@@ -1,0 +1,312 @@
+<!doctype html>
+<html>
+<head>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"><title>nf_gammaFunctions.cc source code [codebrowser/source/processes/hadronic/models/lend/src/nf_gammaFunctions.cc] - Woboq Code Browser</title>
+<link rel="stylesheet" href="../../../../../../../../data/qtcreator.css" title="QtCreator"/>
+<link rel="alternate stylesheet" href="../../../../../../../../data/kdevelop.css" title="KDevelop"/>
+<script type="text/javascript" src="../../../../../../../../data/jquery/jquery.min.js"></script>
+<script type="text/javascript" src="../../../../../../../../data/jquery/jquery-ui.min.js"></script>
+<script>var file = 'codebrowser/source/processes/hadronic/models/lend/src/nf_gammaFunctions.cc'; var root_path = '../../../../../../..'; var data_path = '../../../../../../../../data';</script>
+<script src='../../../../../../../../data/codebrowser.js'></script>
+</head>
+<body><div id='header'><h1 id='breadcrumb'><span>Browse the source code of </span><a href='../../../../../..'>codebrowser</a>/<a href='../../../../..'>source</a>/<a href='../../../..'>processes</a>/<a href='../../..'>hadronic</a>/<a href='../..'>models</a>/<a href='..'>lend</a>/<a href='./'>src</a>/<a href='nf_gammaFunctions.cc.html'>nf_gammaFunctions.cc</a></h1></div>
+<hr/><div id='content'><table class="code">
+<tr><th id="1">1</th><td><i>/*                            gamma.c</i></td></tr>
+<tr><th id="2">2</th><td><i> *</i></td></tr>
+<tr><th id="3">3</th><td><i> *    Gamma function</i></td></tr>
+<tr><th id="4">4</th><td><i> *</i></td></tr>
+<tr><th id="5">5</th><td><i> * DESCRIPTION:</i></td></tr>
+<tr><th id="6">6</th><td><i> *</i></td></tr>
+<tr><th id="7">7</th><td><i> * Returns gamma function of the argument.  The result is</i></td></tr>
+<tr><th id="8">8</th><td><i> * correctly signed, and the sign (+1 or -1) is also</i></td></tr>
+<tr><th id="9">9</th><td><i> * returned in a global (extern) variable named sgngam.</i></td></tr>
+<tr><th id="10">10</th><td><i> * This variable is also filled in by the logarithmic gamma</i></td></tr>
+<tr><th id="11">11</th><td><i> * function lgam().</i></td></tr>
+<tr><th id="12">12</th><td><i> *</i></td></tr>
+<tr><th id="13">13</th><td><i> * Arguments |x| &lt;= 34 are reduced by recurrence and the function</i></td></tr>
+<tr><th id="14">14</th><td><i> * approximated by a rational function of degree 6/7 in the</i></td></tr>
+<tr><th id="15">15</th><td><i> * interval (2,3).  Large arguments are handled by Stirling's</i></td></tr>
+<tr><th id="16">16</th><td><i> * formula. Large negative arguments are made positive using</i></td></tr>
+<tr><th id="17">17</th><td><i> * a reflection formula.  </i></td></tr>
+<tr><th id="18">18</th><td><i> *</i></td></tr>
+<tr><th id="19">19</th><td><i> *</i></td></tr>
+<tr><th id="20">20</th><td><i> * ACCURACY:</i></td></tr>
+<tr><th id="21">21</th><td><i> *</i></td></tr>
+<tr><th id="22">22</th><td><i> *                      Relative error:</i></td></tr>
+<tr><th id="23">23</th><td><i> * arithmetic   domain     # trials      peak         rms</i></td></tr>
+<tr><th id="24">24</th><td><i> *    IEEE    -170,-33      20000       2.3e-15     3.3e-16</i></td></tr>
+<tr><th id="25">25</th><td><i> *    IEEE     -33,  33     20000       9.4e-16     2.2e-16</i></td></tr>
+<tr><th id="26">26</th><td><i> *    IEEE      33, 171.6   20000       2.3e-15     3.2e-16</i></td></tr>
+<tr><th id="27">27</th><td><i> *</i></td></tr>
+<tr><th id="28">28</th><td><i> * Error for arguments outside the test range will be larger</i></td></tr>
+<tr><th id="29">29</th><td><i> * owing to error amplification by the exponential function.</i></td></tr>
+<tr><th id="30">30</th><td><i> *</i></td></tr>
+<tr><th id="31">31</th><td><i> */</i></td></tr>
+<tr><th id="32">32</th><td><i>/*                            lgam()</i></td></tr>
+<tr><th id="33">33</th><td><i> *</i></td></tr>
+<tr><th id="34">34</th><td><i> *    Natural logarithm of gamma function</i></td></tr>
+<tr><th id="35">35</th><td><i> *</i></td></tr>
+<tr><th id="36">36</th><td><i> *</i></td></tr>
+<tr><th id="37">37</th><td><i> * DESCRIPTION:</i></td></tr>
+<tr><th id="38">38</th><td><i> *</i></td></tr>
+<tr><th id="39">39</th><td><i> * Returns the base e (2.718...) logarithm of the absolute</i></td></tr>
+<tr><th id="40">40</th><td><i> * value of the gamma function of the argument.</i></td></tr>
+<tr><th id="41">41</th><td><i> * The sign (+1 or -1) of the gamma function is returned in a</i></td></tr>
+<tr><th id="42">42</th><td><i> * global (extern) variable named sgngam.</i></td></tr>
+<tr><th id="43">43</th><td><i> *</i></td></tr>
+<tr><th id="44">44</th><td><i> * For arguments greater than 13, the logarithm of the gamma</i></td></tr>
+<tr><th id="45">45</th><td><i> * function is approximated by the logarithmic version of</i></td></tr>
+<tr><th id="46">46</th><td><i> * Stirling's formula using a polynomial approximation of</i></td></tr>
+<tr><th id="47">47</th><td><i> * degree 4. Arguments between -33 and +33 are reduced by</i></td></tr>
+<tr><th id="48">48</th><td><i> * recurrence to the interval [2,3] of a rational approximation.</i></td></tr>
+<tr><th id="49">49</th><td><i> * The cosecant reflection formula is employed for arguments</i></td></tr>
+<tr><th id="50">50</th><td><i> * less than -33.</i></td></tr>
+<tr><th id="51">51</th><td><i> *</i></td></tr>
+<tr><th id="52">52</th><td><i> * Arguments greater than MAXLGM return DBL_MAX and an error</i></td></tr>
+<tr><th id="53">53</th><td><i> * message.  MAXLGM = 2.556348e305 for IEEE arithmetic.</i></td></tr>
+<tr><th id="54">54</th><td><i> *</i></td></tr>
+<tr><th id="55">55</th><td><i> *</i></td></tr>
+<tr><th id="56">56</th><td><i> * ACCURACY:</i></td></tr>
+<tr><th id="57">57</th><td><i> *</i></td></tr>
+<tr><th id="58">58</th><td><i> * arithmetic      domain        # trials     peak         rms</i></td></tr>
+<tr><th id="59">59</th><td><i> *    IEEE    0, 3                 28000     5.4e-16     1.1e-16</i></td></tr>
+<tr><th id="60">60</th><td><i> *    IEEE    2.718, 2.556e305     40000     3.5e-16     8.3e-17</i></td></tr>
+<tr><th id="61">61</th><td><i> * The error criterion was relative when the function magnitude</i></td></tr>
+<tr><th id="62">62</th><td><i> * was greater than one but absolute when it was less than one.</i></td></tr>
+<tr><th id="63">63</th><td><i> *</i></td></tr>
+<tr><th id="64">64</th><td><i> * The following test used the relative error criterion, though</i></td></tr>
+<tr><th id="65">65</th><td><i> * at certain points the relative error could be much higher than</i></td></tr>
+<tr><th id="66">66</th><td><i> * indicated.</i></td></tr>
+<tr><th id="67">67</th><td><i> *    IEEE    -200, -4             10000     4.8e-16     1.3e-16</i></td></tr>
+<tr><th id="68">68</th><td><i> *</i></td></tr>
+<tr><th id="69">69</th><td><i> */</i></td></tr>
+<tr><th id="70">70</th><td><i>/*                            gamma.c    */</i></td></tr>
+<tr><th id="71">71</th><td><i>/*    gamma function    */</i></td></tr>
+<tr><th id="72">72</th><td></td></tr>
+<tr><th id="73">73</th><td><i>/*</i></td></tr>
+<tr><th id="74">74</th><td><i>Cephes Math Library Release 2.8:  June, 2000</i></td></tr>
+<tr><th id="75">75</th><td><i>Copyright 1984, 1987, 1989, 1992, 2000 by Stephen L. Moshier</i></td></tr>
+<tr><th id="76">76</th><td><i>*/</i></td></tr>
+<tr><th id="77">77</th><td></td></tr>
+<tr><th id="78">78</th><td><u>#include <a href="../include/nf_specialFunctions.h.html">"nf_specialFunctions.h"</a></u></td></tr>
+<tr><th id="79">79</th><td></td></tr>
+<tr><th id="80">80</th><td><u>#<span data-ppcond="80">if</span> defined <span class="macro" data-ref="_M/__cplusplus">__cplusplus</span></u></td></tr>
+<tr><th id="81">81</th><td><u>#include <a href="../../../../../global/management/include/G4Exp.hh.html">"G4Exp.hh"</a></u></td></tr>
+<tr><th id="82">82</th><td><u>#include <a href="../../../../../global/management/include/G4Log.hh.html">"G4Log.hh"</a></u></td></tr>
+<tr><th id="83">83</th><td><u>#include <a href="../../../../../global/management/include/G4Pow.hh.html">"G4Pow.hh"</a></u></td></tr>
+<tr><th id="84">84</th><td><b>namespace</b> <span class="namespace">GIDI</span> {</td></tr>
+<tr><th id="85">85</th><td><b>using</b> <b>namespace</b> <span class="namespace">GIDI</span>;</td></tr>
+<tr><th id="86">86</th><td><b>using</b> <b>namespace</b> <span class="namespace">std</span>;</td></tr>
+<tr><th id="87">87</th><td><u>#<span data-ppcond="80">endif</span></u></td></tr>
+<tr><th id="88">88</th><td></td></tr>
+<tr><th id="89">89</th><td><em>static</em> <em>double</em> <dfn class="tu decl def" id="GIDI::P" title='GIDI::P' data-type='double [7]' data-ref="GIDI::P">P</dfn>[] = { <var>1.60119522476751861407E-4</var>, <var>1.19135147006586384913E-3</var>, <var>1.04213797561761569935E-2</var>, <var>4.76367800457137231464E-2</var>,</td></tr>
+<tr><th id="90">90</th><td>                      <var>2.07448227648435975150E-1</var>, <var>4.94214826801497100753E-1</var>, <var>9.99999999999999996796E-1</var> };</td></tr>
+<tr><th id="91">91</th><td><em>static</em> <em>double</em> <dfn class="tu decl def" id="GIDI::Q" title='GIDI::Q' data-type='double [8]' data-ref="GIDI::Q">Q</dfn>[] = { -<var>2.31581873324120129819E-5</var>, <var>5.39605580493303397842E-4</var>, -<var>4.45641913851797240494E-3</var>, <var>1.18139785222060435552E-2</var>,</td></tr>
+<tr><th id="92">92</th><td>                       <var>3.58236398605498653373E-2</var>, -<var>2.34591795718243348568E-1</var>, <var>7.14304917030273074085E-2</var>, <var>1.00000000000000000320E0</var> };</td></tr>
+<tr><th id="93">93</th><td><u>#define <dfn class="macro" id="_M/MAXGAM" data-ref="_M/MAXGAM">MAXGAM</dfn> 171.624376956302725</u></td></tr>
+<tr><th id="94">94</th><td><em>static</em> <em>double</em> <dfn class="tu decl def" id="GIDI::LOGPI" title='GIDI::LOGPI' data-type='double' data-ref="GIDI::LOGPI">LOGPI</dfn> = <var>1.14472988584940017414</var>;</td></tr>
+<tr><th id="95">95</th><td><em>static</em> <em>double</em> <dfn class="tu decl def" id="GIDI::SQTPI" title='GIDI::SQTPI' data-type='double' data-ref="GIDI::SQTPI">SQTPI</dfn> = <var>2.50662827463100050242E0</var>;</td></tr>
+<tr><th id="96">96</th><td></td></tr>
+<tr><th id="97">97</th><td><i  data-doc="GIDI::STIR">/* Stirling's formula for the gamma function */</i></td></tr>
+<tr><th id="98">98</th><td><em>static</em> <em>double</em> <dfn class="tu decl def" id="GIDI::STIR" title='GIDI::STIR' data-type='double [5]' data-ref="GIDI::STIR">STIR</dfn>[<var>5</var>] = { <var>7.873113957930936284e-4</var>, -<var>2.2954996161337812638e-4</var>, -<var>2.6813261780578123283e-3</var>, <var>3.472222216054586673e-3</var>, <var>8.3333333333348225713e-2</var> };</td></tr>
+<tr><th id="99">99</th><td><u>#define <dfn class="macro" id="_M/MAXSTIR" data-ref="_M/MAXSTIR">MAXSTIR</dfn> 143.01608</u></td></tr>
+<tr><th id="100">100</th><td></td></tr>
+<tr><th id="101">101</th><td><em>static</em> <em>double</em> <a class="tu decl" href="#_ZN4GIDIL5stirfEdPNS_12nfu_status_eE" title='GIDI::stirf' data-type='double GIDI::stirf(double x, nfu_status * status)' data-ref="_ZN4GIDIL5stirfEdPNS_12nfu_status_eE">stirf</a>( <em>double</em> <dfn class="local col1 decl" id="1x" title='x' data-type='double' data-ref="1x">x</dfn>, <a class="typedef" href="../include/nf_utilities.h.html#GIDI::nfu_status" title='GIDI::nfu_status' data-type='enum nfu_status_e' data-ref="GIDI::nfu_status">nfu_status</a> *<dfn class="local col2 decl" id="2status" title='status' data-type='nfu_status *' data-ref="2status">status</dfn> );</td></tr>
+<tr><th id="102">102</th><td><em>static</em> <em>double</em> <a class="tu decl" href="#_ZN4GIDIL4lgamEdPiPNS_12nfu_status_eE" title='GIDI::lgam' data-type='double GIDI::lgam(double x, int * sgngam, nfu_status * status)' data-ref="_ZN4GIDIL4lgamEdPiPNS_12nfu_status_eE">lgam</a>( <em>double</em> <dfn class="local col3 decl" id="3x" title='x' data-type='double' data-ref="3x">x</dfn>, <em>int</em> *<dfn class="local col4 decl" id="4sgngam" title='sgngam' data-type='int *' data-ref="4sgngam">sgngam</dfn>, <a class="typedef" href="../include/nf_utilities.h.html#GIDI::nfu_status" title='GIDI::nfu_status' data-type='enum nfu_status_e' data-ref="GIDI::nfu_status">nfu_status</a> *<dfn class="local col5 decl" id="5status" title='status' data-type='nfu_status *' data-ref="5status">status</dfn> );</td></tr>
+<tr><th id="103">103</th><td><i  data-doc="_ZN4GIDIL5stirfEdPNS_12nfu_status_eE">/*</i></td></tr>
+<tr><th id="104">104</th><td><i  data-doc="_ZN4GIDIL5stirfEdPNS_12nfu_status_eE">************************************************************</i></td></tr>
+<tr><th id="105">105</th><td><i  data-doc="_ZN4GIDIL5stirfEdPNS_12nfu_status_eE">*/</i></td></tr>
+<tr><th id="106">106</th><td><em>static</em> <em>double</em> <dfn class="tu decl def" id="_ZN4GIDIL5stirfEdPNS_12nfu_status_eE" title='GIDI::stirf' data-type='double GIDI::stirf(double x, nfu_status * )' data-ref="_ZN4GIDIL5stirfEdPNS_12nfu_status_eE">stirf</dfn>( <em>double</em> <dfn class="local col6 decl" id="6x" title='x' data-type='double' data-ref="6x">x</dfn>, <a class="typedef" href="../include/nf_utilities.h.html#GIDI::nfu_status" title='GIDI::nfu_status' data-type='enum nfu_status_e' data-ref="GIDI::nfu_status">nfu_status</a> * <i  data-doc="_ZN4GIDIL5stirfEdPNS_12nfu_status_eE">/*status*/</i> ) {</td></tr>
+<tr><th id="107">107</th><td><i>/* Gamma function computed by Stirling's formula. The polynomial STIR is valid for 33 &lt;= x &lt;= 172.  */</i></td></tr>
+<tr><th id="108">108</th><td></td></tr>
+<tr><th id="109">109</th><td>    <em>double</em> <dfn class="local col7 decl" id="7y" title='y' data-type='double' data-ref="7y">y</dfn>, <dfn class="local col8 decl" id="8w" title='w' data-type='double' data-ref="8w">w</dfn>, <dfn class="local col9 decl" id="9v" title='v' data-type='double' data-ref="9v">v</dfn>;</td></tr>
+<tr><th id="110">110</th><td></td></tr>
+<tr><th id="111">111</th><td>    <a class="local col8 ref" href="#8w" title='w' data-ref="8w">w</a> = <var>1.0</var> / <a class="local col6 ref" href="#6x" title='x' data-ref="6x">x</a>;</td></tr>
+<tr><th id="112">112</th><td>    <a class="local col8 ref" href="#8w" title='w' data-ref="8w">w</a> = <var>1.0</var> + <a class="local col8 ref" href="#8w" title='w' data-ref="8w">w</a> * <a class="ref" href="../include/nf_specialFunctions.h.html#GIDI::nf_polevl" title='GIDI::nf_polevl' data-ref="GIDI::nf_polevl">nf_polevl</a>( <a class="local col8 ref" href="#8w" title='w' data-ref="8w">w</a>, <a class="tu ref" href="#GIDI::STIR" title='GIDI::STIR' data-use='r' data-ref="GIDI::STIR">STIR</a>, <var>4</var> );</td></tr>
+<tr><th id="113">113</th><td>    <a class="local col7 ref" href="#7y" title='y' data-ref="7y">y</a> = <a class="ref" href="../../../../../global/management/include/G4Exp.hh.html#_Z5G4Expd" title='G4Exp' data-ref="_Z5G4Expd">G4Exp</a>( <a class="local col6 ref" href="#6x" title='x' data-ref="6x">x</a> );</td></tr>
+<tr><th id="114">114</th><td>    <b>if</b>( <a class="local col6 ref" href="#6x" title='x' data-ref="6x">x</a> &gt; <a class="macro" href="#99" title="143.01608" data-ref="_M/MAXSTIR">MAXSTIR</a> ) {                     <i>/* Avoid overflow in pow() */</i></td></tr>
+<tr><th id="115">115</th><td>        <a class="local col9 ref" href="#9v" title='v' data-ref="9v">v</a> = <a class="type" href="../../../../../global/management/include/G4Pow.hh.html#G4Pow" title='G4Pow' data-ref="G4Pow">G4Pow</a>::<a class="ref" href="../../../../../global/management/include/G4Pow.hh.html#_ZN5G4Pow11GetInstanceEv" title='G4Pow::GetInstance' data-ref="_ZN5G4Pow11GetInstanceEv">GetInstance</a>()-&gt;<a class="ref" href="../../../../../global/management/include/G4Pow.hh.html#_ZNK5G4Pow4powAEdd" title='G4Pow::powA' data-ref="_ZNK5G4Pow4powAEdd">powA</a>( <a class="local col6 ref" href="#6x" title='x' data-ref="6x">x</a>, <var>0.5</var> * <a class="local col6 ref" href="#6x" title='x' data-ref="6x">x</a> - <var>0.25</var> );</td></tr>
+<tr><th id="116">116</th><td>        <a class="local col7 ref" href="#7y" title='y' data-ref="7y">y</a> = <a class="local col9 ref" href="#9v" title='v' data-ref="9v">v</a> * (<a class="local col9 ref" href="#9v" title='v' data-ref="9v">v</a> / <a class="local col7 ref" href="#7y" title='y' data-ref="7y">y</a>); }</td></tr>
+<tr><th id="117">117</th><td>    <b>else</b> {</td></tr>
+<tr><th id="118">118</th><td>        <a class="local col7 ref" href="#7y" title='y' data-ref="7y">y</a> = <a class="type" href="../../../../../global/management/include/G4Pow.hh.html#G4Pow" title='G4Pow' data-ref="G4Pow">G4Pow</a>::<a class="ref" href="../../../../../global/management/include/G4Pow.hh.html#_ZN5G4Pow11GetInstanceEv" title='G4Pow::GetInstance' data-ref="_ZN5G4Pow11GetInstanceEv">GetInstance</a>()-&gt;<a class="ref" href="../../../../../global/management/include/G4Pow.hh.html#_ZNK5G4Pow4powAEdd" title='G4Pow::powA' data-ref="_ZNK5G4Pow4powAEdd">powA</a>( <a class="local col6 ref" href="#6x" title='x' data-ref="6x">x</a>, <a class="local col6 ref" href="#6x" title='x' data-ref="6x">x</a> - <var>0.5</var> ) / <a class="local col7 ref" href="#7y" title='y' data-ref="7y">y</a>;</td></tr>
+<tr><th id="119">119</th><td>    }</td></tr>
+<tr><th id="120">120</th><td>    <a class="local col7 ref" href="#7y" title='y' data-ref="7y">y</a> = <a class="tu ref" href="#GIDI::SQTPI" title='GIDI::SQTPI' data-use='r' data-ref="GIDI::SQTPI">SQTPI</a> * <a class="local col7 ref" href="#7y" title='y' data-ref="7y">y</a> * <a class="local col8 ref" href="#8w" title='w' data-ref="8w">w</a>;</td></tr>
+<tr><th id="121">121</th><td>    <b>return</b>( <a class="local col7 ref" href="#7y" title='y' data-ref="7y">y</a> );</td></tr>
+<tr><th id="122">122</th><td>}</td></tr>
+<tr><th id="123">123</th><td><i>/*</i></td></tr>
+<tr><th id="124">124</th><td><i>************************************************************</i></td></tr>
+<tr><th id="125">125</th><td><i>*/</i></td></tr>
+<tr><th id="126">126</th><td><em>double</em> <dfn class="decl def" id="GIDI::nf_gammaFunction" title='GIDI::nf_gammaFunction' data-ref="GIDI::nf_gammaFunction">nf_gammaFunction</dfn>( <em>double</em> <dfn class="local col0 decl" id="10x" title='x' data-type='double' data-ref="10x">x</dfn>, <a class="typedef" href="../include/nf_utilities.h.html#GIDI::nfu_status" title='GIDI::nfu_status' data-type='enum nfu_status_e' data-ref="GIDI::nfu_status">nfu_status</a> *<dfn class="local col1 decl" id="11status" title='status' data-type='nfu_status *' data-ref="11status">status</dfn> ) {</td></tr>
+<tr><th id="127">127</th><td></td></tr>
+<tr><th id="128">128</th><td>    <em>double</em> <dfn class="local col2 decl" id="12p" title='p' data-type='double' data-ref="12p">p</dfn>, <dfn class="local col3 decl" id="13q" title='q' data-type='double' data-ref="13q">q</dfn>, <dfn class="local col4 decl" id="14z" title='z' data-type='double' data-ref="14z">z</dfn>;</td></tr>
+<tr><th id="129">129</th><td>    <em>int</em> <dfn class="local col5 decl" id="15i" title='i' data-type='int' data-ref="15i">i</dfn>, <dfn class="local col6 decl" id="16sgngam" title='sgngam' data-type='int' data-ref="16sgngam">sgngam</dfn> = <var>1</var>;</td></tr>
+<tr><th id="130">130</th><td></td></tr>
+<tr><th id="131">131</th><td>    *<a class="local col1 ref" href="#11status" title='status' data-ref="11status">status</a> = <a class="enum" href="../include/nf_utilities.h.html#GIDI::nfu_status_e::nfu_badInput" title='GIDI::nfu_status_e::nfu_badInput' data-ref="GIDI::nfu_status_e::nfu_badInput">nfu_badInput</a>;</td></tr>
+<tr><th id="132">132</th><td>    <b>if</b>( !<span class='error' title="use of undeclared identifier &apos;isfinite&apos;">isfinite</span>( x ) ) <b>return</b>( <a class="local col0 ref" href="#10x" title='x' data-ref="10x">x</a> );</td></tr>
+<tr><th id="133">133</th><td>    *<a class="local col1 ref" href="#11status" title='status' data-ref="11status">status</a> = <a class="enum" href="../include/nf_utilities.h.html#GIDI::nfu_status_e::nfu_Okay" title='GIDI::nfu_status_e::nfu_Okay' data-ref="GIDI::nfu_status_e::nfu_Okay">nfu_Okay</a>;</td></tr>
+<tr><th id="134">134</th><td></td></tr>
+<tr><th id="135">135</th><td>    q = <span class='error' title="use of undeclared identifier &apos;fabs&apos;">fabs</span>( x );</td></tr>
+<tr><th id="136">136</th><td></td></tr>
+<tr><th id="137">137</th><td>    <b>if</b>( <a class="local col3 ref" href="#13q" title='q' data-ref="13q">q</a> &gt; <var>33.0</var> ) {</td></tr>
+<tr><th id="138">138</th><td>        <b>if</b>( <a class="local col0 ref" href="#10x" title='x' data-ref="10x">x</a> &lt; <var>0.0</var> ) {</td></tr>
+<tr><th id="139">139</th><td>            p = <span class='error' title="use of undeclared identifier &apos;floor&apos;">floor</span>( q );</td></tr>
+<tr><th id="140">140</th><td>            <b>if</b>( <a class="local col2 ref" href="#12p" title='p' data-ref="12p">p</a> == <a class="local col3 ref" href="#13q" title='q' data-ref="13q">q</a> ) <b>goto</b> <a class="lbl" href="#17goverf" data-ref="17goverf">goverf</a>;</td></tr>
+<tr><th id="141">141</th><td>            <a class="local col5 ref" href="#15i" title='i' data-ref="15i">i</a> = (<em>int</em>) <a class="local col2 ref" href="#12p" title='p' data-ref="12p">p</a>;</td></tr>
+<tr><th id="142">142</th><td>            <b>if</b>( ( <a class="local col5 ref" href="#15i" title='i' data-ref="15i">i</a> &amp; <var>1</var> ) == <var>0</var> ) <a class="local col6 ref" href="#16sgngam" title='sgngam' data-ref="16sgngam">sgngam</a> = -<var>1</var>;</td></tr>
+<tr><th id="143">143</th><td>            <a class="local col4 ref" href="#14z" title='z' data-ref="14z">z</a> = <a class="local col3 ref" href="#13q" title='q' data-ref="13q">q</a> - <a class="local col2 ref" href="#12p" title='p' data-ref="12p">p</a>;</td></tr>
+<tr><th id="144">144</th><td>            <b>if</b>( <a class="local col4 ref" href="#14z" title='z' data-ref="14z">z</a> &gt; <var>0.5</var> ) {</td></tr>
+<tr><th id="145">145</th><td>                <a class="local col2 ref" href="#12p" title='p' data-ref="12p">p</a> += <var>1.0</var>;</td></tr>
+<tr><th id="146">146</th><td>                <a class="local col4 ref" href="#14z" title='z' data-ref="14z">z</a> = <a class="local col3 ref" href="#13q" title='q' data-ref="13q">q</a> - <a class="local col2 ref" href="#12p" title='p' data-ref="12p">p</a>;</td></tr>
+<tr><th id="147">147</th><td>            }</td></tr>
+<tr><th id="148">148</th><td>            z = q * sin( <span class='error' title="use of undeclared identifier &apos;M_PI&apos;">M_PI</span> * z );</td></tr>
+<tr><th id="149">149</th><td>            <b>if</b>( <a class="local col4 ref" href="#14z" title='z' data-ref="14z">z</a> == <var>0.0</var> ) <b>goto</b> <a class="lbl" href="#17goverf" data-ref="17goverf">goverf</a>;</td></tr>
+<tr><th id="150">150</th><td>            z = <span class='error' title="use of undeclared identifier &apos;M_PI&apos;">M_PI</span> / ( <span class='error' title="use of undeclared identifier &apos;fabs&apos;">fabs</span>( z ) * stirf( q, status ) );</td></tr>
+<tr><th id="151">151</th><td>        }</td></tr>
+<tr><th id="152">152</th><td>        <b>else</b> {</td></tr>
+<tr><th id="153">153</th><td>            <a class="local col4 ref" href="#14z" title='z' data-ref="14z">z</a> = <a class="tu ref" href="#_ZN4GIDIL5stirfEdPNS_12nfu_status_eE" title='GIDI::stirf' data-use='c' data-ref="_ZN4GIDIL5stirfEdPNS_12nfu_status_eE">stirf</a>( <a class="local col0 ref" href="#10x" title='x' data-ref="10x">x</a>, <a class="local col1 ref" href="#11status" title='status' data-ref="11status">status</a> );</td></tr>
+<tr><th id="154">154</th><td>        }</td></tr>
+<tr><th id="155">155</th><td>        <b>return</b>( <a class="local col6 ref" href="#16sgngam" title='sgngam' data-ref="16sgngam">sgngam</a> * <a class="local col4 ref" href="#14z" title='z' data-ref="14z">z</a> );</td></tr>
+<tr><th id="156">156</th><td>    }</td></tr>
+<tr><th id="157">157</th><td></td></tr>
+<tr><th id="158">158</th><td>    <a class="local col4 ref" href="#14z" title='z' data-ref="14z">z</a> = <var>1.0</var>;</td></tr>
+<tr><th id="159">159</th><td>    <b>while</b>( <a class="local col0 ref" href="#10x" title='x' data-ref="10x">x</a> &gt;= <var>3.0</var> ) {</td></tr>
+<tr><th id="160">160</th><td>        <a class="local col0 ref" href="#10x" title='x' data-ref="10x">x</a> -= <var>1.0</var>;</td></tr>
+<tr><th id="161">161</th><td>        <a class="local col4 ref" href="#14z" title='z' data-ref="14z">z</a> *= <a class="local col0 ref" href="#10x" title='x' data-ref="10x">x</a>;</td></tr>
+<tr><th id="162">162</th><td>    } <i>// Loop checking, 11.06.2015, T. Koi</i></td></tr>
+<tr><th id="163">163</th><td></td></tr>
+<tr><th id="164">164</th><td>    <b>while</b>( <a class="local col0 ref" href="#10x" title='x' data-ref="10x">x</a> &lt; <var>0.0</var> ) {</td></tr>
+<tr><th id="165">165</th><td>        <b>if</b>( <a class="local col0 ref" href="#10x" title='x' data-ref="10x">x</a> &gt; -<var>1.E-9</var> ) <b>goto</b> <a class="lbl" href="#18small" data-ref="18small">small</a>;</td></tr>
+<tr><th id="166">166</th><td>        <a class="local col4 ref" href="#14z" title='z' data-ref="14z">z</a> /= <a class="local col0 ref" href="#10x" title='x' data-ref="10x">x</a>;</td></tr>
+<tr><th id="167">167</th><td>        <a class="local col0 ref" href="#10x" title='x' data-ref="10x">x</a> += <var>1.0</var>;</td></tr>
+<tr><th id="168">168</th><td>    } <i>// Loop checking, 11.06.2015, T. Koi</i></td></tr>
+<tr><th id="169">169</th><td></td></tr>
+<tr><th id="170">170</th><td>    <b>while</b>( <a class="local col0 ref" href="#10x" title='x' data-ref="10x">x</a> &lt; <var>2.0</var> ) {</td></tr>
+<tr><th id="171">171</th><td>        <b>if</b>( <a class="local col0 ref" href="#10x" title='x' data-ref="10x">x</a> &lt; <var>1.e-9</var> ) <b>goto</b> <a class="lbl" href="#18small" data-ref="18small">small</a>;</td></tr>
+<tr><th id="172">172</th><td>        <a class="local col4 ref" href="#14z" title='z' data-ref="14z">z</a> /= <a class="local col0 ref" href="#10x" title='x' data-ref="10x">x</a>;</td></tr>
+<tr><th id="173">173</th><td>        <a class="local col0 ref" href="#10x" title='x' data-ref="10x">x</a> += <var>1.0</var>;</td></tr>
+<tr><th id="174">174</th><td>    } <i>// Loop checking, 11.06.2015, T. Koi</i></td></tr>
+<tr><th id="175">175</th><td></td></tr>
+<tr><th id="176">176</th><td>    <b>if</b>( <a class="local col0 ref" href="#10x" title='x' data-ref="10x">x</a> == <var>2.0</var> ) <b>return</b>( <a class="local col4 ref" href="#14z" title='z' data-ref="14z">z</a> );</td></tr>
+<tr><th id="177">177</th><td></td></tr>
+<tr><th id="178">178</th><td>    <a class="local col0 ref" href="#10x" title='x' data-ref="10x">x</a> -= <var>2.0</var>;</td></tr>
+<tr><th id="179">179</th><td>    <a class="local col2 ref" href="#12p" title='p' data-ref="12p">p</a> = <a class="ref" href="../include/nf_specialFunctions.h.html#GIDI::nf_polevl" title='GIDI::nf_polevl' data-ref="GIDI::nf_polevl">nf_polevl</a>( <a class="local col0 ref" href="#10x" title='x' data-ref="10x">x</a>, <a class="tu ref" href="#GIDI::P" title='GIDI::P' data-use='r' data-ref="GIDI::P">P</a>, <var>6</var> );</td></tr>
+<tr><th id="180">180</th><td>    <a class="local col3 ref" href="#13q" title='q' data-ref="13q">q</a> = <a class="ref" href="../include/nf_specialFunctions.h.html#GIDI::nf_polevl" title='GIDI::nf_polevl' data-ref="GIDI::nf_polevl">nf_polevl</a>( <a class="local col0 ref" href="#10x" title='x' data-ref="10x">x</a>, <a class="tu ref" href="#GIDI::Q" title='GIDI::Q' data-use='r' data-ref="GIDI::Q">Q</a>, <var>7</var> );</td></tr>
+<tr><th id="181">181</th><td>    <b>return</b>( <a class="local col4 ref" href="#14z" title='z' data-ref="14z">z</a> * <a class="local col2 ref" href="#12p" title='p' data-ref="12p">p</a> / <a class="local col3 ref" href="#13q" title='q' data-ref="13q">q</a> );</td></tr>
+<tr><th id="182">182</th><td></td></tr>
+<tr><th id="183">183</th><td><dfn class="lbl" id="18small" data-ref="18small">small</dfn>:</td></tr>
+<tr><th id="184">184</th><td>    <b>if</b>( <a class="local col0 ref" href="#10x" title='x' data-ref="10x">x</a> == <var>0.0</var> ) <b>goto</b> <a class="lbl" href="#17goverf" data-ref="17goverf">goverf</a>;</td></tr>
+<tr><th id="185">185</th><td>    <b>return</b>( <a class="local col4 ref" href="#14z" title='z' data-ref="14z">z</a> / ( ( <var>1.0</var> + <var>0.5772156649015329</var> * <a class="local col0 ref" href="#10x" title='x' data-ref="10x">x</a> ) * <a class="local col0 ref" href="#10x" title='x' data-ref="10x">x</a> ) );</td></tr>
+<tr><th id="186">186</th><td></td></tr>
+<tr><th id="187">187</th><td><dfn class="lbl" id="17goverf" data-ref="17goverf">goverf</dfn>:</td></tr>
+<tr><th id="188">188</th><td>    <b>return</b>( <a class="local col6 ref" href="#16sgngam" title='sgngam' data-ref="16sgngam">sgngam</a> * <span class="macro" title="1.7976931348623157e+308" data-ref="_M/DBL_MAX">DBL_MAX</span> );</td></tr>
+<tr><th id="189">189</th><td>}</td></tr>
+<tr><th id="190">190</th><td></td></tr>
+<tr><th id="191">191</th><td><i  data-doc="GIDI::A">/* A[]: Stirling's formula expansion of log gamma</i></td></tr>
+<tr><th id="192">192</th><td><i  data-doc="GIDI::A">*  B[], C[]: log gamma function between 2 and 3</i></td></tr>
+<tr><th id="193">193</th><td><i  data-doc="GIDI::A">*/</i></td></tr>
+<tr><th id="194">194</th><td><em>static</em> <em>double</em> <dfn class="tu decl def" id="GIDI::A" title='GIDI::A' data-type='double [5]' data-ref="GIDI::A">A</dfn>[] = { <var>8.11614167470508450300E-4</var>, -<var>5.95061904284301438324E-4</var>, <var>7.93650340457716943945E-4</var>,</td></tr>
+<tr><th id="195">195</th><td>                     -<var>2.77777777730099687205E-3</var>, <var>8.33333333333331927722E-2</var> };</td></tr>
+<tr><th id="196">196</th><td><em>static</em> <em>double</em> <dfn class="tu decl def" id="GIDI::B" title='GIDI::B' data-type='double [6]' data-ref="GIDI::B">B</dfn>[] = { -<var>1.37825152569120859100E3</var>, -<var>3.88016315134637840924E4</var>, -<var>3.31612992738871184744E5</var>,</td></tr>
+<tr><th id="197">197</th><td>                      -<var>1.16237097492762307383E6</var>, -<var>1.72173700820839662146E6</var>, -<var>8.53555664245765465627E5</var> };</td></tr>
+<tr><th id="198">198</th><td><em>static</em> <em>double</em> <dfn class="tu decl def" id="GIDI::C" title='GIDI::C' data-type='double [6]' data-ref="GIDI::C">C</dfn>[] = { -<var>3.51815701436523470549E2</var>, -<var>1.70642106651881159223E4</var>, -<var>2.20528590553854454839E5</var>,</td></tr>
+<tr><th id="199">199</th><td>                      -<var>1.13933444367982507207E6</var>, -<var>2.53252307177582951285E6</var>, -<var>2.01889141433532773231E6</var> };</td></tr>
+<tr><th id="200">200</th><td><em>static</em> <em>double</em> <dfn class="tu decl def" id="GIDI::LS2PI" title='GIDI::LS2PI' data-type='double' data-ref="GIDI::LS2PI">LS2PI</dfn>  =  <var>0.91893853320467274178</var>;     <i  data-doc="GIDI::LS2PI">/* log( sqrt( 2*pi ) ) */</i></td></tr>
+<tr><th id="201">201</th><td><u>#define <dfn class="macro" id="_M/MAXLGM" data-ref="_M/MAXLGM">MAXLGM</dfn> 2.556348e305</u></td></tr>
+<tr><th id="202">202</th><td></td></tr>
+<tr><th id="203">203</th><td><i>/*</i></td></tr>
+<tr><th id="204">204</th><td><i>************************************************************</i></td></tr>
+<tr><th id="205">205</th><td><i>*/</i></td></tr>
+<tr><th id="206">206</th><td><em>double</em> <dfn class="decl def" id="GIDI::nf_logGammaFunction" title='GIDI::nf_logGammaFunction' data-ref="GIDI::nf_logGammaFunction">nf_logGammaFunction</dfn>( <em>double</em> <dfn class="local col9 decl" id="19x" title='x' data-type='double' data-ref="19x">x</dfn>, <a class="typedef" href="../include/nf_utilities.h.html#GIDI::nfu_status" title='GIDI::nfu_status' data-type='enum nfu_status_e' data-ref="GIDI::nfu_status">nfu_status</a> *<dfn class="local col0 decl" id="20status" title='status' data-type='nfu_status *' data-ref="20status">status</dfn> ) {</td></tr>
+<tr><th id="207">207</th><td><i>/* Logarithm of gamma function */</i></td></tr>
+<tr><th id="208">208</th><td></td></tr>
+<tr><th id="209">209</th><td>    <em>int</em> <dfn class="local col1 decl" id="21sgngam" title='sgngam' data-type='int' data-ref="21sgngam">sgngam</dfn>;</td></tr>
+<tr><th id="210">210</th><td></td></tr>
+<tr><th id="211">211</th><td>    *<a class="local col0 ref" href="#20status" title='status' data-ref="20status">status</a> = <a class="enum" href="../include/nf_utilities.h.html#GIDI::nfu_status_e::nfu_badInput" title='GIDI::nfu_status_e::nfu_badInput' data-ref="GIDI::nfu_status_e::nfu_badInput">nfu_badInput</a>;</td></tr>
+<tr><th id="212">212</th><td>    <b>if</b>( !<span class='error' title="use of undeclared identifier &apos;isfinite&apos;">isfinite</span>( x ) ) <b>return</b>( <a class="local col9 ref" href="#19x" title='x' data-ref="19x">x</a> );</td></tr>
+<tr><th id="213">213</th><td>    *<a class="local col0 ref" href="#20status" title='status' data-ref="20status">status</a> = <a class="enum" href="../include/nf_utilities.h.html#GIDI::nfu_status_e::nfu_Okay" title='GIDI::nfu_status_e::nfu_Okay' data-ref="GIDI::nfu_status_e::nfu_Okay">nfu_Okay</a>;</td></tr>
+<tr><th id="214">214</th><td>    <b>return</b>( <a class="tu ref" href="#_ZN4GIDIL4lgamEdPiPNS_12nfu_status_eE" title='GIDI::lgam' data-use='c' data-ref="_ZN4GIDIL4lgamEdPiPNS_12nfu_status_eE">lgam</a>( <a class="local col9 ref" href="#19x" title='x' data-ref="19x">x</a>, &amp;<a class="local col1 ref" href="#21sgngam" title='sgngam' data-ref="21sgngam">sgngam</a>, <a class="local col0 ref" href="#20status" title='status' data-ref="20status">status</a> ) );</td></tr>
+<tr><th id="215">215</th><td>}</td></tr>
+<tr><th id="216">216</th><td><i  data-doc="_ZN4GIDIL4lgamEdPiPNS_12nfu_status_eE">/*</i></td></tr>
+<tr><th id="217">217</th><td><i  data-doc="_ZN4GIDIL4lgamEdPiPNS_12nfu_status_eE">************************************************************</i></td></tr>
+<tr><th id="218">218</th><td><i  data-doc="_ZN4GIDIL4lgamEdPiPNS_12nfu_status_eE">*/</i></td></tr>
+<tr><th id="219">219</th><td><em>static</em> <em>double</em> <dfn class="tu decl def" id="_ZN4GIDIL4lgamEdPiPNS_12nfu_status_eE" title='GIDI::lgam' data-type='double GIDI::lgam(double x, int * sgngam, nfu_status * status)' data-ref="_ZN4GIDIL4lgamEdPiPNS_12nfu_status_eE">lgam</dfn>( <em>double</em> <dfn class="local col2 decl" id="22x" title='x' data-type='double' data-ref="22x">x</dfn>, <em>int</em> *<dfn class="local col3 decl" id="23sgngam" title='sgngam' data-type='int *' data-ref="23sgngam">sgngam</dfn>, <a class="typedef" href="../include/nf_utilities.h.html#GIDI::nfu_status" title='GIDI::nfu_status' data-type='enum nfu_status_e' data-ref="GIDI::nfu_status">nfu_status</a> *<dfn class="local col4 decl" id="24status" title='status' data-type='nfu_status *' data-ref="24status">status</dfn> ) {</td></tr>
+<tr><th id="220">220</th><td></td></tr>
+<tr><th id="221">221</th><td>    <em>double</em> <dfn class="local col5 decl" id="25p" title='p' data-type='double' data-ref="25p">p</dfn>, <dfn class="local col6 decl" id="26q" title='q' data-type='double' data-ref="26q">q</dfn>, <dfn class="local col7 decl" id="27u" title='u' data-type='double' data-ref="27u">u</dfn>, <dfn class="local col8 decl" id="28w" title='w' data-type='double' data-ref="28w">w</dfn>, <dfn class="local col9 decl" id="29z" title='z' data-type='double' data-ref="29z">z</dfn>;</td></tr>
+<tr><th id="222">222</th><td>    <em>int</em> <dfn class="local col0 decl" id="30i" title='i' data-type='int' data-ref="30i">i</dfn>;</td></tr>
+<tr><th id="223">223</th><td></td></tr>
+<tr><th id="224">224</th><td>    *<a class="local col3 ref" href="#23sgngam" title='sgngam' data-ref="23sgngam">sgngam</a> = <var>1</var>;</td></tr>
+<tr><th id="225">225</th><td></td></tr>
+<tr><th id="226">226</th><td>    <b>if</b>( <a class="local col2 ref" href="#22x" title='x' data-ref="22x">x</a> &lt; -<var>34.0</var> ) {</td></tr>
+<tr><th id="227">227</th><td>        <a class="local col6 ref" href="#26q" title='q' data-ref="26q">q</a> = -<a class="local col2 ref" href="#22x" title='x' data-ref="22x">x</a>;</td></tr>
+<tr><th id="228">228</th><td>        <a class="local col8 ref" href="#28w" title='w' data-ref="28w">w</a> = <a class="tu ref" href="#_ZN4GIDIL4lgamEdPiPNS_12nfu_status_eE" title='GIDI::lgam' data-use='c' data-ref="_ZN4GIDIL4lgamEdPiPNS_12nfu_status_eE">lgam</a>( <a class="local col6 ref" href="#26q" title='q' data-ref="26q">q</a>, <a class="local col3 ref" href="#23sgngam" title='sgngam' data-ref="23sgngam">sgngam</a>, <a class="local col4 ref" href="#24status" title='status' data-ref="24status">status</a> );                  <i>/* note this modifies *sgngam! */</i></td></tr>
+<tr><th id="229">229</th><td>        p = <span class='error' title="use of undeclared identifier &apos;floor&apos;">floor</span>( q );</td></tr>
+<tr><th id="230">230</th><td>        <b>if</b>( <a class="local col5 ref" href="#25p" title='p' data-ref="25p">p</a> == <a class="local col6 ref" href="#26q" title='q' data-ref="26q">q</a> ) <b>goto</b> <a class="lbl" href="#31lgsing" data-ref="31lgsing">lgsing</a>;</td></tr>
+<tr><th id="231">231</th><td>        <a class="local col0 ref" href="#30i" title='i' data-ref="30i">i</a> = (<em>int</em>) <a class="local col5 ref" href="#25p" title='p' data-ref="25p">p</a>;</td></tr>
+<tr><th id="232">232</th><td>        <b>if</b>( ( <a class="local col0 ref" href="#30i" title='i' data-ref="30i">i</a> &amp; <var>1</var> ) == <var>0</var> ) {</td></tr>
+<tr><th id="233">233</th><td>            *<a class="local col3 ref" href="#23sgngam" title='sgngam' data-ref="23sgngam">sgngam</a> = -<var>1</var>; }</td></tr>
+<tr><th id="234">234</th><td>        <b>else</b> {</td></tr>
+<tr><th id="235">235</th><td>            *<a class="local col3 ref" href="#23sgngam" title='sgngam' data-ref="23sgngam">sgngam</a> = <var>1</var>;</td></tr>
+<tr><th id="236">236</th><td>        }</td></tr>
+<tr><th id="237">237</th><td>        <a class="local col9 ref" href="#29z" title='z' data-ref="29z">z</a> = <a class="local col6 ref" href="#26q" title='q' data-ref="26q">q</a> - <a class="local col5 ref" href="#25p" title='p' data-ref="25p">p</a>;</td></tr>
+<tr><th id="238">238</th><td>        <b>if</b>( <a class="local col9 ref" href="#29z" title='z' data-ref="29z">z</a> &gt; <var>0.5</var> ) {</td></tr>
+<tr><th id="239">239</th><td>            <a class="local col5 ref" href="#25p" title='p' data-ref="25p">p</a> += <var>1.0</var>;</td></tr>
+<tr><th id="240">240</th><td>            <a class="local col9 ref" href="#29z" title='z' data-ref="29z">z</a> = <a class="local col5 ref" href="#25p" title='p' data-ref="25p">p</a> - <a class="local col6 ref" href="#26q" title='q' data-ref="26q">q</a>;</td></tr>
+<tr><th id="241">241</th><td>        }</td></tr>
+<tr><th id="242">242</th><td>        z = q * sin( <span class='error' title="use of undeclared identifier &apos;M_PI&apos;">M_PI</span> * z );</td></tr>
+<tr><th id="243">243</th><td>        <b>if</b>( <a class="local col9 ref" href="#29z" title='z' data-ref="29z">z</a> == <var>0.0</var> ) <b>goto</b> <a class="lbl" href="#31lgsing" data-ref="31lgsing">lgsing</a>;</td></tr>
+<tr><th id="244">244</th><td>        <a class="local col9 ref" href="#29z" title='z' data-ref="29z">z</a> = <a class="tu ref" href="#GIDI::LOGPI" title='GIDI::LOGPI' data-use='r' data-ref="GIDI::LOGPI">LOGPI</a> - <a class="ref" href="../../../../../global/management/include/G4Log.hh.html#_Z5G4Logd" title='G4Log' data-ref="_Z5G4Logd">G4Log</a>( <a class="local col9 ref" href="#29z" title='z' data-ref="29z">z</a> ) - <a class="local col8 ref" href="#28w" title='w' data-ref="28w">w</a>;</td></tr>
+<tr><th id="245">245</th><td>        <b>return</b>( <a class="local col9 ref" href="#29z" title='z' data-ref="29z">z</a> );</td></tr>
+<tr><th id="246">246</th><td>    }</td></tr>
+<tr><th id="247">247</th><td></td></tr>
+<tr><th id="248">248</th><td>    <b>if</b>( <a class="local col2 ref" href="#22x" title='x' data-ref="22x">x</a> &lt; <var>13.0</var> ) {</td></tr>
+<tr><th id="249">249</th><td>        <a class="local col9 ref" href="#29z" title='z' data-ref="29z">z</a> = <var>1.0</var>;</td></tr>
+<tr><th id="250">250</th><td>        <a class="local col5 ref" href="#25p" title='p' data-ref="25p">p</a> = <var>0.0</var>;</td></tr>
+<tr><th id="251">251</th><td>        <a class="local col7 ref" href="#27u" title='u' data-ref="27u">u</a> = <a class="local col2 ref" href="#22x" title='x' data-ref="22x">x</a>;</td></tr>
+<tr><th id="252">252</th><td>        <b>while</b>( <a class="local col7 ref" href="#27u" title='u' data-ref="27u">u</a> &gt;= <var>3.0</var> ) {</td></tr>
+<tr><th id="253">253</th><td>            <a class="local col5 ref" href="#25p" title='p' data-ref="25p">p</a> -= <var>1.0</var>;</td></tr>
+<tr><th id="254">254</th><td>            <a class="local col7 ref" href="#27u" title='u' data-ref="27u">u</a> = <a class="local col2 ref" href="#22x" title='x' data-ref="22x">x</a> + <a class="local col5 ref" href="#25p" title='p' data-ref="25p">p</a>;</td></tr>
+<tr><th id="255">255</th><td>            <a class="local col9 ref" href="#29z" title='z' data-ref="29z">z</a> *= <a class="local col7 ref" href="#27u" title='u' data-ref="27u">u</a>;</td></tr>
+<tr><th id="256">256</th><td>        } <i>// Loop checking, 11.06.2015, T. Koi</i></td></tr>
+<tr><th id="257">257</th><td>        <b>while</b>( <a class="local col7 ref" href="#27u" title='u' data-ref="27u">u</a> &lt; <var>2.0</var> ) {</td></tr>
+<tr><th id="258">258</th><td>            <b>if</b>( <a class="local col7 ref" href="#27u" title='u' data-ref="27u">u</a> == <var>0.0</var> ) <b>goto</b> <a class="lbl" href="#31lgsing" data-ref="31lgsing">lgsing</a>;</td></tr>
+<tr><th id="259">259</th><td>            <a class="local col9 ref" href="#29z" title='z' data-ref="29z">z</a> /= <a class="local col7 ref" href="#27u" title='u' data-ref="27u">u</a>;</td></tr>
+<tr><th id="260">260</th><td>            <a class="local col5 ref" href="#25p" title='p' data-ref="25p">p</a> += <var>1.0</var>;</td></tr>
+<tr><th id="261">261</th><td>            <a class="local col7 ref" href="#27u" title='u' data-ref="27u">u</a> = <a class="local col2 ref" href="#22x" title='x' data-ref="22x">x</a> + <a class="local col5 ref" href="#25p" title='p' data-ref="25p">p</a>;</td></tr>
+<tr><th id="262">262</th><td>        } <i>// Loop checking, 11.06.2015, T. Koi</i></td></tr>
+<tr><th id="263">263</th><td>        <b>if</b>( <a class="local col9 ref" href="#29z" title='z' data-ref="29z">z</a> &lt; <var>0.0</var> ) {</td></tr>
+<tr><th id="264">264</th><td>            *<a class="local col3 ref" href="#23sgngam" title='sgngam' data-ref="23sgngam">sgngam</a> = -<var>1</var>;</td></tr>
+<tr><th id="265">265</th><td>            <a class="local col9 ref" href="#29z" title='z' data-ref="29z">z</a> = -<a class="local col9 ref" href="#29z" title='z' data-ref="29z">z</a>; }</td></tr>
+<tr><th id="266">266</th><td>        <b>else</b> {</td></tr>
+<tr><th id="267">267</th><td>            *<a class="local col3 ref" href="#23sgngam" title='sgngam' data-ref="23sgngam">sgngam</a> = <var>1</var>;</td></tr>
+<tr><th id="268">268</th><td>        }</td></tr>
+<tr><th id="269">269</th><td>        <b>if</b>( <a class="local col7 ref" href="#27u" title='u' data-ref="27u">u</a> == <var>2.0</var> ) <b>return</b>( <a class="ref" href="../../../../../global/management/include/G4Log.hh.html#_Z5G4Logd" title='G4Log' data-ref="_Z5G4Logd">G4Log</a>( <a class="local col9 ref" href="#29z" title='z' data-ref="29z">z</a> ) );</td></tr>
+<tr><th id="270">270</th><td>        <a class="local col5 ref" href="#25p" title='p' data-ref="25p">p</a> -= <var>2.0</var>;</td></tr>
+<tr><th id="271">271</th><td>        <a class="local col2 ref" href="#22x" title='x' data-ref="22x">x</a> = <a class="local col2 ref" href="#22x" title='x' data-ref="22x">x</a> + <a class="local col5 ref" href="#25p" title='p' data-ref="25p">p</a>;</td></tr>
+<tr><th id="272">272</th><td>        <a class="local col5 ref" href="#25p" title='p' data-ref="25p">p</a> = <a class="local col2 ref" href="#22x" title='x' data-ref="22x">x</a> * <a class="ref" href="../include/nf_specialFunctions.h.html#GIDI::nf_polevl" title='GIDI::nf_polevl' data-ref="GIDI::nf_polevl">nf_polevl</a>( <a class="local col2 ref" href="#22x" title='x' data-ref="22x">x</a>, <a class="tu ref" href="#GIDI::B" title='GIDI::B' data-use='r' data-ref="GIDI::B">B</a>, <var>5</var> ) / <a class="ref" href="../include/nf_specialFunctions.h.html#GIDI::nf_p1evl" title='GIDI::nf_p1evl' data-ref="GIDI::nf_p1evl">nf_p1evl</a>( <a class="local col2 ref" href="#22x" title='x' data-ref="22x">x</a>, <a class="tu ref" href="#GIDI::C" title='GIDI::C' data-use='r' data-ref="GIDI::C">C</a>, <var>6</var>);</td></tr>
+<tr><th id="273">273</th><td>        <b>return</b>( <a class="ref" href="../../../../../global/management/include/G4Log.hh.html#_Z5G4Logd" title='G4Log' data-ref="_Z5G4Logd">G4Log</a>( <a class="local col9 ref" href="#29z" title='z' data-ref="29z">z</a> ) + <a class="local col5 ref" href="#25p" title='p' data-ref="25p">p</a> );</td></tr>
+<tr><th id="274">274</th><td>    }</td></tr>
+<tr><th id="275">275</th><td></td></tr>
+<tr><th id="276">276</th><td>    <b>if</b>( <a class="local col2 ref" href="#22x" title='x' data-ref="22x">x</a> &gt; <a class="macro" href="#201" title="2.556348e305" data-ref="_M/MAXLGM">MAXLGM</a> ) <b>goto</b> <a class="lbl" href="#31lgsing" data-ref="31lgsing">lgsing</a>;</td></tr>
+<tr><th id="277">277</th><td>    <a class="local col6 ref" href="#26q" title='q' data-ref="26q">q</a> = ( <a class="local col2 ref" href="#22x" title='x' data-ref="22x">x</a> - <var>0.5</var> ) * <a class="ref" href="../../../../../global/management/include/G4Log.hh.html#_Z5G4Logd" title='G4Log' data-ref="_Z5G4Logd">G4Log</a>( <a class="local col2 ref" href="#22x" title='x' data-ref="22x">x</a> ) - <a class="local col2 ref" href="#22x" title='x' data-ref="22x">x</a> + <a class="tu ref" href="#GIDI::LS2PI" title='GIDI::LS2PI' data-use='r' data-ref="GIDI::LS2PI">LS2PI</a>;</td></tr>
+<tr><th id="278">278</th><td>    <b>if</b>( <a class="local col2 ref" href="#22x" title='x' data-ref="22x">x</a> &gt; <var>1.0e8</var> ) <b>return</b>( <a class="local col6 ref" href="#26q" title='q' data-ref="26q">q</a> );</td></tr>
+<tr><th id="279">279</th><td></td></tr>
+<tr><th id="280">280</th><td>    <a class="local col5 ref" href="#25p" title='p' data-ref="25p">p</a> = <var>1.0</var> / ( <a class="local col2 ref" href="#22x" title='x' data-ref="22x">x</a> * <a class="local col2 ref" href="#22x" title='x' data-ref="22x">x</a> );</td></tr>
+<tr><th id="281">281</th><td>    <b>if</b>( <a class="local col2 ref" href="#22x" title='x' data-ref="22x">x</a> &gt;= <var>1000.0</var> ) {</td></tr>
+<tr><th id="282">282</th><td>        <a class="local col6 ref" href="#26q" title='q' data-ref="26q">q</a> += ( ( <var>7.9365079365079365079365e-4</var> * <a class="local col5 ref" href="#25p" title='p' data-ref="25p">p</a> - <var>2.7777777777777777777778e-3</var> ) * <a class="local col5 ref" href="#25p" title='p' data-ref="25p">p</a> + <var>0.0833333333333333333333</var> ) / <a class="local col2 ref" href="#22x" title='x' data-ref="22x">x</a>; }</td></tr>
+<tr><th id="283">283</th><td>    <b>else</b> {</td></tr>
+<tr><th id="284">284</th><td>        <a class="local col6 ref" href="#26q" title='q' data-ref="26q">q</a> += <a class="ref" href="../include/nf_specialFunctions.h.html#GIDI::nf_polevl" title='GIDI::nf_polevl' data-ref="GIDI::nf_polevl">nf_polevl</a>( <a class="local col5 ref" href="#25p" title='p' data-ref="25p">p</a>, <a class="tu ref" href="#GIDI::A" title='GIDI::A' data-use='r' data-ref="GIDI::A">A</a>, <var>4</var> ) / <a class="local col2 ref" href="#22x" title='x' data-ref="22x">x</a>;</td></tr>
+<tr><th id="285">285</th><td>    }</td></tr>
+<tr><th id="286">286</th><td>    <b>return</b>( <a class="local col6 ref" href="#26q" title='q' data-ref="26q">q</a> );</td></tr>
+<tr><th id="287">287</th><td></td></tr>
+<tr><th id="288">288</th><td><dfn class="lbl" id="31lgsing" data-ref="31lgsing">lgsing</dfn>:</td></tr>
+<tr><th id="289">289</th><td>    <b>return</b>( *<a class="local col3 ref" href="#23sgngam" title='sgngam' data-ref="23sgngam">sgngam</a> * <span class="macro" title="1.7976931348623157e+308" data-ref="_M/DBL_MAX">DBL_MAX</span> );</td></tr>
+<tr><th id="290">290</th><td>}</td></tr>
+<tr><th id="291">291</th><td></td></tr>
+<tr><th id="292">292</th><td><u>#<span data-ppcond="292">if</span> defined <span class="macro" data-ref="_M/__cplusplus">__cplusplus</span></u></td></tr>
+<tr><th id="293">293</th><td>}</td></tr>
+<tr><th id="294">294</th><td><u>#<span data-ppcond="292">endif</span></u></td></tr>
+<tr><th id="295">295</th><td></td></tr>
+</table><hr/><p id='footer'>
+Generated on <em>2019-Aug-28</em> from project codebrowser<br />Powered by <a href='https://woboq.com'><img alt='Woboq' src='https://code.woboq.org/woboq-16.png' width='41' height='16' /></a> <a href='https://code.woboq.org'>Code Browser</a> 2.1
+<br/>Generator usage only permitted with license.</p>
+</div></body></html>

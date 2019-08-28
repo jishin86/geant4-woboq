@@ -1,0 +1,133 @@
+<!doctype html>
+<html>
+<head>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"><title>RanshiEngine.h source code [codebrowser/source/externals/clhep/include/CLHEP/Random/RanshiEngine.h] - Woboq Code Browser</title>
+<meta name="woboq:interestingDefinitions" content="CLHEP::RanshiEngine "/>
+<link rel="stylesheet" href="../../../../../../../../data/qtcreator.css" title="QtCreator"/>
+<link rel="alternate stylesheet" href="../../../../../../../../data/kdevelop.css" title="KDevelop"/>
+<script type="text/javascript" src="../../../../../../../../data/jquery/jquery.min.js"></script>
+<script type="text/javascript" src="../../../../../../../../data/jquery/jquery-ui.min.js"></script>
+<script>var file = 'codebrowser/source/externals/clhep/include/CLHEP/Random/RanshiEngine.h'; var root_path = '../../../../../../..'; var data_path = '../../../../../../../../data';</script>
+<script src='../../../../../../../../data/codebrowser.js'></script>
+</head>
+<body><div id='header'><h1 id='breadcrumb'><span>Browse the source code of </span><a href='../../../../../..'>codebrowser</a>/<a href='../../../../..'>source</a>/<a href='../../../..'>externals</a>/<a href='../../..'>clhep</a>/<a href='../..'>include</a>/<a href='..'>CLHEP</a>/<a href='./'>Random</a>/<a href='RanshiEngine.h.html'>RanshiEngine.h</a></h1></div>
+<hr/><div id='content'><table class="code">
+<tr><th id="1">1</th><td><i>// -*- C++ -*-</i></td></tr>
+<tr><th id="2">2</th><td><i>//</i></td></tr>
+<tr><th id="3">3</th><td><i>// -----------------------------------------------------------------------</i></td></tr>
+<tr><th id="4">4</th><td><i>//                           HEP Random</i></td></tr>
+<tr><th id="5">5</th><td><i>//                      --- RanshiEngine ---</i></td></tr>
+<tr><th id="6">6</th><td><i>//                       class header file</i></td></tr>
+<tr><th id="7">7</th><td><i>// -----------------------------------------------------------------------</i></td></tr>
+<tr><th id="8">8</th><td><i>//</i></td></tr>
+<tr><th id="9">9</th><td><i>//</i></td></tr>
+<tr><th id="10">10</th><td><i>// The algorithm for this random engine was taken from "F.Gutbrod, Comp.</i></td></tr>
+<tr><th id="11">11</th><td><i>// Phys. Comm. 87 (1995) 291-306".</i></td></tr>
+<tr><th id="12">12</th><td><i>//</i></td></tr>
+<tr><th id="13">13</th><td><i>// The algorithm can be imagined as a physical system as follows: Imagine</i></td></tr>
+<tr><th id="14">14</th><td><i>// 512 "black balls" each with their own unique spin, and positions char- </i></td></tr>
+<tr><th id="15">15</th><td><i>// acterized by disrete angles, where the spin is a 32-bit unsigned integer.</i></td></tr>
+<tr><th id="16">16</th><td><i>// A "red ball" collides based upon the angle determined by the last 8 bits</i></td></tr>
+<tr><th id="17">17</th><td><i>// of its spin, and the spin of the colliding ball is taken as the output</i></td></tr>
+<tr><th id="18">18</th><td><i>// random number. The spin of the colliding ball is replaced then with the</i></td></tr>
+<tr><th id="19">19</th><td><i>// left circular shift of the black ball's spin XOR'd with the red ball's</i></td></tr>
+<tr><th id="20">20</th><td><i>// spin. The black ball's old spin becomes the red ball's.</i></td></tr>
+<tr><th id="21">21</th><td><i>//</i></td></tr>
+<tr><th id="22">22</th><td><i>// To avoid the traps presented, two measures are taken: first, the red </i></td></tr>
+<tr><th id="23">23</th><td><i>// ball will oscillate between hitting the lower half of the buffer on one</i></td></tr>
+<tr><th id="24">24</th><td><i>// turn and the upper half on another; second, the red ball's spin is </i></td></tr>
+<tr><th id="25">25</th><td><i>// incremented by a counter of the number of random numbers produced.</i></td></tr>
+<tr><th id="26">26</th><td><i>//</i></td></tr>
+<tr><th id="27">27</th><td><i>// The result is scaled to a double precision floating point number to which</i></td></tr>
+<tr><th id="28">28</th><td><i>// is added another random double further scaled 2^(53-32) places to the</i></td></tr>
+<tr><th id="29">29</th><td><i>// right in order to ensure that the remaining bits of the result are not </i></td></tr>
+<tr><th id="30">30</th><td><i>// left empty due to the mere 32 bits representation used internally.</i></td></tr>
+<tr><th id="31">31</th><td><i></i></td></tr>
+<tr><th id="32">32</th><td><i>// =======================================================================</i></td></tr>
+<tr><th id="33">33</th><td><i>// Ken Smith      - Created: 9th June 1998</i></td></tr>
+<tr><th id="34">34</th><td><i>//                - Removed pow() from flat method: 21st Jul 1998</i></td></tr>
+<tr><th id="35">35</th><td><i>//                - Added conversion operators:  6th Aug 1998</i></td></tr>
+<tr><th id="36">36</th><td><i>// Mark Fischler    Methods put, get for instance save/restore 12/8/04    </i></td></tr>
+<tr><th id="37">37</th><td><i>// Mark Fischler    methods for anonymous save/restore 12/27/04    </i></td></tr>
+<tr><th id="38">38</th><td><i>// =======================================================================</i></td></tr>
+<tr><th id="39">39</th><td></td></tr>
+<tr><th id="40">40</th><td><u>#<span data-ppcond="40">ifndef</span> <span class="macro" data-ref="_M/HepRanshiEngine_h">HepRanshiEngine_h</span></u></td></tr>
+<tr><th id="41">41</th><td><u>#define <dfn class="macro" id="_M/HepRanshiEngine_h" data-ref="_M/HepRanshiEngine_h">HepRanshiEngine_h</dfn></u></td></tr>
+<tr><th id="42">42</th><td></td></tr>
+<tr><th id="43">43</th><td><u>#include <a href="RandomEngine.h.html">"CLHEP/Random/RandomEngine.h"</a></u></td></tr>
+<tr><th id="44">44</th><td></td></tr>
+<tr><th id="45">45</th><td><b>namespace</b> <span class="namespace">CLHEP</span> {</td></tr>
+<tr><th id="46">46</th><td></td></tr>
+<tr><th id="47">47</th><td><i class="doc">/**</i></td></tr>
+<tr><th id="48">48</th><td><i class="doc"> * <span class="command">@author</span></i></td></tr>
+<tr><th id="49">49</th><td><i class="doc"> * <span class="command">@ingroup</span> <span class="verb">random</span></i></td></tr>
+<tr><th id="50">50</th><td><i class="doc"> */</i></td></tr>
+<tr><th id="51">51</th><td><b>class</b> <dfn class="type def" id="CLHEP::RanshiEngine" title='CLHEP::RanshiEngine' data-ref="CLHEP::RanshiEngine">RanshiEngine</dfn>: <b>public</b> <a class="type" href="RandomEngine.h.html#CLHEP::HepRandomEngine" title='CLHEP::HepRandomEngine' data-ref="CLHEP::HepRandomEngine">HepRandomEngine</a> {</td></tr>
+<tr><th id="52">52</th><td> </td></tr>
+<tr><th id="53">53</th><td><b>public</b>:</td></tr>
+<tr><th id="54">54</th><td></td></tr>
+<tr><th id="55">55</th><td>    <dfn class="decl" id="_ZN5CLHEP12RanshiEngineC1Ev" title='CLHEP::RanshiEngine::RanshiEngine' data-ref="_ZN5CLHEP12RanshiEngineC1Ev">RanshiEngine</dfn>();</td></tr>
+<tr><th id="56">56</th><td>    RanshiEngine(<span class='error' title="use of undeclared identifier &apos;std&apos;">std</span>::istream &amp;is);</td></tr>
+<tr><th id="57">57</th><td>    <dfn class="decl" id="_ZN5CLHEP12RanshiEngineC1El" title='CLHEP::RanshiEngine::RanshiEngine' data-ref="_ZN5CLHEP12RanshiEngineC1El">RanshiEngine</dfn>(<em>long</em> <dfn class="local col9 decl" id="329seed" title='seed' data-type='long' data-ref="329seed">seed</dfn>);</td></tr>
+<tr><th id="58">58</th><td>    <dfn class="decl" id="_ZN5CLHEP12RanshiEngineC1Eii" title='CLHEP::RanshiEngine::RanshiEngine' data-ref="_ZN5CLHEP12RanshiEngineC1Eii">RanshiEngine</dfn>(<em>int</em> <dfn class="local col0 decl" id="330rowIndex" title='rowIndex' data-type='int' data-ref="330rowIndex">rowIndex</dfn>, <em>int</em> <dfn class="local col1 decl" id="331colIndex" title='colIndex' data-type='int' data-ref="331colIndex">colIndex</dfn>);</td></tr>
+<tr><th id="59">59</th><td>    <b>virtual</b> <dfn class="virtual decl" id="_ZN5CLHEP12RanshiEngineD1Ev" title='CLHEP::RanshiEngine::~RanshiEngine' data-ref="_ZN5CLHEP12RanshiEngineD1Ev">~RanshiEngine</dfn>();</td></tr>
+<tr><th id="60">60</th><td>    <i>// Constructors and destructor</i></td></tr>
+<tr><th id="61">61</th><td></td></tr>
+<tr><th id="62">62</th><td>    <em>double</em> <dfn class="virtual decl" id="_ZN5CLHEP12RanshiEngine4flatEv" title='CLHEP::RanshiEngine::flat' data-ref="_ZN5CLHEP12RanshiEngine4flatEv">flat</dfn>();</td></tr>
+<tr><th id="63">63</th><td>    <i>// Returns a pseudo random number between 0 and 1</i></td></tr>
+<tr><th id="64">64</th><td></td></tr>
+<tr><th id="65">65</th><td>    <em>void</em> <dfn class="virtual decl" id="_ZN5CLHEP12RanshiEngine9flatArrayEiPd" title='CLHEP::RanshiEngine::flatArray' data-ref="_ZN5CLHEP12RanshiEngine9flatArrayEiPd">flatArray</dfn>(<em>const</em> <em>int</em> <dfn class="local col2 decl" id="332size" title='size' data-type='const int' data-ref="332size">size</dfn>, <em>double</em>* <dfn class="local col3 decl" id="333vect" title='vect' data-type='double *' data-ref="333vect">vect</dfn>);</td></tr>
+<tr><th id="66">66</th><td>    <i>// Fills the array "vect" of specified size with flat random values</i></td></tr>
+<tr><th id="67">67</th><td></td></tr>
+<tr><th id="68">68</th><td>    <em>void</em> <dfn class="virtual decl" id="_ZN5CLHEP12RanshiEngine7setSeedEli" title='CLHEP::RanshiEngine::setSeed' data-ref="_ZN5CLHEP12RanshiEngine7setSeedEli">setSeed</dfn>(<em>long</em> <dfn class="local col4 decl" id="334seed" title='seed' data-type='long' data-ref="334seed">seed</dfn>, <em>int</em>);</td></tr>
+<tr><th id="69">69</th><td>    <i>// Sets the state of the algorithm according to seed.</i></td></tr>
+<tr><th id="70">70</th><td></td></tr>
+<tr><th id="71">71</th><td>    <em>void</em> <dfn class="virtual decl" id="_ZN5CLHEP12RanshiEngine8setSeedsEPKli" title='CLHEP::RanshiEngine::setSeeds' data-ref="_ZN5CLHEP12RanshiEngine8setSeedsEPKli">setSeeds</dfn>(<em>const</em> <em>long</em>* <dfn class="local col5 decl" id="335seeds" title='seeds' data-type='const long *' data-ref="335seeds">seeds</dfn>, <em>int</em>);</td></tr>
+<tr><th id="72">72</th><td>    <i>// Sets the state of the algorithm according to the zero-terminated</i></td></tr>
+<tr><th id="73">73</th><td><i>    // array of seeds. </i></td></tr>
+<tr><th id="74">74</th><td></td></tr>
+<tr><th id="75">75</th><td>    <em>void</em> <dfn class="virtual decl" id="_ZNK5CLHEP12RanshiEngine10saveStatusEPKc" title='CLHEP::RanshiEngine::saveStatus' data-ref="_ZNK5CLHEP12RanshiEngine10saveStatusEPKc">saveStatus</dfn>(<em>const</em> <em>char</em> <dfn class="local col6 decl" id="336filename" title='filename' data-type='const char *' data-ref="336filename">filename</dfn>[] = <q>"RanshiEngine.conf"</q>) <em>const</em>;</td></tr>
+<tr><th id="76">76</th><td>    <i>// Saves on named file the current engine status</i></td></tr>
+<tr><th id="77">77</th><td></td></tr>
+<tr><th id="78">78</th><td>    <em>void</em> <dfn class="virtual decl" id="_ZN5CLHEP12RanshiEngine13restoreStatusEPKc" title='CLHEP::RanshiEngine::restoreStatus' data-ref="_ZN5CLHEP12RanshiEngine13restoreStatusEPKc">restoreStatus</dfn>(<em>const</em> <em>char</em> <dfn class="local col7 decl" id="337filename" title='filename' data-type='const char *' data-ref="337filename">filename</dfn>[] = <q>"RanshiEngine.conf"</q>);</td></tr>
+<tr><th id="79">79</th><td>    <i>// Reads from named file the last saved engine status</i></td></tr>
+<tr><th id="80">80</th><td><i>    // and restores it.</i></td></tr>
+<tr><th id="81">81</th><td></td></tr>
+<tr><th id="82">82</th><td>    <em>void</em> <dfn class="virtual decl" id="_ZNK5CLHEP12RanshiEngine10showStatusEv" title='CLHEP::RanshiEngine::showStatus' data-ref="_ZNK5CLHEP12RanshiEngine10showStatusEv">showStatus</dfn>() <em>const</em>;</td></tr>
+<tr><th id="83">83</th><td>    <i>// Dumps the engine status on the screen</i></td></tr>
+<tr><th id="84">84</th><td></td></tr>
+<tr><th id="85">85</th><td>    <dfn class="virtual decl" id="_ZN5CLHEP12RanshiEnginecvdEv" title='CLHEP::RanshiEngine::operator double' data-ref="_ZN5CLHEP12RanshiEnginecvdEv"><b>operator</b> <em>double</em></dfn>();       <i>// Returns same as flat()</i></td></tr>
+<tr><th id="86">86</th><td>    <dfn class="virtual decl" id="_ZN5CLHEP12RanshiEnginecvfEv" title='CLHEP::RanshiEngine::operator float' data-ref="_ZN5CLHEP12RanshiEnginecvfEv"><b>operator</b> <em>float</em></dfn>();        <i>// flat value, without worrying about filling bits</i></td></tr>
+<tr><th id="87">87</th><td>    <dfn class="virtual decl" id="_ZN5CLHEP12RanshiEnginecvjEv" title='CLHEP::RanshiEngine::operator unsigned int' data-ref="_ZN5CLHEP12RanshiEnginecvjEv"><b>operator</b> <em>unsigned</em></dfn> <em>int</em>(); <i>// 32-bit flat value, quickest of all</i></td></tr>
+<tr><th id="88">88</th><td></td></tr>
+<tr><th id="89">89</th><td>    <b>virtual</b> <span class='error' title="use of undeclared identifier &apos;std&apos;">std</span>::ostream &amp; <dfn class="decl" id="_ZNK5CLHEP12RanshiEngine3putERi" title='CLHEP::RanshiEngine::put' data-ref="_ZNK5CLHEP12RanshiEngine3putERi">put</dfn> (<span class='error' title="use of undeclared identifier &apos;std&apos;">std</span>::ostream &amp; os) <em>const</em>;</td></tr>
+<tr><th id="90">90</th><td>    <b>virtual</b> <span class='error' title="use of undeclared identifier &apos;std&apos;">std</span>::istream &amp; <dfn class="decl" id="_ZN5CLHEP12RanshiEngine3getERi" title='CLHEP::RanshiEngine::get' data-ref="_ZN5CLHEP12RanshiEngine3getERi">get</dfn> (<span class='error' title="use of undeclared identifier &apos;std&apos;">std</span>::istream &amp; is);</td></tr>
+<tr><th id="91">91</th><td>    <em>static</em>  <span class='error' title="use of undeclared identifier &apos;std&apos;">std</span>::string <dfn class="decl" id="_ZN5CLHEP12RanshiEngine8beginTagEv" title='CLHEP::RanshiEngine::beginTag' data-ref="_ZN5CLHEP12RanshiEngine8beginTagEv">beginTag</dfn> ( );</td></tr>
+<tr><th id="92">92</th><td>    <b>virtual</b> <span class='error' title="use of undeclared identifier &apos;std&apos;">std</span>::istream &amp; <dfn class="decl" id="_ZN5CLHEP12RanshiEngine8getStateERi" title='CLHEP::RanshiEngine::getState' data-ref="_ZN5CLHEP12RanshiEngine8getStateERi">getState</dfn> ( <span class='error' title="use of undeclared identifier &apos;std&apos;">std</span>::istream &amp; is );</td></tr>
+<tr><th id="93">93</th><td></td></tr>
+<tr><th id="94">94</th><td>    <span class='error' title="use of undeclared identifier &apos;std&apos;">std</span>::string <dfn class="decl" id="_ZNK5CLHEP12RanshiEngine4nameEv" title='CLHEP::RanshiEngine::name' data-ref="_ZNK5CLHEP12RanshiEngine4nameEv">name</dfn>() <em>const</em>;</td></tr>
+<tr><th id="95">95</th><td>    <em>static</em> <span class='error' title="use of undeclared identifier &apos;std&apos;">std</span>::string <dfn class="decl def" id="_ZN5CLHEP12RanshiEngine10engineNameEv" title='CLHEP::RanshiEngine::engineName' data-ref="_ZN5CLHEP12RanshiEngine10engineNameEv">engineName</dfn>() {<b>return</b> <span class='error' title="cannot initialize return object of type &apos;int&apos; with an lvalue of type &apos;const char [13]&apos;"><q>"RanshiEngine"</q></span>;}</td></tr>
+<tr><th id="96">96</th><td></td></tr>
+<tr><th id="97">97</th><td>    <span class='error' title="use of undeclared identifier &apos;std&apos;">std</span>::vector<span class='error' title="expected member name or &apos;;&apos; after declaration specifiers">&lt;</span><em>unsigned</em> <em>long</em>&gt; put () <em>const</em>;</td></tr>
+<tr><th id="98">98</th><td>    <em>bool</em> get (<em>const</em> <span class='error' title="use of undeclared identifier &apos;std&apos;">std</span>::vector<span class='error' title="expected &apos;)&apos;">&lt;</span><em>unsigned</em> <em>long</em>&gt; &amp; v);</td></tr>
+<tr><th id="99">99</th><td>    <em>bool</em> getState (<em>const</em> <span class='error' title="use of undeclared identifier &apos;std&apos;">std</span>::vector<span class='error' title="expected &apos;)&apos;">&lt;</span><em>unsigned</em> <em>long</em>&gt; &amp; v);</td></tr>
+<tr><th id="100">100</th><td>  </td></tr>
+<tr><th id="101">101</th><td><b>private</b>:</td></tr>
+<tr><th id="102">102</th><td>    <b>enum</b> {<dfn class="enum" id="CLHEP::RanshiEngine::numBuff" title='CLHEP::RanshiEngine::numBuff' data-ref="CLHEP::RanshiEngine::numBuff">numBuff</dfn> = <var>512</var>};</td></tr>
+<tr><th id="103">103</th><td></td></tr>
+<tr><th id="104">104</th><td>    <em>unsigned</em> <em>int</em> <dfn class="decl" id="CLHEP::RanshiEngine::halfBuff" title='CLHEP::RanshiEngine::halfBuff' data-ref="CLHEP::RanshiEngine::halfBuff">halfBuff</dfn>, <dfn class="decl" id="CLHEP::RanshiEngine::numFlats" title='CLHEP::RanshiEngine::numFlats' data-ref="CLHEP::RanshiEngine::numFlats">numFlats</dfn>;</td></tr>
+<tr><th id="105">105</th><td>    <em>unsigned</em> <em>int</em> <dfn class="decl" id="CLHEP::RanshiEngine::buffer" title='CLHEP::RanshiEngine::buffer' data-ref="CLHEP::RanshiEngine::buffer">buffer</dfn>[<a class="enum" href="#CLHEP::RanshiEngine::numBuff" title='CLHEP::RanshiEngine::numBuff' data-ref="CLHEP::RanshiEngine::numBuff">numBuff</a>];</td></tr>
+<tr><th id="106">106</th><td>    <em>unsigned</em> <em>int</em> <dfn class="decl" id="CLHEP::RanshiEngine::redSpin" title='CLHEP::RanshiEngine::redSpin' data-ref="CLHEP::RanshiEngine::redSpin">redSpin</dfn>;</td></tr>
+<tr><th id="107">107</th><td></td></tr>
+<tr><th id="108">108</th><td>    <em>static</em> <em>const</em> <em>unsigned</em> <em>int</em> <dfn class="decl" id="CLHEP::RanshiEngine::VECTOR_STATE_SIZE" title='CLHEP::RanshiEngine::VECTOR_STATE_SIZE' data-ref="CLHEP::RanshiEngine::VECTOR_STATE_SIZE">VECTOR_STATE_SIZE</dfn> = <a class="enum" href="#CLHEP::RanshiEngine::numBuff" title='CLHEP::RanshiEngine::numBuff' data-ref="CLHEP::RanshiEngine::numBuff">numBuff</a> + <var>4</var>;</td></tr>
+<tr><th id="109">109</th><td>  </td></tr>
+<tr><th id="110">110</th><td>}; <i>// RanshiEngine</i></td></tr>
+<tr><th id="111">111</th><td></td></tr>
+<tr><th id="112">112</th><td>}  <i>// namespace CLHEP</i></td></tr>
+<tr><th id="113">113</th><td></td></tr>
+<tr><th id="114">114</th><td><u>#<span data-ppcond="40">endif</span> // HepRanshiEngine_h</u></td></tr>
+<tr><th id="115">115</th><td></td></tr>
+</table><hr/><p id='footer'>
+Generated while processing <a href='../../../../../error_propagation/src/G4ErrorMagFieldLimitProcess.cc.html'>codebrowser/source/error_propagation/src/G4ErrorMagFieldLimitProcess.cc</a><br/>Generated on <em>2019-Aug-28</em> from project codebrowser<br />Powered by <a href='https://woboq.com'><img alt='Woboq' src='https://code.woboq.org/woboq-16.png' width='41' height='16' /></a> <a href='https://code.woboq.org'>Code Browser</a> 2.1
+<br/>Generator usage only permitted with license.</p>
+</div></body></html>

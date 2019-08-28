@@ -1,0 +1,448 @@
+<!doctype html>
+<html>
+<head>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"><title>G4PreCompoundModel.cc source code [codebrowser/source/processes/hadronic/models/pre_equilibrium/exciton_model/src/G4PreCompoundModel.cc] - Woboq Code Browser</title>
+<link rel="stylesheet" href="../../../../../../../../../data/qtcreator.css" title="QtCreator"/>
+<link rel="alternate stylesheet" href="../../../../../../../../../data/kdevelop.css" title="KDevelop"/>
+<script type="text/javascript" src="../../../../../../../../../data/jquery/jquery.min.js"></script>
+<script type="text/javascript" src="../../../../../../../../../data/jquery/jquery-ui.min.js"></script>
+<script>var file = 'codebrowser/source/processes/hadronic/models/pre_equilibrium/exciton_model/src/G4PreCompoundModel.cc'; var root_path = '../../../../../../../..'; var data_path = '../../../../../../../../../data';</script>
+<script src='../../../../../../../../../data/codebrowser.js'></script>
+</head>
+<body><div id='header'><h1 id='breadcrumb'><span>Browse the source code of </span><a href='../../../../../../..'>codebrowser</a>/<a href='../../../../../..'>source</a>/<a href='../../../../..'>processes</a>/<a href='../../../..'>hadronic</a>/<a href='../../..'>models</a>/<a href='../..'>pre_equilibrium</a>/<a href='..'>exciton_model</a>/<a href='./'>src</a>/<a href='G4PreCompoundModel.cc.html'>G4PreCompoundModel.cc</a></h1></div>
+<hr/><div id='content'><table class="code">
+<tr><th id="1">1</th><td><i>//</i></td></tr>
+<tr><th id="2">2</th><td><i>// ********************************************************************</i></td></tr>
+<tr><th id="3">3</th><td><i>// * License and Disclaimer                                           *</i></td></tr>
+<tr><th id="4">4</th><td><i>// *                                                                  *</i></td></tr>
+<tr><th id="5">5</th><td><i>// * The  Geant4 software  is  copyright of the Copyright Holders  of *</i></td></tr>
+<tr><th id="6">6</th><td><i>// * the Geant4 Collaboration.  It is provided  under  the terms  and *</i></td></tr>
+<tr><th id="7">7</th><td><i>// * conditions of the Geant4 Software License,  included in the file *</i></td></tr>
+<tr><th id="8">8</th><td><i>// * LICENSE and available at  <a href="http://cern.ch/geant4/license">http://cern.ch/geant4/license</a> .  These *</i></td></tr>
+<tr><th id="9">9</th><td><i>// * include a list of copyright holders.                             *</i></td></tr>
+<tr><th id="10">10</th><td><i>// *                                                                  *</i></td></tr>
+<tr><th id="11">11</th><td><i>// * Neither the authors of this software system, nor their employing *</i></td></tr>
+<tr><th id="12">12</th><td><i>// * institutes,nor the agencies providing financial support for this *</i></td></tr>
+<tr><th id="13">13</th><td><i>// * work  make  any representation or  warranty, express or implied, *</i></td></tr>
+<tr><th id="14">14</th><td><i>// * regarding  this  software system or assume any liability for its *</i></td></tr>
+<tr><th id="15">15</th><td><i>// * use.  Please see the license in the file  LICENSE  and URL above *</i></td></tr>
+<tr><th id="16">16</th><td><i>// * for the full disclaimer and the limitation of liability.         *</i></td></tr>
+<tr><th id="17">17</th><td><i>// *                                                                  *</i></td></tr>
+<tr><th id="18">18</th><td><i>// * This  code  implementation is the result of  the  scientific and *</i></td></tr>
+<tr><th id="19">19</th><td><i>// * technical work of the GEANT4 collaboration.                      *</i></td></tr>
+<tr><th id="20">20</th><td><i>// * By using,  copying,  modifying or  distributing the software (or *</i></td></tr>
+<tr><th id="21">21</th><td><i>// * any work based  on the software)  you  agree  to acknowledge its *</i></td></tr>
+<tr><th id="22">22</th><td><i>// * use  in  resulting  scientific  publications,  and indicate your *</i></td></tr>
+<tr><th id="23">23</th><td><i>// * acceptance of all terms of the Geant4 Software license.          *</i></td></tr>
+<tr><th id="24">24</th><td><i>// ********************************************************************</i></td></tr>
+<tr><th id="25">25</th><td><i>//</i></td></tr>
+<tr><th id="26">26</th><td><i>//</i></td></tr>
+<tr><th id="27">27</th><td><i>// by V. Lara</i></td></tr>
+<tr><th id="28">28</th><td><i>//</i></td></tr>
+<tr><th id="29">29</th><td><i>// Modified:</i></td></tr>
+<tr><th id="30">30</th><td><i>// 01.04.2008 J.M.Quesada Several changes. Soft cut-off switched off. </i></td></tr>
+<tr><th id="31">31</th><td><i>// 01.05.2008 J.M.Quesada Protection against non-physical preeq. </i></td></tr>
+<tr><th id="32">32</th><td><i>//                        transitional regime has been set</i></td></tr>
+<tr><th id="33">33</th><td><i>// 03.09.2008 J.M.Quesada for external choice of inverse cross section option</i></td></tr>
+<tr><th id="34">34</th><td><i>// 06.09.2008 J.M.Quesada Also external choices have been added for:</i></td></tr>
+<tr><th id="35">35</th><td><i>//                      - superimposed Coulomb barrier (useSICB=true) </i></td></tr>
+<tr><th id="36">36</th><td><i>//                      - "never go back"  hipothesis (useNGB=true) </i></td></tr>
+<tr><th id="37">37</th><td><i>//                      - soft cutoff from preeq. to equlibrium (useSCO=true)</i></td></tr>
+<tr><th id="38">38</th><td><i>//                      - CEM transition probabilities (useCEMtr=true)  </i></td></tr>
+<tr><th id="39">39</th><td><i>// 20.08.2010 V.Ivanchenko Cleanup of the code: </i></td></tr>
+<tr><th id="40">40</th><td><i>//                      - integer Z and A;</i></td></tr>
+<tr><th id="41">41</th><td><i>//                      - emission and transition classes created at </i></td></tr>
+<tr><th id="42">42</th><td><i>//                        initialisation</i></td></tr>
+<tr><th id="43">43</th><td><i>//                      - options are set at initialisation</i></td></tr>
+<tr><th id="44">44</th><td><i>//                      - do not use copy-constructors for G4Fragment  </i></td></tr>
+<tr><th id="45">45</th><td><i>// 03.01.2012 V.Ivanchenko Added pointer to G4ExcitationHandler to the </i></td></tr>
+<tr><th id="46">46</th><td><i>//                         constructor</i></td></tr>
+<tr><th id="47">47</th><td></td></tr>
+<tr><th id="48">48</th><td><u>#include <a href="../include/G4PreCompoundModel.hh.html">"G4PreCompoundModel.hh"</a></u></td></tr>
+<tr><th id="49">49</th><td><u>#include <a href="../../../../../../global/management/include/G4PhysicalConstants.hh.html">"G4PhysicalConstants.hh"</a></u></td></tr>
+<tr><th id="50">50</th><td><u>#include <a href="../../../../../../global/management/include/G4SystemOfUnits.hh.html">"G4SystemOfUnits.hh"</a></u></td></tr>
+<tr><th id="51">51</th><td><u>#include <a href="../include/G4PreCompoundEmission.hh.html">"G4PreCompoundEmission.hh"</a></u></td></tr>
+<tr><th id="52">52</th><td><u>#include <a href="../include/G4PreCompoundTransitions.hh.html">"G4PreCompoundTransitions.hh"</a></u></td></tr>
+<tr><th id="53">53</th><td><u>#include <a href="../include/G4GNASHTransitions.hh.html">"G4GNASHTransitions.hh"</a></u></td></tr>
+<tr><th id="54">54</th><td><u>#include <a href="../../../../../../particles/management/include/G4ParticleDefinition.hh.html">"G4ParticleDefinition.hh"</a></u></td></tr>
+<tr><th id="55">55</th><td><u>#include <a href="../../../../../../particles/hadrons/barions/include/G4Proton.hh.html">"G4Proton.hh"</a></u></td></tr>
+<tr><th id="56">56</th><td><u>#include <a href="../../../../../../particles/hadrons/barions/include/G4Neutron.hh.html">"G4Neutron.hh"</a></u></td></tr>
+<tr><th id="57">57</th><td></td></tr>
+<tr><th id="58">58</th><td><u>#include <a href="../../../../../../particles/management/include/G4NucleiProperties.hh.html">"G4NucleiProperties.hh"</a></u></td></tr>
+<tr><th id="59">59</th><td><u>#include <a href="../../../de_excitation/management/include/G4NuclearLevelData.hh.html">"G4NuclearLevelData.hh"</a></u></td></tr>
+<tr><th id="60">60</th><td><u>#include <a href="../../../de_excitation/management/include/G4DeexPrecoParameters.hh.html">"G4DeexPrecoParameters.hh"</a></u></td></tr>
+<tr><th id="61">61</th><td><u>#include <a href="../../../../../../global/HEPRandom/include/Randomize.hh.html">"Randomize.hh"</a></u></td></tr>
+<tr><th id="62">62</th><td><u>#include <a href="../../../../../../particles/management/include/G4DynamicParticle.hh.html">"G4DynamicParticle.hh"</a></u></td></tr>
+<tr><th id="63">63</th><td><u>#include <a href="../../../../../management/include/G4ParticleTypes.hh.html">"G4ParticleTypes.hh"</a></u></td></tr>
+<tr><th id="64">64</th><td><u>#include <a href="../../../../../../particles/management/include/G4ParticleTable.hh.html">"G4ParticleTable.hh"</a></u></td></tr>
+<tr><th id="65">65</th><td><u>#include <a href="../../../../../../global/HEPGeometry/include/G4LorentzVector.hh.html">"G4LorentzVector.hh"</a></u></td></tr>
+<tr><th id="66">66</th><td><u>#include <a href="../../../../../../global/management/include/G4Exp.hh.html">"G4Exp.hh"</a></u></td></tr>
+<tr><th id="67">67</th><td></td></tr>
+<tr><th id="68">68</th><td><i>////////////////////////////////////////////////////////////////////////////////</i></td></tr>
+<tr><th id="69">69</th><td></td></tr>
+<tr><th id="70">70</th><td><a class="type" href="../include/G4PreCompoundModel.hh.html#G4PreCompoundModel" title='G4PreCompoundModel' data-ref="G4PreCompoundModel">G4PreCompoundModel</a>::<dfn class="decl def" id="_ZN18G4PreCompoundModelC1EP19G4ExcitationHandler" title='G4PreCompoundModel::G4PreCompoundModel' data-ref="_ZN18G4PreCompoundModelC1EP19G4ExcitationHandler">G4PreCompoundModel</dfn>(<a class="type" href="../../../de_excitation/handler/include/G4ExcitationHandler.hh.html#G4ExcitationHandler" title='G4ExcitationHandler' data-ref="G4ExcitationHandler">G4ExcitationHandler</a>* <dfn class="local col6 decl" id="6ptr" title='ptr' data-type='G4ExcitationHandler *' data-ref="6ptr">ptr</dfn>) </td></tr>
+<tr><th id="71">71</th><td>  : <a class="type" href="../../../management/include/G4VPreCompoundModel.hh.html#G4VPreCompoundModel" title='G4VPreCompoundModel' data-ref="G4VPreCompoundModel">G4VPreCompoundModel</a><a class="ref" href="../../../management/include/G4VPreCompoundModel.hh.html#_ZN19G4VPreCompoundModelC1EP19G4ExcitationHandlerRK8G4String" title='G4VPreCompoundModel::G4VPreCompoundModel' data-ref="_ZN19G4VPreCompoundModelC1EP19G4ExcitationHandlerRK8G4String">(</a><a class="local col6 ref" href="#6ptr" title='ptr' data-ref="6ptr">ptr</a>,<a class="ref fake" href="../../../../../../global/management/include/G4String.hh.html#_ZN8G4StringC1EPKc" title='G4String::G4String' data-ref="_ZN8G4StringC1EPKc"></a><q>"PRECO"</q>),<a class="member" href="../include/G4PreCompoundModel.hh.html#G4PreCompoundModel::theEmission" title='G4PreCompoundModel::theEmission' data-ref="G4PreCompoundModel::theEmission">theEmission</a>(<b>nullptr</b>),<a class="member" href="../include/G4PreCompoundModel.hh.html#G4PreCompoundModel::theTransition" title='G4PreCompoundModel::theTransition' data-ref="G4PreCompoundModel::theTransition">theTransition</a>(<b>nullptr</b>),</td></tr>
+<tr><th id="72">72</th><td>    <a class="member" href="../include/G4PreCompoundModel.hh.html#G4PreCompoundModel::useSCO" title='G4PreCompoundModel::useSCO' data-ref="G4PreCompoundModel::useSCO">useSCO</a>(<b>false</b>),<a class="member" href="../include/G4PreCompoundModel.hh.html#G4PreCompoundModel::isInitialised" title='G4PreCompoundModel::isInitialised' data-ref="G4PreCompoundModel::isInitialised">isInitialised</a>(<b>false</b>),<a class="member" href="../include/G4PreCompoundModel.hh.html#G4PreCompoundModel::isActive" title='G4PreCompoundModel::isActive' data-ref="G4PreCompoundModel::isActive">isActive</a>(<b>true</b>),<a class="member" href="../include/G4PreCompoundModel.hh.html#G4PreCompoundModel::minZ" title='G4PreCompoundModel::minZ' data-ref="G4PreCompoundModel::minZ">minZ</a>(<var>3</var>),<a class="member" href="../include/G4PreCompoundModel.hh.html#G4PreCompoundModel::minA" title='G4PreCompoundModel::minA' data-ref="G4PreCompoundModel::minA">minA</a>(<var>5</var>) </td></tr>
+<tr><th id="73">73</th><td>{</td></tr>
+<tr><th id="74">74</th><td>  <i>//G4cout &lt;&lt; "### NEW PrecompoundModel " &lt;&lt; this &lt;&lt; G4endl;</i></td></tr>
+<tr><th id="75">75</th><td>  <b>if</b>(!<a class="local col6 ref" href="#6ptr" title='ptr' data-ref="6ptr">ptr</a>) { <a class="member" href="../../../management/include/G4VPreCompoundModel.hh.html#_ZN19G4VPreCompoundModel20SetExcitationHandlerEP19G4ExcitationHandler" title='G4VPreCompoundModel::SetExcitationHandler' data-ref="_ZN19G4VPreCompoundModel20SetExcitationHandlerEP19G4ExcitationHandler">SetExcitationHandler</a>(<b>new</b> <a class="type" href="../../../de_excitation/handler/include/G4ExcitationHandler.hh.html#G4ExcitationHandler" title='G4ExcitationHandler' data-ref="G4ExcitationHandler">G4ExcitationHandler</a><a class="ref" href="../../../de_excitation/handler/include/G4ExcitationHandler.hh.html#_ZN19G4ExcitationHandlerC1Ev" title='G4ExcitationHandler::G4ExcitationHandler' data-ref="_ZN19G4ExcitationHandlerC1Ev">(</a>)); }</td></tr>
+<tr><th id="76">76</th><td></td></tr>
+<tr><th id="77">77</th><td>  <a class="member" href="../include/G4PreCompoundModel.hh.html#G4PreCompoundModel::fNuclData" title='G4PreCompoundModel::fNuclData' data-ref="G4PreCompoundModel::fNuclData">fNuclData</a> = <a class="type" href="../../../de_excitation/management/include/G4NuclearLevelData.hh.html#G4NuclearLevelData" title='G4NuclearLevelData' data-ref="G4NuclearLevelData">G4NuclearLevelData</a>::<a class="ref" href="../../../de_excitation/management/include/G4NuclearLevelData.hh.html#_ZN18G4NuclearLevelData11GetInstanceEv" title='G4NuclearLevelData::GetInstance' data-ref="_ZN18G4NuclearLevelData11GetInstanceEv">GetInstance</a>();</td></tr>
+<tr><th id="78">78</th><td>  <a class="member" href="../include/G4PreCompoundModel.hh.html#G4PreCompoundModel::proton" title='G4PreCompoundModel::proton' data-ref="G4PreCompoundModel::proton">proton</a> = <a class="type" href="../../../../../../particles/hadrons/barions/include/G4Proton.hh.html#G4Proton" title='G4Proton' data-ref="G4Proton">G4Proton</a>::<a class="ref" href="../../../../../../particles/hadrons/barions/include/G4Proton.hh.html#_ZN8G4Proton6ProtonEv" title='G4Proton::Proton' data-ref="_ZN8G4Proton6ProtonEv">Proton</a>();</td></tr>
+<tr><th id="79">79</th><td>  <a class="member" href="../include/G4PreCompoundModel.hh.html#G4PreCompoundModel::neutron" title='G4PreCompoundModel::neutron' data-ref="G4PreCompoundModel::neutron">neutron</a> = <a class="type" href="../../../../../../particles/hadrons/barions/include/G4Neutron.hh.html#G4Neutron" title='G4Neutron' data-ref="G4Neutron">G4Neutron</a>::<a class="ref" href="../../../../../../particles/hadrons/barions/include/G4Neutron.hh.html#_ZN9G4Neutron7NeutronEv" title='G4Neutron::Neutron' data-ref="_ZN9G4Neutron7NeutronEv">Neutron</a>();</td></tr>
+<tr><th id="80">80</th><td>  <a class="member" href="../include/G4PreCompoundModel.hh.html#G4PreCompoundModel::fLimitEnergy" title='G4PreCompoundModel::fLimitEnergy' data-ref="G4PreCompoundModel::fLimitEnergy">fLimitEnergy</a> = <var>0.0</var>;</td></tr>
+<tr><th id="81">81</th><td>}</td></tr>
+<tr><th id="82">82</th><td></td></tr>
+<tr><th id="83">83</th><td><i>////////////////////////////////////////////////////////////////////////////////</i></td></tr>
+<tr><th id="84">84</th><td></td></tr>
+<tr><th id="85">85</th><td><a class="type" href="../include/G4PreCompoundModel.hh.html#G4PreCompoundModel" title='G4PreCompoundModel' data-ref="G4PreCompoundModel">G4PreCompoundModel</a>::<dfn class="virtual decl def" id="_ZN18G4PreCompoundModelD1Ev" title='G4PreCompoundModel::~G4PreCompoundModel' data-ref="_ZN18G4PreCompoundModelD1Ev">~G4PreCompoundModel</dfn>() </td></tr>
+<tr><th id="86">86</th><td>{</td></tr>
+<tr><th id="87">87</th><td>  <b>delete</b> <a class="member" href="../include/G4PreCompoundModel.hh.html#G4PreCompoundModel::theEmission" title='G4PreCompoundModel::theEmission' data-ref="G4PreCompoundModel::theEmission">theEmission</a>;</td></tr>
+<tr><th id="88">88</th><td>  <b>delete</b> <a class="member" href="../include/G4PreCompoundModel.hh.html#G4PreCompoundModel::theTransition" title='G4PreCompoundModel::theTransition' data-ref="G4PreCompoundModel::theTransition">theTransition</a>;</td></tr>
+<tr><th id="89">89</th><td>  <b>delete</b> <a class="member" href="../../../management/include/G4VPreCompoundModel.hh.html#_ZNK19G4VPreCompoundModel20GetExcitationHandlerEv" title='G4VPreCompoundModel::GetExcitationHandler' data-ref="_ZNK19G4VPreCompoundModel20GetExcitationHandlerEv">GetExcitationHandler</a>();</td></tr>
+<tr><th id="90">90</th><td>}</td></tr>
+<tr><th id="91">91</th><td></td></tr>
+<tr><th id="92">92</th><td><i>////////////////////////////////////////////////////////////////////////////////</i></td></tr>
+<tr><th id="93">93</th><td></td></tr>
+<tr><th id="94">94</th><td><em>void</em> <a class="type" href="../include/G4PreCompoundModel.hh.html#G4PreCompoundModel" title='G4PreCompoundModel' data-ref="G4PreCompoundModel">G4PreCompoundModel</a>::<dfn class="virtual decl def" id="_ZN18G4PreCompoundModel17BuildPhysicsTableERK20G4ParticleDefinition" title='G4PreCompoundModel::BuildPhysicsTable' data-ref="_ZN18G4PreCompoundModel17BuildPhysicsTableERK20G4ParticleDefinition">BuildPhysicsTable</dfn>(<em>const</em> <a class="type" href="../../../../../../particles/management/include/G4ParticleDefinition.hh.html#G4ParticleDefinition" title='G4ParticleDefinition' data-ref="G4ParticleDefinition">G4ParticleDefinition</a>&amp;) </td></tr>
+<tr><th id="95">95</th><td>{</td></tr>
+<tr><th id="96">96</th><td>  <a class="virtual member" href="#_ZN18G4PreCompoundModel15InitialiseModelEv" title='G4PreCompoundModel::InitialiseModel' data-ref="_ZN18G4PreCompoundModel15InitialiseModelEv">InitialiseModel</a>();</td></tr>
+<tr><th id="97">97</th><td>}</td></tr>
+<tr><th id="98">98</th><td></td></tr>
+<tr><th id="99">99</th><td><i>////////////////////////////////////////////////////////////////////////////////</i></td></tr>
+<tr><th id="100">100</th><td></td></tr>
+<tr><th id="101">101</th><td><em>void</em> <a class="type" href="../include/G4PreCompoundModel.hh.html#G4PreCompoundModel" title='G4PreCompoundModel' data-ref="G4PreCompoundModel">G4PreCompoundModel</a>::<dfn class="virtual decl def" id="_ZN18G4PreCompoundModel15InitialiseModelEv" title='G4PreCompoundModel::InitialiseModel' data-ref="_ZN18G4PreCompoundModel15InitialiseModelEv">InitialiseModel</dfn>() </td></tr>
+<tr><th id="102">102</th><td>{</td></tr>
+<tr><th id="103">103</th><td>  <b>if</b>(<a class="member" href="../include/G4PreCompoundModel.hh.html#G4PreCompoundModel::isInitialised" title='G4PreCompoundModel::isInitialised' data-ref="G4PreCompoundModel::isInitialised">isInitialised</a>) { <b>return</b>; }</td></tr>
+<tr><th id="104">104</th><td>  <a class="member" href="../include/G4PreCompoundModel.hh.html#G4PreCompoundModel::isInitialised" title='G4PreCompoundModel::isInitialised' data-ref="G4PreCompoundModel::isInitialised">isInitialised</a> = <b>true</b>;</td></tr>
+<tr><th id="105">105</th><td></td></tr>
+<tr><th id="106">106</th><td>  <i>//G4cout &lt;&lt; "G4PreCompoundModel::InitialiseModel() started" &lt;&lt; G4endl;</i></td></tr>
+<tr><th id="107">107</th><td></td></tr>
+<tr><th id="108">108</th><td>  <a class="type" href="../../../de_excitation/management/include/G4DeexPrecoParameters.hh.html#G4DeexPrecoParameters" title='G4DeexPrecoParameters' data-ref="G4DeexPrecoParameters">G4DeexPrecoParameters</a>* <dfn class="local col7 decl" id="7param" title='param' data-type='G4DeexPrecoParameters *' data-ref="7param">param</dfn> = <a class="member" href="../include/G4PreCompoundModel.hh.html#G4PreCompoundModel::fNuclData" title='G4PreCompoundModel::fNuclData' data-ref="G4PreCompoundModel::fNuclData">fNuclData</a>-&gt;<a class="ref" href="../../../de_excitation/management/include/G4NuclearLevelData.hh.html#_ZN18G4NuclearLevelData13GetParametersEv" title='G4NuclearLevelData::GetParameters' data-ref="_ZN18G4NuclearLevelData13GetParametersEv">GetParameters</a>();</td></tr>
+<tr><th id="109">109</th><td></td></tr>
+<tr><th id="110">110</th><td>  <a class="member" href="../include/G4PreCompoundModel.hh.html#G4PreCompoundModel::fLimitEnergy" title='G4PreCompoundModel::fLimitEnergy' data-ref="G4PreCompoundModel::fLimitEnergy">fLimitEnergy</a>  = <a class="local col7 ref" href="#7param" title='param' data-ref="7param">param</a>-&gt;<a class="ref" href="../../../de_excitation/management/include/G4DeexPrecoParameters.hh.html#_ZNK21G4DeexPrecoParameters17GetPrecoLowEnergyEv" title='G4DeexPrecoParameters::GetPrecoLowEnergy' data-ref="_ZNK21G4DeexPrecoParameters17GetPrecoLowEnergyEv">GetPrecoLowEnergy</a>();</td></tr>
+<tr><th id="111">111</th><td></td></tr>
+<tr><th id="112">112</th><td>  <a class="member" href="../include/G4PreCompoundModel.hh.html#G4PreCompoundModel::useSCO" title='G4PreCompoundModel::useSCO' data-ref="G4PreCompoundModel::useSCO">useSCO</a> = <a class="local col7 ref" href="#7param" title='param' data-ref="7param">param</a>-&gt;<a class="ref" href="../../../de_excitation/management/include/G4DeexPrecoParameters.hh.html#_ZNK21G4DeexPrecoParameters13UseSoftCutoffEv" title='G4DeexPrecoParameters::UseSoftCutoff' data-ref="_ZNK21G4DeexPrecoParameters13UseSoftCutoffEv">UseSoftCutoff</a>();</td></tr>
+<tr><th id="113">113</th><td></td></tr>
+<tr><th id="114">114</th><td>  <a class="member" href="../include/G4PreCompoundModel.hh.html#G4PreCompoundModel::minZ" title='G4PreCompoundModel::minZ' data-ref="G4PreCompoundModel::minZ">minZ</a> = <a class="local col7 ref" href="#7param" title='param' data-ref="7param">param</a>-&gt;<a class="ref" href="../../../de_excitation/management/include/G4DeexPrecoParameters.hh.html#_ZNK21G4DeexPrecoParameters15GetMinZForPrecoEv" title='G4DeexPrecoParameters::GetMinZForPreco' data-ref="_ZNK21G4DeexPrecoParameters15GetMinZForPrecoEv">GetMinZForPreco</a>();</td></tr>
+<tr><th id="115">115</th><td>  <a class="member" href="../include/G4PreCompoundModel.hh.html#G4PreCompoundModel::minA" title='G4PreCompoundModel::minA' data-ref="G4PreCompoundModel::minA">minA</a> = <a class="local col7 ref" href="#7param" title='param' data-ref="7param">param</a>-&gt;<a class="ref" href="../../../de_excitation/management/include/G4DeexPrecoParameters.hh.html#_ZNK21G4DeexPrecoParameters15GetMinAForPrecoEv" title='G4DeexPrecoParameters::GetMinAForPreco' data-ref="_ZNK21G4DeexPrecoParameters15GetMinAForPrecoEv">GetMinAForPreco</a>();</td></tr>
+<tr><th id="116">116</th><td></td></tr>
+<tr><th id="117">117</th><td>  <a class="member" href="../include/G4PreCompoundModel.hh.html#G4PreCompoundModel::theEmission" title='G4PreCompoundModel::theEmission' data-ref="G4PreCompoundModel::theEmission">theEmission</a> = <b>new</b> <a class="type" href="../include/G4PreCompoundEmission.hh.html#G4PreCompoundEmission" title='G4PreCompoundEmission' data-ref="G4PreCompoundEmission">G4PreCompoundEmission</a><a class="ref" href="../include/G4PreCompoundEmission.hh.html#_ZN21G4PreCompoundEmissionC1Ev" title='G4PreCompoundEmission::G4PreCompoundEmission' data-ref="_ZN21G4PreCompoundEmissionC1Ev">(</a>);</td></tr>
+<tr><th id="118">118</th><td>  <b>if</b>(<a class="local col7 ref" href="#7param" title='param' data-ref="7param">param</a>-&gt;<a class="ref" href="../../../de_excitation/management/include/G4DeexPrecoParameters.hh.html#_ZNK21G4DeexPrecoParameters7UseHETCEv" title='G4DeexPrecoParameters::UseHETC' data-ref="_ZNK21G4DeexPrecoParameters7UseHETCEv">UseHETC</a>()) { <a class="member" href="../include/G4PreCompoundModel.hh.html#G4PreCompoundModel::theEmission" title='G4PreCompoundModel::theEmission' data-ref="G4PreCompoundModel::theEmission">theEmission</a>-&gt;<a class="ref" href="../include/G4PreCompoundEmission.hh.html#_ZN21G4PreCompoundEmission12SetHETCModelEv" title='G4PreCompoundEmission::SetHETCModel' data-ref="_ZN21G4PreCompoundEmission12SetHETCModelEv">SetHETCModel</a>(); }</td></tr>
+<tr><th id="119">119</th><td>  <i>//else { theEmission-&gt;SetDefaultModel(); }</i></td></tr>
+<tr><th id="120">120</th><td>  <a class="member" href="../include/G4PreCompoundModel.hh.html#G4PreCompoundModel::theEmission" title='G4PreCompoundModel::theEmission' data-ref="G4PreCompoundModel::theEmission">theEmission</a>-&gt;<a class="ref" href="../include/G4PreCompoundEmission.hh.html#_ZN21G4PreCompoundEmission8SetOPTxsEi" title='G4PreCompoundEmission::SetOPTxs' data-ref="_ZN21G4PreCompoundEmission8SetOPTxsEi">SetOPTxs</a>(<a class="local col7 ref" href="#7param" title='param' data-ref="7param">param</a>-&gt;<a class="ref" href="../../../de_excitation/management/include/G4DeexPrecoParameters.hh.html#_ZNK21G4DeexPrecoParameters17GetPrecoModelTypeEv" title='G4DeexPrecoParameters::GetPrecoModelType' data-ref="_ZNK21G4DeexPrecoParameters17GetPrecoModelTypeEv">GetPrecoModelType</a>());</td></tr>
+<tr><th id="121">121</th><td></td></tr>
+<tr><th id="122">122</th><td>  <b>if</b>(<a class="local col7 ref" href="#7param" title='param' data-ref="7param">param</a>-&gt;<a class="ref" href="../../../de_excitation/management/include/G4DeexPrecoParameters.hh.html#_ZNK21G4DeexPrecoParameters8UseGNASHEv" title='G4DeexPrecoParameters::UseGNASH' data-ref="_ZNK21G4DeexPrecoParameters8UseGNASHEv">UseGNASH</a>()) { <a class="member" href="../include/G4PreCompoundModel.hh.html#G4PreCompoundModel::theTransition" title='G4PreCompoundModel::theTransition' data-ref="G4PreCompoundModel::theTransition">theTransition</a> = <b>new</b> <a class="ref fake" href="../include/G4GNASHTransitions.hh.html#_ZN18G4GNASHTransitionsC1Ev" title='G4GNASHTransitions::G4GNASHTransitions' data-ref="_ZN18G4GNASHTransitionsC1Ev"></a><a class="type" href="../include/G4GNASHTransitions.hh.html#G4GNASHTransitions" title='G4GNASHTransitions' data-ref="G4GNASHTransitions">G4GNASHTransitions</a>; }</td></tr>
+<tr><th id="123">123</th><td>  <b>else</b> { <a class="member" href="../include/G4PreCompoundModel.hh.html#G4PreCompoundModel::theTransition" title='G4PreCompoundModel::theTransition' data-ref="G4PreCompoundModel::theTransition">theTransition</a> = <b>new</b> <a class="type" href="../include/G4PreCompoundTransitions.hh.html#G4PreCompoundTransitions" title='G4PreCompoundTransitions' data-ref="G4PreCompoundTransitions">G4PreCompoundTransitions</a><a class="ref" href="../include/G4PreCompoundTransitions.hh.html#_ZN24G4PreCompoundTransitionsC1Ev" title='G4PreCompoundTransitions::G4PreCompoundTransitions' data-ref="_ZN24G4PreCompoundTransitionsC1Ev">(</a>); }</td></tr>
+<tr><th id="124">124</th><td>  <a class="member" href="../include/G4PreCompoundModel.hh.html#G4PreCompoundModel::theTransition" title='G4PreCompoundModel::theTransition' data-ref="G4PreCompoundModel::theTransition">theTransition</a>-&gt;<a class="ref" href="../include/G4VPreCompoundTransitions.hh.html#_ZN25G4VPreCompoundTransitions6UseNGBEb" title='G4VPreCompoundTransitions::UseNGB' data-ref="_ZN25G4VPreCompoundTransitions6UseNGBEb">UseNGB</a>(<a class="local col7 ref" href="#7param" title='param' data-ref="7param">param</a>-&gt;<a class="ref" href="../../../de_excitation/management/include/G4DeexPrecoParameters.hh.html#_ZNK21G4DeexPrecoParameters11NeverGoBackEv" title='G4DeexPrecoParameters::NeverGoBack' data-ref="_ZNK21G4DeexPrecoParameters11NeverGoBackEv">NeverGoBack</a>());</td></tr>
+<tr><th id="125">125</th><td>  <a class="member" href="../include/G4PreCompoundModel.hh.html#G4PreCompoundModel::theTransition" title='G4PreCompoundModel::theTransition' data-ref="G4PreCompoundModel::theTransition">theTransition</a>-&gt;<a class="ref" href="../include/G4VPreCompoundTransitions.hh.html#_ZN25G4VPreCompoundTransitions8UseCEMtrEb" title='G4VPreCompoundTransitions::UseCEMtr' data-ref="_ZN25G4VPreCompoundTransitions8UseCEMtrEb">UseCEMtr</a>(<a class="local col7 ref" href="#7param" title='param' data-ref="7param">param</a>-&gt;<a class="ref" href="../../../de_excitation/management/include/G4DeexPrecoParameters.hh.html#_ZNK21G4DeexPrecoParameters6UseCEMEv" title='G4DeexPrecoParameters::UseCEM' data-ref="_ZNK21G4DeexPrecoParameters6UseCEMEv">UseCEM</a>());</td></tr>
+<tr><th id="126">126</th><td></td></tr>
+<tr><th id="127">127</th><td>  <b>if</b>(<a class="local col7 ref" href="#7param" title='param' data-ref="7param">param</a>-&gt;<a class="ref" href="../../../de_excitation/management/include/G4DeexPrecoParameters.hh.html#_ZNK21G4DeexPrecoParameters10PrecoDummyEv" title='G4DeexPrecoParameters::PrecoDummy' data-ref="_ZNK21G4DeexPrecoParameters10PrecoDummyEv">PrecoDummy</a>()) { <a class="member" href="../include/G4PreCompoundModel.hh.html#G4PreCompoundModel::isActive" title='G4PreCompoundModel::isActive' data-ref="G4PreCompoundModel::isActive">isActive</a> = <b>false</b>; } </td></tr>
+<tr><th id="128">128</th><td></td></tr>
+<tr><th id="129">129</th><td>  <a class="member" href="../../../management/include/G4VPreCompoundModel.hh.html#_ZNK19G4VPreCompoundModel20GetExcitationHandlerEv" title='G4VPreCompoundModel::GetExcitationHandler' data-ref="_ZNK19G4VPreCompoundModel20GetExcitationHandlerEv">GetExcitationHandler</a>()-&gt;<a class="ref" href="../../../de_excitation/handler/include/G4ExcitationHandler.hh.html#_ZN19G4ExcitationHandler10InitialiseEv" title='G4ExcitationHandler::Initialise' data-ref="_ZN19G4ExcitationHandler10InitialiseEv">Initialise</a>();</td></tr>
+<tr><th id="130">130</th><td>}</td></tr>
+<tr><th id="131">131</th><td></td></tr>
+<tr><th id="132">132</th><td><i>////////////////////////////////////////////////////////////////////////////////</i></td></tr>
+<tr><th id="133">133</th><td></td></tr>
+<tr><th id="134">134</th><td><a class="type" href="../../../../util/include/G4HadFinalState.hh.html#G4HadFinalState" title='G4HadFinalState' data-ref="G4HadFinalState">G4HadFinalState</a>* </td></tr>
+<tr><th id="135">135</th><td><a class="type" href="../include/G4PreCompoundModel.hh.html#G4PreCompoundModel" title='G4PreCompoundModel' data-ref="G4PreCompoundModel">G4PreCompoundModel</a>::<dfn class="virtual decl def" id="_ZN18G4PreCompoundModel13ApplyYourselfERK15G4HadProjectileR9G4Nucleus" title='G4PreCompoundModel::ApplyYourself' data-ref="_ZN18G4PreCompoundModel13ApplyYourselfERK15G4HadProjectileR9G4Nucleus">ApplyYourself</dfn>(<em>const</em> <a class="type" href="../../../../util/include/G4HadProjectile.hh.html#G4HadProjectile" title='G4HadProjectile' data-ref="G4HadProjectile">G4HadProjectile</a> &amp; <dfn class="local col8 decl" id="8thePrimary" title='thePrimary' data-type='const G4HadProjectile &amp;' data-ref="8thePrimary">thePrimary</dfn>,</td></tr>
+<tr><th id="136">136</th><td>				  <a class="type" href="../../../../util/include/G4Nucleus.hh.html#G4Nucleus" title='G4Nucleus' data-ref="G4Nucleus">G4Nucleus</a> &amp; <dfn class="local col9 decl" id="9theNucleus" title='theNucleus' data-type='G4Nucleus &amp;' data-ref="9theNucleus">theNucleus</dfn>)</td></tr>
+<tr><th id="137">137</th><td>{  </td></tr>
+<tr><th id="138">138</th><td>  <em>const</em> <a class="type" href="../../../../../../particles/management/include/G4ParticleDefinition.hh.html#G4ParticleDefinition" title='G4ParticleDefinition' data-ref="G4ParticleDefinition">G4ParticleDefinition</a>* <dfn class="local col0 decl" id="10primary" title='primary' data-type='const G4ParticleDefinition *' data-ref="10primary">primary</dfn> = <a class="local col8 ref" href="#8thePrimary" title='thePrimary' data-ref="8thePrimary">thePrimary</a>.<a class="ref" href="../../../../util/include/G4HadProjectile.hh.html#_ZNK15G4HadProjectile13GetDefinitionEv" title='G4HadProjectile::GetDefinition' data-ref="_ZNK15G4HadProjectile13GetDefinitionEv">GetDefinition</a>();</td></tr>
+<tr><th id="139">139</th><td>  <b>if</b>(<a class="local col0 ref" href="#10primary" title='primary' data-ref="10primary">primary</a> != <a class="member" href="../include/G4PreCompoundModel.hh.html#G4PreCompoundModel::neutron" title='G4PreCompoundModel::neutron' data-ref="G4PreCompoundModel::neutron">neutron</a> &amp;&amp; <a class="local col0 ref" href="#10primary" title='primary' data-ref="10primary">primary</a> != <a class="member" href="../include/G4PreCompoundModel.hh.html#G4PreCompoundModel::proton" title='G4PreCompoundModel::proton' data-ref="G4PreCompoundModel::proton">proton</a>) {</td></tr>
+<tr><th id="140">140</th><td>    <a class="typedef" href="../../../../../../global/management/include/G4Exception.hh.html#G4ExceptionDescription" title='G4ExceptionDescription' data-type='int' data-ref="G4ExceptionDescription">G4ExceptionDescription</a> <dfn class="local col1 decl" id="11ed" title='ed' data-type='G4ExceptionDescription' data-ref="11ed">ed</dfn>;</td></tr>
+<tr><th id="141">141</th><td>    ed <span class='error' title="invalid operands to binary expression (&apos;G4ExceptionDescription&apos; (aka &apos;int&apos;) and &apos;const char *&apos;)">&lt;&lt;</span> <q>"G4PreCompoundModel is used for "</q>;</td></tr>
+<tr><th id="142">142</th><td>    <b>if</b>(<a class="local col0 ref" href="#10primary" title='primary' data-ref="10primary">primary</a>) { ed <span class='error' title="invalid operands to binary expression (&apos;G4ExceptionDescription&apos; (aka &apos;int&apos;) and &apos;const G4String&apos;)">&lt;&lt;</span> primary-&gt;GetParticleName(); }</td></tr>
+<tr><th id="143">143</th><td>    <a class="ref" href="../../../../../../global/management/include/G4Exception.hh.html#_Z11G4ExceptionPKcS0_19G4ExceptionSeverityRiS0_" title='G4Exception' data-ref="_Z11G4ExceptionPKcS0_19G4ExceptionSeverityRiS0_">G4Exception</a>(<q>"G4PreCompoundModel::ApplyYourself()"</q>,<q>"had0033"</q>,<a class="enum" href="../../../../../../global/management/include/G4ExceptionSeverity.hh.html#G4ExceptionSeverity::FatalException" title='G4ExceptionSeverity::FatalException' data-ref="G4ExceptionSeverity::FatalException">FatalException</a>,</td></tr>
+<tr><th id="144">144</th><td>                <span class='refarg'><a class="local col1 ref" href="#11ed" title='ed' data-ref="11ed">ed</a></span>,<q>""</q>);</td></tr>
+<tr><th id="145">145</th><td>    <b>return</b> <var>0</var>;</td></tr>
+<tr><th id="146">146</th><td>  }</td></tr>
+<tr><th id="147">147</th><td></td></tr>
+<tr><th id="148">148</th><td>  <a class="typedef" href="../../../../../../global/management/include/G4Types.hh.html#G4int" title='G4int' data-type='int' data-ref="G4int">G4int</a> <dfn class="local col2 decl" id="12Zp" title='Zp' data-type='G4int' data-ref="12Zp">Zp</dfn> = <var>0</var>;</td></tr>
+<tr><th id="149">149</th><td>  <a class="typedef" href="../../../../../../global/management/include/G4Types.hh.html#G4int" title='G4int' data-type='int' data-ref="G4int">G4int</a> <dfn class="local col3 decl" id="13Ap" title='Ap' data-type='G4int' data-ref="13Ap">Ap</dfn> = <var>1</var>;</td></tr>
+<tr><th id="150">150</th><td>  <b>if</b>(<a class="local col0 ref" href="#10primary" title='primary' data-ref="10primary">primary</a> == <a class="member" href="../include/G4PreCompoundModel.hh.html#G4PreCompoundModel::proton" title='G4PreCompoundModel::proton' data-ref="G4PreCompoundModel::proton">proton</a>) { <a class="local col2 ref" href="#12Zp" title='Zp' data-ref="12Zp">Zp</a> = <var>1</var>; }</td></tr>
+<tr><th id="151">151</th><td></td></tr>
+<tr><th id="152">152</th><td>  <a class="typedef" href="../../../../../../global/management/include/G4Types.hh.html#G4double" title='G4double' data-type='double' data-ref="G4double">G4double</a> <dfn class="local col4 decl" id="14timePrimary" title='timePrimary' data-type='G4double' data-ref="14timePrimary">timePrimary</dfn>=<a class="local col8 ref" href="#8thePrimary" title='thePrimary' data-ref="8thePrimary">thePrimary</a>.<a class="ref" href="../../../../util/include/G4HadProjectile.hh.html#_ZNK15G4HadProjectile13GetGlobalTimeEv" title='G4HadProjectile::GetGlobalTime' data-ref="_ZNK15G4HadProjectile13GetGlobalTimeEv">GetGlobalTime</a>();</td></tr>
+<tr><th id="153">153</th><td></td></tr>
+<tr><th id="154">154</th><td>  <a class="typedef" href="../../../../../../global/management/include/G4Types.hh.html#G4int" title='G4int' data-type='int' data-ref="G4int">G4int</a> <dfn class="local col5 decl" id="15A" title='A' data-type='G4int' data-ref="15A">A</dfn> = <a class="local col9 ref" href="#9theNucleus" title='theNucleus' data-ref="9theNucleus">theNucleus</a>.<a class="ref" href="../../../../util/include/G4Nucleus.hh.html#_ZNK9G4Nucleus10GetA_asIntEv" title='G4Nucleus::GetA_asInt' data-ref="_ZNK9G4Nucleus10GetA_asIntEv">GetA_asInt</a>();</td></tr>
+<tr><th id="155">155</th><td>  <a class="typedef" href="../../../../../../global/management/include/G4Types.hh.html#G4int" title='G4int' data-type='int' data-ref="G4int">G4int</a> <dfn class="local col6 decl" id="16Z" title='Z' data-type='G4int' data-ref="16Z">Z</dfn> = <a class="local col9 ref" href="#9theNucleus" title='theNucleus' data-ref="9theNucleus">theNucleus</a>.<a class="ref" href="../../../../util/include/G4Nucleus.hh.html#_ZNK9G4Nucleus10GetZ_asIntEv" title='G4Nucleus::GetZ_asInt' data-ref="_ZNK9G4Nucleus10GetZ_asIntEv">GetZ_asInt</a>();</td></tr>
+<tr><th id="156">156</th><td>   </td></tr>
+<tr><th id="157">157</th><td>  <i>//G4cout &lt;&lt; "### G4PreCompoundModel::ApplyYourself: A= " &lt;&lt; A &lt;&lt; " Z= " &lt;&lt; Z</i></td></tr>
+<tr><th id="158">158</th><td><i>  //	 &lt;&lt; " Ap= " &lt;&lt; Ap &lt;&lt; " Zp= " &lt;&lt; Zp &lt;&lt; G4endl; </i></td></tr>
+<tr><th id="159">159</th><td><i>  // 4-Momentum</i></td></tr>
+<tr><th id="160">160</th><td>  <a class="typedef" href="../../../../../../global/HEPGeometry/include/G4LorentzVector.hh.html#G4LorentzVector" title='G4LorentzVector' data-type='CLHEP::HepLorentzVector' data-ref="G4LorentzVector">G4LorentzVector</a> <dfn class="local col7 decl" id="17p" title='p' data-type='G4LorentzVector' data-ref="17p">p</dfn> = <a class="ref fake" href="../../../../../../externals/clhep/include/CLHEP/Vector/LorentzVector.h.html#_ZN5CLHEP16HepLorentzVectorC1ERKS0_" title='CLHEP::HepLorentzVector::HepLorentzVector' data-ref="_ZN5CLHEP16HepLorentzVectorC1ERKS0_"></a><a class="local col8 ref" href="#8thePrimary" title='thePrimary' data-ref="8thePrimary">thePrimary</a>.<a class="ref" href="../../../../util/include/G4HadProjectile.hh.html#_ZNK15G4HadProjectile12Get4MomentumEv" title='G4HadProjectile::Get4Momentum' data-ref="_ZNK15G4HadProjectile12Get4MomentumEv">Get4Momentum</a>();</td></tr>
+<tr><th id="161">161</th><td>  <a class="typedef" href="../../../../../../global/management/include/G4Types.hh.html#G4double" title='G4double' data-type='double' data-ref="G4double">G4double</a> <dfn class="local col8 decl" id="18mass" title='mass' data-type='G4double' data-ref="18mass">mass</dfn> = <a class="type" href="../../../../../../particles/management/include/G4NucleiProperties.hh.html#G4NucleiProperties" title='G4NucleiProperties' data-ref="G4NucleiProperties">G4NucleiProperties</a>::<a class="ref" href="../../../../../../particles/management/include/G4NucleiProperties.hh.html#_ZN18G4NucleiProperties14GetNuclearMassEii" title='G4NucleiProperties::GetNuclearMass' data-ref="_ZN18G4NucleiProperties14GetNuclearMassEii">GetNuclearMass</a>(<a class="local col5 ref" href="#15A" title='A' data-ref="15A">A</a>, <a class="local col6 ref" href="#16Z" title='Z' data-ref="16Z">Z</a>);</td></tr>
+<tr><th id="162">162</th><td>  <a class="local col7 ref" href="#17p" title='p' data-ref="17p">p</a> <a class="ref" href="../../../../../../externals/clhep/include/CLHEP/Vector/LorentzVector.h.html#_ZN5CLHEP16HepLorentzVectorpLERKS0_" title='CLHEP::HepLorentzVector::operator+=' data-ref="_ZN5CLHEP16HepLorentzVectorpLERKS0_">+=</a> <a class="typedef" href="../../../../../../global/HEPGeometry/include/G4LorentzVector.hh.html#G4LorentzVector" title='G4LorentzVector' data-type='CLHEP::HepLorentzVector' data-ref="G4LorentzVector">G4LorentzVector</a><a class="ref" href="../../../../../../externals/clhep/include/CLHEP/Vector/LorentzVector.h.html#_ZN5CLHEP16HepLorentzVectorC1Edddd" title='CLHEP::HepLorentzVector::HepLorentzVector' data-ref="_ZN5CLHEP16HepLorentzVectorC1Edddd">(</a><var>0.0</var>,<var>0.0</var>,<var>0.0</var>,<a class="local col8 ref" href="#18mass" title='mass' data-ref="18mass">mass</a>);</td></tr>
+<tr><th id="163">163</th><td>  <i>//G4cout &lt;&lt; "Primary 4-mom " &lt;&lt; p &lt;&lt; "  mass= " &lt;&lt; mass &lt;&lt; G4endl;</i></td></tr>
+<tr><th id="164">164</th><td><i></i></td></tr>
+<tr><th id="165">165</th><td><i>  // prepare fragment</i></td></tr>
+<tr><th id="166">166</th><td>  <a class="type" href="../../../util/include/G4Fragment.hh.html#G4Fragment" title='G4Fragment' data-ref="G4Fragment">G4Fragment</a> <dfn class="local col9 decl" id="19anInitialState" title='anInitialState' data-type='G4Fragment' data-ref="19anInitialState">anInitialState</dfn><a class="ref" href="../../../util/include/G4Fragment.hh.html#_ZN10G4FragmentC1EiiRKN5CLHEP16HepLorentzVectorE" title='G4Fragment::G4Fragment' data-ref="_ZN10G4FragmentC1EiiRKN5CLHEP16HepLorentzVectorE">(</a><a class="local col5 ref" href="#15A" title='A' data-ref="15A">A</a> + <a class="local col3 ref" href="#13Ap" title='Ap' data-ref="13Ap">Ap</a>, <a class="local col6 ref" href="#16Z" title='Z' data-ref="16Z">Z</a> + <a class="local col2 ref" href="#12Zp" title='Zp' data-ref="12Zp">Zp</a>, <a class="local col7 ref" href="#17p" title='p' data-ref="17p">p</a>);</td></tr>
+<tr><th id="167">167</th><td>  <a class="local col9 ref" href="#19anInitialState" title='anInitialState' data-ref="19anInitialState">anInitialState</a>.<a class="ref" href="../../../util/include/G4Fragment.hh.html#_ZN10G4Fragment26SetNumberOfExcitedParticleEii" title='G4Fragment::SetNumberOfExcitedParticle' data-ref="_ZN10G4Fragment26SetNumberOfExcitedParticleEii">SetNumberOfExcitedParticle</a>(<var>2</var>, <var>1</var>);</td></tr>
+<tr><th id="168">168</th><td>  <a class="local col9 ref" href="#19anInitialState" title='anInitialState' data-ref="19anInitialState">anInitialState</a>.<a class="ref" href="../../../util/include/G4Fragment.hh.html#_ZN10G4Fragment16SetNumberOfHolesEii" title='G4Fragment::SetNumberOfHoles' data-ref="_ZN10G4Fragment16SetNumberOfHolesEii">SetNumberOfHoles</a>(<var>1</var>,<var>0</var>);</td></tr>
+<tr><th id="169">169</th><td>  <a class="local col9 ref" href="#19anInitialState" title='anInitialState' data-ref="19anInitialState">anInitialState</a>.<a class="ref" href="../../../util/include/G4Fragment.hh.html#_ZN10G4Fragment15SetCreationTimeEd" title='G4Fragment::SetCreationTime' data-ref="_ZN10G4Fragment15SetCreationTimeEd">SetCreationTime</a>(<a class="local col8 ref" href="#8thePrimary" title='thePrimary' data-ref="8thePrimary">thePrimary</a>.<a class="ref" href="../../../../util/include/G4HadProjectile.hh.html#_ZNK15G4HadProjectile13GetGlobalTimeEv" title='G4HadProjectile::GetGlobalTime' data-ref="_ZNK15G4HadProjectile13GetGlobalTimeEv">GetGlobalTime</a>());</td></tr>
+<tr><th id="170">170</th><td>  </td></tr>
+<tr><th id="171">171</th><td>  <i>// call excitation handler</i></td></tr>
+<tr><th id="172">172</th><td>  <span class='error' title="unknown type name &apos;G4ReactionProductVector&apos;">G4ReactionProductVector</span> * <dfn class="local col0 decl" id="20result" title='result' data-type='int *' data-ref="20result">result</dfn> = DeExcite(anInitialState);</td></tr>
+<tr><th id="173">173</th><td></td></tr>
+<tr><th id="174">174</th><td>  <i>// fill particle change</i></td></tr>
+<tr><th id="175">175</th><td>  <a class="member" href="../include/G4PreCompoundModel.hh.html#G4PreCompoundModel::theResult" title='G4PreCompoundModel::theResult' data-ref="G4PreCompoundModel::theResult">theResult</a>.<a class="ref" href="../../../../util/include/G4HadFinalState.hh.html#_ZN15G4HadFinalState5ClearEv" title='G4HadFinalState::Clear' data-ref="_ZN15G4HadFinalState5ClearEv">Clear</a>();</td></tr>
+<tr><th id="176">176</th><td>  <a class="member" href="../include/G4PreCompoundModel.hh.html#G4PreCompoundModel::theResult" title='G4PreCompoundModel::theResult' data-ref="G4PreCompoundModel::theResult">theResult</a>.<a class="ref" href="../../../../util/include/G4HadFinalState.hh.html#_ZN15G4HadFinalState15SetStatusChangeE21G4HadFinalStateStatus" title='G4HadFinalState::SetStatusChange' data-ref="_ZN15G4HadFinalState15SetStatusChangeE21G4HadFinalStateStatus">SetStatusChange</a>(<a class="enum" href="../../../../util/include/G4HadFinalState.hh.html#G4HadFinalStateStatus::stopAndKill" title='G4HadFinalStateStatus::stopAndKill' data-ref="G4HadFinalStateStatus::stopAndKill">stopAndKill</a>);</td></tr>
+<tr><th id="177">177</th><td>  <b>for</b>(<span class='error' title="use of undeclared identifier &apos;G4ReactionProductVector&apos;">G4ReactionProductVector</span>::iterator <dfn class="local col1 decl" id="21i" title='i' data-type='int' data-ref="21i">i</dfn>= result-&gt;begin(); </td></tr>
+<tr><th id="178">178</th><td>      i != result-&gt;end(); ++i)</td></tr>
+<tr><th id="179">179</th><td>    {</td></tr>
+<tr><th id="180">180</th><td>      <a class="type" href="../../../../../../particles/management/include/G4DynamicParticle.hh.html#G4DynamicParticle" title='G4DynamicParticle' data-ref="G4DynamicParticle">G4DynamicParticle</a> * <dfn class="local col2 decl" id="22aNewDP" title='aNewDP' data-type='G4DynamicParticle *' data-ref="22aNewDP">aNewDP</dfn> =</td></tr>
+<tr><th id="181">181</th><td>	       <b>new</b> G4DynamicParticle((*i)-&gt;GetDefinition(),</td></tr>
+<tr><th id="182">182</th><td>			      (*i)-&gt;GetTotalEnergy(),</td></tr>
+<tr><th id="183">183</th><td>			      (*i)-&gt;GetMomentum());</td></tr>
+<tr><th id="184">184</th><td>      <a class="type" href="../../../../util/include/G4HadSecondary.hh.html#G4HadSecondary" title='G4HadSecondary' data-ref="G4HadSecondary">G4HadSecondary</a> <dfn class="local col3 decl" id="23aNew" title='aNew' data-type='G4HadSecondary' data-ref="23aNew">aNew</dfn> =  <a class="type" href="../../../../util/include/G4HadSecondary.hh.html#G4HadSecondary" title='G4HadSecondary' data-ref="G4HadSecondary">G4HadSecondary</a><a class="ref" href="../../../../util/include/G4HadSecondary.hh.html#_ZN14G4HadSecondaryC1EP17G4DynamicParticledi" title='G4HadSecondary::G4HadSecondary' data-ref="_ZN14G4HadSecondaryC1EP17G4DynamicParticledi">(</a><a class="local col2 ref" href="#22aNewDP" title='aNewDP' data-ref="22aNewDP">aNewDP</a>);</td></tr>
+<tr><th id="185">185</th><td>      <a class="typedef" href="../../../../../../global/management/include/G4Types.hh.html#G4double" title='G4double' data-type='double' data-ref="G4double">G4double</a> <dfn class="local col4 decl" id="24time" title='time' data-type='G4double' data-ref="24time">time</dfn>=(*i)-&gt;GetFormationTime();</td></tr>
+<tr><th id="186">186</th><td>      <b>if</b>(<a class="local col4 ref" href="#24time" title='time' data-ref="24time">time</a> &lt; <var>0.0</var>) { <a class="local col4 ref" href="#24time" title='time' data-ref="24time">time</a> = <var>0.0</var>; }</td></tr>
+<tr><th id="187">187</th><td>      <a class="local col3 ref" href="#23aNew" title='aNew' data-ref="23aNew">aNew</a>.<a class="ref" href="../../../../util/include/G4HadSecondary.hh.html#_ZN14G4HadSecondary7SetTimeEd" title='G4HadSecondary::SetTime' data-ref="_ZN14G4HadSecondary7SetTimeEd">SetTime</a>(<a class="local col4 ref" href="#14timePrimary" title='timePrimary' data-ref="14timePrimary">timePrimary</a> + <a class="local col4 ref" href="#24time" title='time' data-ref="24time">time</a>);</td></tr>
+<tr><th id="188">188</th><td>      aNew.SetCreatorModelType((*i)-&gt;GetCreatorModel());</td></tr>
+<tr><th id="189">189</th><td>      <b>delete</b> (*i);</td></tr>
+<tr><th id="190">190</th><td>      <a class="member" href="../include/G4PreCompoundModel.hh.html#G4PreCompoundModel::theResult" title='G4PreCompoundModel::theResult' data-ref="G4PreCompoundModel::theResult">theResult</a>.<a class="ref" href="../../../../util/include/G4HadFinalState.hh.html#_ZN15G4HadFinalState12AddSecondaryERK14G4HadSecondary" title='G4HadFinalState::AddSecondary' data-ref="_ZN15G4HadFinalState12AddSecondaryERK14G4HadSecondary">AddSecondary</a>(<a class="local col3 ref" href="#23aNew" title='aNew' data-ref="23aNew">aNew</a>);</td></tr>
+<tr><th id="191">191</th><td>    }</td></tr>
+<tr><th id="192">192</th><td>  <b>delete</b> result;</td></tr>
+<tr><th id="193">193</th><td>  </td></tr>
+<tr><th id="194">194</th><td>  <i>//return the filled particle change</i></td></tr>
+<tr><th id="195">195</th><td>  <b>return</b> &amp;<a class="member" href="../include/G4PreCompoundModel.hh.html#G4PreCompoundModel::theResult" title='G4PreCompoundModel::theResult' data-ref="G4PreCompoundModel::theResult">theResult</a>;</td></tr>
+<tr><th id="196">196</th><td>}</td></tr>
+<tr><th id="197">197</th><td></td></tr>
+<tr><th id="198">198</th><td><i>////////////////////////////////////////////////////////////////////////////////</i></td></tr>
+<tr><th id="199">199</th><td></td></tr>
+<tr><th id="200">200</th><td><span class='error' title="unknown type name &apos;G4ReactionProductVector&apos;">G4ReactionProductVector</span>* G4PreCompoundModel::DeExcite(G4Fragment&amp; aFragment)</td></tr>
+<tr><th id="201">201</th><td>{</td></tr>
+<tr><th id="202">202</th><td>  <b>if</b>(!isInitialised) { InitialiseModel(); }</td></tr>
+<tr><th id="203">203</th><td></td></tr>
+<tr><th id="204">204</th><td>  <span class='error' title="unknown type name &apos;G4ReactionProductVector&apos;">G4ReactionProductVector</span> * Result = <b>new</b> <span class='error' title="unknown type name &apos;G4ReactionProductVector&apos;">G4ReactionProductVector</span>;</td></tr>
+<tr><th id="205">205</th><td>  G4double Eex = aFragment.GetExcitationEnergy();</td></tr>
+<tr><th id="206">206</th><td>  G4int Z = aFragment.GetZ_asInt(); </td></tr>
+<tr><th id="207">207</th><td>  G4int A = aFragment.GetA_asInt(); </td></tr>
+<tr><th id="208">208</th><td></td></tr>
+<tr><th id="209">209</th><td>  <i>//G4cout &lt;&lt; "### G4PreCompoundModel::DeExcite" &lt;&lt; G4endl;</i></td></tr>
+<tr><th id="210">210</th><td><i>  //G4cout &lt;&lt; aFragment &lt;&lt; G4endl;</i></td></tr>
+<tr><th id="211">211</th><td><i> </i></td></tr>
+<tr><th id="212">212</th><td><i>  // Perform Equilibrium Emission </i></td></tr>
+<tr><th id="213">213</th><td>  <b>if</b> (!isActive || (Z &lt; minZ &amp;&amp; A &lt; minA) || Eex &lt; fLimitEnergy*A) {</td></tr>
+<tr><th id="214">214</th><td>    PerformEquilibriumEmission(aFragment, Result);</td></tr>
+<tr><th id="215">215</th><td>    <b>return</b> Result;</td></tr>
+<tr><th id="216">216</th><td>  }</td></tr>
+<tr><th id="217">217</th><td>  </td></tr>
+<tr><th id="218">218</th><td>  <i>// main loop  </i></td></tr>
+<tr><th id="219">219</th><td>  G4int count = <var>0</var>;</td></tr>
+<tr><th id="220">220</th><td>  <em>static</em> <em>const</em> G4double ldfact = <var>12.0</var>/CLHEP::pi2;</td></tr>
+<tr><th id="221">221</th><td>  <em>static</em> <em>const</em> G4int countmax = <var>1000</var>;</td></tr>
+<tr><th id="222">222</th><td>  <b>for</b> (;;) {</td></tr>
+<tr><th id="223">223</th><td>    <i>//G4cout &lt;&lt; "### PreCompound loop over fragment" &lt;&lt; G4endl;</i></td></tr>
+<tr><th id="224">224</th><td><i>    //G4cout &lt;&lt; aFragment &lt;&lt; G4endl;</i></td></tr>
+<tr><th id="225">225</th><td>    G4double U = aFragment.GetExcitationEnergy();</td></tr>
+<tr><th id="226">226</th><td>    Z = aFragment.GetZ_asInt();</td></tr>
+<tr><th id="227">227</th><td>    A = aFragment.GetA_asInt();</td></tr>
+<tr><th id="228">228</th><td>    G4int EquilibriumExcitonNumber = </td></tr>
+<tr><th id="229">229</th><td>      G4lrint(<span class='error' title="use of undeclared identifier &apos;std&apos;">std</span>::sqrt(ldfact*U*fNuclData-&gt;GetLevelDensity(Z, A, U)));</td></tr>
+<tr><th id="230">230</th><td>    <i>//   </i></td></tr>
+<tr><th id="231">231</th><td><i>    //    G4cout&lt;&lt;"Neq="&lt;&lt;EquilibriumExcitonNumber&lt;&lt;G4endl;</i></td></tr>
+<tr><th id="232">232</th><td><i>    //</i></td></tr>
+<tr><th id="233">233</th><td><i>    // J. M. Quesada (Jan. 08)  equilibrium hole number could be used as preeq.</i></td></tr>
+<tr><th id="234">234</th><td><i>    // evap. delimiter (IAEA report)</i></td></tr>
+<tr><th id="235">235</th><td><i>    </i></td></tr>
+<tr><th id="236">236</th><td><i>    // Loop for transitions, it is performed while there are </i></td></tr>
+<tr><th id="237">237</th><td><i>    // preequilibrium transitions.</i></td></tr>
+<tr><th id="238">238</th><td>    G4bool ThereIsTransition = <b>false</b>;</td></tr>
+<tr><th id="239">239</th><td>    </td></tr>
+<tr><th id="240">240</th><td>    <i>//        G4cout&lt;&lt;"----------------------------------------"&lt;&lt;G4endl;</i></td></tr>
+<tr><th id="241">241</th><td><i>    //        G4double NP=aFragment.GetNumberOfParticles();</i></td></tr>
+<tr><th id="242">242</th><td><i>    //        G4double NH=aFragment.GetNumberOfHoles();</i></td></tr>
+<tr><th id="243">243</th><td><i>    //        G4double NE=aFragment.GetNumberOfExcitons();</i></td></tr>
+<tr><th id="244">244</th><td><i>    //        G4cout&lt;&lt;" Ex. Energy="&lt;&lt;aFragment.GetExcitationEnergy()&lt;&lt;G4endl;</i></td></tr>
+<tr><th id="245">245</th><td><i>    //   G4cout&lt;&lt;"N. excitons="&lt;&lt;NE&lt;&lt;"  N. Part="&lt;&lt;NP&lt;&lt;"N. Holes ="&lt;&lt;NH&lt;&lt;G4endl;</i></td></tr>
+<tr><th id="246">246</th><td>    <b>do</b> {</td></tr>
+<tr><th id="247">247</th><td>      ++count;</td></tr>
+<tr><th id="248">248</th><td>      <i>//G4cout&lt;&lt;"transition number .."&lt;&lt;count</i></td></tr>
+<tr><th id="249">249</th><td><i>      //      &lt;&lt;" n ="&lt;&lt;aFragment.GetNumberOfExcitons()&lt;&lt;G4endl;</i></td></tr>
+<tr><th id="250">250</th><td>      G4bool go_ahead = <b>false</b>;</td></tr>
+<tr><th id="251">251</th><td>      <i>// soft cutoff criterium as an "ad-hoc" solution to force </i></td></tr>
+<tr><th id="252">252</th><td><i>      // increase in  evaporation  </i></td></tr>
+<tr><th id="253">253</th><td>      G4int test = aFragment.GetNumberOfExcitons();</td></tr>
+<tr><th id="254">254</th><td>      <b>if</b> (test &lt;= EquilibriumExcitonNumber) { go_ahead=<b>true</b>; }</td></tr>
+<tr><th id="255">255</th><td></td></tr>
+<tr><th id="256">256</th><td>      <i>//J. M. Quesada (Apr. 08): soft-cutoff switched off by default</i></td></tr>
+<tr><th id="257">257</th><td>      <b>if</b> (useSCO &amp;&amp; go_ahead)</td></tr>
+<tr><th id="258">258</th><td>	{</td></tr>
+<tr><th id="259">259</th><td>	  G4double x = G4double(test)/G4double(EquilibriumExcitonNumber) - <var>1</var>;</td></tr>
+<tr><th id="260">260</th><td>	  <b>if</b>( <a class="macro" href="../../../../../../global/HEPRandom/include/Randomize.hh.html#52" title="CLHEP::HepRandom::getTheEngine()-&gt;flat()" data-ref="_M/G4UniformRand">G4UniformRand</a>() &lt; <var>1.0</var> -  G4Exp(-x*x/<var>0.32</var>) ) { go_ahead = <b>false</b>; }</td></tr>
+<tr><th id="261">261</th><td>	} </td></tr>
+<tr><th id="262">262</th><td>        </td></tr>
+<tr><th id="263">263</th><td>      <i>// JMQ: WARNING:  CalculateProbability MUST be called prior to Get!! </i></td></tr>
+<tr><th id="264">264</th><td><i>      // (O values would be returned otherwise)</i></td></tr>
+<tr><th id="265">265</th><td>      G4double TotalTransitionProbability = </td></tr>
+<tr><th id="266">266</th><td>	theTransition-&gt;CalculateProbability(aFragment);</td></tr>
+<tr><th id="267">267</th><td>      G4double P1 = theTransition-&gt;GetTransitionProb1();</td></tr>
+<tr><th id="268">268</th><td>      G4double P2 = theTransition-&gt;GetTransitionProb2();</td></tr>
+<tr><th id="269">269</th><td>      G4double P3 = theTransition-&gt;GetTransitionProb3();</td></tr>
+<tr><th id="270">270</th><td>      <i>//G4cout&lt;&lt;"#0 P1="&lt;&lt;P1&lt;&lt;" P2="&lt;&lt;P2&lt;&lt;"  P3="&lt;&lt;P3&lt;&lt;G4endl;</i></td></tr>
+<tr><th id="271">271</th><td><i>      </i></td></tr>
+<tr><th id="272">272</th><td><i>      //J.M. Quesada (May 2008) Physical criterium (lamdas)  PREVAILS over </i></td></tr>
+<tr><th id="273">273</th><td><i>      //                        approximation (critical exciton number)</i></td></tr>
+<tr><th id="274">274</th><td><i>      //V.Ivanchenko (May 2011) added check on number of nucleons</i></td></tr>
+<tr><th id="275">275</th><td><i>      //                        to send a fragment to FermiBreakUp</i></td></tr>
+<tr><th id="276">276</th><td>      <b>if</b>(!go_ahead || P1 &lt;= P2+P3 || Z &lt; minZ || A &lt; minA || U &lt;= fLimitEnergy*A)</td></tr>
+<tr><th id="277">277</th><td>	{</td></tr>
+<tr><th id="278">278</th><td>	  <i>//G4cout&lt;&lt;"#4 EquilibriumEmission"&lt;&lt;G4endl; </i></td></tr>
+<tr><th id="279">279</th><td>	  PerformEquilibriumEmission(aFragment,Result);</td></tr>
+<tr><th id="280">280</th><td>	  <b>return</b> Result;</td></tr>
+<tr><th id="281">281</th><td>	}</td></tr>
+<tr><th id="282">282</th><td>      <b>else</b> </td></tr>
+<tr><th id="283">283</th><td>	{</td></tr>
+<tr><th id="284">284</th><td>	  <i>//</i></td></tr>
+<tr><th id="285">285</th><td><i>	  // Check if number of excitons is greater than 0</i></td></tr>
+<tr><th id="286">286</th><td><i>	  // else perform equilibrium emission</i></td></tr>
+<tr><th id="287">287</th><td>	  <b>if</b> (aFragment.GetNumberOfExcitons() &lt;= <var>0</var>) </td></tr>
+<tr><th id="288">288</th><td>	    {</td></tr>
+<tr><th id="289">289</th><td>	      PerformEquilibriumEmission(aFragment,Result);</td></tr>
+<tr><th id="290">290</th><td>	      <b>return</b> Result;</td></tr>
+<tr><th id="291">291</th><td>	    }</td></tr>
+<tr><th id="292">292</th><td>	    </td></tr>
+<tr><th id="293">293</th><td>	  G4double TotalEmissionProbability = </td></tr>
+<tr><th id="294">294</th><td>	    theEmission-&gt;GetTotalProbability(aFragment);</td></tr>
+<tr><th id="295">295</th><td>	  <i>//</i></td></tr>
+<tr><th id="296">296</th><td><i>	  //G4cout&lt;&lt;"#1 TotalEmissionProbability="&lt;&lt;TotalEmissionProbability</i></td></tr>
+<tr><th id="297">297</th><td><i>	  // &lt;&lt;" Nex= " &lt;&lt;aFragment.GetNumberOfExcitons()&lt;&lt;G4endl;</i></td></tr>
+<tr><th id="298">298</th><td><i>	  //J.M.Quesada (May 08) this has already been done in order to decide  </i></td></tr>
+<tr><th id="299">299</th><td><i>	  //                     what to do (preeq-eq) </i></td></tr>
+<tr><th id="300">300</th><td><i>	  // Sum of all probabilities</i></td></tr>
+<tr><th id="301">301</th><td>	  G4double TotalProbability = TotalEmissionProbability </td></tr>
+<tr><th id="302">302</th><td>	    + TotalTransitionProbability;</td></tr>
+<tr><th id="303">303</th><td>            </td></tr>
+<tr><th id="304">304</th><td>	  <i>// Select subprocess</i></td></tr>
+<tr><th id="305">305</th><td>	  <b>if</b> (TotalProbability*<a class="macro" href="../../../../../../global/HEPRandom/include/Randomize.hh.html#52" title="CLHEP::HepRandom::getTheEngine()-&gt;flat()" data-ref="_M/G4UniformRand">G4UniformRand</a>() &gt; TotalEmissionProbability) </td></tr>
+<tr><th id="306">306</th><td>	    {</td></tr>
+<tr><th id="307">307</th><td>	      <i>//G4cout&lt;&lt;"#2 Transition"&lt;&lt;G4endl; </i></td></tr>
+<tr><th id="308">308</th><td><i>	      // It will be transition to state with a new number of excitons</i></td></tr>
+<tr><th id="309">309</th><td>	      ThereIsTransition = <b>true</b>;		</td></tr>
+<tr><th id="310">310</th><td>	      <i>// Perform the transition</i></td></tr>
+<tr><th id="311">311</th><td>	      theTransition-&gt;PerformTransition(aFragment);</td></tr>
+<tr><th id="312">312</th><td>	    } </td></tr>
+<tr><th id="313">313</th><td>	  <b>else</b> </td></tr>
+<tr><th id="314">314</th><td>	    {</td></tr>
+<tr><th id="315">315</th><td>	      <i>//G4cout&lt;&lt;"#3 Emission"&lt;&lt;G4endl; </i></td></tr>
+<tr><th id="316">316</th><td><i>	      // It will be fragment emission</i></td></tr>
+<tr><th id="317">317</th><td>	      ThereIsTransition = <b>false</b>;</td></tr>
+<tr><th id="318">318</th><td>	      Result-&gt;push_back(theEmission-&gt;PerformEmission(aFragment));</td></tr>
+<tr><th id="319">319</th><td>	    }</td></tr>
+<tr><th id="320">320</th><td>	}</td></tr>
+<tr><th id="321">321</th><td>      <i>// Loop checking, 05-Aug-2015, Vladimir Ivanchenko</i></td></tr>
+<tr><th id="322">322</th><td>    } <b>while</b> (ThereIsTransition);   <i>// end of do loop</i></td></tr>
+<tr><th id="323">323</th><td></td></tr>
+<tr><th id="324">324</th><td>    <i>// stop if too many iterations</i></td></tr>
+<tr><th id="325">325</th><td>    <b>if</b>(count &gt;= countmax) {</td></tr>
+<tr><th id="326">326</th><td>      G4ExceptionDescription ed;</td></tr>
+<tr><th id="327">327</th><td>      ed <span class='error' title="invalid operands to binary expression (&apos;G4ExceptionDescription&apos; (aka &apos;int&apos;) and &apos;const char *&apos;)">&lt;&lt;</span> <q>"G4PreCompoundModel loop over "</q> &lt;&lt; countmax &lt;&lt; <q>" iterations; "</q></td></tr>
+<tr><th id="328">328</th><td>	 &lt;&lt; <q>"current G4Fragment: \n"</q> &lt;&lt; aFragment;</td></tr>
+<tr><th id="329">329</th><td>      G4Exception(<q>"G4PreCompoundModel::DeExcite()"</q>,<q>"had0034"</q>,JustWarning,</td></tr>
+<tr><th id="330">330</th><td>		  ed,<q>""</q>);</td></tr>
+<tr><th id="331">331</th><td>      PerformEquilibriumEmission(aFragment, Result);</td></tr>
+<tr><th id="332">332</th><td>      <b>return</b> Result;</td></tr>
+<tr><th id="333">333</th><td>    }</td></tr>
+<tr><th id="334">334</th><td>  } <i>// end of for (;;) loop</i></td></tr>
+<tr><th id="335">335</th><td>  <b>return</b> Result;</td></tr>
+<tr><th id="336">336</th><td>}</td></tr>
+<tr><th id="337">337</th><td></td></tr>
+<tr><th id="338">338</th><td><i>////////////////////////////////////////////////////////////////////////////////</i></td></tr>
+<tr><th id="339">339</th><td><i>//       Initialisation</i></td></tr>
+<tr><th id="340">340</th><td><i>////////////////////////////////////////////////////////////////////////////////</i></td></tr>
+<tr><th id="341">341</th><td></td></tr>
+<tr><th id="342">342</th><td><em>void</em> <a class="type" href="../include/G4PreCompoundModel.hh.html#G4PreCompoundModel" title='G4PreCompoundModel' data-ref="G4PreCompoundModel">G4PreCompoundModel</a>::<dfn class="decl def" id="_ZN18G4PreCompoundModel15UseHETCEmissionEv" title='G4PreCompoundModel::UseHETCEmission' data-ref="_ZN18G4PreCompoundModel15UseHETCEmissionEv">UseHETCEmission</dfn>() </td></tr>
+<tr><th id="343">343</th><td>{</td></tr>
+<tr><th id="344">344</th><td>  <a class="member" href="#_ZN18G4PreCompoundModel12PrintWarningERK8G4String" title='G4PreCompoundModel::PrintWarning' data-ref="_ZN18G4PreCompoundModel12PrintWarningERK8G4String">PrintWarning</a>(<a class="ref fake" href="../../../../../../global/management/include/G4String.hh.html#_ZN8G4StringC1EPKc" title='G4String::G4String' data-ref="_ZN8G4StringC1EPKc"></a><q>"UseHETCEmission"</q>);</td></tr>
+<tr><th id="345">345</th><td>}</td></tr>
+<tr><th id="346">346</th><td></td></tr>
+<tr><th id="347">347</th><td><em>void</em> <a class="type" href="../include/G4PreCompoundModel.hh.html#G4PreCompoundModel" title='G4PreCompoundModel' data-ref="G4PreCompoundModel">G4PreCompoundModel</a>::<dfn class="decl def" id="_ZN18G4PreCompoundModel18UseDefaultEmissionEv" title='G4PreCompoundModel::UseDefaultEmission' data-ref="_ZN18G4PreCompoundModel18UseDefaultEmissionEv">UseDefaultEmission</dfn>() </td></tr>
+<tr><th id="348">348</th><td>{ </td></tr>
+<tr><th id="349">349</th><td>  <a class="member" href="#_ZN18G4PreCompoundModel12PrintWarningERK8G4String" title='G4PreCompoundModel::PrintWarning' data-ref="_ZN18G4PreCompoundModel12PrintWarningERK8G4String">PrintWarning</a>(<a class="ref fake" href="../../../../../../global/management/include/G4String.hh.html#_ZN8G4StringC1EPKc" title='G4String::G4String' data-ref="_ZN8G4StringC1EPKc"></a><q>"UseDefaultEmission"</q>);</td></tr>
+<tr><th id="350">350</th><td>}</td></tr>
+<tr><th id="351">351</th><td></td></tr>
+<tr><th id="352">352</th><td><em>void</em> <a class="type" href="../include/G4PreCompoundModel.hh.html#G4PreCompoundModel" title='G4PreCompoundModel' data-ref="G4PreCompoundModel">G4PreCompoundModel</a>::<dfn class="decl def" id="_ZN18G4PreCompoundModel18UseGNASHTransitionEv" title='G4PreCompoundModel::UseGNASHTransition' data-ref="_ZN18G4PreCompoundModel18UseGNASHTransitionEv">UseGNASHTransition</dfn>() </td></tr>
+<tr><th id="353">353</th><td>{ </td></tr>
+<tr><th id="354">354</th><td>  <a class="member" href="#_ZN18G4PreCompoundModel12PrintWarningERK8G4String" title='G4PreCompoundModel::PrintWarning' data-ref="_ZN18G4PreCompoundModel12PrintWarningERK8G4String">PrintWarning</a>(<a class="ref fake" href="../../../../../../global/management/include/G4String.hh.html#_ZN8G4StringC1EPKc" title='G4String::G4String' data-ref="_ZN8G4StringC1EPKc"></a><q>"UseGNASHTransition"</q>);</td></tr>
+<tr><th id="355">355</th><td>}</td></tr>
+<tr><th id="356">356</th><td></td></tr>
+<tr><th id="357">357</th><td><em>void</em> <a class="type" href="../include/G4PreCompoundModel.hh.html#G4PreCompoundModel" title='G4PreCompoundModel' data-ref="G4PreCompoundModel">G4PreCompoundModel</a>::<dfn class="decl def" id="_ZN18G4PreCompoundModel20UseDefaultTransitionEv" title='G4PreCompoundModel::UseDefaultTransition' data-ref="_ZN18G4PreCompoundModel20UseDefaultTransitionEv">UseDefaultTransition</dfn>() </td></tr>
+<tr><th id="358">358</th><td>{ </td></tr>
+<tr><th id="359">359</th><td>  <a class="member" href="#_ZN18G4PreCompoundModel12PrintWarningERK8G4String" title='G4PreCompoundModel::PrintWarning' data-ref="_ZN18G4PreCompoundModel12PrintWarningERK8G4String">PrintWarning</a>(<a class="ref fake" href="../../../../../../global/management/include/G4String.hh.html#_ZN8G4StringC1EPKc" title='G4String::G4String' data-ref="_ZN8G4StringC1EPKc"></a><q>"UseDefaultTransition"</q>);</td></tr>
+<tr><th id="360">360</th><td>}</td></tr>
+<tr><th id="361">361</th><td></td></tr>
+<tr><th id="362">362</th><td><em>void</em> <a class="type" href="../include/G4PreCompoundModel.hh.html#G4PreCompoundModel" title='G4PreCompoundModel' data-ref="G4PreCompoundModel">G4PreCompoundModel</a>::<dfn class="decl def" id="_ZN18G4PreCompoundModel8SetOPTxsEi" title='G4PreCompoundModel::SetOPTxs' data-ref="_ZN18G4PreCompoundModel8SetOPTxsEi">SetOPTxs</dfn>(<a class="typedef" href="../../../../../../global/management/include/G4Types.hh.html#G4int" title='G4int' data-type='int' data-ref="G4int">G4int</a>) </td></tr>
+<tr><th id="363">363</th><td>{ </td></tr>
+<tr><th id="364">364</th><td>  <a class="member" href="#_ZN18G4PreCompoundModel12PrintWarningERK8G4String" title='G4PreCompoundModel::PrintWarning' data-ref="_ZN18G4PreCompoundModel12PrintWarningERK8G4String">PrintWarning</a>(<a class="ref fake" href="../../../../../../global/management/include/G4String.hh.html#_ZN8G4StringC1EPKc" title='G4String::G4String' data-ref="_ZN8G4StringC1EPKc"></a><q>"UseOPTxs"</q>);</td></tr>
+<tr><th id="365">365</th><td>}</td></tr>
+<tr><th id="366">366</th><td></td></tr>
+<tr><th id="367">367</th><td><em>void</em> <a class="type" href="../include/G4PreCompoundModel.hh.html#G4PreCompoundModel" title='G4PreCompoundModel' data-ref="G4PreCompoundModel">G4PreCompoundModel</a>::<dfn class="decl def" id="_ZN18G4PreCompoundModel7UseSICBEv" title='G4PreCompoundModel::UseSICB' data-ref="_ZN18G4PreCompoundModel7UseSICBEv">UseSICB</dfn>() </td></tr>
+<tr><th id="368">368</th><td>{ </td></tr>
+<tr><th id="369">369</th><td>  <a class="member" href="#_ZN18G4PreCompoundModel12PrintWarningERK8G4String" title='G4PreCompoundModel::PrintWarning' data-ref="_ZN18G4PreCompoundModel12PrintWarningERK8G4String">PrintWarning</a>(<a class="ref fake" href="../../../../../../global/management/include/G4String.hh.html#_ZN8G4StringC1EPKc" title='G4String::G4String' data-ref="_ZN8G4StringC1EPKc"></a><q>"UseSICB"</q>);</td></tr>
+<tr><th id="370">370</th><td>}</td></tr>
+<tr><th id="371">371</th><td></td></tr>
+<tr><th id="372">372</th><td><em>void</em> <a class="type" href="../include/G4PreCompoundModel.hh.html#G4PreCompoundModel" title='G4PreCompoundModel' data-ref="G4PreCompoundModel">G4PreCompoundModel</a>::<dfn class="decl def" id="_ZN18G4PreCompoundModel6UseNGBEv" title='G4PreCompoundModel::UseNGB' data-ref="_ZN18G4PreCompoundModel6UseNGBEv">UseNGB</dfn>()  </td></tr>
+<tr><th id="373">373</th><td>{ </td></tr>
+<tr><th id="374">374</th><td>  <a class="member" href="#_ZN18G4PreCompoundModel12PrintWarningERK8G4String" title='G4PreCompoundModel::PrintWarning' data-ref="_ZN18G4PreCompoundModel12PrintWarningERK8G4String">PrintWarning</a>(<a class="ref fake" href="../../../../../../global/management/include/G4String.hh.html#_ZN8G4StringC1EPKc" title='G4String::G4String' data-ref="_ZN8G4StringC1EPKc"></a><q>"UseNGB"</q>);</td></tr>
+<tr><th id="375">375</th><td>}</td></tr>
+<tr><th id="376">376</th><td></td></tr>
+<tr><th id="377">377</th><td><em>void</em> <a class="type" href="../include/G4PreCompoundModel.hh.html#G4PreCompoundModel" title='G4PreCompoundModel' data-ref="G4PreCompoundModel">G4PreCompoundModel</a>::<dfn class="decl def" id="_ZN18G4PreCompoundModel6UseSCOEv" title='G4PreCompoundModel::UseSCO' data-ref="_ZN18G4PreCompoundModel6UseSCOEv">UseSCO</dfn>()  </td></tr>
+<tr><th id="378">378</th><td>{ </td></tr>
+<tr><th id="379">379</th><td>  <a class="member" href="#_ZN18G4PreCompoundModel12PrintWarningERK8G4String" title='G4PreCompoundModel::PrintWarning' data-ref="_ZN18G4PreCompoundModel12PrintWarningERK8G4String">PrintWarning</a>(<a class="ref fake" href="../../../../../../global/management/include/G4String.hh.html#_ZN8G4StringC1EPKc" title='G4String::G4String' data-ref="_ZN8G4StringC1EPKc"></a><q>"UseSCO"</q>);</td></tr>
+<tr><th id="380">380</th><td>}</td></tr>
+<tr><th id="381">381</th><td></td></tr>
+<tr><th id="382">382</th><td><em>void</em> <a class="type" href="../include/G4PreCompoundModel.hh.html#G4PreCompoundModel" title='G4PreCompoundModel' data-ref="G4PreCompoundModel">G4PreCompoundModel</a>::<dfn class="decl def" id="_ZN18G4PreCompoundModel8UseCEMtrEv" title='G4PreCompoundModel::UseCEMtr' data-ref="_ZN18G4PreCompoundModel8UseCEMtrEv">UseCEMtr</dfn>() </td></tr>
+<tr><th id="383">383</th><td>{ </td></tr>
+<tr><th id="384">384</th><td>  <a class="member" href="#_ZN18G4PreCompoundModel12PrintWarningERK8G4String" title='G4PreCompoundModel::PrintWarning' data-ref="_ZN18G4PreCompoundModel12PrintWarningERK8G4String">PrintWarning</a>(<a class="ref fake" href="../../../../../../global/management/include/G4String.hh.html#_ZN8G4StringC1EPKc" title='G4String::G4String' data-ref="_ZN8G4StringC1EPKc"></a><q>"UseCEMtr"</q>);</td></tr>
+<tr><th id="385">385</th><td>}</td></tr>
+<tr><th id="386">386</th><td></td></tr>
+<tr><th id="387">387</th><td><em>void</em> <a class="type" href="../include/G4PreCompoundModel.hh.html#G4PreCompoundModel" title='G4PreCompoundModel' data-ref="G4PreCompoundModel">G4PreCompoundModel</a>::<dfn class="decl def" id="_ZN18G4PreCompoundModel12PrintWarningERK8G4String" title='G4PreCompoundModel::PrintWarning' data-ref="_ZN18G4PreCompoundModel12PrintWarningERK8G4String">PrintWarning</dfn>(<em>const</em> <a class="type" href="../../../../../../global/management/include/G4String.hh.html#G4String" title='G4String' data-ref="G4String">G4String</a>&amp; <dfn class="local col5 decl" id="25mname" title='mname' data-type='const G4String &amp;' data-ref="25mname">mname</dfn>)</td></tr>
+<tr><th id="388">388</th><td>{</td></tr>
+<tr><th id="389">389</th><td>  <a class="typedef" href="../../../../../../global/management/include/G4Exception.hh.html#G4ExceptionDescription" title='G4ExceptionDescription' data-type='int' data-ref="G4ExceptionDescription">G4ExceptionDescription</a> <dfn class="local col6 decl" id="26ed" title='ed' data-type='G4ExceptionDescription' data-ref="26ed">ed</dfn>;</td></tr>
+<tr><th id="390">390</th><td>  ed <span class='error' title="invalid operands to binary expression (&apos;G4ExceptionDescription&apos; (aka &apos;int&apos;) and &apos;const char *&apos;)">&lt;&lt;</span> <q>"Obsolete method of the preCompound model is called: "</q> </td></tr>
+<tr><th id="391">391</th><td>     &lt;&lt; mname &lt;&lt; <q>"() \n Instead a corresponding method of "</q></td></tr>
+<tr><th id="392">392</th><td>     &lt;&lt; <q>"G4DeexPrecoParameters class should be used"</q>;</td></tr>
+<tr><th id="393">393</th><td></td></tr>
+<tr><th id="394">394</th><td>  <a class="ref" href="../../../../../../global/management/include/G4Exception.hh.html#_Z11G4ExceptionPKcS0_19G4ExceptionSeverityRi" title='G4Exception' data-ref="_Z11G4ExceptionPKcS0_19G4ExceptionSeverityRi">G4Exception</a>(<q>"G4PreCompoundModel::ReadData()"</q>,<q>"had0803"</q>,<a class="enum" href="../../../../../../global/management/include/G4ExceptionSeverity.hh.html#G4ExceptionSeverity::JustWarning" title='G4ExceptionSeverity::JustWarning' data-ref="G4ExceptionSeverity::JustWarning">JustWarning</a>,<span class='refarg'><a class="local col6 ref" href="#26ed" title='ed' data-ref="26ed">ed</a></span>);</td></tr>
+<tr><th id="395">395</th><td>}</td></tr>
+<tr><th id="396">396</th><td></td></tr>
+<tr><th id="397">397</th><td><i>////////////////////////////////////////////////////////////////////////////////</i></td></tr>
+<tr><th id="398">398</th><td><i>//       Documentation</i></td></tr>
+<tr><th id="399">399</th><td><i>////////////////////////////////////////////////////////////////////////////////</i></td></tr>
+<tr><th id="400">400</th><td></td></tr>
+<tr><th id="401">401</th><td><em>void</em> G4PreCompoundModel::ModelDescription(<span class='error' title="use of undeclared identifier &apos;std&apos;">std</span>::ostream&amp; outFile) <em>const</em></td></tr>
+<tr><th id="402">402</th><td>{</td></tr>
+<tr><th id="403">403</th><td>  outFile </td></tr>
+<tr><th id="404">404</th><td>    &lt;&lt; <q>"The GEANT4 precompound model is considered as an extension of the\n"</q></td></tr>
+<tr><th id="405">405</th><td>    &lt;&lt;	<q>"hadron kinetic model. It gives a possibility to extend the low energy range\n"</q></td></tr>
+<tr><th id="406">406</th><td>    &lt;&lt;	<q>"of the hadron kinetic model for nucleon-nucleus inelastic collision and it \n"</q></td></tr>
+<tr><th id="407">407</th><td>    &lt;&lt;	<q>"provides a ”smooth” transition from kinetic stage of reaction described by the\n"</q></td></tr>
+<tr><th id="408">408</th><td>    &lt;&lt;	<q>"hadron kinetic model to the equilibrium stage of reaction described by the\n"</q></td></tr>
+<tr><th id="409">409</th><td>    &lt;&lt;	<q>"equilibrium deexcitation models.\n"</q></td></tr>
+<tr><th id="410">410</th><td>    &lt;&lt;	<q>"The initial information for calculation of pre-compound nuclear stage\n"</q></td></tr>
+<tr><th id="411">411</th><td>    &lt;&lt;	<q>"consists of the atomic mass number A, charge Z of residual nucleus, its\n"</q></td></tr>
+<tr><th id="412">412</th><td>    &lt;&lt;	<q>"four momentum P0 , excitation energy U and number of excitons n, which equals\n"</q></td></tr>
+<tr><th id="413">413</th><td>    &lt;&lt;	<q>"the sum of the number of particles p (from them p_Z are charged) and the number of\n"</q></td></tr>
+<tr><th id="414">414</th><td>    &lt;&lt;	<q>"holes h.\n"</q></td></tr>
+<tr><th id="415">415</th><td>    &lt;&lt;	<q>"At the preequilibrium stage of reaction, we follow the exciton model approach in ref. [1],\n"</q></td></tr>
+<tr><th id="416">416</th><td>    &lt;&lt;	<q>"taking into account the competition among all possible nuclear transitions\n"</q></td></tr>
+<tr><th id="417">417</th><td>    &lt;&lt;	<q>"with ∆n = +2, −2, 0 (which are defined by their associated transition probabilities) and\n"</q></td></tr>
+<tr><th id="418">418</th><td>    &lt;&lt;	<q>"the emission of neutrons, protons, deuterons, thritium and helium nuclei (also defined by\n"</q></td></tr>
+<tr><th id="419">419</th><td>    &lt;&lt;	<q>"their associated emission  probabilities according to exciton model)\n"</q></td></tr>
+<tr><th id="420">420</th><td>    &lt;&lt;	<q>"\n"</q></td></tr>
+<tr><th id="421">421</th><td>    &lt;&lt;	<q>"[1] K.K. Gudima, S.G. Mashnik, V.D. Toneev, Nucl. Phys. A401 329 (1983)\n"</q></td></tr>
+<tr><th id="422">422</th><td>    &lt;&lt; <q>"\n"</q>;</td></tr>
+<tr><th id="423">423</th><td>}</td></tr>
+<tr><th id="424">424</th><td></td></tr>
+<tr><th id="425">425</th><td><em>void</em> G4PreCompoundModel::DeExciteModelDescription(<span class='error' title="use of undeclared identifier &apos;std&apos;">std</span>::ostream&amp; outFile) <em>const</em></td></tr>
+<tr><th id="426">426</th><td>{</td></tr>
+<tr><th id="427">427</th><td>  outFile &lt;&lt; <q>"description of precompound model as used with DeExcite()"</q> &lt;&lt; <q>"\n"</q>;</td></tr>
+<tr><th id="428">428</th><td>}</td></tr>
+<tr><th id="429">429</th><td></td></tr>
+<tr><th id="430">430</th><td><i>/////////////////////////////////////////////////////////////////////////////////////////</i></td></tr>
+<tr><th id="431">431</th><td></td></tr>
+</table><hr/><p id='footer'>
+Generated on <em>2019-Aug-28</em> from project codebrowser<br />Powered by <a href='https://woboq.com'><img alt='Woboq' src='https://code.woboq.org/woboq-16.png' width='41' height='16' /></a> <a href='https://code.woboq.org'>Code Browser</a> 2.1
+<br/>Generator usage only permitted with license.</p>
+</div></body></html>

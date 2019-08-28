@@ -1,0 +1,770 @@
+<!doctype html>
+<html>
+<head>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"><title>G4SPSRandomGenerator.cc source code [codebrowser/source/event/src/G4SPSRandomGenerator.cc] - Woboq Code Browser</title>
+<link rel="stylesheet" href="../../../../../data/qtcreator.css" title="QtCreator"/>
+<link rel="alternate stylesheet" href="../../../../../data/kdevelop.css" title="KDevelop"/>
+<script type="text/javascript" src="../../../../../data/jquery/jquery.min.js"></script>
+<script type="text/javascript" src="../../../../../data/jquery/jquery-ui.min.js"></script>
+<script>var file = 'codebrowser/source/event/src/G4SPSRandomGenerator.cc'; var root_path = '../../../..'; var data_path = '../../../../../data';</script>
+<script src='../../../../../data/codebrowser.js'></script>
+</head>
+<body><div id='header'><h1 id='breadcrumb'><span>Browse the source code of </span><a href='../../..'>codebrowser</a>/<a href='../..'>source</a>/<a href='..'>event</a>/<a href='./'>src</a>/<a href='G4SPSRandomGenerator.cc.html'>G4SPSRandomGenerator.cc</a></h1></div>
+<hr/><div id='content'><table class="code">
+<tr><th id="1">1</th><td><i>//</i></td></tr>
+<tr><th id="2">2</th><td><i>// ********************************************************************</i></td></tr>
+<tr><th id="3">3</th><td><i>// * License and Disclaimer                                           *</i></td></tr>
+<tr><th id="4">4</th><td><i>// *                                                                  *</i></td></tr>
+<tr><th id="5">5</th><td><i>// * The  Geant4 software  is  copyright of the Copyright Holders  of *</i></td></tr>
+<tr><th id="6">6</th><td><i>// * the Geant4 Collaboration.  It is provided  under  the terms  and *</i></td></tr>
+<tr><th id="7">7</th><td><i>// * conditions of the Geant4 Software License,  included in the file *</i></td></tr>
+<tr><th id="8">8</th><td><i>// * LICENSE and available at  <a href="http://cern.ch/geant4/license">http://cern.ch/geant4/license</a> .  These *</i></td></tr>
+<tr><th id="9">9</th><td><i>// * include a list of copyright holders.                             *</i></td></tr>
+<tr><th id="10">10</th><td><i>// *                                                                  *</i></td></tr>
+<tr><th id="11">11</th><td><i>// * Neither the authors of this software system, nor their employing *</i></td></tr>
+<tr><th id="12">12</th><td><i>// * institutes,nor the agencies providing financial support for this *</i></td></tr>
+<tr><th id="13">13</th><td><i>// * work  make  any representation or  warranty, express or implied, *</i></td></tr>
+<tr><th id="14">14</th><td><i>// * regarding  this  software system or assume any liability for its *</i></td></tr>
+<tr><th id="15">15</th><td><i>// * use.  Please see the license in the file  LICENSE  and URL above *</i></td></tr>
+<tr><th id="16">16</th><td><i>// * for the full disclaimer and the limitation of liability.         *</i></td></tr>
+<tr><th id="17">17</th><td><i>// *                                                                  *</i></td></tr>
+<tr><th id="18">18</th><td><i>// * This  code  implementation is the result of  the  scientific and *</i></td></tr>
+<tr><th id="19">19</th><td><i>// * technical work of the GEANT4 collaboration.                      *</i></td></tr>
+<tr><th id="20">20</th><td><i>// * By using,  copying,  modifying or  distributing the software (or *</i></td></tr>
+<tr><th id="21">21</th><td><i>// * any work based  on the software)  you  agree  to acknowledge its *</i></td></tr>
+<tr><th id="22">22</th><td><i>// * use  in  resulting  scientific  publications,  and indicate your *</i></td></tr>
+<tr><th id="23">23</th><td><i>// * acceptance of all terms of the Geant4 Software license.          *</i></td></tr>
+<tr><th id="24">24</th><td><i>// ********************************************************************</i></td></tr>
+<tr><th id="25">25</th><td><i>//</i></td></tr>
+<tr><th id="26">26</th><td><i>///////////////////////////////////////////////////////////////////////////////</i></td></tr>
+<tr><th id="27">27</th><td><i>//</i></td></tr>
+<tr><th id="28">28</th><td><i>// MODULE:        G4SPSRandomGenerator.cc</i></td></tr>
+<tr><th id="29">29</th><td><i>//</i></td></tr>
+<tr><th id="30">30</th><td><i>// Version:      1.0</i></td></tr>
+<tr><th id="31">31</th><td><i>// Date:         5/02/04</i></td></tr>
+<tr><th id="32">32</th><td><i>// Author:       Fan Lei </i></td></tr>
+<tr><th id="33">33</th><td><i>// Organisation: QinetiQ ltd.</i></td></tr>
+<tr><th id="34">34</th><td><i>// Customer:     ESA/ESTEC</i></td></tr>
+<tr><th id="35">35</th><td><i>//</i></td></tr>
+<tr><th id="36">36</th><td><i>///////////////////////////////////////////////////////////////////////////////</i></td></tr>
+<tr><th id="37">37</th><td><i>//</i></td></tr>
+<tr><th id="38">38</th><td><i>// CHANGE HISTORY</i></td></tr>
+<tr><th id="39">39</th><td><i>// --------------</i></td></tr>
+<tr><th id="40">40</th><td><i>//</i></td></tr>
+<tr><th id="41">41</th><td><i>//</i></td></tr>
+<tr><th id="42">42</th><td><i>// Version 1.0, 05/02/2004, Fan Lei, Created.</i></td></tr>
+<tr><th id="43">43</th><td><i>//    Based on the G4GeneralParticleSource class in Geant4 v6.0</i></td></tr>
+<tr><th id="44">44</th><td><i>//</i></td></tr>
+<tr><th id="45">45</th><td><i>///////////////////////////////////////////////////////////////////////////////</i></td></tr>
+<tr><th id="46">46</th><td><i>//</i></td></tr>
+<tr><th id="47">47</th><td><u>#include <a href="../../particles/management/include/G4PrimaryParticle.hh.html">"G4PrimaryParticle.hh"</a></u></td></tr>
+<tr><th id="48">48</th><td><u>#include <a href="../include/G4Event.hh.html">"G4Event.hh"</a></u></td></tr>
+<tr><th id="49">49</th><td><u>#include <a href="../../global/HEPRandom/include/Randomize.hh.html">"Randomize.hh"</a></u></td></tr>
+<tr><th id="50">50</th><td><u>#include <span class='error' title="&apos;cmath&apos; file not found">&lt;</span>cmath&gt;</u></td></tr>
+<tr><th id="51">51</th><td><u>#include <a href="../../geometry/navigation/include/G4TransportationManager.hh.html">"G4TransportationManager.hh"</a></u></td></tr>
+<tr><th id="52">52</th><td><u>#include <a href="../../geometry/management/include/G4VPhysicalVolume.hh.html">"G4VPhysicalVolume.hh"</a></u></td></tr>
+<tr><th id="53">53</th><td><u>#include <a href="../../geometry/management/include/G4PhysicalVolumeStore.hh.html">"G4PhysicalVolumeStore.hh"</a></u></td></tr>
+<tr><th id="54">54</th><td><u>#include <a href="../../particles/management/include/G4ParticleTable.hh.html">"G4ParticleTable.hh"</a></u></td></tr>
+<tr><th id="55">55</th><td><u>#include <a href="../../particles/management/include/G4ParticleDefinition.hh.html">"G4ParticleDefinition.hh"</a></u></td></tr>
+<tr><th id="56">56</th><td><u>#include <a href="../../particles/management/include/G4IonTable.hh.html">"G4IonTable.hh"</a></u></td></tr>
+<tr><th id="57">57</th><td><u>#include <a href="../../particles/management/include/G4Ions.hh.html">"G4Ions.hh"</a></u></td></tr>
+<tr><th id="58">58</th><td><u>#include <a href="../../tracking/include/G4TrackingManager.hh.html">"G4TrackingManager.hh"</a></u></td></tr>
+<tr><th id="59">59</th><td><u>#include <a href="../../track/include/G4Track.hh.html">"G4Track.hh"</a></u></td></tr>
+<tr><th id="60">60</th><td><u>#include <a href="../../global/management/include/G4AutoLock.hh.html">"G4AutoLock.hh"</a></u></td></tr>
+<tr><th id="61">61</th><td></td></tr>
+<tr><th id="62">62</th><td><u>#include <a href="../include/G4SPSRandomGenerator.hh.html">"G4SPSRandomGenerator.hh"</a></u></td></tr>
+<tr><th id="63">63</th><td></td></tr>
+<tr><th id="64">64</th><td><i>//G4SPSRandomGenerator* G4SPSRandomGenerator::instance = 0;</i></td></tr>
+<tr><th id="65">65</th><td></td></tr>
+<tr><th id="66">66</th><td><span class='error' title="use of undeclared identifier &apos;G4SPSRandomGenerator&apos;">G4SPSRandomGenerator</span>::bweights_t::bweights_t() {</td></tr>
+<tr><th id="67">67</th><td>  <b>for</b> ( <em>int</em> i = <var>0</var> ; i &lt; <var>9</var> ; ++i ) w[i] = <var>1</var>;</td></tr>
+<tr><th id="68">68</th><td>}</td></tr>
+<tr><th id="69">69</th><td></td></tr>
+<tr><th id="70">70</th><td>G4double&amp;</td></tr>
+<tr><th id="71">71</th><td><span class='error' title="use of undeclared identifier &apos;G4SPSRandomGenerator&apos;">G4SPSRandomGenerator</span>::bweights_t::<b>operator</b> [](<em>const</em> <em>int</em> i) { <b>return</b> w[i]; }</td></tr>
+<tr><th id="72">72</th><td></td></tr>
+<tr><th id="73">73</th><td><span class='error' title="use of undeclared identifier &apos;G4SPSRandomGenerator&apos;">G4SPSRandomGenerator</span>::G4SPSRandomGenerator()</td></tr>
+<tr><th id="74">74</th><td>{</td></tr>
+<tr><th id="75">75</th><td>	<i>// Initialise all variables</i></td></tr>
+<tr><th id="76">76</th><td><i></i></td></tr>
+<tr><th id="77">77</th><td><i>	// Bias variables</i></td></tr>
+<tr><th id="78">78</th><td>	XBias = <b>false</b>;</td></tr>
+<tr><th id="79">79</th><td>	IPDFXBias = <b>false</b>;</td></tr>
+<tr><th id="80">80</th><td>	YBias = <b>false</b>;</td></tr>
+<tr><th id="81">81</th><td>	IPDFYBias = <b>false</b>;</td></tr>
+<tr><th id="82">82</th><td>	ZBias = <b>false</b>;</td></tr>
+<tr><th id="83">83</th><td>	IPDFZBias = <b>false</b>;</td></tr>
+<tr><th id="84">84</th><td>	ThetaBias = <b>false</b>;</td></tr>
+<tr><th id="85">85</th><td>	IPDFThetaBias = <b>false</b>;</td></tr>
+<tr><th id="86">86</th><td>	PhiBias = <b>false</b>;</td></tr>
+<tr><th id="87">87</th><td>	IPDFPhiBias = <b>false</b>;</td></tr>
+<tr><th id="88">88</th><td>	EnergyBias = <b>false</b>;</td></tr>
+<tr><th id="89">89</th><td>	IPDFEnergyBias = <b>false</b>;</td></tr>
+<tr><th id="90">90</th><td>	PosThetaBias = <b>false</b>;</td></tr>
+<tr><th id="91">91</th><td>	IPDFPosThetaBias = <b>false</b>;</td></tr>
+<tr><th id="92">92</th><td>	PosPhiBias = <b>false</b>;</td></tr>
+<tr><th id="93">93</th><td>	IPDFPosPhiBias = <b>false</b>;</td></tr>
+<tr><th id="94">94</th><td>	verbosityLevel = <var>0</var>;</td></tr>
+<tr><th id="95">95</th><td>    <a class="macro" href="../../global/management/include/G4Threading.hh.html#89" title=";;" data-ref="_M/G4MUTEXINIT">G4MUTEXINIT</a>(mutex);</td></tr>
+<tr><th id="96">96</th><td>}</td></tr>
+<tr><th id="97">97</th><td></td></tr>
+<tr><th id="98">98</th><td><span class='error' title="use of undeclared identifier &apos;G4SPSRandomGenerator&apos;">G4SPSRandomGenerator</span>::~G4SPSRandomGenerator() {</td></tr>
+<tr><th id="99">99</th><td>    <a class="macro" href="../../global/management/include/G4Threading.hh.html#90" title=";;" data-ref="_M/G4MUTEXDESTROY">G4MUTEXDESTROY</a>(mutex);</td></tr>
+<tr><th id="100">100</th><td>}</td></tr>
+<tr><th id="101">101</th><td></td></tr>
+<tr><th id="102">102</th><td><i>//G4SPSRandomGenerator* G4SPSRandomGenerator::getInstance ()</i></td></tr>
+<tr><th id="103">103</th><td><i>//{</i></td></tr>
+<tr><th id="104">104</th><td><i>//  if (instance == 0) instance = new G4SPSRandomGenerator();</i></td></tr>
+<tr><th id="105">105</th><td><i>//  return instance;</i></td></tr>
+<tr><th id="106">106</th><td><i>//}</i></td></tr>
+<tr><th id="107">107</th><td><i></i></td></tr>
+<tr><th id="108">108</th><td><i>// Biasing methods</i></td></tr>
+<tr><th id="109">109</th><td></td></tr>
+<tr><th id="110">110</th><td><em>void</em> <span class='error' title="use of undeclared identifier &apos;G4SPSRandomGenerator&apos;">G4SPSRandomGenerator</span>::SetXBias(G4ThreeVector input) {</td></tr>
+<tr><th id="111">111</th><td>    G4AutoLock l(&amp;mutex);</td></tr>
+<tr><th id="112">112</th><td>	G4double ehi, val;</td></tr>
+<tr><th id="113">113</th><td>	ehi = input.x();</td></tr>
+<tr><th id="114">114</th><td>	val = input.y();</td></tr>
+<tr><th id="115">115</th><td>	XBiasH.InsertValues(ehi, val);</td></tr>
+<tr><th id="116">116</th><td>	XBias = <b>true</b>;</td></tr>
+<tr><th id="117">117</th><td>}</td></tr>
+<tr><th id="118">118</th><td></td></tr>
+<tr><th id="119">119</th><td><em>void</em> <span class='error' title="use of undeclared identifier &apos;G4SPSRandomGenerator&apos;">G4SPSRandomGenerator</span>::SetYBias(G4ThreeVector input) {</td></tr>
+<tr><th id="120">120</th><td>    G4AutoLock l(&amp;mutex);</td></tr>
+<tr><th id="121">121</th><td>	G4double ehi, val;</td></tr>
+<tr><th id="122">122</th><td>	ehi = input.x();</td></tr>
+<tr><th id="123">123</th><td>	val = input.y();</td></tr>
+<tr><th id="124">124</th><td>	YBiasH.InsertValues(ehi, val);</td></tr>
+<tr><th id="125">125</th><td>	YBias = <b>true</b>;</td></tr>
+<tr><th id="126">126</th><td>}</td></tr>
+<tr><th id="127">127</th><td></td></tr>
+<tr><th id="128">128</th><td><em>void</em> <span class='error' title="use of undeclared identifier &apos;G4SPSRandomGenerator&apos;">G4SPSRandomGenerator</span>::SetZBias(G4ThreeVector input) {</td></tr>
+<tr><th id="129">129</th><td>    G4AutoLock l(&amp;mutex);</td></tr>
+<tr><th id="130">130</th><td>	G4double ehi, val;</td></tr>
+<tr><th id="131">131</th><td>	ehi = input.x();</td></tr>
+<tr><th id="132">132</th><td>	val = input.y();</td></tr>
+<tr><th id="133">133</th><td>	ZBiasH.InsertValues(ehi, val);</td></tr>
+<tr><th id="134">134</th><td>	ZBias = <b>true</b>;</td></tr>
+<tr><th id="135">135</th><td>}</td></tr>
+<tr><th id="136">136</th><td></td></tr>
+<tr><th id="137">137</th><td><em>void</em> <span class='error' title="use of undeclared identifier &apos;G4SPSRandomGenerator&apos;">G4SPSRandomGenerator</span>::SetThetaBias(G4ThreeVector input) {</td></tr>
+<tr><th id="138">138</th><td>    G4AutoLock l(&amp;mutex);</td></tr>
+<tr><th id="139">139</th><td>	G4double ehi, val;</td></tr>
+<tr><th id="140">140</th><td>	ehi = input.x();</td></tr>
+<tr><th id="141">141</th><td>	val = input.y();</td></tr>
+<tr><th id="142">142</th><td>	ThetaBiasH.InsertValues(ehi, val);</td></tr>
+<tr><th id="143">143</th><td>	ThetaBias = <b>true</b>;</td></tr>
+<tr><th id="144">144</th><td>}</td></tr>
+<tr><th id="145">145</th><td></td></tr>
+<tr><th id="146">146</th><td><em>void</em> <span class='error' title="use of undeclared identifier &apos;G4SPSRandomGenerator&apos;">G4SPSRandomGenerator</span>::SetPhiBias(G4ThreeVector input) {</td></tr>
+<tr><th id="147">147</th><td>    G4AutoLock l(&amp;mutex);</td></tr>
+<tr><th id="148">148</th><td>	G4double ehi, val;</td></tr>
+<tr><th id="149">149</th><td>	ehi = input.x();</td></tr>
+<tr><th id="150">150</th><td>	val = input.y();</td></tr>
+<tr><th id="151">151</th><td>	PhiBiasH.InsertValues(ehi, val);</td></tr>
+<tr><th id="152">152</th><td>	PhiBias = <b>true</b>;</td></tr>
+<tr><th id="153">153</th><td>}</td></tr>
+<tr><th id="154">154</th><td></td></tr>
+<tr><th id="155">155</th><td><em>void</em> <span class='error' title="use of undeclared identifier &apos;G4SPSRandomGenerator&apos;">G4SPSRandomGenerator</span>::SetEnergyBias(G4ThreeVector input) {</td></tr>
+<tr><th id="156">156</th><td>    G4AutoLock l(&amp;mutex);</td></tr>
+<tr><th id="157">157</th><td>	G4double ehi, val;</td></tr>
+<tr><th id="158">158</th><td>	ehi = input.x();</td></tr>
+<tr><th id="159">159</th><td>	val = input.y();</td></tr>
+<tr><th id="160">160</th><td>	EnergyBiasH.InsertValues(ehi, val);</td></tr>
+<tr><th id="161">161</th><td>	EnergyBias = <b>true</b>;</td></tr>
+<tr><th id="162">162</th><td>}</td></tr>
+<tr><th id="163">163</th><td></td></tr>
+<tr><th id="164">164</th><td><em>void</em> <span class='error' title="use of undeclared identifier &apos;G4SPSRandomGenerator&apos;">G4SPSRandomGenerator</span>::SetPosThetaBias(G4ThreeVector input) {</td></tr>
+<tr><th id="165">165</th><td>    G4AutoLock l(&amp;mutex);</td></tr>
+<tr><th id="166">166</th><td>	G4double ehi, val;</td></tr>
+<tr><th id="167">167</th><td>	ehi = input.x();</td></tr>
+<tr><th id="168">168</th><td>	val = input.y();</td></tr>
+<tr><th id="169">169</th><td>	PosThetaBiasH.InsertValues(ehi, val);</td></tr>
+<tr><th id="170">170</th><td>	PosThetaBias = <b>true</b>;</td></tr>
+<tr><th id="171">171</th><td>}</td></tr>
+<tr><th id="172">172</th><td></td></tr>
+<tr><th id="173">173</th><td><em>void</em> <span class='error' title="use of undeclared identifier &apos;G4SPSRandomGenerator&apos;">G4SPSRandomGenerator</span>::SetPosPhiBias(G4ThreeVector input) {</td></tr>
+<tr><th id="174">174</th><td>    G4AutoLock l(&amp;mutex);</td></tr>
+<tr><th id="175">175</th><td>	G4double ehi, val;</td></tr>
+<tr><th id="176">176</th><td>	ehi = input.x();</td></tr>
+<tr><th id="177">177</th><td>	val = input.y();</td></tr>
+<tr><th id="178">178</th><td>	PosPhiBiasH.InsertValues(ehi, val);</td></tr>
+<tr><th id="179">179</th><td>	PosPhiBias = <b>true</b>;</td></tr>
+<tr><th id="180">180</th><td>}</td></tr>
+<tr><th id="181">181</th><td></td></tr>
+<tr><th id="182">182</th><td><em>void</em> <span class='error' title="use of undeclared identifier &apos;G4SPSRandomGenerator&apos;">G4SPSRandomGenerator</span>::SetIntensityWeight(G4double weight) {</td></tr>
+<tr><th id="183">183</th><td>  bweights.Get()[<var>8</var>] = weight;</td></tr>
+<tr><th id="184">184</th><td>}</td></tr>
+<tr><th id="185">185</th><td></td></tr>
+<tr><th id="186">186</th><td>G4double <span class='error' title="use of undeclared identifier &apos;G4SPSRandomGenerator&apos;">G4SPSRandomGenerator</span>::GetBiasWeight() {</td></tr>
+<tr><th id="187">187</th><td>  bweights_t&amp; w = bweights.Get();</td></tr>
+<tr><th id="188">188</th><td>  <b>return</b> w[<var>0</var>] * w[<var>1</var>] * w[<var>2</var>] * w[<var>3</var>]</td></tr>
+<tr><th id="189">189</th><td>    * w[<var>4</var>] * w[<var>5</var>] * w[<var>6</var>] * w[<var>7</var>]</td></tr>
+<tr><th id="190">190</th><td>    * w[<var>8</var>];</td></tr>
+<tr><th id="191">191</th><td>}</td></tr>
+<tr><th id="192">192</th><td></td></tr>
+<tr><th id="193">193</th><td><em>void</em> <span class='error' title="use of undeclared identifier &apos;G4SPSRandomGenerator&apos;">G4SPSRandomGenerator</span>::SetVerbosity(G4int a) {</td></tr>
+<tr><th id="194">194</th><td>     G4AutoLock l(&amp;mutex);</td></tr>
+<tr><th id="195">195</th><td>    verbosityLevel = a;</td></tr>
+<tr><th id="196">196</th><td>}</td></tr>
+<tr><th id="197">197</th><td></td></tr>
+<tr><th id="198">198</th><td></td></tr>
+<tr><th id="199">199</th><td><b>namespace</b> {</td></tr>
+<tr><th id="200">200</th><td>  <a class="type" href="../../global/management/include/G4PhysicsOrderedFreeVector.hh.html#G4PhysicsOrderedFreeVector" title='G4PhysicsOrderedFreeVector' data-ref="G4PhysicsOrderedFreeVector">G4PhysicsOrderedFreeVector</a> <a class="ref fake" href="../../global/management/include/G4PhysicsOrderedFreeVector.hh.html#_ZN26G4PhysicsOrderedFreeVectorC1Ev" title='G4PhysicsOrderedFreeVector::G4PhysicsOrderedFreeVector' data-ref="_ZN26G4PhysicsOrderedFreeVectorC1Ev"></a><dfn class="tu decl def" id="(anonymousnamespace)::ZeroPhysVector" title='(anonymous namespace)::ZeroPhysVector' data-type='G4PhysicsOrderedFreeVector' data-ref="(anonymousnamespace)::ZeroPhysVector">ZeroPhysVector</dfn>; <i  data-doc="(anonymousnamespace)::ZeroPhysVector">// for re-set only</i></td></tr>
+<tr><th id="201">201</th><td>}</td></tr>
+<tr><th id="202">202</th><td></td></tr>
+<tr><th id="203">203</th><td><em>void</em> <span class='error' title="use of undeclared identifier &apos;G4SPSRandomGenerator&apos;">G4SPSRandomGenerator</span>::ReSetHist(G4String atype) {</td></tr>
+<tr><th id="204">204</th><td>    G4AutoLock l(&amp;mutex);</td></tr>
+<tr><th id="205">205</th><td>	<b>if</b> (atype == <q>"biasx"</q>) {</td></tr>
+<tr><th id="206">206</th><td>		XBias = <b>false</b>;</td></tr>
+<tr><th id="207">207</th><td>		IPDFXBias = <b>false</b>;</td></tr>
+<tr><th id="208">208</th><td>		local_IPDFXBias.Get().val = <b>false</b>;</td></tr>
+<tr><th id="209">209</th><td>		XBiasH = IPDFXBiasH = ZeroPhysVector;</td></tr>
+<tr><th id="210">210</th><td>	} <b>else</b> <b>if</b> (atype == <q>"biasy"</q>) {</td></tr>
+<tr><th id="211">211</th><td>		YBias = <b>false</b>;</td></tr>
+<tr><th id="212">212</th><td>		IPDFYBias = <b>false</b>;</td></tr>
+<tr><th id="213">213</th><td>                local_IPDFYBias.Get().val = <b>false</b>;</td></tr>
+<tr><th id="214">214</th><td>		YBiasH = IPDFYBiasH = ZeroPhysVector;</td></tr>
+<tr><th id="215">215</th><td>	} <b>else</b> <b>if</b> (atype == <q>"biasz"</q>) {</td></tr>
+<tr><th id="216">216</th><td>		ZBias = <b>false</b>;</td></tr>
+<tr><th id="217">217</th><td>		IPDFZBias = <b>false</b>;</td></tr>
+<tr><th id="218">218</th><td>                local_IPDFZBias.Get().val = <b>false</b>;</td></tr>
+<tr><th id="219">219</th><td>		ZBiasH = IPDFZBiasH = ZeroPhysVector;</td></tr>
+<tr><th id="220">220</th><td>	} <b>else</b> <b>if</b> (atype == <q>"biast"</q>) {</td></tr>
+<tr><th id="221">221</th><td>		ThetaBias = <b>false</b>;</td></tr>
+<tr><th id="222">222</th><td>		IPDFThetaBias = <b>false</b>;</td></tr>
+<tr><th id="223">223</th><td>                local_IPDFThetaBias.Get().val = <b>false</b>;</td></tr>
+<tr><th id="224">224</th><td>		ThetaBiasH = IPDFThetaBiasH = ZeroPhysVector;</td></tr>
+<tr><th id="225">225</th><td>	} <b>else</b> <b>if</b> (atype == <q>"biasp"</q>) {</td></tr>
+<tr><th id="226">226</th><td>		PhiBias = <b>false</b>;</td></tr>
+<tr><th id="227">227</th><td>		IPDFPhiBias = <b>false</b>;</td></tr>
+<tr><th id="228">228</th><td>                local_IPDFPhiBias.Get().val = <b>false</b>;</td></tr>
+<tr><th id="229">229</th><td>		PhiBiasH = IPDFPhiBiasH = ZeroPhysVector;</td></tr>
+<tr><th id="230">230</th><td>	} <b>else</b> <b>if</b> (atype == <q>"biase"</q>) {</td></tr>
+<tr><th id="231">231</th><td>		EnergyBias = <b>false</b>;</td></tr>
+<tr><th id="232">232</th><td>		IPDFEnergyBias = <b>false</b>;</td></tr>
+<tr><th id="233">233</th><td>                local_IPDFEnergyBias.Get().val = <b>false</b>;</td></tr>
+<tr><th id="234">234</th><td>		EnergyBiasH = IPDFEnergyBiasH = ZeroPhysVector;</td></tr>
+<tr><th id="235">235</th><td>	} <b>else</b> <b>if</b> (atype == <q>"biaspt"</q>) {</td></tr>
+<tr><th id="236">236</th><td>		PosThetaBias = <b>false</b>;</td></tr>
+<tr><th id="237">237</th><td>		IPDFPosThetaBias = <b>false</b>;</td></tr>
+<tr><th id="238">238</th><td>		local_IPDFPosThetaBias.Get().val = <b>false</b>;</td></tr>
+<tr><th id="239">239</th><td>		PosThetaBiasH = IPDFPosThetaBiasH = ZeroPhysVector;</td></tr>
+<tr><th id="240">240</th><td>	} <b>else</b> <b>if</b> (atype == <q>"biaspp"</q>) {</td></tr>
+<tr><th id="241">241</th><td>		PosPhiBias = <b>false</b>;</td></tr>
+<tr><th id="242">242</th><td>		IPDFPosPhiBias = <b>false</b>;</td></tr>
+<tr><th id="243">243</th><td>		local_IPDFPosPhiBias.Get().val = <b>false</b>;</td></tr>
+<tr><th id="244">244</th><td>		PosPhiBiasH = IPDFPosPhiBiasH = ZeroPhysVector;</td></tr>
+<tr><th id="245">245</th><td>	} <b>else</b> {</td></tr>
+<tr><th id="246">246</th><td>		<a class="macro" href="../../global/management/include/G4ios.hh.html#46" title="(*_G4cout_p())" data-ref="_M/G4cout">G4cout</a> &lt;&lt; <q>"Error, histtype not accepted "</q> &lt;&lt; <a class="macro" href="../../global/management/include/G4ios.hh.html#60" title="std::endl" data-ref="_M/G4endl">G4endl</a>;</td></tr>
+<tr><th id="247">247</th><td>	}</td></tr>
+<tr><th id="248">248</th><td>}</td></tr>
+<tr><th id="249">249</th><td></td></tr>
+<tr><th id="250">250</th><td>G4double <span class='error' title="use of undeclared identifier &apos;G4SPSRandomGenerator&apos;">G4SPSRandomGenerator</span>::GenRandX() {</td></tr>
+<tr><th id="251">251</th><td>	<b>if</b> (verbosityLevel &gt;= <var>1</var>)</td></tr>
+<tr><th id="252">252</th><td>		<a class="macro" href="../../global/management/include/G4ios.hh.html#46" title="(*_G4cout_p())" data-ref="_M/G4cout">G4cout</a> &lt;&lt; <q>"In GenRandX"</q> &lt;&lt; <a class="macro" href="../../global/management/include/G4ios.hh.html#60" title="std::endl" data-ref="_M/G4endl">G4endl</a>;</td></tr>
+<tr><th id="253">253</th><td>	<b>if</b> (XBias == <b>false</b>) {</td></tr>
+<tr><th id="254">254</th><td>		<i>// X is not biased</i></td></tr>
+<tr><th id="255">255</th><td>		G4double rndm = <a class="macro" href="../../global/HEPRandom/include/Randomize.hh.html#52" title="CLHEP::HepRandom::getTheEngine()-&gt;flat()" data-ref="_M/G4UniformRand">G4UniformRand</a>();</td></tr>
+<tr><th id="256">256</th><td>		<b>return</b> (rndm);</td></tr>
+<tr><th id="257">257</th><td>	} <b>else</b> {</td></tr>
+<tr><th id="258">258</th><td>	    <i>// X is biased</i></td></tr>
+<tr><th id="259">259</th><td><i>	    //This is shared among threads, and we need to initialize</i></td></tr>
+<tr><th id="260">260</th><td><i>	    //only once. Multiple instances of this class can exists</i></td></tr>
+<tr><th id="261">261</th><td><i>	    //so we rely on a class-private, thread-private variable</i></td></tr>
+<tr><th id="262">262</th><td><i>	    //to check if we need an initialiation. We do not use a lock here</i></td></tr>
+<tr><th id="263">263</th><td><i>	    //because the boolean on which we check is thread private</i></td></tr>
+<tr><th id="264">264</th><td>	    <b>if</b> ( local_IPDFXBias.Get().val == <b>false</b> ) {</td></tr>
+<tr><th id="265">265</th><td>	        <i>//For time that this thread arrived, here</i></td></tr>
+<tr><th id="266">266</th><td><i>	        //Now two cases are possible: it is the first time</i></td></tr>
+<tr><th id="267">267</th><td><i>	         //ANY thread has ever initialized this.</i></td></tr>
+<tr><th id="268">268</th><td><i>	        //Now we need a lock. In any case, the thread local</i></td></tr>
+<tr><th id="269">269</th><td><i>	        //variable can now be set to true</i></td></tr>
+<tr><th id="270">270</th><td>	        local_IPDFXBias.Get().val = <b>true</b>;</td></tr>
+<tr><th id="271">271</th><td>	        G4AutoLock l(&amp;mutex);</td></tr>
+<tr><th id="272">272</th><td>	        <b>if</b> (IPDFXBias == <b>false</b>) {</td></tr>
+<tr><th id="273">273</th><td>	            <i>// IPDF has not been created, so create it</i></td></tr>
+<tr><th id="274">274</th><td>	            G4double bins[<var>1024</var>], vals[<var>1024</var>], sum;</td></tr>
+<tr><th id="275">275</th><td>	            G4int ii;</td></tr>
+<tr><th id="276">276</th><td>	            G4int maxbin = G4int(XBiasH.GetVectorLength());</td></tr>
+<tr><th id="277">277</th><td>	            bins[<var>0</var>] = XBiasH.GetLowEdgeEnergy(size_t(<var>0</var>));</td></tr>
+<tr><th id="278">278</th><td>	            vals[<var>0</var>] = XBiasH(size_t(<var>0</var>));</td></tr>
+<tr><th id="279">279</th><td>	            sum = vals[<var>0</var>];</td></tr>
+<tr><th id="280">280</th><td>	            <b>for</b> (ii = <var>1</var>; ii &lt; maxbin; ii++) {</td></tr>
+<tr><th id="281">281</th><td>	                bins[ii] = XBiasH.GetLowEdgeEnergy(size_t(ii));</td></tr>
+<tr><th id="282">282</th><td>	                vals[ii] = XBiasH(size_t(ii)) + vals[ii - <var>1</var>];</td></tr>
+<tr><th id="283">283</th><td>	                sum = sum + XBiasH(size_t(ii));</td></tr>
+<tr><th id="284">284</th><td>	            }</td></tr>
+<tr><th id="285">285</th><td></td></tr>
+<tr><th id="286">286</th><td>	            <b>for</b> (ii = <var>0</var>; ii &lt; maxbin; ii++) {</td></tr>
+<tr><th id="287">287</th><td>	                vals[ii] = vals[ii] / sum;</td></tr>
+<tr><th id="288">288</th><td>	                IPDFXBiasH.InsertValues(bins[ii], vals[ii]);</td></tr>
+<tr><th id="289">289</th><td>	            }</td></tr>
+<tr><th id="290">290</th><td>	            <i>// Make IPDFXBias = true</i></td></tr>
+<tr><th id="291">291</th><td>	            IPDFXBias = <b>true</b>;</td></tr>
+<tr><th id="292">292</th><td>	        }</td></tr>
+<tr><th id="293">293</th><td>	    }</td></tr>
+<tr><th id="294">294</th><td>          <i>// IPDF has been create so carry on</i></td></tr>
+<tr><th id="295">295</th><td>          G4double rndm = <a class="macro" href="../../global/HEPRandom/include/Randomize.hh.html#52" title="CLHEP::HepRandom::getTheEngine()-&gt;flat()" data-ref="_M/G4UniformRand">G4UniformRand</a>();</td></tr>
+<tr><th id="296">296</th><td></td></tr>
+<tr><th id="297">297</th><td>          <i>// Calculate the weighting: Find the bin that the determined</i></td></tr>
+<tr><th id="298">298</th><td><i>          // rndm is in and the weigthing will be the difference in the</i></td></tr>
+<tr><th id="299">299</th><td><i>          // natural probability (from the x-axis) divided by the</i></td></tr>
+<tr><th id="300">300</th><td><i>          // difference in the biased probability (the area).</i></td></tr>
+<tr><th id="301">301</th><td>          size_t numberOfBin = IPDFXBiasH.GetVectorLength();</td></tr>
+<tr><th id="302">302</th><td>          G4int biasn1 = <var>0</var>;</td></tr>
+<tr><th id="303">303</th><td>          G4int biasn2 = numberOfBin / <var>2</var>;</td></tr>
+<tr><th id="304">304</th><td>          G4int biasn3 = numberOfBin - <var>1</var>;</td></tr>
+<tr><th id="305">305</th><td>          <b>while</b> (biasn1 != biasn3 - <var>1</var>) {</td></tr>
+<tr><th id="306">306</th><td>              <b>if</b> (rndm &gt; IPDFXBiasH(biasn2))</td></tr>
+<tr><th id="307">307</th><td>                biasn1 = biasn2;</td></tr>
+<tr><th id="308">308</th><td>              <b>else</b></td></tr>
+<tr><th id="309">309</th><td>                biasn3 = biasn2;</td></tr>
+<tr><th id="310">310</th><td>              biasn2 = biasn1 + (biasn3 - biasn1 + <var>1</var>) / <var>2</var>;</td></tr>
+<tr><th id="311">311</th><td>          }</td></tr>
+<tr><th id="312">312</th><td>          <i>// retrieve the areas and then the x-axis values</i></td></tr>
+<tr><th id="313">313</th><td>          bweights_t&amp; w = bweights.Get();</td></tr>
+<tr><th id="314">314</th><td>          w[<var>0</var>] = IPDFXBiasH(biasn2) - IPDFXBiasH(biasn2 - <var>1</var>);</td></tr>
+<tr><th id="315">315</th><td>          G4double xaxisl = IPDFXBiasH.GetLowEdgeEnergy(size_t(biasn2 - <var>1</var>));</td></tr>
+<tr><th id="316">316</th><td>          G4double xaxisu = IPDFXBiasH.GetLowEdgeEnergy(size_t(biasn2));</td></tr>
+<tr><th id="317">317</th><td>          G4double NatProb = xaxisu - xaxisl;</td></tr>
+<tr><th id="318">318</th><td>          <i>//G4cout &lt;&lt; "X Bin weight " &lt;&lt; bweights[0] &lt;&lt; " " &lt;&lt; rndm &lt;&lt; G4endl;</i></td></tr>
+<tr><th id="319">319</th><td><i>          //G4cout &lt;&lt; "lower and upper xaxis vals "&lt;&lt;xaxisl&lt;&lt;" "&lt;&lt;xaxisu&lt;&lt;G4endl;</i></td></tr>
+<tr><th id="320">320</th><td>          w[<var>0</var>] = NatProb / w[<var>0</var>];</td></tr>
+<tr><th id="321">321</th><td>          <b>if</b> (verbosityLevel &gt;= <var>1</var>)</td></tr>
+<tr><th id="322">322</th><td>            <a class="macro" href="../../global/management/include/G4ios.hh.html#46" title="(*_G4cout_p())" data-ref="_M/G4cout">G4cout</a> &lt;&lt; <q>"X bin weight "</q> &lt;&lt; w[<var>0</var>] &lt;&lt; <q>" "</q> &lt;&lt; rndm &lt;&lt; <a class="macro" href="../../global/management/include/G4ios.hh.html#60" title="std::endl" data-ref="_M/G4endl">G4endl</a>;</td></tr>
+<tr><th id="323">323</th><td>          <b>return</b> (IPDFXBiasH.GetEnergy(rndm));</td></tr>
+<tr><th id="324">324</th><td>	}</td></tr>
+<tr><th id="325">325</th><td>}</td></tr>
+<tr><th id="326">326</th><td></td></tr>
+<tr><th id="327">327</th><td>G4double <span class='error' title="use of undeclared identifier &apos;G4SPSRandomGenerator&apos;">G4SPSRandomGenerator</span>::GenRandY() {</td></tr>
+<tr><th id="328">328</th><td>	<b>if</b> (verbosityLevel &gt;= <var>1</var>)</td></tr>
+<tr><th id="329">329</th><td>		<a class="macro" href="../../global/management/include/G4ios.hh.html#46" title="(*_G4cout_p())" data-ref="_M/G4cout">G4cout</a> &lt;&lt; <q>"In GenRandY"</q> &lt;&lt; <a class="macro" href="../../global/management/include/G4ios.hh.html#60" title="std::endl" data-ref="_M/G4endl">G4endl</a>;</td></tr>
+<tr><th id="330">330</th><td>	<b>if</b> (YBias == <b>false</b>) {</td></tr>
+<tr><th id="331">331</th><td>		<i>// Y is not biased</i></td></tr>
+<tr><th id="332">332</th><td>		G4double rndm = <a class="macro" href="../../global/HEPRandom/include/Randomize.hh.html#52" title="CLHEP::HepRandom::getTheEngine()-&gt;flat()" data-ref="_M/G4UniformRand">G4UniformRand</a>();</td></tr>
+<tr><th id="333">333</th><td>		<b>return</b> (rndm);</td></tr>
+<tr><th id="334">334</th><td>	} <b>else</b> {</td></tr>
+<tr><th id="335">335</th><td>	    <i>// Y is biased</i></td></tr>
+<tr><th id="336">336</th><td>	    <b>if</b> ( local_IPDFYBias.Get().val == <b>false</b> ) {</td></tr>
+<tr><th id="337">337</th><td>	        local_IPDFYBias.Get().val = <b>true</b>;</td></tr>
+<tr><th id="338">338</th><td>	        G4AutoLock l(&amp;mutex);</td></tr>
+<tr><th id="339">339</th><td>		<b>if</b> (IPDFYBias == <b>false</b>) {</td></tr>
+<tr><th id="340">340</th><td>			<i>// IPDF has not been created, so create it</i></td></tr>
+<tr><th id="341">341</th><td>			G4double bins[<var>1024</var>], vals[<var>1024</var>], sum;</td></tr>
+<tr><th id="342">342</th><td>			G4int ii;</td></tr>
+<tr><th id="343">343</th><td>			G4int maxbin = G4int(YBiasH.GetVectorLength());</td></tr>
+<tr><th id="344">344</th><td>			bins[<var>0</var>] = YBiasH.GetLowEdgeEnergy(size_t(<var>0</var>));</td></tr>
+<tr><th id="345">345</th><td>			vals[<var>0</var>] = YBiasH(size_t(<var>0</var>));</td></tr>
+<tr><th id="346">346</th><td>			sum = vals[<var>0</var>];</td></tr>
+<tr><th id="347">347</th><td>			<b>for</b> (ii = <var>1</var>; ii &lt; maxbin; ii++) {</td></tr>
+<tr><th id="348">348</th><td>				bins[ii] = YBiasH.GetLowEdgeEnergy(size_t(ii));</td></tr>
+<tr><th id="349">349</th><td>				vals[ii] = YBiasH(size_t(ii)) + vals[ii - <var>1</var>];</td></tr>
+<tr><th id="350">350</th><td>				sum = sum + YBiasH(size_t(ii));</td></tr>
+<tr><th id="351">351</th><td>			}</td></tr>
+<tr><th id="352">352</th><td></td></tr>
+<tr><th id="353">353</th><td>			<b>for</b> (ii = <var>0</var>; ii &lt; maxbin; ii++) {</td></tr>
+<tr><th id="354">354</th><td>				vals[ii] = vals[ii] / sum;</td></tr>
+<tr><th id="355">355</th><td>				IPDFYBiasH.InsertValues(bins[ii], vals[ii]);</td></tr>
+<tr><th id="356">356</th><td>			}</td></tr>
+<tr><th id="357">357</th><td>			<i>// Make IPDFYBias = true</i></td></tr>
+<tr><th id="358">358</th><td>			IPDFYBias = <b>true</b>;</td></tr>
+<tr><th id="359">359</th><td>		}</td></tr>
+<tr><th id="360">360</th><td>	    }		<i>// IPDF has been create so carry on</i></td></tr>
+<tr><th id="361">361</th><td>	    G4double rndm = <a class="macro" href="../../global/HEPRandom/include/Randomize.hh.html#52" title="CLHEP::HepRandom::getTheEngine()-&gt;flat()" data-ref="_M/G4UniformRand">G4UniformRand</a>();</td></tr>
+<tr><th id="362">362</th><td>	    size_t numberOfBin = IPDFYBiasH.GetVectorLength();</td></tr>
+<tr><th id="363">363</th><td>	    G4int biasn1 = <var>0</var>;</td></tr>
+<tr><th id="364">364</th><td>	    G4int biasn2 = numberOfBin / <var>2</var>;</td></tr>
+<tr><th id="365">365</th><td>	    G4int biasn3 = numberOfBin - <var>1</var>;</td></tr>
+<tr><th id="366">366</th><td>	    <b>while</b> (biasn1 != biasn3 - <var>1</var>) {</td></tr>
+<tr><th id="367">367</th><td>	        <b>if</b> (rndm &gt; IPDFYBiasH(biasn2))</td></tr>
+<tr><th id="368">368</th><td>	          biasn1 = biasn2;</td></tr>
+<tr><th id="369">369</th><td>	        <b>else</b></td></tr>
+<tr><th id="370">370</th><td>	          biasn3 = biasn2;</td></tr>
+<tr><th id="371">371</th><td>	        biasn2 = biasn1 + (biasn3 - biasn1 + <var>1</var>) / <var>2</var>;</td></tr>
+<tr><th id="372">372</th><td>	    }</td></tr>
+<tr><th id="373">373</th><td>	    bweights_t&amp; w = bweights.Get();</td></tr>
+<tr><th id="374">374</th><td>	    w[<var>1</var>] = IPDFYBiasH(biasn2) - IPDFYBiasH(biasn2 - <var>1</var>);</td></tr>
+<tr><th id="375">375</th><td>	    G4double xaxisl = IPDFYBiasH.GetLowEdgeEnergy(size_t(biasn2 - <var>1</var>));</td></tr>
+<tr><th id="376">376</th><td>	    G4double xaxisu = IPDFYBiasH.GetLowEdgeEnergy(size_t(biasn2));</td></tr>
+<tr><th id="377">377</th><td>	    G4double NatProb = xaxisu - xaxisl;</td></tr>
+<tr><th id="378">378</th><td>	    w[<var>1</var>] = NatProb / w[<var>1</var>];</td></tr>
+<tr><th id="379">379</th><td>	    <b>if</b> (verbosityLevel &gt;= <var>1</var>)</td></tr>
+<tr><th id="380">380</th><td>	      <a class="macro" href="../../global/management/include/G4ios.hh.html#46" title="(*_G4cout_p())" data-ref="_M/G4cout">G4cout</a> &lt;&lt; <q>"Y bin weight "</q> &lt;&lt; w[<var>1</var>] &lt;&lt; <q>" "</q> &lt;&lt; rndm &lt;&lt; <a class="macro" href="../../global/management/include/G4ios.hh.html#60" title="std::endl" data-ref="_M/G4endl">G4endl</a>;</td></tr>
+<tr><th id="381">381</th><td>	    <b>return</b> (IPDFYBiasH.GetEnergy(rndm));</td></tr>
+<tr><th id="382">382</th><td>	}</td></tr>
+<tr><th id="383">383</th><td>}</td></tr>
+<tr><th id="384">384</th><td></td></tr>
+<tr><th id="385">385</th><td>G4double <span class='error' title="use of undeclared identifier &apos;G4SPSRandomGenerator&apos;">G4SPSRandomGenerator</span>::GenRandZ() {</td></tr>
+<tr><th id="386">386</th><td>	<b>if</b> (verbosityLevel &gt;= <var>1</var>)</td></tr>
+<tr><th id="387">387</th><td>		<a class="macro" href="../../global/management/include/G4ios.hh.html#46" title="(*_G4cout_p())" data-ref="_M/G4cout">G4cout</a> &lt;&lt; <q>"In GenRandZ"</q> &lt;&lt; <a class="macro" href="../../global/management/include/G4ios.hh.html#60" title="std::endl" data-ref="_M/G4endl">G4endl</a>;</td></tr>
+<tr><th id="388">388</th><td>	<b>if</b> (ZBias == <b>false</b>) {</td></tr>
+<tr><th id="389">389</th><td>		<i>// Z is not biased</i></td></tr>
+<tr><th id="390">390</th><td>		G4double rndm = <a class="macro" href="../../global/HEPRandom/include/Randomize.hh.html#52" title="CLHEP::HepRandom::getTheEngine()-&gt;flat()" data-ref="_M/G4UniformRand">G4UniformRand</a>();</td></tr>
+<tr><th id="391">391</th><td>		<b>return</b> (rndm);</td></tr>
+<tr><th id="392">392</th><td>	} <b>else</b> {</td></tr>
+<tr><th id="393">393</th><td>		<i>// Z is biased</i></td></tr>
+<tr><th id="394">394</th><td>	    <b>if</b> (local_IPDFZBias.Get().val == <b>false</b> ) {</td></tr>
+<tr><th id="395">395</th><td>	        local_IPDFZBias.Get().val = <b>true</b>;</td></tr>
+<tr><th id="396">396</th><td>	        G4AutoLock l(&amp;mutex);</td></tr>
+<tr><th id="397">397</th><td>		<b>if</b> (IPDFZBias == <b>false</b>) {</td></tr>
+<tr><th id="398">398</th><td>		    <i>// IPDF has not been created, so create it</i></td></tr>
+<tr><th id="399">399</th><td>		    G4double bins[<var>1024</var>], vals[<var>1024</var>], sum;</td></tr>
+<tr><th id="400">400</th><td>		    G4int ii;</td></tr>
+<tr><th id="401">401</th><td>		    G4int maxbin = G4int(ZBiasH.GetVectorLength());</td></tr>
+<tr><th id="402">402</th><td>		    bins[<var>0</var>] = ZBiasH.GetLowEdgeEnergy(size_t(<var>0</var>));</td></tr>
+<tr><th id="403">403</th><td>		    vals[<var>0</var>] = ZBiasH(size_t(<var>0</var>));</td></tr>
+<tr><th id="404">404</th><td>		    sum = vals[<var>0</var>];</td></tr>
+<tr><th id="405">405</th><td>		    <b>for</b> (ii = <var>1</var>; ii &lt; maxbin; ii++) {</td></tr>
+<tr><th id="406">406</th><td>		        bins[ii] = ZBiasH.GetLowEdgeEnergy(size_t(ii));</td></tr>
+<tr><th id="407">407</th><td>		        vals[ii] = ZBiasH(size_t(ii)) + vals[ii - <var>1</var>];</td></tr>
+<tr><th id="408">408</th><td>		        sum = sum + ZBiasH(size_t(ii));</td></tr>
+<tr><th id="409">409</th><td>		    }</td></tr>
+<tr><th id="410">410</th><td></td></tr>
+<tr><th id="411">411</th><td>		    <b>for</b> (ii = <var>0</var>; ii &lt; maxbin; ii++) {</td></tr>
+<tr><th id="412">412</th><td>		        vals[ii] = vals[ii] / sum;</td></tr>
+<tr><th id="413">413</th><td>		        IPDFZBiasH.InsertValues(bins[ii], vals[ii]);</td></tr>
+<tr><th id="414">414</th><td>		    }</td></tr>
+<tr><th id="415">415</th><td>		    <i>// Make IPDFZBias = true</i></td></tr>
+<tr><th id="416">416</th><td>		    IPDFZBias = <b>true</b>;</td></tr>
+<tr><th id="417">417</th><td>		}</td></tr>
+<tr><th id="418">418</th><td>	    }</td></tr>
+<tr><th id="419">419</th><td>	    <i>// IPDF has been create so carry on</i></td></tr>
+<tr><th id="420">420</th><td>	    G4double rndm = <a class="macro" href="../../global/HEPRandom/include/Randomize.hh.html#52" title="CLHEP::HepRandom::getTheEngine()-&gt;flat()" data-ref="_M/G4UniformRand">G4UniformRand</a>();</td></tr>
+<tr><th id="421">421</th><td>	    <i>//      size_t weight_bin_no = IPDFZBiasH.FindValueBinLocation(rndm);</i></td></tr>
+<tr><th id="422">422</th><td>	    size_t numberOfBin = IPDFZBiasH.GetVectorLength();</td></tr>
+<tr><th id="423">423</th><td>	    G4int biasn1 = <var>0</var>;</td></tr>
+<tr><th id="424">424</th><td>	    G4int biasn2 = numberOfBin / <var>2</var>;</td></tr>
+<tr><th id="425">425</th><td>	    G4int biasn3 = numberOfBin - <var>1</var>;</td></tr>
+<tr><th id="426">426</th><td>	    <b>while</b> (biasn1 != biasn3 - <var>1</var>) {</td></tr>
+<tr><th id="427">427</th><td>	        <b>if</b> (rndm &gt; IPDFZBiasH(biasn2))</td></tr>
+<tr><th id="428">428</th><td>	          biasn1 = biasn2;</td></tr>
+<tr><th id="429">429</th><td>	        <b>else</b></td></tr>
+<tr><th id="430">430</th><td>	          biasn3 = biasn2;</td></tr>
+<tr><th id="431">431</th><td>	        biasn2 = biasn1 + (biasn3 - biasn1 + <var>1</var>) / <var>2</var>;</td></tr>
+<tr><th id="432">432</th><td>	    }</td></tr>
+<tr><th id="433">433</th><td>	    bweights_t&amp; w = bweights.Get();</td></tr>
+<tr><th id="434">434</th><td>	    w[<var>2</var>] = IPDFZBiasH(biasn2) - IPDFZBiasH(biasn2 - <var>1</var>);</td></tr>
+<tr><th id="435">435</th><td>	    G4double xaxisl = IPDFZBiasH.GetLowEdgeEnergy(size_t(biasn2 - <var>1</var>));</td></tr>
+<tr><th id="436">436</th><td>	    G4double xaxisu = IPDFZBiasH.GetLowEdgeEnergy(size_t(biasn2));</td></tr>
+<tr><th id="437">437</th><td>	    G4double NatProb = xaxisu - xaxisl;</td></tr>
+<tr><th id="438">438</th><td>	    w[<var>2</var>] = NatProb / w[<var>2</var>];</td></tr>
+<tr><th id="439">439</th><td>	    <b>if</b> (verbosityLevel &gt;= <var>1</var>)</td></tr>
+<tr><th id="440">440</th><td>	      <a class="macro" href="../../global/management/include/G4ios.hh.html#46" title="(*_G4cout_p())" data-ref="_M/G4cout">G4cout</a> &lt;&lt; <q>"Z bin weight "</q> &lt;&lt; w[<var>2</var>] &lt;&lt; <q>" "</q> &lt;&lt; rndm &lt;&lt; <a class="macro" href="../../global/management/include/G4ios.hh.html#60" title="std::endl" data-ref="_M/G4endl">G4endl</a>;</td></tr>
+<tr><th id="441">441</th><td>	    <b>return</b> (IPDFZBiasH.GetEnergy(rndm));</td></tr>
+<tr><th id="442">442</th><td>	}</td></tr>
+<tr><th id="443">443</th><td>}</td></tr>
+<tr><th id="444">444</th><td></td></tr>
+<tr><th id="445">445</th><td>G4double <span class='error' title="use of undeclared identifier &apos;G4SPSRandomGenerator&apos;">G4SPSRandomGenerator</span>::GenRandTheta() {</td></tr>
+<tr><th id="446">446</th><td>	<b>if</b> (verbosityLevel &gt;= <var>1</var>) {</td></tr>
+<tr><th id="447">447</th><td>		<a class="macro" href="../../global/management/include/G4ios.hh.html#46" title="(*_G4cout_p())" data-ref="_M/G4cout">G4cout</a> &lt;&lt; <q>"In GenRandTheta"</q> &lt;&lt; <a class="macro" href="../../global/management/include/G4ios.hh.html#60" title="std::endl" data-ref="_M/G4endl">G4endl</a>;</td></tr>
+<tr><th id="448">448</th><td>		<a class="macro" href="../../global/management/include/G4ios.hh.html#46" title="(*_G4cout_p())" data-ref="_M/G4cout">G4cout</a> &lt;&lt; <q>"Verbosity "</q> &lt;&lt; verbosityLevel &lt;&lt; <a class="macro" href="../../global/management/include/G4ios.hh.html#60" title="std::endl" data-ref="_M/G4endl">G4endl</a>;</td></tr>
+<tr><th id="449">449</th><td>	}</td></tr>
+<tr><th id="450">450</th><td>	<b>if</b> (ThetaBias == <b>false</b>) {</td></tr>
+<tr><th id="451">451</th><td>		<i>// Theta is not biased</i></td></tr>
+<tr><th id="452">452</th><td>		G4double rndm = <a class="macro" href="../../global/HEPRandom/include/Randomize.hh.html#52" title="CLHEP::HepRandom::getTheEngine()-&gt;flat()" data-ref="_M/G4UniformRand">G4UniformRand</a>();</td></tr>
+<tr><th id="453">453</th><td>		<b>return</b> (rndm);</td></tr>
+<tr><th id="454">454</th><td>	} <b>else</b> {</td></tr>
+<tr><th id="455">455</th><td>		<i>// Theta is biased</i></td></tr>
+<tr><th id="456">456</th><td>	    <b>if</b> ( local_IPDFThetaBias.Get().val == <b>false</b> ) {</td></tr>
+<tr><th id="457">457</th><td>	        local_IPDFThetaBias.Get().val = <b>true</b>;</td></tr>
+<tr><th id="458">458</th><td>	        G4AutoLock l(&amp;mutex);</td></tr>
+<tr><th id="459">459</th><td>		<b>if</b> (IPDFThetaBias == <b>false</b>) {</td></tr>
+<tr><th id="460">460</th><td>		    <i>// IPDF has not been created, so create it</i></td></tr>
+<tr><th id="461">461</th><td>		    G4double bins[<var>1024</var>], vals[<var>1024</var>], sum;</td></tr>
+<tr><th id="462">462</th><td>		    G4int ii;</td></tr>
+<tr><th id="463">463</th><td>		    G4int maxbin = G4int(ThetaBiasH.GetVectorLength());</td></tr>
+<tr><th id="464">464</th><td>		    bins[<var>0</var>] = ThetaBiasH.GetLowEdgeEnergy(size_t(<var>0</var>));</td></tr>
+<tr><th id="465">465</th><td>		    vals[<var>0</var>] = ThetaBiasH(size_t(<var>0</var>));</td></tr>
+<tr><th id="466">466</th><td>		    sum = vals[<var>0</var>];</td></tr>
+<tr><th id="467">467</th><td>		    <b>for</b> (ii = <var>1</var>; ii &lt; maxbin; ii++) {</td></tr>
+<tr><th id="468">468</th><td>		        bins[ii] = ThetaBiasH.GetLowEdgeEnergy(size_t(ii));</td></tr>
+<tr><th id="469">469</th><td>		        vals[ii] = ThetaBiasH(size_t(ii)) + vals[ii - <var>1</var>];</td></tr>
+<tr><th id="470">470</th><td>		        sum = sum + ThetaBiasH(size_t(ii));</td></tr>
+<tr><th id="471">471</th><td>		    }</td></tr>
+<tr><th id="472">472</th><td></td></tr>
+<tr><th id="473">473</th><td>		    <b>for</b> (ii = <var>0</var>; ii &lt; maxbin; ii++) {</td></tr>
+<tr><th id="474">474</th><td>		        vals[ii] = vals[ii] / sum;</td></tr>
+<tr><th id="475">475</th><td>		        IPDFThetaBiasH.InsertValues(bins[ii], vals[ii]);</td></tr>
+<tr><th id="476">476</th><td>		    }</td></tr>
+<tr><th id="477">477</th><td>		    <i>// Make IPDFThetaBias = true</i></td></tr>
+<tr><th id="478">478</th><td>		    IPDFThetaBias = <b>true</b>;</td></tr>
+<tr><th id="479">479</th><td>		}</td></tr>
+<tr><th id="480">480</th><td>	    }</td></tr>
+<tr><th id="481">481</th><td>	    <i>// IPDF has been create so carry on</i></td></tr>
+<tr><th id="482">482</th><td>	    G4double rndm = <a class="macro" href="../../global/HEPRandom/include/Randomize.hh.html#52" title="CLHEP::HepRandom::getTheEngine()-&gt;flat()" data-ref="_M/G4UniformRand">G4UniformRand</a>();</td></tr>
+<tr><th id="483">483</th><td>	    <i>//      size_t weight_bin_no = IPDFThetaBiasH.FindValueBinLocation(rndm);</i></td></tr>
+<tr><th id="484">484</th><td>	    size_t numberOfBin = IPDFThetaBiasH.GetVectorLength();</td></tr>
+<tr><th id="485">485</th><td>	    G4int biasn1 = <var>0</var>;</td></tr>
+<tr><th id="486">486</th><td>	    G4int biasn2 = numberOfBin / <var>2</var>;</td></tr>
+<tr><th id="487">487</th><td>	    G4int biasn3 = numberOfBin - <var>1</var>;</td></tr>
+<tr><th id="488">488</th><td>	    <b>while</b> (biasn1 != biasn3 - <var>1</var>) {</td></tr>
+<tr><th id="489">489</th><td>	        <b>if</b> (rndm &gt; IPDFThetaBiasH(biasn2))</td></tr>
+<tr><th id="490">490</th><td>	          biasn1 = biasn2;</td></tr>
+<tr><th id="491">491</th><td>	        <b>else</b></td></tr>
+<tr><th id="492">492</th><td>	          biasn3 = biasn2;</td></tr>
+<tr><th id="493">493</th><td>	        biasn2 = biasn1 + (biasn3 - biasn1 + <var>1</var>) / <var>2</var>;</td></tr>
+<tr><th id="494">494</th><td>	    }</td></tr>
+<tr><th id="495">495</th><td>	    bweights_t&amp; w = bweights.Get();</td></tr>
+<tr><th id="496">496</th><td>	    w[<var>3</var>] = IPDFThetaBiasH(biasn2) - IPDFThetaBiasH(biasn2 - <var>1</var>);</td></tr>
+<tr><th id="497">497</th><td>	    G4double xaxisl = IPDFThetaBiasH.GetLowEdgeEnergy(size_t(biasn2 - <var>1</var>));</td></tr>
+<tr><th id="498">498</th><td>	    G4double xaxisu = IPDFThetaBiasH.GetLowEdgeEnergy(size_t(biasn2));</td></tr>
+<tr><th id="499">499</th><td>	    G4double NatProb = xaxisu - xaxisl;</td></tr>
+<tr><th id="500">500</th><td>	    w[<var>3</var>] = NatProb / w[<var>3</var>];</td></tr>
+<tr><th id="501">501</th><td>	    <b>if</b> (verbosityLevel &gt;= <var>1</var>)</td></tr>
+<tr><th id="502">502</th><td>	      <a class="macro" href="../../global/management/include/G4ios.hh.html#46" title="(*_G4cout_p())" data-ref="_M/G4cout">G4cout</a> &lt;&lt; <q>"Theta bin weight "</q> &lt;&lt; w[<var>3</var>] &lt;&lt; <q>" "</q> &lt;&lt; rndm</td></tr>
+<tr><th id="503">503</th><td>	      &lt;&lt; <a class="macro" href="../../global/management/include/G4ios.hh.html#60" title="std::endl" data-ref="_M/G4endl">G4endl</a>;</td></tr>
+<tr><th id="504">504</th><td>	    <b>return</b> (IPDFThetaBiasH.GetEnergy(rndm));</td></tr>
+<tr><th id="505">505</th><td>	}</td></tr>
+<tr><th id="506">506</th><td>}</td></tr>
+<tr><th id="507">507</th><td></td></tr>
+<tr><th id="508">508</th><td>G4double <span class='error' title="use of undeclared identifier &apos;G4SPSRandomGenerator&apos;">G4SPSRandomGenerator</span>::GenRandPhi() {</td></tr>
+<tr><th id="509">509</th><td>	<b>if</b> (verbosityLevel &gt;= <var>1</var>)</td></tr>
+<tr><th id="510">510</th><td>		<a class="macro" href="../../global/management/include/G4ios.hh.html#46" title="(*_G4cout_p())" data-ref="_M/G4cout">G4cout</a> &lt;&lt; <q>"In GenRandPhi"</q> &lt;&lt; <a class="macro" href="../../global/management/include/G4ios.hh.html#60" title="std::endl" data-ref="_M/G4endl">G4endl</a>;</td></tr>
+<tr><th id="511">511</th><td>	<b>if</b> (PhiBias == <b>false</b>) {</td></tr>
+<tr><th id="512">512</th><td>		<i>// Phi is not biased</i></td></tr>
+<tr><th id="513">513</th><td>		G4double rndm = <a class="macro" href="../../global/HEPRandom/include/Randomize.hh.html#52" title="CLHEP::HepRandom::getTheEngine()-&gt;flat()" data-ref="_M/G4UniformRand">G4UniformRand</a>();</td></tr>
+<tr><th id="514">514</th><td>		<b>return</b> (rndm);</td></tr>
+<tr><th id="515">515</th><td>	} <b>else</b> {</td></tr>
+<tr><th id="516">516</th><td>	    <i>// Phi is biased</i></td></tr>
+<tr><th id="517">517</th><td>	    <b>if</b> ( local_IPDFPhiBias.Get().val == <b>false</b> ) {</td></tr>
+<tr><th id="518">518</th><td>	        local_IPDFPhiBias.Get().val = <b>true</b>;</td></tr>
+<tr><th id="519">519</th><td>	        G4AutoLock l(&amp;mutex);</td></tr>
+<tr><th id="520">520</th><td>	        <b>if</b> (IPDFPhiBias == <b>false</b>) {</td></tr>
+<tr><th id="521">521</th><td>	            <i>// IPDF has not been created, so create it</i></td></tr>
+<tr><th id="522">522</th><td>	            G4double bins[<var>1024</var>], vals[<var>1024</var>], sum;</td></tr>
+<tr><th id="523">523</th><td>	            G4int ii;</td></tr>
+<tr><th id="524">524</th><td>	            G4int maxbin = G4int(PhiBiasH.GetVectorLength());</td></tr>
+<tr><th id="525">525</th><td>	            bins[<var>0</var>] = PhiBiasH.GetLowEdgeEnergy(size_t(<var>0</var>));</td></tr>
+<tr><th id="526">526</th><td>	            vals[<var>0</var>] = PhiBiasH(size_t(<var>0</var>));</td></tr>
+<tr><th id="527">527</th><td>	            sum = vals[<var>0</var>];</td></tr>
+<tr><th id="528">528</th><td>	            <b>for</b> (ii = <var>1</var>; ii &lt; maxbin; ii++) {</td></tr>
+<tr><th id="529">529</th><td>	                bins[ii] = PhiBiasH.GetLowEdgeEnergy(size_t(ii));</td></tr>
+<tr><th id="530">530</th><td>	                vals[ii] = PhiBiasH(size_t(ii)) + vals[ii - <var>1</var>];</td></tr>
+<tr><th id="531">531</th><td>	                sum = sum + PhiBiasH(size_t(ii));</td></tr>
+<tr><th id="532">532</th><td>	            }</td></tr>
+<tr><th id="533">533</th><td></td></tr>
+<tr><th id="534">534</th><td>	            <b>for</b> (ii = <var>0</var>; ii &lt; maxbin; ii++) {</td></tr>
+<tr><th id="535">535</th><td>	                vals[ii] = vals[ii] / sum;</td></tr>
+<tr><th id="536">536</th><td>	                IPDFPhiBiasH.InsertValues(bins[ii], vals[ii]);</td></tr>
+<tr><th id="537">537</th><td>	            }</td></tr>
+<tr><th id="538">538</th><td>	            <i>// Make IPDFPhiBias = true</i></td></tr>
+<tr><th id="539">539</th><td>	            IPDFPhiBias = <b>true</b>;</td></tr>
+<tr><th id="540">540</th><td>		}</td></tr>
+<tr><th id="541">541</th><td>	    }</td></tr>
+<tr><th id="542">542</th><td>	    <i>// IPDF has been create so carry on</i></td></tr>
+<tr><th id="543">543</th><td>	    G4double rndm = <a class="macro" href="../../global/HEPRandom/include/Randomize.hh.html#52" title="CLHEP::HepRandom::getTheEngine()-&gt;flat()" data-ref="_M/G4UniformRand">G4UniformRand</a>();</td></tr>
+<tr><th id="544">544</th><td>	    <i>//      size_t weight_bin_no = IPDFPhiBiasH.FindValueBinLocation(rndm);</i></td></tr>
+<tr><th id="545">545</th><td>	    size_t numberOfBin = IPDFPhiBiasH.GetVectorLength();</td></tr>
+<tr><th id="546">546</th><td>	    G4int biasn1 = <var>0</var>;</td></tr>
+<tr><th id="547">547</th><td>	    G4int biasn2 = numberOfBin / <var>2</var>;</td></tr>
+<tr><th id="548">548</th><td>	    G4int biasn3 = numberOfBin - <var>1</var>;</td></tr>
+<tr><th id="549">549</th><td>	    <b>while</b> (biasn1 != biasn3 - <var>1</var>) {</td></tr>
+<tr><th id="550">550</th><td>	        <b>if</b> (rndm &gt; IPDFPhiBiasH(biasn2))</td></tr>
+<tr><th id="551">551</th><td>	          biasn1 = biasn2;</td></tr>
+<tr><th id="552">552</th><td>	        <b>else</b></td></tr>
+<tr><th id="553">553</th><td>	          biasn3 = biasn2;</td></tr>
+<tr><th id="554">554</th><td>	        biasn2 = biasn1 + (biasn3 - biasn1 + <var>1</var>) / <var>2</var>;</td></tr>
+<tr><th id="555">555</th><td>	    }</td></tr>
+<tr><th id="556">556</th><td>	    bweights_t&amp; w = bweights.Get();</td></tr>
+<tr><th id="557">557</th><td>	    w[<var>4</var>] = IPDFPhiBiasH(biasn2) - IPDFPhiBiasH(biasn2 - <var>1</var>);</td></tr>
+<tr><th id="558">558</th><td>	    G4double xaxisl = IPDFPhiBiasH.GetLowEdgeEnergy(size_t(biasn2 - <var>1</var>));</td></tr>
+<tr><th id="559">559</th><td>	    G4double xaxisu = IPDFPhiBiasH.GetLowEdgeEnergy(size_t(biasn2));</td></tr>
+<tr><th id="560">560</th><td>	    G4double NatProb = xaxisu - xaxisl;</td></tr>
+<tr><th id="561">561</th><td>	    w[<var>4</var>] = NatProb / w[<var>4</var>];</td></tr>
+<tr><th id="562">562</th><td>	    <b>if</b> (verbosityLevel &gt;= <var>1</var>)</td></tr>
+<tr><th id="563">563</th><td>	      <a class="macro" href="../../global/management/include/G4ios.hh.html#46" title="(*_G4cout_p())" data-ref="_M/G4cout">G4cout</a> &lt;&lt; <q>"Phi bin weight "</q> &lt;&lt; w[<var>4</var>] &lt;&lt; <q>" "</q> &lt;&lt; rndm &lt;&lt; <a class="macro" href="../../global/management/include/G4ios.hh.html#60" title="std::endl" data-ref="_M/G4endl">G4endl</a>;</td></tr>
+<tr><th id="564">564</th><td>	    <b>return</b> (IPDFPhiBiasH.GetEnergy(rndm));</td></tr>
+<tr><th id="565">565</th><td>	}</td></tr>
+<tr><th id="566">566</th><td>}</td></tr>
+<tr><th id="567">567</th><td></td></tr>
+<tr><th id="568">568</th><td>G4double <span class='error' title="use of undeclared identifier &apos;G4SPSRandomGenerator&apos;">G4SPSRandomGenerator</span>::GenRandEnergy() {</td></tr>
+<tr><th id="569">569</th><td>	<b>if</b> (verbosityLevel &gt;= <var>1</var>)</td></tr>
+<tr><th id="570">570</th><td>		<a class="macro" href="../../global/management/include/G4ios.hh.html#46" title="(*_G4cout_p())" data-ref="_M/G4cout">G4cout</a> &lt;&lt; <q>"In GenRandEnergy"</q> &lt;&lt; <a class="macro" href="../../global/management/include/G4ios.hh.html#60" title="std::endl" data-ref="_M/G4endl">G4endl</a>;</td></tr>
+<tr><th id="571">571</th><td>	<b>if</b> (EnergyBias == <b>false</b>) {</td></tr>
+<tr><th id="572">572</th><td>		<i>// Energy is not biased</i></td></tr>
+<tr><th id="573">573</th><td>		G4double rndm = <a class="macro" href="../../global/HEPRandom/include/Randomize.hh.html#52" title="CLHEP::HepRandom::getTheEngine()-&gt;flat()" data-ref="_M/G4UniformRand">G4UniformRand</a>();</td></tr>
+<tr><th id="574">574</th><td>		<b>return</b> (rndm);</td></tr>
+<tr><th id="575">575</th><td>	} <b>else</b> {</td></tr>
+<tr><th id="576">576</th><td>	    <b>if</b> ( local_IPDFEnergyBias.Get().val == <b>false</b> ) {</td></tr>
+<tr><th id="577">577</th><td>	        local_IPDFEnergyBias.Get().val = <b>true</b>;</td></tr>
+<tr><th id="578">578</th><td>	        <i>// ENERGY is biased</i></td></tr>
+<tr><th id="579">579</th><td>	        G4AutoLock l(&amp;mutex);</td></tr>
+<tr><th id="580">580</th><td>		<b>if</b> (IPDFEnergyBias == <b>false</b>) {</td></tr>
+<tr><th id="581">581</th><td>		    <i>// IPDF has not been created, so create it</i></td></tr>
+<tr><th id="582">582</th><td>		    G4double bins[<var>1024</var>], vals[<var>1024</var>], sum;</td></tr>
+<tr><th id="583">583</th><td>		    G4int ii;</td></tr>
+<tr><th id="584">584</th><td>		    G4int maxbin = G4int(EnergyBiasH.GetVectorLength());</td></tr>
+<tr><th id="585">585</th><td>		    bins[<var>0</var>] = EnergyBiasH.GetLowEdgeEnergy(size_t(<var>0</var>));</td></tr>
+<tr><th id="586">586</th><td>		    vals[<var>0</var>] = EnergyBiasH(size_t(<var>0</var>));</td></tr>
+<tr><th id="587">587</th><td>		    sum = vals[<var>0</var>];</td></tr>
+<tr><th id="588">588</th><td>		    <b>for</b> (ii = <var>1</var>; ii &lt; maxbin; ii++) {</td></tr>
+<tr><th id="589">589</th><td>		        bins[ii] = EnergyBiasH.GetLowEdgeEnergy(size_t(ii));</td></tr>
+<tr><th id="590">590</th><td>		        vals[ii] = EnergyBiasH(size_t(ii)) + vals[ii - <var>1</var>];</td></tr>
+<tr><th id="591">591</th><td>		        sum = sum + EnergyBiasH(size_t(ii));</td></tr>
+<tr><th id="592">592</th><td>		    }</td></tr>
+<tr><th id="593">593</th><td>		    IPDFEnergyBiasH = ZeroPhysVector;</td></tr>
+<tr><th id="594">594</th><td>		    <b>for</b> (ii = <var>0</var>; ii &lt; maxbin; ii++) {</td></tr>
+<tr><th id="595">595</th><td>		        vals[ii] = vals[ii] / sum;</td></tr>
+<tr><th id="596">596</th><td>		        IPDFEnergyBiasH.InsertValues(bins[ii], vals[ii]);</td></tr>
+<tr><th id="597">597</th><td>		    }</td></tr>
+<tr><th id="598">598</th><td>		    <i>// Make IPDFEnergyBias = true</i></td></tr>
+<tr><th id="599">599</th><td>		    IPDFEnergyBias = <b>true</b>;</td></tr>
+<tr><th id="600">600</th><td>		}</td></tr>
+<tr><th id="601">601</th><td>	    }</td></tr>
+<tr><th id="602">602</th><td>	    <i>// IPDF has been create so carry on</i></td></tr>
+<tr><th id="603">603</th><td>	    G4double rndm = <a class="macro" href="../../global/HEPRandom/include/Randomize.hh.html#52" title="CLHEP::HepRandom::getTheEngine()-&gt;flat()" data-ref="_M/G4UniformRand">G4UniformRand</a>();</td></tr>
+<tr><th id="604">604</th><td>	    <i>//  size_t weight_bin_no = IPDFEnergyBiasH.FindValueBinLocation(rndm);</i></td></tr>
+<tr><th id="605">605</th><td>	    size_t numberOfBin = IPDFEnergyBiasH.GetVectorLength();</td></tr>
+<tr><th id="606">606</th><td>	    G4int biasn1 = <var>0</var>;</td></tr>
+<tr><th id="607">607</th><td>	    G4int biasn2 = numberOfBin / <var>2</var>;</td></tr>
+<tr><th id="608">608</th><td>	    G4int biasn3 = numberOfBin - <var>1</var>;</td></tr>
+<tr><th id="609">609</th><td>	    <b>while</b> (biasn1 != biasn3 - <var>1</var>) {</td></tr>
+<tr><th id="610">610</th><td>	        <b>if</b> (rndm &gt; IPDFEnergyBiasH(biasn2))</td></tr>
+<tr><th id="611">611</th><td>	          biasn1 = biasn2;</td></tr>
+<tr><th id="612">612</th><td>	        <b>else</b></td></tr>
+<tr><th id="613">613</th><td>	          biasn3 = biasn2;</td></tr>
+<tr><th id="614">614</th><td>	        biasn2 = biasn1 + (biasn3 - biasn1 + <var>1</var>) / <var>2</var>;</td></tr>
+<tr><th id="615">615</th><td>	    }</td></tr>
+<tr><th id="616">616</th><td>	    bweights_t&amp; w = bweights.Get();</td></tr>
+<tr><th id="617">617</th><td>	    w[<var>5</var>] = IPDFEnergyBiasH(biasn2) - IPDFEnergyBiasH(biasn2 - <var>1</var>);</td></tr>
+<tr><th id="618">618</th><td>	    G4double xaxisl = IPDFEnergyBiasH.GetLowEdgeEnergy(size_t(biasn2 - <var>1</var>));</td></tr>
+<tr><th id="619">619</th><td>	    G4double xaxisu = IPDFEnergyBiasH.GetLowEdgeEnergy(size_t(biasn2));</td></tr>
+<tr><th id="620">620</th><td>	    G4double NatProb = xaxisu - xaxisl;</td></tr>
+<tr><th id="621">621</th><td>	    w[<var>5</var>] = NatProb / w[<var>5</var>];</td></tr>
+<tr><th id="622">622</th><td>	    <b>if</b> (verbosityLevel &gt;= <var>1</var>)</td></tr>
+<tr><th id="623">623</th><td>	      <a class="macro" href="../../global/management/include/G4ios.hh.html#46" title="(*_G4cout_p())" data-ref="_M/G4cout">G4cout</a> &lt;&lt; <q>"Energy bin weight "</q> &lt;&lt; w[<var>5</var>] &lt;&lt; <q>" "</q> &lt;&lt; rndm</td></tr>
+<tr><th id="624">624</th><td>	      &lt;&lt; <a class="macro" href="../../global/management/include/G4ios.hh.html#60" title="std::endl" data-ref="_M/G4endl">G4endl</a>;</td></tr>
+<tr><th id="625">625</th><td>	    <b>return</b> (IPDFEnergyBiasH.GetEnergy(rndm));</td></tr>
+<tr><th id="626">626</th><td>	}</td></tr>
+<tr><th id="627">627</th><td>}</td></tr>
+<tr><th id="628">628</th><td></td></tr>
+<tr><th id="629">629</th><td>G4double <span class='error' title="use of undeclared identifier &apos;G4SPSRandomGenerator&apos;">G4SPSRandomGenerator</span>::GenRandPosTheta() {</td></tr>
+<tr><th id="630">630</th><td>	<b>if</b> (verbosityLevel &gt;= <var>1</var>) {</td></tr>
+<tr><th id="631">631</th><td>		<a class="macro" href="../../global/management/include/G4ios.hh.html#46" title="(*_G4cout_p())" data-ref="_M/G4cout">G4cout</a> &lt;&lt; <q>"In GenRandPosTheta"</q> &lt;&lt; <a class="macro" href="../../global/management/include/G4ios.hh.html#60" title="std::endl" data-ref="_M/G4endl">G4endl</a>;</td></tr>
+<tr><th id="632">632</th><td>		<a class="macro" href="../../global/management/include/G4ios.hh.html#46" title="(*_G4cout_p())" data-ref="_M/G4cout">G4cout</a> &lt;&lt; <q>"Verbosity "</q> &lt;&lt; verbosityLevel &lt;&lt; <a class="macro" href="../../global/management/include/G4ios.hh.html#60" title="std::endl" data-ref="_M/G4endl">G4endl</a>;</td></tr>
+<tr><th id="633">633</th><td>	}</td></tr>
+<tr><th id="634">634</th><td>	<b>if</b> (PosThetaBias == <b>false</b>) {</td></tr>
+<tr><th id="635">635</th><td>		<i>// Theta is not biased</i></td></tr>
+<tr><th id="636">636</th><td>		G4double rndm = <a class="macro" href="../../global/HEPRandom/include/Randomize.hh.html#52" title="CLHEP::HepRandom::getTheEngine()-&gt;flat()" data-ref="_M/G4UniformRand">G4UniformRand</a>();</td></tr>
+<tr><th id="637">637</th><td>		<b>return</b> (rndm);</td></tr>
+<tr><th id="638">638</th><td>	} <b>else</b> {</td></tr>
+<tr><th id="639">639</th><td>		<i>// Theta is biased</i></td></tr>
+<tr><th id="640">640</th><td>	    <b>if</b> ( local_IPDFPosThetaBias.Get().val == <b>false</b> ) {</td></tr>
+<tr><th id="641">641</th><td>	        local_IPDFPosThetaBias.Get().val = <b>true</b>;</td></tr>
+<tr><th id="642">642</th><td>	        G4AutoLock l(&amp;mutex);</td></tr>
+<tr><th id="643">643</th><td>	        <b>if</b> (IPDFPosThetaBias == <b>false</b>) {</td></tr>
+<tr><th id="644">644</th><td>	            <i>// IPDF has not been created, so create it</i></td></tr>
+<tr><th id="645">645</th><td>	            G4double bins[<var>1024</var>], vals[<var>1024</var>], sum;</td></tr>
+<tr><th id="646">646</th><td>	            G4int ii;</td></tr>
+<tr><th id="647">647</th><td>	            G4int maxbin = G4int(PosThetaBiasH.GetVectorLength());</td></tr>
+<tr><th id="648">648</th><td>	            bins[<var>0</var>] = PosThetaBiasH.GetLowEdgeEnergy(size_t(<var>0</var>));</td></tr>
+<tr><th id="649">649</th><td>	            vals[<var>0</var>] = PosThetaBiasH(size_t(<var>0</var>));</td></tr>
+<tr><th id="650">650</th><td>	            sum = vals[<var>0</var>];</td></tr>
+<tr><th id="651">651</th><td>	            <b>for</b> (ii = <var>1</var>; ii &lt; maxbin; ii++) {</td></tr>
+<tr><th id="652">652</th><td>	                bins[ii] = PosThetaBiasH.GetLowEdgeEnergy(size_t(ii));</td></tr>
+<tr><th id="653">653</th><td>	                vals[ii] = PosThetaBiasH(size_t(ii)) + vals[ii - <var>1</var>];</td></tr>
+<tr><th id="654">654</th><td>	                sum = sum + PosThetaBiasH(size_t(ii));</td></tr>
+<tr><th id="655">655</th><td>	            }</td></tr>
+<tr><th id="656">656</th><td></td></tr>
+<tr><th id="657">657</th><td>	            <b>for</b> (ii = <var>0</var>; ii &lt; maxbin; ii++) {</td></tr>
+<tr><th id="658">658</th><td>	                vals[ii] = vals[ii] / sum;</td></tr>
+<tr><th id="659">659</th><td>	                IPDFPosThetaBiasH.InsertValues(bins[ii], vals[ii]);</td></tr>
+<tr><th id="660">660</th><td>	            }</td></tr>
+<tr><th id="661">661</th><td>	            <i>// Make IPDFThetaBias = true</i></td></tr>
+<tr><th id="662">662</th><td>	            IPDFPosThetaBias = <b>true</b>;</td></tr>
+<tr><th id="663">663</th><td>		}</td></tr>
+<tr><th id="664">664</th><td>	    }</td></tr>
+<tr><th id="665">665</th><td>	    <i>// IPDF has been create so carry on</i></td></tr>
+<tr><th id="666">666</th><td>	    G4double rndm = <a class="macro" href="../../global/HEPRandom/include/Randomize.hh.html#52" title="CLHEP::HepRandom::getTheEngine()-&gt;flat()" data-ref="_M/G4UniformRand">G4UniformRand</a>();</td></tr>
+<tr><th id="667">667</th><td>	    <i>//      size_t weight_bin_no = IPDFThetaBiasH.FindValueBinLocation(rndm);</i></td></tr>
+<tr><th id="668">668</th><td>	    size_t numberOfBin = IPDFPosThetaBiasH.GetVectorLength();</td></tr>
+<tr><th id="669">669</th><td>	    G4int biasn1 = <var>0</var>;</td></tr>
+<tr><th id="670">670</th><td>	    G4int biasn2 = numberOfBin / <var>2</var>;</td></tr>
+<tr><th id="671">671</th><td>	    G4int biasn3 = numberOfBin - <var>1</var>;</td></tr>
+<tr><th id="672">672</th><td>	    <b>while</b> (biasn1 != biasn3 - <var>1</var>) {</td></tr>
+<tr><th id="673">673</th><td>	        <b>if</b> (rndm &gt; IPDFPosThetaBiasH(biasn2))</td></tr>
+<tr><th id="674">674</th><td>	          biasn1 = biasn2;</td></tr>
+<tr><th id="675">675</th><td>	        <b>else</b></td></tr>
+<tr><th id="676">676</th><td>	          biasn3 = biasn2;</td></tr>
+<tr><th id="677">677</th><td>	        biasn2 = biasn1 + (biasn3 - biasn1 + <var>1</var>) / <var>2</var>;</td></tr>
+<tr><th id="678">678</th><td>	    }</td></tr>
+<tr><th id="679">679</th><td>	    bweights_t&amp; w = bweights.Get();</td></tr>
+<tr><th id="680">680</th><td>	    w[<var>6</var>] = IPDFPosThetaBiasH(biasn2) - IPDFPosThetaBiasH(biasn2 - <var>1</var>);</td></tr>
+<tr><th id="681">681</th><td>	      G4double xaxisl =</td></tr>
+<tr><th id="682">682</th><td>	          IPDFPosThetaBiasH.GetLowEdgeEnergy(size_t(biasn2 - <var>1</var>));</td></tr>
+<tr><th id="683">683</th><td>	      G4double xaxisu = IPDFPosThetaBiasH.GetLowEdgeEnergy(size_t(biasn2));</td></tr>
+<tr><th id="684">684</th><td>	      G4double NatProb = xaxisu - xaxisl;</td></tr>
+<tr><th id="685">685</th><td>	      w[<var>6</var>] = NatProb / w[<var>6</var>];</td></tr>
+<tr><th id="686">686</th><td>	      <b>if</b> (verbosityLevel &gt;= <var>1</var>)</td></tr>
+<tr><th id="687">687</th><td>	        <a class="macro" href="../../global/management/include/G4ios.hh.html#46" title="(*_G4cout_p())" data-ref="_M/G4cout">G4cout</a> &lt;&lt; <q>"PosTheta bin weight "</q> &lt;&lt; w[<var>6</var>] &lt;&lt; <q>" "</q> &lt;&lt; rndm</td></tr>
+<tr><th id="688">688</th><td>	        &lt;&lt; <a class="macro" href="../../global/management/include/G4ios.hh.html#60" title="std::endl" data-ref="_M/G4endl">G4endl</a>;</td></tr>
+<tr><th id="689">689</th><td>	      <b>return</b> (IPDFPosThetaBiasH.GetEnergy(rndm));</td></tr>
+<tr><th id="690">690</th><td>	}</td></tr>
+<tr><th id="691">691</th><td>}</td></tr>
+<tr><th id="692">692</th><td></td></tr>
+<tr><th id="693">693</th><td>G4double <span class='error' title="use of undeclared identifier &apos;G4SPSRandomGenerator&apos;">G4SPSRandomGenerator</span>::GenRandPosPhi() {</td></tr>
+<tr><th id="694">694</th><td>	<b>if</b> (verbosityLevel &gt;= <var>1</var>)</td></tr>
+<tr><th id="695">695</th><td>		<a class="macro" href="../../global/management/include/G4ios.hh.html#46" title="(*_G4cout_p())" data-ref="_M/G4cout">G4cout</a> &lt;&lt; <q>"In GenRandPosPhi"</q> &lt;&lt; <a class="macro" href="../../global/management/include/G4ios.hh.html#60" title="std::endl" data-ref="_M/G4endl">G4endl</a>;</td></tr>
+<tr><th id="696">696</th><td>	<b>if</b> (PosPhiBias == <b>false</b>) {</td></tr>
+<tr><th id="697">697</th><td>		<i>// PosPhi is not biased</i></td></tr>
+<tr><th id="698">698</th><td>		G4double rndm = <a class="macro" href="../../global/HEPRandom/include/Randomize.hh.html#52" title="CLHEP::HepRandom::getTheEngine()-&gt;flat()" data-ref="_M/G4UniformRand">G4UniformRand</a>();</td></tr>
+<tr><th id="699">699</th><td>		<b>return</b> (rndm);</td></tr>
+<tr><th id="700">700</th><td>	} <b>else</b> {</td></tr>
+<tr><th id="701">701</th><td>		<i>// PosPhi is biased</i></td></tr>
+<tr><th id="702">702</th><td>	    <b>if</b> (local_IPDFPosPhiBias.Get().val == <b>false</b> ) {</td></tr>
+<tr><th id="703">703</th><td>	        local_IPDFPosPhiBias.Get().val = <b>true</b>;</td></tr>
+<tr><th id="704">704</th><td>	        G4AutoLock l(&amp;mutex);</td></tr>
+<tr><th id="705">705</th><td>		<b>if</b> (IPDFPosPhiBias == <b>false</b>) {</td></tr>
+<tr><th id="706">706</th><td>		    <i>// IPDF has not been created, so create it</i></td></tr>
+<tr><th id="707">707</th><td>		    G4double bins[<var>1024</var>], vals[<var>1024</var>], sum;</td></tr>
+<tr><th id="708">708</th><td>		    G4int ii;</td></tr>
+<tr><th id="709">709</th><td>		    G4int maxbin = G4int(PosPhiBiasH.GetVectorLength());</td></tr>
+<tr><th id="710">710</th><td>		    bins[<var>0</var>] = PosPhiBiasH.GetLowEdgeEnergy(size_t(<var>0</var>));</td></tr>
+<tr><th id="711">711</th><td>		    vals[<var>0</var>] = PosPhiBiasH(size_t(<var>0</var>));</td></tr>
+<tr><th id="712">712</th><td>		    sum = vals[<var>0</var>];</td></tr>
+<tr><th id="713">713</th><td>		    <b>for</b> (ii = <var>1</var>; ii &lt; maxbin; ii++) {</td></tr>
+<tr><th id="714">714</th><td>		        bins[ii] = PosPhiBiasH.GetLowEdgeEnergy(size_t(ii));</td></tr>
+<tr><th id="715">715</th><td>		        vals[ii] = PosPhiBiasH(size_t(ii)) + vals[ii - <var>1</var>];</td></tr>
+<tr><th id="716">716</th><td>		        sum = sum + PosPhiBiasH(size_t(ii));</td></tr>
+<tr><th id="717">717</th><td>		    }</td></tr>
+<tr><th id="718">718</th><td></td></tr>
+<tr><th id="719">719</th><td>		    <b>for</b> (ii = <var>0</var>; ii &lt; maxbin; ii++) {</td></tr>
+<tr><th id="720">720</th><td>		        vals[ii] = vals[ii] / sum;</td></tr>
+<tr><th id="721">721</th><td>		        IPDFPosPhiBiasH.InsertValues(bins[ii], vals[ii]);</td></tr>
+<tr><th id="722">722</th><td>		    }</td></tr>
+<tr><th id="723">723</th><td>		    <i>// Make IPDFPosPhiBias = true</i></td></tr>
+<tr><th id="724">724</th><td>		    IPDFPosPhiBias = <b>true</b>;</td></tr>
+<tr><th id="725">725</th><td>		}</td></tr>
+<tr><th id="726">726</th><td>	    }</td></tr>
+<tr><th id="727">727</th><td>	    <i>// IPDF has been create so carry on</i></td></tr>
+<tr><th id="728">728</th><td>	    G4double rndm = <a class="macro" href="../../global/HEPRandom/include/Randomize.hh.html#52" title="CLHEP::HepRandom::getTheEngine()-&gt;flat()" data-ref="_M/G4UniformRand">G4UniformRand</a>();</td></tr>
+<tr><th id="729">729</th><td>	    <i>//      size_t weight_bin_no = IPDFPosPhiBiasH.FindValueBinLocation(rndm);</i></td></tr>
+<tr><th id="730">730</th><td>	    size_t numberOfBin = IPDFPosPhiBiasH.GetVectorLength();</td></tr>
+<tr><th id="731">731</th><td>	    G4int biasn1 = <var>0</var>;</td></tr>
+<tr><th id="732">732</th><td>	    G4int biasn2 = numberOfBin / <var>2</var>;</td></tr>
+<tr><th id="733">733</th><td>	    G4int biasn3 = numberOfBin - <var>1</var>;</td></tr>
+<tr><th id="734">734</th><td>	    <b>while</b> (biasn1 != biasn3 - <var>1</var>) {</td></tr>
+<tr><th id="735">735</th><td>	        <b>if</b> (rndm &gt; IPDFPosPhiBiasH(biasn2))</td></tr>
+<tr><th id="736">736</th><td>	          biasn1 = biasn2;</td></tr>
+<tr><th id="737">737</th><td>	        <b>else</b></td></tr>
+<tr><th id="738">738</th><td>	          biasn3 = biasn2;</td></tr>
+<tr><th id="739">739</th><td>	        biasn2 = biasn1 + (biasn3 - biasn1 + <var>1</var>) / <var>2</var>;</td></tr>
+<tr><th id="740">740</th><td>	    }</td></tr>
+<tr><th id="741">741</th><td>	    bweights_t&amp; w = bweights.Get();</td></tr>
+<tr><th id="742">742</th><td>	    w[<var>7</var>] = IPDFPosPhiBiasH(biasn2) - IPDFPosPhiBiasH(biasn2 - <var>1</var>);</td></tr>
+<tr><th id="743">743</th><td>	    G4double xaxisl = IPDFPosPhiBiasH.GetLowEdgeEnergy(size_t(biasn2 - <var>1</var>));</td></tr>
+<tr><th id="744">744</th><td>	    G4double xaxisu = IPDFPosPhiBiasH.GetLowEdgeEnergy(size_t(biasn2));</td></tr>
+<tr><th id="745">745</th><td>	    G4double NatProb = xaxisu - xaxisl;</td></tr>
+<tr><th id="746">746</th><td>	    w[<var>7</var>] = NatProb / w[<var>7</var>];</td></tr>
+<tr><th id="747">747</th><td>	    <b>if</b> (verbosityLevel &gt;= <var>1</var>)</td></tr>
+<tr><th id="748">748</th><td>	      <a class="macro" href="../../global/management/include/G4ios.hh.html#46" title="(*_G4cout_p())" data-ref="_M/G4cout">G4cout</a> &lt;&lt; <q>"PosPhi bin weight "</q> &lt;&lt; w[<var>7</var>] &lt;&lt; <q>" "</q> &lt;&lt; rndm</td></tr>
+<tr><th id="749">749</th><td>	      &lt;&lt; <a class="macro" href="../../global/management/include/G4ios.hh.html#60" title="std::endl" data-ref="_M/G4endl">G4endl</a>;</td></tr>
+<tr><th id="750">750</th><td>	    <b>return</b> (IPDFPosPhiBiasH.GetEnergy(rndm));</td></tr>
+<tr><th id="751">751</th><td>	}</td></tr>
+<tr><th id="752">752</th><td>}</td></tr>
+<tr><th id="753">753</th><td></td></tr>
+</table><hr/><p id='footer'>
+Generated on <em>2019-Aug-28</em> from project codebrowser<br />Powered by <a href='https://woboq.com'><img alt='Woboq' src='https://code.woboq.org/woboq-16.png' width='41' height='16' /></a> <a href='https://code.woboq.org'>Code Browser</a> 2.1
+<br/>Generator usage only permitted with license.</p>
+</div></body></html>

@@ -1,0 +1,152 @@
+<!doctype html>
+<html>
+<head>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"><title>_tess source code [codebrowser/source/analysis/g4tools/include/tools/glutess/_tess] - Woboq Code Browser</title>
+<meta name="woboq:interestingDefinitions" content="CachedVertex,GLUtesselator,TessState "/>
+<link rel="stylesheet" href="../../../../../../../../data/qtcreator.css" title="QtCreator"/>
+<link rel="alternate stylesheet" href="../../../../../../../../data/kdevelop.css" title="KDevelop"/>
+<script type="text/javascript" src="../../../../../../../../data/jquery/jquery.min.js"></script>
+<script type="text/javascript" src="../../../../../../../../data/jquery/jquery-ui.min.js"></script>
+<script>var file = 'codebrowser/source/analysis/g4tools/include/tools/glutess/_tess'; var root_path = '../../../../../../..'; var data_path = '../../../../../../../../data';</script>
+<script src='../../../../../../../../data/codebrowser.js'></script>
+</head>
+<body><div id='header'><h1 id='breadcrumb'><span>Browse the source code of </span><a href='../../../../../..'>codebrowser</a>/<a href='../../../../..'>source</a>/<a href='../../../..'>analysis</a>/<a href='../../..'>g4tools</a>/<a href='../..'>include</a>/<a href='..'>tools</a>/<a href='./'>glutess</a>/<a href='_tess.html'>_tess</a></h1></div>
+<hr/><div id='content'><table class="code">
+<tr><th id="1">1</th><td><i>// see license file for original license.</i></td></tr>
+<tr><th id="2">2</th><td></td></tr>
+<tr><th id="3">3</th><td><u>#<span data-ppcond="3">ifndef</span> <span class="macro" data-ref="_M/tools_glutess__tess">tools_glutess__tess</span></u></td></tr>
+<tr><th id="4">4</th><td><u>#define <dfn class="macro" id="_M/tools_glutess__tess" data-ref="_M/tools_glutess__tess">tools_glutess__tess</dfn></u></td></tr>
+<tr><th id="5">5</th><td></td></tr>
+<tr><th id="6">6</th><td><u>#include <a href="mesh.html">"mesh"</a></u></td></tr>
+<tr><th id="7">7</th><td><u>#include <a href="dict.html">"dict"</a></u></td></tr>
+<tr><th id="8">8</th><td><u>#include <a href="priorityq.html">"priorityq"</a></u></td></tr>
+<tr><th id="9">9</th><td></td></tr>
+<tr><th id="10">10</th><td><u>#include <span class='error' title="&apos;csetjmp&apos; file not found">&lt;</span>csetjmp&gt;</u></td></tr>
+<tr><th id="11">11</th><td></td></tr>
+<tr><th id="12">12</th><td><i>/* The begin/end calls must be properly nested.  We keep track of</i></td></tr>
+<tr><th id="13">13</th><td><i> * the current state to enforce the ordering.</i></td></tr>
+<tr><th id="14">14</th><td><i> */</i></td></tr>
+<tr><th id="15">15</th><td><b>enum</b> <dfn class="type def" id="TessState" title='TessState' data-ref="TessState">TessState</dfn> { <dfn class="enum" id="TessState::T_DORMANT" title='TessState::T_DORMANT' data-ref="TessState::T_DORMANT">T_DORMANT</dfn>, <dfn class="enum" id="TessState::T_IN_POLYGON" title='TessState::T_IN_POLYGON' data-ref="TessState::T_IN_POLYGON">T_IN_POLYGON</dfn>, <dfn class="enum" id="TessState::T_IN_CONTOUR" title='TessState::T_IN_CONTOUR' data-ref="TessState::T_IN_CONTOUR">T_IN_CONTOUR</dfn> };</td></tr>
+<tr><th id="16">16</th><td></td></tr>
+<tr><th id="17">17</th><td><i>/* We cache vertex data for single-contour polygons so that we can</i></td></tr>
+<tr><th id="18">18</th><td><i> * try a quick-and-dirty decomposition first.</i></td></tr>
+<tr><th id="19">19</th><td><i> */</i></td></tr>
+<tr><th id="20">20</th><td><u>#define <dfn class="macro" id="_M/GLU_TESS_MAX_CACHE" data-ref="_M/GLU_TESS_MAX_CACHE">GLU_TESS_MAX_CACHE</dfn> 100</u></td></tr>
+<tr><th id="21">21</th><td></td></tr>
+<tr><th id="22">22</th><td><b>typedef</b> <b>struct</b> <dfn class="type def" id="CachedVertex" title='CachedVertex' data-ref="CachedVertex"><a class="type" href="#CachedVertex" title='CachedVertex' data-ref="CachedVertex">CachedVertex</a></dfn> {</td></tr>
+<tr><th id="23">23</th><td>  <a class="typedef" href="_glu.html#GLUdouble" title='GLUdouble' data-type='double' data-ref="GLUdouble">GLUdouble</a>	<dfn class="decl" id="CachedVertex::coords" title='CachedVertex::coords' data-ref="CachedVertex::coords">coords</dfn>[<var>3</var>];</td></tr>
+<tr><th id="24">24</th><td>  <em>void</em>		*<dfn class="decl" id="CachedVertex::data" title='CachedVertex::data' data-ref="CachedVertex::data">data</dfn>;</td></tr>
+<tr><th id="25">25</th><td>} <dfn class="typedef" id="CachedVertex" title='CachedVertex' data-type='struct CachedVertex' data-ref="CachedVertex">CachedVertex</dfn>;</td></tr>
+<tr><th id="26">26</th><td></td></tr>
+<tr><th id="27">27</th><td><b>struct</b> <dfn class="type def" id="GLUtesselator" title='GLUtesselator' data-ref="GLUtesselator">GLUtesselator</dfn> {</td></tr>
+<tr><th id="28">28</th><td></td></tr>
+<tr><th id="29">29</th><td>  <i>/*** state needed for collecting the input data ***/</i></td></tr>
+<tr><th id="30">30</th><td></td></tr>
+<tr><th id="31">31</th><td>  <b>enum</b> <a class="type" href="#TessState" title='TessState' data-ref="TessState">TessState</a> <dfn class="decl" id="GLUtesselator::state" title='GLUtesselator::state' data-ref="GLUtesselator::state">state</dfn>;		<i>/* what begin/end calls have we seen? */</i></td></tr>
+<tr><th id="32">32</th><td></td></tr>
+<tr><th id="33">33</th><td>  <a class="typedef" href="mesh.html#GLUhalfEdge" title='GLUhalfEdge' data-type='struct GLUhalfEdge' data-ref="GLUhalfEdge">GLUhalfEdge</a>	*<dfn class="decl" id="GLUtesselator::lastEdge" title='GLUtesselator::lastEdge' data-ref="GLUtesselator::lastEdge">lastEdge</dfn>;	<i>/* lastEdge-&gt;Org is the most recent vertex */</i></td></tr>
+<tr><th id="34">34</th><td>  <a class="typedef" href="mesh.html#GLUmesh" title='GLUmesh' data-type='struct GLUmesh' data-ref="GLUmesh">GLUmesh</a>	*<dfn class="decl" id="GLUtesselator::mesh" title='GLUtesselator::mesh' data-ref="GLUtesselator::mesh">mesh</dfn>;		<i>/* stores the input contours, and eventually</i></td></tr>
+<tr><th id="35">35</th><td><i>                                   the tessellation itself */</i></td></tr>
+<tr><th id="36">36</th><td></td></tr>
+<tr><th id="37">37</th><td>  <em>void</em>		(<a class="macro" href="_glu.html#48" title="" data-ref="_M/GLUAPIENTRY">GLUAPIENTRY</a> *<dfn class="decl" id="GLUtesselator::callError" title='GLUtesselator::callError' data-ref="GLUtesselator::callError">callError</dfn>)( <a class="typedef" href="_glu.html#GLUenum" title='GLUenum' data-type='unsigned int' data-ref="GLUenum">GLUenum</a> <dfn class="local col5 decl" id="4795errnum" title='errnum' data-type='GLUenum' data-ref="4795errnum">errnum</dfn> );</td></tr>
+<tr><th id="38">38</th><td></td></tr>
+<tr><th id="39">39</th><td>  <i>/*** state needed for projecting onto the sweep plane ***/</i></td></tr>
+<tr><th id="40">40</th><td></td></tr>
+<tr><th id="41">41</th><td>  <a class="typedef" href="_glu.html#GLUdouble" title='GLUdouble' data-type='double' data-ref="GLUdouble">GLUdouble</a>	<dfn class="decl" id="GLUtesselator::normal" title='GLUtesselator::normal' data-ref="GLUtesselator::normal">normal</dfn>[<var>3</var>];	<i>/* user-specified normal (if provided) */</i></td></tr>
+<tr><th id="42">42</th><td>  <a class="typedef" href="_glu.html#GLUdouble" title='GLUdouble' data-type='double' data-ref="GLUdouble">GLUdouble</a>	<dfn class="decl" id="GLUtesselator::sUnit" title='GLUtesselator::sUnit' data-ref="GLUtesselator::sUnit">sUnit</dfn>[<var>3</var>];	<i>/* unit vector in s-direction (debugging) */</i></td></tr>
+<tr><th id="43">43</th><td>  <a class="typedef" href="_glu.html#GLUdouble" title='GLUdouble' data-type='double' data-ref="GLUdouble">GLUdouble</a>	<dfn class="decl" id="GLUtesselator::tUnit" title='GLUtesselator::tUnit' data-ref="GLUtesselator::tUnit">tUnit</dfn>[<var>3</var>];	<i>/* unit vector in t-direction (debugging) */</i></td></tr>
+<tr><th id="44">44</th><td></td></tr>
+<tr><th id="45">45</th><td>  <i>/*** state needed for the line sweep ***/</i></td></tr>
+<tr><th id="46">46</th><td></td></tr>
+<tr><th id="47">47</th><td>  <a class="typedef" href="_glu.html#GLUdouble" title='GLUdouble' data-type='double' data-ref="GLUdouble">GLUdouble</a>	<dfn class="decl" id="GLUtesselator::relTolerance" title='GLUtesselator::relTolerance' data-ref="GLUtesselator::relTolerance">relTolerance</dfn>;	<i>/* tolerance for merging features */</i></td></tr>
+<tr><th id="48">48</th><td>  <a class="typedef" href="_glu.html#GLUenum" title='GLUenum' data-type='unsigned int' data-ref="GLUenum">GLUenum</a>	<dfn class="decl" id="GLUtesselator::windingRule" title='GLUtesselator::windingRule' data-ref="GLUtesselator::windingRule">windingRule</dfn>;	<i>/* rule for determining polygon interior */</i></td></tr>
+<tr><th id="49">49</th><td>  <a class="typedef" href="_glu.html#GLUboolean" title='GLUboolean' data-type='unsigned char' data-ref="GLUboolean">GLUboolean</a>	<dfn class="decl" id="GLUtesselator::fatalError" title='GLUtesselator::fatalError' data-ref="GLUtesselator::fatalError">fatalError</dfn>;	<i>/* fatal error: needed combine callback */</i></td></tr>
+<tr><th id="50">50</th><td></td></tr>
+<tr><th id="51">51</th><td>  <a class="macro" href="dict.html#9" title="DictList" data-ref="_M/Dict">Dict</a>		*<dfn class="decl" id="GLUtesselator::dict" title='GLUtesselator::dict' data-ref="GLUtesselator::dict">dict</dfn>;		<i>/* edge dictionary for sweep line */</i></td></tr>
+<tr><th id="52">52</th><td>  <a class="macro" href="priorityq.html#308" title="PriorityQSort" data-ref="_M/PriorityQ">PriorityQ</a>	*<dfn class="decl" id="GLUtesselator::pq" title='GLUtesselator::pq' data-ref="GLUtesselator::pq">pq</dfn>;		<i>/* priority queue of vertex events */</i></td></tr>
+<tr><th id="53">53</th><td>  <a class="typedef" href="mesh.html#GLUvertex" title='GLUvertex' data-type='struct GLUvertex' data-ref="GLUvertex">GLUvertex</a>	*<dfn class="decl" id="GLUtesselator::event" title='GLUtesselator::event' data-ref="GLUtesselator::event">event</dfn>;		<i>/* current sweep event being processed */</i></td></tr>
+<tr><th id="54">54</th><td></td></tr>
+<tr><th id="55">55</th><td>  <em>void</em>		(<a class="macro" href="_glu.html#48" title="" data-ref="_M/GLUAPIENTRY">GLUAPIENTRY</a> *<dfn class="decl" id="GLUtesselator::callCombine" title='GLUtesselator::callCombine' data-ref="GLUtesselator::callCombine">callCombine</dfn>)( <a class="typedef" href="_glu.html#GLUdouble" title='GLUdouble' data-type='double' data-ref="GLUdouble">GLUdouble</a> <dfn class="local col6 decl" id="4796coords" title='coords' data-type='GLUdouble *' data-ref="4796coords">coords</dfn>[<var>3</var>], <em>void</em> *<dfn class="local col7 decl" id="4797data" title='data' data-type='void **' data-ref="4797data">data</dfn>[<var>4</var>],</td></tr>
+<tr><th id="56">56</th><td>			        <a class="typedef" href="_glu.html#GLUfloat" title='GLUfloat' data-type='float' data-ref="GLUfloat">GLUfloat</a> <dfn class="local col8 decl" id="4798weight" title='weight' data-type='GLUfloat *' data-ref="4798weight">weight</dfn>[<var>4</var>], <em>void</em> **<dfn class="local col9 decl" id="4799outData" title='outData' data-type='void **' data-ref="4799outData">outData</dfn> );</td></tr>
+<tr><th id="57">57</th><td></td></tr>
+<tr><th id="58">58</th><td>  <i>/*** state needed for rendering callbacks (see render.c) ***/</i></td></tr>
+<tr><th id="59">59</th><td></td></tr>
+<tr><th id="60">60</th><td>  <a class="typedef" href="_glu.html#GLUboolean" title='GLUboolean' data-type='unsigned char' data-ref="GLUboolean">GLUboolean</a>	<dfn class="decl" id="GLUtesselator::flagBoundary" title='GLUtesselator::flagBoundary' data-ref="GLUtesselator::flagBoundary">flagBoundary</dfn>;	<i>/* mark boundary edges (use EdgeFlag) */</i></td></tr>
+<tr><th id="61">61</th><td>  <a class="typedef" href="_glu.html#GLUboolean" title='GLUboolean' data-type='unsigned char' data-ref="GLUboolean">GLUboolean</a>	<dfn class="decl" id="GLUtesselator::boundaryOnly" title='GLUtesselator::boundaryOnly' data-ref="GLUtesselator::boundaryOnly">boundaryOnly</dfn>;	<i>/* Extract contours, not triangles */</i></td></tr>
+<tr><th id="62">62</th><td>  <a class="typedef" href="mesh.html#GLUface" title='GLUface' data-type='struct GLUface' data-ref="GLUface">GLUface</a>	*<dfn class="decl" id="GLUtesselator::lonelyTriList" title='GLUtesselator::lonelyTriList' data-ref="GLUtesselator::lonelyTriList">lonelyTriList</dfn>;</td></tr>
+<tr><th id="63">63</th><td>    <i>/* list of triangles which could not be rendered as strips or fans */</i></td></tr>
+<tr><th id="64">64</th><td></td></tr>
+<tr><th id="65">65</th><td>  <em>void</em>		(<a class="macro" href="_glu.html#48" title="" data-ref="_M/GLUAPIENTRY">GLUAPIENTRY</a> *<dfn class="decl" id="GLUtesselator::callBegin" title='GLUtesselator::callBegin' data-ref="GLUtesselator::callBegin">callBegin</dfn>)( <a class="typedef" href="_glu.html#GLUenum" title='GLUenum' data-type='unsigned int' data-ref="GLUenum">GLUenum</a> <dfn class="local col0 decl" id="4800type" title='type' data-type='GLUenum' data-ref="4800type">type</dfn> );</td></tr>
+<tr><th id="66">66</th><td>  <em>void</em>		(<a class="macro" href="_glu.html#48" title="" data-ref="_M/GLUAPIENTRY">GLUAPIENTRY</a> *<dfn class="decl" id="GLUtesselator::callEdgeFlag" title='GLUtesselator::callEdgeFlag' data-ref="GLUtesselator::callEdgeFlag">callEdgeFlag</dfn>)( <a class="typedef" href="_glu.html#GLUboolean" title='GLUboolean' data-type='unsigned char' data-ref="GLUboolean">GLUboolean</a> <dfn class="local col1 decl" id="4801boundaryEdge" title='boundaryEdge' data-type='GLUboolean' data-ref="4801boundaryEdge">boundaryEdge</dfn> );</td></tr>
+<tr><th id="67">67</th><td>  <em>void</em>		(<a class="macro" href="_glu.html#48" title="" data-ref="_M/GLUAPIENTRY">GLUAPIENTRY</a> *<dfn class="decl" id="GLUtesselator::callVertex" title='GLUtesselator::callVertex' data-ref="GLUtesselator::callVertex">callVertex</dfn>)( <em>void</em> *<dfn class="local col2 decl" id="4802data" title='data' data-type='void *' data-ref="4802data">data</dfn> );</td></tr>
+<tr><th id="68">68</th><td>  <em>void</em>		(<a class="macro" href="_glu.html#48" title="" data-ref="_M/GLUAPIENTRY">GLUAPIENTRY</a> *<dfn class="decl" id="GLUtesselator::callEnd" title='GLUtesselator::callEnd' data-ref="GLUtesselator::callEnd">callEnd</dfn>)( <em>void</em> );</td></tr>
+<tr><th id="69">69</th><td>  <em>void</em>		(<a class="macro" href="_glu.html#48" title="" data-ref="_M/GLUAPIENTRY">GLUAPIENTRY</a> *<dfn class="decl" id="GLUtesselator::callMesh" title='GLUtesselator::callMesh' data-ref="GLUtesselator::callMesh">callMesh</dfn>)( <a class="typedef" href="mesh.html#GLUmesh" title='GLUmesh' data-type='struct GLUmesh' data-ref="GLUmesh">GLUmesh</a> *<dfn class="local col3 decl" id="4803mesh" title='mesh' data-type='GLUmesh *' data-ref="4803mesh">mesh</dfn> );</td></tr>
+<tr><th id="70">70</th><td></td></tr>
+<tr><th id="71">71</th><td></td></tr>
+<tr><th id="72">72</th><td>  <i>/*** state needed to cache single-contour polygons for renderCache() */</i></td></tr>
+<tr><th id="73">73</th><td></td></tr>
+<tr><th id="74">74</th><td>  <a class="typedef" href="_glu.html#GLUboolean" title='GLUboolean' data-type='unsigned char' data-ref="GLUboolean">GLUboolean</a>	<dfn class="decl" id="GLUtesselator::emptyCache" title='GLUtesselator::emptyCache' data-ref="GLUtesselator::emptyCache">emptyCache</dfn>;		<i>/* empty cache on next vertex() call */</i></td></tr>
+<tr><th id="75">75</th><td>  <em>int</em>		<dfn class="decl" id="GLUtesselator::cacheCount" title='GLUtesselator::cacheCount' data-ref="GLUtesselator::cacheCount">cacheCount</dfn>;		<i>/* number of cached vertices */</i></td></tr>
+<tr><th id="76">76</th><td>  <a class="typedef" href="#CachedVertex" title='CachedVertex' data-type='struct CachedVertex' data-ref="CachedVertex">CachedVertex</a>	<dfn class="decl" id="GLUtesselator::cache" title='GLUtesselator::cache' data-ref="GLUtesselator::cache">cache</dfn>[<a class="macro" href="#20" title="100" data-ref="_M/GLU_TESS_MAX_CACHE">GLU_TESS_MAX_CACHE</a>];	<i>/* the vertex data */</i></td></tr>
+<tr><th id="77">77</th><td></td></tr>
+<tr><th id="78">78</th><td>  <i>/*** rendering callbacks that also pass polygon data  ***/</i> </td></tr>
+<tr><th id="79">79</th><td>  <em>void</em>		(<a class="macro" href="_glu.html#48" title="" data-ref="_M/GLUAPIENTRY">GLUAPIENTRY</a> *<dfn class="decl" id="GLUtesselator::callBeginData" title='GLUtesselator::callBeginData' data-ref="GLUtesselator::callBeginData">callBeginData</dfn>)( <a class="typedef" href="_glu.html#GLUenum" title='GLUenum' data-type='unsigned int' data-ref="GLUenum">GLUenum</a> <dfn class="local col4 decl" id="4804type" title='type' data-type='GLUenum' data-ref="4804type">type</dfn>, <em>void</em> *<dfn class="local col5 decl" id="4805polygonData" title='polygonData' data-type='void *' data-ref="4805polygonData">polygonData</dfn> );</td></tr>
+<tr><th id="80">80</th><td>  <em>void</em>		(<a class="macro" href="_glu.html#48" title="" data-ref="_M/GLUAPIENTRY">GLUAPIENTRY</a> *<dfn class="decl" id="GLUtesselator::callEdgeFlagData" title='GLUtesselator::callEdgeFlagData' data-ref="GLUtesselator::callEdgeFlagData">callEdgeFlagData</dfn>)( <a class="typedef" href="_glu.html#GLUboolean" title='GLUboolean' data-type='unsigned char' data-ref="GLUboolean">GLUboolean</a> <dfn class="local col6 decl" id="4806boundaryEdge" title='boundaryEdge' data-type='GLUboolean' data-ref="4806boundaryEdge">boundaryEdge</dfn>, </td></tr>
+<tr><th id="81">81</th><td>				     <em>void</em> *<dfn class="local col7 decl" id="4807polygonData" title='polygonData' data-type='void *' data-ref="4807polygonData">polygonData</dfn> );</td></tr>
+<tr><th id="82">82</th><td>  <em>void</em>		(<a class="macro" href="_glu.html#48" title="" data-ref="_M/GLUAPIENTRY">GLUAPIENTRY</a> *<dfn class="decl" id="GLUtesselator::callVertexData" title='GLUtesselator::callVertexData' data-ref="GLUtesselator::callVertexData">callVertexData</dfn>)( <em>void</em> *<dfn class="local col8 decl" id="4808data" title='data' data-type='void *' data-ref="4808data">data</dfn>, <em>void</em> *<dfn class="local col9 decl" id="4809polygonData" title='polygonData' data-type='void *' data-ref="4809polygonData">polygonData</dfn> );</td></tr>
+<tr><th id="83">83</th><td>  <em>void</em>		(<a class="macro" href="_glu.html#48" title="" data-ref="_M/GLUAPIENTRY">GLUAPIENTRY</a> *<dfn class="decl" id="GLUtesselator::callEndData" title='GLUtesselator::callEndData' data-ref="GLUtesselator::callEndData">callEndData</dfn>)( <em>void</em> *<dfn class="local col0 decl" id="4810polygonData" title='polygonData' data-type='void *' data-ref="4810polygonData">polygonData</dfn> );</td></tr>
+<tr><th id="84">84</th><td>  <em>void</em>		(<a class="macro" href="_glu.html#48" title="" data-ref="_M/GLUAPIENTRY">GLUAPIENTRY</a> *<dfn class="decl" id="GLUtesselator::callErrorData" title='GLUtesselator::callErrorData' data-ref="GLUtesselator::callErrorData">callErrorData</dfn>)( <a class="typedef" href="_glu.html#GLUenum" title='GLUenum' data-type='unsigned int' data-ref="GLUenum">GLUenum</a> <dfn class="local col1 decl" id="4811errnum" title='errnum' data-type='GLUenum' data-ref="4811errnum">errnum</dfn>, <em>void</em> *<dfn class="local col2 decl" id="4812polygonData" title='polygonData' data-type='void *' data-ref="4812polygonData">polygonData</dfn> );</td></tr>
+<tr><th id="85">85</th><td>  <em>void</em>		(<a class="macro" href="_glu.html#48" title="" data-ref="_M/GLUAPIENTRY">GLUAPIENTRY</a> *<dfn class="decl" id="GLUtesselator::callCombineData" title='GLUtesselator::callCombineData' data-ref="GLUtesselator::callCombineData">callCombineData</dfn>)( <a class="typedef" href="_glu.html#GLUdouble" title='GLUdouble' data-type='double' data-ref="GLUdouble">GLUdouble</a> <dfn class="local col3 decl" id="4813coords" title='coords' data-type='GLUdouble *' data-ref="4813coords">coords</dfn>[<var>3</var>], <em>void</em> *<dfn class="local col4 decl" id="4814data" title='data' data-type='void **' data-ref="4814data">data</dfn>[<var>4</var>],</td></tr>
+<tr><th id="86">86</th><td>				    <a class="typedef" href="_glu.html#GLUfloat" title='GLUfloat' data-type='float' data-ref="GLUfloat">GLUfloat</a> <dfn class="local col5 decl" id="4815weight" title='weight' data-type='GLUfloat *' data-ref="4815weight">weight</dfn>[<var>4</var>], <em>void</em> **<dfn class="local col6 decl" id="4816outData" title='outData' data-type='void **' data-ref="4816outData">outData</dfn>,</td></tr>
+<tr><th id="87">87</th><td>				    <em>void</em> *<dfn class="local col7 decl" id="4817polygonData" title='polygonData' data-type='void *' data-ref="4817polygonData">polygonData</dfn> );</td></tr>
+<tr><th id="88">88</th><td></td></tr>
+<tr><th id="89">89</th><td>  jmp_buf <dfn class="decl" id="GLUtesselator::env" title='GLUtesselator::env' data-ref="GLUtesselator::env">env</dfn>;			<i>/* place to jump to when memAllocs fail */</i></td></tr>
+<tr><th id="90">90</th><td></td></tr>
+<tr><th id="91">91</th><td>  <em>void</em> *<dfn class="decl" id="GLUtesselator::polygonData" title='GLUtesselator::polygonData' data-ref="GLUtesselator::polygonData">polygonData</dfn>;		<i>/* client data for current polygon */</i></td></tr>
+<tr><th id="92">92</th><td>};</td></tr>
+<tr><th id="93">93</th><td></td></tr>
+<tr><th id="94">94</th><td><em>void</em> <a class="macro" href="_glu.html#48" title="" data-ref="_M/GLUAPIENTRY">GLUAPIENTRY</a> <a class="macro" href="rename.html#51" title="tools__gl_noBeginData" data-ref="_M/__gl_noBeginData">__gl_noBeginData</a>( <a class="typedef" href="_glu.html#GLUenum" title='GLUenum' data-type='unsigned int' data-ref="GLUenum">GLUenum</a> <dfn class="local col8 decl" id="4818type" title='type' data-type='GLUenum' data-ref="4818type">type</dfn>, <em>void</em> *<dfn class="local col9 decl" id="4819polygonData" title='polygonData' data-type='void *' data-ref="4819polygonData">polygonData</dfn> );</td></tr>
+<tr><th id="95">95</th><td><em>void</em> <a class="macro" href="_glu.html#48" title="" data-ref="_M/GLUAPIENTRY">GLUAPIENTRY</a> <a class="macro" href="rename.html#53" title="tools__gl_noEdgeFlagData" data-ref="_M/__gl_noEdgeFlagData">__gl_noEdgeFlagData</a>( <a class="typedef" href="_glu.html#GLUboolean" title='GLUboolean' data-type='unsigned char' data-ref="GLUboolean">GLUboolean</a> <dfn class="local col0 decl" id="4820boundaryEdge" title='boundaryEdge' data-type='GLUboolean' data-ref="4820boundaryEdge">boundaryEdge</dfn>, <em>void</em> *<dfn class="local col1 decl" id="4821polygonData" title='polygonData' data-type='void *' data-ref="4821polygonData">polygonData</dfn> );</td></tr>
+<tr><th id="96">96</th><td><em>void</em> <a class="macro" href="_glu.html#48" title="" data-ref="_M/GLUAPIENTRY">GLUAPIENTRY</a> <a class="macro" href="rename.html#56" title="tools__gl_noVertexData" data-ref="_M/__gl_noVertexData">__gl_noVertexData</a>( <em>void</em> *<dfn class="local col2 decl" id="4822data" title='data' data-type='void *' data-ref="4822data">data</dfn>, <em>void</em> *<dfn class="local col3 decl" id="4823polygonData" title='polygonData' data-type='void *' data-ref="4823polygonData">polygonData</dfn> );</td></tr>
+<tr><th id="97">97</th><td><em>void</em> <a class="macro" href="_glu.html#48" title="" data-ref="_M/GLUAPIENTRY">GLUAPIENTRY</a> <a class="macro" href="rename.html#54" title="tools__gl_noEndData" data-ref="_M/__gl_noEndData">__gl_noEndData</a>( <em>void</em> *<dfn class="local col4 decl" id="4824polygonData" title='polygonData' data-type='void *' data-ref="4824polygonData">polygonData</dfn> );</td></tr>
+<tr><th id="98">98</th><td><em>void</em> <a class="macro" href="_glu.html#48" title="" data-ref="_M/GLUAPIENTRY">GLUAPIENTRY</a> <a class="macro" href="rename.html#55" title="tools__gl_noErrorData" data-ref="_M/__gl_noErrorData">__gl_noErrorData</a>( <a class="typedef" href="_glu.html#GLUenum" title='GLUenum' data-type='unsigned int' data-ref="GLUenum">GLUenum</a> <dfn class="local col5 decl" id="4825errnum" title='errnum' data-type='GLUenum' data-ref="4825errnum">errnum</dfn>, <em>void</em> *<dfn class="local col6 decl" id="4826polygonData" title='polygonData' data-type='void *' data-ref="4826polygonData">polygonData</dfn> );</td></tr>
+<tr><th id="99">99</th><td><em>void</em> <a class="macro" href="_glu.html#48" title="" data-ref="_M/GLUAPIENTRY">GLUAPIENTRY</a> <a class="macro" href="rename.html#52" title="tools__gl_noCombineData" data-ref="_M/__gl_noCombineData">__gl_noCombineData</a>( <a class="typedef" href="_glu.html#GLUdouble" title='GLUdouble' data-type='double' data-ref="GLUdouble">GLUdouble</a> <dfn class="local col7 decl" id="4827coords" title='coords' data-type='GLUdouble *' data-ref="4827coords">coords</dfn>[<var>3</var>], <em>void</em> *<dfn class="local col8 decl" id="4828data" title='data' data-type='void **' data-ref="4828data">data</dfn>[<var>4</var>],</td></tr>
+<tr><th id="100">100</th><td>			 <a class="typedef" href="_glu.html#GLUfloat" title='GLUfloat' data-type='float' data-ref="GLUfloat">GLUfloat</a> <dfn class="local col9 decl" id="4829weight" title='weight' data-type='GLUfloat *' data-ref="4829weight">weight</dfn>[<var>4</var>], <em>void</em> **<dfn class="local col0 decl" id="4830outData" title='outData' data-type='void **' data-ref="4830outData">outData</dfn>,</td></tr>
+<tr><th id="101">101</th><td>			 <em>void</em> *<dfn class="local col1 decl" id="4831polygonData" title='polygonData' data-type='void *' data-ref="4831polygonData">polygonData</dfn> );</td></tr>
+<tr><th id="102">102</th><td></td></tr>
+<tr><th id="103">103</th><td><u>#define <dfn class="macro" id="_M/CALL_BEGIN_OR_BEGIN_DATA" data-ref="_M/CALL_BEGIN_OR_BEGIN_DATA">CALL_BEGIN_OR_BEGIN_DATA</dfn>(a) \</u></td></tr>
+<tr><th id="104">104</th><td><u>   if (tess-&gt;callBeginData != &amp;__gl_noBeginData) \</u></td></tr>
+<tr><th id="105">105</th><td><u>      (*tess-&gt;callBeginData)((a),tess-&gt;polygonData); \</u></td></tr>
+<tr><th id="106">106</th><td><u>   else (*tess-&gt;callBegin)((a));</u></td></tr>
+<tr><th id="107">107</th><td></td></tr>
+<tr><th id="108">108</th><td><u>#define <dfn class="macro" id="_M/CALL_VERTEX_OR_VERTEX_DATA" data-ref="_M/CALL_VERTEX_OR_VERTEX_DATA">CALL_VERTEX_OR_VERTEX_DATA</dfn>(a) \</u></td></tr>
+<tr><th id="109">109</th><td><u>   if (tess-&gt;callVertexData != &amp;__gl_noVertexData) \</u></td></tr>
+<tr><th id="110">110</th><td><u>      (*tess-&gt;callVertexData)((a),tess-&gt;polygonData); \</u></td></tr>
+<tr><th id="111">111</th><td><u>   else (*tess-&gt;callVertex)((a));</u></td></tr>
+<tr><th id="112">112</th><td></td></tr>
+<tr><th id="113">113</th><td><u>#define <dfn class="macro" id="_M/CALL_EDGE_FLAG_OR_EDGE_FLAG_DATA" data-ref="_M/CALL_EDGE_FLAG_OR_EDGE_FLAG_DATA">CALL_EDGE_FLAG_OR_EDGE_FLAG_DATA</dfn>(a) \</u></td></tr>
+<tr><th id="114">114</th><td><u>   if (tess-&gt;callEdgeFlagData != &amp;__gl_noEdgeFlagData) \</u></td></tr>
+<tr><th id="115">115</th><td><u>      (*tess-&gt;callEdgeFlagData)((a),tess-&gt;polygonData); \</u></td></tr>
+<tr><th id="116">116</th><td><u>   else (*tess-&gt;callEdgeFlag)((a));</u></td></tr>
+<tr><th id="117">117</th><td></td></tr>
+<tr><th id="118">118</th><td><u>#define <dfn class="macro" id="_M/CALL_END_OR_END_DATA" data-ref="_M/CALL_END_OR_END_DATA">CALL_END_OR_END_DATA</dfn>() \</u></td></tr>
+<tr><th id="119">119</th><td><u>   if (tess-&gt;callEndData != &amp;__gl_noEndData) \</u></td></tr>
+<tr><th id="120">120</th><td><u>      (*tess-&gt;callEndData)(tess-&gt;polygonData); \</u></td></tr>
+<tr><th id="121">121</th><td><u>   else (*tess-&gt;callEnd)();</u></td></tr>
+<tr><th id="122">122</th><td></td></tr>
+<tr><th id="123">123</th><td><u>#define <dfn class="macro" id="_M/CALL_COMBINE_OR_COMBINE_DATA" data-ref="_M/CALL_COMBINE_OR_COMBINE_DATA">CALL_COMBINE_OR_COMBINE_DATA</dfn>(a,b,c,d) \</u></td></tr>
+<tr><th id="124">124</th><td><u>   if (tess-&gt;callCombineData != &amp;__gl_noCombineData) \</u></td></tr>
+<tr><th id="125">125</th><td><u>      (*tess-&gt;callCombineData)((a),(b),(c),(d),tess-&gt;polygonData); \</u></td></tr>
+<tr><th id="126">126</th><td><u>   else (*tess-&gt;callCombine)((a),(b),(c),(d));</u></td></tr>
+<tr><th id="127">127</th><td></td></tr>
+<tr><th id="128">128</th><td><u>#define <dfn class="macro" id="_M/CALL_ERROR_OR_ERROR_DATA" data-ref="_M/CALL_ERROR_OR_ERROR_DATA">CALL_ERROR_OR_ERROR_DATA</dfn>(a) \</u></td></tr>
+<tr><th id="129">129</th><td><u>   if (tess-&gt;callErrorData != &amp;__gl_noErrorData) \</u></td></tr>
+<tr><th id="130">130</th><td><u>      (*tess-&gt;callErrorData)((a),tess-&gt;polygonData); \</u></td></tr>
+<tr><th id="131">131</th><td><u>   else (*tess-&gt;callError)((a));</u></td></tr>
+<tr><th id="132">132</th><td></td></tr>
+<tr><th id="133">133</th><td><u>#<span data-ppcond="3">endif</span></u></td></tr>
+<tr><th id="134">134</th><td></td></tr>
+</table><hr/><p id='footer'>
+Generated while processing <a href='../../../../hntools/src/G4ToolsAnalysisManager.cc.html'>codebrowser/source/analysis/hntools/src/G4ToolsAnalysisManager.cc</a><br/>Generated on <em>2019-Aug-28</em> from project codebrowser<br />Powered by <a href='https://woboq.com'><img alt='Woboq' src='https://code.woboq.org/woboq-16.png' width='41' height='16' /></a> <a href='https://code.woboq.org'>Code Browser</a> 2.1
+<br/>Generator usage only permitted with license.</p>
+</div></body></html>

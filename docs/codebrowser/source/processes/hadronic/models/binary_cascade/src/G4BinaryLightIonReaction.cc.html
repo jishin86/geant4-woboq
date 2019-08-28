@@ -1,0 +1,789 @@
+<!doctype html>
+<html>
+<head>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"><title>G4BinaryLightIonReaction.cc source code [codebrowser/source/processes/hadronic/models/binary_cascade/src/G4BinaryLightIonReaction.cc] - Woboq Code Browser</title>
+<meta name="woboq:interestingDefinitions" content="ReactionProduct4Mom "/>
+<link rel="stylesheet" href="../../../../../../../../data/qtcreator.css" title="QtCreator"/>
+<link rel="alternate stylesheet" href="../../../../../../../../data/kdevelop.css" title="KDevelop"/>
+<script type="text/javascript" src="../../../../../../../../data/jquery/jquery.min.js"></script>
+<script type="text/javascript" src="../../../../../../../../data/jquery/jquery-ui.min.js"></script>
+<script>var file = 'codebrowser/source/processes/hadronic/models/binary_cascade/src/G4BinaryLightIonReaction.cc'; var root_path = '../../../../../../..'; var data_path = '../../../../../../../../data';</script>
+<script src='../../../../../../../../data/codebrowser.js'></script>
+</head>
+<body><div id='header'><h1 id='breadcrumb'><span>Browse the source code of </span><a href='../../../../../..'>codebrowser</a>/<a href='../../../../..'>source</a>/<a href='../../../..'>processes</a>/<a href='../../..'>hadronic</a>/<a href='../..'>models</a>/<a href='..'>binary_cascade</a>/<a href='./'>src</a>/<a href='G4BinaryLightIonReaction.cc.html'>G4BinaryLightIonReaction.cc</a></h1></div>
+<hr/><div id='content'><table class="code">
+<tr><th id="1">1</th><td><i>//</i></td></tr>
+<tr><th id="2">2</th><td><i>// ********************************************************************</i></td></tr>
+<tr><th id="3">3</th><td><i>// * License and Disclaimer                                           *</i></td></tr>
+<tr><th id="4">4</th><td><i>// *                                                                  *</i></td></tr>
+<tr><th id="5">5</th><td><i>// * The  Geant4 software  is  copyright of the Copyright Holders  of *</i></td></tr>
+<tr><th id="6">6</th><td><i>// * the Geant4 Collaboration.  It is provided  under  the terms  and *</i></td></tr>
+<tr><th id="7">7</th><td><i>// * conditions of the Geant4 Software License,  included in the file *</i></td></tr>
+<tr><th id="8">8</th><td><i>// * LICENSE and available at  <a href="http://cern.ch/geant4/license">http://cern.ch/geant4/license</a> .  These *</i></td></tr>
+<tr><th id="9">9</th><td><i>// * include a list of copyright holders.                             *</i></td></tr>
+<tr><th id="10">10</th><td><i>// *                                                                  *</i></td></tr>
+<tr><th id="11">11</th><td><i>// * Neither the authors of this software system, nor their employing *</i></td></tr>
+<tr><th id="12">12</th><td><i>// * institutes,nor the agencies providing financial support for this *</i></td></tr>
+<tr><th id="13">13</th><td><i>// * work  make  any representation or  warranty, express or implied, *</i></td></tr>
+<tr><th id="14">14</th><td><i>// * regarding  this  software system or assume any liability for its *</i></td></tr>
+<tr><th id="15">15</th><td><i>// * use.  Please see the license in the file  LICENSE  and URL above *</i></td></tr>
+<tr><th id="16">16</th><td><i>// * for the full disclaimer and the limitation of liability.         *</i></td></tr>
+<tr><th id="17">17</th><td><i>// *                                                                  *</i></td></tr>
+<tr><th id="18">18</th><td><i>// * This  code  implementation is the result of  the  scientific and *</i></td></tr>
+<tr><th id="19">19</th><td><i>// * technical work of the GEANT4 collaboration.                      *</i></td></tr>
+<tr><th id="20">20</th><td><i>// * By using,  copying,  modifying or  distributing the software (or *</i></td></tr>
+<tr><th id="21">21</th><td><i>// * any work based  on the software)  you  agree  to acknowledge its *</i></td></tr>
+<tr><th id="22">22</th><td><i>// * use  in  resulting  scientific  publications,  and indicate your *</i></td></tr>
+<tr><th id="23">23</th><td><i>// * acceptance of all terms of the Geant4 Software license.          *</i></td></tr>
+<tr><th id="24">24</th><td><i>// ********************************************************************</i></td></tr>
+<tr><th id="25">25</th><td><i>//</i></td></tr>
+<tr><th id="26">26</th><td><u>#include <span class='error' title="&apos;algorithm&apos; file not found">&lt;</span>algorithm&gt;</u></td></tr>
+<tr><th id="27">27</th><td><u>#include &lt;vector&gt;</u></td></tr>
+<tr><th id="28">28</th><td><u>#include &lt;cmath&gt;</u></td></tr>
+<tr><th id="29">29</th><td><u>#include &lt;numeric&gt;</u></td></tr>
+<tr><th id="30">30</th><td></td></tr>
+<tr><th id="31">31</th><td><u>#include <a href="../include/G4BinaryLightIonReaction.hh.html">"G4BinaryLightIonReaction.hh"</a></u></td></tr>
+<tr><th id="32">32</th><td><u>#include <a href="../../../../../global/management/include/G4PhysicalConstants.hh.html">"G4PhysicalConstants.hh"</a></u></td></tr>
+<tr><th id="33">33</th><td><u>#include <a href="../../../../../global/management/include/G4SystemOfUnits.hh.html">"G4SystemOfUnits.hh"</a></u></td></tr>
+<tr><th id="34">34</th><td><u>#include <a href="../../../../../global/HEPGeometry/include/G4LorentzVector.hh.html">"G4LorentzVector.hh"</a></u></td></tr>
+<tr><th id="35">35</th><td><u>#include <a href="../../../../../global/HEPGeometry/include/G4LorentzRotation.hh.html">"G4LorentzRotation.hh"</a></u></td></tr>
+<tr><th id="36">36</th><td><u>#include <a href="../../../util/include/G4ReactionProductVector.hh.html">"G4ReactionProductVector.hh"</a></u></td></tr>
+<tr><th id="37">37</th><td><u>#include <a href="../../../util/include/G4ping.hh.html">"G4ping.hh"</a></u></td></tr>
+<tr><th id="38">38</th><td><u>#include <a href="../../../util/include/G4Delete.hh.html">"G4Delete.hh"</a></u></td></tr>
+<tr><th id="39">39</th><td><u>#include <a href="../../../../../particles/hadrons/barions/include/G4Neutron.hh.html">"G4Neutron.hh"</a></u></td></tr>
+<tr><th id="40">40</th><td><u>#include <a href="../../management/include/G4VNuclearDensity.hh.html">"G4VNuclearDensity.hh"</a></u></td></tr>
+<tr><th id="41">41</th><td><u>#include <a href="../../util/include/G4FermiMomentum.hh.html">"G4FermiMomentum.hh"</a></u></td></tr>
+<tr><th id="42">42</th><td><u>#include <a href="../../../util/include/G4HadTmpUtil.hh.html">"G4HadTmpUtil.hh"</a></u></td></tr>
+<tr><th id="43">43</th><td><u>#include <a href="../../pre_equilibrium/exciton_model/include/G4PreCompoundModel.hh.html">"G4PreCompoundModel.hh"</a></u></td></tr>
+<tr><th id="44">44</th><td><u>#include <a href="../../management/include/G4HadronicInteractionRegistry.hh.html">"G4HadronicInteractionRegistry.hh"</a></u></td></tr>
+<tr><th id="45">45</th><td><u>#include <a href="../../../../../global/management/include/G4Log.hh.html">"G4Log.hh"</a></u></td></tr>
+<tr><th id="46">46</th><td></td></tr>
+<tr><th id="47">47</th><td><u>#<span data-ppcond="47">ifdef</span> <span class="macro" data-ref="_M/G4MULTITHREADED">G4MULTITHREADED</span></u></td></tr>
+<tr><th id="48">48</th><td>   <span class='error' title="unknown type name &apos;G4Mutex&apos;">G4Mutex</span> <a class="type" href="../include/G4BinaryLightIonReaction.hh.html#G4BinaryLightIonReaction" title='G4BinaryLightIonReaction' data-ref="G4BinaryLightIonReaction">G4BinaryLightIonReaction</a>::<dfn class="tu decl def" id="G4BinaryLightIonReaction::BLIRMutex" title='G4BinaryLightIonReaction::BLIRMutex' data-type='int' data-ref="G4BinaryLightIonReaction::BLIRMutex">BLIRMutex</dfn> = <a class="macro" href="../../../../../global/management/include/G4Threading.hh.html#88" title="{}" data-ref="_M/G4MUTEX_INITIALIZER">G4MUTEX_INITIALIZER</a>;</td></tr>
+<tr><th id="49">49</th><td><u>#<span data-ppcond="47">endif</span></u></td></tr>
+<tr><th id="50">50</th><td>   <a class="typedef" href="../../../../../global/management/include/G4Types.hh.html#G4int" title='G4int' data-type='int' data-ref="G4int">G4int</a> <a class="type" href="../include/G4BinaryLightIonReaction.hh.html#G4BinaryLightIonReaction" title='G4BinaryLightIonReaction' data-ref="G4BinaryLightIonReaction">G4BinaryLightIonReaction</a>::<dfn class="decl def" id="G4BinaryLightIonReaction::theBLIR_ID" title='G4BinaryLightIonReaction::theBLIR_ID' data-ref="G4BinaryLightIonReaction::theBLIR_ID">theBLIR_ID</dfn> = -<var>1</var>;</td></tr>
+<tr><th id="51">51</th><td></td></tr>
+<tr><th id="52">52</th><td></td></tr>
+<tr><th id="53">53</th><td><i>//#define debug_G4BinaryLightIonReaction</i></td></tr>
+<tr><th id="54">54</th><td><i>//#define debug_BLIR_finalstate</i></td></tr>
+<tr><th id="55">55</th><td><i>//#define debug_BLIR_result</i></td></tr>
+<tr><th id="56">56</th><td></td></tr>
+<tr><th id="57">57</th><td><a class="type" href="../include/G4BinaryLightIonReaction.hh.html#G4BinaryLightIonReaction" title='G4BinaryLightIonReaction' data-ref="G4BinaryLightIonReaction">G4BinaryLightIonReaction</a>::<dfn class="decl def" id="_ZN24G4BinaryLightIonReactionC1EP19G4VPreCompoundModel" title='G4BinaryLightIonReaction::G4BinaryLightIonReaction' data-ref="_ZN24G4BinaryLightIonReactionC1EP19G4VPreCompoundModel">G4BinaryLightIonReaction</dfn>(<a class="type" href="../../management/include/G4VPreCompoundModel.hh.html#G4VPreCompoundModel" title='G4VPreCompoundModel' data-ref="G4VPreCompoundModel">G4VPreCompoundModel</a>* <dfn class="local col1 decl" id="1ptr" title='ptr' data-type='G4VPreCompoundModel *' data-ref="1ptr">ptr</dfn>)</td></tr>
+<tr><th id="58">58</th><td>: <a class="type" href="../../management/include/G4HadronicInteraction.hh.html#G4HadronicInteraction" title='G4HadronicInteraction' data-ref="G4HadronicInteraction">G4HadronicInteraction</a><a class="ref" href="../../management/include/G4HadronicInteraction.hh.html#_ZN21G4HadronicInteractionC1ERK8G4String" title='G4HadronicInteraction::G4HadronicInteraction' data-ref="_ZN21G4HadronicInteractionC1ERK8G4String">(</a><a class="ref fake" href="../../../../../global/management/include/G4String.hh.html#_ZN8G4StringC1EPKc" title='G4String::G4String' data-ref="_ZN8G4StringC1EPKc"></a><q>"Binary Light Ion Cascade"</q>),</td></tr>
+<tr><th id="59">59</th><td>  <a class="member" href="../include/G4BinaryLightIonReaction.hh.html#G4BinaryLightIonReaction::theProjectileFragmentation" title='G4BinaryLightIonReaction::theProjectileFragmentation' data-ref="G4BinaryLightIonReaction::theProjectileFragmentation">theProjectileFragmentation</a>(<a class="local col1 ref" href="#1ptr" title='ptr' data-ref="1ptr">ptr</a>),</td></tr>
+<tr><th id="60">60</th><td>  <a class="member" href="../include/G4BinaryLightIonReaction.hh.html#G4BinaryLightIonReaction::pA" title='G4BinaryLightIonReaction::pA' data-ref="G4BinaryLightIonReaction::pA">pA</a>(<var>0</var>),<a class="member" href="../include/G4BinaryLightIonReaction.hh.html#G4BinaryLightIonReaction::pZ" title='G4BinaryLightIonReaction::pZ' data-ref="G4BinaryLightIonReaction::pZ">pZ</a>(<var>0</var>), <a class="member" href="../include/G4BinaryLightIonReaction.hh.html#G4BinaryLightIonReaction::tA" title='G4BinaryLightIonReaction::tA' data-ref="G4BinaryLightIonReaction::tA">tA</a>(<var>0</var>),<a class="member" href="../include/G4BinaryLightIonReaction.hh.html#G4BinaryLightIonReaction::tZ" title='G4BinaryLightIonReaction::tZ' data-ref="G4BinaryLightIonReaction::tZ">tZ</a>(<var>0</var>),<a class="member" href="../include/G4BinaryLightIonReaction.hh.html#G4BinaryLightIonReaction::spectatorA" title='G4BinaryLightIonReaction::spectatorA' data-ref="G4BinaryLightIonReaction::spectatorA">spectatorA</a>(<var>0</var>),<a class="member" href="../include/G4BinaryLightIonReaction.hh.html#G4BinaryLightIonReaction::spectatorZ" title='G4BinaryLightIonReaction::spectatorZ' data-ref="G4BinaryLightIonReaction::spectatorZ">spectatorZ</a>(<var>0</var>),</td></tr>
+<tr><th id="61">61</th><td>  <a class="member" href="../include/G4BinaryLightIonReaction.hh.html#G4BinaryLightIonReaction::projectile3dNucleus" title='G4BinaryLightIonReaction::projectile3dNucleus' data-ref="G4BinaryLightIonReaction::projectile3dNucleus">projectile3dNucleus</a>(<var>0</var>),<a class="member" href="../include/G4BinaryLightIonReaction.hh.html#G4BinaryLightIonReaction::target3dNucleus" title='G4BinaryLightIonReaction::target3dNucleus' data-ref="G4BinaryLightIonReaction::target3dNucleus">target3dNucleus</a>(<var>0</var>)</td></tr>
+<tr><th id="62">62</th><td>{</td></tr>
+<tr><th id="63">63</th><td>	<b>if</b>(!<a class="local col1 ref" href="#1ptr" title='ptr' data-ref="1ptr">ptr</a>) {</td></tr>
+<tr><th id="64">64</th><td>	  <a class="type" href="../../management/include/G4HadronicInteraction.hh.html#G4HadronicInteraction" title='G4HadronicInteraction' data-ref="G4HadronicInteraction">G4HadronicInteraction</a>* <dfn class="local col2 decl" id="2p" title='p' data-type='G4HadronicInteraction *' data-ref="2p">p</dfn> =</td></tr>
+<tr><th id="65">65</th><td>	    <a class="type" href="../../management/include/G4HadronicInteractionRegistry.hh.html#G4HadronicInteractionRegistry" title='G4HadronicInteractionRegistry' data-ref="G4HadronicInteractionRegistry">G4HadronicInteractionRegistry</a>::<a class="ref" href="../../management/include/G4HadronicInteractionRegistry.hh.html#_ZN29G4HadronicInteractionRegistry8InstanceEv" title='G4HadronicInteractionRegistry::Instance' data-ref="_ZN29G4HadronicInteractionRegistry8InstanceEv">Instance</a>()-&gt;<a class="ref" href="../../management/include/G4HadronicInteractionRegistry.hh.html#_ZN29G4HadronicInteractionRegistry9FindModelERK8G4String" title='G4HadronicInteractionRegistry::FindModel' data-ref="_ZN29G4HadronicInteractionRegistry9FindModelERK8G4String">FindModel</a>(<a class="ref fake" href="../../../../../global/management/include/G4String.hh.html#_ZN8G4StringC1EPKc" title='G4String::G4String' data-ref="_ZN8G4StringC1EPKc"></a><q>"PRECO"</q>);</td></tr>
+<tr><th id="66">66</th><td>	  <a class="type" href="../../management/include/G4VPreCompoundModel.hh.html#G4VPreCompoundModel" title='G4VPreCompoundModel' data-ref="G4VPreCompoundModel">G4VPreCompoundModel</a>* <dfn class="local col3 decl" id="3pre" title='pre' data-type='G4VPreCompoundModel *' data-ref="3pre">pre</dfn> = <b>static_cast</b>&lt;<a class="type" href="../../management/include/G4VPreCompoundModel.hh.html#G4VPreCompoundModel" title='G4VPreCompoundModel' data-ref="G4VPreCompoundModel">G4VPreCompoundModel</a>*&gt;(<a class="local col2 ref" href="#2p" title='p' data-ref="2p">p</a>);</td></tr>
+<tr><th id="67">67</th><td>	  <b>if</b>(!<a class="local col3 ref" href="#3pre" title='pre' data-ref="3pre">pre</a>) { pre = <b>new</b> <span class='error' title="allocating an object of abstract class type &apos;G4PreCompoundModel&apos;">G4PreCompoundModel</span>(); }</td></tr>
+<tr><th id="68">68</th><td>	  <a class="member" href="../include/G4BinaryLightIonReaction.hh.html#G4BinaryLightIonReaction::theProjectileFragmentation" title='G4BinaryLightIonReaction::theProjectileFragmentation' data-ref="G4BinaryLightIonReaction::theProjectileFragmentation">theProjectileFragmentation</a> = <a class="local col3 ref" href="#3pre" title='pre' data-ref="3pre">pre</a>;</td></tr>
+<tr><th id="69">69</th><td>	}</td></tr>
+<tr><th id="70">70</th><td>	<a class="member" href="../include/G4BinaryLightIonReaction.hh.html#G4BinaryLightIonReaction::theModel" title='G4BinaryLightIonReaction::theModel' data-ref="G4BinaryLightIonReaction::theModel">theModel</a> = <b>new</b> <a class="type" href="../include/G4BinaryCascade.hh.html#G4BinaryCascade" title='G4BinaryCascade' data-ref="G4BinaryCascade">G4BinaryCascade</a><a class="ref" href="../include/G4BinaryCascade.hh.html#_ZN15G4BinaryCascadeC1EP19G4VPreCompoundModel" title='G4BinaryCascade::G4BinaryCascade' data-ref="_ZN15G4BinaryCascadeC1EP19G4VPreCompoundModel">(</a><a class="member" href="../include/G4BinaryLightIonReaction.hh.html#G4BinaryLightIonReaction::theProjectileFragmentation" title='G4BinaryLightIonReaction::theProjectileFragmentation' data-ref="G4BinaryLightIonReaction::theProjectileFragmentation">theProjectileFragmentation</a>);</td></tr>
+<tr><th id="71">71</th><td>	<a class="member" href="../include/G4BinaryLightIonReaction.hh.html#G4BinaryLightIonReaction::theHandler" title='G4BinaryLightIonReaction::theHandler' data-ref="G4BinaryLightIonReaction::theHandler">theHandler</a> = <a class="member" href="../include/G4BinaryLightIonReaction.hh.html#G4BinaryLightIonReaction::theProjectileFragmentation" title='G4BinaryLightIonReaction::theProjectileFragmentation' data-ref="G4BinaryLightIonReaction::theProjectileFragmentation">theProjectileFragmentation</a>-&gt;<a class="ref" href="../../management/include/G4VPreCompoundModel.hh.html#_ZNK19G4VPreCompoundModel20GetExcitationHandlerEv" title='G4VPreCompoundModel::GetExcitationHandler' data-ref="_ZNK19G4VPreCompoundModel20GetExcitationHandlerEv">GetExcitationHandler</a>();</td></tr>
+<tr><th id="72">72</th><td>	<b>if</b> ( <a class="member" href="../include/G4BinaryLightIonReaction.hh.html#G4BinaryLightIonReaction::theBLIR_ID" title='G4BinaryLightIonReaction::theBLIR_ID' data-ref="G4BinaryLightIonReaction::theBLIR_ID">theBLIR_ID</a> == -<var>1</var> ) {</td></tr>
+<tr><th id="73">73</th><td><u>#<span data-ppcond="73">ifdef</span> <span class="macro" data-ref="_M/G4MULTITHREADED">G4MULTITHREADED</span></u></td></tr>
+<tr><th id="74">74</th><td>       <a class="macro" href="../../../../../global/management/include/G4Threading.hh.html#159" title="{ (&amp;G4BinaryLightIonReaction::BLIRMutex)-&gt;lock(); }" data-ref="_M/G4MUTEXLOCK">G4MUTEXLOCK</a>(&amp;G4BinaryLightIonReaction::BLIRMutex);</td></tr>
+<tr><th id="75">75</th><td>       <b>if</b> ( <a class="member" href="../include/G4BinaryLightIonReaction.hh.html#G4BinaryLightIonReaction::theBLIR_ID" title='G4BinaryLightIonReaction::theBLIR_ID' data-ref="G4BinaryLightIonReaction::theBLIR_ID">theBLIR_ID</a> == -<var>1</var> ) {</td></tr>
+<tr><th id="76">76</th><td><u>#<span data-ppcond="73">endif</span></u></td></tr>
+<tr><th id="77">77</th><td>    	   <a class="member" href="../include/G4BinaryLightIonReaction.hh.html#G4BinaryLightIonReaction::theBLIR_ID" title='G4BinaryLightIonReaction::theBLIR_ID' data-ref="G4BinaryLightIonReaction::theBLIR_ID">theBLIR_ID</a> = <a class="type" href="../../../../../global/management/include/G4PhysicsModelCatalog.hh.html#G4PhysicsModelCatalog" title='G4PhysicsModelCatalog' data-ref="G4PhysicsModelCatalog">G4PhysicsModelCatalog</a>::<a class="ref" href="../../../../../global/management/include/G4PhysicsModelCatalog.hh.html#_ZN21G4PhysicsModelCatalog8RegisterERK8G4String" title='G4PhysicsModelCatalog::Register' data-ref="_ZN21G4PhysicsModelCatalog8RegisterERK8G4String">Register</a>(<a class="ref fake" href="../../../../../global/management/include/G4String.hh.html#_ZN8G4StringC1EPKc" title='G4String::G4String' data-ref="_ZN8G4StringC1EPKc"></a><q>"Binary Light Ion Reaction"</q>);</td></tr>
+<tr><th id="78">78</th><td><u>#<span data-ppcond="78">ifdef</span> <span class="macro" data-ref="_M/G4MULTITHREADED">G4MULTITHREADED</span></u></td></tr>
+<tr><th id="79">79</th><td>       }</td></tr>
+<tr><th id="80">80</th><td>       <a class="macro" href="../../../../../global/management/include/G4Threading.hh.html#160" title="{ (&amp;G4BinaryLightIonReaction::BLIRMutex)-&gt;unlock(); }" data-ref="_M/G4MUTEXUNLOCK">G4MUTEXUNLOCK</a>(&amp;G4BinaryLightIonReaction::BLIRMutex);</td></tr>
+<tr><th id="81">81</th><td><u>#<span data-ppcond="78">endif</span></u></td></tr>
+<tr><th id="82">82</th><td>    }</td></tr>
+<tr><th id="83">83</th><td></td></tr>
+<tr><th id="84">84</th><td></td></tr>
+<tr><th id="85">85</th><td>	debug_G4BinaryLightIonReactionResults=<span class='error' title="use of undeclared identifier &apos;getenv&apos;">getenv</span>(<q>"debug_G4BinaryLightIonReactionResults"</q>)!=<var>0</var>;</td></tr>
+<tr><th id="86">86</th><td>}</td></tr>
+<tr><th id="87">87</th><td></td></tr>
+<tr><th id="88">88</th><td><a class="type" href="../include/G4BinaryLightIonReaction.hh.html#G4BinaryLightIonReaction" title='G4BinaryLightIonReaction' data-ref="G4BinaryLightIonReaction">G4BinaryLightIonReaction</a>::<dfn class="virtual decl def" id="_ZN24G4BinaryLightIonReactionD1Ev" title='G4BinaryLightIonReaction::~G4BinaryLightIonReaction' data-ref="_ZN24G4BinaryLightIonReactionD1Ev">~G4BinaryLightIonReaction</dfn>()</td></tr>
+<tr><th id="89">89</th><td>{}</td></tr>
+<tr><th id="90">90</th><td></td></tr>
+<tr><th id="91">91</th><td><em>void</em> G4BinaryLightIonReaction::ModelDescription(<span class='error' title="use of undeclared identifier &apos;std&apos;">std</span>::ostream&amp; outFile) <em>const</em></td></tr>
+<tr><th id="92">92</th><td>{</td></tr>
+<tr><th id="93">93</th><td>	outFile &lt;&lt; <q>"G4Binary Light Ion Cascade is an intra-nuclear cascade model\n"</q></td></tr>
+<tr><th id="94">94</th><td>			&lt;&lt; <q>"using G4BinaryCasacde to model the interaction of a light\n"</q></td></tr>
+<tr><th id="95">95</th><td>			&lt;&lt; <q>"nucleus with a nucleus.\n"</q></td></tr>
+<tr><th id="96">96</th><td>			&lt;&lt; <q>"The lighter of the two nuclei is treated like a set of projectiles\n"</q></td></tr>
+<tr><th id="97">97</th><td>			&lt;&lt; <q>"which are transported simultanously through the heavier nucleus.\n"</q>;</td></tr>
+<tr><th id="98">98</th><td>}</td></tr>
+<tr><th id="99">99</th><td></td></tr>
+<tr><th id="100">100</th><td><i>//--------------------------------------------------------------------------------</i></td></tr>
+<tr><th id="101">101</th><td><b>struct</b> <dfn class="type def" id="ReactionProduct4Mom" title='ReactionProduct4Mom' data-ref="ReactionProduct4Mom">ReactionProduct4Mom</dfn></td></tr>
+<tr><th id="102">102</th><td>{</td></tr>
+<tr><th id="103">103</th><td>   <a class="typedef" href="../../../../../global/HEPGeometry/include/G4LorentzVector.hh.html#G4LorentzVector" title='G4LorentzVector' data-type='CLHEP::HepLorentzVector' data-ref="G4LorentzVector">G4LorentzVector</a> <dfn class="tu decl def" id="_ZN19ReactionProduct4MomclEN5CLHEP16HepLorentzVectorEP17G4ReactionProduct" title='ReactionProduct4Mom::operator()' data-type='G4LorentzVector ReactionProduct4Mom::operator()(G4LorentzVector a, G4ReactionProduct * b)' data-ref="_ZN19ReactionProduct4MomclEN5CLHEP16HepLorentzVectorEP17G4ReactionProduct"><b>operator</b>()</dfn>(<a class="typedef" href="../../../../../global/HEPGeometry/include/G4LorentzVector.hh.html#G4LorentzVector" title='G4LorentzVector' data-type='CLHEP::HepLorentzVector' data-ref="G4LorentzVector">G4LorentzVector</a> <dfn class="local col4 decl" id="4a" title='a' data-type='G4LorentzVector' data-ref="4a">a</dfn>,<a class="type" href="../../../util/include/G4ReactionProduct.hh.html#G4ReactionProduct" title='G4ReactionProduct' data-ref="G4ReactionProduct">G4ReactionProduct</a>* <dfn class="local col5 decl" id="5b" title='b' data-type='G4ReactionProduct *' data-ref="5b">b</dfn>) {<b>return</b> <a class="local col4 ref" href="#4a" title='a' data-ref="4a">a</a> <a class="ref" href="../../../../../externals/clhep/include/CLHEP/Vector/LorentzVector.h.html#_ZNK5CLHEP16HepLorentzVectorplERKS0_" title='CLHEP::HepLorentzVector::operator+' data-ref="_ZNK5CLHEP16HepLorentzVectorplERKS0_">+</a> <a class="typedef" href="../../../../../global/HEPGeometry/include/G4LorentzVector.hh.html#G4LorentzVector" title='G4LorentzVector' data-type='CLHEP::HepLorentzVector' data-ref="G4LorentzVector">G4LorentzVector</a><a class="ref" href="../../../../../externals/clhep/include/CLHEP/Vector/LorentzVector.h.html#_ZN5CLHEP16HepLorentzVectorC1ERKNS_10Hep3VectorEd" title='CLHEP::HepLorentzVector::HepLorentzVector' data-ref="_ZN5CLHEP16HepLorentzVectorC1ERKNS_10Hep3VectorEd">(</a><a class="local col5 ref" href="#5b" title='b' data-ref="5b">b</a>-&gt;<a class="ref" href="../../../util/include/G4ReactionProduct.hh.html#_ZNK17G4ReactionProduct11GetMomentumEv" title='G4ReactionProduct::GetMomentum' data-ref="_ZNK17G4ReactionProduct11GetMomentumEv">GetMomentum</a>(), <a class="local col5 ref" href="#5b" title='b' data-ref="5b">b</a>-&gt;<a class="ref" href="../../../util/include/G4ReactionProduct.hh.html#_ZNK17G4ReactionProduct14GetTotalEnergyEv" title='G4ReactionProduct::GetTotalEnergy' data-ref="_ZNK17G4ReactionProduct14GetTotalEnergyEv">GetTotalEnergy</a>() );}</td></tr>
+<tr><th id="104">104</th><td>};</td></tr>
+<tr><th id="105">105</th><td></td></tr>
+<tr><th id="106">106</th><td><a class="type" href="../../../util/include/G4HadFinalState.hh.html#G4HadFinalState" title='G4HadFinalState' data-ref="G4HadFinalState">G4HadFinalState</a> *<a class="type" href="../include/G4BinaryLightIonReaction.hh.html#G4BinaryLightIonReaction" title='G4BinaryLightIonReaction' data-ref="G4BinaryLightIonReaction">G4BinaryLightIonReaction</a>::</td></tr>
+<tr><th id="107">107</th><td><dfn class="virtual decl def" id="_ZN24G4BinaryLightIonReaction13ApplyYourselfERK15G4HadProjectileR9G4Nucleus" title='G4BinaryLightIonReaction::ApplyYourself' data-ref="_ZN24G4BinaryLightIonReaction13ApplyYourselfERK15G4HadProjectileR9G4Nucleus">ApplyYourself</dfn>(<em>const</em> <a class="type" href="../../../util/include/G4HadProjectile.hh.html#G4HadProjectile" title='G4HadProjectile' data-ref="G4HadProjectile">G4HadProjectile</a> &amp;<dfn class="local col6 decl" id="6aTrack" title='aTrack' data-type='const G4HadProjectile &amp;' data-ref="6aTrack">aTrack</dfn>, <a class="type" href="../../../util/include/G4Nucleus.hh.html#G4Nucleus" title='G4Nucleus' data-ref="G4Nucleus">G4Nucleus</a> &amp; <dfn class="local col7 decl" id="7targetNucleus" title='targetNucleus' data-type='G4Nucleus &amp;' data-ref="7targetNucleus">targetNucleus</dfn> )</td></tr>
+<tr><th id="108">108</th><td>{</td></tr>
+<tr><th id="109">109</th><td>	<b>if</b>(<span class='error' title="use of undeclared identifier &apos;getenv&apos;">getenv</span>(<q>"BLICDEBUG"</q>) ) <a class="macro" href="../../../../../global/management/include/G4ios.hh.html#47" title="(*_G4cerr_p())" data-ref="_M/G4cerr">G4cerr</a> <span class='error' title="invalid operands to binary expression (&apos;int&apos; and &apos;const char *&apos;)">&lt;&lt;</span> <q>" ######### Binary Light Ion Reaction starts ######### "</q> &lt;&lt; <a class="macro" href="../../../../../global/management/include/G4ios.hh.html#60" title="std::endl" data-ref="_M/G4endl">G4endl</a>;</td></tr>
+<tr><th id="110">110</th><td>	<a class="type" href="../../../util/include/G4ping.hh.html#G4ping" title='G4ping' data-ref="G4ping">G4ping</a> <dfn class="local col8 decl" id="8debug" title='debug' data-type='G4ping' data-ref="8debug">debug</dfn><a class="ref" href="../../../util/include/G4ping.hh.html#_ZN6G4pingC1E8G4String" title='G4ping::G4ping' data-ref="_ZN6G4pingC1E8G4String">(</a><a class="ref fake" href="../../../../../global/management/include/G4String.hh.html#_ZN8G4StringC1EPKc" title='G4String::G4String' data-ref="_ZN8G4StringC1EPKc"></a><q>"debug_G4BinaryLightIonReaction"</q>);</td></tr>
+<tr><th id="111">111</th><td>	<a class="member" href="../include/G4BinaryLightIonReaction.hh.html#G4BinaryLightIonReaction::pA" title='G4BinaryLightIonReaction::pA' data-ref="G4BinaryLightIonReaction::pA">pA</a>=<a class="local col6 ref" href="#6aTrack" title='aTrack' data-ref="6aTrack">aTrack</a>.<a class="ref" href="../../../util/include/G4HadProjectile.hh.html#_ZNK15G4HadProjectile13GetDefinitionEv" title='G4HadProjectile::GetDefinition' data-ref="_ZNK15G4HadProjectile13GetDefinitionEv">GetDefinition</a>()-&gt;<a class="ref" href="../../../../../particles/management/include/G4ParticleDefinition.hh.html#_ZNK20G4ParticleDefinition15GetBaryonNumberEv" title='G4ParticleDefinition::GetBaryonNumber' data-ref="_ZNK20G4ParticleDefinition15GetBaryonNumberEv">GetBaryonNumber</a>();</td></tr>
+<tr><th id="112">112</th><td>	<a class="member" href="../include/G4BinaryLightIonReaction.hh.html#G4BinaryLightIonReaction::pZ" title='G4BinaryLightIonReaction::pZ' data-ref="G4BinaryLightIonReaction::pZ">pZ</a>=<a class="ref" href="../../../../../global/management/include/templates.hh.html#_Z7G4lrintd" title='G4lrint' data-ref="_Z7G4lrintd">G4lrint</a>(<a class="local col6 ref" href="#6aTrack" title='aTrack' data-ref="6aTrack">aTrack</a>.<a class="ref" href="../../../util/include/G4HadProjectile.hh.html#_ZNK15G4HadProjectile13GetDefinitionEv" title='G4HadProjectile::GetDefinition' data-ref="_ZNK15G4HadProjectile13GetDefinitionEv">GetDefinition</a>()-&gt;<a class="ref" href="../../../../../particles/management/include/G4ParticleDefinition.hh.html#_ZNK20G4ParticleDefinition12GetPDGChargeEv" title='G4ParticleDefinition::GetPDGCharge' data-ref="_ZNK20G4ParticleDefinition12GetPDGChargeEv">GetPDGCharge</a>()/<a class="ref" href="../../../../../externals/clhep/include/CLHEP/Units/SystemOfUnits.h.html#CLHEP::eplus" title='CLHEP::eplus' data-ref="CLHEP::eplus">eplus</a>);</td></tr>
+<tr><th id="113">113</th><td>	<a class="member" href="../include/G4BinaryLightIonReaction.hh.html#G4BinaryLightIonReaction::tA" title='G4BinaryLightIonReaction::tA' data-ref="G4BinaryLightIonReaction::tA">tA</a>=<a class="local col7 ref" href="#7targetNucleus" title='targetNucleus' data-ref="7targetNucleus">targetNucleus</a>.<a class="ref" href="../../../util/include/G4Nucleus.hh.html#_ZNK9G4Nucleus10GetA_asIntEv" title='G4Nucleus::GetA_asInt' data-ref="_ZNK9G4Nucleus10GetA_asIntEv">GetA_asInt</a>();</td></tr>
+<tr><th id="114">114</th><td>	<a class="member" href="../include/G4BinaryLightIonReaction.hh.html#G4BinaryLightIonReaction::tZ" title='G4BinaryLightIonReaction::tZ' data-ref="G4BinaryLightIonReaction::tZ">tZ</a>=<a class="local col7 ref" href="#7targetNucleus" title='targetNucleus' data-ref="7targetNucleus">targetNucleus</a>.<a class="ref" href="../../../util/include/G4Nucleus.hh.html#_ZNK9G4Nucleus10GetZ_asIntEv" title='G4Nucleus::GetZ_asInt' data-ref="_ZNK9G4Nucleus10GetZ_asIntEv">GetZ_asInt</a>();</td></tr>
+<tr><th id="115">115</th><td>	<a class="typedef" href="../../../../../global/management/include/G4Types.hh.html#G4double" title='G4double' data-type='double' data-ref="G4double">G4double</a> <dfn class="local col9 decl" id="9timePrimary" title='timePrimary' data-type='G4double' data-ref="9timePrimary">timePrimary</dfn> = <a class="local col6 ref" href="#6aTrack" title='aTrack' data-ref="6aTrack">aTrack</a>.<a class="ref" href="../../../util/include/G4HadProjectile.hh.html#_ZNK15G4HadProjectile13GetGlobalTimeEv" title='G4HadProjectile::GetGlobalTime' data-ref="_ZNK15G4HadProjectile13GetGlobalTimeEv">GetGlobalTime</a>();</td></tr>
+<tr><th id="116">116</th><td>	<a class="typedef" href="../../../../../global/HEPGeometry/include/G4LorentzVector.hh.html#G4LorentzVector" title='G4LorentzVector' data-type='CLHEP::HepLorentzVector' data-ref="G4LorentzVector">G4LorentzVector</a> <dfn class="local col0 decl" id="10mom" title='mom' data-type='G4LorentzVector' data-ref="10mom">mom</dfn><a class="ref" href="../../../../../externals/clhep/include/CLHEP/Vector/LorentzVector.h.html#_ZN5CLHEP16HepLorentzVectorC1ERKS0_" title='CLHEP::HepLorentzVector::HepLorentzVector' data-ref="_ZN5CLHEP16HepLorentzVectorC1ERKS0_">(</a><a class="local col6 ref" href="#6aTrack" title='aTrack' data-ref="6aTrack">aTrack</a>.<a class="ref" href="../../../util/include/G4HadProjectile.hh.html#_ZNK15G4HadProjectile12Get4MomentumEv" title='G4HadProjectile::Get4Momentum' data-ref="_ZNK15G4HadProjectile12Get4MomentumEv">Get4Momentum</a>());</td></tr>
+<tr><th id="117">117</th><td>   <i>//G4cout &lt;&lt; "proj mom : " &lt;&lt; mom &lt;&lt; G4endl;</i></td></tr>
+<tr><th id="118">118</th><td>	<a class="typedef" href="../../../../../global/HEPGeometry/include/G4LorentzRotation.hh.html#G4LorentzRotation" title='G4LorentzRotation' data-type='CLHEP::HepLorentzRotation' data-ref="G4LorentzRotation">G4LorentzRotation</a> <dfn class="local col1 decl" id="11toBreit" title='toBreit' data-type='G4LorentzRotation' data-ref="11toBreit">toBreit</dfn><a class="ref" href="../../../../../externals/clhep/include/CLHEP/Vector/LorentzRotation.h.html#_ZN5CLHEP18HepLorentzRotationC1ERKNS_10Hep3VectorE" title='CLHEP::HepLorentzRotation::HepLorentzRotation' data-ref="_ZN5CLHEP18HepLorentzRotationC1ERKNS_10Hep3VectorE">(</a><a class="local col0 ref" href="#10mom" title='mom' data-ref="10mom">mom</a>.<a class="ref" href="../../../../../externals/clhep/include/CLHEP/Vector/LorentzVector.h.html#_ZNK5CLHEP16HepLorentzVector11boostVectorEv" title='CLHEP::HepLorentzVector::boostVector' data-ref="_ZNK5CLHEP16HepLorentzVector11boostVectorEv">boostVector</a>());</td></tr>
+<tr><th id="119">119</th><td></td></tr>
+<tr><th id="120">120</th><td>	<a class="typedef" href="../../../../../global/management/include/G4Types.hh.html#G4bool" title='G4bool' data-type='bool' data-ref="G4bool">G4bool</a> <dfn class="local col2 decl" id="12swapped" title='swapped' data-type='G4bool' data-ref="12swapped">swapped</dfn>=<a class="member" href="#_ZN24G4BinaryLightIonReaction22SetLighterAsProjectileERN5CLHEP16HepLorentzVectorERKNS0_18HepLorentzRotationE" title='G4BinaryLightIonReaction::SetLighterAsProjectile' data-ref="_ZN24G4BinaryLightIonReaction22SetLighterAsProjectileERN5CLHEP16HepLorentzVectorERKNS0_18HepLorentzRotationE">SetLighterAsProjectile</a>(<span class='refarg'><a class="local col0 ref" href="#10mom" title='mom' data-ref="10mom">mom</a></span>, <a class="local col1 ref" href="#11toBreit" title='toBreit' data-ref="11toBreit">toBreit</a>);</td></tr>
+<tr><th id="121">121</th><td>   <i>//G4cout &lt;&lt; "after swap, swapped? / mom " &lt;&lt; swapped &lt;&lt; " / " &lt;&lt; mom &lt;&lt;G4endl;</i></td></tr>
+<tr><th id="122">122</th><td>	<span class='error' title="unknown type name &apos;G4ReactionProductVector&apos;">G4ReactionProductVector</span> * <dfn class="local col3 decl" id="13result" title='result' data-type='int *' data-ref="13result">result</dfn> = <var>0</var>;</td></tr>
+<tr><th id="123">123</th><td>	<span class='error' title="unknown type name &apos;G4ReactionProductVector&apos;">G4ReactionProductVector</span> * <dfn class="local col4 decl" id="14cascaders" title='cascaders' data-type='int *' data-ref="14cascaders">cascaders</dfn>=<var>0</var>; <i>//new G4ReactionProductVector;</i></td></tr>
+<tr><th id="124">124</th><td><i>//	G4double m_nucl(0);      // to check energy balance</i></td></tr>
+<tr><th id="125">125</th><td><i></i></td></tr>
+<tr><th id="126">126</th><td><i></i></td></tr>
+<tr><th id="127">127</th><td><i>	//    G4double m1=G4ParticleTable::GetParticleTable()-&gt;GetIonTable()-&gt;GetIonMass(pZ,pA);</i></td></tr>
+<tr><th id="128">128</th><td><i>	//    G4cout &lt;&lt; "Entering the decision point "</i></td></tr>
+<tr><th id="129">129</th><td><i>	//           &lt;&lt; (mom.t()-mom.mag())/pA &lt;&lt; " "</i></td></tr>
+<tr><th id="130">130</th><td><i>	//	   &lt;&lt; pA&lt;&lt;" "&lt;&lt; pZ&lt;&lt;" "</i></td></tr>
+<tr><th id="131">131</th><td><i>	//	   &lt;&lt; tA&lt;&lt;" "&lt;&lt; tZ&lt;&lt;G4endl</i></td></tr>
+<tr><th id="132">132</th><td><i>	//	   &lt;&lt; " "&lt;&lt;mom.t()-mom.mag()&lt;&lt;" "</i></td></tr>
+<tr><th id="133">133</th><td><i>	//	   &lt;&lt; mom.t()- m1&lt;&lt;G4endl;</i></td></tr>
+<tr><th id="134">134</th><td>	<b>if</b>( (<a class="local col0 ref" href="#10mom" title='mom' data-ref="10mom">mom</a>.<a class="ref" href="../../../../../externals/clhep/include/CLHEP/Vector/LorentzVector.h.html#_ZNK5CLHEP16HepLorentzVector1tEv" title='CLHEP::HepLorentzVector::t' data-ref="_ZNK5CLHEP16HepLorentzVector1tEv">t</a>()-<a class="local col0 ref" href="#10mom" title='mom' data-ref="10mom">mom</a>.<a class="ref" href="../../../../../externals/clhep/include/CLHEP/Vector/LorentzVector.h.html#_ZNK5CLHEP16HepLorentzVector3magEv" title='CLHEP::HepLorentzVector::mag' data-ref="_ZNK5CLHEP16HepLorentzVector3magEv">mag</a>())/<a class="member" href="../include/G4BinaryLightIonReaction.hh.html#G4BinaryLightIonReaction::pA" title='G4BinaryLightIonReaction::pA' data-ref="G4BinaryLightIonReaction::pA">pA</a> &lt; <var>50</var>*<a class="ref" href="../../../../../externals/clhep/include/CLHEP/Units/SystemOfUnits.h.html#CLHEP::MeV" title='CLHEP::MeV' data-ref="CLHEP::MeV">MeV</a> )</td></tr>
+<tr><th id="135">135</th><td>	{</td></tr>
+<tr><th id="136">136</th><td>		<i>//      G4cout &lt;&lt; "Using pre-compound only, E= "&lt;&lt;mom.t()-mom.mag()&lt;&lt;G4endl;</i></td></tr>
+<tr><th id="137">137</th><td><i>		//      m_nucl = mom.mag();</i></td></tr>
+<tr><th id="138">138</th><td>      cascaders=FuseNucleiAndPrompound(mom);</td></tr>
+<tr><th id="139">139</th><td>      <b>if</b>( !cascaders )</td></tr>
+<tr><th id="140">140</th><td>      {</td></tr>
+<tr><th id="141">141</th><td></td></tr>
+<tr><th id="142">142</th><td>         <i>// abort!! happens for too low energy for nuclei to fuse</i></td></tr>
+<tr><th id="143">143</th><td></td></tr>
+<tr><th id="144">144</th><td>         <a class="member" href="../include/G4BinaryLightIonReaction.hh.html#G4BinaryLightIonReaction::theResult" title='G4BinaryLightIonReaction::theResult' data-ref="G4BinaryLightIonReaction::theResult">theResult</a>.<a class="ref" href="../../../util/include/G4HadFinalState.hh.html#_ZN15G4HadFinalState5ClearEv" title='G4HadFinalState::Clear' data-ref="_ZN15G4HadFinalState5ClearEv">Clear</a>();</td></tr>
+<tr><th id="145">145</th><td>         <a class="member" href="../include/G4BinaryLightIonReaction.hh.html#G4BinaryLightIonReaction::theResult" title='G4BinaryLightIonReaction::theResult' data-ref="G4BinaryLightIonReaction::theResult">theResult</a>.<a class="ref" href="../../../util/include/G4HadFinalState.hh.html#_ZN15G4HadFinalState15SetStatusChangeE21G4HadFinalStateStatus" title='G4HadFinalState::SetStatusChange' data-ref="_ZN15G4HadFinalState15SetStatusChangeE21G4HadFinalStateStatus">SetStatusChange</a>(<a class="enum" href="../../../util/include/G4HadFinalState.hh.html#G4HadFinalStateStatus::isAlive" title='G4HadFinalStateStatus::isAlive' data-ref="G4HadFinalStateStatus::isAlive">isAlive</a>);</td></tr>
+<tr><th id="146">146</th><td>         <a class="member" href="../include/G4BinaryLightIonReaction.hh.html#G4BinaryLightIonReaction::theResult" title='G4BinaryLightIonReaction::theResult' data-ref="G4BinaryLightIonReaction::theResult">theResult</a>.<a class="ref" href="../../../util/include/G4HadFinalState.hh.html#_ZN15G4HadFinalState15SetEnergyChangeEd" title='G4HadFinalState::SetEnergyChange' data-ref="_ZN15G4HadFinalState15SetEnergyChangeEd">SetEnergyChange</a>(<a class="local col6 ref" href="#6aTrack" title='aTrack' data-ref="6aTrack">aTrack</a>.<a class="ref" href="../../../util/include/G4HadProjectile.hh.html#_ZNK15G4HadProjectile16GetKineticEnergyEv" title='G4HadProjectile::GetKineticEnergy' data-ref="_ZNK15G4HadProjectile16GetKineticEnergyEv">GetKineticEnergy</a>());</td></tr>
+<tr><th id="147">147</th><td>         <a class="member" href="../include/G4BinaryLightIonReaction.hh.html#G4BinaryLightIonReaction::theResult" title='G4BinaryLightIonReaction::theResult' data-ref="G4BinaryLightIonReaction::theResult">theResult</a>.<a class="ref" href="../../../util/include/G4HadFinalState.hh.html#_ZN15G4HadFinalState17SetMomentumChangeERKN5CLHEP10Hep3VectorE" title='G4HadFinalState::SetMomentumChange' data-ref="_ZN15G4HadFinalState17SetMomentumChangeERKN5CLHEP10Hep3VectorE">SetMomentumChange</a>(<a class="local col6 ref" href="#6aTrack" title='aTrack' data-ref="6aTrack">aTrack</a>.<a class="ref" href="../../../util/include/G4HadProjectile.hh.html#_ZNK15G4HadProjectile12Get4MomentumEv" title='G4HadProjectile::Get4Momentum' data-ref="_ZNK15G4HadProjectile12Get4MomentumEv">Get4Momentum</a>().<a class="ref" href="../../../../../externals/clhep/include/CLHEP/Vector/LorentzVector.h.html#_ZNK5CLHEP16HepLorentzVector4vectEv" title='CLHEP::HepLorentzVector::vect' data-ref="_ZNK5CLHEP16HepLorentzVector4vectEv">vect</a>().<a class="ref" href="../../../../../externals/clhep/include/CLHEP/Vector/ThreeVector.h.html#_ZNK5CLHEP10Hep3Vector4unitEv" title='CLHEP::Hep3Vector::unit' data-ref="_ZNK5CLHEP10Hep3Vector4unitEv">unit</a>());</td></tr>
+<tr><th id="148">148</th><td>         <b>return</b> &amp;<a class="member" href="../include/G4BinaryLightIonReaction.hh.html#G4BinaryLightIonReaction::theResult" title='G4BinaryLightIonReaction::theResult' data-ref="G4BinaryLightIonReaction::theResult">theResult</a>;</td></tr>
+<tr><th id="149">149</th><td>      }</td></tr>
+<tr><th id="150">150</th><td>	}</td></tr>
+<tr><th id="151">151</th><td>	<b>else</b></td></tr>
+<tr><th id="152">152</th><td>	{</td></tr>
+<tr><th id="153">153</th><td>	   result=Interact(mom,toBreit);</td></tr>
+<tr><th id="154">154</th><td></td></tr>
+<tr><th id="155">155</th><td>      <b>if</b>(! result )</td></tr>
+<tr><th id="156">156</th><td>      {</td></tr>
+<tr><th id="157">157</th><td>            <i>// abort!!</i></td></tr>
+<tr><th id="158">158</th><td></td></tr>
+<tr><th id="159">159</th><td>            <a class="macro" href="../../../../../global/management/include/G4ios.hh.html#47" title="(*_G4cerr_p())" data-ref="_M/G4cerr">G4cerr</a> <span class='error' title="invalid operands to binary expression (&apos;int&apos; and &apos;const char *&apos;)">&lt;&lt;</span> <q>"G4BinaryLightIonReaction no final state for: "</q> &lt;&lt; <a class="macro" href="../../../../../global/management/include/G4ios.hh.html#60" title="std::endl" data-ref="_M/G4endl">G4endl</a>;</td></tr>
+<tr><th id="160">160</th><td>            <a class="macro" href="../../../../../global/management/include/G4ios.hh.html#47" title="(*_G4cerr_p())" data-ref="_M/G4cerr">G4cerr</a> <span class='error' title="invalid operands to binary expression (&apos;int&apos; and &apos;const char *&apos;)">&lt;&lt;</span> <q>" Primary "</q> &lt;&lt; aTrack.GetDefinition()</td></tr>
+<tr><th id="161">161</th><td>               &lt;&lt; <q>", (A,Z)=("</q> &lt;&lt; aTrack.GetDefinition()-&gt;GetBaryonNumber()</td></tr>
+<tr><th id="162">162</th><td>               &lt;&lt; <q>","</q> &lt;&lt; aTrack.GetDefinition()-&gt;GetPDGCharge()/eplus &lt;&lt; <q>") "</q></td></tr>
+<tr><th id="163">163</th><td>               &lt;&lt; <q>", kinetic energy "</q> &lt;&lt; aTrack.GetKineticEnergy()</td></tr>
+<tr><th id="164">164</th><td>               &lt;&lt; <a class="macro" href="../../../../../global/management/include/G4ios.hh.html#60" title="std::endl" data-ref="_M/G4endl">G4endl</a>;</td></tr>
+<tr><th id="165">165</th><td>            <a class="macro" href="../../../../../global/management/include/G4ios.hh.html#47" title="(*_G4cerr_p())" data-ref="_M/G4cerr">G4cerr</a> <span class='error' title="invalid operands to binary expression (&apos;int&apos; and &apos;const char *&apos;)">&lt;&lt;</span> <q>" Target nucleus (A,Z)=("</q></td></tr>
+<tr><th id="166">166</th><td>                   &lt;&lt;  (swapped?pA:tA)  &lt;&lt; <q>","</q></td></tr>
+<tr><th id="167">167</th><td>                   &lt;&lt; (swapped?pZ:tZ) &lt;&lt; <q>")"</q> &lt;&lt; <a class="macro" href="../../../../../global/management/include/G4ios.hh.html#60" title="std::endl" data-ref="_M/G4endl">G4endl</a>;</td></tr>
+<tr><th id="168">168</th><td>            <a class="macro" href="../../../../../global/management/include/G4ios.hh.html#47" title="(*_G4cerr_p())" data-ref="_M/G4cerr">G4cerr</a> <span class='error' title="invalid operands to binary expression (&apos;int&apos; and &apos;const char *&apos;)">&lt;&lt;</span> <q>" if frequent, please submit above information as bug report"</q></td></tr>
+<tr><th id="169">169</th><td>                  &lt;&lt; <a class="macro" href="../../../../../global/management/include/G4ios.hh.html#60" title="std::endl" data-ref="_M/G4endl">G4endl</a> &lt;&lt; <a class="macro" href="../../../../../global/management/include/G4ios.hh.html#60" title="std::endl" data-ref="_M/G4endl">G4endl</a>;</td></tr>
+<tr><th id="170">170</th><td></td></tr>
+<tr><th id="171">171</th><td>            <a class="member" href="../include/G4BinaryLightIonReaction.hh.html#G4BinaryLightIonReaction::theResult" title='G4BinaryLightIonReaction::theResult' data-ref="G4BinaryLightIonReaction::theResult">theResult</a>.<a class="ref" href="../../../util/include/G4HadFinalState.hh.html#_ZN15G4HadFinalState5ClearEv" title='G4HadFinalState::Clear' data-ref="_ZN15G4HadFinalState5ClearEv">Clear</a>();</td></tr>
+<tr><th id="172">172</th><td>            <a class="member" href="../include/G4BinaryLightIonReaction.hh.html#G4BinaryLightIonReaction::theResult" title='G4BinaryLightIonReaction::theResult' data-ref="G4BinaryLightIonReaction::theResult">theResult</a>.<a class="ref" href="../../../util/include/G4HadFinalState.hh.html#_ZN15G4HadFinalState15SetStatusChangeE21G4HadFinalStateStatus" title='G4HadFinalState::SetStatusChange' data-ref="_ZN15G4HadFinalState15SetStatusChangeE21G4HadFinalStateStatus">SetStatusChange</a>(<a class="enum" href="../../../util/include/G4HadFinalState.hh.html#G4HadFinalStateStatus::isAlive" title='G4HadFinalStateStatus::isAlive' data-ref="G4HadFinalStateStatus::isAlive">isAlive</a>);</td></tr>
+<tr><th id="173">173</th><td>            <a class="member" href="../include/G4BinaryLightIonReaction.hh.html#G4BinaryLightIonReaction::theResult" title='G4BinaryLightIonReaction::theResult' data-ref="G4BinaryLightIonReaction::theResult">theResult</a>.<a class="ref" href="../../../util/include/G4HadFinalState.hh.html#_ZN15G4HadFinalState15SetEnergyChangeEd" title='G4HadFinalState::SetEnergyChange' data-ref="_ZN15G4HadFinalState15SetEnergyChangeEd">SetEnergyChange</a>(<a class="local col6 ref" href="#6aTrack" title='aTrack' data-ref="6aTrack">aTrack</a>.<a class="ref" href="../../../util/include/G4HadProjectile.hh.html#_ZNK15G4HadProjectile16GetKineticEnergyEv" title='G4HadProjectile::GetKineticEnergy' data-ref="_ZNK15G4HadProjectile16GetKineticEnergyEv">GetKineticEnergy</a>());</td></tr>
+<tr><th id="174">174</th><td>            <a class="member" href="../include/G4BinaryLightIonReaction.hh.html#G4BinaryLightIonReaction::theResult" title='G4BinaryLightIonReaction::theResult' data-ref="G4BinaryLightIonReaction::theResult">theResult</a>.<a class="ref" href="../../../util/include/G4HadFinalState.hh.html#_ZN15G4HadFinalState17SetMomentumChangeERKN5CLHEP10Hep3VectorE" title='G4HadFinalState::SetMomentumChange' data-ref="_ZN15G4HadFinalState17SetMomentumChangeERKN5CLHEP10Hep3VectorE">SetMomentumChange</a>(<a class="local col6 ref" href="#6aTrack" title='aTrack' data-ref="6aTrack">aTrack</a>.<a class="ref" href="../../../util/include/G4HadProjectile.hh.html#_ZNK15G4HadProjectile12Get4MomentumEv" title='G4HadProjectile::Get4Momentum' data-ref="_ZNK15G4HadProjectile12Get4MomentumEv">Get4Momentum</a>().<a class="ref" href="../../../../../externals/clhep/include/CLHEP/Vector/LorentzVector.h.html#_ZNK5CLHEP16HepLorentzVector4vectEv" title='CLHEP::HepLorentzVector::vect' data-ref="_ZNK5CLHEP16HepLorentzVector4vectEv">vect</a>().<a class="ref" href="../../../../../externals/clhep/include/CLHEP/Vector/ThreeVector.h.html#_ZNK5CLHEP10Hep3Vector4unitEv" title='CLHEP::Hep3Vector::unit' data-ref="_ZNK5CLHEP10Hep3Vector4unitEv">unit</a>());</td></tr>
+<tr><th id="175">175</th><td>            <b>return</b> &amp;<a class="member" href="../include/G4BinaryLightIonReaction.hh.html#G4BinaryLightIonReaction::theResult" title='G4BinaryLightIonReaction::theResult' data-ref="G4BinaryLightIonReaction::theResult">theResult</a>;</td></tr>
+<tr><th id="176">176</th><td>      }</td></tr>
+<tr><th id="177">177</th><td></td></tr>
+<tr><th id="178">178</th><td>		<i>// Calculate excitation energy,</i></td></tr>
+<tr><th id="179">179</th><td>      <a class="typedef" href="../../../../../global/management/include/G4Types.hh.html#G4double" title='G4double' data-type='double' data-ref="G4double">G4double</a> <dfn class="local col5 decl" id="15theStatisticalExEnergy" title='theStatisticalExEnergy' data-type='G4double' data-ref="15theStatisticalExEnergy">theStatisticalExEnergy</dfn> = <a class="member" href="#_ZN24G4BinaryLightIonReaction23GetProjectileExcitationEv" title='G4BinaryLightIonReaction::GetProjectileExcitation' data-ref="_ZN24G4BinaryLightIonReaction23GetProjectileExcitationEv">GetProjectileExcitation</a>();</td></tr>
+<tr><th id="180">180</th><td></td></tr>
+<tr><th id="181">181</th><td></td></tr>
+<tr><th id="182">182</th><td>		<a class="member" href="../include/G4BinaryLightIonReaction.hh.html#G4BinaryLightIonReaction::pInitialState" title='G4BinaryLightIonReaction::pInitialState' data-ref="G4BinaryLightIonReaction::pInitialState">pInitialState</a> <a class="ref" href="../../../../../externals/clhep/include/CLHEP/Vector/LorentzVector.h.html#_ZN5CLHEP16HepLorentzVectoraSERKS0_" title='CLHEP::HepLorentzVector::operator=' data-ref="_ZN5CLHEP16HepLorentzVectoraSERKS0_">=</a> <a class="local col0 ref" href="#10mom" title='mom' data-ref="10mom">mom</a>;</td></tr>
+<tr><th id="183">183</th><td>		   <i>//G4cout &lt;&lt; "BLIC: pInitialState from aTrack : " &lt;&lt; pInitialState;</i></td></tr>
+<tr><th id="184">184</th><td>		<a class="member" href="../include/G4BinaryLightIonReaction.hh.html#G4BinaryLightIonReaction::pInitialState" title='G4BinaryLightIonReaction::pInitialState' data-ref="G4BinaryLightIonReaction::pInitialState">pInitialState</a>.<a class="ref" href="../../../../../externals/clhep/include/CLHEP/Vector/LorentzVector.h.html#_ZN5CLHEP16HepLorentzVector4setTEd" title='CLHEP::HepLorentzVector::setT' data-ref="_ZN5CLHEP16HepLorentzVector4setTEd">setT</a>(<a class="member" href="../include/G4BinaryLightIonReaction.hh.html#G4BinaryLightIonReaction::pInitialState" title='G4BinaryLightIonReaction::pInitialState' data-ref="G4BinaryLightIonReaction::pInitialState">pInitialState</a>.<a class="ref" href="../../../../../externals/clhep/include/CLHEP/Vector/LorentzVector.h.html#_ZNK5CLHEP16HepLorentzVector4getTEv" title='CLHEP::HepLorentzVector::getT' data-ref="_ZNK5CLHEP16HepLorentzVector4getTEv">getT</a>() +</td></tr>
+<tr><th id="185">185</th><td>		     <a class="type" href="../../../../../particles/management/include/G4ParticleTable.hh.html#G4ParticleTable" title='G4ParticleTable' data-ref="G4ParticleTable">G4ParticleTable</a>::<a class="ref" href="../../../../../particles/management/include/G4ParticleTable.hh.html#_ZN15G4ParticleTable16GetParticleTableEv" title='G4ParticleTable::GetParticleTable' data-ref="_ZN15G4ParticleTable16GetParticleTableEv">GetParticleTable</a>()-&gt;<a class="ref" href="../../../../../particles/management/include/G4ParticleTable.hh.html#_ZNK15G4ParticleTable11GetIonTableEv" title='G4ParticleTable::GetIonTable' data-ref="_ZNK15G4ParticleTable11GetIonTableEv">GetIonTable</a>()-&gt;<a class="ref" href="../../../../../particles/management/include/G4IonTable.hh.html#_ZNK10G4IonTable10GetIonMassEiiii" title='G4IonTable::GetIonMass' data-ref="_ZNK10G4IonTable10GetIonMassEiiii">GetIonMass</a>(<a class="member" href="../include/G4BinaryLightIonReaction.hh.html#G4BinaryLightIonReaction::tZ" title='G4BinaryLightIonReaction::tZ' data-ref="G4BinaryLightIonReaction::tZ">tZ</a>,<a class="member" href="../include/G4BinaryLightIonReaction.hh.html#G4BinaryLightIonReaction::tA" title='G4BinaryLightIonReaction::tA' data-ref="G4BinaryLightIonReaction::tA">tA</a>));</td></tr>
+<tr><th id="186">186</th><td>           <i>//G4cout &lt;&lt; "BLIC: target nucleus added : " &lt;&lt; pInitialState &lt;&lt; G4endl;</i></td></tr>
+<tr><th id="187">187</th><td></td></tr>
+<tr><th id="188">188</th><td>		<b>delete</b> <a class="member" href="../include/G4BinaryLightIonReaction.hh.html#G4BinaryLightIonReaction::target3dNucleus" title='G4BinaryLightIonReaction::target3dNucleus' data-ref="G4BinaryLightIonReaction::target3dNucleus">target3dNucleus</a>;<a class="member" href="../include/G4BinaryLightIonReaction.hh.html#G4BinaryLightIonReaction::target3dNucleus" title='G4BinaryLightIonReaction::target3dNucleus' data-ref="G4BinaryLightIonReaction::target3dNucleus">target3dNucleus</a>=<var>0</var>;</td></tr>
+<tr><th id="189">189</th><td>		<b>delete</b> <a class="member" href="../include/G4BinaryLightIonReaction.hh.html#G4BinaryLightIonReaction::projectile3dNucleus" title='G4BinaryLightIonReaction::projectile3dNucleus' data-ref="G4BinaryLightIonReaction::projectile3dNucleus">projectile3dNucleus</a>;<a class="member" href="../include/G4BinaryLightIonReaction.hh.html#G4BinaryLightIonReaction::projectile3dNucleus" title='G4BinaryLightIonReaction::projectile3dNucleus' data-ref="G4BinaryLightIonReaction::projectile3dNucleus">projectile3dNucleus</a>=<var>0</var>;</td></tr>
+<tr><th id="190">190</th><td></td></tr>
+<tr><th id="191">191</th><td>      <span class='error' title="unknown type name &apos;G4ReactionProductVector&apos;">G4ReactionProductVector</span> * <dfn class="local col6 decl" id="16spectators" title='spectators' data-type='int *' data-ref="16spectators">spectators</dfn>= <b>new</b> <span class='error' title="unknown type name &apos;G4ReactionProductVector&apos;">G4ReactionProductVector</span>;</td></tr>
+<tr><th id="192">192</th><td></td></tr>
+<tr><th id="193">193</th><td>      cascaders = <b>new</b> <span class='error' title="unknown type name &apos;G4ReactionProductVector&apos;">G4ReactionProductVector</span>;</td></tr>
+<tr><th id="194">194</th><td></td></tr>
+<tr><th id="195">195</th><td>      <a class="typedef" href="../../../../../global/HEPGeometry/include/G4LorentzVector.hh.html#G4LorentzVector" title='G4LorentzVector' data-type='CLHEP::HepLorentzVector' data-ref="G4LorentzVector">G4LorentzVector</a> <dfn class="local col7 decl" id="17pspectators" title='pspectators' data-type='G4LorentzVector' data-ref="17pspectators">pspectators</dfn>=SortResult(result,spectators,cascaders);</td></tr>
+<tr><th id="196">196</th><td>        <i>// this also sets spectatorA and spectatorZ</i></td></tr>
+<tr><th id="197">197</th><td><i></i></td></tr>
+<tr><th id="198">198</th><td><i>      //      pFinalState=std::accumulate(cascaders-&gt;begin(),cascaders-&gt;end(),pFinalState,ReactionProduct4Mom);</i></td></tr>
+<tr><th id="199">199</th><td></td></tr>
+<tr><th id="200">200</th><td>      <span class='error' title="use of undeclared identifier &apos;std&apos;">std</span>::vector&lt;<span class='error' title="&apos;G4ReactionProduct&apos; does not refer to a value">G4ReactionProduct</span> *<span class='error' title="expected expression">&gt;</span>::<span class='error' title="no member named &apos;iterator&apos; in the global namespace">iterator</span> iter;</td></tr>
+<tr><th id="201">201</th><td></td></tr>
+<tr><th id="202">202</th><td>        <i>// G4cout &lt;&lt; "pInitialState, pFinalState / pspectators"&lt;&lt; pInitialState &lt;&lt; " / " &lt;&lt; pFinalState &lt;&lt; " / " &lt;&lt; pspectators &lt;&lt; G4endl;</i></td></tr>
+<tr><th id="203">203</th><td><i>		//      if ( spectA-spectatorA !=0 || spectZ-spectatorZ !=0)</i></td></tr>
+<tr><th id="204">204</th><td><i>		//      {</i></td></tr>
+<tr><th id="205">205</th><td><i>		//          G4cout &lt;&lt; "spect Nucl != spectators: nucl a,z; spect a,z" &lt;&lt;</i></td></tr>
+<tr><th id="206">206</th><td><i>		//	      spectatorA &lt;&lt;" "&lt;&lt; spectatorZ &lt;&lt;" ; " &lt;&lt; spectA &lt;&lt;" "&lt;&lt; spectZ &lt;&lt; G4endl;</i></td></tr>
+<tr><th id="207">207</th><td><i>		//      }</i></td></tr>
+<tr><th id="208">208</th><td>		<b>delete</b> result;</td></tr>
+<tr><th id="209">209</th><td>		result=<var>0</var>;</td></tr>
+<tr><th id="210">210</th><td>		<a class="typedef" href="../../../../../global/HEPGeometry/include/G4LorentzVector.hh.html#G4LorentzVector" title='G4LorentzVector' data-type='CLHEP::HepLorentzVector' data-ref="G4LorentzVector">G4LorentzVector</a> <dfn class="local col8 decl" id="18momentum" title='momentum' data-type='G4LorentzVector' data-ref="18momentum">momentum</dfn><a class="ref" href="../../../../../externals/clhep/include/CLHEP/Vector/LorentzVector.h.html#_ZN5CLHEP16HepLorentzVectorC1ERKS0_" title='CLHEP::HepLorentzVector::HepLorentzVector' data-ref="_ZN5CLHEP16HepLorentzVectorC1ERKS0_">(</a><a class="member" href="../include/G4BinaryLightIonReaction.hh.html#G4BinaryLightIonReaction::pInitialState" title='G4BinaryLightIonReaction::pInitialState' data-ref="G4BinaryLightIonReaction::pInitialState">pInitialState</a><a class="ref" href="../../../../../externals/clhep/include/CLHEP/Vector/LorentzVector.h.html#_ZNK5CLHEP16HepLorentzVectormiERKS0_" title='CLHEP::HepLorentzVector::operator-' data-ref="_ZNK5CLHEP16HepLorentzVectormiERKS0_">-</a><a class="member" href="../include/G4BinaryLightIonReaction.hh.html#G4BinaryLightIonReaction::pFinalState" title='G4BinaryLightIonReaction::pFinalState' data-ref="G4BinaryLightIonReaction::pFinalState">pFinalState</a>);</td></tr>
+<tr><th id="211">211</th><td>		<a class="typedef" href="../../../../../global/management/include/G4Types.hh.html#G4int" title='G4int' data-type='int' data-ref="G4int">G4int</a> <dfn class="local col9 decl" id="19loopcount" title='loopcount' data-type='G4int' data-ref="19loopcount">loopcount</dfn>(<var>0</var>);</td></tr>
+<tr><th id="212">212</th><td>		   <i>//G4cout &lt;&lt; "BLIC: momentum, pspectators : " &lt;&lt; momentum &lt;&lt; " / " &lt;&lt; pspectators &lt;&lt; G4endl;</i></td></tr>
+<tr><th id="213">213</th><td>		<b>while</b> (<span class='error' title="use of undeclared identifier &apos;std&apos;">std</span>::abs(momentum.e()-pspectators.e()) &gt; <var>10</var>*MeV)                <i>/* Loop checking, 31.08.2015, G.Folger */</i></td></tr>
+<tr><th id="214">214</th><td>		                                                                       <i>// see if on loopcount </i></td></tr>
+<tr><th id="215">215</th><td>		{</td></tr>
+<tr><th id="216">216</th><td>			G4LorentzVector pCorrect(pInitialState-pspectators);</td></tr>
+<tr><th id="217">217</th><td>		         <i>//G4cout &lt;&lt; "BLIC:: BIC nonconservation? (pInitialState-pFinalState) / spectators :" &lt;&lt; momentum &lt;&lt; " / " &lt;&lt; pspectators &lt;&lt; "pCorrect "&lt;&lt; pCorrect&lt;&lt; G4endl;</i></td></tr>
+<tr><th id="218">218</th><td><i>			// Correct outgoing casacde particles.... to have momentum of (initial state - spectators)</i></td></tr>
+<tr><th id="219">219</th><td>			G4bool EnergyIsCorrect=EnergyAndMomentumCorrector(cascaders, pCorrect);</td></tr>
+<tr><th id="220">220</th><td>			<b>if</b> ( ! EnergyIsCorrect &amp;&amp; debug_G4BinaryLightIonReactionResults)</td></tr>
+<tr><th id="221">221</th><td>			{</td></tr>
+<tr><th id="222">222</th><td>				<a class="macro" href="../../../../../global/management/include/G4ios.hh.html#46" title="(*_G4cout_p())" data-ref="_M/G4cout">G4cout</a> <span class='error' title="invalid operands to binary expression (&apos;int&apos; and &apos;const char *&apos;)">&lt;&lt;</span> <q>"Warning - G4BinaryLightIonReaction E/P correction for cascaders failed"</q> &lt;&lt; <a class="macro" href="../../../../../global/management/include/G4ios.hh.html#60" title="std::endl" data-ref="_M/G4endl">G4endl</a>;</td></tr>
+<tr><th id="223">223</th><td>			}</td></tr>
+<tr><th id="224">224</th><td>			pFinalState=G4LorentzVector(<var>0</var>,<var>0</var>,<var>0</var>,<var>0</var>);</td></tr>
+<tr><th id="225">225</th><td>		  	<b>for</b>(<span class='error' title="use of undeclared identifier &apos;iter&apos;">iter</span>=cascaders-&gt;begin(); <span class='error' title="use of undeclared identifier &apos;iter&apos;">iter</span>!=cascaders-&gt;end(); <span class='error' title="use of undeclared identifier &apos;iter&apos;">iter</span>++)</td></tr>
+<tr><th id="226">226</th><td>			{</td></tr>
+<tr><th id="227">227</th><td>				pFinalState += G4LorentzVector( (*<span class='error' title="use of undeclared identifier &apos;iter&apos;">iter</span>)-&gt;GetMomentum(), (*<span class='error' title="use of undeclared identifier &apos;iter&apos;">iter</span>)-&gt;GetTotalEnergy() );</td></tr>
+<tr><th id="228">228</th><td>			}</td></tr>
+<tr><th id="229">229</th><td>			momentum=pInitialState-pFinalState;</td></tr>
+<tr><th id="230">230</th><td>			<b>if</b> (++loopcount &gt; <var>10</var> )</td></tr>
+<tr><th id="231">231</th><td>			{</td></tr>
+<tr><th id="232">232</th><td>				<b>if</b> ( momentum.vect().mag() - momentum.e()&gt; <var>10</var>*keV  )</td></tr>
+<tr><th id="233">233</th><td>				{</td></tr>
+<tr><th id="234">234</th><td>					<a class="macro" href="../../../../../global/management/include/G4ios.hh.html#47" title="(*_G4cerr_p())" data-ref="_M/G4cerr">G4cerr</a> <span class='error' title="invalid operands to binary expression (&apos;int&apos; and &apos;const char *&apos;)">&lt;&lt;</span> <q>"G4BinaryLightIonReaction.cc: Cannot correct 4-momentum of cascade particles"</q> &lt;&lt; <a class="macro" href="../../../../../global/management/include/G4ios.hh.html#60" title="std::endl" data-ref="_M/G4endl">G4endl</a>;</td></tr>
+<tr><th id="235">235</th><td>					<b>throw</b> G4HadronicException(<span class="macro" title="&quot;/home/jishin/app/geant4/1005p1/geant4.10.05.p01/source/processes/hadronic/models/binary_cascade/src/G4BinaryLightIonReaction.cc&quot;" data-ref="_M/__FILE__">__FILE__</span>, <span class="macro" title="235" data-ref="_M/__LINE__">__LINE__</span>, <q>"G4BinaryCasacde::ApplyCollision()"</q>);</td></tr>
+<tr><th id="236">236</th><td>				} <b>else</b> {</td></tr>
+<tr><th id="237">237</th><td>					<b>break</b>;</td></tr>
+<tr><th id="238">238</th><td>				}</td></tr>
+<tr><th id="239">239</th><td></td></tr>
+<tr><th id="240">240</th><td>			}</td></tr>
+<tr><th id="241">241</th><td>		}</td></tr>
+<tr><th id="242">242</th><td></td></tr>
+<tr><th id="243">243</th><td>   	<b>if</b> (<a class="member" href="../include/G4BinaryLightIonReaction.hh.html#G4BinaryLightIonReaction::spectatorA" title='G4BinaryLightIonReaction::spectatorA' data-ref="G4BinaryLightIonReaction::spectatorA">spectatorA</a> &gt; <var>0</var> )</td></tr>
+<tr><th id="244">244</th><td>		{</td></tr>
+<tr><th id="245">245</th><td>		   <i>// check spectator momentum</i></td></tr>
+<tr><th id="246">246</th><td>		   <b>if</b> ( <a class="local col8 ref" href="#18momentum" title='momentum' data-ref="18momentum">momentum</a>.<a class="ref" href="../../../../../externals/clhep/include/CLHEP/Vector/LorentzVector.h.html#_ZNK5CLHEP16HepLorentzVector4vectEv" title='CLHEP::HepLorentzVector::vect' data-ref="_ZNK5CLHEP16HepLorentzVector4vectEv">vect</a>().<a class="ref" href="../../../../../externals/clhep/include/CLHEP/Vector/ThreeVector.h.html#_ZNK5CLHEP10Hep3Vector3magEv" title='CLHEP::Hep3Vector::mag' data-ref="_ZNK5CLHEP10Hep3Vector3magEv">mag</a>() - <a class="local col8 ref" href="#18momentum" title='momentum' data-ref="18momentum">momentum</a>.<a class="ref" href="../../../../../externals/clhep/include/CLHEP/Vector/LorentzVector.h.html#_ZNK5CLHEP16HepLorentzVector1eEv" title='CLHEP::HepLorentzVector::e' data-ref="_ZNK5CLHEP16HepLorentzVector1eEv">e</a>()&lt; <var>10</var>*<a class="ref" href="../../../../../externals/clhep/include/CLHEP/Units/SystemOfUnits.h.html#CLHEP::keV" title='CLHEP::keV' data-ref="CLHEP::keV">keV</a> )</td></tr>
+<tr><th id="247">247</th><td>		   {</td></tr>
+<tr><th id="248">248</th><td>   	   	   	   <i>// DeExciteSpectatorNucleus() also handles also case of A=1, Z=0,1</i></td></tr>
+<tr><th id="249">249</th><td>               DeExciteSpectatorNucleus(spectators, cascaders, theStatisticalExEnergy, momentum);</td></tr>
+<tr><th id="250">250</th><td></td></tr>
+<tr><th id="251">251</th><td>		   } <b>else</b> {   <i>// momentum non-conservation --&gt; fail</i></td></tr>
+<tr><th id="252">252</th><td>			  <b>for</b> (<span class='error' title="use of undeclared identifier &apos;iter&apos;">iter</span>=spectators-&gt;begin();<span class='error' title="use of undeclared identifier &apos;iter&apos;">iter</span>!=spectators-&gt;end();<span class='error' title="use of undeclared identifier &apos;iter&apos;">iter</span>++)</td></tr>
+<tr><th id="253">253</th><td>		      {</td></tr>
+<tr><th id="254">254</th><td>		    	 <b>delete</b> *<span class='error' title="use of undeclared identifier &apos;iter&apos;">iter</span>;</td></tr>
+<tr><th id="255">255</th><td>		      }</td></tr>
+<tr><th id="256">256</th><td>		      <b>delete</b> spectators;</td></tr>
+<tr><th id="257">257</th><td>		  	  <b>for</b>(<span class='error' title="use of undeclared identifier &apos;iter&apos;">iter</span>=cascaders-&gt;begin(); <span class='error' title="use of undeclared identifier &apos;iter&apos;">iter</span>!=cascaders-&gt;end(); <span class='error' title="use of undeclared identifier &apos;iter&apos;">iter</span>++)</td></tr>
+<tr><th id="258">258</th><td>		  	  {</td></tr>
+<tr><th id="259">259</th><td>		  		 <b>delete</b> *<span class='error' title="use of undeclared identifier &apos;iter&apos;">iter</span>;</td></tr>
+<tr><th id="260">260</th><td>		  	  }</td></tr>
+<tr><th id="261">261</th><td>		  	  <b>delete</b> cascaders;</td></tr>
+<tr><th id="262">262</th><td></td></tr>
+<tr><th id="263">263</th><td>		      <a class="macro" href="../../../../../global/management/include/G4ios.hh.html#46" title="(*_G4cout_p())" data-ref="_M/G4cout">G4cout</a> <span class='error' title="invalid operands to binary expression (&apos;int&apos; and &apos;const char *&apos;)">&lt;&lt;</span> <q>"G4BinaryLightIonReaction.cc: mom check: "</q> &lt;&lt;  momentum</td></tr>
+<tr><th id="264">264</th><td>		            &lt;&lt; <q>" 3.mag "</q>&lt;&lt; momentum.vect().mag() &lt;&lt; <a class="macro" href="../../../../../global/management/include/G4ios.hh.html#60" title="std::endl" data-ref="_M/G4endl">G4endl</a></td></tr>
+<tr><th id="265">265</th><td>		            &lt;&lt; <q>" .. pInitialState/pFinalState/spectators "</q> &lt;&lt; pInitialState &lt;&lt;<q>" "</q></td></tr>
+<tr><th id="266">266</th><td>		            &lt;&lt; pFinalState &lt;&lt; <q>" "</q> &lt;&lt; pspectators &lt;&lt; <a class="macro" href="../../../../../global/management/include/G4ios.hh.html#60" title="std::endl" data-ref="_M/G4endl">G4endl</a></td></tr>
+<tr><th id="267">267</th><td>		            &lt;&lt; <q>" .. A,Z "</q> &lt;&lt; spectatorA &lt;&lt;<q>" "</q>&lt;&lt; spectatorZ &lt;&lt; <a class="macro" href="../../../../../global/management/include/G4ios.hh.html#60" title="std::endl" data-ref="_M/G4endl">G4endl</a>;</td></tr>
+<tr><th id="268">268</th><td>		      <a class="macro" href="../../../../../global/management/include/G4ios.hh.html#46" title="(*_G4cout_p())" data-ref="_M/G4cout">G4cout</a> <span class='error' title="invalid operands to binary expression (&apos;int&apos; and &apos;const char *&apos;)">&lt;&lt;</span> <q>"G4BinaryLightIonReaction invalid final state for: "</q> &lt;&lt; <a class="macro" href="../../../../../global/management/include/G4ios.hh.html#60" title="std::endl" data-ref="_M/G4endl">G4endl</a>;</td></tr>
+<tr><th id="269">269</th><td>		      <a class="macro" href="../../../../../global/management/include/G4ios.hh.html#46" title="(*_G4cout_p())" data-ref="_M/G4cout">G4cout</a> <span class='error' title="invalid operands to binary expression (&apos;int&apos; and &apos;const char *&apos;)">&lt;&lt;</span> <q>" Primary "</q> &lt;&lt; aTrack.GetDefinition()</td></tr>
+<tr><th id="270">270</th><td>  	    		      &lt;&lt; <q>", (A,Z)=("</q> &lt;&lt; aTrack.GetDefinition()-&gt;GetBaryonNumber()</td></tr>
+<tr><th id="271">271</th><td>  	    		      &lt;&lt; <q>","</q> &lt;&lt; aTrack.GetDefinition()-&gt;GetPDGCharge()/eplus &lt;&lt; <q>") "</q></td></tr>
+<tr><th id="272">272</th><td>  	    		      &lt;&lt; <q>", kinetic energy "</q> &lt;&lt; aTrack.GetKineticEnergy()</td></tr>
+<tr><th id="273">273</th><td>  	    		      &lt;&lt; <a class="macro" href="../../../../../global/management/include/G4ios.hh.html#60" title="std::endl" data-ref="_M/G4endl">G4endl</a>;</td></tr>
+<tr><th id="274">274</th><td>		      <a class="macro" href="../../../../../global/management/include/G4ios.hh.html#46" title="(*_G4cout_p())" data-ref="_M/G4cout">G4cout</a> <span class='error' title="invalid operands to binary expression (&apos;int&apos; and &apos;const char *&apos;)">&lt;&lt;</span> <q>" Target nucleus (A,Z)=("</q> &lt;&lt;  targetNucleus.GetA_asInt()</td></tr>
+<tr><th id="275">275</th><td>            		      &lt;&lt; <q>","</q> &lt;&lt; targetNucleus.GetZ_asInt() &lt;&lt; <q>")"</q> &lt;&lt; <a class="macro" href="../../../../../global/management/include/G4ios.hh.html#60" title="std::endl" data-ref="_M/G4endl">G4endl</a>;</td></tr>
+<tr><th id="276">276</th><td>		      <a class="macro" href="../../../../../global/management/include/G4ios.hh.html#46" title="(*_G4cout_p())" data-ref="_M/G4cout">G4cout</a> <span class='error' title="invalid operands to binary expression (&apos;int&apos; and &apos;const char *&apos;)">&lt;&lt;</span> <q>" if frequent, please submit above information as bug report"</q></td></tr>
+<tr><th id="277">277</th><td>		            &lt;&lt; <a class="macro" href="../../../../../global/management/include/G4ios.hh.html#60" title="std::endl" data-ref="_M/G4endl">G4endl</a> &lt;&lt; <a class="macro" href="../../../../../global/management/include/G4ios.hh.html#60" title="std::endl" data-ref="_M/G4endl">G4endl</a>;</td></tr>
+<tr><th id="278">278</th><td><u>#<span data-ppcond="278">ifdef</span> <span class="macro" data-ref="_M/debug_G4BinaryLightIonReaction">debug_G4BinaryLightIonReaction</span></u></td></tr>
+<tr><th id="279">279</th><td>		      G4ExceptionDescription ed;</td></tr>
+<tr><th id="280">280</th><td>		      ed &lt;&lt; <q>"G4BinaryLightIonreaction: Terminate for above error"</q>  &lt;&lt; G4endl;</td></tr>
+<tr><th id="281">281</th><td>		      G4Exception(<q>"G4BinaryLightIonreaction::ApplyYourSelf()"</q>, <q>"BLIC001"</q>, FatalException,</td></tr>
+<tr><th id="282">282</th><td>		  		ed);</td></tr>
+<tr><th id="283">283</th><td></td></tr>
+<tr><th id="284">284</th><td><u>#<span data-ppcond="278">endif</span></u></td></tr>
+<tr><th id="285">285</th><td>		      <a class="member" href="../include/G4BinaryLightIonReaction.hh.html#G4BinaryLightIonReaction::theResult" title='G4BinaryLightIonReaction::theResult' data-ref="G4BinaryLightIonReaction::theResult">theResult</a>.<a class="ref" href="../../../util/include/G4HadFinalState.hh.html#_ZN15G4HadFinalState5ClearEv" title='G4HadFinalState::Clear' data-ref="_ZN15G4HadFinalState5ClearEv">Clear</a>();</td></tr>
+<tr><th id="286">286</th><td>		      <a class="member" href="../include/G4BinaryLightIonReaction.hh.html#G4BinaryLightIonReaction::theResult" title='G4BinaryLightIonReaction::theResult' data-ref="G4BinaryLightIonReaction::theResult">theResult</a>.<a class="ref" href="../../../util/include/G4HadFinalState.hh.html#_ZN15G4HadFinalState15SetStatusChangeE21G4HadFinalStateStatus" title='G4HadFinalState::SetStatusChange' data-ref="_ZN15G4HadFinalState15SetStatusChangeE21G4HadFinalStateStatus">SetStatusChange</a>(<a class="enum" href="../../../util/include/G4HadFinalState.hh.html#G4HadFinalStateStatus::isAlive" title='G4HadFinalStateStatus::isAlive' data-ref="G4HadFinalStateStatus::isAlive">isAlive</a>);</td></tr>
+<tr><th id="287">287</th><td>		      <a class="member" href="../include/G4BinaryLightIonReaction.hh.html#G4BinaryLightIonReaction::theResult" title='G4BinaryLightIonReaction::theResult' data-ref="G4BinaryLightIonReaction::theResult">theResult</a>.<a class="ref" href="../../../util/include/G4HadFinalState.hh.html#_ZN15G4HadFinalState15SetEnergyChangeEd" title='G4HadFinalState::SetEnergyChange' data-ref="_ZN15G4HadFinalState15SetEnergyChangeEd">SetEnergyChange</a>(<a class="local col6 ref" href="#6aTrack" title='aTrack' data-ref="6aTrack">aTrack</a>.<a class="ref" href="../../../util/include/G4HadProjectile.hh.html#_ZNK15G4HadProjectile16GetKineticEnergyEv" title='G4HadProjectile::GetKineticEnergy' data-ref="_ZNK15G4HadProjectile16GetKineticEnergyEv">GetKineticEnergy</a>());</td></tr>
+<tr><th id="288">288</th><td>		      <a class="member" href="../include/G4BinaryLightIonReaction.hh.html#G4BinaryLightIonReaction::theResult" title='G4BinaryLightIonReaction::theResult' data-ref="G4BinaryLightIonReaction::theResult">theResult</a>.<a class="ref" href="../../../util/include/G4HadFinalState.hh.html#_ZN15G4HadFinalState17SetMomentumChangeERKN5CLHEP10Hep3VectorE" title='G4HadFinalState::SetMomentumChange' data-ref="_ZN15G4HadFinalState17SetMomentumChangeERKN5CLHEP10Hep3VectorE">SetMomentumChange</a>(<a class="local col6 ref" href="#6aTrack" title='aTrack' data-ref="6aTrack">aTrack</a>.<a class="ref" href="../../../util/include/G4HadProjectile.hh.html#_ZNK15G4HadProjectile12Get4MomentumEv" title='G4HadProjectile::Get4Momentum' data-ref="_ZNK15G4HadProjectile12Get4MomentumEv">Get4Momentum</a>().<a class="ref" href="../../../../../externals/clhep/include/CLHEP/Vector/LorentzVector.h.html#_ZNK5CLHEP16HepLorentzVector4vectEv" title='CLHEP::HepLorentzVector::vect' data-ref="_ZNK5CLHEP16HepLorentzVector4vectEv">vect</a>().<a class="ref" href="../../../../../externals/clhep/include/CLHEP/Vector/ThreeVector.h.html#_ZNK5CLHEP10Hep3Vector4unitEv" title='CLHEP::Hep3Vector::unit' data-ref="_ZNK5CLHEP10Hep3Vector4unitEv">unit</a>());</td></tr>
+<tr><th id="289">289</th><td>		      <b>return</b> &amp;<a class="member" href="../include/G4BinaryLightIonReaction.hh.html#G4BinaryLightIonReaction::theResult" title='G4BinaryLightIonReaction::theResult' data-ref="G4BinaryLightIonReaction::theResult">theResult</a>;</td></tr>
+<tr><th id="290">290</th><td>		   }</td></tr>
+<tr><th id="291">291</th><td>		} <b>else</b> {    <i>// no spectators</i></td></tr>
+<tr><th id="292">292</th><td>		   <b>delete</b> spectators;</td></tr>
+<tr><th id="293">293</th><td>		}</td></tr>
+<tr><th id="294">294</th><td>	}</td></tr>
+<tr><th id="295">295</th><td>	<i>// Rotate to lab</i></td></tr>
+<tr><th id="296">296</th><td>	<a class="typedef" href="../../../../../global/HEPGeometry/include/G4LorentzRotation.hh.html#G4LorentzRotation" title='G4LorentzRotation' data-type='CLHEP::HepLorentzRotation' data-ref="G4LorentzRotation">G4LorentzRotation</a> <a class="ref fake" href="../../../../../externals/clhep/include/CLHEP/Vector/LorentzRotation.h.html#_ZN5CLHEP18HepLorentzRotationC1Ev" title='CLHEP::HepLorentzRotation::HepLorentzRotation' data-ref="_ZN5CLHEP18HepLorentzRotationC1Ev"></a><dfn class="local col0 decl" id="20toZ" title='toZ' data-type='G4LorentzRotation' data-ref="20toZ">toZ</dfn>;</td></tr>
+<tr><th id="297">297</th><td>	<a class="local col0 ref" href="#20toZ" title='toZ' data-ref="20toZ">toZ</a>.<a class="ref" href="../../../../../externals/clhep/include/CLHEP/Vector/LorentzRotation.h.html#_ZN5CLHEP18HepLorentzRotation7rotateZEd" title='CLHEP::HepLorentzRotation::rotateZ' data-ref="_ZN5CLHEP18HepLorentzRotation7rotateZEd">rotateZ</a>(-<var>1</var>*<a class="local col0 ref" href="#10mom" title='mom' data-ref="10mom">mom</a>.<a class="ref" href="../../../../../externals/clhep/include/CLHEP/Vector/LorentzVector.h.html#_ZNK5CLHEP16HepLorentzVector3phiEv" title='CLHEP::HepLorentzVector::phi' data-ref="_ZNK5CLHEP16HepLorentzVector3phiEv">phi</a>());</td></tr>
+<tr><th id="298">298</th><td>	<a class="local col0 ref" href="#20toZ" title='toZ' data-ref="20toZ">toZ</a>.<a class="ref" href="../../../../../externals/clhep/include/CLHEP/Vector/LorentzRotation.h.html#_ZN5CLHEP18HepLorentzRotation7rotateYEd" title='CLHEP::HepLorentzRotation::rotateY' data-ref="_ZN5CLHEP18HepLorentzRotation7rotateYEd">rotateY</a>(-<var>1</var>*<a class="local col0 ref" href="#10mom" title='mom' data-ref="10mom">mom</a>.<a class="ref" href="../../../../../externals/clhep/include/CLHEP/Vector/LorentzVector.h.html#_ZNK5CLHEP16HepLorentzVector5thetaEv" title='CLHEP::HepLorentzVector::theta' data-ref="_ZNK5CLHEP16HepLorentzVector5thetaEv">theta</a>());</td></tr>
+<tr><th id="299">299</th><td>	<a class="typedef" href="../../../../../global/HEPGeometry/include/G4LorentzRotation.hh.html#G4LorentzRotation" title='G4LorentzRotation' data-type='CLHEP::HepLorentzRotation' data-ref="G4LorentzRotation">G4LorentzRotation</a> <dfn class="local col1 decl" id="21toLab" title='toLab' data-type='G4LorentzRotation' data-ref="21toLab">toLab</dfn><a class="ref" href="../../../../../externals/clhep/include/CLHEP/Vector/LorentzRotation.h.html#_ZN5CLHEP18HepLorentzRotationC1ERKS0_" title='CLHEP::HepLorentzRotation::HepLorentzRotation' data-ref="_ZN5CLHEP18HepLorentzRotationC1ERKS0_">(</a><a class="local col0 ref" href="#20toZ" title='toZ' data-ref="20toZ">toZ</a>.<a class="ref" href="../../../../../externals/clhep/include/CLHEP/Vector/LorentzRotation.h.html#_ZNK5CLHEP18HepLorentzRotation7inverseEv" title='CLHEP::HepLorentzRotation::inverse' data-ref="_ZNK5CLHEP18HepLorentzRotation7inverseEv">inverse</a>());</td></tr>
+<tr><th id="300">300</th><td></td></tr>
+<tr><th id="301">301</th><td>	<i>// Fill the particle change, while rotating. Boost from projectile breit-frame in case we swapped.</i></td></tr>
+<tr><th id="302">302</th><td><i>	// theResult.Clear();</i></td></tr>
+<tr><th id="303">303</th><td>	<a class="member" href="../include/G4BinaryLightIonReaction.hh.html#G4BinaryLightIonReaction::theResult" title='G4BinaryLightIonReaction::theResult' data-ref="G4BinaryLightIonReaction::theResult">theResult</a>.<a class="ref" href="../../../util/include/G4HadFinalState.hh.html#_ZN15G4HadFinalState5ClearEv" title='G4HadFinalState::Clear' data-ref="_ZN15G4HadFinalState5ClearEv">Clear</a>();</td></tr>
+<tr><th id="304">304</th><td>	<a class="member" href="../include/G4BinaryLightIonReaction.hh.html#G4BinaryLightIonReaction::theResult" title='G4BinaryLightIonReaction::theResult' data-ref="G4BinaryLightIonReaction::theResult">theResult</a>.<a class="ref" href="../../../util/include/G4HadFinalState.hh.html#_ZN15G4HadFinalState15SetStatusChangeE21G4HadFinalStateStatus" title='G4HadFinalState::SetStatusChange' data-ref="_ZN15G4HadFinalState15SetStatusChangeE21G4HadFinalStateStatus">SetStatusChange</a>(<a class="enum" href="../../../util/include/G4HadFinalState.hh.html#G4HadFinalStateStatus::stopAndKill" title='G4HadFinalStateStatus::stopAndKill' data-ref="G4HadFinalStateStatus::stopAndKill">stopAndKill</a>);</td></tr>
+<tr><th id="305">305</th><td>	<a class="typedef" href="../../../../../global/HEPGeometry/include/G4LorentzVector.hh.html#G4LorentzVector" title='G4LorentzVector' data-type='CLHEP::HepLorentzVector' data-ref="G4LorentzVector">G4LorentzVector</a> <dfn class="local col2 decl" id="22ptot" title='ptot' data-type='G4LorentzVector' data-ref="22ptot">ptot</dfn><a class="ref" href="../../../../../externals/clhep/include/CLHEP/Vector/LorentzVector.h.html#_ZN5CLHEP16HepLorentzVectorC1Ed" title='CLHEP::HepLorentzVector::HepLorentzVector' data-ref="_ZN5CLHEP16HepLorentzVectorC1Ed">(</a><var>0</var>);</td></tr>
+<tr><th id="306">306</th><td>    <span class='error' title="use of undeclared identifier &apos;G4ReactionProductVector&apos;">G4ReactionProductVector</span>::iterator <dfn class="local col3 decl" id="23iter" title='iter' data-type='int' data-ref="23iter">iter</dfn>;</td></tr>
+<tr><th id="307">307</th><td>    <u>#<span data-ppcond="307">ifdef</span> <span class="macro" data-ref="_M/debug_BLIR_result">debug_BLIR_result</span></u></td></tr>
+<tr><th id="308">308</th><td>       G4LorentzVector p_raw;</td></tr>
+<tr><th id="309">309</th><td>    <u>#<span data-ppcond="307">endif</span></u></td></tr>
+<tr><th id="310">310</th><td>    <i>//G4int i=0;</i></td></tr>
+<tr><th id="311">311</th><td></td></tr>
+<tr><th id="312">312</th><td>	<b>for</b>(iter=cascaders-&gt;begin(); iter!=cascaders-&gt;end(); iter++)</td></tr>
+<tr><th id="313">313</th><td>	{</td></tr>
+<tr><th id="314">314</th><td>		<b>if</b>((*iter)-&gt;GetNewlyAdded())</td></tr>
+<tr><th id="315">315</th><td>		{</td></tr>
+<tr><th id="316">316</th><td>			<a class="type" href="../../../../../particles/management/include/G4DynamicParticle.hh.html#G4DynamicParticle" title='G4DynamicParticle' data-ref="G4DynamicParticle">G4DynamicParticle</a> * <dfn class="local col4 decl" id="24aNewDP" title='aNewDP' data-type='G4DynamicParticle *' data-ref="24aNewDP">aNewDP</dfn> =</td></tr>
+<tr><th id="317">317</th><td>					<b>new</b> G4DynamicParticle((*iter)-&gt;GetDefinition(),</td></tr>
+<tr><th id="318">318</th><td>							(*iter)-&gt;GetTotalEnergy(),</td></tr>
+<tr><th id="319">319</th><td>							(*iter)-&gt;GetMomentum() );</td></tr>
+<tr><th id="320">320</th><td>			<a class="typedef" href="../../../../../global/HEPGeometry/include/G4LorentzVector.hh.html#G4LorentzVector" title='G4LorentzVector' data-type='CLHEP::HepLorentzVector' data-ref="G4LorentzVector">G4LorentzVector</a> <dfn class="local col5 decl" id="25tmp" title='tmp' data-type='G4LorentzVector' data-ref="25tmp">tmp</dfn> = <a class="local col4 ref" href="#24aNewDP" title='aNewDP' data-ref="24aNewDP">aNewDP</a>-&gt;<a class="ref" href="../../../../../particles/management/include/G4DynamicParticle.hh.html#_ZNK17G4DynamicParticle12Get4MomentumEv" title='G4DynamicParticle::Get4Momentum' data-ref="_ZNK17G4DynamicParticle12Get4MomentumEv">Get4Momentum</a>();</td></tr>
+<tr><th id="321">321</th><td>             <u>#<span data-ppcond="321">ifdef</span> <span class="macro" data-ref="_M/debug_BLIR_result">debug_BLIR_result</span></u></td></tr>
+<tr><th id="322">322</th><td>			     p_raw+= tmp;</td></tr>
+<tr><th id="323">323</th><td>             <u>#<span data-ppcond="321">endif</span></u></td></tr>
+<tr><th id="324">324</th><td>			<b>if</b>(<a class="local col2 ref" href="#12swapped" title='swapped' data-ref="12swapped">swapped</a>)</td></tr>
+<tr><th id="325">325</th><td>			{</td></tr>
+<tr><th id="326">326</th><td>				<a class="local col5 ref" href="#25tmp" title='tmp' data-ref="25tmp">tmp</a><a class="ref" href="../../../../../externals/clhep/include/CLHEP/Vector/LorentzVector.h.html#_ZN5CLHEP16HepLorentzVectormLERKNS_18HepLorentzRotationE" title='CLHEP::HepLorentzVector::operator*=' data-ref="_ZN5CLHEP16HepLorentzVectormLERKNS_18HepLorentzRotationE">*=</a><a class="local col1 ref" href="#11toBreit" title='toBreit' data-ref="11toBreit">toBreit</a>.<a class="ref" href="../../../../../externals/clhep/include/CLHEP/Vector/LorentzRotation.h.html#_ZNK5CLHEP18HepLorentzRotation7inverseEv" title='CLHEP::HepLorentzRotation::inverse' data-ref="_ZNK5CLHEP18HepLorentzRotation7inverseEv">inverse</a>();</td></tr>
+<tr><th id="327">327</th><td>				<a class="local col5 ref" href="#25tmp" title='tmp' data-ref="25tmp">tmp</a>.<a class="ref" href="../../../../../externals/clhep/include/CLHEP/Vector/LorentzVector.h.html#_ZN5CLHEP16HepLorentzVector7setVectERKNS_10Hep3VectorE" title='CLHEP::HepLorentzVector::setVect' data-ref="_ZN5CLHEP16HepLorentzVector7setVectERKNS_10Hep3VectorE">setVect</a>(<a class="ref" href="../../../../../externals/clhep/include/CLHEP/Vector/ThreeVector.h.html#_ZNK5CLHEP10Hep3VectorngEv" title='CLHEP::Hep3Vector::operator-' data-ref="_ZNK5CLHEP10Hep3VectorngEv">-</a><a class="local col5 ref" href="#25tmp" title='tmp' data-ref="25tmp">tmp</a>.<a class="ref" href="../../../../../externals/clhep/include/CLHEP/Vector/LorentzVector.h.html#_ZNK5CLHEP16HepLorentzVector4vectEv" title='CLHEP::HepLorentzVector::vect' data-ref="_ZNK5CLHEP16HepLorentzVector4vectEv">vect</a>());</td></tr>
+<tr><th id="328">328</th><td>			}</td></tr>
+<tr><th id="329">329</th><td>			<a class="local col5 ref" href="#25tmp" title='tmp' data-ref="25tmp">tmp</a> <a class="ref" href="../../../../../externals/clhep/include/CLHEP/Vector/LorentzVector.h.html#_ZN5CLHEP16HepLorentzVectormLERKNS_18HepLorentzRotationE" title='CLHEP::HepLorentzVector::operator*=' data-ref="_ZN5CLHEP16HepLorentzVectormLERKNS_18HepLorentzRotationE">*=</a> <a class="local col1 ref" href="#21toLab" title='toLab' data-ref="21toLab">toLab</a>;</td></tr>
+<tr><th id="330">330</th><td>			<a class="local col4 ref" href="#24aNewDP" title='aNewDP' data-ref="24aNewDP">aNewDP</a>-&gt;<a class="ref" href="../../../../../particles/management/include/G4DynamicParticle.hh.html#_ZN17G4DynamicParticle12Set4MomentumERKN5CLHEP16HepLorentzVectorE" title='G4DynamicParticle::Set4Momentum' data-ref="_ZN17G4DynamicParticle12Set4MomentumERKN5CLHEP16HepLorentzVectorE">Set4Momentum</a>(<a class="local col5 ref" href="#25tmp" title='tmp' data-ref="25tmp">tmp</a>);</td></tr>
+<tr><th id="331">331</th><td>			<a class="type" href="../../../util/include/G4HadSecondary.hh.html#G4HadSecondary" title='G4HadSecondary' data-ref="G4HadSecondary">G4HadSecondary</a> <dfn class="local col6 decl" id="26aNew" title='aNew' data-type='G4HadSecondary' data-ref="26aNew">aNew</dfn> = <a class="type" href="../../../util/include/G4HadSecondary.hh.html#G4HadSecondary" title='G4HadSecondary' data-ref="G4HadSecondary">G4HadSecondary</a><a class="ref" href="../../../util/include/G4HadSecondary.hh.html#_ZN14G4HadSecondaryC1EP17G4DynamicParticledi" title='G4HadSecondary::G4HadSecondary' data-ref="_ZN14G4HadSecondaryC1EP17G4DynamicParticledi">(</a><a class="local col4 ref" href="#24aNewDP" title='aNewDP' data-ref="24aNewDP">aNewDP</a>);</td></tr>
+<tr><th id="332">332</th><td>            <a class="typedef" href="../../../../../global/management/include/G4Types.hh.html#G4double" title='G4double' data-type='double' data-ref="G4double">G4double</a> <dfn class="local col7 decl" id="27time" title='time' data-type='G4double' data-ref="27time">time</dfn> = <var>0</var>;                     <i>//(*iter)-&gt;GetCreationTime();</i></td></tr>
+<tr><th id="333">333</th><td>            <i>//if(time &lt; 0.0) { time = 0.0; }</i></td></tr>
+<tr><th id="334">334</th><td>            <a class="local col6 ref" href="#26aNew" title='aNew' data-ref="26aNew">aNew</a>.<a class="ref" href="../../../util/include/G4HadSecondary.hh.html#_ZN14G4HadSecondary7SetTimeEd" title='G4HadSecondary::SetTime' data-ref="_ZN14G4HadSecondary7SetTimeEd">SetTime</a>(<a class="local col9 ref" href="#9timePrimary" title='timePrimary' data-ref="9timePrimary">timePrimary</a> + <a class="local col7 ref" href="#27time" title='time' data-ref="27time">time</a>);</td></tr>
+<tr><th id="335">335</th><td>            aNew.SetCreatorModelType((*iter)-&gt;GetCreatorModel());</td></tr>
+<tr><th id="336">336</th><td></td></tr>
+<tr><th id="337">337</th><td>			<a class="member" href="../include/G4BinaryLightIonReaction.hh.html#G4BinaryLightIonReaction::theResult" title='G4BinaryLightIonReaction::theResult' data-ref="G4BinaryLightIonReaction::theResult">theResult</a>.<a class="ref" href="../../../util/include/G4HadFinalState.hh.html#_ZN15G4HadFinalState12AddSecondaryERK14G4HadSecondary" title='G4HadFinalState::AddSecondary' data-ref="_ZN15G4HadFinalState12AddSecondaryERK14G4HadSecondary">AddSecondary</a>(<a class="local col6 ref" href="#26aNew" title='aNew' data-ref="26aNew">aNew</a>);</td></tr>
+<tr><th id="338">338</th><td>			<a class="local col2 ref" href="#22ptot" title='ptot' data-ref="22ptot">ptot</a> <a class="ref" href="../../../../../externals/clhep/include/CLHEP/Vector/LorentzVector.h.html#_ZN5CLHEP16HepLorentzVectorpLERKS0_" title='CLHEP::HepLorentzVector::operator+=' data-ref="_ZN5CLHEP16HepLorentzVectorpLERKS0_">+=</a> <a class="local col5 ref" href="#25tmp" title='tmp' data-ref="25tmp">tmp</a>;</td></tr>
+<tr><th id="339">339</th><td>			        <i>//G4cout &lt;&lt; "BLIC: Secondary " &lt;&lt; aNew-&gt;GetDefinition()-&gt;GetParticleName()</i></td></tr>
+<tr><th id="340">340</th><td><i>			        //       &lt;&lt;" "&lt;&lt;  aNew-&gt;GetMomentum()&lt;&lt;" "&lt;&lt;  aNew-&gt;GetTotalEnergy() &lt;&lt; G4endl;</i></td></tr>
+<tr><th id="341">341</th><td>		}</td></tr>
+<tr><th id="342">342</th><td>		<b>delete</b> *iter;</td></tr>
+<tr><th id="343">343</th><td>	}</td></tr>
+<tr><th id="344">344</th><td>	<b>delete</b> cascaders;</td></tr>
+<tr><th id="345">345</th><td></td></tr>
+<tr><th id="346">346</th><td><u>#<span data-ppcond="346">ifdef</span> <span class="macro" data-ref="_M/debug_BLIR_result">debug_BLIR_result</span></u></td></tr>
+<tr><th id="347">347</th><td>	<i>//G4cout &lt;&lt; "Result analysis, secondaries " &lt;&lt; theResult.GetNumberOfSecondaries() &lt;&lt; G4endl;</i></td></tr>
+<tr><th id="348">348</th><td><i>	//G4cout &lt;&lt; "p_tot_raw " &lt;&lt; p_raw &lt;&lt; " sum p final " &lt;&lt; ptot &lt;&lt; G4endl;</i></td></tr>
+<tr><th id="349">349</th><td>	G4double m_nucl=	G4ParticleTable::GetParticleTable()-&gt;GetIonTable()-&gt;</td></tr>
+<tr><th id="350">350</th><td>			    GetIonMass(targetNucleus.GetZ_asInt(),targetNucleus.GetA_asInt());</td></tr>
+<tr><th id="351">351</th><td>	<i>// delete? tZ=targetNucleus.GetZ_asInt();</i></td></tr>
+<tr><th id="352">352</th><td><i></i></td></tr>
+<tr><th id="353">353</th><td><i>	//G4cout &lt;&lt; "BLIC Energy conservation initial/primary/nucleus/final/delta(init-final) "</i></td></tr>
+<tr><th id="354">354</th><td><i>	 //     &lt;&lt; aTrack.GetTotalEnergy()   + m_nucl &lt;&lt;" "&lt;&lt; aTrack.GetTotalEnergy() &lt;&lt;" "&lt;&lt; m_nucl &lt;&lt;" "&lt;&lt;ptot.e()</i></td></tr>
+<tr><th id="355">355</th><td><i>	 //     &lt;&lt;" "&lt;&lt; aTrack.GetTotalEnergy() + m_nucl - ptot.e() &lt;&lt; G4endl;</i></td></tr>
+<tr><th id="356">356</th><td>	G4cout &lt;&lt; <q>"BLIC momentum conservation "</q> &lt;&lt; aTrack.Get4Momentum()+ G4LorentzVector(m_nucl)</td></tr>
+<tr><th id="357">357</th><td>			&lt;&lt; <q>" ptot "</q> &lt;&lt; ptot &lt;&lt; <q>" delta "</q> &lt;&lt; aTrack.Get4Momentum()+ G4LorentzVector(m_nucl) - ptot</td></tr>
+<tr><th id="358">358</th><td>			&lt;&lt; <q>"        3mom.mag() "</q> &lt;&lt; (aTrack.Get4Momentum()+ G4LorentzVector(m_nucl) - ptot).vect().mag() &lt;&lt; G4endl;</td></tr>
+<tr><th id="359">359</th><td><u>#<span data-ppcond="346">endif</span></u></td></tr>
+<tr><th id="360">360</th><td></td></tr>
+<tr><th id="361">361</th><td>	<b>if</b>(<span class='error' title="use of undeclared identifier &apos;getenv&apos;">getenv</span>(<q>"BLICDEBUG"</q>) ) <a class="macro" href="../../../../../global/management/include/G4ios.hh.html#47" title="(*_G4cerr_p())" data-ref="_M/G4cerr">G4cerr</a> <span class='error' title="invalid operands to binary expression (&apos;int&apos; and &apos;const char *&apos;)">&lt;&lt;</span> <q>" ######### Binary Light Ion Reaction number ends ######### "</q> &lt;&lt; <a class="macro" href="../../../../../global/management/include/G4ios.hh.html#60" title="std::endl" data-ref="_M/G4endl">G4endl</a>;</td></tr>
+<tr><th id="362">362</th><td></td></tr>
+<tr><th id="363">363</th><td>	<b>return</b> &amp;<a class="member" href="../include/G4BinaryLightIonReaction.hh.html#G4BinaryLightIonReaction::theResult" title='G4BinaryLightIonReaction::theResult' data-ref="G4BinaryLightIonReaction::theResult">theResult</a>;</td></tr>
+<tr><th id="364">364</th><td>}</td></tr>
+<tr><th id="365">365</th><td></td></tr>
+<tr><th id="366">366</th><td><i>//--------------------------------------------------------------------------------</i></td></tr>
+<tr><th id="367">367</th><td><i></i></td></tr>
+<tr><th id="368">368</th><td><i>//****************************************************************************</i></td></tr>
+<tr><th id="369">369</th><td>G4bool G4BinaryLightIonReaction::EnergyAndMomentumCorrector(</td></tr>
+<tr><th id="370">370</th><td>		<span class='error' title="unknown type name &apos;G4ReactionProductVector&apos;">G4ReactionProductVector</span>* Output, G4LorentzVector&amp; TotalCollisionMom)</td></tr>
+<tr><th id="371">371</th><td><i>//****************************************************************************</i></td></tr>
+<tr><th id="372">372</th><td>{</td></tr>
+<tr><th id="373">373</th><td>	<em>const</em> <em>int</em>    nAttemptScale = <var>2500</var>;</td></tr>
+<tr><th id="374">374</th><td>	<em>const</em> <em>double</em> ErrLimit = <var>1.E-6</var>;</td></tr>
+<tr><th id="375">375</th><td>	<b>if</b> (Output-&gt;empty())</td></tr>
+<tr><th id="376">376</th><td>		<b>return</b> <a class="macro" href="../../../../../global/management/include/globals.hh.html#54" title="1" data-ref="_M/TRUE">TRUE</a>;</td></tr>
+<tr><th id="377">377</th><td>	G4LorentzVector SumMom(<var>0</var>,<var>0</var>,<var>0</var>,<var>0</var>);</td></tr>
+<tr><th id="378">378</th><td>	G4double        SumMass = <var>0</var>;</td></tr>
+<tr><th id="379">379</th><td>	G4double        TotalCollisionMass = TotalCollisionMom.m();</td></tr>
+<tr><th id="380">380</th><td>	<span class='error' title="unknown type name &apos;size_t&apos;">size_t</span> i = <var>0</var>;</td></tr>
+<tr><th id="381">381</th><td>	<i>// Calculate sum hadron 4-momenta and summing hadron mass</i></td></tr>
+<tr><th id="382">382</th><td>	<b>for</b>(i = <var>0</var>; i &lt; Output-&gt;size(); i++)</td></tr>
+<tr><th id="383">383</th><td>	{</td></tr>
+<tr><th id="384">384</th><td>		SumMom  += G4LorentzVector((*Output)[i]-&gt;GetMomentum(),(*Output)[i]-&gt;GetTotalEnergy());</td></tr>
+<tr><th id="385">385</th><td>		SumMass += (*Output)[i]-&gt;GetDefinition()-&gt;GetPDGMass();</td></tr>
+<tr><th id="386">386</th><td>	}</td></tr>
+<tr><th id="387">387</th><td>	  <i>// G4cout &lt;&lt; " E/P corrector, SumMass, SumMom.m2, TotalMass "</i></td></tr>
+<tr><th id="388">388</th><td><i>	  //       &lt;&lt; SumMass &lt;&lt;" "&lt;&lt; SumMom.m2() &lt;&lt;" "&lt;&lt;TotalCollisionMass&lt;&lt; G4endl;</i></td></tr>
+<tr><th id="389">389</th><td>	<b>if</b> (SumMass &gt; TotalCollisionMass) <b>return</b> <a class="macro" href="../../../../../global/management/include/globals.hh.html#51" title="0" data-ref="_M/FALSE">FALSE</a>;</td></tr>
+<tr><th id="390">390</th><td>	SumMass = SumMom.m2();</td></tr>
+<tr><th id="391">391</th><td>	<b>if</b> (SumMass &lt; <var>0</var>) <b>return</b> <a class="macro" href="../../../../../global/management/include/globals.hh.html#51" title="0" data-ref="_M/FALSE">FALSE</a>;</td></tr>
+<tr><th id="392">392</th><td>	SumMass = <span class='error' title="use of undeclared identifier &apos;std&apos;">std</span>::sqrt(SumMass);</td></tr>
+<tr><th id="393">393</th><td></td></tr>
+<tr><th id="394">394</th><td>	<i>// Compute c.m.s. hadron velocity and boost KTV to hadron c.m.s.</i></td></tr>
+<tr><th id="395">395</th><td>	G4ThreeVector Beta = -SumMom.boostVector();</td></tr>
+<tr><th id="396">396</th><td>	      <i>//G4cout &lt;&lt; " == pre boost 2 "&lt;&lt; SumMom.e()&lt;&lt; " "&lt;&lt; SumMom.mag()&lt;&lt;" "&lt;&lt; Beta &lt;&lt;G4endl;</i></td></tr>
+<tr><th id="397">397</th><td><i>	//--old    Output-&gt;Boost(Beta);</i></td></tr>
+<tr><th id="398">398</th><td>	<b>for</b>(i = <var>0</var>; i &lt; Output-&gt;size(); i++)</td></tr>
+<tr><th id="399">399</th><td>	{</td></tr>
+<tr><th id="400">400</th><td>		G4LorentzVector mom = G4LorentzVector((*Output)[i]-&gt;GetMomentum(),(*Output)[i]-&gt;GetTotalEnergy());</td></tr>
+<tr><th id="401">401</th><td>		mom *= Beta;</td></tr>
+<tr><th id="402">402</th><td>		(*Output)[i]-&gt;SetMomentum(mom.vect());</td></tr>
+<tr><th id="403">403</th><td>		(*Output)[i]-&gt;SetTotalEnergy(mom.e());</td></tr>
+<tr><th id="404">404</th><td>	}</td></tr>
+<tr><th id="405">405</th><td></td></tr>
+<tr><th id="406">406</th><td>	<i>// Scale total c.m.s. hadron energy (hadron system mass).</i></td></tr>
+<tr><th id="407">407</th><td><i>	// It should be equal interaction mass</i></td></tr>
+<tr><th id="408">408</th><td>	G4double Scale = <var>0</var>,OldScale=<var>0</var>;</td></tr>
+<tr><th id="409">409</th><td>	G4double factor = <var>1.</var>;</td></tr>
+<tr><th id="410">410</th><td>	G4int cAttempt = <var>0</var>;</td></tr>
+<tr><th id="411">411</th><td>	G4double Sum = <var>0</var>;</td></tr>
+<tr><th id="412">412</th><td>	G4bool success = <b>false</b>;</td></tr>
+<tr><th id="413">413</th><td>	<b>for</b>(cAttempt = <var>0</var>; cAttempt &lt; nAttemptScale; cAttempt++)</td></tr>
+<tr><th id="414">414</th><td>	{</td></tr>
+<tr><th id="415">415</th><td>		Sum = <var>0</var>;</td></tr>
+<tr><th id="416">416</th><td>		<b>for</b>(i = <var>0</var>; i &lt; Output-&gt;size(); i++)</td></tr>
+<tr><th id="417">417</th><td>		{</td></tr>
+<tr><th id="418">418</th><td>			G4LorentzVector HadronMom = G4LorentzVector((*Output)[i]-&gt;GetMomentum(),(*Output)[i]-&gt;GetTotalEnergy());</td></tr>
+<tr><th id="419">419</th><td>			HadronMom.setVect(HadronMom.vect()+ factor*Scale*HadronMom.vect());</td></tr>
+<tr><th id="420">420</th><td>			G4double E = <span class='error' title="use of undeclared identifier &apos;std&apos;">std</span>::sqrt(HadronMom.vect().mag2() + sqr((*Output)[i]-&gt;GetDefinition()-&gt;GetPDGMass()));</td></tr>
+<tr><th id="421">421</th><td>			HadronMom.setE(E);</td></tr>
+<tr><th id="422">422</th><td>			(*Output)[i]-&gt;SetMomentum(HadronMom.vect());</td></tr>
+<tr><th id="423">423</th><td>			(*Output)[i]-&gt;SetTotalEnergy(HadronMom.e());</td></tr>
+<tr><th id="424">424</th><td>			Sum += E;</td></tr>
+<tr><th id="425">425</th><td>		}</td></tr>
+<tr><th id="426">426</th><td>		OldScale=Scale;</td></tr>
+<tr><th id="427">427</th><td>		Scale = TotalCollisionMass/Sum - <var>1</var>;</td></tr>
+<tr><th id="428">428</th><td>		<i>//  G4cout &lt;&lt; "E/P corr - " &lt;&lt; cAttempt &lt;&lt; " " &lt;&lt; Scale &lt;&lt; G4endl;</i></td></tr>
+<tr><th id="429">429</th><td>		<b>if</b> (<span class='error' title="use of undeclared identifier &apos;std&apos;">std</span>::abs(Scale) &lt;= ErrLimit</td></tr>
+<tr><th id="430">430</th><td>				|| OldScale == Scale)			<i>// protect 'frozen' situation and divide by 0 in calculating new factor below</i></td></tr>
+<tr><th id="431">431</th><td>		{</td></tr>
+<tr><th id="432">432</th><td>			<b>if</b> (debug_G4BinaryLightIonReactionResults) <a class="macro" href="../../../../../global/management/include/G4ios.hh.html#46" title="(*_G4cout_p())" data-ref="_M/G4cout">G4cout</a> <span class='error' title="invalid operands to binary expression (&apos;int&apos; and &apos;const char *&apos;)">&lt;&lt;</span> <q>"E/p corrector: "</q> &lt;&lt; cAttempt &lt;&lt; <a class="macro" href="../../../../../global/management/include/G4ios.hh.html#60" title="std::endl" data-ref="_M/G4endl">G4endl</a>;</td></tr>
+<tr><th id="433">433</th><td>			success = <b>true</b>;</td></tr>
+<tr><th id="434">434</th><td>			<b>break</b>;</td></tr>
+<tr><th id="435">435</th><td>		}</td></tr>
+<tr><th id="436">436</th><td>		<b>if</b> ( cAttempt &gt; <var>10</var> )</td></tr>
+<tr><th id="437">437</th><td>		{</td></tr>
+<tr><th id="438">438</th><td>			<i>//         G4cout &lt;&lt; " speed it up? " &lt;&lt; std::abs(OldScale/(OldScale-Scale)) &lt;&lt; G4endl;</i></td></tr>
+<tr><th id="439">439</th><td>			factor=<span class='error' title="use of undeclared identifier &apos;std&apos;">std</span>::max(<var>1.</var>,G4Log(<span class='error' title="use of undeclared identifier &apos;std&apos;">std</span>::abs(OldScale/(OldScale-Scale))));</td></tr>
+<tr><th id="440">440</th><td>			<i>//	 G4cout &lt;&lt; " ? factor ? " &lt;&lt; factor &lt;&lt; G4endl;</i></td></tr>
+<tr><th id="441">441</th><td>		}</td></tr>
+<tr><th id="442">442</th><td>	}</td></tr>
+<tr><th id="443">443</th><td></td></tr>
+<tr><th id="444">444</th><td>	<b>if</b>( (!success)  &amp;&amp; debug_G4BinaryLightIonReactionResults)</td></tr>
+<tr><th id="445">445</th><td>	{</td></tr>
+<tr><th id="446">446</th><td>		<a class="macro" href="../../../../../global/management/include/G4ios.hh.html#46" title="(*_G4cout_p())" data-ref="_M/G4cout">G4cout</a> <span class='error' title="invalid operands to binary expression (&apos;int&apos; and &apos;const char *&apos;)">&lt;&lt;</span> <q>"G4G4BinaryLightIonReaction::EnergyAndMomentumCorrector - Warning"</q>&lt;&lt;<a class="macro" href="../../../../../global/management/include/G4ios.hh.html#60" title="std::endl" data-ref="_M/G4endl">G4endl</a>;</td></tr>
+<tr><th id="447">447</th><td>		<a class="macro" href="../../../../../global/management/include/G4ios.hh.html#46" title="(*_G4cout_p())" data-ref="_M/G4cout">G4cout</a> <span class='error' title="invalid operands to binary expression (&apos;int&apos; and &apos;const char *&apos;)">&lt;&lt;</span> <q>"   Scale not unity at end of iteration loop: "</q>&lt;&lt;TotalCollisionMass&lt;&lt;<q>" "</q>&lt;&lt;Sum&lt;&lt;<q>" "</q>&lt;&lt;Scale&lt;&lt;<a class="macro" href="../../../../../global/management/include/G4ios.hh.html#60" title="std::endl" data-ref="_M/G4endl">G4endl</a>;</td></tr>
+<tr><th id="448">448</th><td>		<a class="macro" href="../../../../../global/management/include/G4ios.hh.html#46" title="(*_G4cout_p())" data-ref="_M/G4cout">G4cout</a> <span class='error' title="invalid operands to binary expression (&apos;int&apos; and &apos;const char *&apos;)">&lt;&lt;</span> <q>"   Increase number of attempts or increase ERRLIMIT"</q>&lt;&lt;<a class="macro" href="../../../../../global/management/include/G4ios.hh.html#60" title="std::endl" data-ref="_M/G4endl">G4endl</a>;</td></tr>
+<tr><th id="449">449</th><td>	}</td></tr>
+<tr><th id="450">450</th><td></td></tr>
+<tr><th id="451">451</th><td>	<i>// Compute c.m.s. interaction velocity and KTV back boost</i></td></tr>
+<tr><th id="452">452</th><td>	Beta = TotalCollisionMom.boostVector();</td></tr>
+<tr><th id="453">453</th><td>	<i>//--old    Output-&gt;Boost(Beta);</i></td></tr>
+<tr><th id="454">454</th><td>	<b>for</b>(i = <var>0</var>; i &lt; Output-&gt;size(); i++)</td></tr>
+<tr><th id="455">455</th><td>	{</td></tr>
+<tr><th id="456">456</th><td>		G4LorentzVector mom = G4LorentzVector((*Output)[i]-&gt;GetMomentum(),(*Output)[i]-&gt;GetTotalEnergy());</td></tr>
+<tr><th id="457">457</th><td>		mom *= Beta;</td></tr>
+<tr><th id="458">458</th><td>		(*Output)[i]-&gt;SetMomentum(mom.vect());</td></tr>
+<tr><th id="459">459</th><td>		(*Output)[i]-&gt;SetTotalEnergy(mom.e());</td></tr>
+<tr><th id="460">460</th><td>	}</td></tr>
+<tr><th id="461">461</th><td>	<b>return</b> <a class="macro" href="../../../../../global/management/include/globals.hh.html#54" title="1" data-ref="_M/TRUE">TRUE</a>;</td></tr>
+<tr><th id="462">462</th><td>}</td></tr>
+<tr><th id="463">463</th><td><a class="typedef" href="../../../../../global/management/include/G4Types.hh.html#G4bool" title='G4bool' data-type='bool' data-ref="G4bool">G4bool</a> <a class="type" href="../include/G4BinaryLightIonReaction.hh.html#G4BinaryLightIonReaction" title='G4BinaryLightIonReaction' data-ref="G4BinaryLightIonReaction">G4BinaryLightIonReaction</a>::<dfn class="decl def" id="_ZN24G4BinaryLightIonReaction22SetLighterAsProjectileERN5CLHEP16HepLorentzVectorERKNS0_18HepLorentzRotationE" title='G4BinaryLightIonReaction::SetLighterAsProjectile' data-ref="_ZN24G4BinaryLightIonReaction22SetLighterAsProjectileERN5CLHEP16HepLorentzVectorERKNS0_18HepLorentzRotationE">SetLighterAsProjectile</dfn>(<a class="typedef" href="../../../../../global/HEPGeometry/include/G4LorentzVector.hh.html#G4LorentzVector" title='G4LorentzVector' data-type='CLHEP::HepLorentzVector' data-ref="G4LorentzVector">G4LorentzVector</a> &amp; <dfn class="local col8 decl" id="28mom" title='mom' data-type='G4LorentzVector &amp;' data-ref="28mom">mom</dfn>,<em>const</em> <a class="typedef" href="../../../../../global/HEPGeometry/include/G4LorentzRotation.hh.html#G4LorentzRotation" title='G4LorentzRotation' data-type='CLHEP::HepLorentzRotation' data-ref="G4LorentzRotation">G4LorentzRotation</a> &amp; <dfn class="local col9 decl" id="29toBreit" title='toBreit' data-type='const G4LorentzRotation &amp;' data-ref="29toBreit">toBreit</dfn>)</td></tr>
+<tr><th id="464">464</th><td>{</td></tr>
+<tr><th id="465">465</th><td>   <a class="typedef" href="../../../../../global/management/include/G4Types.hh.html#G4bool" title='G4bool' data-type='bool' data-ref="G4bool">G4bool</a> <dfn class="local col0 decl" id="30swapped" title='swapped' data-type='G4bool' data-ref="30swapped">swapped</dfn> = <b>false</b>;</td></tr>
+<tr><th id="466">466</th><td>   <b>if</b>(<a class="member" href="../include/G4BinaryLightIonReaction.hh.html#G4BinaryLightIonReaction::tA" title='G4BinaryLightIonReaction::tA' data-ref="G4BinaryLightIonReaction::tA">tA</a>&lt;<a class="member" href="../include/G4BinaryLightIonReaction.hh.html#G4BinaryLightIonReaction::pA" title='G4BinaryLightIonReaction::pA' data-ref="G4BinaryLightIonReaction::pA">pA</a>)</td></tr>
+<tr><th id="467">467</th><td>   {</td></tr>
+<tr><th id="468">468</th><td>      <a class="local col0 ref" href="#30swapped" title='swapped' data-ref="30swapped">swapped</a> = <b>true</b>;</td></tr>
+<tr><th id="469">469</th><td>      <a class="typedef" href="../../../../../global/management/include/G4Types.hh.html#G4int" title='G4int' data-type='int' data-ref="G4int">G4int</a> <dfn class="local col1 decl" id="31tmp" title='tmp' data-type='G4int' data-ref="31tmp">tmp</dfn>(<var>0</var>);</td></tr>
+<tr><th id="470">470</th><td>      <a class="local col1 ref" href="#31tmp" title='tmp' data-ref="31tmp">tmp</a> = <a class="member" href="../include/G4BinaryLightIonReaction.hh.html#G4BinaryLightIonReaction::tA" title='G4BinaryLightIonReaction::tA' data-ref="G4BinaryLightIonReaction::tA">tA</a>; <a class="member" href="../include/G4BinaryLightIonReaction.hh.html#G4BinaryLightIonReaction::tA" title='G4BinaryLightIonReaction::tA' data-ref="G4BinaryLightIonReaction::tA">tA</a>=<a class="member" href="../include/G4BinaryLightIonReaction.hh.html#G4BinaryLightIonReaction::pA" title='G4BinaryLightIonReaction::pA' data-ref="G4BinaryLightIonReaction::pA">pA</a>; <a class="member" href="../include/G4BinaryLightIonReaction.hh.html#G4BinaryLightIonReaction::pA" title='G4BinaryLightIonReaction::pA' data-ref="G4BinaryLightIonReaction::pA">pA</a>=<a class="local col1 ref" href="#31tmp" title='tmp' data-ref="31tmp">tmp</a>;</td></tr>
+<tr><th id="471">471</th><td>      <a class="local col1 ref" href="#31tmp" title='tmp' data-ref="31tmp">tmp</a> = <a class="member" href="../include/G4BinaryLightIonReaction.hh.html#G4BinaryLightIonReaction::tZ" title='G4BinaryLightIonReaction::tZ' data-ref="G4BinaryLightIonReaction::tZ">tZ</a>; <a class="member" href="../include/G4BinaryLightIonReaction.hh.html#G4BinaryLightIonReaction::tZ" title='G4BinaryLightIonReaction::tZ' data-ref="G4BinaryLightIonReaction::tZ">tZ</a>=<a class="member" href="../include/G4BinaryLightIonReaction.hh.html#G4BinaryLightIonReaction::pZ" title='G4BinaryLightIonReaction::pZ' data-ref="G4BinaryLightIonReaction::pZ">pZ</a>; <a class="member" href="../include/G4BinaryLightIonReaction.hh.html#G4BinaryLightIonReaction::pZ" title='G4BinaryLightIonReaction::pZ' data-ref="G4BinaryLightIonReaction::pZ">pZ</a>=<a class="local col1 ref" href="#31tmp" title='tmp' data-ref="31tmp">tmp</a>;</td></tr>
+<tr><th id="472">472</th><td>      <a class="typedef" href="../../../../../global/management/include/G4Types.hh.html#G4double" title='G4double' data-type='double' data-ref="G4double">G4double</a> <dfn class="local col2 decl" id="32m1" title='m1' data-type='G4double' data-ref="32m1">m1</dfn>=<a class="type" href="../../../../../particles/management/include/G4ParticleTable.hh.html#G4ParticleTable" title='G4ParticleTable' data-ref="G4ParticleTable">G4ParticleTable</a>::<a class="ref" href="../../../../../particles/management/include/G4ParticleTable.hh.html#_ZN15G4ParticleTable16GetParticleTableEv" title='G4ParticleTable::GetParticleTable' data-ref="_ZN15G4ParticleTable16GetParticleTableEv">GetParticleTable</a>()-&gt;<a class="ref" href="../../../../../particles/management/include/G4ParticleTable.hh.html#_ZNK15G4ParticleTable11GetIonTableEv" title='G4ParticleTable::GetIonTable' data-ref="_ZNK15G4ParticleTable11GetIonTableEv">GetIonTable</a>()-&gt;<a class="ref" href="../../../../../particles/management/include/G4IonTable.hh.html#_ZNK10G4IonTable10GetIonMassEiiii" title='G4IonTable::GetIonMass' data-ref="_ZNK10G4IonTable10GetIonMassEiiii">GetIonMass</a>(<a class="member" href="../include/G4BinaryLightIonReaction.hh.html#G4BinaryLightIonReaction::pZ" title='G4BinaryLightIonReaction::pZ' data-ref="G4BinaryLightIonReaction::pZ">pZ</a>,<a class="member" href="../include/G4BinaryLightIonReaction.hh.html#G4BinaryLightIonReaction::pA" title='G4BinaryLightIonReaction::pA' data-ref="G4BinaryLightIonReaction::pA">pA</a>);</td></tr>
+<tr><th id="473">473</th><td>      <a class="typedef" href="../../../../../global/HEPGeometry/include/G4LorentzVector.hh.html#G4LorentzVector" title='G4LorentzVector' data-type='CLHEP::HepLorentzVector' data-ref="G4LorentzVector">G4LorentzVector</a> <dfn class="local col3 decl" id="33it" title='it' data-type='G4LorentzVector' data-ref="33it">it</dfn><a class="ref" href="../../../../../externals/clhep/include/CLHEP/Vector/LorentzVector.h.html#_ZN5CLHEP16HepLorentzVectorC1EdRKNS_10Hep3VectorE" title='CLHEP::HepLorentzVector::HepLorentzVector' data-ref="_ZN5CLHEP16HepLorentzVectorC1EdRKNS_10Hep3VectorE">(</a><a class="local col2 ref" href="#32m1" title='m1' data-ref="32m1">m1</a>, <a class="typedef" href="../../../../../global/management/include/G4ThreeVector.hh.html#G4ThreeVector" title='G4ThreeVector' data-type='CLHEP::Hep3Vector' data-ref="G4ThreeVector">G4ThreeVector</a><a class="ref" href="../../../../../externals/clhep/include/CLHEP/Vector/ThreeVector.h.html#_ZN5CLHEP10Hep3VectorC1Eddd" title='CLHEP::Hep3Vector::Hep3Vector' data-ref="_ZN5CLHEP10Hep3VectorC1Eddd">(</a><var>0</var>,<var>0</var>,<var>0</var>));</td></tr>
+<tr><th id="474">474</th><td>      <a class="local col8 ref" href="#28mom" title='mom' data-ref="28mom">mom</a> <a class="ref" href="../../../../../externals/clhep/include/CLHEP/Vector/LorentzVector.h.html#_ZN5CLHEP16HepLorentzVectoraSERKS0_" title='CLHEP::HepLorentzVector::operator=' data-ref="_ZN5CLHEP16HepLorentzVectoraSERKS0_">=</a> <a class="local col9 ref" href="#29toBreit" title='toBreit' data-ref="29toBreit">toBreit</a><a class="ref" href="../../../../../externals/clhep/include/CLHEP/Vector/LorentzRotation.h.html#_ZNK5CLHEP18HepLorentzRotationmlERKNS_16HepLorentzVectorE" title='CLHEP::HepLorentzRotation::operator*' data-ref="_ZNK5CLHEP18HepLorentzRotationmlERKNS_16HepLorentzVectorE">*</a><a class="local col3 ref" href="#33it" title='it' data-ref="33it">it</a>;</td></tr>
+<tr><th id="475">475</th><td>   }</td></tr>
+<tr><th id="476">476</th><td>   <b>return</b> <a class="local col0 ref" href="#30swapped" title='swapped' data-ref="30swapped">swapped</a>;</td></tr>
+<tr><th id="477">477</th><td>}</td></tr>
+<tr><th id="478">478</th><td><span class='error' title="unknown type name &apos;G4ReactionProductVector&apos;">G4ReactionProductVector</span> * G4BinaryLightIonReaction::FuseNucleiAndPrompound(<em>const</em> G4LorentzVector &amp; mom)</td></tr>
+<tr><th id="479">479</th><td>{</td></tr>
+<tr><th id="480">480</th><td>   <i>// Check if kinematically nuclei can fuse.</i></td></tr>
+<tr><th id="481">481</th><td>   G4double mFused=G4ParticleTable::GetParticleTable()-&gt;GetIonTable()-&gt;GetIonMass(pZ+tZ,pA+tA);</td></tr>
+<tr><th id="482">482</th><td>   G4double mTarget=G4ParticleTable::GetParticleTable()-&gt;GetIonTable()-&gt;GetIonMass(tZ,tA);</td></tr>
+<tr><th id="483">483</th><td>   G4LorentzVector pCompound(mom.e()+mTarget,mom.vect());</td></tr>
+<tr><th id="484">484</th><td>   G4double m2Compound=pCompound.m2();</td></tr>
+<tr><th id="485">485</th><td>   <b>if</b> (m2Compound &lt; sqr(mFused) ) {</td></tr>
+<tr><th id="486">486</th><td>	   <i>//G4cout &lt;&lt; "G4BLIC: projectile p, mTarget, mFused, mCompound, delta: " &lt;&lt;mom &lt;&lt;  " " &lt;&lt; mTarget &lt;&lt;  " " &lt;&lt; mFused</i></td></tr>
+<tr><th id="487">487</th><td><i>	   //	   &lt;&lt;  " " &lt;&lt; sqrt(m2Compound)&lt;&lt;  " " &lt;&lt; sqrt(m2Compound) - mFused &lt;&lt; G4endl;</i></td></tr>
+<tr><th id="488">488</th><td>	   <b>return</b> <var>0</var>;</td></tr>
+<tr><th id="489">489</th><td>   }</td></tr>
+<tr><th id="490">490</th><td></td></tr>
+<tr><th id="491">491</th><td>   G4Fragment aPreFrag;</td></tr>
+<tr><th id="492">492</th><td>   aPreFrag.SetZandA_asInt(pZ+tZ, pA+tA);</td></tr>
+<tr><th id="493">493</th><td>   aPreFrag.SetNumberOfParticles(pA);</td></tr>
+<tr><th id="494">494</th><td>   aPreFrag.SetNumberOfCharged(pZ);</td></tr>
+<tr><th id="495">495</th><td>   aPreFrag.SetNumberOfHoles(<var>0</var>);</td></tr>
+<tr><th id="496">496</th><td>   <i>//GF FIXME: whyusing plop in z direction? this will not conserve momentum?</i></td></tr>
+<tr><th id="497">497</th><td><i>   //G4ThreeVector plop(0.,0., mom.vect().mag());</i></td></tr>
+<tr><th id="498">498</th><td><i>   //G4LorentzVector aL(mom.t()+mTarget, plop);</i></td></tr>
+<tr><th id="499">499</th><td>   G4LorentzVector aL(mom.t()+mTarget,mom.vect());</td></tr>
+<tr><th id="500">500</th><td>   aPreFrag.SetMomentum(aL);</td></tr>
+<tr><th id="501">501</th><td></td></tr>
+<tr><th id="502">502</th><td></td></tr>
+<tr><th id="503">503</th><td>         <i>//G4cout &lt;&lt; "Fragment INFO "&lt;&lt; pA+tA &lt;&lt;" "&lt;&lt;pZ+tZ&lt;&lt;" "</i></td></tr>
+<tr><th id="504">504</th><td><i>         //       &lt;&lt; aL &lt;&lt;" "&lt;&lt;G4endl &lt;&lt; aPreFrag &lt;&lt; G4endl;</i></td></tr>
+<tr><th id="505">505</th><td>   <span class='error' title="unknown type name &apos;G4ReactionProductVector&apos;">G4ReactionProductVector</span> * cascaders = theProjectileFragmentation-&gt;DeExcite(aPreFrag);</td></tr>
+<tr><th id="506">506</th><td>   <i>//G4double tSum = 0;</i></td></tr>
+<tr><th id="507">507</th><td>   <b>for</b>(<span class='error' title="unknown type name &apos;size_t&apos;">size_t</span> count = <var>0</var>; count&lt;cascaders-&gt;size(); count++)</td></tr>
+<tr><th id="508">508</th><td>   {</td></tr>
+<tr><th id="509">509</th><td>      cascaders-&gt;<b>operator</b>[](count)-&gt;SetNewlyAdded(<b>true</b>);</td></tr>
+<tr><th id="510">510</th><td>      <i>//tSum += cascaders-&gt;operator[](count)-&gt;GetKineticEnergy();</i></td></tr>
+<tr><th id="511">511</th><td>   }</td></tr>
+<tr><th id="512">512</th><td>   <i>//       G4cout &lt;&lt; "Exiting pre-compound only, E= "&lt;&lt;tSum&lt;&lt;G4endl;</i></td></tr>
+<tr><th id="513">513</th><td>   <b>return</b> cascaders;</td></tr>
+<tr><th id="514">514</th><td>}</td></tr>
+<tr><th id="515">515</th><td><span class='error' title="unknown type name &apos;G4ReactionProductVector&apos;">G4ReactionProductVector</span> * G4BinaryLightIonReaction::Interact(G4LorentzVector &amp; mom, <em>const</em> G4LorentzRotation &amp; toBreit)</td></tr>
+<tr><th id="516">516</th><td>{</td></tr>
+<tr><th id="517">517</th><td>      <span class='error' title="unknown type name &apos;G4ReactionProductVector&apos;">G4ReactionProductVector</span> * result = <var>0</var>;</td></tr>
+<tr><th id="518">518</th><td>      G4double projectileMass(<var>0</var>);</td></tr>
+<tr><th id="519">519</th><td>      G4LorentzVector it;</td></tr>
+<tr><th id="520">520</th><td></td></tr>
+<tr><th id="521">521</th><td>      G4int tryCount(<var>0</var>);</td></tr>
+<tr><th id="522">522</th><td>      <b>do</b></td></tr>
+<tr><th id="523">523</th><td>      {</td></tr>
+<tr><th id="524">524</th><td>         ++tryCount;</td></tr>
+<tr><th id="525">525</th><td>         projectile3dNucleus = <b>new</b> G4Fancy3DNucleus;</td></tr>
+<tr><th id="526">526</th><td>         projectile3dNucleus-&gt;Init(pA, pZ);</td></tr>
+<tr><th id="527">527</th><td>         projectile3dNucleus-&gt;CenterNucleons();</td></tr>
+<tr><th id="528">528</th><td>         projectileMass=G4ParticleTable::GetParticleTable()-&gt;GetIonTable()-&gt;GetIonMass(</td></tr>
+<tr><th id="529">529</th><td>               projectile3dNucleus-&gt;GetCharge(),projectile3dNucleus-&gt;GetMassNumber());</td></tr>
+<tr><th id="530">530</th><td>         it=toBreit * G4LorentzVector(projectileMass,G4ThreeVector(<var>0</var>,<var>0</var>,<var>0</var>));</td></tr>
+<tr><th id="531">531</th><td></td></tr>
+<tr><th id="532">532</th><td>         target3dNucleus = <b>new</b> G4Fancy3DNucleus;</td></tr>
+<tr><th id="533">533</th><td>         target3dNucleus-&gt;Init(tA, tZ);</td></tr>
+<tr><th id="534">534</th><td>         G4double impactMax = target3dNucleus-&gt;GetOuterRadius()+projectile3dNucleus-&gt;GetOuterRadius();</td></tr>
+<tr><th id="535">535</th><td>         <i>//        G4cout &lt;&lt; "out radius - nucleus - projectile " &lt;&lt; target3dNucleus-&gt;GetOuterRadius()/fermi &lt;&lt; " - " &lt;&lt; projectile3dNucleus-&gt;GetOuterRadius()/fermi &lt;&lt; G4endl;</i></td></tr>
+<tr><th id="536">536</th><td>         G4double aX=(<var>2.</var>*<a class="macro" href="../../../../../global/HEPRandom/include/Randomize.hh.html#52" title="CLHEP::HepRandom::getTheEngine()-&gt;flat()" data-ref="_M/G4UniformRand">G4UniformRand</a>()-<var>1.</var>)*impactMax;</td></tr>
+<tr><th id="537">537</th><td>         G4double aY=(<var>2.</var>*<a class="macro" href="../../../../../global/HEPRandom/include/Randomize.hh.html#52" title="CLHEP::HepRandom::getTheEngine()-&gt;flat()" data-ref="_M/G4UniformRand">G4UniformRand</a>()-<var>1.</var>)*impactMax;</td></tr>
+<tr><th id="538">538</th><td>         G4ThreeVector pos(aX, aY, -<var>2.</var>*impactMax-<var>5.</var>*fermi);</td></tr>
+<tr><th id="539">539</th><td></td></tr>
+<tr><th id="540">540</th><td>         G4KineticTrackVector * initalState = <b>new</b> G4KineticTrackVector;</td></tr>
+<tr><th id="541">541</th><td>         projectile3dNucleus-&gt;StartLoop();</td></tr>
+<tr><th id="542">542</th><td>         G4Nucleon * aNuc;</td></tr>
+<tr><th id="543">543</th><td>         G4LorentzVector tmpV(<var>0</var>,<var>0</var>,<var>0</var>,<var>0</var>);</td></tr>
+<tr><th id="544">544</th><td>         <u>#<span data-ppcond="544">ifdef</span> <span class="macro" data-ref="_M/debug_BLIR_finalstate">debug_BLIR_finalstate</span></u></td></tr>
+<tr><th id="545">545</th><td>             G4LorentzVector pinitial;</td></tr>
+<tr><th id="546">546</th><td>         <u>#<span data-ppcond="544">endif</span></u></td></tr>
+<tr><th id="547">547</th><td>         G4LorentzVector nucleonMom(<var>1.</var>/pA*mom);</td></tr>
+<tr><th id="548">548</th><td>         nucleonMom.setZ(nucleonMom.vect().mag());</td></tr>
+<tr><th id="549">549</th><td>         nucleonMom.setX(<var>0</var>);</td></tr>
+<tr><th id="550">550</th><td>         nucleonMom.setY(<var>0</var>);</td></tr>
+<tr><th id="551">551</th><td>         theFermi.Init(pA,pZ);</td></tr>
+<tr><th id="552">552</th><td>         <b>while</b>( (aNuc=projectile3dNucleus-&gt;GetNextNucleon()) )   <i>/* Loop checking, 31.08.2015, G.Folger */</i></td></tr>
+<tr><th id="553">553</th><td>         {</td></tr>
+<tr><th id="554">554</th><td>            G4LorentzVector p4 = aNuc-&gt;GetMomentum();</td></tr>
+<tr><th id="555">555</th><td>            tmpV+=p4;</td></tr>
+<tr><th id="556">556</th><td>            G4ThreeVector nucleonPosition(aNuc-&gt;GetPosition());</td></tr>
+<tr><th id="557">557</th><td>            G4double density=(projectile3dNucleus-&gt;GetNuclearDensity())-&gt;GetDensity(nucleonPosition);</td></tr>
+<tr><th id="558">558</th><td>            nucleonPosition += pos;</td></tr>
+<tr><th id="559">559</th><td>            G4KineticTrack * it1 = <b>new</b> G4KineticTrack(aNuc, nucleonPosition, nucleonMom );</td></tr>
+<tr><th id="560">560</th><td>            it1-&gt;SetState(G4KineticTrack::outside);</td></tr>
+<tr><th id="561">561</th><td>            G4double pfermi= theFermi.GetFermiMomentum(density);</td></tr>
+<tr><th id="562">562</th><td>            G4double mass = aNuc-&gt;GetDefinition()-&gt;GetPDGMass();</td></tr>
+<tr><th id="563">563</th><td>            G4double Efermi= <span class='error' title="use of undeclared identifier &apos;std&apos;">std</span>::sqrt( sqr(mass) + sqr(pfermi)) - mass;</td></tr>
+<tr><th id="564">564</th><td>            it1-&gt;SetProjectilePotential(-Efermi);</td></tr>
+<tr><th id="565">565</th><td>            initalState-&gt;<span class='error' title="no member named &apos;push_back&apos; in &apos;G4KineticTrackVector&apos;">push_back</span>(it1);</td></tr>
+<tr><th id="566">566</th><td>            <u>#<span data-ppcond="566">ifdef</span> <span class="macro" data-ref="_M/debug_BLIR_finalstate">debug_BLIR_finalstate</span></u></td></tr>
+<tr><th id="567">567</th><td>               pinitial += it1-&gt;Get4Momentum();</td></tr>
+<tr><th id="568">568</th><td>            <u>#<span data-ppcond="566">endif</span></u></td></tr>
+<tr><th id="569">569</th><td>         }</td></tr>
+<tr><th id="570">570</th><td></td></tr>
+<tr><th id="571">571</th><td>         result=theModel-&gt;Propagate(initalState, target3dNucleus);</td></tr>
+<tr><th id="572">572</th><td>         <u>#<span data-ppcond="572">ifdef</span> <span class="macro" data-ref="_M/debug_BLIR_finalstate">debug_BLIR_finalstate</span></u></td></tr>
+<tr><th id="573">573</th><td>         <b>if</b>( result &amp;&amp; result-&gt;size()&gt;<var>0</var>)</td></tr>
+<tr><th id="574">574</th><td>         {</td></tr>
+<tr><th id="575">575</th><td>        	 G4LorentzVector presult;</td></tr>
+<tr><th id="576">576</th><td>        	 G4ReactionProductVector::iterator iter;</td></tr>
+<tr><th id="577">577</th><td>        	 G4ReactionProduct xp;</td></tr>
+<tr><th id="578">578</th><td>        	 <b>for</b> (iter=result-&gt;begin(); iter !=result-&gt;end(); ++iter)</td></tr>
+<tr><th id="579">579</th><td>        	 {</td></tr>
+<tr><th id="580">580</th><td>        		presult += G4LorentzVector((*iter)-&gt;GetMomentum(),(*iter)-&gt;GetTotalEnergy());</td></tr>
+<tr><th id="581">581</th><td>        	 }</td></tr>
+<tr><th id="582">582</th><td></td></tr>
+<tr><th id="583">583</th><td>        	      G4cout &lt;&lt; <q>"BLIC check result :  initial "</q> &lt;&lt; pinitial &lt;&lt; <q>" mass tgt "</q> &lt;&lt; target3dNucleus-&gt;GetMass()</td></tr>
+<tr><th id="584">584</th><td>        			 &lt;&lt; <q>" final "</q> &lt;&lt; presult</td></tr>
+<tr><th id="585">585</th><td>        			 &lt;&lt; <q>" IF - FF "</q> &lt;&lt; pinitial +G4LorentzVector(target3dNucleus-&gt;GetMass()) - presult &lt;&lt; G4endl;</td></tr>
+<tr><th id="586">586</th><td></td></tr>
+<tr><th id="587">587</th><td>         }</td></tr>
+<tr><th id="588">588</th><td>         <u>#<span data-ppcond="572">endif</span></u></td></tr>
+<tr><th id="589">589</th><td>         <b>if</b>( result &amp;&amp; result-&gt;size()==<var>0</var>)</td></tr>
+<tr><th id="590">590</th><td>         {</td></tr>
+<tr><th id="591">591</th><td>            <b>delete</b> result;</td></tr>
+<tr><th id="592">592</th><td>            result=<var>0</var>;</td></tr>
+<tr><th id="593">593</th><td>         }</td></tr>
+<tr><th id="594">594</th><td>         <b>if</b> ( ! result )</td></tr>
+<tr><th id="595">595</th><td>         {</td></tr>
+<tr><th id="596">596</th><td>            <b>delete</b> target3dNucleus;</td></tr>
+<tr><th id="597">597</th><td>            <b>delete</b> projectile3dNucleus;</td></tr>
+<tr><th id="598">598</th><td>         }</td></tr>
+<tr><th id="599">599</th><td></td></tr>
+<tr><th id="600">600</th><td>         <i>// std::for_each(initalState-&gt;begin(), initalState-&gt;end(), Delete&lt;G4KineticTrack&gt;());</i></td></tr>
+<tr><th id="601">601</th><td><i>         // delete initalState;</i></td></tr>
+<tr><th id="602">602</th><td></td></tr>
+<tr><th id="603">603</th><td>      } <b>while</b> (! result &amp;&amp; tryCount&lt; <var>150</var>);   <i>/* Loop checking, 31.08.2015, G.Folger */</i></td></tr>
+<tr><th id="604">604</th><td>      <b>return</b> result;</td></tr>
+<tr><th id="605">605</th><td>}</td></tr>
+<tr><th id="606">606</th><td><a class="typedef" href="../../../../../global/management/include/G4Types.hh.html#G4double" title='G4double' data-type='double' data-ref="G4double">G4double</a> <a class="type" href="../include/G4BinaryLightIonReaction.hh.html#G4BinaryLightIonReaction" title='G4BinaryLightIonReaction' data-ref="G4BinaryLightIonReaction">G4BinaryLightIonReaction</a>::<dfn class="decl def" id="_ZN24G4BinaryLightIonReaction23GetProjectileExcitationEv" title='G4BinaryLightIonReaction::GetProjectileExcitation' data-ref="_ZN24G4BinaryLightIonReaction23GetProjectileExcitationEv">GetProjectileExcitation</dfn>()</td></tr>
+<tr><th id="607">607</th><td>{</td></tr>
+<tr><th id="608">608</th><td></td></tr>
+<tr><th id="609">609</th><td>      <a class="type" href="../../util/include/G4Nucleon.hh.html#G4Nucleon" title='G4Nucleon' data-ref="G4Nucleon">G4Nucleon</a> * <dfn class="local col4 decl" id="34aNuc" title='aNuc' data-type='G4Nucleon *' data-ref="34aNuc">aNuc</dfn>;</td></tr>
+<tr><th id="610">610</th><td>      <i>// the projectileNucleus excitation energy estimate...</i></td></tr>
+<tr><th id="611">611</th><td>      <a class="typedef" href="../../../../../global/management/include/G4Types.hh.html#G4double" title='G4double' data-type='double' data-ref="G4double">G4double</a> <dfn class="local col5 decl" id="35theStatisticalExEnergy" title='theStatisticalExEnergy' data-type='G4double' data-ref="35theStatisticalExEnergy">theStatisticalExEnergy</dfn> = <var>0</var>;</td></tr>
+<tr><th id="612">612</th><td>      <a class="member" href="../include/G4BinaryLightIonReaction.hh.html#G4BinaryLightIonReaction::projectile3dNucleus" title='G4BinaryLightIonReaction::projectile3dNucleus' data-ref="G4BinaryLightIonReaction::projectile3dNucleus">projectile3dNucleus</a>-&gt;<a class="virtual ref" href="../../util/include/G4Fancy3DNucleus.hh.html#_ZN16G4Fancy3DNucleus9StartLoopEv" title='G4Fancy3DNucleus::StartLoop' data-ref="_ZN16G4Fancy3DNucleus9StartLoopEv">StartLoop</a>();</td></tr>
+<tr><th id="613">613</th><td>      <b>while</b>( (<a class="local col4 ref" href="#34aNuc" title='aNuc' data-ref="34aNuc">aNuc</a>=<a class="member" href="../include/G4BinaryLightIonReaction.hh.html#G4BinaryLightIonReaction::projectile3dNucleus" title='G4BinaryLightIonReaction::projectile3dNucleus' data-ref="G4BinaryLightIonReaction::projectile3dNucleus">projectile3dNucleus</a>-&gt;<a class="virtual ref" href="../../util/include/G4Fancy3DNucleus.hh.html#_ZN16G4Fancy3DNucleus14GetNextNucleonEv" title='G4Fancy3DNucleus::GetNextNucleon' data-ref="_ZN16G4Fancy3DNucleus14GetNextNucleonEv">GetNextNucleon</a>()) )   <i>/* Loop checking, 31.08.2015, G.Folger */</i></td></tr>
+<tr><th id="614">614</th><td>      {</td></tr>
+<tr><th id="615">615</th><td>                <i>//G4cout &lt;&lt; " Nucleon : " &lt;&lt; aNuc-&gt;GetDefinition()-&gt;GetParticleName() &lt;&lt;" "&lt;&lt; aNuc-&gt;AreYouHit() &lt;&lt;" "&lt;&lt;aNuc-&gt;GetMomentum()&lt;&lt;G4endl;</i></td></tr>
+<tr><th id="616">616</th><td>         <b>if</b>(<a class="local col4 ref" href="#34aNuc" title='aNuc' data-ref="34aNuc">aNuc</a>-&gt;<a class="ref" href="../../util/include/G4Nucleon.hh.html#_ZNK9G4Nucleon9AreYouHitEv" title='G4Nucleon::AreYouHit' data-ref="_ZNK9G4Nucleon9AreYouHitEv">AreYouHit</a>()) {</td></tr>
+<tr><th id="617">617</th><td>            <a class="typedef" href="../../../../../global/management/include/G4ThreeVector.hh.html#G4ThreeVector" title='G4ThreeVector' data-type='CLHEP::Hep3Vector' data-ref="G4ThreeVector">G4ThreeVector</a> <dfn class="local col6 decl" id="36aPosition" title='aPosition' data-type='G4ThreeVector' data-ref="36aPosition">aPosition</dfn><a class="ref" href="../../../../../externals/clhep/include/CLHEP/Vector/ThreeVector.h.html#_ZN5CLHEP10Hep3VectorC1ERKS0_" title='CLHEP::Hep3Vector::Hep3Vector' data-ref="_ZN5CLHEP10Hep3VectorC1ERKS0_">(</a><a class="local col4 ref" href="#34aNuc" title='aNuc' data-ref="34aNuc">aNuc</a>-&gt;<a class="virtual ref" href="../../util/include/G4Nucleon.hh.html#_ZNK9G4Nucleon11GetPositionEv" title='G4Nucleon::GetPosition' data-ref="_ZNK9G4Nucleon11GetPositionEv">GetPosition</a>());</td></tr>
+<tr><th id="618">618</th><td>            <a class="typedef" href="../../../../../global/management/include/G4Types.hh.html#G4double" title='G4double' data-type='double' data-ref="G4double">G4double</a> <dfn class="local col7 decl" id="37localDensity" title='localDensity' data-type='G4double' data-ref="37localDensity">localDensity</dfn> = <a class="member" href="../include/G4BinaryLightIonReaction.hh.html#G4BinaryLightIonReaction::projectile3dNucleus" title='G4BinaryLightIonReaction::projectile3dNucleus' data-ref="G4BinaryLightIonReaction::projectile3dNucleus">projectile3dNucleus</a>-&gt;<a class="virtual ref" href="../../util/include/G4Fancy3DNucleus.hh.html#_ZNK16G4Fancy3DNucleus17GetNuclearDensityEv" title='G4Fancy3DNucleus::GetNuclearDensity' data-ref="_ZNK16G4Fancy3DNucleus17GetNuclearDensityEv">GetNuclearDensity</a>()-&gt;<a class="ref" href="../../management/include/G4VNuclearDensity.hh.html#_ZNK17G4VNuclearDensity10GetDensityERKN5CLHEP10Hep3VectorE" title='G4VNuclearDensity::GetDensity' data-ref="_ZNK17G4VNuclearDensity10GetDensityERKN5CLHEP10Hep3VectorE">GetDensity</a>(<a class="local col6 ref" href="#36aPosition" title='aPosition' data-ref="36aPosition">aPosition</a>);</td></tr>
+<tr><th id="619">619</th><td>            <a class="typedef" href="../../../../../global/management/include/G4Types.hh.html#G4double" title='G4double' data-type='double' data-ref="G4double">G4double</a> <dfn class="local col8 decl" id="38localPfermi" title='localPfermi' data-type='G4double' data-ref="38localPfermi">localPfermi</dfn> = <a class="member" href="../include/G4BinaryLightIonReaction.hh.html#G4BinaryLightIonReaction::theFermi" title='G4BinaryLightIonReaction::theFermi' data-ref="G4BinaryLightIonReaction::theFermi">theFermi</a>.<a class="ref" href="../../util/include/G4FermiMomentum.hh.html#_ZN15G4FermiMomentum16GetFermiMomentumEd" title='G4FermiMomentum::GetFermiMomentum' data-ref="_ZN15G4FermiMomentum16GetFermiMomentumEd">GetFermiMomentum</a>(<a class="local col7 ref" href="#37localDensity" title='localDensity' data-ref="37localDensity">localDensity</a>);</td></tr>
+<tr><th id="620">620</th><td>            <a class="typedef" href="../../../../../global/management/include/G4Types.hh.html#G4double" title='G4double' data-type='double' data-ref="G4double">G4double</a> <dfn class="local col9 decl" id="39nucMass" title='nucMass' data-type='G4double' data-ref="39nucMass">nucMass</dfn> = <a class="local col4 ref" href="#34aNuc" title='aNuc' data-ref="34aNuc">aNuc</a>-&gt;<a class="virtual ref" href="../../util/include/G4Nucleon.hh.html#_ZNK9G4Nucleon13GetDefinitionEv" title='G4Nucleon::GetDefinition' data-ref="_ZNK9G4Nucleon13GetDefinitionEv">GetDefinition</a>()-&gt;<a class="ref" href="../../../../../particles/management/include/G4ParticleDefinition.hh.html#_ZNK20G4ParticleDefinition10GetPDGMassEv" title='G4ParticleDefinition::GetPDGMass' data-ref="_ZNK20G4ParticleDefinition10GetPDGMassEv">GetPDGMass</a>();</td></tr>
+<tr><th id="621">621</th><td>            <a class="typedef" href="../../../../../global/management/include/G4Types.hh.html#G4double" title='G4double' data-type='double' data-ref="G4double">G4double</a> <dfn class="local col0 decl" id="40localFermiEnergy" title='localFermiEnergy' data-type='G4double' data-ref="40localFermiEnergy">localFermiEnergy</dfn> = <span class='error' title="use of undeclared identifier &apos;std&apos;">std</span>::sqrt(nucMass*nucMass + localPfermi*localPfermi) - nucMass;</td></tr>
+<tr><th id="622">622</th><td>            <a class="typedef" href="../../../../../global/management/include/G4Types.hh.html#G4double" title='G4double' data-type='double' data-ref="G4double">G4double</a> <dfn class="local col1 decl" id="41deltaE" title='deltaE' data-type='G4double' data-ref="41deltaE">deltaE</dfn> = <a class="local col0 ref" href="#40localFermiEnergy" title='localFermiEnergy' data-ref="40localFermiEnergy">localFermiEnergy</a> - (<a class="local col4 ref" href="#34aNuc" title='aNuc' data-ref="34aNuc">aNuc</a>-&gt;<a class="ref" href="../../util/include/G4Nucleon.hh.html#_ZNK9G4Nucleon11GetMomentumEv" title='G4Nucleon::GetMomentum' data-ref="_ZNK9G4Nucleon11GetMomentumEv">GetMomentum</a>().<a class="ref" href="../../../../../externals/clhep/include/CLHEP/Vector/LorentzVector.h.html#_ZNK5CLHEP16HepLorentzVector1tEv" title='CLHEP::HepLorentzVector::t' data-ref="_ZNK5CLHEP16HepLorentzVector1tEv">t</a>()-<a class="local col4 ref" href="#34aNuc" title='aNuc' data-ref="34aNuc">aNuc</a>-&gt;<a class="ref" href="../../util/include/G4Nucleon.hh.html#_ZNK9G4Nucleon11GetMomentumEv" title='G4Nucleon::GetMomentum' data-ref="_ZNK9G4Nucleon11GetMomentumEv">GetMomentum</a>().<a class="ref" href="../../../../../externals/clhep/include/CLHEP/Vector/LorentzVector.h.html#_ZNK5CLHEP16HepLorentzVector3magEv" title='CLHEP::HepLorentzVector::mag' data-ref="_ZNK5CLHEP16HepLorentzVector3magEv">mag</a>());</td></tr>
+<tr><th id="623">623</th><td>            <a class="local col5 ref" href="#35theStatisticalExEnergy" title='theStatisticalExEnergy' data-ref="35theStatisticalExEnergy">theStatisticalExEnergy</a> += <a class="local col1 ref" href="#41deltaE" title='deltaE' data-ref="41deltaE">deltaE</a>;</td></tr>
+<tr><th id="624">624</th><td>         }</td></tr>
+<tr><th id="625">625</th><td>      }</td></tr>
+<tr><th id="626">626</th><td>      <b>return</b> <a class="local col5 ref" href="#35theStatisticalExEnergy" title='theStatisticalExEnergy' data-ref="35theStatisticalExEnergy">theStatisticalExEnergy</a>;</td></tr>
+<tr><th id="627">627</th><td>}</td></tr>
+<tr><th id="628">628</th><td></td></tr>
+<tr><th id="629">629</th><td>G4LorentzVector G4BinaryLightIonReaction::SortResult(<span class='error' title="unknown type name &apos;G4ReactionProductVector&apos;">G4ReactionProductVector</span> * result, <span class='error' title="unknown type name &apos;G4ReactionProductVector&apos;">G4ReactionProductVector</span> * spectators,<span class='error' title="unknown type name &apos;G4ReactionProductVector&apos;">G4ReactionProductVector</span> * cascaders)</td></tr>
+<tr><th id="630">630</th><td>{</td></tr>
+<tr><th id="631">631</th><td>   <em>unsigned</em> <em>int</em> i(<var>0</var>);</td></tr>
+<tr><th id="632">632</th><td>   spectatorA=spectatorZ=<var>0</var>;</td></tr>
+<tr><th id="633">633</th><td>   G4LorentzVector pspectators(<var>0</var>,<var>0</var>,<var>0</var>,<var>0</var>);</td></tr>
+<tr><th id="634">634</th><td>   pFinalState=G4LorentzVector(<var>0</var>,<var>0</var>,<var>0</var>,<var>0</var>);</td></tr>
+<tr><th id="635">635</th><td>   <b>for</b>(i=<var>0</var>; i&lt;result-&gt;size(); i++)</td></tr>
+<tr><th id="636">636</th><td>   {</td></tr>
+<tr><th id="637">637</th><td>      <b>if</b>( (*result)[i]-&gt;GetNewlyAdded() )</td></tr>
+<tr><th id="638">638</th><td>      {</td></tr>
+<tr><th id="639">639</th><td>         pFinalState += G4LorentzVector( (*result)[i]-&gt;GetMomentum(), (*result)[i]-&gt;GetTotalEnergy() );</td></tr>
+<tr><th id="640">640</th><td>         cascaders-&gt;push_back((*result)[i]);</td></tr>
+<tr><th id="641">641</th><td>      }</td></tr>
+<tr><th id="642">642</th><td>      <b>else</b> {</td></tr>
+<tr><th id="643">643</th><td>         <i>//          G4cout &lt;&lt;" spectator ... ";</i></td></tr>
+<tr><th id="644">644</th><td>         pspectators += G4LorentzVector( (*result)[i]-&gt;GetMomentum(), (*result)[i]-&gt;GetTotalEnergy() );</td></tr>
+<tr><th id="645">645</th><td>         spectators-&gt;push_back((*result)[i]);</td></tr>
+<tr><th id="646">646</th><td>         spectatorA++;</td></tr>
+<tr><th id="647">647</th><td>         spectatorZ+= G4lrint((*result)[i]-&gt;GetDefinition()-&gt;GetPDGCharge()/eplus);</td></tr>
+<tr><th id="648">648</th><td>      }</td></tr>
+<tr><th id="649">649</th><td></td></tr>
+<tr><th id="650">650</th><td>      <i>//       G4cout &lt;&lt; (*result)[i]&lt;&lt; " "</i></td></tr>
+<tr><th id="651">651</th><td><i>      //        &lt;&lt; (*result)[i]-&gt;GetDefinition()-&gt;GetParticleName() &lt;&lt; " "</i></td></tr>
+<tr><th id="652">652</th><td><i>      //        &lt;&lt; (*result)[i]-&gt;GetMomentum()&lt;&lt; " "</i></td></tr>
+<tr><th id="653">653</th><td><i>      //        &lt;&lt; (*result)[i]-&gt;GetTotalEnergy() &lt;&lt; G4endl;</i></td></tr>
+<tr><th id="654">654</th><td>   }</td></tr>
+<tr><th id="655">655</th><td>      <i>//G4cout &lt;&lt; "pFinalState / pspectators, (A,Z), p " &lt;&lt; pFinalState &lt;&lt; " / " &lt;&lt; spectators-&gt;size()</i></td></tr>
+<tr><th id="656">656</th><td><i>      //		&lt;&lt; " (" &lt;&lt; spectatorA &lt;&lt; ", "&lt;&lt; spectatorZ  &lt;&lt; "), 4-mom: " &lt;&lt; pspectators &lt;&lt; G4endl;</i></td></tr>
+<tr><th id="657">657</th><td></td></tr>
+<tr><th id="658">658</th><td>   <b>return</b> pspectators;</td></tr>
+<tr><th id="659">659</th><td>}</td></tr>
+<tr><th id="660">660</th><td></td></tr>
+<tr><th id="661">661</th><td><em>void</em> G4BinaryLightIonReaction::DeExciteSpectatorNucleus(<span class='error' title="unknown type name &apos;G4ReactionProductVector&apos;">G4ReactionProductVector</span> * spectators, <span class='error' title="unknown type name &apos;G4ReactionProductVector&apos;">G4ReactionProductVector</span> * cascaders,</td></tr>
+<tr><th id="662">662</th><td>                                                 G4double theStatisticalExEnergy, G4LorentzVector &amp; pSpectators)</td></tr>
+<tr><th id="663">663</th><td>{</td></tr>
+<tr><th id="664">664</th><td>   <i>// call precompound model</i></td></tr>
+<tr><th id="665">665</th><td>   <span class='error' title="unknown type name &apos;G4ReactionProductVector&apos;">G4ReactionProductVector</span> * proFrag = <var>0</var>;</td></tr>
+<tr><th id="666">666</th><td>   G4LorentzVector pFragment(<var>0.</var>,<var>0.</var>,<var>0.</var>,<var>0.</var>);</td></tr>
+<tr><th id="667">667</th><td>   <i>//      G4cout &lt;&lt; " == pre boost 1 "&lt;&lt; momentum.e()&lt;&lt; " "&lt;&lt; momentum.mag()&lt;&lt;G4endl;</i></td></tr>
+<tr><th id="668">668</th><td>   G4LorentzRotation boost_fragments;</td></tr>
+<tr><th id="669">669</th><td>   <i>//      G4cout &lt;&lt; " == post boost 1 "&lt;&lt; momentum.e()&lt;&lt; " "&lt;&lt; momentum.mag()&lt;&lt;G4endl;</i></td></tr>
+<tr><th id="670">670</th><td><i>   //    G4LorentzRotation boost_spectator_mom(-momentum.boostVector());</i></td></tr>
+<tr><th id="671">671</th><td><i>   //     G4cout &lt;&lt; "- momentum " &lt;&lt; boost_spectator_mom * momentum &lt;&lt; G4endl;</i></td></tr>
+<tr><th id="672">672</th><td>   G4LorentzVector pFragments(<var>0</var>,<var>0</var>,<var>0</var>,<var>0</var>);</td></tr>
+<tr><th id="673">673</th><td></td></tr>
+<tr><th id="674">674</th><td>   <b>if</b>(spectatorZ&gt;<var>0</var> &amp;&amp; spectatorA&gt;<var>1</var>)</td></tr>
+<tr><th id="675">675</th><td>   {</td></tr>
+<tr><th id="676">676</th><td>      <i>//  Make the fragment</i></td></tr>
+<tr><th id="677">677</th><td>      G4Fragment aProRes;</td></tr>
+<tr><th id="678">678</th><td>      aProRes.SetZandA_asInt(spectatorZ, spectatorA);</td></tr>
+<tr><th id="679">679</th><td>      aProRes.SetNumberOfParticles(<var>0</var>);</td></tr>
+<tr><th id="680">680</th><td>      aProRes.SetNumberOfCharged(<var>0</var>);</td></tr>
+<tr><th id="681">681</th><td>      aProRes.SetNumberOfHoles(pA-spectatorA);</td></tr>
+<tr><th id="682">682</th><td>      G4double mFragment=G4ParticleTable::GetParticleTable()-&gt;GetIonTable()-&gt;GetIonMass(spectatorZ,spectatorA);</td></tr>
+<tr><th id="683">683</th><td>      pFragment=G4LorentzVector(<var>0</var>,<var>0</var>,<var>0</var>,mFragment+<span class='error' title="use of undeclared identifier &apos;std&apos;">std</span>::max(<var>0.</var>,theStatisticalExEnergy) );</td></tr>
+<tr><th id="684">684</th><td>      aProRes.SetMomentum(pFragment);</td></tr>
+<tr><th id="685">685</th><td></td></tr>
+<tr><th id="686">686</th><td>      proFrag = theHandler-&gt;BreakItUp(aProRes);</td></tr>
+<tr><th id="687">687</th><td></td></tr>
+<tr><th id="688">688</th><td>      boost_fragments = G4LorentzRotation(pSpectators.boostVector());</td></tr>
+<tr><th id="689">689</th><td></td></tr>
+<tr><th id="690">690</th><td>      <i>//     G4cout &lt;&lt; " Fragment a,z, Mass Fragment, mass spect-mom, exitationE "</i></td></tr>
+<tr><th id="691">691</th><td><i>      //       &lt;&lt; spectatorA &lt;&lt;" "&lt;&lt; spectatorZ &lt;&lt;" "&lt;&lt; mFragment &lt;&lt;" "</i></td></tr>
+<tr><th id="692">692</th><td><i>      //       &lt;&lt; momentum.mag() &lt;&lt;" "&lt;&lt; momentum.mag() - mFragment</i></td></tr>
+<tr><th id="693">693</th><td><i>      //       &lt;&lt; " "&lt;&lt;theStatisticalExEnergy</i></td></tr>
+<tr><th id="694">694</th><td><i>      //       &lt;&lt; " "&lt;&lt; boost_fragments*pFragment&lt;&lt; G4endl;</i></td></tr>
+<tr><th id="695">695</th><td>      <span class='error' title="use of undeclared identifier &apos;G4ReactionProductVector&apos;">G4ReactionProductVector</span>::iterator ispectator;</td></tr>
+<tr><th id="696">696</th><td>      <b>for</b> (ispectator=spectators-&gt;begin();ispectator!=spectators-&gt;end();ispectator++)</td></tr>
+<tr><th id="697">697</th><td>      {</td></tr>
+<tr><th id="698">698</th><td>         <b>delete</b> *ispectator;</td></tr>
+<tr><th id="699">699</th><td>      }</td></tr>
+<tr><th id="700">700</th><td>   }</td></tr>
+<tr><th id="701">701</th><td>   <b>else</b> <b>if</b>(spectatorA!=<var>0</var>)</td></tr>
+<tr><th id="702">702</th><td>   {</td></tr>
+<tr><th id="703">703</th><td>     <span class='error' title="use of undeclared identifier &apos;G4ReactionProductVector&apos;">G4ReactionProductVector</span>::iterator ispectator;</td></tr>
+<tr><th id="704">704</th><td>     <b>for</b> (ispectator=spectators-&gt;begin();ispectator!=spectators-&gt;end();ispectator++)</td></tr>
+<tr><th id="705">705</th><td>      {</td></tr>
+<tr><th id="706">706</th><td>         (*ispectator)-&gt;SetNewlyAdded(<b>true</b>);</td></tr>
+<tr><th id="707">707</th><td>         cascaders-&gt;push_back(*ispectator);</td></tr>
+<tr><th id="708">708</th><td>         pFinalState+=G4LorentzVector((*ispectator)-&gt;GetMomentum(),(*ispectator)-&gt;GetTotalEnergy());</td></tr>
+<tr><th id="709">709</th><td>                  <i>//G4cout &lt;&lt; "BLIC: spectatorA&gt;0, Z=0 from spectator "</i></td></tr>
+<tr><th id="710">710</th><td><i>                  // &lt;&lt; (*ispectator)-&gt;GetDefinition()-&gt;GetParticleName() &lt;&lt; " "</i></td></tr>
+<tr><th id="711">711</th><td><i>                  // &lt;&lt; (*ispectator)-&gt;GetMomentum()&lt;&lt; " "</i></td></tr>
+<tr><th id="712">712</th><td><i>                  // &lt;&lt; (*ispectator)-&gt;GetTotalEnergy() &lt;&lt; G4endl;</i></td></tr>
+<tr><th id="713">713</th><td>      }</td></tr>
+<tr><th id="714">714</th><td></td></tr>
+<tr><th id="715">715</th><td>   }</td></tr>
+<tr><th id="716">716</th><td>   <i>// / if (spectators)</i></td></tr>
+<tr><th id="717">717</th><td>   <b>delete</b> spectators;</td></tr>
+<tr><th id="718">718</th><td></td></tr>
+<tr><th id="719">719</th><td>   <i>// collect the evaporation part and boost to spectator frame</i></td></tr>
+<tr><th id="720">720</th><td>   <span class='error' title="use of undeclared identifier &apos;G4ReactionProductVector&apos;">G4ReactionProductVector</span>::iterator ii;</td></tr>
+<tr><th id="721">721</th><td>   <b>if</b>(proFrag)</td></tr>
+<tr><th id="722">722</th><td>   {</td></tr>
+<tr><th id="723">723</th><td>      <b>for</b>(ii=proFrag-&gt;begin(); ii!=proFrag-&gt;end(); ii++)</td></tr>
+<tr><th id="724">724</th><td>      {</td></tr>
+<tr><th id="725">725</th><td>         (*ii)-&gt;SetNewlyAdded(<b>true</b>);</td></tr>
+<tr><th id="726">726</th><td>         G4LorentzVector tmp((*ii)-&gt;GetMomentum(),(*ii)-&gt;GetTotalEnergy());</td></tr>
+<tr><th id="727">727</th><td>         tmp *= boost_fragments;</td></tr>
+<tr><th id="728">728</th><td>         (*ii)-&gt;SetMomentum(tmp.vect());</td></tr>
+<tr><th id="729">729</th><td>         (*ii)-&gt;SetTotalEnergy(tmp.e());</td></tr>
+<tr><th id="730">730</th><td>         <i>//      result-&gt;push_back(*ii);</i></td></tr>
+<tr><th id="731">731</th><td>         pFragments += tmp;</td></tr>
+<tr><th id="732">732</th><td>      }</td></tr>
+<tr><th id="733">733</th><td>   }</td></tr>
+<tr><th id="734">734</th><td></td></tr>
+<tr><th id="735">735</th><td>   <i>//    G4cout &lt;&lt; "Fragmented p, momentum, delta " &lt;&lt; pFragments &lt;&lt;" "&lt;&lt;momentum</i></td></tr>
+<tr><th id="736">736</th><td><i>   //            &lt;&lt;" "&lt;&lt; pFragments-momentum &lt;&lt; G4endl;</i></td></tr>
+<tr><th id="737">737</th><td><i></i></td></tr>
+<tr><th id="738">738</th><td><i>   //  correct p/E of Cascade secondaries</i></td></tr>
+<tr><th id="739">739</th><td>   G4LorentzVector pCas=pInitialState - pFragments;</td></tr>
+<tr><th id="740">740</th><td></td></tr>
+<tr><th id="741">741</th><td>       <i>//G4cout &lt;&lt;"BLIC: Going to correct from " &lt;&lt; pFinalState &lt;&lt; " to " &lt;&lt; pCas &lt;&lt; G4endl;</i></td></tr>
+<tr><th id="742">742</th><td><i>   //  the creation of excited fragment did violate E/p, so correct cascaders to get overall conservation.</i></td></tr>
+<tr><th id="743">743</th><td>   G4bool EnergyIsCorrect=EnergyAndMomentumCorrector(cascaders, pCas);</td></tr>
+<tr><th id="744">744</th><td>   <b>if</b> ( ! EnergyIsCorrect &amp;&amp; debug_G4BinaryLightIonReactionResults)</td></tr>
+<tr><th id="745">745</th><td>   {</td></tr>
+<tr><th id="746">746</th><td>      <a class="macro" href="../../../../../global/management/include/G4ios.hh.html#46" title="(*_G4cout_p())" data-ref="_M/G4cout">G4cout</a> <span class='error' title="invalid operands to binary expression (&apos;int&apos; and &apos;const char *&apos;)">&lt;&lt;</span> <q>"G4BinaryLightIonReaction E/P correction for nucleus failed, will try to correct overall"</q> &lt;&lt; <a class="macro" href="../../../../../global/management/include/G4ios.hh.html#60" title="std::endl" data-ref="_M/G4endl">G4endl</a>;</td></tr>
+<tr><th id="747">747</th><td>   }</td></tr>
+<tr><th id="748">748</th><td></td></tr>
+<tr><th id="749">749</th><td>   <i>//  Add deexcitation secondaries</i></td></tr>
+<tr><th id="750">750</th><td>   <b>if</b>(proFrag)</td></tr>
+<tr><th id="751">751</th><td>   {</td></tr>
+<tr><th id="752">752</th><td>      <b>for</b>(ii=proFrag-&gt;begin(); ii!=proFrag-&gt;end(); ii++)</td></tr>
+<tr><th id="753">753</th><td>      {</td></tr>
+<tr><th id="754">754</th><td>         cascaders-&gt;push_back(*ii);</td></tr>
+<tr><th id="755">755</th><td>      }</td></tr>
+<tr><th id="756">756</th><td>      <b>delete</b> proFrag;</td></tr>
+<tr><th id="757">757</th><td>   }</td></tr>
+<tr><th id="758">758</th><td>      <i>//G4cout &lt;&lt; "EnergyIsCorrect? " &lt;&lt; EnergyIsCorrect &lt;&lt; G4endl;</i></td></tr>
+<tr><th id="759">759</th><td>   <b>if</b> ( ! EnergyIsCorrect )</td></tr>
+<tr><th id="760">760</th><td>   {</td></tr>
+<tr><th id="761">761</th><td>         <i>// G4cout &lt;&lt;" ! EnergyIsCorrect " &lt;&lt; pFinalState &lt;&lt; " to " &lt;&lt; pInitialState &lt;&lt; G4endl;</i></td></tr>
+<tr><th id="762">762</th><td>      <b>if</b> (! EnergyAndMomentumCorrector(cascaders,pInitialState))</td></tr>
+<tr><th id="763">763</th><td>      {</td></tr>
+<tr><th id="764">764</th><td>         <b>if</b>(debug_G4BinaryLightIonReactionResults)</td></tr>
+<tr><th id="765">765</th><td>            <a class="macro" href="../../../../../global/management/include/G4ios.hh.html#46" title="(*_G4cout_p())" data-ref="_M/G4cout">G4cout</a> <span class='error' title="invalid operands to binary expression (&apos;int&apos; and &apos;const char *&apos;)">&lt;&lt;</span> <q>"G4BinaryLightIonReaction E/P corrections failed"</q> &lt;&lt; <a class="macro" href="../../../../../global/management/include/G4ios.hh.html#60" title="std::endl" data-ref="_M/G4endl">G4endl</a>;</td></tr>
+<tr><th id="766">766</th><td>      }</td></tr>
+<tr><th id="767">767</th><td>   }</td></tr>
+<tr><th id="768">768</th><td></td></tr>
+<tr><th id="769">769</th><td>}</td></tr>
+<tr><th id="770">770</th><td></td></tr>
+<tr><th id="771">771</th><td></td></tr>
+</table><hr/><p id='footer'>
+Generated on <em>2019-Aug-28</em> from project codebrowser<br />Powered by <a href='https://woboq.com'><img alt='Woboq' src='https://code.woboq.org/woboq-16.png' width='41' height='16' /></a> <a href='https://code.woboq.org'>Code Browser</a> 2.1
+<br/>Generator usage only permitted with license.</p>
+</div></body></html>

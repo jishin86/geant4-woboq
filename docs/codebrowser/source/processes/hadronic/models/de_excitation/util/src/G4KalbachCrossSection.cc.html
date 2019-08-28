@@ -1,0 +1,204 @@
+<!doctype html>
+<html>
+<head>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"><title>G4KalbachCrossSection.cc source code [codebrowser/source/processes/hadronic/models/de_excitation/util/src/G4KalbachCrossSection.cc] - Woboq Code Browser</title>
+<link rel="stylesheet" href="../../../../../../../../../data/qtcreator.css" title="QtCreator"/>
+<link rel="alternate stylesheet" href="../../../../../../../../../data/kdevelop.css" title="KDevelop"/>
+<script type="text/javascript" src="../../../../../../../../../data/jquery/jquery.min.js"></script>
+<script type="text/javascript" src="../../../../../../../../../data/jquery/jquery-ui.min.js"></script>
+<script>var file = 'codebrowser/source/processes/hadronic/models/de_excitation/util/src/G4KalbachCrossSection.cc'; var root_path = '../../../../../../../..'; var data_path = '../../../../../../../../../data';</script>
+<script src='../../../../../../../../../data/codebrowser.js'></script>
+</head>
+<body><div id='header'><h1 id='breadcrumb'><span>Browse the source code of </span><a href='../../../../../../..'>codebrowser</a>/<a href='../../../../../..'>source</a>/<a href='../../../../..'>processes</a>/<a href='../../../..'>hadronic</a>/<a href='../../..'>models</a>/<a href='../..'>de_excitation</a>/<a href='..'>util</a>/<a href='./'>src</a>/<a href='G4KalbachCrossSection.cc.html'>G4KalbachCrossSection.cc</a></h1></div>
+<hr/><div id='content'><table class="code">
+<tr><th id="1">1</th><td><i>//</i></td></tr>
+<tr><th id="2">2</th><td><i>// ********************************************************************</i></td></tr>
+<tr><th id="3">3</th><td><i>// * License and Disclaimer                                           *</i></td></tr>
+<tr><th id="4">4</th><td><i>// *                                                                  *</i></td></tr>
+<tr><th id="5">5</th><td><i>// * The  Geant4 software  is  copyright of the Copyright Holders  of *</i></td></tr>
+<tr><th id="6">6</th><td><i>// * the Geant4 Collaboration.  It is provided  under  the terms  and *</i></td></tr>
+<tr><th id="7">7</th><td><i>// * conditions of the Geant4 Software License,  included in the file *</i></td></tr>
+<tr><th id="8">8</th><td><i>// * LICENSE and available at  <a href="http://cern.ch/geant4/license">http://cern.ch/geant4/license</a> .  These *</i></td></tr>
+<tr><th id="9">9</th><td><i>// * include a list of copyright holders.                             *</i></td></tr>
+<tr><th id="10">10</th><td><i>// *                                                                  *</i></td></tr>
+<tr><th id="11">11</th><td><i>// * Neither the authors of this software system, nor their employing *</i></td></tr>
+<tr><th id="12">12</th><td><i>// * institutes,nor the agencies providing financial support for this *</i></td></tr>
+<tr><th id="13">13</th><td><i>// * work  make  any representation or  warranty, express or implied, *</i></td></tr>
+<tr><th id="14">14</th><td><i>// * regarding  this  software system or assume any liability for its *</i></td></tr>
+<tr><th id="15">15</th><td><i>// * use.  Please see the license in the file  LICENSE  and URL above *</i></td></tr>
+<tr><th id="16">16</th><td><i>// * for the full disclaimer and the limitation of liability.         *</i></td></tr>
+<tr><th id="17">17</th><td><i>// *                                                                  *</i></td></tr>
+<tr><th id="18">18</th><td><i>// * This  code  implementation is the result of  the  scientific and *</i></td></tr>
+<tr><th id="19">19</th><td><i>// * technical work of the GEANT4 collaboration.                      *</i></td></tr>
+<tr><th id="20">20</th><td><i>// * By using,  copying,  modifying or  distributing the software (or *</i></td></tr>
+<tr><th id="21">21</th><td><i>// * any work based  on the software)  you  agree  to acknowledge its *</i></td></tr>
+<tr><th id="22">22</th><td><i>// * use  in  resulting  scientific  publications,  and indicate your *</i></td></tr>
+<tr><th id="23">23</th><td><i>// * acceptance of all terms of the Geant4 Software license.          *</i></td></tr>
+<tr><th id="24">24</th><td><i>// ********************************************************************</i></td></tr>
+<tr><th id="25">25</th><td><i>//</i></td></tr>
+<tr><th id="26">26</th><td><i>//</i></td></tr>
+<tr><th id="27">27</th><td><i>//</i></td></tr>
+<tr><th id="28">28</th><td><i>// V.Ivanchenko 26.02.2018</i></td></tr>
+<tr><th id="29">29</th><td><i>// </i></td></tr>
+<tr><th id="30">30</th><td></td></tr>
+<tr><th id="31">31</th><td><u>#include <a href="../include/G4KalbachCrossSection.hh.html">"G4KalbachCrossSection.hh"</a></u></td></tr>
+<tr><th id="32">32</th><td><u>#include <a href="../../../../../../global/management/include/G4Exp.hh.html">"G4Exp.hh"</a></u></td></tr>
+<tr><th id="33">33</th><td><u>#include <a href="../../../../../../global/management/include/G4Pow.hh.html">"G4Pow.hh"</a></u></td></tr>
+<tr><th id="34">34</th><td></td></tr>
+<tr><th id="35">35</th><td><i  data-doc="paramK">//from subroutine sigpar of PRECO-2000  by Constance Kalbach Walker</i></td></tr>
+<tr><th id="36">36</th><td><i  data-doc="paramK">//     Calculate optical model reaction cross sections</i></td></tr>
+<tr><th id="37">37</th><td><i  data-doc="paramK">//     using the empirical parameterization</i></td></tr>
+<tr><th id="38">38</th><td><i  data-doc="paramK">//     of Narasimha Murthy, Chaterjee, and Gupta</i></td></tr>
+<tr><th id="39">39</th><td><i  data-doc="paramK">//     going over to the geometrical limit at high energy.</i></td></tr>
+<tr><th id="40">40</th><td><i  data-doc="paramK">//</i></td></tr>
+<tr><th id="41">41</th><td><i  data-doc="paramK">//           Proton cross sections scaled down with signor for a&lt;100</i></td></tr>
+<tr><th id="42">42</th><td><i  data-doc="paramK">//           (appropriate for becchetti-greenlees potential).</i></td></tr>
+<tr><th id="43">43</th><td><i  data-doc="paramK">//           p2 reduced and global red'n factor introduced below Bc</i></td></tr>
+<tr><th id="44">44</th><td><i  data-doc="paramK">//           Neutron cross sections scaled down with signor for a&lt;40</i></td></tr>
+<tr><th id="45">45</th><td><i  data-doc="paramK">//           Scaled up for A&gt;210 (added June '98 to conform with</i></td></tr>
+<tr><th id="46">46</th><td><i  data-doc="paramK">//           my published papers)</i></td></tr>
+<tr><th id="47">47</th><td><i  data-doc="paramK">//           (appropriate for Mani et al potential)</i></td></tr>
+<tr><th id="48">48</th><td><i  data-doc="paramK">//</i></td></tr>
+<tr><th id="49">49</th><td><i  data-doc="paramK"></i></td></tr>
+<tr><th id="50">50</th><td><i  data-doc="paramK">// index: 0-neutron, 1-proton, 2-deuteron, 3-triton, 4-He3, 5-He4</i></td></tr>
+<tr><th id="51">51</th><td><i  data-doc="paramK">// parameters: p0, p1, p2, lambda0, lambda1, mu0, mu1, nu0, nu1, nu2, ra</i></td></tr>
+<tr><th id="52">52</th><td></td></tr>
+<tr><th id="53">53</th><td><em>static</em> <em>const</em> <a class="typedef" href="../../../../../../global/management/include/G4Types.hh.html#G4double" title='G4double' data-type='double' data-ref="G4double">G4double</a> <dfn class="tu decl def" id="paramK" title='paramK' data-type='const G4double [6][11]' data-ref="paramK">paramK</dfn>[<var>6</var>][<var>11</var>] = {</td></tr>
+<tr><th id="54">54</th><td>  <i>// n from mani, melkanoff and iori</i></td></tr>
+<tr><th id="55">55</th><td>  {-<var>312.</var>, <var>0.</var>,      <var>0.</var>,  <var>12.10</var>,  -<var>11.27</var>, <var>234.1</var>, <var>38.26</var>, <var>1.55</var>,  -<var>106.1</var>, <var>1280.8</var>, <var>0.0</var>},</td></tr>
+<tr><th id="56">56</th><td>  <i>// p from  becchetti and greenlees (but modified with sub-barrier</i></td></tr>
+<tr><th id="57">57</th><td><i>  // correction function and p2 changed from -449)</i></td></tr>
+<tr><th id="58">58</th><td>  {<var>15.72</var>, <var>9.65</var>, -<var>300.</var>,  <var>0.00437</var>,-<var>16.58</var>, <var>244.7</var>, <var>0.503</var>, <var>273.1</var>, -<var>182.4</var>, -<var>1.872</var>, <var>0.0</var>},</td></tr>
+<tr><th id="59">59</th><td>  <i>// d from o.m. of perey and perey</i></td></tr>
+<tr><th id="60">60</th><td>  {<var>0.798</var>, <var>420.3</var>,-<var>1651.</var>, <var>0.00619</var>, -<var>7.54</var>, <var>583.5</var>, <var>0.337</var>, <var>421.8</var>, -<var>474.5</var>, -<var>3.592</var>, <var>0.8</var>},</td></tr>
+<tr><th id="61">61</th><td>  <i>// t from o.m. of hafele, flynn et al</i></td></tr>
+<tr><th id="62">62</th><td>  {-<var>21.45</var>,<var>484.7</var>,-<var>1608.</var>, <var>0.0186</var>, -<var>8.9</var>,   <var>686.3</var>, <var>0.325</var>, <var>368.9</var>, -<var>522.2</var>, -<var>4.998</var>, <var>0.8</var>},</td></tr>
+<tr><th id="63">63</th><td>  <i>// 3he from o.m. of gibson et al</i></td></tr>
+<tr><th id="64">64</th><td>  {-<var>2.88</var>,<var>205.6</var>, -<var>1487.</var>,<var>0.00459</var>,-<var>8.93</var>,   <var>611.2</var>, <var>0.35</var> , <var>473.8</var>, -<var>468.2</var>, -<var>2.225</var>, <var>0.8</var>},</td></tr>
+<tr><th id="65">65</th><td>  <i>// alpha from huizenga and igo </i></td></tr>
+<tr><th id="66">66</th><td>  { <var>10.95</var>,-<var>85.2</var>, <var>1146.</var>,  <var>0.0643</var>,-<var>13.96</var>, <var>781.2</var>,  <var>0.29</var>, -<var>304.7</var>,-<var>470.0</var>, -<var>8.580</var>, <var>1.2</var>}</td></tr>
+<tr><th id="67">67</th><td>};</td></tr>
+<tr><th id="68">68</th><td></td></tr>
+<tr><th id="69">69</th><td><a class="typedef" href="../../../../../../global/management/include/G4Types.hh.html#G4double" title='G4double' data-type='double' data-ref="G4double">G4double</a> <a class="type" href="../include/G4KalbachCrossSection.hh.html#G4KalbachCrossSection" title='G4KalbachCrossSection' data-ref="G4KalbachCrossSection">G4KalbachCrossSection</a>::<dfn class="decl def" id="_ZN21G4KalbachCrossSection21ComputePowerParameterEii" title='G4KalbachCrossSection::ComputePowerParameter' data-ref="_ZN21G4KalbachCrossSection21ComputePowerParameterEii">ComputePowerParameter</dfn>(<a class="typedef" href="../../../../../../global/management/include/G4Types.hh.html#G4int" title='G4int' data-type='int' data-ref="G4int">G4int</a> <dfn class="local col1 decl" id="1resA" title='resA' data-type='G4int' data-ref="1resA">resA</dfn>, <a class="typedef" href="../../../../../../global/management/include/G4Types.hh.html#G4int" title='G4int' data-type='int' data-ref="G4int">G4int</a> <dfn class="local col2 decl" id="2idx" title='idx' data-type='G4int' data-ref="2idx">idx</dfn>)</td></tr>
+<tr><th id="70">70</th><td>{</td></tr>
+<tr><th id="71">71</th><td>  <b>return</b> <a class="type" href="../../../../../../global/management/include/G4Pow.hh.html#G4Pow" title='G4Pow' data-ref="G4Pow">G4Pow</a>::<a class="ref" href="../../../../../../global/management/include/G4Pow.hh.html#_ZN5G4Pow11GetInstanceEv" title='G4Pow::GetInstance' data-ref="_ZN5G4Pow11GetInstanceEv">GetInstance</a>()-&gt;<a class="ref" href="../../../../../../global/management/include/G4Pow.hh.html#_ZNK5G4Pow4powZEid" title='G4Pow::powZ' data-ref="_ZNK5G4Pow4powZEid">powZ</a>(<a class="local col1 ref" href="#1resA" title='resA' data-ref="1resA">resA</a>, <a class="tu ref" href="#paramK" title='paramK' data-use='r' data-ref="paramK">paramK</a>[<a class="local col2 ref" href="#2idx" title='idx' data-ref="2idx">idx</a>][<var>6</var>]);</td></tr>
+<tr><th id="72">72</th><td>}</td></tr>
+<tr><th id="73">73</th><td></td></tr>
+<tr><th id="74">74</th><td><a class="typedef" href="../../../../../../global/management/include/G4Types.hh.html#G4double" title='G4double' data-type='double' data-ref="G4double">G4double</a> </td></tr>
+<tr><th id="75">75</th><td><a class="type" href="../include/G4KalbachCrossSection.hh.html#G4KalbachCrossSection" title='G4KalbachCrossSection' data-ref="G4KalbachCrossSection">G4KalbachCrossSection</a>::<dfn class="decl def" id="_ZN21G4KalbachCrossSection19ComputeCrossSectionEddddiiii" title='G4KalbachCrossSection::ComputeCrossSection' data-ref="_ZN21G4KalbachCrossSection19ComputeCrossSectionEddddiiii">ComputeCrossSection</dfn>(<a class="typedef" href="../../../../../../global/management/include/G4Types.hh.html#G4double" title='G4double' data-type='double' data-ref="G4double">G4double</a> <dfn class="local col3 decl" id="3K" title='K' data-type='G4double' data-ref="3K">K</dfn>, <a class="typedef" href="../../../../../../global/management/include/G4Types.hh.html#G4double" title='G4double' data-type='double' data-ref="G4double">G4double</a> <dfn class="local col4 decl" id="4cb" title='cb' data-type='G4double' data-ref="4cb">cb</dfn>,  </td></tr>
+<tr><th id="76">76</th><td>				           <a class="typedef" href="../../../../../../global/management/include/G4Types.hh.html#G4double" title='G4double' data-type='double' data-ref="G4double">G4double</a> <dfn class="local col5 decl" id="5resA13" title='resA13' data-type='G4double' data-ref="5resA13">resA13</dfn>, <a class="typedef" href="../../../../../../global/management/include/G4Types.hh.html#G4double" title='G4double' data-type='double' data-ref="G4double">G4double</a> <dfn class="local col6 decl" id="6amu1" title='amu1' data-type='G4double' data-ref="6amu1">amu1</dfn>, </td></tr>
+<tr><th id="77">77</th><td>				           <a class="typedef" href="../../../../../../global/management/include/G4Types.hh.html#G4int" title='G4int' data-type='int' data-ref="G4int">G4int</a> <dfn class="local col7 decl" id="7idx" title='idx' data-type='G4int' data-ref="7idx">idx</dfn>, <a class="typedef" href="../../../../../../global/management/include/G4Types.hh.html#G4int" title='G4int' data-type='int' data-ref="G4int">G4int</a> <dfn class="local col8 decl" id="8Z" title='Z' data-type='G4int' data-ref="8Z">Z</dfn>, <a class="typedef" href="../../../../../../global/management/include/G4Types.hh.html#G4int" title='G4int' data-type='int' data-ref="G4int">G4int</a> <dfn class="local col9 decl" id="9A" title='A' data-type='G4int' data-ref="9A">A</dfn>, </td></tr>
+<tr><th id="78">78</th><td>				           <a class="typedef" href="../../../../../../global/management/include/G4Types.hh.html#G4int" title='G4int' data-type='int' data-ref="G4int">G4int</a> <dfn class="local col0 decl" id="10resA" title='resA' data-type='G4int' data-ref="10resA">resA</dfn>)</td></tr>
+<tr><th id="79">79</th><td>{</td></tr>
+<tr><th id="80">80</th><td>  <a class="typedef" href="../../../../../../global/management/include/G4Types.hh.html#G4double" title='G4double' data-type='double' data-ref="G4double">G4double</a> <dfn class="local col1 decl" id="11sig" title='sig' data-type='G4double' data-ref="11sig">sig</dfn> = <var>0.0</var>;</td></tr>
+<tr><th id="81">81</th><td>  <a class="typedef" href="../../../../../../global/management/include/G4Types.hh.html#G4double" title='G4double' data-type='double' data-ref="G4double">G4double</a> <dfn class="local col2 decl" id="12signor" title='signor' data-type='G4double' data-ref="12signor">signor</dfn> = <var>1.0</var>; </td></tr>
+<tr><th id="82">82</th><td>  <a class="typedef" href="../../../../../../global/management/include/G4Types.hh.html#G4double" title='G4double' data-type='double' data-ref="G4double">G4double</a> <dfn class="local col3 decl" id="13lambda" title='lambda' data-type='G4double' data-ref="13lambda">lambda</dfn>, <dfn class="local col4 decl" id="14mu" title='mu' data-type='G4double' data-ref="14mu">mu</dfn>, <dfn class="local col5 decl" id="15nu" title='nu' data-type='G4double' data-ref="15nu">nu</dfn>;</td></tr>
+<tr><th id="83">83</th><td>  <a class="typedef" href="../../../../../../global/management/include/G4Types.hh.html#G4double" title='G4double' data-type='double' data-ref="G4double">G4double</a> <dfn class="local col6 decl" id="16ec" title='ec' data-type='G4double' data-ref="16ec">ec</dfn> = <var>0.5</var>;</td></tr>
+<tr><th id="84">84</th><td>  <b>if</b>(<var>0</var> &lt; <a class="local col8 ref" href="#8Z" title='Z' data-ref="8Z">Z</a>) { <a class="local col6 ref" href="#16ec" title='ec' data-ref="16ec">ec</a> = <a class="local col4 ref" href="#4cb" title='cb' data-ref="4cb">cb</a>; }</td></tr>
+<tr><th id="85">85</th><td>  <i>//JMQ 13.02.2009 tuning for improving cluster emission ddxs </i></td></tr>
+<tr><th id="86">86</th><td><i>  //               (spallation benchmark) </i></td></tr>
+<tr><th id="87">87</th><td>  <i>/*</i></td></tr>
+<tr><th id="88">88</th><td><i>    G4double xx = 1.7;</i></td></tr>
+<tr><th id="89">89</th><td><i>    if(1 == A) { xx = 1.5; }</i></td></tr>
+<tr><th id="90">90</th><td><i>    ec = 1.44 * Z * resZ / (xx*resA13 + paramK[idx][10]);</i></td></tr>
+<tr><th id="91">91</th><td><i>    }</i></td></tr>
+<tr><th id="92">92</th><td><i>  */</i></td></tr>
+<tr><th id="93">93</th><td>  <a class="typedef" href="../../../../../../global/management/include/G4Types.hh.html#G4double" title='G4double' data-type='double' data-ref="G4double">G4double</a> <dfn class="local col7 decl" id="17ecsq" title='ecsq' data-type='G4double' data-ref="17ecsq">ecsq</dfn> = <a class="local col6 ref" href="#16ec" title='ec' data-ref="16ec">ec</a>*<a class="local col6 ref" href="#16ec" title='ec' data-ref="16ec">ec</a>;</td></tr>
+<tr><th id="94">94</th><td>  <a class="typedef" href="../../../../../../global/management/include/G4Types.hh.html#G4double" title='G4double' data-type='double' data-ref="G4double">G4double</a> <dfn class="local col8 decl" id="18elab" title='elab' data-type='G4double' data-ref="18elab">elab</dfn> = <a class="local col3 ref" href="#3K" title='K' data-ref="3K">K</a> * (<a class="local col9 ref" href="#9A" title='A' data-ref="9A">A</a> + <a class="local col0 ref" href="#10resA" title='resA' data-ref="10resA">resA</a>) / <a class="typedef" href="../../../../../../global/management/include/G4Types.hh.html#G4double" title='G4double' data-type='double' data-ref="G4double">G4double</a>(<a class="local col0 ref" href="#10resA" title='resA' data-ref="10resA">resA</a>);    </td></tr>
+<tr><th id="95">95</th><td>    </td></tr>
+<tr><th id="96">96</th><td>  <b>if</b>(<a class="local col7 ref" href="#7idx" title='idx' data-ref="7idx">idx</a> == <var>0</var>) { <i>// parameterization for neutron</i></td></tr>
+<tr><th id="97">97</th><td></td></tr>
+<tr><th id="98">98</th><td>    <b>if</b>(<a class="local col0 ref" href="#10resA" title='resA' data-ref="10resA">resA</a> &lt; <var>40</var>)       { <a class="local col2 ref" href="#12signor" title='signor' data-ref="12signor">signor</a> =<var>0.7</var> + <a class="local col0 ref" href="#10resA" title='resA' data-ref="10resA">resA</a>*<var>0.0075</var>; }</td></tr>
+<tr><th id="99">99</th><td>    <b>else</b> <b>if</b>(<a class="local col0 ref" href="#10resA" title='resA' data-ref="10resA">resA</a> &gt; <var>210</var>) { <a class="local col2 ref" href="#12signor" title='signor' data-ref="12signor">signor</a> = <var>1.</var> + (<a class="local col0 ref" href="#10resA" title='resA' data-ref="10resA">resA</a>-<var>210</var>)*<var>0.004</var>; }</td></tr>
+<tr><th id="100">100</th><td>    <a class="local col3 ref" href="#13lambda" title='lambda' data-ref="13lambda">lambda</a> = <a class="tu ref" href="#paramK" title='paramK' data-use='r' data-ref="paramK">paramK</a>[<a class="local col7 ref" href="#7idx" title='idx' data-ref="7idx">idx</a>][<var>3</var>]/<a class="local col5 ref" href="#5resA13" title='resA13' data-ref="5resA13">resA13</a> + <a class="tu ref" href="#paramK" title='paramK' data-use='r' data-ref="paramK">paramK</a>[<a class="local col7 ref" href="#7idx" title='idx' data-ref="7idx">idx</a>][<var>4</var>];</td></tr>
+<tr><th id="101">101</th><td>    <a class="local col4 ref" href="#14mu" title='mu' data-ref="14mu">mu</a> = (<a class="tu ref" href="#paramK" title='paramK' data-use='r' data-ref="paramK">paramK</a>[<a class="local col7 ref" href="#7idx" title='idx' data-ref="7idx">idx</a>][<var>5</var>] + <a class="tu ref" href="#paramK" title='paramK' data-use='r' data-ref="paramK">paramK</a>[<a class="local col7 ref" href="#7idx" title='idx' data-ref="7idx">idx</a>][<var>6</var>]*<a class="local col5 ref" href="#5resA13" title='resA13' data-ref="5resA13">resA13</a>)*<a class="local col5 ref" href="#5resA13" title='resA13' data-ref="5resA13">resA13</a>;</td></tr>
+<tr><th id="102">102</th><td>    <i>// JMQ 20.11.2008 very low energy behaviour corrected </i></td></tr>
+<tr><th id="103">103</th><td><i>    //                (problem for A (apprx.)&gt;60) fix for avoiding  </i></td></tr>
+<tr><th id="104">104</th><td><i>    //                neutron xs going to zero at very low energies</i></td></tr>
+<tr><th id="105">105</th><td>    nu = <span class='error' title="use of undeclared identifier &apos;std&apos;">std</span>::abs((paramK[idx][<var>7</var>]*resA + paramK[idx][<var>8</var>]*resA13)*resA13 </td></tr>
+<tr><th id="106">106</th><td>		  + paramK[idx][<var>9</var>]);</td></tr>
+<tr><th id="107">107</th><td></td></tr>
+<tr><th id="108">108</th><td>  } <b>else</b> { <i>// parameterization for charged </i></td></tr>
+<tr><th id="109">109</th><td>    <i>// proton correction</i></td></tr>
+<tr><th id="110">110</th><td>    <b>if</b>(<a class="local col7 ref" href="#7idx" title='idx' data-ref="7idx">idx</a> == <var>1</var>) {</td></tr>
+<tr><th id="111">111</th><td>      <b>if</b> (<a class="local col0 ref" href="#10resA" title='resA' data-ref="10resA">resA</a> &lt;= <var>60</var>)      { <a class="local col2 ref" href="#12signor" title='signor' data-ref="12signor">signor</a> = <var>0.92</var>; }</td></tr>
+<tr><th id="112">112</th><td>      <b>else</b> <b>if</b> (<a class="local col0 ref" href="#10resA" title='resA' data-ref="10resA">resA</a> &lt; <var>100</var>) { <a class="local col2 ref" href="#12signor" title='signor' data-ref="12signor">signor</a> = <var>0.8</var> + <a class="local col0 ref" href="#10resA" title='resA' data-ref="10resA">resA</a>*<var>0.002</var>; }</td></tr>
+<tr><th id="113">113</th><td>    }</td></tr>
+<tr><th id="114">114</th><td>    <a class="local col3 ref" href="#13lambda" title='lambda' data-ref="13lambda">lambda</a> = <a class="tu ref" href="#paramK" title='paramK' data-use='r' data-ref="paramK">paramK</a>[<a class="local col7 ref" href="#7idx" title='idx' data-ref="7idx">idx</a>][<var>3</var>]*<a class="local col0 ref" href="#10resA" title='resA' data-ref="10resA">resA</a> + <a class="tu ref" href="#paramK" title='paramK' data-use='r' data-ref="paramK">paramK</a>[<a class="local col7 ref" href="#7idx" title='idx' data-ref="7idx">idx</a>][<var>4</var>];</td></tr>
+<tr><th id="115">115</th><td>    <a class="local col4 ref" href="#14mu" title='mu' data-ref="14mu">mu</a> = <a class="tu ref" href="#paramK" title='paramK' data-use='r' data-ref="paramK">paramK</a>[<a class="local col7 ref" href="#7idx" title='idx' data-ref="7idx">idx</a>][<var>5</var>]*<a class="local col6 ref" href="#6amu1" title='amu1' data-ref="6amu1">amu1</a>;</td></tr>
+<tr><th id="116">116</th><td>    <a class="local col5 ref" href="#15nu" title='nu' data-ref="15nu">nu</a> = <a class="local col6 ref" href="#6amu1" title='amu1' data-ref="6amu1">amu1</a>* (<a class="tu ref" href="#paramK" title='paramK' data-use='r' data-ref="paramK">paramK</a>[<a class="local col7 ref" href="#7idx" title='idx' data-ref="7idx">idx</a>][<var>7</var>] + <a class="tu ref" href="#paramK" title='paramK' data-use='r' data-ref="paramK">paramK</a>[<a class="local col7 ref" href="#7idx" title='idx' data-ref="7idx">idx</a>][<var>8</var>]*<a class="local col6 ref" href="#16ec" title='ec' data-ref="16ec">ec</a> + <a class="tu ref" href="#paramK" title='paramK' data-use='r' data-ref="paramK">paramK</a>[<a class="local col7 ref" href="#7idx" title='idx' data-ref="7idx">idx</a>][<var>9</var>]*<a class="local col7 ref" href="#17ecsq" title='ecsq' data-ref="17ecsq">ecsq</a>);</td></tr>
+<tr><th id="117">117</th><td>  }</td></tr>
+<tr><th id="118">118</th><td>  <i>/*</i></td></tr>
+<tr><th id="119">119</th><td><i>    G4cout &lt;&lt; "## idx= " &lt;&lt; idx &lt;&lt; " K= " &lt;&lt; K &lt;&lt; " elab= " &lt;&lt; elab &lt;&lt; "  ec= " &lt;&lt; ec </i></td></tr>
+<tr><th id="120">120</th><td><i>    &lt;&lt; " lambda= " &lt;&lt; lambda &lt;&lt; " mu= " &lt;&lt; mu &lt;&lt; "  nu= " &lt;&lt; nu &lt;&lt; G4endl; </i></td></tr>
+<tr><th id="121">121</th><td><i>  */</i></td></tr>
+<tr><th id="122">122</th><td><i>  // threashold cross section</i></td></tr>
+<tr><th id="123">123</th><td>  <b>if</b>(<a class="local col8 ref" href="#18elab" title='elab' data-ref="18elab">elab</a> &lt; <a class="local col6 ref" href="#16ec" title='ec' data-ref="16ec">ec</a>) {</td></tr>
+<tr><th id="124">124</th><td>    <a class="typedef" href="../../../../../../global/management/include/G4Types.hh.html#G4double" title='G4double' data-type='double' data-ref="G4double">G4double</a> <dfn class="local col9 decl" id="19p" title='p' data-type='G4double' data-ref="19p">p</dfn> = <a class="tu ref" href="#paramK" title='paramK' data-use='r' data-ref="paramK">paramK</a>[<a class="local col7 ref" href="#7idx" title='idx' data-ref="7idx">idx</a>][<var>0</var>];</td></tr>
+<tr><th id="125">125</th><td>    <b>if</b>(<var>0</var> &lt; <a class="local col8 ref" href="#8Z" title='Z' data-ref="8Z">Z</a>) { <a class="local col9 ref" href="#19p" title='p' data-ref="19p">p</a> += <a class="tu ref" href="#paramK" title='paramK' data-use='r' data-ref="paramK">paramK</a>[<a class="local col7 ref" href="#7idx" title='idx' data-ref="7idx">idx</a>][<var>1</var>]/<a class="local col6 ref" href="#16ec" title='ec' data-ref="16ec">ec</a> + <a class="tu ref" href="#paramK" title='paramK' data-use='r' data-ref="paramK">paramK</a>[<a class="local col7 ref" href="#7idx" title='idx' data-ref="7idx">idx</a>][<var>2</var>]/<a class="local col7 ref" href="#17ecsq" title='ecsq' data-ref="17ecsq">ecsq</a>; }</td></tr>
+<tr><th id="126">126</th><td>    <a class="typedef" href="../../../../../../global/management/include/G4Types.hh.html#G4double" title='G4double' data-type='double' data-ref="G4double">G4double</a> <dfn class="local col0 decl" id="20a" title='a' data-type='G4double' data-ref="20a">a</dfn> = -<var>2</var>*<a class="local col9 ref" href="#19p" title='p' data-ref="19p">p</a>*<a class="local col6 ref" href="#16ec" title='ec' data-ref="16ec">ec</a> + <a class="local col3 ref" href="#13lambda" title='lambda' data-ref="13lambda">lambda</a> - <a class="local col5 ref" href="#15nu" title='nu' data-ref="15nu">nu</a>/<a class="local col7 ref" href="#17ecsq" title='ecsq' data-ref="17ecsq">ecsq</a>;</td></tr>
+<tr><th id="127">127</th><td>    <a class="typedef" href="../../../../../../global/management/include/G4Types.hh.html#G4double" title='G4double' data-type='double' data-ref="G4double">G4double</a> <dfn class="local col1 decl" id="21b" title='b' data-type='G4double' data-ref="21b">b</dfn> = <a class="local col9 ref" href="#19p" title='p' data-ref="19p">p</a>*<a class="local col7 ref" href="#17ecsq" title='ecsq' data-ref="17ecsq">ecsq</a> + <a class="local col4 ref" href="#14mu" title='mu' data-ref="14mu">mu</a> + <var>2</var>*<a class="local col5 ref" href="#15nu" title='nu' data-ref="15nu">nu</a>/<a class="local col6 ref" href="#16ec" title='ec' data-ref="16ec">ec</a>;</td></tr>
+<tr><th id="128">128</th><td>    <a class="typedef" href="../../../../../../global/management/include/G4Types.hh.html#G4double" title='G4double' data-type='double' data-ref="G4double">G4double</a> <dfn class="local col2 decl" id="22ecut" title='ecut' data-type='G4double' data-ref="22ecut">ecut</dfn>;</td></tr>
+<tr><th id="129">129</th><td>    <a class="typedef" href="../../../../../../global/management/include/G4Types.hh.html#G4double" title='G4double' data-type='double' data-ref="G4double">G4double</a> <dfn class="local col3 decl" id="23det" title='det' data-type='G4double' data-ref="23det">det</dfn> = <a class="local col0 ref" href="#20a" title='a' data-ref="20a">a</a>*<a class="local col0 ref" href="#20a" title='a' data-ref="20a">a</a> - <var>4</var>*<a class="local col9 ref" href="#19p" title='p' data-ref="19p">p</a>*<a class="local col1 ref" href="#21b" title='b' data-ref="21b">b</a>;</td></tr>
+<tr><th id="130">130</th><td>    <b>if</b> (<a class="local col3 ref" href="#23det" title='det' data-ref="23det">det</a> &gt; <var>0.0</var>) { ecut = (<span class='error' title="use of undeclared identifier &apos;std&apos;">std</span>::sqrt(det) - a)/(<var>2</var>*p); }</td></tr>
+<tr><th id="131">131</th><td>    <b>else</b>           { <a class="local col2 ref" href="#22ecut" title='ecut' data-ref="22ecut">ecut</a> = -<a class="local col0 ref" href="#20a" title='a' data-ref="20a">a</a>/(<var>2</var>*<a class="local col9 ref" href="#19p" title='p' data-ref="19p">p</a>); }</td></tr>
+<tr><th id="132">132</th><td></td></tr>
+<tr><th id="133">133</th><td>    <i>//G4cout &lt;&lt; "  elab= " &lt;&lt; elab &lt;&lt; " ecut= " &lt;&lt; ecut &lt;&lt; " sig= " &lt;&lt; sig</i></td></tr>
+<tr><th id="134">134</th><td><i>    //	     &lt;&lt; "  sig1= " &lt;&lt; (p*elab*elab + a*elab + b)*signor &lt;&lt; G4endl;</i></td></tr>
+<tr><th id="135">135</th><td><i>    // If ecut&gt;0, sig=0 at elab=ecut</i></td></tr>
+<tr><th id="136">136</th><td>    <b>if</b>(<var>0</var> == <a class="local col7 ref" href="#7idx" title='idx' data-ref="7idx">idx</a>) {</td></tr>
+<tr><th id="137">137</th><td>      sig = (lambda*ec + mu + nu/ec)*signor*<span class='error' title="use of undeclared identifier &apos;std&apos;">std</span>::sqrt(elab/ec);</td></tr>
+<tr><th id="138">138</th><td>    } <b>else</b> <b>if</b>(<a class="local col8 ref" href="#18elab" title='elab' data-ref="18elab">elab</a> &gt;= <a class="local col2 ref" href="#22ecut" title='ecut' data-ref="22ecut">ecut</a>) { </td></tr>
+<tr><th id="139">139</th><td>      <a class="local col1 ref" href="#11sig" title='sig' data-ref="11sig">sig</a> = (<a class="local col9 ref" href="#19p" title='p' data-ref="19p">p</a>*<a class="local col8 ref" href="#18elab" title='elab' data-ref="18elab">elab</a>*<a class="local col8 ref" href="#18elab" title='elab' data-ref="18elab">elab</a> + <a class="local col0 ref" href="#20a" title='a' data-ref="20a">a</a>*<a class="local col8 ref" href="#18elab" title='elab' data-ref="18elab">elab</a> + <a class="local col1 ref" href="#21b" title='b' data-ref="21b">b</a>)*<a class="local col2 ref" href="#12signor" title='signor' data-ref="12signor">signor</a>; </td></tr>
+<tr><th id="140">140</th><td></td></tr>
+<tr><th id="141">141</th><td>      <i>// extra proton correction</i></td></tr>
+<tr><th id="142">142</th><td>      <b>if</b>(<var>1</var> == <a class="local col7 ref" href="#7idx" title='idx' data-ref="7idx">idx</a>) {</td></tr>
+<tr><th id="143">143</th><td>	<i>// c and w are for global correction factor for </i></td></tr>
+<tr><th id="144">144</th><td><i>	// they are scaled down for light targets where ec is low.</i></td></tr>
+<tr><th id="145">145</th><td>	<a class="typedef" href="../../../../../../global/management/include/G4Types.hh.html#G4double" title='G4double' data-type='double' data-ref="G4double">G4double</a> <dfn class="local col4 decl" id="24cc" title='cc' data-type='G4double' data-ref="24cc">cc</dfn> = <span class='error' title="use of undeclared identifier &apos;std&apos;">std</span>::min(<var>3.15</var>, ec*<var>0.5</var>);</td></tr>
+<tr><th id="146">146</th><td>	<a class="typedef" href="../../../../../../global/management/include/G4Types.hh.html#G4double" title='G4double' data-type='double' data-ref="G4double">G4double</a> <dfn class="local col5 decl" id="25signor2" title='signor2' data-type='G4double' data-ref="25signor2">signor2</dfn> = (<a class="local col6 ref" href="#16ec" title='ec' data-ref="16ec">ec</a> - <a class="local col8 ref" href="#18elab" title='elab' data-ref="18elab">elab</a> - <a class="local col4 ref" href="#24cc" title='cc' data-ref="24cc">cc</a>) *<var>3.15</var>/ (<var>0.7</var>*<a class="local col4 ref" href="#24cc" title='cc' data-ref="24cc">cc</a>);</td></tr>
+<tr><th id="147">147</th><td>	<a class="local col1 ref" href="#11sig" title='sig' data-ref="11sig">sig</a> /= (<var>1.</var> + <a class="ref" href="../../../../../../global/management/include/G4Exp.hh.html#_Z5G4Expd" title='G4Exp' data-ref="_Z5G4Expd">G4Exp</a>(<a class="local col5 ref" href="#25signor2" title='signor2' data-ref="25signor2">signor2</a>));</td></tr>
+<tr><th id="148">148</th><td>      }</td></tr>
+<tr><th id="149">149</th><td>    }</td></tr>
+<tr><th id="150">150</th><td>    <i>//G4cout &lt;&lt; "       ecut= " &lt;&lt; ecut &lt;&lt; " a= " &lt;&lt; a &lt;&lt; "  b= " &lt;&lt; b </i></td></tr>
+<tr><th id="151">151</th><td><i>    //     &lt;&lt;  " signor= " &lt;&lt; signor &lt;&lt; " sig= " &lt;&lt; sig &lt;&lt; G4endl;  </i></td></tr>
+<tr><th id="152">152</th><td><i></i></td></tr>
+<tr><th id="153">153</th><td><i>    // high energy cross section</i></td></tr>
+<tr><th id="154">154</th><td>  } <b>else</b> {</td></tr>
+<tr><th id="155">155</th><td>    <i>// etest is the energy above which the rxn cross section is</i></td></tr>
+<tr><th id="156">156</th><td><i>    // compared with the geometrical limit and the max taken.</i></td></tr>
+<tr><th id="157">157</th><td><i></i></td></tr>
+<tr><th id="158">158</th><td><i>    // neutron parameters</i></td></tr>
+<tr><th id="159">159</th><td>    <a class="typedef" href="../../../../../../global/management/include/G4Types.hh.html#G4double" title='G4double' data-type='double' data-ref="G4double">G4double</a> <dfn class="local col6 decl" id="26etest" title='etest' data-type='G4double' data-ref="26etest">etest</dfn>  = <var>32.</var>;</td></tr>
+<tr><th id="160">160</th><td>    <a class="typedef" href="../../../../../../global/management/include/G4Types.hh.html#G4double" title='G4double' data-type='double' data-ref="G4double">G4double</a> <dfn class="local col7 decl" id="27xnulam" title='xnulam' data-type='G4double' data-ref="27xnulam">xnulam</dfn> = <var>1.0</var>;</td></tr>
+<tr><th id="161">161</th><td></td></tr>
+<tr><th id="162">162</th><td>    <i>// parameters for charged</i></td></tr>
+<tr><th id="163">163</th><td>    <em>static</em> <em>const</em> <a class="typedef" href="../../../../../../global/management/include/G4Types.hh.html#G4double" title='G4double' data-type='double' data-ref="G4double">G4double</a> <dfn class="local col8 decl" id="28flow" title='flow' data-type='const G4double' data-ref="28flow">flow</dfn> = <var>1.e-18</var>;</td></tr>
+<tr><th id="164">164</th><td>    <em>static</em> <em>const</em> <a class="typedef" href="../../../../../../global/management/include/G4Types.hh.html#G4double" title='G4double' data-type='double' data-ref="G4double">G4double</a> <dfn class="local col9 decl" id="29spill" title='spill' data-type='const G4double' data-ref="29spill">spill</dfn>= <var>1.e+18</var>;</td></tr>
+<tr><th id="165">165</th><td>    <b>if</b>(<var>0</var> &lt; <a class="local col8 ref" href="#8Z" title='Z' data-ref="8Z">Z</a>) {</td></tr>
+<tr><th id="166">166</th><td>      <a class="local col6 ref" href="#26etest" title='etest' data-ref="26etest">etest</a> = <var>0.0</var>;</td></tr>
+<tr><th id="167">167</th><td>      <a class="local col7 ref" href="#27xnulam" title='xnulam' data-ref="27xnulam">xnulam</a> = <a class="local col5 ref" href="#15nu" title='nu' data-ref="15nu">nu</a> / <a class="local col3 ref" href="#13lambda" title='lambda' data-ref="13lambda">lambda</a>;</td></tr>
+<tr><th id="168">168</th><td>      xnulam = <span class='error' title="use of undeclared identifier &apos;std&apos;">std</span>::min(xnulam, spill); </td></tr>
+<tr><th id="169">169</th><td>      <b>if</b> (<a class="local col7 ref" href="#27xnulam" title='xnulam' data-ref="27xnulam">xnulam</a> &gt;= <a class="local col8 ref" href="#28flow" title='flow' data-ref="28flow">flow</a>) { </td></tr>
+<tr><th id="170">170</th><td>	<b>if</b>(<var>1</var> == <a class="local col7 ref" href="#7idx" title='idx' data-ref="7idx">idx</a>) { etest = <span class='error' title="use of undeclared identifier &apos;std&apos;">std</span>::sqrt(xnulam) + <var>7.</var>; }</td></tr>
+<tr><th id="171">171</th><td>	<b>else</b>         { etest = <var>1.2</var> *<span class='error' title="use of undeclared identifier &apos;std&apos;">std</span>::sqrt(xnulam); }</td></tr>
+<tr><th id="172">172</th><td>      }</td></tr>
+<tr><th id="173">173</th><td>    }</td></tr>
+<tr><th id="174">174</th><td>    <i>// ** For xnulam.gt.0, sig reaches a maximum at sqrt(xnulam).</i></td></tr>
+<tr><th id="175">175</th><td>    <a class="local col1 ref" href="#11sig" title='sig' data-ref="11sig">sig</a> = (<a class="local col3 ref" href="#13lambda" title='lambda' data-ref="13lambda">lambda</a>*<a class="local col8 ref" href="#18elab" title='elab' data-ref="18elab">elab</a> + <a class="local col4 ref" href="#14mu" title='mu' data-ref="14mu">mu</a> + <a class="local col5 ref" href="#15nu" title='nu' data-ref="15nu">nu</a>/<a class="local col8 ref" href="#18elab" title='elab' data-ref="18elab">elab</a>)*<a class="local col2 ref" href="#12signor" title='signor' data-ref="12signor">signor</a>;</td></tr>
+<tr><th id="176">176</th><td>    <b>if</b> (<a class="local col7 ref" href="#27xnulam" title='xnulam' data-ref="27xnulam">xnulam</a> &gt;= <a class="local col8 ref" href="#28flow" title='flow' data-ref="28flow">flow</a> &amp;&amp; <a class="local col8 ref" href="#18elab" title='elab' data-ref="18elab">elab</a> &gt;= <a class="local col6 ref" href="#26etest" title='etest' data-ref="26etest">etest</a>) {</td></tr>
+<tr><th id="177">177</th><td>      <a class="typedef" href="../../../../../../global/management/include/G4Types.hh.html#G4double" title='G4double' data-type='double' data-ref="G4double">G4double</a> <dfn class="local col0 decl" id="30geom" title='geom' data-type='G4double' data-ref="30geom">geom</dfn> = <span class='error' title="use of undeclared identifier &apos;std&apos;">std</span>::sqrt(A*K);</td></tr>
+<tr><th id="178">178</th><td>      <a class="local col0 ref" href="#30geom" title='geom' data-ref="30geom">geom</a> = <var>1.23</var>*<a class="local col5 ref" href="#5resA13" title='resA13' data-ref="5resA13">resA13</a> + <a class="tu ref" href="#paramK" title='paramK' data-use='r' data-ref="paramK">paramK</a>[<a class="local col7 ref" href="#7idx" title='idx' data-ref="7idx">idx</a>][<var>10</var>] + <var>4.573</var>/<a class="local col0 ref" href="#30geom" title='geom' data-ref="30geom">geom</a>;</td></tr>
+<tr><th id="179">179</th><td>      <a class="local col0 ref" href="#30geom" title='geom' data-ref="30geom">geom</a> = <var>31.416</var> * <a class="local col0 ref" href="#30geom" title='geom' data-ref="30geom">geom</a> * <a class="local col0 ref" href="#30geom" title='geom' data-ref="30geom">geom</a>;</td></tr>
+<tr><th id="180">180</th><td>      sig = <span class='error' title="use of undeclared identifier &apos;std&apos;">std</span>::max(sig, geom);</td></tr>
+<tr><th id="181">181</th><td>    }</td></tr>
+<tr><th id="182">182</th><td>  }</td></tr>
+<tr><th id="183">183</th><td>  sig = <span class='error' title="use of undeclared identifier &apos;std&apos;">std</span>::max(sig, <var>0.0</var>);</td></tr>
+<tr><th id="184">184</th><td>  <i>//G4cout &lt;&lt; "  ---- sig= " &lt;&lt; sig &lt;&lt; G4endl;</i></td></tr>
+<tr><th id="185">185</th><td>  <b>return</b> <a class="local col1 ref" href="#11sig" title='sig' data-ref="11sig">sig</a>;</td></tr>
+<tr><th id="186">186</th><td>}</td></tr>
+<tr><th id="187">187</th><td></td></tr>
+</table><hr/><p id='footer'>
+Generated on <em>2019-Aug-28</em> from project codebrowser<br />Powered by <a href='https://woboq.com'><img alt='Woboq' src='https://code.woboq.org/woboq-16.png' width='41' height='16' /></a> <a href='https://code.woboq.org'>Code Browser</a> 2.1
+<br/>Generator usage only permitted with license.</p>
+</div></body></html>

@@ -1,0 +1,765 @@
+<!doctype html>
+<html>
+<head>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"><title>G4VCrossSectionHandler.cc source code [codebrowser/source/processes/electromagnetic/lowenergy/src/G4VCrossSectionHandler.cc] - Woboq Code Browser</title>
+<link rel="stylesheet" href="../../../../../../../data/qtcreator.css" title="QtCreator"/>
+<link rel="alternate stylesheet" href="../../../../../../../data/kdevelop.css" title="KDevelop"/>
+<script type="text/javascript" src="../../../../../../../data/jquery/jquery.min.js"></script>
+<script type="text/javascript" src="../../../../../../../data/jquery/jquery-ui.min.js"></script>
+<script>var file = 'codebrowser/source/processes/electromagnetic/lowenergy/src/G4VCrossSectionHandler.cc'; var root_path = '../../../../../..'; var data_path = '../../../../../../../data';</script>
+<script src='../../../../../../../data/codebrowser.js'></script>
+</head>
+<body><div id='header'><h1 id='breadcrumb'><span>Browse the source code of </span><a href='../../../../..'>codebrowser</a>/<a href='../../../..'>source</a>/<a href='../../..'>processes</a>/<a href='../..'>electromagnetic</a>/<a href='..'>lowenergy</a>/<a href='./'>src</a>/<a href='G4VCrossSectionHandler.cc.html'>G4VCrossSectionHandler.cc</a></h1></div>
+<hr/><div id='content'><table class="code">
+<tr><th id="1">1</th><td><i>//</i></td></tr>
+<tr><th id="2">2</th><td><i>// ********************************************************************</i></td></tr>
+<tr><th id="3">3</th><td><i>// * License and Disclaimer                                           *</i></td></tr>
+<tr><th id="4">4</th><td><i>// *                                                                  *</i></td></tr>
+<tr><th id="5">5</th><td><i>// * The  Geant4 software  is  copyright of the Copyright Holders  of *</i></td></tr>
+<tr><th id="6">6</th><td><i>// * the Geant4 Collaboration.  It is provided  under  the terms  and *</i></td></tr>
+<tr><th id="7">7</th><td><i>// * conditions of the Geant4 Software License,  included in the file *</i></td></tr>
+<tr><th id="8">8</th><td><i>// * LICENSE and available at  <a href="http://cern.ch/geant4/license">http://cern.ch/geant4/license</a> .  These *</i></td></tr>
+<tr><th id="9">9</th><td><i>// * include a list of copyright holders.                             *</i></td></tr>
+<tr><th id="10">10</th><td><i>// *                                                                  *</i></td></tr>
+<tr><th id="11">11</th><td><i>// * Neither the authors of this software system, nor their employing *</i></td></tr>
+<tr><th id="12">12</th><td><i>// * institutes,nor the agencies providing financial support for this *</i></td></tr>
+<tr><th id="13">13</th><td><i>// * work  make  any representation or  warranty, express or implied, *</i></td></tr>
+<tr><th id="14">14</th><td><i>// * regarding  this  software system or assume any liability for its *</i></td></tr>
+<tr><th id="15">15</th><td><i>// * use.  Please see the license in the file  LICENSE  and URL above *</i></td></tr>
+<tr><th id="16">16</th><td><i>// * for the full disclaimer and the limitation of liability.         *</i></td></tr>
+<tr><th id="17">17</th><td><i>// *                                                                  *</i></td></tr>
+<tr><th id="18">18</th><td><i>// * This  code  implementation is the result of  the  scientific and *</i></td></tr>
+<tr><th id="19">19</th><td><i>// * technical work of the GEANT4 collaboration.                      *</i></td></tr>
+<tr><th id="20">20</th><td><i>// * By using,  copying,  modifying or  distributing the software (or *</i></td></tr>
+<tr><th id="21">21</th><td><i>// * any work based  on the software)  you  agree  to acknowledge its *</i></td></tr>
+<tr><th id="22">22</th><td><i>// * use  in  resulting  scientific  publications,  and indicate your *</i></td></tr>
+<tr><th id="23">23</th><td><i>// * acceptance of all terms of the Geant4 Software license.          *</i></td></tr>
+<tr><th id="24">24</th><td><i>// ********************************************************************</i></td></tr>
+<tr><th id="25">25</th><td><i>//</i></td></tr>
+<tr><th id="26">26</th><td><i>//</i></td></tr>
+<tr><th id="27">27</th><td><i>//</i></td></tr>
+<tr><th id="28">28</th><td><i>// Author: Maria Grazia Pia (Maria.Grazia.Pia@cern.ch)</i></td></tr>
+<tr><th id="29">29</th><td><i>//</i></td></tr>
+<tr><th id="30">30</th><td><i>// History:</i></td></tr>
+<tr><th id="31">31</th><td><i>// -----------</i></td></tr>
+<tr><th id="32">32</th><td><i>// 1  Aug 2001   MGP        Created</i></td></tr>
+<tr><th id="33">33</th><td><i>// 09 Oct 2001   VI         Add FindValue with 3 parameters </i></td></tr>
+<tr><th id="34">34</th><td><i>//                          + NumberOfComponents</i></td></tr>
+<tr><th id="35">35</th><td><i>// 19 Jul 2002   VI         Create composite data set for material</i></td></tr>
+<tr><th id="36">36</th><td><i>// 21 Jan 2003   VI         Cut per region</i></td></tr>
+<tr><th id="37">37</th><td><i>//</i></td></tr>
+<tr><th id="38">38</th><td><i>// 15 Jul 2009   Nicolas A. Karakatsanis</i></td></tr>
+<tr><th id="39">39</th><td><i>//</i></td></tr>
+<tr><th id="40">40</th><td><i>//                           - LoadNonLogData method was created to load only the non-logarithmic data from G4EMLOW</i></td></tr>
+<tr><th id="41">41</th><td><i>//                             dataset. It is essentially performing the data loading operations as in the past.</i></td></tr>
+<tr><th id="42">42</th><td><i>//</i></td></tr>
+<tr><th id="43">43</th><td><i>//                           - LoadData method was revised in order to calculate the logarithmic values of the data</i></td></tr>
+<tr><th id="44">44</th><td><i>//                             It retrieves the data values from the G4EMLOW data files but, then, calculates the</i></td></tr>
+<tr><th id="45">45</th><td><i>//                             respective log values and loads them to seperate data structures.</i></td></tr>
+<tr><th id="46">46</th><td><i>//                             The EM data sets, initialized this way, contain both non-log and log values.</i></td></tr>
+<tr><th id="47">47</th><td><i>//                             These initialized data sets can enhance the computing performance of data interpolation</i></td></tr>
+<tr><th id="48">48</th><td><i>//                             operations</i></td></tr>
+<tr><th id="49">49</th><td><i>//</i></td></tr>
+<tr><th id="50">50</th><td><i>//                           - BuildMeanFreePathForMaterials method was also revised in order to calculate the </i></td></tr>
+<tr><th id="51">51</th><td><i>//                             logarithmic values of the loaded data. </i></td></tr>
+<tr><th id="52">52</th><td><i>//                             It generates the data values and, then, calculates the respective log values which </i></td></tr>
+<tr><th id="53">53</th><td><i>//                             later load to seperate data structures.</i></td></tr>
+<tr><th id="54">54</th><td><i>//                             The EM data sets, initialized this way, contain both non-log and log values.</i></td></tr>
+<tr><th id="55">55</th><td><i>//                             These initialized data sets can enhance the computing performance of data interpolation</i></td></tr>
+<tr><th id="56">56</th><td><i>//                             operations</i></td></tr>
+<tr><th id="57">57</th><td><i>//                             </i></td></tr>
+<tr><th id="58">58</th><td><i>//                           - LoadShellData method was revised in order to eliminate the presence of a potential</i></td></tr>
+<tr><th id="59">59</th><td><i>//                             memory leak originally identified by Riccardo Capra.</i></td></tr>
+<tr><th id="60">60</th><td><i>//                             Riccardo Capra Original Comment</i></td></tr>
+<tr><th id="61">61</th><td><i>//                             Riccardo Capra &lt;capra@ge.infn.it&gt;: PLEASE CHECK THE FOLLOWING PIECE OF CODE</i></td></tr>
+<tr><th id="62">62</th><td><i>//                             "energies" AND "data" G4DataVector ARE ALLOCATED, FILLED IN AND NEVER USED OR</i></td></tr>
+<tr><th id="63">63</th><td><i>//                             DELETED. WHATSMORE LOADING FILE OPERATIONS WERE DONE BY G4ShellEMDataSet</i></td></tr>
+<tr><th id="64">64</th><td><i>//                             EVEN BEFORE THE CHANGES I DID ON THIS FILE. SO THE FOLLOWING CODE IN MY</i></td></tr>
+<tr><th id="65">65</th><td><i>//                             OPINION SHOULD BE USELESS AND SHOULD PRODUCE A MEMORY LEAK.</i></td></tr>
+<tr><th id="66">66</th><td><i>//</i></td></tr>
+<tr><th id="67">67</th><td><i>//</i></td></tr>
+<tr><th id="68">68</th><td><i>// -------------------------------------------------------------------</i></td></tr>
+<tr><th id="69">69</th><td></td></tr>
+<tr><th id="70">70</th><td><u>#include <a href="../include/G4VCrossSectionHandler.hh.html">"G4VCrossSectionHandler.hh"</a></u></td></tr>
+<tr><th id="71">71</th><td><u>#include <a href="../include/G4VDataSetAlgorithm.hh.html">"G4VDataSetAlgorithm.hh"</a></u></td></tr>
+<tr><th id="72">72</th><td><u>#include <a href="../include/G4LogLogInterpolation.hh.html">"G4LogLogInterpolation.hh"</a></u></td></tr>
+<tr><th id="73">73</th><td><u>#include <a href="../include/G4VEMDataSet.hh.html">"G4VEMDataSet.hh"</a></u></td></tr>
+<tr><th id="74">74</th><td><u>#include <a href="../include/G4EMDataSet.hh.html">"G4EMDataSet.hh"</a></u></td></tr>
+<tr><th id="75">75</th><td><u>#include <a href="../include/G4CompositeEMDataSet.hh.html">"G4CompositeEMDataSet.hh"</a></u></td></tr>
+<tr><th id="76">76</th><td><u>#include <a href="../include/G4ShellEMDataSet.hh.html">"G4ShellEMDataSet.hh"</a></u></td></tr>
+<tr><th id="77">77</th><td><u>#include <a href="../../../cuts/include/G4ProductionCutsTable.hh.html">"G4ProductionCutsTable.hh"</a></u></td></tr>
+<tr><th id="78">78</th><td><u>#include <a href="../../../../materials/include/G4Material.hh.html">"G4Material.hh"</a></u></td></tr>
+<tr><th id="79">79</th><td><u>#include <a href="../../../../materials/include/G4Element.hh.html">"G4Element.hh"</a></u></td></tr>
+<tr><th id="80">80</th><td><u>#include <a href="../../../../global/HEPRandom/include/Randomize.hh.html">"Randomize.hh"</a></u></td></tr>
+<tr><th id="81">81</th><td><u>#include <span class='error' title="&apos;map&apos; file not found">&lt;</span>map&gt;</u></td></tr>
+<tr><th id="82">82</th><td><u>#include &lt;vector&gt;</u></td></tr>
+<tr><th id="83">83</th><td><u>#include &lt;fstream&gt;</u></td></tr>
+<tr><th id="84">84</th><td><u>#include &lt;sstream&gt;</u></td></tr>
+<tr><th id="85">85</th><td></td></tr>
+<tr><th id="86">86</th><td></td></tr>
+<tr><th id="87">87</th><td><a class="type" href="../include/G4VCrossSectionHandler.hh.html#G4VCrossSectionHandler" title='G4VCrossSectionHandler' data-ref="G4VCrossSectionHandler">G4VCrossSectionHandler</a>::<dfn class="decl def" id="_ZN22G4VCrossSectionHandlerC1Ev" title='G4VCrossSectionHandler::G4VCrossSectionHandler' data-ref="_ZN22G4VCrossSectionHandlerC1Ev">G4VCrossSectionHandler</dfn>()</td></tr>
+<tr><th id="88">88</th><td>{</td></tr>
+<tr><th id="89">89</th><td>  <span class='error' title="use of undeclared identifier &apos;crossSections&apos;">crossSections</span> = <var>0</var>;</td></tr>
+<tr><th id="90">90</th><td>  <a class="member" href="../include/G4VCrossSectionHandler.hh.html#G4VCrossSectionHandler::interpolation" title='G4VCrossSectionHandler::interpolation' data-ref="G4VCrossSectionHandler::interpolation">interpolation</a> = <var>0</var>;</td></tr>
+<tr><th id="91">91</th><td>  <a class="member" href="#_ZN22G4VCrossSectionHandler10InitialiseEP19G4VDataSetAlgorithmddiddii" title='G4VCrossSectionHandler::Initialise' data-ref="_ZN22G4VCrossSectionHandler10InitialiseEP19G4VDataSetAlgorithmddiddii">Initialise</a>();</td></tr>
+<tr><th id="92">92</th><td>  <a class="member" href="#_ZN22G4VCrossSectionHandler14ActiveElementsEv" title='G4VCrossSectionHandler::ActiveElements' data-ref="_ZN22G4VCrossSectionHandler14ActiveElementsEv">ActiveElements</a>();</td></tr>
+<tr><th id="93">93</th><td>}</td></tr>
+<tr><th id="94">94</th><td></td></tr>
+<tr><th id="95">95</th><td></td></tr>
+<tr><th id="96">96</th><td><a class="type" href="../include/G4VCrossSectionHandler.hh.html#G4VCrossSectionHandler" title='G4VCrossSectionHandler' data-ref="G4VCrossSectionHandler">G4VCrossSectionHandler</a>::<dfn class="decl def" id="_ZN22G4VCrossSectionHandlerC1EP19G4VDataSetAlgorithmddiddii" title='G4VCrossSectionHandler::G4VCrossSectionHandler' data-ref="_ZN22G4VCrossSectionHandlerC1EP19G4VDataSetAlgorithmddiddii">G4VCrossSectionHandler</dfn>(<a class="type" href="../include/G4VDataSetAlgorithm.hh.html#G4VDataSetAlgorithm" title='G4VDataSetAlgorithm' data-ref="G4VDataSetAlgorithm">G4VDataSetAlgorithm</a>* <dfn class="local col1 decl" id="1algorithm" title='algorithm' data-type='G4VDataSetAlgorithm *' data-ref="1algorithm">algorithm</dfn>,</td></tr>
+<tr><th id="97">97</th><td>					       <a class="typedef" href="../../../../global/management/include/G4Types.hh.html#G4double" title='G4double' data-type='double' data-ref="G4double">G4double</a> <dfn class="local col2 decl" id="2minE" title='minE' data-type='G4double' data-ref="2minE">minE</dfn>,</td></tr>
+<tr><th id="98">98</th><td>					       <a class="typedef" href="../../../../global/management/include/G4Types.hh.html#G4double" title='G4double' data-type='double' data-ref="G4double">G4double</a> <dfn class="local col3 decl" id="3maxE" title='maxE' data-type='G4double' data-ref="3maxE">maxE</dfn>,</td></tr>
+<tr><th id="99">99</th><td>					       <a class="typedef" href="../../../../global/management/include/G4Types.hh.html#G4int" title='G4int' data-type='int' data-ref="G4int">G4int</a> <dfn class="local col4 decl" id="4bins" title='bins' data-type='G4int' data-ref="4bins">bins</dfn>,</td></tr>
+<tr><th id="100">100</th><td>					       <a class="typedef" href="../../../../global/management/include/G4Types.hh.html#G4double" title='G4double' data-type='double' data-ref="G4double">G4double</a> <dfn class="local col5 decl" id="5unitE" title='unitE' data-type='G4double' data-ref="5unitE">unitE</dfn>,</td></tr>
+<tr><th id="101">101</th><td>					       <a class="typedef" href="../../../../global/management/include/G4Types.hh.html#G4double" title='G4double' data-type='double' data-ref="G4double">G4double</a> <dfn class="local col6 decl" id="6unitData" title='unitData' data-type='G4double' data-ref="6unitData">unitData</dfn>,</td></tr>
+<tr><th id="102">102</th><td>					       <a class="typedef" href="../../../../global/management/include/G4Types.hh.html#G4int" title='G4int' data-type='int' data-ref="G4int">G4int</a> <dfn class="local col7 decl" id="7minZ" title='minZ' data-type='G4int' data-ref="7minZ">minZ</dfn>, </td></tr>
+<tr><th id="103">103</th><td>					       <a class="typedef" href="../../../../global/management/include/G4Types.hh.html#G4int" title='G4int' data-type='int' data-ref="G4int">G4int</a> <dfn class="local col8 decl" id="8maxZ" title='maxZ' data-type='G4int' data-ref="8maxZ">maxZ</dfn>)</td></tr>
+<tr><th id="104">104</th><td>  : <a class="member" href="../include/G4VCrossSectionHandler.hh.html#G4VCrossSectionHandler::interpolation" title='G4VCrossSectionHandler::interpolation' data-ref="G4VCrossSectionHandler::interpolation">interpolation</a>(<a class="local col1 ref" href="#1algorithm" title='algorithm' data-ref="1algorithm">algorithm</a>), <a class="member" href="../include/G4VCrossSectionHandler.hh.html#G4VCrossSectionHandler::eMin" title='G4VCrossSectionHandler::eMin' data-ref="G4VCrossSectionHandler::eMin">eMin</a>(<a class="local col2 ref" href="#2minE" title='minE' data-ref="2minE">minE</a>), <a class="member" href="../include/G4VCrossSectionHandler.hh.html#G4VCrossSectionHandler::eMax" title='G4VCrossSectionHandler::eMax' data-ref="G4VCrossSectionHandler::eMax">eMax</a>(<a class="local col3 ref" href="#3maxE" title='maxE' data-ref="3maxE">maxE</a>), <a class="member" href="../include/G4VCrossSectionHandler.hh.html#G4VCrossSectionHandler::nBins" title='G4VCrossSectionHandler::nBins' data-ref="G4VCrossSectionHandler::nBins">nBins</a>(<a class="local col4 ref" href="#4bins" title='bins' data-ref="4bins">bins</a>),</td></tr>
+<tr><th id="105">105</th><td>    <a class="member" href="../include/G4VCrossSectionHandler.hh.html#G4VCrossSectionHandler::unit1" title='G4VCrossSectionHandler::unit1' data-ref="G4VCrossSectionHandler::unit1">unit1</a>(<a class="local col5 ref" href="#5unitE" title='unitE' data-ref="5unitE">unitE</a>), <a class="member" href="../include/G4VCrossSectionHandler.hh.html#G4VCrossSectionHandler::unit2" title='G4VCrossSectionHandler::unit2' data-ref="G4VCrossSectionHandler::unit2">unit2</a>(<a class="local col6 ref" href="#6unitData" title='unitData' data-ref="6unitData">unitData</a>), <a class="member" href="../include/G4VCrossSectionHandler.hh.html#G4VCrossSectionHandler::zMin" title='G4VCrossSectionHandler::zMin' data-ref="G4VCrossSectionHandler::zMin">zMin</a>(<a class="local col7 ref" href="#7minZ" title='minZ' data-ref="7minZ">minZ</a>), <a class="member" href="../include/G4VCrossSectionHandler.hh.html#G4VCrossSectionHandler::zMax" title='G4VCrossSectionHandler::zMax' data-ref="G4VCrossSectionHandler::zMax">zMax</a>(<a class="local col8 ref" href="#8maxZ" title='maxZ' data-ref="8maxZ">maxZ</a>)</td></tr>
+<tr><th id="106">106</th><td>{</td></tr>
+<tr><th id="107">107</th><td>  <span class='error' title="use of undeclared identifier &apos;crossSections&apos;">crossSections</span> = <var>0</var>;</td></tr>
+<tr><th id="108">108</th><td>  <a class="member" href="#_ZN22G4VCrossSectionHandler14ActiveElementsEv" title='G4VCrossSectionHandler::ActiveElements' data-ref="_ZN22G4VCrossSectionHandler14ActiveElementsEv">ActiveElements</a>();</td></tr>
+<tr><th id="109">109</th><td>}</td></tr>
+<tr><th id="110">110</th><td></td></tr>
+<tr><th id="111">111</th><td><a class="type" href="../include/G4VCrossSectionHandler.hh.html#G4VCrossSectionHandler" title='G4VCrossSectionHandler' data-ref="G4VCrossSectionHandler">G4VCrossSectionHandler</a>::<dfn class="virtual decl def" id="_ZN22G4VCrossSectionHandlerD1Ev" title='G4VCrossSectionHandler::~G4VCrossSectionHandler' data-ref="_ZN22G4VCrossSectionHandlerD1Ev">~G4VCrossSectionHandler</dfn>()</td></tr>
+<tr><th id="112">112</th><td>{</td></tr>
+<tr><th id="113">113</th><td>  <b>delete</b> <a class="member" href="../include/G4VCrossSectionHandler.hh.html#G4VCrossSectionHandler::interpolation" title='G4VCrossSectionHandler::interpolation' data-ref="G4VCrossSectionHandler::interpolation">interpolation</a>;</td></tr>
+<tr><th id="114">114</th><td>  <a class="member" href="../include/G4VCrossSectionHandler.hh.html#G4VCrossSectionHandler::interpolation" title='G4VCrossSectionHandler::interpolation' data-ref="G4VCrossSectionHandler::interpolation">interpolation</a> = <var>0</var>;</td></tr>
+<tr><th id="115">115</th><td>  <span class='error' title="use of undeclared identifier &apos;std&apos;">std</span>::map&lt;<span class='error' title="unexpected type name &apos;G4int&apos;: expected expression">G4int</span>,G4VEMDataSet*,std::less&lt;G4int&gt; &gt;::iterator pos;</td></tr>
+<tr><th id="116">116</th><td></td></tr>
+<tr><th id="117">117</th><td>  <b>for</b> (<span class='error' title="use of undeclared identifier &apos;pos&apos;">pos</span> = <span class='error' title="use of undeclared identifier &apos;dataMap&apos;">dataMap</span>.begin(); <span class='error' title="use of undeclared identifier &apos;pos&apos;">pos</span> != <span class='error' title="use of undeclared identifier &apos;dataMap&apos;">dataMap</span>.end(); ++<span class='error' title="use of undeclared identifier &apos;pos&apos;">pos</span>)</td></tr>
+<tr><th id="118">118</th><td>    {</td></tr>
+<tr><th id="119">119</th><td>      <i>// The following is a workaround for STL ObjectSpace implementation, </i></td></tr>
+<tr><th id="120">120</th><td><i>      // which does not support the standard and does not accept </i></td></tr>
+<tr><th id="121">121</th><td><i>      // the syntax pos-&gt;second</i></td></tr>
+<tr><th id="122">122</th><td><i>      // G4VEMDataSet* dataSet = pos-&gt;second;</i></td></tr>
+<tr><th id="123">123</th><td>      <a class="type" href="../include/G4VEMDataSet.hh.html#G4VEMDataSet" title='G4VEMDataSet' data-ref="G4VEMDataSet">G4VEMDataSet</a>* <dfn class="local col9 decl" id="9dataSet" title='dataSet' data-type='G4VEMDataSet *' data-ref="9dataSet">dataSet</dfn> = (*<span class='error' title="use of undeclared identifier &apos;pos&apos;">pos</span>).second;</td></tr>
+<tr><th id="124">124</th><td>      <b>delete</b> <a class="local col9 ref" href="#9dataSet" title='dataSet' data-ref="9dataSet">dataSet</a>;</td></tr>
+<tr><th id="125">125</th><td>    }</td></tr>
+<tr><th id="126">126</th><td></td></tr>
+<tr><th id="127">127</th><td>  <b>if</b> (<span class='error' title="use of undeclared identifier &apos;crossSections&apos;">crossSections</span> != <var>0</var>)</td></tr>
+<tr><th id="128">128</th><td>    {</td></tr>
+<tr><th id="129">129</th><td>      <span class='error' title="unknown type name &apos;size_t&apos;">size_t</span> <dfn class="local col0 decl" id="10n" title='n' data-type='int' data-ref="10n">n</dfn> = <span class='error' title="use of undeclared identifier &apos;crossSections&apos;">crossSections</span>-&gt;size();</td></tr>
+<tr><th id="130">130</th><td>      <b>for</b> (<span class='error' title="unknown type name &apos;size_t&apos;">size_t</span> <dfn class="local col1 decl" id="11i" title='i' data-type='int' data-ref="11i">i</dfn>=<var>0</var>; i&lt;n; i++)</td></tr>
+<tr><th id="131">131</th><td>	{</td></tr>
+<tr><th id="132">132</th><td>	  <b>delete</b> (*<span class='error' title="use of undeclared identifier &apos;crossSections&apos;">crossSections</span>)[i];</td></tr>
+<tr><th id="133">133</th><td>	}</td></tr>
+<tr><th id="134">134</th><td>      <b>delete</b> <span class='error' title="use of undeclared identifier &apos;crossSections&apos;">crossSections</span>;</td></tr>
+<tr><th id="135">135</th><td>      <span class='error' title="use of undeclared identifier &apos;crossSections&apos;">crossSections</span> = <var>0</var>;</td></tr>
+<tr><th id="136">136</th><td>    }</td></tr>
+<tr><th id="137">137</th><td>}</td></tr>
+<tr><th id="138">138</th><td></td></tr>
+<tr><th id="139">139</th><td><em>void</em> <a class="type" href="../include/G4VCrossSectionHandler.hh.html#G4VCrossSectionHandler" title='G4VCrossSectionHandler' data-ref="G4VCrossSectionHandler">G4VCrossSectionHandler</a>::<dfn class="decl def" id="_ZN22G4VCrossSectionHandler10InitialiseEP19G4VDataSetAlgorithmddiddii" title='G4VCrossSectionHandler::Initialise' data-ref="_ZN22G4VCrossSectionHandler10InitialiseEP19G4VDataSetAlgorithmddiddii">Initialise</dfn>(<a class="type" href="../include/G4VDataSetAlgorithm.hh.html#G4VDataSetAlgorithm" title='G4VDataSetAlgorithm' data-ref="G4VDataSetAlgorithm">G4VDataSetAlgorithm</a>* <dfn class="local col2 decl" id="12algorithm" title='algorithm' data-type='G4VDataSetAlgorithm *' data-ref="12algorithm">algorithm</dfn>,</td></tr>
+<tr><th id="140">140</th><td>					<a class="typedef" href="../../../../global/management/include/G4Types.hh.html#G4double" title='G4double' data-type='double' data-ref="G4double">G4double</a> <dfn class="local col3 decl" id="13minE" title='minE' data-type='G4double' data-ref="13minE">minE</dfn>, <a class="typedef" href="../../../../global/management/include/G4Types.hh.html#G4double" title='G4double' data-type='double' data-ref="G4double">G4double</a> <dfn class="local col4 decl" id="14maxE" title='maxE' data-type='G4double' data-ref="14maxE">maxE</dfn>, </td></tr>
+<tr><th id="141">141</th><td>					<a class="typedef" href="../../../../global/management/include/G4Types.hh.html#G4int" title='G4int' data-type='int' data-ref="G4int">G4int</a> <dfn class="local col5 decl" id="15numberOfBins" title='numberOfBins' data-type='G4int' data-ref="15numberOfBins">numberOfBins</dfn>,</td></tr>
+<tr><th id="142">142</th><td>					<a class="typedef" href="../../../../global/management/include/G4Types.hh.html#G4double" title='G4double' data-type='double' data-ref="G4double">G4double</a> <dfn class="local col6 decl" id="16unitE" title='unitE' data-type='G4double' data-ref="16unitE">unitE</dfn>, <a class="typedef" href="../../../../global/management/include/G4Types.hh.html#G4double" title='G4double' data-type='double' data-ref="G4double">G4double</a> <dfn class="local col7 decl" id="17unitData" title='unitData' data-type='G4double' data-ref="17unitData">unitData</dfn>,</td></tr>
+<tr><th id="143">143</th><td>					<a class="typedef" href="../../../../global/management/include/G4Types.hh.html#G4int" title='G4int' data-type='int' data-ref="G4int">G4int</a> <dfn class="local col8 decl" id="18minZ" title='minZ' data-type='G4int' data-ref="18minZ">minZ</dfn>, <a class="typedef" href="../../../../global/management/include/G4Types.hh.html#G4int" title='G4int' data-type='int' data-ref="G4int">G4int</a> <dfn class="local col9 decl" id="19maxZ" title='maxZ' data-type='G4int' data-ref="19maxZ">maxZ</dfn>)</td></tr>
+<tr><th id="144">144</th><td>{</td></tr>
+<tr><th id="145">145</th><td>  <b>if</b> (<a class="local col2 ref" href="#12algorithm" title='algorithm' data-ref="12algorithm">algorithm</a> != <var>0</var>) </td></tr>
+<tr><th id="146">146</th><td>    {</td></tr>
+<tr><th id="147">147</th><td>      <b>delete</b> <a class="member" href="../include/G4VCrossSectionHandler.hh.html#G4VCrossSectionHandler::interpolation" title='G4VCrossSectionHandler::interpolation' data-ref="G4VCrossSectionHandler::interpolation">interpolation</a>;</td></tr>
+<tr><th id="148">148</th><td>      <a class="member" href="../include/G4VCrossSectionHandler.hh.html#G4VCrossSectionHandler::interpolation" title='G4VCrossSectionHandler::interpolation' data-ref="G4VCrossSectionHandler::interpolation">interpolation</a> = <a class="local col2 ref" href="#12algorithm" title='algorithm' data-ref="12algorithm">algorithm</a>;</td></tr>
+<tr><th id="149">149</th><td>    }</td></tr>
+<tr><th id="150">150</th><td>  <b>else</b></td></tr>
+<tr><th id="151">151</th><td>    {</td></tr>
+<tr><th id="152">152</th><td>      <b>delete</b> <a class="member" href="../include/G4VCrossSectionHandler.hh.html#G4VCrossSectionHandler::interpolation" title='G4VCrossSectionHandler::interpolation' data-ref="G4VCrossSectionHandler::interpolation">interpolation</a>;</td></tr>
+<tr><th id="153">153</th><td>      <a class="member" href="../include/G4VCrossSectionHandler.hh.html#G4VCrossSectionHandler::interpolation" title='G4VCrossSectionHandler::interpolation' data-ref="G4VCrossSectionHandler::interpolation">interpolation</a> = <a class="virtual member" href="#_ZN22G4VCrossSectionHandler19CreateInterpolationEv" title='G4VCrossSectionHandler::CreateInterpolation' data-ref="_ZN22G4VCrossSectionHandler19CreateInterpolationEv">CreateInterpolation</a>();</td></tr>
+<tr><th id="154">154</th><td>    }</td></tr>
+<tr><th id="155">155</th><td></td></tr>
+<tr><th id="156">156</th><td>  <a class="member" href="../include/G4VCrossSectionHandler.hh.html#G4VCrossSectionHandler::eMin" title='G4VCrossSectionHandler::eMin' data-ref="G4VCrossSectionHandler::eMin">eMin</a> = <a class="local col3 ref" href="#13minE" title='minE' data-ref="13minE">minE</a>;</td></tr>
+<tr><th id="157">157</th><td>  <a class="member" href="../include/G4VCrossSectionHandler.hh.html#G4VCrossSectionHandler::eMax" title='G4VCrossSectionHandler::eMax' data-ref="G4VCrossSectionHandler::eMax">eMax</a> = <a class="local col4 ref" href="#14maxE" title='maxE' data-ref="14maxE">maxE</a>;</td></tr>
+<tr><th id="158">158</th><td>  <a class="member" href="../include/G4VCrossSectionHandler.hh.html#G4VCrossSectionHandler::nBins" title='G4VCrossSectionHandler::nBins' data-ref="G4VCrossSectionHandler::nBins">nBins</a> = <a class="local col5 ref" href="#15numberOfBins" title='numberOfBins' data-ref="15numberOfBins">numberOfBins</a>;</td></tr>
+<tr><th id="159">159</th><td>  <a class="member" href="../include/G4VCrossSectionHandler.hh.html#G4VCrossSectionHandler::unit1" title='G4VCrossSectionHandler::unit1' data-ref="G4VCrossSectionHandler::unit1">unit1</a> = <a class="local col6 ref" href="#16unitE" title='unitE' data-ref="16unitE">unitE</a>;</td></tr>
+<tr><th id="160">160</th><td>  <a class="member" href="../include/G4VCrossSectionHandler.hh.html#G4VCrossSectionHandler::unit2" title='G4VCrossSectionHandler::unit2' data-ref="G4VCrossSectionHandler::unit2">unit2</a> = <a class="local col7 ref" href="#17unitData" title='unitData' data-ref="17unitData">unitData</a>;</td></tr>
+<tr><th id="161">161</th><td>  <a class="member" href="../include/G4VCrossSectionHandler.hh.html#G4VCrossSectionHandler::zMin" title='G4VCrossSectionHandler::zMin' data-ref="G4VCrossSectionHandler::zMin">zMin</a> = <a class="local col8 ref" href="#18minZ" title='minZ' data-ref="18minZ">minZ</a>;</td></tr>
+<tr><th id="162">162</th><td>  <a class="member" href="../include/G4VCrossSectionHandler.hh.html#G4VCrossSectionHandler::zMax" title='G4VCrossSectionHandler::zMax' data-ref="G4VCrossSectionHandler::zMax">zMax</a> = <a class="local col9 ref" href="#19maxZ" title='maxZ' data-ref="19maxZ">maxZ</a>;</td></tr>
+<tr><th id="163">163</th><td>}</td></tr>
+<tr><th id="164">164</th><td></td></tr>
+<tr><th id="165">165</th><td><em>void</em> <a class="type" href="../include/G4VCrossSectionHandler.hh.html#G4VCrossSectionHandler" title='G4VCrossSectionHandler' data-ref="G4VCrossSectionHandler">G4VCrossSectionHandler</a>::<dfn class="decl def" id="_ZNK22G4VCrossSectionHandler9PrintDataEv" title='G4VCrossSectionHandler::PrintData' data-ref="_ZNK22G4VCrossSectionHandler9PrintDataEv">PrintData</dfn>() <em>const</em></td></tr>
+<tr><th id="166">166</th><td>{</td></tr>
+<tr><th id="167">167</th><td>  <span class='error' title="use of undeclared identifier &apos;std&apos;">std</span>::map&lt;<span class='error' title="unexpected type name &apos;G4int&apos;: expected expression">G4int</span>,G4VEMDataSet*,std::less&lt;G4int&gt; &gt;::const_iterator pos;</td></tr>
+<tr><th id="168">168</th><td></td></tr>
+<tr><th id="169">169</th><td>  <b>for</b> (<span class='error' title="use of undeclared identifier &apos;pos&apos;">pos</span> = <span class='error' title="use of undeclared identifier &apos;dataMap&apos;">dataMap</span>.begin(); <span class='error' title="use of undeclared identifier &apos;pos&apos;">pos</span> != <span class='error' title="use of undeclared identifier &apos;dataMap&apos;">dataMap</span>.end(); <span class='error' title="use of undeclared identifier &apos;pos&apos;">pos</span>++)</td></tr>
+<tr><th id="170">170</th><td>    {</td></tr>
+<tr><th id="171">171</th><td>      <i>// The following is a workaround for STL ObjectSpace implementation, </i></td></tr>
+<tr><th id="172">172</th><td><i>      // which does not support the standard and does not accept </i></td></tr>
+<tr><th id="173">173</th><td><i>      // the syntax pos-&gt;first or pos-&gt;second</i></td></tr>
+<tr><th id="174">174</th><td><i>      // G4int z = pos-&gt;first;</i></td></tr>
+<tr><th id="175">175</th><td><i>      // G4VEMDataSet* dataSet = pos-&gt;second;</i></td></tr>
+<tr><th id="176">176</th><td>      <a class="typedef" href="../../../../global/management/include/G4Types.hh.html#G4int" title='G4int' data-type='int' data-ref="G4int">G4int</a> <dfn class="local col0 decl" id="20z" title='z' data-type='G4int' data-ref="20z">z</dfn> = (*<span class='error' title="use of undeclared identifier &apos;pos&apos;">pos</span>).first;</td></tr>
+<tr><th id="177">177</th><td>      <a class="type" href="../include/G4VEMDataSet.hh.html#G4VEMDataSet" title='G4VEMDataSet' data-ref="G4VEMDataSet">G4VEMDataSet</a>* <dfn class="local col1 decl" id="21dataSet" title='dataSet' data-type='G4VEMDataSet *' data-ref="21dataSet">dataSet</dfn> = (*<span class='error' title="use of undeclared identifier &apos;pos&apos;">pos</span>).second;     </td></tr>
+<tr><th id="178">178</th><td>      <a class="macro" href="../../../../global/management/include/G4ios.hh.html#46" title="(*_G4cout_p())" data-ref="_M/G4cout">G4cout</a> <span class='error' title="invalid operands to binary expression (&apos;int&apos; and &apos;const char *&apos;)">&lt;&lt;</span> <q>"---- Data set for Z = "</q></td></tr>
+<tr><th id="179">179</th><td>	     &lt;&lt; z</td></tr>
+<tr><th id="180">180</th><td>	     &lt;&lt; <a class="macro" href="../../../../global/management/include/G4ios.hh.html#60" title="std::endl" data-ref="_M/G4endl">G4endl</a>;</td></tr>
+<tr><th id="181">181</th><td>      <a class="local col1 ref" href="#21dataSet" title='dataSet' data-ref="21dataSet">dataSet</a>-&gt;<a class="virtual ref" href="../include/G4VEMDataSet.hh.html#_ZNK12G4VEMDataSet9PrintDataEv" title='G4VEMDataSet::PrintData' data-ref="_ZNK12G4VEMDataSet9PrintDataEv">PrintData</a>();</td></tr>
+<tr><th id="182">182</th><td>      <a class="macro" href="../../../../global/management/include/G4ios.hh.html#46" title="(*_G4cout_p())" data-ref="_M/G4cout">G4cout</a> <span class='error' title="invalid operands to binary expression (&apos;int&apos; and &apos;const char *&apos;)">&lt;&lt;</span> <q>"--------------------------------------------------"</q> &lt;&lt; <a class="macro" href="../../../../global/management/include/G4ios.hh.html#60" title="std::endl" data-ref="_M/G4endl">G4endl</a>;</td></tr>
+<tr><th id="183">183</th><td>    }</td></tr>
+<tr><th id="184">184</th><td>}</td></tr>
+<tr><th id="185">185</th><td></td></tr>
+<tr><th id="186">186</th><td><em>void</em> <a class="type" href="../include/G4VCrossSectionHandler.hh.html#G4VCrossSectionHandler" title='G4VCrossSectionHandler' data-ref="G4VCrossSectionHandler">G4VCrossSectionHandler</a>::<dfn class="decl def" id="_ZN22G4VCrossSectionHandler8LoadDataERK8G4String" title='G4VCrossSectionHandler::LoadData' data-ref="_ZN22G4VCrossSectionHandler8LoadDataERK8G4String">LoadData</dfn>(<em>const</em> <a class="type" href="../../../../global/management/include/G4String.hh.html#G4String" title='G4String' data-ref="G4String">G4String</a>&amp; <dfn class="local col2 decl" id="22fileName" title='fileName' data-type='const G4String &amp;' data-ref="22fileName">fileName</dfn>)</td></tr>
+<tr><th id="187">187</th><td>{</td></tr>
+<tr><th id="188">188</th><td>  <span class='error' title="unknown type name &apos;size_t&apos;">size_t</span> <dfn class="local col3 decl" id="23nZ" title='nZ' data-type='int' data-ref="23nZ">nZ</dfn> = activeZ.<span class='error' title="no member named &apos;size&apos; in &apos;G4DataVector&apos;">size</span>();</td></tr>
+<tr><th id="189">189</th><td>  <b>for</b> (<span class='error' title="unknown type name &apos;size_t&apos;">size_t</span> <dfn class="local col4 decl" id="24i" title='i' data-type='int' data-ref="24i">i</dfn>=<var>0</var>; i&lt;nZ; i++)</td></tr>
+<tr><th id="190">190</th><td>    {</td></tr>
+<tr><th id="191">191</th><td>      <a class="typedef" href="../../../../global/management/include/G4Types.hh.html#G4int" title='G4int' data-type='int' data-ref="G4int">G4int</a> <dfn class="local col5 decl" id="25Z" title='Z' data-type='G4int' data-ref="25Z">Z</dfn> = (G4int) activeZ[i];</td></tr>
+<tr><th id="192">192</th><td></td></tr>
+<tr><th id="193">193</th><td>      <i>// Build the complete string identifying the file with the data set</i></td></tr>
+<tr><th id="194">194</th><td>      </td></tr>
+<tr><th id="195">195</th><td>      <em>char</em>* <dfn class="local col6 decl" id="26path" title='path' data-type='char *' data-ref="26path">path</dfn> = <span class='error' title="use of undeclared identifier &apos;getenv&apos;">getenv</span>(<q>"G4LEDATA"</q>);</td></tr>
+<tr><th id="196">196</th><td>      <b>if</b> (!<a class="local col6 ref" href="#26path" title='path' data-ref="26path">path</a>)</td></tr>
+<tr><th id="197">197</th><td>	{ </td></tr>
+<tr><th id="198">198</th><td>          <a class="ref" href="../../../../global/management/include/G4Exception.hh.html#_Z11G4ExceptionPKcS0_19G4ExceptionSeverityS0_" title='G4Exception' data-ref="_Z11G4ExceptionPKcS0_19G4ExceptionSeverityS0_">G4Exception</a>(<q>"G4VCrossSectionHandler::LoadData"</q>,</td></tr>
+<tr><th id="199">199</th><td>		    <q>"em0006"</q>,<a class="enum" href="../../../../global/management/include/G4ExceptionSeverity.hh.html#G4ExceptionSeverity::FatalException" title='G4ExceptionSeverity::FatalException' data-ref="G4ExceptionSeverity::FatalException">FatalException</a>,<q>"G4LEDATA environment variable not set"</q>);</td></tr>
+<tr><th id="200">200</th><td>	  <b>return</b>;</td></tr>
+<tr><th id="201">201</th><td>	}</td></tr>
+<tr><th id="202">202</th><td>      </td></tr>
+<tr><th id="203">203</th><td>      <span class='error' title="use of undeclared identifier &apos;std&apos;">std</span>::ostringstream <dfn class="local col7 decl" id="27ost" title='ost' data-type='int' data-ref="27ost">ost</dfn>;</td></tr>
+<tr><th id="204">204</th><td>      ost &lt;&lt; path &lt;&lt; <kbd>'/'</kbd> &lt;&lt; fileName &lt;&lt; Z &lt;&lt; <q>".dat"</q>;</td></tr>
+<tr><th id="205">205</th><td>      <span class='error' title="use of undeclared identifier &apos;std&apos;">std</span>::ifstream file(ost.str().c_str());</td></tr>
+<tr><th id="206">206</th><td>      <span class='error' title="use of undeclared identifier &apos;std&apos;">std</span>::filebuf* <dfn class="local col8 decl" id="28lsdp" title='lsdp' data-type='int *' data-ref="28lsdp">lsdp</dfn> = <span class='error' title="use of undeclared identifier &apos;file&apos;">file</span>.rdbuf();</td></tr>
+<tr><th id="207">207</th><td>       </td></tr>
+<tr><th id="208">208</th><td>      <b>if</b> (! (lsdp-&gt;is_open()) )</td></tr>
+<tr><th id="209">209</th><td>	{</td></tr>
+<tr><th id="210">210</th><td>	  <a class="type" href="../../../../global/management/include/G4String.hh.html#G4String" title='G4String' data-ref="G4String">G4String</a> <dfn class="local col9 decl" id="29excep" title='excep' data-type='G4String' data-ref="29excep">excep</dfn> = <q>"data file: "</q> + ost.str() + <q>" not found"</q>;</td></tr>
+<tr><th id="211">211</th><td>          <a class="ref" href="../../../../global/management/include/G4Exception.hh.html#_Z11G4ExceptionPKcS0_19G4ExceptionSeverityS0_" title='G4Exception' data-ref="_Z11G4ExceptionPKcS0_19G4ExceptionSeverityS0_">G4Exception</a>(<q>"G4VCrossSectionHandler::LoadData"</q>,</td></tr>
+<tr><th id="212">212</th><td>		    <q>"em0003"</q>,<a class="enum" href="../../../../global/management/include/G4ExceptionSeverity.hh.html#G4ExceptionSeverity::FatalException" title='G4ExceptionSeverity::FatalException' data-ref="G4ExceptionSeverity::FatalException">FatalException</a>,<a class="ref fake" href="../../../../global/management/include/G4String.hh.html#_ZNK8G4StringcvPKcEv" title='G4String::operator const char *' data-ref="_ZNK8G4StringcvPKcEv"></a><a class="local col9 ref" href="#29excep" title='excep' data-ref="29excep">excep</a>);</td></tr>
+<tr><th id="213">213</th><td>	}</td></tr>
+<tr><th id="214">214</th><td>      <a class="typedef" href="../../../../global/management/include/G4Types.hh.html#G4double" title='G4double' data-type='double' data-ref="G4double">G4double</a> <dfn class="local col0 decl" id="30a" title='a' data-type='G4double' data-ref="30a">a</dfn> = <var>0</var>;</td></tr>
+<tr><th id="215">215</th><td>      <a class="typedef" href="../../../../global/management/include/G4Types.hh.html#G4int" title='G4int' data-type='int' data-ref="G4int">G4int</a> <dfn class="local col1 decl" id="31k" title='k' data-type='G4int' data-ref="31k">k</dfn> = <var>0</var>;</td></tr>
+<tr><th id="216">216</th><td>      <a class="typedef" href="../../../../global/management/include/G4Types.hh.html#G4int" title='G4int' data-type='int' data-ref="G4int">G4int</a> <dfn class="local col2 decl" id="32nColumns" title='nColumns' data-type='G4int' data-ref="32nColumns">nColumns</dfn> = <var>2</var>;</td></tr>
+<tr><th id="217">217</th><td></td></tr>
+<tr><th id="218">218</th><td>      <a class="type" href="../../../../global/management/include/G4DataVector.hh.html#G4DataVector" title='G4DataVector' data-ref="G4DataVector">G4DataVector</a>* <dfn class="local col3 decl" id="33orig_reg_energies" title='orig_reg_energies' data-type='G4DataVector *' data-ref="33orig_reg_energies">orig_reg_energies</dfn> = <b>new</b> <a class="ref fake" href="../../../../global/management/include/G4DataVector.hh.html#_ZN12G4DataVectorC1Ev" title='G4DataVector::G4DataVector' data-ref="_ZN12G4DataVectorC1Ev"></a><a class="type" href="../../../../global/management/include/G4DataVector.hh.html#G4DataVector" title='G4DataVector' data-ref="G4DataVector">G4DataVector</a>;</td></tr>
+<tr><th id="219">219</th><td>      <a class="type" href="../../../../global/management/include/G4DataVector.hh.html#G4DataVector" title='G4DataVector' data-ref="G4DataVector">G4DataVector</a>* <dfn class="local col4 decl" id="34orig_reg_data" title='orig_reg_data' data-type='G4DataVector *' data-ref="34orig_reg_data">orig_reg_data</dfn> = <b>new</b> <a class="ref fake" href="../../../../global/management/include/G4DataVector.hh.html#_ZN12G4DataVectorC1Ev" title='G4DataVector::G4DataVector' data-ref="_ZN12G4DataVectorC1Ev"></a><a class="type" href="../../../../global/management/include/G4DataVector.hh.html#G4DataVector" title='G4DataVector' data-ref="G4DataVector">G4DataVector</a>;</td></tr>
+<tr><th id="220">220</th><td>      <a class="type" href="../../../../global/management/include/G4DataVector.hh.html#G4DataVector" title='G4DataVector' data-ref="G4DataVector">G4DataVector</a>* <dfn class="local col5 decl" id="35log_reg_energies" title='log_reg_energies' data-type='G4DataVector *' data-ref="35log_reg_energies">log_reg_energies</dfn> = <b>new</b> <a class="ref fake" href="../../../../global/management/include/G4DataVector.hh.html#_ZN12G4DataVectorC1Ev" title='G4DataVector::G4DataVector' data-ref="_ZN12G4DataVectorC1Ev"></a><a class="type" href="../../../../global/management/include/G4DataVector.hh.html#G4DataVector" title='G4DataVector' data-ref="G4DataVector">G4DataVector</a>;</td></tr>
+<tr><th id="221">221</th><td>      <a class="type" href="../../../../global/management/include/G4DataVector.hh.html#G4DataVector" title='G4DataVector' data-ref="G4DataVector">G4DataVector</a>* <dfn class="local col6 decl" id="36log_reg_data" title='log_reg_data' data-type='G4DataVector *' data-ref="36log_reg_data">log_reg_data</dfn> = <b>new</b> <a class="ref fake" href="../../../../global/management/include/G4DataVector.hh.html#_ZN12G4DataVectorC1Ev" title='G4DataVector::G4DataVector' data-ref="_ZN12G4DataVectorC1Ev"></a><a class="type" href="../../../../global/management/include/G4DataVector.hh.html#G4DataVector" title='G4DataVector' data-ref="G4DataVector">G4DataVector</a>;</td></tr>
+<tr><th id="222">222</th><td></td></tr>
+<tr><th id="223">223</th><td>      <b>do</b></td></tr>
+<tr><th id="224">224</th><td>	{</td></tr>
+<tr><th id="225">225</th><td>	  <span class='error' title="use of undeclared identifier &apos;file&apos;">file</span> &gt;&gt; a;</td></tr>
+<tr><th id="226">226</th><td></td></tr>
+<tr><th id="227">227</th><td>          <b>if</b> (<a class="local col0 ref" href="#30a" title='a' data-ref="30a">a</a>==<var>0.</var>) <a class="local col0 ref" href="#30a" title='a' data-ref="30a">a</a>=<var>1e-300</var>;</td></tr>
+<tr><th id="228">228</th><td></td></tr>
+<tr><th id="229">229</th><td>	  <i>// The file is organized into four columns:</i></td></tr>
+<tr><th id="230">230</th><td><i>	  // 1st column contains the values of energy</i></td></tr>
+<tr><th id="231">231</th><td><i>	  // 2nd column contains the corresponding data value</i></td></tr>
+<tr><th id="232">232</th><td><i>	  // The file terminates with the pattern: -1   -1</i></td></tr>
+<tr><th id="233">233</th><td><i>	  //                                       -2   -2</i></td></tr>
+<tr><th id="234">234</th><td><i>          //</i></td></tr>
+<tr><th id="235">235</th><td>	  <b>if</b> (<a class="local col0 ref" href="#30a" title='a' data-ref="30a">a</a> != -<var>1</var> &amp;&amp; <a class="local col0 ref" href="#30a" title='a' data-ref="30a">a</a> != -<var>2</var>)</td></tr>
+<tr><th id="236">236</th><td>	    {</td></tr>
+<tr><th id="237">237</th><td>	      <b>if</b> (<a class="local col1 ref" href="#31k" title='k' data-ref="31k">k</a>%<a class="local col2 ref" href="#32nColumns" title='nColumns' data-ref="32nColumns">nColumns</a> == <var>0</var>)</td></tr>
+<tr><th id="238">238</th><td>                {</td></tr>
+<tr><th id="239">239</th><td>		 orig_reg_energies-&gt;<span class='error' title="no member named &apos;push_back&apos; in &apos;G4DataVector&apos;">push_back</span>(a*unit1);</td></tr>
+<tr><th id="240">240</th><td>                 log_reg_energies-&gt;<span class='error' title="no member named &apos;push_back&apos; in &apos;G4DataVector&apos;">push_back</span>(<span class='error' title="use of undeclared identifier &apos;std&apos;">std</span>::log10(a)+<span class='error' title="use of undeclared identifier &apos;std&apos;">std</span>::log10(unit1));</td></tr>
+<tr><th id="241">241</th><td>                }</td></tr>
+<tr><th id="242">242</th><td>	      <b>else</b> <b>if</b> (<a class="local col1 ref" href="#31k" title='k' data-ref="31k">k</a>%<a class="local col2 ref" href="#32nColumns" title='nColumns' data-ref="32nColumns">nColumns</a> == <var>1</var>)</td></tr>
+<tr><th id="243">243</th><td>                {</td></tr>
+<tr><th id="244">244</th><td>		 orig_reg_data-&gt;<span class='error' title="no member named &apos;push_back&apos; in &apos;G4DataVector&apos;">push_back</span>(a*unit2);</td></tr>
+<tr><th id="245">245</th><td>                 log_reg_data-&gt;<span class='error' title="no member named &apos;push_back&apos; in &apos;G4DataVector&apos;">push_back</span>(<span class='error' title="use of undeclared identifier &apos;std&apos;">std</span>::log10(a)+<span class='error' title="use of undeclared identifier &apos;std&apos;">std</span>::log10(unit2));</td></tr>
+<tr><th id="246">246</th><td>                }</td></tr>
+<tr><th id="247">247</th><td>              <a class="local col1 ref" href="#31k" title='k' data-ref="31k">k</a>++;</td></tr>
+<tr><th id="248">248</th><td>	    }</td></tr>
+<tr><th id="249">249</th><td>	} </td></tr>
+<tr><th id="250">250</th><td>      <b>while</b> (<a class="local col0 ref" href="#30a" title='a' data-ref="30a">a</a> != -<var>2</var>); <i>// End of File</i></td></tr>
+<tr><th id="251">251</th><td>      </td></tr>
+<tr><th id="252">252</th><td>      <span class='error' title="use of undeclared identifier &apos;file&apos;">file</span>.close();</td></tr>
+<tr><th id="253">253</th><td>      <a class="type" href="../include/G4VDataSetAlgorithm.hh.html#G4VDataSetAlgorithm" title='G4VDataSetAlgorithm' data-ref="G4VDataSetAlgorithm">G4VDataSetAlgorithm</a>* <dfn class="local col7 decl" id="37algo" title='algo' data-type='G4VDataSetAlgorithm *' data-ref="37algo">algo</dfn> = <a class="member" href="../include/G4VCrossSectionHandler.hh.html#G4VCrossSectionHandler::interpolation" title='G4VCrossSectionHandler::interpolation' data-ref="G4VCrossSectionHandler::interpolation">interpolation</a>-&gt;<a class="virtual ref" href="../include/G4VDataSetAlgorithm.hh.html#_ZNK19G4VDataSetAlgorithm5CloneEv" title='G4VDataSetAlgorithm::Clone' data-ref="_ZNK19G4VDataSetAlgorithm5CloneEv">Clone</a>();</td></tr>
+<tr><th id="254">254</th><td></td></tr>
+<tr><th id="255">255</th><td>      <a class="type" href="../include/G4VEMDataSet.hh.html#G4VEMDataSet" title='G4VEMDataSet' data-ref="G4VEMDataSet">G4VEMDataSet</a>* <dfn class="local col8 decl" id="38dataSet" title='dataSet' data-type='G4VEMDataSet *' data-ref="38dataSet">dataSet</dfn> = <b>new</b> <a class="type" href="../include/G4EMDataSet.hh.html#G4EMDataSet" title='G4EMDataSet' data-ref="G4EMDataSet">G4EMDataSet</a><a class="ref" href="../include/G4EMDataSet.hh.html#_ZN11G4EMDataSetC1EiP12G4DataVectorS1_S1_S1_P19G4VDataSetAlgorithmddb" title='G4EMDataSet::G4EMDataSet' data-ref="_ZN11G4EMDataSetC1EiP12G4DataVectorS1_S1_S1_P19G4VDataSetAlgorithmddb">(</a><a class="local col5 ref" href="#25Z" title='Z' data-ref="25Z">Z</a>,<a class="local col3 ref" href="#33orig_reg_energies" title='orig_reg_energies' data-ref="33orig_reg_energies">orig_reg_energies</a>,<a class="local col4 ref" href="#34orig_reg_data" title='orig_reg_data' data-ref="34orig_reg_data">orig_reg_data</a>,<a class="local col5 ref" href="#35log_reg_energies" title='log_reg_energies' data-ref="35log_reg_energies">log_reg_energies</a>,<a class="local col6 ref" href="#36log_reg_data" title='log_reg_data' data-ref="36log_reg_data">log_reg_data</a>,<a class="local col7 ref" href="#37algo" title='algo' data-ref="37algo">algo</a>);</td></tr>
+<tr><th id="256">256</th><td></td></tr>
+<tr><th id="257">257</th><td>      <span class='error' title="use of undeclared identifier &apos;dataMap&apos;">dataMap</span>[Z] = dataSet;</td></tr>
+<tr><th id="258">258</th><td></td></tr>
+<tr><th id="259">259</th><td>    }</td></tr>
+<tr><th id="260">260</th><td>}</td></tr>
+<tr><th id="261">261</th><td></td></tr>
+<tr><th id="262">262</th><td></td></tr>
+<tr><th id="263">263</th><td><em>void</em> <a class="type" href="../include/G4VCrossSectionHandler.hh.html#G4VCrossSectionHandler" title='G4VCrossSectionHandler' data-ref="G4VCrossSectionHandler">G4VCrossSectionHandler</a>::<dfn class="decl def" id="_ZN22G4VCrossSectionHandler14LoadNonLogDataERK8G4String" title='G4VCrossSectionHandler::LoadNonLogData' data-ref="_ZN22G4VCrossSectionHandler14LoadNonLogDataERK8G4String">LoadNonLogData</dfn>(<em>const</em> <a class="type" href="../../../../global/management/include/G4String.hh.html#G4String" title='G4String' data-ref="G4String">G4String</a>&amp; <dfn class="local col9 decl" id="39fileName" title='fileName' data-type='const G4String &amp;' data-ref="39fileName">fileName</dfn>)</td></tr>
+<tr><th id="264">264</th><td>{</td></tr>
+<tr><th id="265">265</th><td>  <span class='error' title="unknown type name &apos;size_t&apos;">size_t</span> <dfn class="local col0 decl" id="40nZ" title='nZ' data-type='int' data-ref="40nZ">nZ</dfn> = activeZ.<span class='error' title="no member named &apos;size&apos; in &apos;G4DataVector&apos;">size</span>();</td></tr>
+<tr><th id="266">266</th><td>  <b>for</b> (<span class='error' title="unknown type name &apos;size_t&apos;">size_t</span> <dfn class="local col1 decl" id="41i" title='i' data-type='int' data-ref="41i">i</dfn>=<var>0</var>; i&lt;nZ; i++)</td></tr>
+<tr><th id="267">267</th><td>    {</td></tr>
+<tr><th id="268">268</th><td>      <a class="typedef" href="../../../../global/management/include/G4Types.hh.html#G4int" title='G4int' data-type='int' data-ref="G4int">G4int</a> <dfn class="local col2 decl" id="42Z" title='Z' data-type='G4int' data-ref="42Z">Z</dfn> = (G4int) activeZ[i];</td></tr>
+<tr><th id="269">269</th><td></td></tr>
+<tr><th id="270">270</th><td>      <i>// Build the complete string identifying the file with the data set</i></td></tr>
+<tr><th id="271">271</th><td>      </td></tr>
+<tr><th id="272">272</th><td>      <em>char</em>* <dfn class="local col3 decl" id="43path" title='path' data-type='char *' data-ref="43path">path</dfn> = <span class='error' title="use of undeclared identifier &apos;getenv&apos;">getenv</span>(<q>"G4LEDATA"</q>);</td></tr>
+<tr><th id="273">273</th><td>      <b>if</b> (!<a class="local col3 ref" href="#43path" title='path' data-ref="43path">path</a>)</td></tr>
+<tr><th id="274">274</th><td>	{ </td></tr>
+<tr><th id="275">275</th><td>          <a class="ref" href="../../../../global/management/include/G4Exception.hh.html#_Z11G4ExceptionPKcS0_19G4ExceptionSeverityS0_" title='G4Exception' data-ref="_Z11G4ExceptionPKcS0_19G4ExceptionSeverityS0_">G4Exception</a>(<q>"G4VCrossSectionHandler::LoadNonLogData"</q>,</td></tr>
+<tr><th id="276">276</th><td>		    <q>"em0006"</q>,<a class="enum" href="../../../../global/management/include/G4ExceptionSeverity.hh.html#G4ExceptionSeverity::FatalException" title='G4ExceptionSeverity::FatalException' data-ref="G4ExceptionSeverity::FatalException">FatalException</a>,<q>"G4LEDATA environment variable not set"</q>);</td></tr>
+<tr><th id="277">277</th><td>	  <b>return</b>;</td></tr>
+<tr><th id="278">278</th><td>	}</td></tr>
+<tr><th id="279">279</th><td>      </td></tr>
+<tr><th id="280">280</th><td>      <span class='error' title="use of undeclared identifier &apos;std&apos;">std</span>::ostringstream <dfn class="local col4 decl" id="44ost" title='ost' data-type='int' data-ref="44ost">ost</dfn>;</td></tr>
+<tr><th id="281">281</th><td>      ost &lt;&lt; path &lt;&lt; <kbd>'/'</kbd> &lt;&lt; fileName &lt;&lt; Z &lt;&lt; <q>".dat"</q>;</td></tr>
+<tr><th id="282">282</th><td>      <span class='error' title="use of undeclared identifier &apos;std&apos;">std</span>::ifstream file(ost.str().c_str());</td></tr>
+<tr><th id="283">283</th><td>      <span class='error' title="use of undeclared identifier &apos;std&apos;">std</span>::filebuf* <dfn class="local col5 decl" id="45lsdp" title='lsdp' data-type='int *' data-ref="45lsdp">lsdp</dfn> = <span class='error' title="use of undeclared identifier &apos;file&apos;">file</span>.rdbuf();</td></tr>
+<tr><th id="284">284</th><td>       </td></tr>
+<tr><th id="285">285</th><td>      <b>if</b> (! (lsdp-&gt;is_open()) )</td></tr>
+<tr><th id="286">286</th><td>	{</td></tr>
+<tr><th id="287">287</th><td>	  <a class="type" href="../../../../global/management/include/G4String.hh.html#G4String" title='G4String' data-ref="G4String">G4String</a> <dfn class="local col6 decl" id="46excep" title='excep' data-type='G4String' data-ref="46excep">excep</dfn> = <q>"data file: "</q> + ost.str() + <q>" not found"</q>;</td></tr>
+<tr><th id="288">288</th><td>          <a class="ref" href="../../../../global/management/include/G4Exception.hh.html#_Z11G4ExceptionPKcS0_19G4ExceptionSeverityS0_" title='G4Exception' data-ref="_Z11G4ExceptionPKcS0_19G4ExceptionSeverityS0_">G4Exception</a>(<q>"G4VCrossSectionHandler::LoadNonLogData"</q>,</td></tr>
+<tr><th id="289">289</th><td>		    <q>"em0003"</q>,<a class="enum" href="../../../../global/management/include/G4ExceptionSeverity.hh.html#G4ExceptionSeverity::FatalException" title='G4ExceptionSeverity::FatalException' data-ref="G4ExceptionSeverity::FatalException">FatalException</a>,<a class="ref fake" href="../../../../global/management/include/G4String.hh.html#_ZNK8G4StringcvPKcEv" title='G4String::operator const char *' data-ref="_ZNK8G4StringcvPKcEv"></a><a class="local col6 ref" href="#46excep" title='excep' data-ref="46excep">excep</a>);</td></tr>
+<tr><th id="290">290</th><td>	}</td></tr>
+<tr><th id="291">291</th><td>      <a class="typedef" href="../../../../global/management/include/G4Types.hh.html#G4double" title='G4double' data-type='double' data-ref="G4double">G4double</a> <dfn class="local col7 decl" id="47a" title='a' data-type='G4double' data-ref="47a">a</dfn> = <var>0</var>;</td></tr>
+<tr><th id="292">292</th><td>      <a class="typedef" href="../../../../global/management/include/G4Types.hh.html#G4int" title='G4int' data-type='int' data-ref="G4int">G4int</a> <dfn class="local col8 decl" id="48k" title='k' data-type='G4int' data-ref="48k">k</dfn> = <var>0</var>;</td></tr>
+<tr><th id="293">293</th><td>      <a class="typedef" href="../../../../global/management/include/G4Types.hh.html#G4int" title='G4int' data-type='int' data-ref="G4int">G4int</a> <dfn class="local col9 decl" id="49nColumns" title='nColumns' data-type='G4int' data-ref="49nColumns">nColumns</dfn> = <var>2</var>;</td></tr>
+<tr><th id="294">294</th><td></td></tr>
+<tr><th id="295">295</th><td>      <a class="type" href="../../../../global/management/include/G4DataVector.hh.html#G4DataVector" title='G4DataVector' data-ref="G4DataVector">G4DataVector</a>* <dfn class="local col0 decl" id="50orig_reg_energies" title='orig_reg_energies' data-type='G4DataVector *' data-ref="50orig_reg_energies">orig_reg_energies</dfn> = <b>new</b> <a class="ref fake" href="../../../../global/management/include/G4DataVector.hh.html#_ZN12G4DataVectorC1Ev" title='G4DataVector::G4DataVector' data-ref="_ZN12G4DataVectorC1Ev"></a><a class="type" href="../../../../global/management/include/G4DataVector.hh.html#G4DataVector" title='G4DataVector' data-ref="G4DataVector">G4DataVector</a>;</td></tr>
+<tr><th id="296">296</th><td>      <a class="type" href="../../../../global/management/include/G4DataVector.hh.html#G4DataVector" title='G4DataVector' data-ref="G4DataVector">G4DataVector</a>* <dfn class="local col1 decl" id="51orig_reg_data" title='orig_reg_data' data-type='G4DataVector *' data-ref="51orig_reg_data">orig_reg_data</dfn> = <b>new</b> <a class="ref fake" href="../../../../global/management/include/G4DataVector.hh.html#_ZN12G4DataVectorC1Ev" title='G4DataVector::G4DataVector' data-ref="_ZN12G4DataVectorC1Ev"></a><a class="type" href="../../../../global/management/include/G4DataVector.hh.html#G4DataVector" title='G4DataVector' data-ref="G4DataVector">G4DataVector</a>;</td></tr>
+<tr><th id="297">297</th><td></td></tr>
+<tr><th id="298">298</th><td>      <b>do</b></td></tr>
+<tr><th id="299">299</th><td>	{</td></tr>
+<tr><th id="300">300</th><td>	  <span class='error' title="use of undeclared identifier &apos;file&apos;">file</span> &gt;&gt; a;</td></tr>
+<tr><th id="301">301</th><td></td></tr>
+<tr><th id="302">302</th><td>	  <i>// The file is organized into four columns:</i></td></tr>
+<tr><th id="303">303</th><td><i>	  // 1st column contains the values of energy</i></td></tr>
+<tr><th id="304">304</th><td><i>	  // 2nd column contains the corresponding data value</i></td></tr>
+<tr><th id="305">305</th><td><i>	  // The file terminates with the pattern: -1   -1</i></td></tr>
+<tr><th id="306">306</th><td><i>	  //                                       -2   -2</i></td></tr>
+<tr><th id="307">307</th><td><i>          //</i></td></tr>
+<tr><th id="308">308</th><td>	  <b>if</b> (<a class="local col7 ref" href="#47a" title='a' data-ref="47a">a</a> != -<var>1</var> &amp;&amp; <a class="local col7 ref" href="#47a" title='a' data-ref="47a">a</a> != -<var>2</var>)</td></tr>
+<tr><th id="309">309</th><td>	    {</td></tr>
+<tr><th id="310">310</th><td>	      <b>if</b> (<a class="local col8 ref" href="#48k" title='k' data-ref="48k">k</a>%<a class="local col9 ref" href="#49nColumns" title='nColumns' data-ref="49nColumns">nColumns</a> == <var>0</var>)</td></tr>
+<tr><th id="311">311</th><td>                {</td></tr>
+<tr><th id="312">312</th><td>		 orig_reg_energies-&gt;<span class='error' title="no member named &apos;push_back&apos; in &apos;G4DataVector&apos;">push_back</span>(a*unit1);</td></tr>
+<tr><th id="313">313</th><td>                }</td></tr>
+<tr><th id="314">314</th><td>	      <b>else</b> <b>if</b> (<a class="local col8 ref" href="#48k" title='k' data-ref="48k">k</a>%<a class="local col9 ref" href="#49nColumns" title='nColumns' data-ref="49nColumns">nColumns</a> == <var>1</var>)</td></tr>
+<tr><th id="315">315</th><td>                {</td></tr>
+<tr><th id="316">316</th><td>		 orig_reg_data-&gt;<span class='error' title="no member named &apos;push_back&apos; in &apos;G4DataVector&apos;">push_back</span>(a*unit2);</td></tr>
+<tr><th id="317">317</th><td>                }</td></tr>
+<tr><th id="318">318</th><td>              <a class="local col8 ref" href="#48k" title='k' data-ref="48k">k</a>++;</td></tr>
+<tr><th id="319">319</th><td>	    }</td></tr>
+<tr><th id="320">320</th><td>	} </td></tr>
+<tr><th id="321">321</th><td>      <b>while</b> (<a class="local col7 ref" href="#47a" title='a' data-ref="47a">a</a> != -<var>2</var>); <i>// End of File</i></td></tr>
+<tr><th id="322">322</th><td>      </td></tr>
+<tr><th id="323">323</th><td>      <span class='error' title="use of undeclared identifier &apos;file&apos;">file</span>.close();</td></tr>
+<tr><th id="324">324</th><td>      <a class="type" href="../include/G4VDataSetAlgorithm.hh.html#G4VDataSetAlgorithm" title='G4VDataSetAlgorithm' data-ref="G4VDataSetAlgorithm">G4VDataSetAlgorithm</a>* <dfn class="local col2 decl" id="52algo" title='algo' data-type='G4VDataSetAlgorithm *' data-ref="52algo">algo</dfn> = <a class="member" href="../include/G4VCrossSectionHandler.hh.html#G4VCrossSectionHandler::interpolation" title='G4VCrossSectionHandler::interpolation' data-ref="G4VCrossSectionHandler::interpolation">interpolation</a>-&gt;<a class="virtual ref" href="../include/G4VDataSetAlgorithm.hh.html#_ZNK19G4VDataSetAlgorithm5CloneEv" title='G4VDataSetAlgorithm::Clone' data-ref="_ZNK19G4VDataSetAlgorithm5CloneEv">Clone</a>();</td></tr>
+<tr><th id="325">325</th><td></td></tr>
+<tr><th id="326">326</th><td>      <a class="type" href="../include/G4VEMDataSet.hh.html#G4VEMDataSet" title='G4VEMDataSet' data-ref="G4VEMDataSet">G4VEMDataSet</a>* <dfn class="local col3 decl" id="53dataSet" title='dataSet' data-type='G4VEMDataSet *' data-ref="53dataSet">dataSet</dfn> = <b>new</b> <a class="type" href="../include/G4EMDataSet.hh.html#G4EMDataSet" title='G4EMDataSet' data-ref="G4EMDataSet">G4EMDataSet</a><a class="ref" href="../include/G4EMDataSet.hh.html#_ZN11G4EMDataSetC1EiP12G4DataVectorS1_P19G4VDataSetAlgorithmddb" title='G4EMDataSet::G4EMDataSet' data-ref="_ZN11G4EMDataSetC1EiP12G4DataVectorS1_P19G4VDataSetAlgorithmddb">(</a><a class="local col2 ref" href="#42Z" title='Z' data-ref="42Z">Z</a>,<a class="local col0 ref" href="#50orig_reg_energies" title='orig_reg_energies' data-ref="50orig_reg_energies">orig_reg_energies</a>,<a class="local col1 ref" href="#51orig_reg_data" title='orig_reg_data' data-ref="51orig_reg_data">orig_reg_data</a>,<a class="local col2 ref" href="#52algo" title='algo' data-ref="52algo">algo</a>);</td></tr>
+<tr><th id="327">327</th><td></td></tr>
+<tr><th id="328">328</th><td>      <span class='error' title="use of undeclared identifier &apos;dataMap&apos;">dataMap</span>[Z] = dataSet;</td></tr>
+<tr><th id="329">329</th><td></td></tr>
+<tr><th id="330">330</th><td>    }</td></tr>
+<tr><th id="331">331</th><td>}</td></tr>
+<tr><th id="332">332</th><td></td></tr>
+<tr><th id="333">333</th><td><em>void</em> <a class="type" href="../include/G4VCrossSectionHandler.hh.html#G4VCrossSectionHandler" title='G4VCrossSectionHandler' data-ref="G4VCrossSectionHandler">G4VCrossSectionHandler</a>::<dfn class="decl def" id="_ZN22G4VCrossSectionHandler13LoadShellDataERK8G4String" title='G4VCrossSectionHandler::LoadShellData' data-ref="_ZN22G4VCrossSectionHandler13LoadShellDataERK8G4String">LoadShellData</dfn>(<em>const</em> <a class="type" href="../../../../global/management/include/G4String.hh.html#G4String" title='G4String' data-ref="G4String">G4String</a>&amp; <dfn class="local col4 decl" id="54fileName" title='fileName' data-type='const G4String &amp;' data-ref="54fileName">fileName</dfn>)</td></tr>
+<tr><th id="334">334</th><td>{</td></tr>
+<tr><th id="335">335</th><td>  <span class='error' title="unknown type name &apos;size_t&apos;">size_t</span> <dfn class="local col5 decl" id="55nZ" title='nZ' data-type='int' data-ref="55nZ">nZ</dfn> = activeZ.<span class='error' title="no member named &apos;size&apos; in &apos;G4DataVector&apos;">size</span>();</td></tr>
+<tr><th id="336">336</th><td>  <b>for</b> (<span class='error' title="unknown type name &apos;size_t&apos;">size_t</span> <dfn class="local col6 decl" id="56i" title='i' data-type='int' data-ref="56i">i</dfn>=<var>0</var>; i&lt;nZ; i++)</td></tr>
+<tr><th id="337">337</th><td>    {</td></tr>
+<tr><th id="338">338</th><td>      <a class="typedef" href="../../../../global/management/include/G4Types.hh.html#G4int" title='G4int' data-type='int' data-ref="G4int">G4int</a> <dfn class="local col7 decl" id="57Z" title='Z' data-type='G4int' data-ref="57Z">Z</dfn> = (G4int) activeZ[i];</td></tr>
+<tr><th id="339">339</th><td>      </td></tr>
+<tr><th id="340">340</th><td>      <a class="type" href="../include/G4VDataSetAlgorithm.hh.html#G4VDataSetAlgorithm" title='G4VDataSetAlgorithm' data-ref="G4VDataSetAlgorithm">G4VDataSetAlgorithm</a>* <dfn class="local col8 decl" id="58algo" title='algo' data-type='G4VDataSetAlgorithm *' data-ref="58algo">algo</dfn> = <a class="member" href="../include/G4VCrossSectionHandler.hh.html#G4VCrossSectionHandler::interpolation" title='G4VCrossSectionHandler::interpolation' data-ref="G4VCrossSectionHandler::interpolation">interpolation</a>-&gt;<a class="virtual ref" href="../include/G4VDataSetAlgorithm.hh.html#_ZNK19G4VDataSetAlgorithm5CloneEv" title='G4VDataSetAlgorithm::Clone' data-ref="_ZNK19G4VDataSetAlgorithm5CloneEv">Clone</a>();</td></tr>
+<tr><th id="341">341</th><td>      <a class="type" href="../include/G4VEMDataSet.hh.html#G4VEMDataSet" title='G4VEMDataSet' data-ref="G4VEMDataSet">G4VEMDataSet</a>* <dfn class="local col9 decl" id="59dataSet" title='dataSet' data-type='G4VEMDataSet *' data-ref="59dataSet">dataSet</dfn> = <b>new</b> <a class="type" href="../include/G4ShellEMDataSet.hh.html#G4ShellEMDataSet" title='G4ShellEMDataSet' data-ref="G4ShellEMDataSet">G4ShellEMDataSet</a><a class="ref" href="../include/G4ShellEMDataSet.hh.html#_ZN16G4ShellEMDataSetC1EiP19G4VDataSetAlgorithmdd" title='G4ShellEMDataSet::G4ShellEMDataSet' data-ref="_ZN16G4ShellEMDataSetC1EiP19G4VDataSetAlgorithmdd">(</a><a class="local col7 ref" href="#57Z" title='Z' data-ref="57Z">Z</a>, <a class="local col8 ref" href="#58algo" title='algo' data-ref="58algo">algo</a>);</td></tr>
+<tr><th id="342">342</th><td></td></tr>
+<tr><th id="343">343</th><td>      <a class="local col9 ref" href="#59dataSet" title='dataSet' data-ref="59dataSet">dataSet</a>-&gt;<a class="virtual ref" href="../include/G4VEMDataSet.hh.html#_ZN12G4VEMDataSet8LoadDataERK8G4String" title='G4VEMDataSet::LoadData' data-ref="_ZN12G4VEMDataSet8LoadDataERK8G4String">LoadData</a>(<a class="local col4 ref" href="#54fileName" title='fileName' data-ref="54fileName">fileName</a>);</td></tr>
+<tr><th id="344">344</th><td>      </td></tr>
+<tr><th id="345">345</th><td>      <span class='error' title="use of undeclared identifier &apos;dataMap&apos;">dataMap</span>[Z] = dataSet;</td></tr>
+<tr><th id="346">346</th><td>    }</td></tr>
+<tr><th id="347">347</th><td>}</td></tr>
+<tr><th id="348">348</th><td></td></tr>
+<tr><th id="349">349</th><td></td></tr>
+<tr><th id="350">350</th><td></td></tr>
+<tr><th id="351">351</th><td></td></tr>
+<tr><th id="352">352</th><td><em>void</em> <a class="type" href="../include/G4VCrossSectionHandler.hh.html#G4VCrossSectionHandler" title='G4VCrossSectionHandler' data-ref="G4VCrossSectionHandler">G4VCrossSectionHandler</a>::<dfn class="decl def" id="_ZN22G4VCrossSectionHandler5ClearEv" title='G4VCrossSectionHandler::Clear' data-ref="_ZN22G4VCrossSectionHandler5ClearEv">Clear</dfn>()</td></tr>
+<tr><th id="353">353</th><td>{</td></tr>
+<tr><th id="354">354</th><td>  <i>// Reset the map of data sets: remove the data sets from the map </i></td></tr>
+<tr><th id="355">355</th><td>  <span class='error' title="use of undeclared identifier &apos;std&apos;">std</span>::map&lt;<span class='error' title="unexpected type name &apos;G4int&apos;: expected expression">G4int</span>,G4VEMDataSet*,std::less&lt;G4int&gt; &gt;::iterator pos;</td></tr>
+<tr><th id="356">356</th><td></td></tr>
+<tr><th id="357">357</th><td>  <b>if</b>(! <span class='error' title="use of undeclared identifier &apos;dataMap&apos;">dataMap</span>.empty())</td></tr>
+<tr><th id="358">358</th><td>    {</td></tr>
+<tr><th id="359">359</th><td>        <b>for</b> (<span class='error' title="use of undeclared identifier &apos;pos&apos;">pos</span> = <span class='error' title="use of undeclared identifier &apos;dataMap&apos;">dataMap</span>.begin(); <span class='error' title="use of undeclared identifier &apos;pos&apos;">pos</span> != <span class='error' title="use of undeclared identifier &apos;dataMap&apos;">dataMap</span>.end(); ++<span class='error' title="use of undeclared identifier &apos;pos&apos;">pos</span>)</td></tr>
+<tr><th id="360">360</th><td>	{</td></tr>
+<tr><th id="361">361</th><td>	  <i>// The following is a workaround for STL ObjectSpace implementation, </i></td></tr>
+<tr><th id="362">362</th><td><i>	  // which does not support the standard and does not accept</i></td></tr>
+<tr><th id="363">363</th><td><i>	  // the syntax pos-&gt;first or pos-&gt;second</i></td></tr>
+<tr><th id="364">364</th><td><i>	  // G4VEMDataSet* dataSet = pos-&gt;second;</i></td></tr>
+<tr><th id="365">365</th><td>	  <a class="type" href="../include/G4VEMDataSet.hh.html#G4VEMDataSet" title='G4VEMDataSet' data-ref="G4VEMDataSet">G4VEMDataSet</a>* <dfn class="local col0 decl" id="60dataSet" title='dataSet' data-type='G4VEMDataSet *' data-ref="60dataSet">dataSet</dfn> = (*<span class='error' title="use of undeclared identifier &apos;pos&apos;">pos</span>).second;</td></tr>
+<tr><th id="366">366</th><td>	  <b>delete</b> <a class="local col0 ref" href="#60dataSet" title='dataSet' data-ref="60dataSet">dataSet</a>;</td></tr>
+<tr><th id="367">367</th><td>	  <a class="local col0 ref" href="#60dataSet" title='dataSet' data-ref="60dataSet">dataSet</a> = <var>0</var>;</td></tr>
+<tr><th id="368">368</th><td>	  <a class="typedef" href="../../../../global/management/include/G4Types.hh.html#G4int" title='G4int' data-type='int' data-ref="G4int">G4int</a> <dfn class="local col1 decl" id="61i" title='i' data-type='G4int' data-ref="61i">i</dfn> = (*<span class='error' title="use of undeclared identifier &apos;pos&apos;">pos</span>).first;</td></tr>
+<tr><th id="369">369</th><td>	  <span class='error' title="use of undeclared identifier &apos;dataMap&apos;">dataMap</span>[i] = <var>0</var>;</td></tr>
+<tr><th id="370">370</th><td>	}</td></tr>
+<tr><th id="371">371</th><td>	<span class='error' title="use of undeclared identifier &apos;dataMap&apos;">dataMap</span>.clear();</td></tr>
+<tr><th id="372">372</th><td>    }</td></tr>
+<tr><th id="373">373</th><td></td></tr>
+<tr><th id="374">374</th><td>  activeZ.<span class='error' title="no member named &apos;clear&apos; in &apos;G4DataVector&apos;">clear</span>();</td></tr>
+<tr><th id="375">375</th><td>  <a class="member" href="#_ZN22G4VCrossSectionHandler14ActiveElementsEv" title='G4VCrossSectionHandler::ActiveElements' data-ref="_ZN22G4VCrossSectionHandler14ActiveElementsEv">ActiveElements</a>();</td></tr>
+<tr><th id="376">376</th><td>}</td></tr>
+<tr><th id="377">377</th><td></td></tr>
+<tr><th id="378">378</th><td><a class="typedef" href="../../../../global/management/include/G4Types.hh.html#G4double" title='G4double' data-type='double' data-ref="G4double">G4double</a> <a class="type" href="../include/G4VCrossSectionHandler.hh.html#G4VCrossSectionHandler" title='G4VCrossSectionHandler' data-ref="G4VCrossSectionHandler">G4VCrossSectionHandler</a>::<dfn class="decl def" id="_ZNK22G4VCrossSectionHandler9FindValueEid" title='G4VCrossSectionHandler::FindValue' data-ref="_ZNK22G4VCrossSectionHandler9FindValueEid">FindValue</dfn>(<a class="typedef" href="../../../../global/management/include/G4Types.hh.html#G4int" title='G4int' data-type='int' data-ref="G4int">G4int</a> <dfn class="local col2 decl" id="62Z" title='Z' data-type='G4int' data-ref="62Z">Z</dfn>, <a class="typedef" href="../../../../global/management/include/G4Types.hh.html#G4double" title='G4double' data-type='double' data-ref="G4double">G4double</a> <dfn class="local col3 decl" id="63energy" title='energy' data-type='G4double' data-ref="63energy">energy</dfn>) <em>const</em></td></tr>
+<tr><th id="379">379</th><td>{</td></tr>
+<tr><th id="380">380</th><td>  <a class="typedef" href="../../../../global/management/include/G4Types.hh.html#G4double" title='G4double' data-type='double' data-ref="G4double">G4double</a> <dfn class="local col4 decl" id="64value" title='value' data-type='G4double' data-ref="64value">value</dfn> = <var>0.</var>;</td></tr>
+<tr><th id="381">381</th><td>  </td></tr>
+<tr><th id="382">382</th><td>  <span class='error' title="use of undeclared identifier &apos;std&apos;">std</span>::map&lt;<span class='error' title="unexpected type name &apos;G4int&apos;: expected expression">G4int</span>,G4VEMDataSet*,std::less&lt;G4int&gt; &gt;::const_iterator pos;</td></tr>
+<tr><th id="383">383</th><td>  <span class='error' title="use of undeclared identifier &apos;pos&apos;">pos</span> = <span class='error' title="use of undeclared identifier &apos;dataMap&apos;">dataMap</span>.find(Z);</td></tr>
+<tr><th id="384">384</th><td>  <b>if</b> (<span class='error' title="use of undeclared identifier &apos;pos&apos;">pos</span>!= <span class='error' title="use of undeclared identifier &apos;dataMap&apos;">dataMap</span>.end())</td></tr>
+<tr><th id="385">385</th><td>    {</td></tr>
+<tr><th id="386">386</th><td>      <i>// The following is a workaround for STL ObjectSpace implementation, </i></td></tr>
+<tr><th id="387">387</th><td><i>      // which does not support the standard and does not accept </i></td></tr>
+<tr><th id="388">388</th><td><i>      // the syntax pos-&gt;first or pos-&gt;second</i></td></tr>
+<tr><th id="389">389</th><td><i>      // G4VEMDataSet* dataSet = pos-&gt;second;</i></td></tr>
+<tr><th id="390">390</th><td>      <a class="type" href="../include/G4VEMDataSet.hh.html#G4VEMDataSet" title='G4VEMDataSet' data-ref="G4VEMDataSet">G4VEMDataSet</a>* <dfn class="local col5 decl" id="65dataSet" title='dataSet' data-type='G4VEMDataSet *' data-ref="65dataSet">dataSet</dfn> = (*<span class='error' title="use of undeclared identifier &apos;pos&apos;">pos</span>).second;</td></tr>
+<tr><th id="391">391</th><td>      <a class="local col4 ref" href="#64value" title='value' data-ref="64value">value</a> = <a class="local col5 ref" href="#65dataSet" title='dataSet' data-ref="65dataSet">dataSet</a>-&gt;<a class="virtual ref" href="../include/G4VEMDataSet.hh.html#_ZNK12G4VEMDataSet9FindValueEdi" title='G4VEMDataSet::FindValue' data-ref="_ZNK12G4VEMDataSet9FindValueEdi">FindValue</a>(<a class="local col3 ref" href="#63energy" title='energy' data-ref="63energy">energy</a>);</td></tr>
+<tr><th id="392">392</th><td>    }</td></tr>
+<tr><th id="393">393</th><td>  <b>else</b></td></tr>
+<tr><th id="394">394</th><td>    {</td></tr>
+<tr><th id="395">395</th><td>      <a class="macro" href="../../../../global/management/include/G4ios.hh.html#46" title="(*_G4cout_p())" data-ref="_M/G4cout">G4cout</a> <span class='error' title="invalid operands to binary expression (&apos;int&apos; and &apos;const char *&apos;)">&lt;&lt;</span> <q>"WARNING: G4VCrossSectionHandler::FindValue did not find Z = "</q></td></tr>
+<tr><th id="396">396</th><td>	     &lt;&lt; Z &lt;&lt; <a class="macro" href="../../../../global/management/include/G4ios.hh.html#60" title="std::endl" data-ref="_M/G4endl">G4endl</a>;</td></tr>
+<tr><th id="397">397</th><td>    }</td></tr>
+<tr><th id="398">398</th><td>  <b>return</b> <a class="local col4 ref" href="#64value" title='value' data-ref="64value">value</a>;</td></tr>
+<tr><th id="399">399</th><td>}</td></tr>
+<tr><th id="400">400</th><td></td></tr>
+<tr><th id="401">401</th><td><a class="typedef" href="../../../../global/management/include/G4Types.hh.html#G4double" title='G4double' data-type='double' data-ref="G4double">G4double</a> <a class="type" href="../include/G4VCrossSectionHandler.hh.html#G4VCrossSectionHandler" title='G4VCrossSectionHandler' data-ref="G4VCrossSectionHandler">G4VCrossSectionHandler</a>::<dfn class="decl def" id="_ZNK22G4VCrossSectionHandler9FindValueEidi" title='G4VCrossSectionHandler::FindValue' data-ref="_ZNK22G4VCrossSectionHandler9FindValueEidi">FindValue</dfn>(<a class="typedef" href="../../../../global/management/include/G4Types.hh.html#G4int" title='G4int' data-type='int' data-ref="G4int">G4int</a> <dfn class="local col6 decl" id="66Z" title='Z' data-type='G4int' data-ref="66Z">Z</dfn>, <a class="typedef" href="../../../../global/management/include/G4Types.hh.html#G4double" title='G4double' data-type='double' data-ref="G4double">G4double</a> <dfn class="local col7 decl" id="67energy" title='energy' data-type='G4double' data-ref="67energy">energy</dfn>, </td></tr>
+<tr><th id="402">402</th><td>                                           <a class="typedef" href="../../../../global/management/include/G4Types.hh.html#G4int" title='G4int' data-type='int' data-ref="G4int">G4int</a> <dfn class="local col8 decl" id="68shellIndex" title='shellIndex' data-type='G4int' data-ref="68shellIndex">shellIndex</dfn>) <em>const</em></td></tr>
+<tr><th id="403">403</th><td>{</td></tr>
+<tr><th id="404">404</th><td>  <a class="typedef" href="../../../../global/management/include/G4Types.hh.html#G4double" title='G4double' data-type='double' data-ref="G4double">G4double</a> <dfn class="local col9 decl" id="69value" title='value' data-type='G4double' data-ref="69value">value</dfn> = <var>0.</var>;</td></tr>
+<tr><th id="405">405</th><td></td></tr>
+<tr><th id="406">406</th><td>  <span class='error' title="use of undeclared identifier &apos;std&apos;">std</span>::map&lt;<span class='error' title="unexpected type name &apos;G4int&apos;: expected expression">G4int</span>,G4VEMDataSet*,std::less&lt;G4int&gt; &gt;::const_iterator pos;</td></tr>
+<tr><th id="407">407</th><td>  <span class='error' title="use of undeclared identifier &apos;pos&apos;">pos</span> = <span class='error' title="use of undeclared identifier &apos;dataMap&apos;">dataMap</span>.find(Z);</td></tr>
+<tr><th id="408">408</th><td>  <b>if</b> (<span class='error' title="use of undeclared identifier &apos;pos&apos;">pos</span>!= <span class='error' title="use of undeclared identifier &apos;dataMap&apos;">dataMap</span>.end())</td></tr>
+<tr><th id="409">409</th><td>    {</td></tr>
+<tr><th id="410">410</th><td>      <i>// The following is a workaround for STL ObjectSpace implementation, </i></td></tr>
+<tr><th id="411">411</th><td><i>      // which does not support the standard and does not accept </i></td></tr>
+<tr><th id="412">412</th><td><i>      // the syntax pos-&gt;first or pos-&gt;second</i></td></tr>
+<tr><th id="413">413</th><td><i>      // G4VEMDataSet* dataSet = pos-&gt;second;</i></td></tr>
+<tr><th id="414">414</th><td>      <a class="type" href="../include/G4VEMDataSet.hh.html#G4VEMDataSet" title='G4VEMDataSet' data-ref="G4VEMDataSet">G4VEMDataSet</a>* <dfn class="local col0 decl" id="70dataSet" title='dataSet' data-type='G4VEMDataSet *' data-ref="70dataSet">dataSet</dfn> = (*<span class='error' title="use of undeclared identifier &apos;pos&apos;">pos</span>).second;</td></tr>
+<tr><th id="415">415</th><td>      <b>if</b> (<a class="local col8 ref" href="#68shellIndex" title='shellIndex' data-ref="68shellIndex">shellIndex</a> &gt;= <var>0</var>) </td></tr>
+<tr><th id="416">416</th><td>	{</td></tr>
+<tr><th id="417">417</th><td>	  <a class="typedef" href="../../../../global/management/include/G4Types.hh.html#G4int" title='G4int' data-type='int' data-ref="G4int">G4int</a> <dfn class="local col1 decl" id="71nComponents" title='nComponents' data-type='G4int' data-ref="71nComponents">nComponents</dfn> = dataSet-&gt;NumberOfComponents();</td></tr>
+<tr><th id="418">418</th><td>	  <b>if</b>(<a class="local col8 ref" href="#68shellIndex" title='shellIndex' data-ref="68shellIndex">shellIndex</a> &lt; <a class="local col1 ref" href="#71nComponents" title='nComponents' data-ref="71nComponents">nComponents</a>)    </td></tr>
+<tr><th id="419">419</th><td>	    <i>// - MGP - Why doesn't it use G4VEMDataSet::FindValue directly?</i></td></tr>
+<tr><th id="420">420</th><td>	    <a class="local col9 ref" href="#69value" title='value' data-ref="69value">value</a> = <a class="local col0 ref" href="#70dataSet" title='dataSet' data-ref="70dataSet">dataSet</a>-&gt;<a class="virtual ref" href="../include/G4VEMDataSet.hh.html#_ZNK12G4VEMDataSet12GetComponentEi" title='G4VEMDataSet::GetComponent' data-ref="_ZNK12G4VEMDataSet12GetComponentEi">GetComponent</a>(<a class="local col8 ref" href="#68shellIndex" title='shellIndex' data-ref="68shellIndex">shellIndex</a>)-&gt;<a class="virtual ref" href="../include/G4VEMDataSet.hh.html#_ZNK12G4VEMDataSet9FindValueEdi" title='G4VEMDataSet::FindValue' data-ref="_ZNK12G4VEMDataSet9FindValueEdi">FindValue</a>(<a class="local col7 ref" href="#67energy" title='energy' data-ref="67energy">energy</a>);</td></tr>
+<tr><th id="421">421</th><td>	  <b>else</b> </td></tr>
+<tr><th id="422">422</th><td>	    {</td></tr>
+<tr><th id="423">423</th><td>	      <a class="macro" href="../../../../global/management/include/G4ios.hh.html#46" title="(*_G4cout_p())" data-ref="_M/G4cout">G4cout</a> <span class='error' title="invalid operands to binary expression (&apos;int&apos; and &apos;const char *&apos;)">&lt;&lt;</span> <q>"WARNING: G4VCrossSectionHandler::FindValue did not find"</q></td></tr>
+<tr><th id="424">424</th><td>		     &lt;&lt; <q>" shellIndex= "</q> &lt;&lt; shellIndex</td></tr>
+<tr><th id="425">425</th><td>		     &lt;&lt; <q>" for  Z= "</q></td></tr>
+<tr><th id="426">426</th><td>		     &lt;&lt; Z &lt;&lt; <a class="macro" href="../../../../global/management/include/G4ios.hh.html#60" title="std::endl" data-ref="_M/G4endl">G4endl</a>;</td></tr>
+<tr><th id="427">427</th><td>	    }</td></tr>
+<tr><th id="428">428</th><td>	} <b>else</b> {</td></tr>
+<tr><th id="429">429</th><td>	  <a class="local col9 ref" href="#69value" title='value' data-ref="69value">value</a> = <a class="local col0 ref" href="#70dataSet" title='dataSet' data-ref="70dataSet">dataSet</a>-&gt;<a class="virtual ref" href="../include/G4VEMDataSet.hh.html#_ZNK12G4VEMDataSet9FindValueEdi" title='G4VEMDataSet::FindValue' data-ref="_ZNK12G4VEMDataSet9FindValueEdi">FindValue</a>(<a class="local col7 ref" href="#67energy" title='energy' data-ref="67energy">energy</a>);</td></tr>
+<tr><th id="430">430</th><td>	}</td></tr>
+<tr><th id="431">431</th><td>    }</td></tr>
+<tr><th id="432">432</th><td>  <b>else</b></td></tr>
+<tr><th id="433">433</th><td>    {</td></tr>
+<tr><th id="434">434</th><td>      <a class="macro" href="../../../../global/management/include/G4ios.hh.html#46" title="(*_G4cout_p())" data-ref="_M/G4cout">G4cout</a> <span class='error' title="invalid operands to binary expression (&apos;int&apos; and &apos;const char *&apos;)">&lt;&lt;</span> <q>"WARNING: G4VCrossSectionHandler::FindValue did not find Z = "</q></td></tr>
+<tr><th id="435">435</th><td>	     &lt;&lt; Z &lt;&lt; <a class="macro" href="../../../../global/management/include/G4ios.hh.html#60" title="std::endl" data-ref="_M/G4endl">G4endl</a>;</td></tr>
+<tr><th id="436">436</th><td>    }</td></tr>
+<tr><th id="437">437</th><td>  <b>return</b> <a class="local col9 ref" href="#69value" title='value' data-ref="69value">value</a>;</td></tr>
+<tr><th id="438">438</th><td>}</td></tr>
+<tr><th id="439">439</th><td></td></tr>
+<tr><th id="440">440</th><td></td></tr>
+<tr><th id="441">441</th><td><a class="typedef" href="../../../../global/management/include/G4Types.hh.html#G4double" title='G4double' data-type='double' data-ref="G4double">G4double</a> <a class="type" href="../include/G4VCrossSectionHandler.hh.html#G4VCrossSectionHandler" title='G4VCrossSectionHandler' data-ref="G4VCrossSectionHandler">G4VCrossSectionHandler</a>::<dfn class="decl def" id="_ZNK22G4VCrossSectionHandler16ValueForMaterialEPK10G4Materiald" title='G4VCrossSectionHandler::ValueForMaterial' data-ref="_ZNK22G4VCrossSectionHandler16ValueForMaterialEPK10G4Materiald">ValueForMaterial</dfn>(<em>const</em> <a class="type" href="../../../../materials/include/G4Material.hh.html#G4Material" title='G4Material' data-ref="G4Material">G4Material</a>* <dfn class="local col2 decl" id="72material" title='material' data-type='const G4Material *' data-ref="72material">material</dfn>,</td></tr>
+<tr><th id="442">442</th><td>						  <a class="typedef" href="../../../../global/management/include/G4Types.hh.html#G4double" title='G4double' data-type='double' data-ref="G4double">G4double</a> <dfn class="local col3 decl" id="73energy" title='energy' data-type='G4double' data-ref="73energy">energy</dfn>) <em>const</em></td></tr>
+<tr><th id="443">443</th><td>{</td></tr>
+<tr><th id="444">444</th><td>  <a class="typedef" href="../../../../global/management/include/G4Types.hh.html#G4double" title='G4double' data-type='double' data-ref="G4double">G4double</a> <dfn class="local col4 decl" id="74value" title='value' data-type='G4double' data-ref="74value">value</dfn> = <var>0.</var>;</td></tr>
+<tr><th id="445">445</th><td></td></tr>
+<tr><th id="446">446</th><td>  <em>const</em> <span class='error' title="unknown type name &apos;G4ElementVector&apos;">G4ElementVector</span>* <dfn class="local col5 decl" id="75elementVector" title='elementVector' data-type='const int *' data-ref="75elementVector">elementVector</dfn> = material-&gt;GetElementVector();</td></tr>
+<tr><th id="447">447</th><td>  <em>const</em> <a class="typedef" href="../../../../global/management/include/G4Types.hh.html#G4double" title='G4double' data-type='double' data-ref="G4double">G4double</a>* <dfn class="local col6 decl" id="76nAtomsPerVolume" title='nAtomsPerVolume' data-type='const G4double *' data-ref="76nAtomsPerVolume">nAtomsPerVolume</dfn> = <a class="local col2 ref" href="#72material" title='material' data-ref="72material">material</a>-&gt;<a class="ref" href="../../../../materials/include/G4Material.hh.html#_ZNK10G4Material24GetVecNbOfAtomsPerVolumeEv" title='G4Material::GetVecNbOfAtomsPerVolume' data-ref="_ZNK10G4Material24GetVecNbOfAtomsPerVolumeEv">GetVecNbOfAtomsPerVolume</a>();</td></tr>
+<tr><th id="448">448</th><td>  <a class="typedef" href="../../../../global/management/include/G4Types.hh.html#G4int" title='G4int' data-type='int' data-ref="G4int">G4int</a> <dfn class="local col7 decl" id="77nElements" title='nElements' data-type='G4int' data-ref="77nElements">nElements</dfn> = material-&gt;GetNumberOfElements();</td></tr>
+<tr><th id="449">449</th><td></td></tr>
+<tr><th id="450">450</th><td>  <b>for</b> (<a class="typedef" href="../../../../global/management/include/G4Types.hh.html#G4int" title='G4int' data-type='int' data-ref="G4int">G4int</a> <dfn class="local col8 decl" id="78i" title='i' data-type='G4int' data-ref="78i">i</dfn>=<var>0</var> ; <a class="local col8 ref" href="#78i" title='i' data-ref="78i">i</a>&lt;<a class="local col7 ref" href="#77nElements" title='nElements' data-ref="77nElements">nElements</a> ; <a class="local col8 ref" href="#78i" title='i' data-ref="78i">i</a>++)</td></tr>
+<tr><th id="451">451</th><td>    {</td></tr>
+<tr><th id="452">452</th><td>      <a class="typedef" href="../../../../global/management/include/G4Types.hh.html#G4int" title='G4int' data-type='int' data-ref="G4int">G4int</a> <dfn class="local col9 decl" id="79Z" title='Z' data-type='G4int' data-ref="79Z">Z</dfn> = (G4int) (*elementVector)[i]-&gt;GetZ();</td></tr>
+<tr><th id="453">453</th><td>      <a class="typedef" href="../../../../global/management/include/G4Types.hh.html#G4double" title='G4double' data-type='double' data-ref="G4double">G4double</a> <dfn class="local col0 decl" id="80elementValue" title='elementValue' data-type='G4double' data-ref="80elementValue">elementValue</dfn> = <a class="member" href="#_ZNK22G4VCrossSectionHandler9FindValueEid" title='G4VCrossSectionHandler::FindValue' data-ref="_ZNK22G4VCrossSectionHandler9FindValueEid">FindValue</a>(<a class="local col9 ref" href="#79Z" title='Z' data-ref="79Z">Z</a>,<a class="local col3 ref" href="#73energy" title='energy' data-ref="73energy">energy</a>);</td></tr>
+<tr><th id="454">454</th><td>      <a class="typedef" href="../../../../global/management/include/G4Types.hh.html#G4double" title='G4double' data-type='double' data-ref="G4double">G4double</a> <dfn class="local col1 decl" id="81nAtomsVol" title='nAtomsVol' data-type='G4double' data-ref="81nAtomsVol">nAtomsVol</dfn> = <a class="local col6 ref" href="#76nAtomsPerVolume" title='nAtomsPerVolume' data-ref="76nAtomsPerVolume">nAtomsPerVolume</a>[<a class="local col8 ref" href="#78i" title='i' data-ref="78i">i</a>];</td></tr>
+<tr><th id="455">455</th><td>      <a class="local col4 ref" href="#74value" title='value' data-ref="74value">value</a> += <a class="local col1 ref" href="#81nAtomsVol" title='nAtomsVol' data-ref="81nAtomsVol">nAtomsVol</a> * <a class="local col0 ref" href="#80elementValue" title='elementValue' data-ref="80elementValue">elementValue</a>;</td></tr>
+<tr><th id="456">456</th><td>    }</td></tr>
+<tr><th id="457">457</th><td></td></tr>
+<tr><th id="458">458</th><td>  <b>return</b> <a class="local col4 ref" href="#74value" title='value' data-ref="74value">value</a>;</td></tr>
+<tr><th id="459">459</th><td>}</td></tr>
+<tr><th id="460">460</th><td></td></tr>
+<tr><th id="461">461</th><td></td></tr>
+<tr><th id="462">462</th><td><a class="type" href="../include/G4VEMDataSet.hh.html#G4VEMDataSet" title='G4VEMDataSet' data-ref="G4VEMDataSet">G4VEMDataSet</a>* <a class="type" href="../include/G4VCrossSectionHandler.hh.html#G4VCrossSectionHandler" title='G4VCrossSectionHandler' data-ref="G4VCrossSectionHandler">G4VCrossSectionHandler</a>::<dfn class="decl def" id="_ZN22G4VCrossSectionHandler29BuildMeanFreePathForMaterialsEPK12G4DataVector" title='G4VCrossSectionHandler::BuildMeanFreePathForMaterials' data-ref="_ZN22G4VCrossSectionHandler29BuildMeanFreePathForMaterialsEPK12G4DataVector">BuildMeanFreePathForMaterials</dfn>(<em>const</em> <a class="type" href="../../../../global/management/include/G4DataVector.hh.html#G4DataVector" title='G4DataVector' data-ref="G4DataVector">G4DataVector</a>* <dfn class="local col2 decl" id="82energyCuts" title='energyCuts' data-type='const G4DataVector *' data-ref="82energyCuts">energyCuts</dfn>)</td></tr>
+<tr><th id="463">463</th><td>{</td></tr>
+<tr><th id="464">464</th><td>  <i>// Builds a CompositeDataSet containing the mean free path for each material</i></td></tr>
+<tr><th id="465">465</th><td><i>  // in the material table</i></td></tr>
+<tr><th id="466">466</th><td></td></tr>
+<tr><th id="467">467</th><td>  <a class="type" href="../../../../global/management/include/G4DataVector.hh.html#G4DataVector" title='G4DataVector' data-ref="G4DataVector">G4DataVector</a> <a class="ref fake" href="../../../../global/management/include/G4DataVector.hh.html#_ZN12G4DataVectorC1Ev" title='G4DataVector::G4DataVector' data-ref="_ZN12G4DataVectorC1Ev"></a><dfn class="local col3 decl" id="83energyVector" title='energyVector' data-type='G4DataVector' data-ref="83energyVector">energyVector</dfn>;</td></tr>
+<tr><th id="468">468</th><td>  <a class="typedef" href="../../../../global/management/include/G4Types.hh.html#G4double" title='G4double' data-type='double' data-ref="G4double">G4double</a> <dfn class="local col4 decl" id="84dBin" title='dBin' data-type='G4double' data-ref="84dBin">dBin</dfn> = <span class='error' title="use of undeclared identifier &apos;std&apos;">std</span>::log10(eMax/eMin) / nBins;</td></tr>
+<tr><th id="469">469</th><td></td></tr>
+<tr><th id="470">470</th><td>  <b>for</b> (<a class="typedef" href="../../../../global/management/include/G4Types.hh.html#G4int" title='G4int' data-type='int' data-ref="G4int">G4int</a> <dfn class="local col5 decl" id="85i" title='i' data-type='G4int' data-ref="85i">i</dfn>=<var>0</var>; <a class="local col5 ref" href="#85i" title='i' data-ref="85i">i</a>&lt;<a class="member" href="../include/G4VCrossSectionHandler.hh.html#G4VCrossSectionHandler::nBins" title='G4VCrossSectionHandler::nBins' data-ref="G4VCrossSectionHandler::nBins">nBins</a>+<var>1</var>; <a class="local col5 ref" href="#85i" title='i' data-ref="85i">i</a>++)</td></tr>
+<tr><th id="471">471</th><td>    {</td></tr>
+<tr><th id="472">472</th><td>      energyVector.<span class='error' title="no member named &apos;push_back&apos; in &apos;G4DataVector&apos;">push_back</span>(<span class='error' title="use of undeclared identifier &apos;std&apos;">std</span>::pow(<var>10.</var>, <span class='error' title="use of undeclared identifier &apos;std&apos;">std</span>::log10(eMin)+i*dBin));</td></tr>
+<tr><th id="473">473</th><td>    }</td></tr>
+<tr><th id="474">474</th><td></td></tr>
+<tr><th id="475">475</th><td>  <i>// Factory method to build cross sections in derived classes,</i></td></tr>
+<tr><th id="476">476</th><td><i>  // related to the type of physics process</i></td></tr>
+<tr><th id="477">477</th><td></td></tr>
+<tr><th id="478">478</th><td>  <b>if</b> (<span class='error' title="use of undeclared identifier &apos;crossSections&apos;">crossSections</span> != <var>0</var>)</td></tr>
+<tr><th id="479">479</th><td>    {  <i>// Reset the list of cross sections</i></td></tr>
+<tr><th id="480">480</th><td>      <span class='error' title="use of undeclared identifier &apos;std&apos;">std</span>::vector&lt;<span class='error' title="&apos;G4VEMDataSet&apos; does not refer to a value">G4VEMDataSet</span>*<span class='error' title="expected expression">&gt;</span>::<span class='error' title="no member named &apos;iterator&apos; in the global namespace">iterator</span> mat;</td></tr>
+<tr><th id="481">481</th><td>      <b>if</b> (! <span class='error' title="use of undeclared identifier &apos;crossSections&apos;">crossSections</span>-&gt;empty())</td></tr>
+<tr><th id="482">482</th><td>	{</td></tr>
+<tr><th id="483">483</th><td>	  <b>for</b> (<span class='error' title="use of undeclared identifier &apos;mat&apos;">mat</span> = <span class='error' title="use of undeclared identifier &apos;crossSections&apos;">crossSections</span>-&gt;begin(); <span class='error' title="use of undeclared identifier &apos;mat&apos;">mat</span>!= <span class='error' title="use of undeclared identifier &apos;crossSections&apos;">crossSections</span>-&gt;end(); ++<span class='error' title="use of undeclared identifier &apos;mat&apos;">mat</span>)</td></tr>
+<tr><th id="484">484</th><td>	    {</td></tr>
+<tr><th id="485">485</th><td>	      <a class="type" href="../include/G4VEMDataSet.hh.html#G4VEMDataSet" title='G4VEMDataSet' data-ref="G4VEMDataSet">G4VEMDataSet</a>* <dfn class="local col6 decl" id="86set" title='set' data-type='G4VEMDataSet *' data-ref="86set">set</dfn> = *<span class='error' title="use of undeclared identifier &apos;mat&apos;">mat</span>;</td></tr>
+<tr><th id="486">486</th><td>	      <b>delete</b> <a class="local col6 ref" href="#86set" title='set' data-ref="86set">set</a>;</td></tr>
+<tr><th id="487">487</th><td>	      <a class="local col6 ref" href="#86set" title='set' data-ref="86set">set</a> = <var>0</var>;</td></tr>
+<tr><th id="488">488</th><td>	    }</td></tr>
+<tr><th id="489">489</th><td>	  <span class='error' title="use of undeclared identifier &apos;crossSections&apos;">crossSections</span>-&gt;clear();</td></tr>
+<tr><th id="490">490</th><td>	  <b>delete</b> <span class='error' title="use of undeclared identifier &apos;crossSections&apos;">crossSections</span>;</td></tr>
+<tr><th id="491">491</th><td>	  <span class='error' title="use of undeclared identifier &apos;crossSections&apos;">crossSections</span> = <var>0</var>;</td></tr>
+<tr><th id="492">492</th><td>	}</td></tr>
+<tr><th id="493">493</th><td>    }</td></tr>
+<tr><th id="494">494</th><td></td></tr>
+<tr><th id="495">495</th><td>  <span class='error' title="use of undeclared identifier &apos;crossSections&apos;">crossSections</span> = <span class='error' title="use of undeclared identifier &apos;BuildCrossSectionsForMaterials&apos;">BuildCrossSectionsForMaterials</span>(energyVector,energyCuts);</td></tr>
+<tr><th id="496">496</th><td></td></tr>
+<tr><th id="497">497</th><td>  <b>if</b> (<span class='error' title="use of undeclared identifier &apos;crossSections&apos;">crossSections</span> == <var>0</var>)</td></tr>
+<tr><th id="498">498</th><td>    {</td></tr>
+<tr><th id="499">499</th><td>      <a class="ref" href="../../../../global/management/include/G4Exception.hh.html#_Z11G4ExceptionPKcS0_19G4ExceptionSeverityS0_" title='G4Exception' data-ref="_Z11G4ExceptionPKcS0_19G4ExceptionSeverityS0_">G4Exception</a>(<q>"G4VCrossSectionHandler::BuildMeanFreePathForMaterials"</q>,</td></tr>
+<tr><th id="500">500</th><td>		    <q>"em1010"</q>,<a class="enum" href="../../../../global/management/include/G4ExceptionSeverity.hh.html#G4ExceptionSeverity::FatalException" title='G4ExceptionSeverity::FatalException' data-ref="G4ExceptionSeverity::FatalException">FatalException</a>,<q>"crossSections = 0"</q>);</td></tr>
+<tr><th id="501">501</th><td>      <b>return</b> <var>0</var>;</td></tr>
+<tr><th id="502">502</th><td>    }</td></tr>
+<tr><th id="503">503</th><td></td></tr>
+<tr><th id="504">504</th><td>  <a class="type" href="../include/G4VDataSetAlgorithm.hh.html#G4VDataSetAlgorithm" title='G4VDataSetAlgorithm' data-ref="G4VDataSetAlgorithm">G4VDataSetAlgorithm</a>* <dfn class="local col7 decl" id="87algo" title='algo' data-type='G4VDataSetAlgorithm *' data-ref="87algo">algo</dfn> = <a class="virtual member" href="#_ZN22G4VCrossSectionHandler19CreateInterpolationEv" title='G4VCrossSectionHandler::CreateInterpolation' data-ref="_ZN22G4VCrossSectionHandler19CreateInterpolationEv">CreateInterpolation</a>();</td></tr>
+<tr><th id="505">505</th><td>  <a class="type" href="../include/G4VEMDataSet.hh.html#G4VEMDataSet" title='G4VEMDataSet' data-ref="G4VEMDataSet">G4VEMDataSet</a>* <dfn class="local col8 decl" id="88materialSet" title='materialSet' data-type='G4VEMDataSet *' data-ref="88materialSet">materialSet</dfn> = <b>new</b> <a class="type" href="../include/G4CompositeEMDataSet.hh.html#G4CompositeEMDataSet" title='G4CompositeEMDataSet' data-ref="G4CompositeEMDataSet">G4CompositeEMDataSet</a><a class="ref" href="../include/G4CompositeEMDataSet.hh.html#_ZN20G4CompositeEMDataSetC1EP19G4VDataSetAlgorithmddii" title='G4CompositeEMDataSet::G4CompositeEMDataSet' data-ref="_ZN20G4CompositeEMDataSetC1EP19G4VDataSetAlgorithmddii">(</a><a class="local col7 ref" href="#87algo" title='algo' data-ref="87algo">algo</a>);</td></tr>
+<tr><th id="506">506</th><td>  <i>//G4cout &lt;&lt; "G4VCrossSectionHandler  new dataset " &lt;&lt; materialSet &lt;&lt; G4endl; </i></td></tr>
+<tr><th id="507">507</th><td></td></tr>
+<tr><th id="508">508</th><td>  <a class="type" href="../../../../global/management/include/G4DataVector.hh.html#G4DataVector" title='G4DataVector' data-ref="G4DataVector">G4DataVector</a>* <dfn class="local col9 decl" id="89energies" title='energies' data-type='G4DataVector *' data-ref="89energies">energies</dfn>;</td></tr>
+<tr><th id="509">509</th><td>  <a class="type" href="../../../../global/management/include/G4DataVector.hh.html#G4DataVector" title='G4DataVector' data-ref="G4DataVector">G4DataVector</a>* <dfn class="local col0 decl" id="90data" title='data' data-type='G4DataVector *' data-ref="90data">data</dfn>;</td></tr>
+<tr><th id="510">510</th><td>  <a class="type" href="../../../../global/management/include/G4DataVector.hh.html#G4DataVector" title='G4DataVector' data-ref="G4DataVector">G4DataVector</a>* <dfn class="local col1 decl" id="91log_energies" title='log_energies' data-type='G4DataVector *' data-ref="91log_energies">log_energies</dfn>;</td></tr>
+<tr><th id="511">511</th><td>  <a class="type" href="../../../../global/management/include/G4DataVector.hh.html#G4DataVector" title='G4DataVector' data-ref="G4DataVector">G4DataVector</a>* <dfn class="local col2 decl" id="92log_data" title='log_data' data-type='G4DataVector *' data-ref="92log_data">log_data</dfn>;</td></tr>
+<tr><th id="512">512</th><td></td></tr>
+<tr><th id="513">513</th><td>  </td></tr>
+<tr><th id="514">514</th><td>  <em>const</em> <a class="type" href="../../../cuts/include/G4ProductionCutsTable.hh.html#G4ProductionCutsTable" title='G4ProductionCutsTable' data-ref="G4ProductionCutsTable">G4ProductionCutsTable</a>* <dfn class="local col3 decl" id="93theCoupleTable" title='theCoupleTable' data-type='const G4ProductionCutsTable *' data-ref="93theCoupleTable">theCoupleTable</dfn>=</td></tr>
+<tr><th id="515">515</th><td>        <a class="type" href="../../../cuts/include/G4ProductionCutsTable.hh.html#G4ProductionCutsTable" title='G4ProductionCutsTable' data-ref="G4ProductionCutsTable">G4ProductionCutsTable</a>::<a class="ref" href="../../../cuts/include/G4ProductionCutsTable.hh.html#_ZN21G4ProductionCutsTable22GetProductionCutsTableEv" title='G4ProductionCutsTable::GetProductionCutsTable' data-ref="_ZN21G4ProductionCutsTable22GetProductionCutsTableEv">GetProductionCutsTable</a>();</td></tr>
+<tr><th id="516">516</th><td>  <span class='error' title="unknown type name &apos;size_t&apos;">size_t</span> <dfn class="local col4 decl" id="94numOfCouples" title='numOfCouples' data-type='int' data-ref="94numOfCouples">numOfCouples</dfn> = theCoupleTable-&gt;GetTableSize();</td></tr>
+<tr><th id="517">517</th><td></td></tr>
+<tr><th id="518">518</th><td></td></tr>
+<tr><th id="519">519</th><td>  <b>for</b> (<span class='error' title="unknown type name &apos;size_t&apos;">size_t</span> <dfn class="local col5 decl" id="95mLocal" title='mLocal' data-type='int' data-ref="95mLocal">mLocal</dfn>=<var>0</var>; mLocal&lt;numOfCouples; mLocal++)</td></tr>
+<tr><th id="520">520</th><td>    {</td></tr>
+<tr><th id="521">521</th><td>      <a class="local col9 ref" href="#89energies" title='energies' data-ref="89energies">energies</a> = <b>new</b> <a class="ref fake" href="../../../../global/management/include/G4DataVector.hh.html#_ZN12G4DataVectorC1Ev" title='G4DataVector::G4DataVector' data-ref="_ZN12G4DataVectorC1Ev"></a><a class="type" href="../../../../global/management/include/G4DataVector.hh.html#G4DataVector" title='G4DataVector' data-ref="G4DataVector">G4DataVector</a>;</td></tr>
+<tr><th id="522">522</th><td>      <a class="local col0 ref" href="#90data" title='data' data-ref="90data">data</a> = <b>new</b> <a class="ref fake" href="../../../../global/management/include/G4DataVector.hh.html#_ZN12G4DataVectorC1Ev" title='G4DataVector::G4DataVector' data-ref="_ZN12G4DataVectorC1Ev"></a><a class="type" href="../../../../global/management/include/G4DataVector.hh.html#G4DataVector" title='G4DataVector' data-ref="G4DataVector">G4DataVector</a>;</td></tr>
+<tr><th id="523">523</th><td>      <a class="local col1 ref" href="#91log_energies" title='log_energies' data-ref="91log_energies">log_energies</a> = <b>new</b> <a class="ref fake" href="../../../../global/management/include/G4DataVector.hh.html#_ZN12G4DataVectorC1Ev" title='G4DataVector::G4DataVector' data-ref="_ZN12G4DataVectorC1Ev"></a><a class="type" href="../../../../global/management/include/G4DataVector.hh.html#G4DataVector" title='G4DataVector' data-ref="G4DataVector">G4DataVector</a>;</td></tr>
+<tr><th id="524">524</th><td>      <a class="local col2 ref" href="#92log_data" title='log_data' data-ref="92log_data">log_data</a> = <b>new</b> <a class="ref fake" href="../../../../global/management/include/G4DataVector.hh.html#_ZN12G4DataVectorC1Ev" title='G4DataVector::G4DataVector' data-ref="_ZN12G4DataVectorC1Ev"></a><a class="type" href="../../../../global/management/include/G4DataVector.hh.html#G4DataVector" title='G4DataVector' data-ref="G4DataVector">G4DataVector</a>;</td></tr>
+<tr><th id="525">525</th><td>      <b>for</b> (<a class="typedef" href="../../../../global/management/include/G4Types.hh.html#G4int" title='G4int' data-type='int' data-ref="G4int">G4int</a> <dfn class="local col6 decl" id="96bin" title='bin' data-type='G4int' data-ref="96bin">bin</dfn>=<var>0</var>; <a class="local col6 ref" href="#96bin" title='bin' data-ref="96bin">bin</a>&lt;<a class="member" href="../include/G4VCrossSectionHandler.hh.html#G4VCrossSectionHandler::nBins" title='G4VCrossSectionHandler::nBins' data-ref="G4VCrossSectionHandler::nBins">nBins</a>; <a class="local col6 ref" href="#96bin" title='bin' data-ref="96bin">bin</a>++)</td></tr>
+<tr><th id="526">526</th><td>	{</td></tr>
+<tr><th id="527">527</th><td>	  <a class="typedef" href="../../../../global/management/include/G4Types.hh.html#G4double" title='G4double' data-type='double' data-ref="G4double">G4double</a> <dfn class="local col7 decl" id="97energy" title='energy' data-type='G4double' data-ref="97energy">energy</dfn> = energyVector<span class='error' title="type &apos;G4DataVector&apos; does not provide a subscript operator">[</span>bin];</td></tr>
+<tr><th id="528">528</th><td>	  energies-&gt;<span class='error' title="no member named &apos;push_back&apos; in &apos;G4DataVector&apos;">push_back</span>(energy);</td></tr>
+<tr><th id="529">529</th><td>          log_energies-&gt;<span class='error' title="no member named &apos;push_back&apos; in &apos;G4DataVector&apos;">push_back</span>(<span class='error' title="use of undeclared identifier &apos;std&apos;">std</span>::log10(energy));</td></tr>
+<tr><th id="530">530</th><td>	  <a class="type" href="../include/G4VEMDataSet.hh.html#G4VEMDataSet" title='G4VEMDataSet' data-ref="G4VEMDataSet">G4VEMDataSet</a>* <dfn class="local col8 decl" id="98matCrossSet" title='matCrossSet' data-type='G4VEMDataSet *' data-ref="98matCrossSet">matCrossSet</dfn> = (*<span class='error' title="use of undeclared identifier &apos;crossSections&apos;">crossSections</span>)[mLocal];</td></tr>
+<tr><th id="531">531</th><td>	  <a class="typedef" href="../../../../global/management/include/G4Types.hh.html#G4double" title='G4double' data-type='double' data-ref="G4double">G4double</a> <dfn class="local col9 decl" id="99materialCrossSection" title='materialCrossSection' data-type='G4double' data-ref="99materialCrossSection">materialCrossSection</dfn> = <var>0.0</var>;</td></tr>
+<tr><th id="532">532</th><td>          <a class="typedef" href="../../../../global/management/include/G4Types.hh.html#G4int" title='G4int' data-type='int' data-ref="G4int">G4int</a> <dfn class="local col0 decl" id="100nElm" title='nElm' data-type='G4int' data-ref="100nElm">nElm</dfn> = matCrossSet-&gt;NumberOfComponents();</td></tr>
+<tr><th id="533">533</th><td>          <b>for</b>(<a class="typedef" href="../../../../global/management/include/G4Types.hh.html#G4int" title='G4int' data-type='int' data-ref="G4int">G4int</a> <dfn class="local col1 decl" id="101j" title='j' data-type='G4int' data-ref="101j">j</dfn>=<var>0</var>; <a class="local col1 ref" href="#101j" title='j' data-ref="101j">j</a>&lt;<a class="local col0 ref" href="#100nElm" title='nElm' data-ref="100nElm">nElm</a>; <a class="local col1 ref" href="#101j" title='j' data-ref="101j">j</a>++) {</td></tr>
+<tr><th id="534">534</th><td>            <a class="local col9 ref" href="#99materialCrossSection" title='materialCrossSection' data-ref="99materialCrossSection">materialCrossSection</a> += <a class="local col8 ref" href="#98matCrossSet" title='matCrossSet' data-ref="98matCrossSet">matCrossSet</a>-&gt;<a class="virtual ref" href="../include/G4VEMDataSet.hh.html#_ZNK12G4VEMDataSet12GetComponentEi" title='G4VEMDataSet::GetComponent' data-ref="_ZNK12G4VEMDataSet12GetComponentEi">GetComponent</a>(<a class="local col1 ref" href="#101j" title='j' data-ref="101j">j</a>)-&gt;<a class="virtual ref" href="../include/G4VEMDataSet.hh.html#_ZNK12G4VEMDataSet9FindValueEdi" title='G4VEMDataSet::FindValue' data-ref="_ZNK12G4VEMDataSet9FindValueEdi">FindValue</a>(<a class="local col7 ref" href="#97energy" title='energy' data-ref="97energy">energy</a>);</td></tr>
+<tr><th id="535">535</th><td>	  }</td></tr>
+<tr><th id="536">536</th><td></td></tr>
+<tr><th id="537">537</th><td>	  <b>if</b> (<a class="local col9 ref" href="#99materialCrossSection" title='materialCrossSection' data-ref="99materialCrossSection">materialCrossSection</a> &gt; <var>0.</var>)</td></tr>
+<tr><th id="538">538</th><td>	    {</td></tr>
+<tr><th id="539">539</th><td>	      data-&gt;<span class='error' title="no member named &apos;push_back&apos; in &apos;G4DataVector&apos;">push_back</span>(<var>1.</var>/materialCrossSection);</td></tr>
+<tr><th id="540">540</th><td>              log_data-&gt;<span class='error' title="no member named &apos;push_back&apos; in &apos;G4DataVector&apos;">push_back</span>(<span class='error' title="use of undeclared identifier &apos;std&apos;">std</span>::log10(<var>1.</var>/materialCrossSection));</td></tr>
+<tr><th id="541">541</th><td>	    }</td></tr>
+<tr><th id="542">542</th><td>	  <b>else</b></td></tr>
+<tr><th id="543">543</th><td>	    {</td></tr>
+<tr><th id="544">544</th><td>	      data-&gt;<span class='error' title="no member named &apos;push_back&apos; in &apos;G4DataVector&apos;">push_back</span>(<a class="macro" href="../../../../global/management/include/templates.hh.html#82" title="std::numeric_limits&lt;double&gt;::max()" data-ref="_M/DBL_MAX">DBL_MAX</a>);</td></tr>
+<tr><th id="545">545</th><td>              log_data-&gt;<span class='error' title="no member named &apos;push_back&apos; in &apos;G4DataVector&apos;">push_back</span>(<span class='error' title="use of undeclared identifier &apos;std&apos;">std</span>::log10(<a class="macro" href="../../../../global/management/include/templates.hh.html#82" title="std::numeric_limits&lt;double&gt;::max()" data-ref="_M/DBL_MAX">DBL_MAX</a>));</td></tr>
+<tr><th id="546">546</th><td>	    }</td></tr>
+<tr><th id="547">547</th><td>	}</td></tr>
+<tr><th id="548">548</th><td>      <a class="type" href="../include/G4VDataSetAlgorithm.hh.html#G4VDataSetAlgorithm" title='G4VDataSetAlgorithm' data-ref="G4VDataSetAlgorithm">G4VDataSetAlgorithm</a>* <dfn class="local col2 decl" id="102algoLocal" title='algoLocal' data-type='G4VDataSetAlgorithm *' data-ref="102algoLocal">algoLocal</dfn> = <a class="virtual member" href="#_ZN22G4VCrossSectionHandler19CreateInterpolationEv" title='G4VCrossSectionHandler::CreateInterpolation' data-ref="_ZN22G4VCrossSectionHandler19CreateInterpolationEv">CreateInterpolation</a>();</td></tr>
+<tr><th id="549">549</th><td></td></tr>
+<tr><th id="550">550</th><td>      <i>//G4VEMDataSet* dataSet = new G4EMDataSet(m,energies,data,algo,1.,1.);</i></td></tr>
+<tr><th id="551">551</th><td></td></tr>
+<tr><th id="552">552</th><td>      <a class="type" href="../include/G4VEMDataSet.hh.html#G4VEMDataSet" title='G4VEMDataSet' data-ref="G4VEMDataSet">G4VEMDataSet</a>* <dfn class="local col3 decl" id="103dataSet" title='dataSet' data-type='G4VEMDataSet *' data-ref="103dataSet">dataSet</dfn> = <b>new</b> G4EMDataSet(mLocal,energies,data,log_energies,log_data,algoLocal,<var>1.</var>,<var>1.</var>);</td></tr>
+<tr><th id="553">553</th><td></td></tr>
+<tr><th id="554">554</th><td>      <a class="local col8 ref" href="#88materialSet" title='materialSet' data-ref="88materialSet">materialSet</a>-&gt;<a class="virtual ref" href="../include/G4VEMDataSet.hh.html#_ZN12G4VEMDataSet12AddComponentEPS_" title='G4VEMDataSet::AddComponent' data-ref="_ZN12G4VEMDataSet12AddComponentEPS_">AddComponent</a>(<a class="local col3 ref" href="#103dataSet" title='dataSet' data-ref="103dataSet">dataSet</a>);</td></tr>
+<tr><th id="555">555</th><td>    }</td></tr>
+<tr><th id="556">556</th><td></td></tr>
+<tr><th id="557">557</th><td>  <b>return</b> <a class="local col8 ref" href="#88materialSet" title='materialSet' data-ref="88materialSet">materialSet</a>;</td></tr>
+<tr><th id="558">558</th><td>}</td></tr>
+<tr><th id="559">559</th><td></td></tr>
+<tr><th id="560">560</th><td></td></tr>
+<tr><th id="561">561</th><td><a class="typedef" href="../../../../global/management/include/G4Types.hh.html#G4int" title='G4int' data-type='int' data-ref="G4int">G4int</a> <a class="type" href="../include/G4VCrossSectionHandler.hh.html#G4VCrossSectionHandler" title='G4VCrossSectionHandler' data-ref="G4VCrossSectionHandler">G4VCrossSectionHandler</a>::<dfn class="decl def" id="_ZNK22G4VCrossSectionHandler16SelectRandomAtomEPK20G4MaterialCutsCoupled" title='G4VCrossSectionHandler::SelectRandomAtom' data-ref="_ZNK22G4VCrossSectionHandler16SelectRandomAtomEPK20G4MaterialCutsCoupled">SelectRandomAtom</dfn>(<em>const</em> <a class="type" href="../../../cuts/include/G4MaterialCutsCouple.hh.html#G4MaterialCutsCouple" title='G4MaterialCutsCouple' data-ref="G4MaterialCutsCouple">G4MaterialCutsCouple</a>* <dfn class="local col4 decl" id="104couple" title='couple' data-type='const G4MaterialCutsCouple *' data-ref="104couple">couple</dfn>,</td></tr>
+<tr><th id="562">562</th><td>                                                     <a class="typedef" href="../../../../global/management/include/G4Types.hh.html#G4double" title='G4double' data-type='double' data-ref="G4double">G4double</a> <dfn class="local col5 decl" id="105e" title='e' data-type='G4double' data-ref="105e">e</dfn>) <em>const</em></td></tr>
+<tr><th id="563">563</th><td>{</td></tr>
+<tr><th id="564">564</th><td>  <i>// Select randomly an element within the material, according to the weight</i></td></tr>
+<tr><th id="565">565</th><td><i>  // determined by the cross sections in the data set</i></td></tr>
+<tr><th id="566">566</th><td></td></tr>
+<tr><th id="567">567</th><td>  <em>const</em> <a class="type" href="../../../../materials/include/G4Material.hh.html#G4Material" title='G4Material' data-ref="G4Material">G4Material</a>* <dfn class="local col6 decl" id="106material" title='material' data-type='const G4Material *' data-ref="106material">material</dfn> = <a class="local col4 ref" href="#104couple" title='couple' data-ref="104couple">couple</a>-&gt;<a class="ref" href="../../../cuts/include/G4MaterialCutsCouple.hh.html#_ZNK20G4MaterialCutsCouple11GetMaterialEv" title='G4MaterialCutsCouple::GetMaterial' data-ref="_ZNK20G4MaterialCutsCouple11GetMaterialEv">GetMaterial</a>();</td></tr>
+<tr><th id="568">568</th><td>  <a class="typedef" href="../../../../global/management/include/G4Types.hh.html#G4int" title='G4int' data-type='int' data-ref="G4int">G4int</a> <dfn class="local col7 decl" id="107nElements" title='nElements' data-type='G4int' data-ref="107nElements">nElements</dfn> = material-&gt;GetNumberOfElements();</td></tr>
+<tr><th id="569">569</th><td></td></tr>
+<tr><th id="570">570</th><td>  <i>// Special case: the material consists of one element</i></td></tr>
+<tr><th id="571">571</th><td>  <b>if</b> (<a class="local col7 ref" href="#107nElements" title='nElements' data-ref="107nElements">nElements</a> == <var>1</var>)</td></tr>
+<tr><th id="572">572</th><td>    {</td></tr>
+<tr><th id="573">573</th><td>      <a class="typedef" href="../../../../global/management/include/G4Types.hh.html#G4int" title='G4int' data-type='int' data-ref="G4int">G4int</a> <dfn class="local col8 decl" id="108Z" title='Z' data-type='G4int' data-ref="108Z">Z</dfn> = (G4int) material-&gt;<span class='error' title="no member named &apos;GetZ&apos; in &apos;G4Material&apos;">GetZ</span>();</td></tr>
+<tr><th id="574">574</th><td>      <b>return</b> <a class="local col8 ref" href="#108Z" title='Z' data-ref="108Z">Z</a>;</td></tr>
+<tr><th id="575">575</th><td>    }</td></tr>
+<tr><th id="576">576</th><td></td></tr>
+<tr><th id="577">577</th><td>  <i>// Composite material</i></td></tr>
+<tr><th id="578">578</th><td></td></tr>
+<tr><th id="579">579</th><td>  <em>const</em> <span class='error' title="unknown type name &apos;G4ElementVector&apos;">G4ElementVector</span>* <dfn class="local col9 decl" id="109elementVector" title='elementVector' data-type='const int *' data-ref="109elementVector">elementVector</dfn> = material-&gt;GetElementVector();</td></tr>
+<tr><th id="580">580</th><td>  <span class='error' title="unknown type name &apos;size_t&apos;">size_t</span> <dfn class="local col0 decl" id="110materialIndex" title='materialIndex' data-type='int' data-ref="110materialIndex">materialIndex</dfn> = couple-&gt;GetIndex();</td></tr>
+<tr><th id="581">581</th><td></td></tr>
+<tr><th id="582">582</th><td>  <a class="type" href="../include/G4VEMDataSet.hh.html#G4VEMDataSet" title='G4VEMDataSet' data-ref="G4VEMDataSet">G4VEMDataSet</a>* <dfn class="local col1 decl" id="111materialSet" title='materialSet' data-type='G4VEMDataSet *' data-ref="111materialSet">materialSet</dfn> = (*<span class='error' title="use of undeclared identifier &apos;crossSections&apos;">crossSections</span>)[materialIndex];</td></tr>
+<tr><th id="583">583</th><td>  <a class="typedef" href="../../../../global/management/include/G4Types.hh.html#G4double" title='G4double' data-type='double' data-ref="G4double">G4double</a> <dfn class="local col2 decl" id="112materialCrossSection0" title='materialCrossSection0' data-type='G4double' data-ref="112materialCrossSection0">materialCrossSection0</dfn> = <var>0.0</var>;</td></tr>
+<tr><th id="584">584</th><td>  <a class="type" href="../../../../global/management/include/G4DataVector.hh.html#G4DataVector" title='G4DataVector' data-ref="G4DataVector">G4DataVector</a> <a class="ref fake" href="../../../../global/management/include/G4DataVector.hh.html#_ZN12G4DataVectorC1Ev" title='G4DataVector::G4DataVector' data-ref="_ZN12G4DataVectorC1Ev"></a><dfn class="local col3 decl" id="113cross" title='cross' data-type='G4DataVector' data-ref="113cross">cross</dfn>;</td></tr>
+<tr><th id="585">585</th><td>  cross.<span class='error' title="no member named &apos;clear&apos; in &apos;G4DataVector&apos;">clear</span>();</td></tr>
+<tr><th id="586">586</th><td>  <b>for</b> ( <a class="typedef" href="../../../../global/management/include/G4Types.hh.html#G4int" title='G4int' data-type='int' data-ref="G4int">G4int</a> <dfn class="local col4 decl" id="114i" title='i' data-type='G4int' data-ref="114i">i</dfn>=<var>0</var>; <a class="local col4 ref" href="#114i" title='i' data-ref="114i">i</a> &lt; <a class="local col7 ref" href="#107nElements" title='nElements' data-ref="107nElements">nElements</a>; <a class="local col4 ref" href="#114i" title='i' data-ref="114i">i</a>++ )</td></tr>
+<tr><th id="587">587</th><td>    {</td></tr>
+<tr><th id="588">588</th><td>      <a class="typedef" href="../../../../global/management/include/G4Types.hh.html#G4double" title='G4double' data-type='double' data-ref="G4double">G4double</a> <dfn class="local col5 decl" id="115cr" title='cr' data-type='G4double' data-ref="115cr">cr</dfn> = <a class="local col1 ref" href="#111materialSet" title='materialSet' data-ref="111materialSet">materialSet</a>-&gt;<a class="virtual ref" href="../include/G4VEMDataSet.hh.html#_ZNK12G4VEMDataSet12GetComponentEi" title='G4VEMDataSet::GetComponent' data-ref="_ZNK12G4VEMDataSet12GetComponentEi">GetComponent</a>(<a class="local col4 ref" href="#114i" title='i' data-ref="114i">i</a>)-&gt;<a class="virtual ref" href="../include/G4VEMDataSet.hh.html#_ZNK12G4VEMDataSet9FindValueEdi" title='G4VEMDataSet::FindValue' data-ref="_ZNK12G4VEMDataSet9FindValueEdi">FindValue</a>(<a class="local col5 ref" href="#105e" title='e' data-ref="105e">e</a>);</td></tr>
+<tr><th id="589">589</th><td>      <a class="local col2 ref" href="#112materialCrossSection0" title='materialCrossSection0' data-ref="112materialCrossSection0">materialCrossSection0</a> += <a class="local col5 ref" href="#115cr" title='cr' data-ref="115cr">cr</a>;</td></tr>
+<tr><th id="590">590</th><td>      cross.<span class='error' title="no member named &apos;push_back&apos; in &apos;G4DataVector&apos;">push_back</span>(materialCrossSection0);</td></tr>
+<tr><th id="591">591</th><td>    }</td></tr>
+<tr><th id="592">592</th><td></td></tr>
+<tr><th id="593">593</th><td>  <a class="typedef" href="../../../../global/management/include/G4Types.hh.html#G4double" title='G4double' data-type='double' data-ref="G4double">G4double</a> <dfn class="local col6 decl" id="116random" title='random' data-type='G4double' data-ref="116random">random</dfn> = <a class="macro" href="../../../../global/HEPRandom/include/Randomize.hh.html#52" title="CLHEP::HepRandom::getTheEngine()-&gt;flat()" data-ref="_M/G4UniformRand">G4UniformRand</a>() * <a class="local col2 ref" href="#112materialCrossSection0" title='materialCrossSection0' data-ref="112materialCrossSection0">materialCrossSection0</a>;</td></tr>
+<tr><th id="594">594</th><td></td></tr>
+<tr><th id="595">595</th><td>  <b>for</b> (<a class="typedef" href="../../../../global/management/include/G4Types.hh.html#G4int" title='G4int' data-type='int' data-ref="G4int">G4int</a> <dfn class="local col7 decl" id="117k" title='k' data-type='G4int' data-ref="117k">k</dfn>=<var>0</var> ; <a class="local col7 ref" href="#117k" title='k' data-ref="117k">k</a> &lt; <a class="local col7 ref" href="#107nElements" title='nElements' data-ref="107nElements">nElements</a> ; <a class="local col7 ref" href="#117k" title='k' data-ref="117k">k</a>++ )</td></tr>
+<tr><th id="596">596</th><td>    {</td></tr>
+<tr><th id="597">597</th><td>      <b>if</b> (random &lt;= cross<span class='error' title="type &apos;G4DataVector&apos; does not provide a subscript operator">[</span>k]) <b>return</b> (G4int) (*elementVector)[k]-&gt;GetZ();</td></tr>
+<tr><th id="598">598</th><td>    }</td></tr>
+<tr><th id="599">599</th><td>  <i>// It should never get here</i></td></tr>
+<tr><th id="600">600</th><td>  <b>return</b> <var>0</var>;</td></tr>
+<tr><th id="601">601</th><td>}</td></tr>
+<tr><th id="602">602</th><td></td></tr>
+<tr><th id="603">603</th><td><em>const</em> <a class="type" href="../../../../materials/include/G4Element.hh.html#G4Element" title='G4Element' data-ref="G4Element">G4Element</a>* <a class="type" href="../include/G4VCrossSectionHandler.hh.html#G4VCrossSectionHandler" title='G4VCrossSectionHandler' data-ref="G4VCrossSectionHandler">G4VCrossSectionHandler</a>::<dfn class="decl def" id="_ZNK22G4VCrossSectionHandler19SelectRandomElementEPK20G4MaterialCutsCoupled" title='G4VCrossSectionHandler::SelectRandomElement' data-ref="_ZNK22G4VCrossSectionHandler19SelectRandomElementEPK20G4MaterialCutsCoupled">SelectRandomElement</dfn>(<em>const</em> <a class="type" href="../../../cuts/include/G4MaterialCutsCouple.hh.html#G4MaterialCutsCouple" title='G4MaterialCutsCouple' data-ref="G4MaterialCutsCouple">G4MaterialCutsCouple</a>* <dfn class="local col8 decl" id="118couple" title='couple' data-type='const G4MaterialCutsCouple *' data-ref="118couple">couple</dfn>,</td></tr>
+<tr><th id="604">604</th><td>							     <a class="typedef" href="../../../../global/management/include/G4Types.hh.html#G4double" title='G4double' data-type='double' data-ref="G4double">G4double</a> <dfn class="local col9 decl" id="119e" title='e' data-type='G4double' data-ref="119e">e</dfn>) <em>const</em></td></tr>
+<tr><th id="605">605</th><td>{</td></tr>
+<tr><th id="606">606</th><td>  <i>// Select randomly an element within the material, according to the weight determined</i></td></tr>
+<tr><th id="607">607</th><td><i>  // by the cross sections in the data set</i></td></tr>
+<tr><th id="608">608</th><td></td></tr>
+<tr><th id="609">609</th><td>  <em>const</em> <a class="type" href="../../../../materials/include/G4Material.hh.html#G4Material" title='G4Material' data-ref="G4Material">G4Material</a>* <dfn class="local col0 decl" id="120material" title='material' data-type='const G4Material *' data-ref="120material">material</dfn> = <a class="local col8 ref" href="#118couple" title='couple' data-ref="118couple">couple</a>-&gt;<a class="ref" href="../../../cuts/include/G4MaterialCutsCouple.hh.html#_ZNK20G4MaterialCutsCouple11GetMaterialEv" title='G4MaterialCutsCouple::GetMaterial' data-ref="_ZNK20G4MaterialCutsCouple11GetMaterialEv">GetMaterial</a>();</td></tr>
+<tr><th id="610">610</th><td>  <a class="type" href="../../../../materials/include/G4Element.hh.html#G4Element" title='G4Element' data-ref="G4Element">G4Element</a>* <dfn class="local col1 decl" id="121nullElement" title='nullElement' data-type='G4Element *' data-ref="121nullElement">nullElement</dfn> = <var>0</var>;</td></tr>
+<tr><th id="611">611</th><td>  <a class="typedef" href="../../../../global/management/include/G4Types.hh.html#G4int" title='G4int' data-type='int' data-ref="G4int">G4int</a> <dfn class="local col2 decl" id="122nElements" title='nElements' data-type='G4int' data-ref="122nElements">nElements</dfn> = material-&gt;GetNumberOfElements();</td></tr>
+<tr><th id="612">612</th><td>  <em>const</em> <span class='error' title="unknown type name &apos;G4ElementVector&apos;">G4ElementVector</span>* <dfn class="local col3 decl" id="123elementVector" title='elementVector' data-type='const int *' data-ref="123elementVector">elementVector</dfn> = material-&gt;GetElementVector();</td></tr>
+<tr><th id="613">613</th><td></td></tr>
+<tr><th id="614">614</th><td>  <i>// Special case: the material consists of one element</i></td></tr>
+<tr><th id="615">615</th><td>  <b>if</b> (<a class="local col2 ref" href="#122nElements" title='nElements' data-ref="122nElements">nElements</a> == <var>1</var>)</td></tr>
+<tr><th id="616">616</th><td>    {</td></tr>
+<tr><th id="617">617</th><td>      <a class="type" href="../../../../materials/include/G4Element.hh.html#G4Element" title='G4Element' data-ref="G4Element">G4Element</a>* <dfn class="local col4 decl" id="124element" title='element' data-type='G4Element *' data-ref="124element">element</dfn> = (*elementVector)[<var>0</var>];</td></tr>
+<tr><th id="618">618</th><td>      <b>return</b> <a class="local col4 ref" href="#124element" title='element' data-ref="124element">element</a>;</td></tr>
+<tr><th id="619">619</th><td>    }</td></tr>
+<tr><th id="620">620</th><td>  <b>else</b></td></tr>
+<tr><th id="621">621</th><td>    {</td></tr>
+<tr><th id="622">622</th><td>      <i>// Composite material</i></td></tr>
+<tr><th id="623">623</th><td></td></tr>
+<tr><th id="624">624</th><td>      <span class='error' title="unknown type name &apos;size_t&apos;">size_t</span> <dfn class="local col5 decl" id="125materialIndex" title='materialIndex' data-type='int' data-ref="125materialIndex">materialIndex</dfn> = couple-&gt;GetIndex();</td></tr>
+<tr><th id="625">625</th><td></td></tr>
+<tr><th id="626">626</th><td>      <a class="type" href="../include/G4VEMDataSet.hh.html#G4VEMDataSet" title='G4VEMDataSet' data-ref="G4VEMDataSet">G4VEMDataSet</a>* <dfn class="local col6 decl" id="126materialSet" title='materialSet' data-type='G4VEMDataSet *' data-ref="126materialSet">materialSet</dfn> = (*<span class='error' title="use of undeclared identifier &apos;crossSections&apos;">crossSections</span>)[materialIndex];</td></tr>
+<tr><th id="627">627</th><td>      <a class="typedef" href="../../../../global/management/include/G4Types.hh.html#G4double" title='G4double' data-type='double' data-ref="G4double">G4double</a> <dfn class="local col7 decl" id="127materialCrossSection0" title='materialCrossSection0' data-type='G4double' data-ref="127materialCrossSection0">materialCrossSection0</dfn> = <var>0.0</var>;</td></tr>
+<tr><th id="628">628</th><td>      <a class="type" href="../../../../global/management/include/G4DataVector.hh.html#G4DataVector" title='G4DataVector' data-ref="G4DataVector">G4DataVector</a> <a class="ref fake" href="../../../../global/management/include/G4DataVector.hh.html#_ZN12G4DataVectorC1Ev" title='G4DataVector::G4DataVector' data-ref="_ZN12G4DataVectorC1Ev"></a><dfn class="local col8 decl" id="128cross" title='cross' data-type='G4DataVector' data-ref="128cross">cross</dfn>;</td></tr>
+<tr><th id="629">629</th><td>      cross.<span class='error' title="no member named &apos;clear&apos; in &apos;G4DataVector&apos;">clear</span>();</td></tr>
+<tr><th id="630">630</th><td>      <b>for</b> (<a class="typedef" href="../../../../global/management/include/G4Types.hh.html#G4int" title='G4int' data-type='int' data-ref="G4int">G4int</a> <dfn class="local col9 decl" id="129i" title='i' data-type='G4int' data-ref="129i">i</dfn>=<var>0</var>; <a class="local col9 ref" href="#129i" title='i' data-ref="129i">i</a>&lt;<a class="local col2 ref" href="#122nElements" title='nElements' data-ref="122nElements">nElements</a>; <a class="local col9 ref" href="#129i" title='i' data-ref="129i">i</a>++)</td></tr>
+<tr><th id="631">631</th><td>        {</td></tr>
+<tr><th id="632">632</th><td>          <a class="typedef" href="../../../../global/management/include/G4Types.hh.html#G4double" title='G4double' data-type='double' data-ref="G4double">G4double</a> <dfn class="local col0 decl" id="130cr" title='cr' data-type='G4double' data-ref="130cr">cr</dfn> = <a class="local col6 ref" href="#126materialSet" title='materialSet' data-ref="126materialSet">materialSet</a>-&gt;<a class="virtual ref" href="../include/G4VEMDataSet.hh.html#_ZNK12G4VEMDataSet12GetComponentEi" title='G4VEMDataSet::GetComponent' data-ref="_ZNK12G4VEMDataSet12GetComponentEi">GetComponent</a>(<a class="local col9 ref" href="#129i" title='i' data-ref="129i">i</a>)-&gt;<a class="virtual ref" href="../include/G4VEMDataSet.hh.html#_ZNK12G4VEMDataSet9FindValueEdi" title='G4VEMDataSet::FindValue' data-ref="_ZNK12G4VEMDataSet9FindValueEdi">FindValue</a>(<a class="local col9 ref" href="#119e" title='e' data-ref="119e">e</a>);</td></tr>
+<tr><th id="633">633</th><td>          <a class="local col7 ref" href="#127materialCrossSection0" title='materialCrossSection0' data-ref="127materialCrossSection0">materialCrossSection0</a> += <a class="local col0 ref" href="#130cr" title='cr' data-ref="130cr">cr</a>;</td></tr>
+<tr><th id="634">634</th><td>          cross.<span class='error' title="no member named &apos;push_back&apos; in &apos;G4DataVector&apos;">push_back</span>(materialCrossSection0);</td></tr>
+<tr><th id="635">635</th><td>        }</td></tr>
+<tr><th id="636">636</th><td></td></tr>
+<tr><th id="637">637</th><td>      <a class="typedef" href="../../../../global/management/include/G4Types.hh.html#G4double" title='G4double' data-type='double' data-ref="G4double">G4double</a> <dfn class="local col1 decl" id="131random" title='random' data-type='G4double' data-ref="131random">random</dfn> = <a class="macro" href="../../../../global/HEPRandom/include/Randomize.hh.html#52" title="CLHEP::HepRandom::getTheEngine()-&gt;flat()" data-ref="_M/G4UniformRand">G4UniformRand</a>() * <a class="local col7 ref" href="#127materialCrossSection0" title='materialCrossSection0' data-ref="127materialCrossSection0">materialCrossSection0</a>;</td></tr>
+<tr><th id="638">638</th><td></td></tr>
+<tr><th id="639">639</th><td>      <b>for</b> (<a class="typedef" href="../../../../global/management/include/G4Types.hh.html#G4int" title='G4int' data-type='int' data-ref="G4int">G4int</a> <dfn class="local col2 decl" id="132k" title='k' data-type='G4int' data-ref="132k">k</dfn>=<var>0</var> ; <a class="local col2 ref" href="#132k" title='k' data-ref="132k">k</a> &lt; <a class="local col2 ref" href="#122nElements" title='nElements' data-ref="122nElements">nElements</a> ; <a class="local col2 ref" href="#132k" title='k' data-ref="132k">k</a>++ )</td></tr>
+<tr><th id="640">640</th><td>        {</td></tr>
+<tr><th id="641">641</th><td>          <b>if</b> (random &lt;= cross<span class='error' title="type &apos;G4DataVector&apos; does not provide a subscript operator">[</span>k]) <b>return</b> (*elementVector)[k];</td></tr>
+<tr><th id="642">642</th><td>        }</td></tr>
+<tr><th id="643">643</th><td>      <i>// It should never end up here</i></td></tr>
+<tr><th id="644">644</th><td>      <a class="macro" href="../../../../global/management/include/G4ios.hh.html#46" title="(*_G4cout_p())" data-ref="_M/G4cout">G4cout</a> <span class='error' title="invalid operands to binary expression (&apos;int&apos; and &apos;const char *&apos;)">&lt;&lt;</span> <q>"G4VCrossSectionHandler::SelectRandomElement - no element found"</q> &lt;&lt; <a class="macro" href="../../../../global/management/include/G4ios.hh.html#60" title="std::endl" data-ref="_M/G4endl">G4endl</a>;</td></tr>
+<tr><th id="645">645</th><td>      <b>return</b> <a class="local col1 ref" href="#121nullElement" title='nullElement' data-ref="121nullElement">nullElement</a>;</td></tr>
+<tr><th id="646">646</th><td>    }</td></tr>
+<tr><th id="647">647</th><td>}</td></tr>
+<tr><th id="648">648</th><td></td></tr>
+<tr><th id="649">649</th><td><a class="typedef" href="../../../../global/management/include/G4Types.hh.html#G4int" title='G4int' data-type='int' data-ref="G4int">G4int</a> <a class="type" href="../include/G4VCrossSectionHandler.hh.html#G4VCrossSectionHandler" title='G4VCrossSectionHandler' data-ref="G4VCrossSectionHandler">G4VCrossSectionHandler</a>::<dfn class="decl def" id="_ZNK22G4VCrossSectionHandler17SelectRandomShellEid" title='G4VCrossSectionHandler::SelectRandomShell' data-ref="_ZNK22G4VCrossSectionHandler17SelectRandomShellEid">SelectRandomShell</dfn>(<a class="typedef" href="../../../../global/management/include/G4Types.hh.html#G4int" title='G4int' data-type='int' data-ref="G4int">G4int</a> <dfn class="local col3 decl" id="133Z" title='Z' data-type='G4int' data-ref="133Z">Z</dfn>, <a class="typedef" href="../../../../global/management/include/G4Types.hh.html#G4double" title='G4double' data-type='double' data-ref="G4double">G4double</a> <dfn class="local col4 decl" id="134e" title='e' data-type='G4double' data-ref="134e">e</dfn>) <em>const</em></td></tr>
+<tr><th id="650">650</th><td>{</td></tr>
+<tr><th id="651">651</th><td>  <i>// Select randomly a shell, according to the weight determined by the cross sections</i></td></tr>
+<tr><th id="652">652</th><td><i>  // in the data set</i></td></tr>
+<tr><th id="653">653</th><td><i></i></td></tr>
+<tr><th id="654">654</th><td><i>  // Note for later improvement: it would be useful to add a cache mechanism for already</i></td></tr>
+<tr><th id="655">655</th><td><i>  // used shells to improve performance</i></td></tr>
+<tr><th id="656">656</th><td></td></tr>
+<tr><th id="657">657</th><td>  <a class="typedef" href="../../../../global/management/include/G4Types.hh.html#G4int" title='G4int' data-type='int' data-ref="G4int">G4int</a> <dfn class="local col5 decl" id="135shell" title='shell' data-type='G4int' data-ref="135shell">shell</dfn> = <var>0</var>;</td></tr>
+<tr><th id="658">658</th><td></td></tr>
+<tr><th id="659">659</th><td>  <a class="typedef" href="../../../../global/management/include/G4Types.hh.html#G4double" title='G4double' data-type='double' data-ref="G4double">G4double</a> <dfn class="local col6 decl" id="136totCrossSection" title='totCrossSection' data-type='G4double' data-ref="136totCrossSection">totCrossSection</dfn> = <a class="member" href="#_ZNK22G4VCrossSectionHandler9FindValueEid" title='G4VCrossSectionHandler::FindValue' data-ref="_ZNK22G4VCrossSectionHandler9FindValueEid">FindValue</a>(<a class="local col3 ref" href="#133Z" title='Z' data-ref="133Z">Z</a>,<a class="local col4 ref" href="#134e" title='e' data-ref="134e">e</a>);</td></tr>
+<tr><th id="660">660</th><td>  <a class="typedef" href="../../../../global/management/include/G4Types.hh.html#G4double" title='G4double' data-type='double' data-ref="G4double">G4double</a> <dfn class="local col7 decl" id="137random" title='random' data-type='G4double' data-ref="137random">random</dfn> = <a class="macro" href="../../../../global/HEPRandom/include/Randomize.hh.html#52" title="CLHEP::HepRandom::getTheEngine()-&gt;flat()" data-ref="_M/G4UniformRand">G4UniformRand</a>() * <a class="local col6 ref" href="#136totCrossSection" title='totCrossSection' data-ref="136totCrossSection">totCrossSection</a>;</td></tr>
+<tr><th id="661">661</th><td>  <a class="typedef" href="../../../../global/management/include/G4Types.hh.html#G4double" title='G4double' data-type='double' data-ref="G4double">G4double</a> <dfn class="local col8 decl" id="138partialSum" title='partialSum' data-type='G4double' data-ref="138partialSum">partialSum</dfn> = <var>0.</var>;</td></tr>
+<tr><th id="662">662</th><td></td></tr>
+<tr><th id="663">663</th><td>  <a class="type" href="../include/G4VEMDataSet.hh.html#G4VEMDataSet" title='G4VEMDataSet' data-ref="G4VEMDataSet">G4VEMDataSet</a>* <dfn class="local col9 decl" id="139dataSet" title='dataSet' data-type='G4VEMDataSet *' data-ref="139dataSet">dataSet</dfn> = <var>0</var>;</td></tr>
+<tr><th id="664">664</th><td>  <span class='error' title="use of undeclared identifier &apos;std&apos;">std</span>::map&lt;<span class='error' title="unexpected type name &apos;G4int&apos;: expected expression">G4int</span>,G4VEMDataSet*,std::less&lt;G4int&gt; &gt;::const_iterator pos;</td></tr>
+<tr><th id="665">665</th><td>  <span class='error' title="use of undeclared identifier &apos;pos&apos;">pos</span> = <span class='error' title="use of undeclared identifier &apos;dataMap&apos;">dataMap</span>.find(Z);</td></tr>
+<tr><th id="666">666</th><td>  <i>// The following is a workaround for STL ObjectSpace implementation,</i></td></tr>
+<tr><th id="667">667</th><td><i>  // which does not support the standard and does not accept</i></td></tr>
+<tr><th id="668">668</th><td><i>  // the syntax pos-&gt;first or pos-&gt;second</i></td></tr>
+<tr><th id="669">669</th><td><i>  // if (pos != dataMap.end()) dataSet = pos-&gt;second;</i></td></tr>
+<tr><th id="670">670</th><td>  <b>if</b> (<span class='error' title="use of undeclared identifier &apos;pos&apos;">pos</span> != <span class='error' title="use of undeclared identifier &apos;dataMap&apos;">dataMap</span>.end()) </td></tr>
+<tr><th id="671">671</th><td>    dataSet = (*<span class='error' title="use of undeclared identifier &apos;pos&apos;">pos</span>).second;</td></tr>
+<tr><th id="672">672</th><td>  <b>else</b></td></tr>
+<tr><th id="673">673</th><td>    {</td></tr>
+<tr><th id="674">674</th><td>      <a class="ref" href="../../../../global/management/include/G4Exception.hh.html#_Z11G4ExceptionPKcS0_19G4ExceptionSeverityS0_" title='G4Exception' data-ref="_Z11G4ExceptionPKcS0_19G4ExceptionSeverityS0_">G4Exception</a>(<q>"G4VCrossSectionHandler::SelectRandomShell"</q>,</td></tr>
+<tr><th id="675">675</th><td>		    <q>"em1011"</q>,<a class="enum" href="../../../../global/management/include/G4ExceptionSeverity.hh.html#G4ExceptionSeverity::FatalException" title='G4ExceptionSeverity::FatalException' data-ref="G4ExceptionSeverity::FatalException">FatalException</a>,<q>"unable to load the dataSet"</q>);</td></tr>
+<tr><th id="676">676</th><td>      <b>return</b> <var>0</var>;</td></tr>
+<tr><th id="677">677</th><td>    }</td></tr>
+<tr><th id="678">678</th><td></td></tr>
+<tr><th id="679">679</th><td>  <span class='error' title="unknown type name &apos;size_t&apos;">size_t</span> <dfn class="local col0 decl" id="140nShells" title='nShells' data-type='int' data-ref="140nShells">nShells</dfn> = dataSet-&gt;NumberOfComponents();</td></tr>
+<tr><th id="680">680</th><td>  <b>for</b> (<span class='error' title="unknown type name &apos;size_t&apos;">size_t</span> <dfn class="local col1 decl" id="141i" title='i' data-type='int' data-ref="141i">i</dfn>=<var>0</var>; i&lt;nShells; i++)</td></tr>
+<tr><th id="681">681</th><td>    {</td></tr>
+<tr><th id="682">682</th><td>      <em>const</em> <a class="type" href="../include/G4VEMDataSet.hh.html#G4VEMDataSet" title='G4VEMDataSet' data-ref="G4VEMDataSet">G4VEMDataSet</a>* <dfn class="local col2 decl" id="142shellDataSet" title='shellDataSet' data-type='const G4VEMDataSet *' data-ref="142shellDataSet">shellDataSet</dfn> = dataSet-&gt;GetComponent(i);</td></tr>
+<tr><th id="683">683</th><td>      <b>if</b> (<a class="local col2 ref" href="#142shellDataSet" title='shellDataSet' data-ref="142shellDataSet">shellDataSet</a> != <var>0</var>)</td></tr>
+<tr><th id="684">684</th><td>	{</td></tr>
+<tr><th id="685">685</th><td>	  <a class="typedef" href="../../../../global/management/include/G4Types.hh.html#G4double" title='G4double' data-type='double' data-ref="G4double">G4double</a> <dfn class="local col3 decl" id="143value" title='value' data-type='G4double' data-ref="143value">value</dfn> = <a class="local col2 ref" href="#142shellDataSet" title='shellDataSet' data-ref="142shellDataSet">shellDataSet</a>-&gt;<a class="virtual ref" href="../include/G4VEMDataSet.hh.html#_ZNK12G4VEMDataSet9FindValueEdi" title='G4VEMDataSet::FindValue' data-ref="_ZNK12G4VEMDataSet9FindValueEdi">FindValue</a>(<a class="local col4 ref" href="#134e" title='e' data-ref="134e">e</a>);</td></tr>
+<tr><th id="686">686</th><td>	  <a class="local col8 ref" href="#138partialSum" title='partialSum' data-ref="138partialSum">partialSum</a> += <a class="local col3 ref" href="#143value" title='value' data-ref="143value">value</a>;</td></tr>
+<tr><th id="687">687</th><td>	  <b>if</b> (random &lt;= partialSum) <b>return</b> i;</td></tr>
+<tr><th id="688">688</th><td>	}</td></tr>
+<tr><th id="689">689</th><td>    }</td></tr>
+<tr><th id="690">690</th><td>  <i>// It should never get here</i></td></tr>
+<tr><th id="691">691</th><td>  <b>return</b> <a class="local col5 ref" href="#135shell" title='shell' data-ref="135shell">shell</a>;</td></tr>
+<tr><th id="692">692</th><td>}</td></tr>
+<tr><th id="693">693</th><td></td></tr>
+<tr><th id="694">694</th><td><em>void</em> <a class="type" href="../include/G4VCrossSectionHandler.hh.html#G4VCrossSectionHandler" title='G4VCrossSectionHandler' data-ref="G4VCrossSectionHandler">G4VCrossSectionHandler</a>::<dfn class="decl def" id="_ZN22G4VCrossSectionHandler14ActiveElementsEv" title='G4VCrossSectionHandler::ActiveElements' data-ref="_ZN22G4VCrossSectionHandler14ActiveElementsEv">ActiveElements</dfn>()</td></tr>
+<tr><th id="695">695</th><td>{</td></tr>
+<tr><th id="696">696</th><td>  <em>const</em> <span class='error' title="unknown type name &apos;G4MaterialTable&apos;">G4MaterialTable</span>* <dfn class="local col4 decl" id="144materialTable" title='materialTable' data-type='const int *' data-ref="144materialTable">materialTable</dfn> = G4Material::GetMaterialTable();</td></tr>
+<tr><th id="697">697</th><td>  <b>if</b> (materialTable == <var>0</var>)</td></tr>
+<tr><th id="698">698</th><td>      <a class="ref" href="../../../../global/management/include/G4Exception.hh.html#_Z11G4ExceptionPKcS0_19G4ExceptionSeverityS0_" title='G4Exception' data-ref="_Z11G4ExceptionPKcS0_19G4ExceptionSeverityS0_">G4Exception</a>(<q>"G4VCrossSectionHandler::ActiveElements"</q>,</td></tr>
+<tr><th id="699">699</th><td>		    <q>"em1001"</q>,<a class="enum" href="../../../../global/management/include/G4ExceptionSeverity.hh.html#G4ExceptionSeverity::FatalException" title='G4ExceptionSeverity::FatalException' data-ref="G4ExceptionSeverity::FatalException">FatalException</a>,<q>"no MaterialTable found"</q>);</td></tr>
+<tr><th id="700">700</th><td></td></tr>
+<tr><th id="701">701</th><td>  <a class="typedef" href="../../../../global/management/include/G4Types.hh.html#G4int" title='G4int' data-type='int' data-ref="G4int">G4int</a> <dfn class="local col5 decl" id="145nMaterials" title='nMaterials' data-type='G4int' data-ref="145nMaterials">nMaterials</dfn> = G4Material::GetNumberOfMaterials();</td></tr>
+<tr><th id="702">702</th><td></td></tr>
+<tr><th id="703">703</th><td>  <b>for</b> (<a class="typedef" href="../../../../global/management/include/G4Types.hh.html#G4int" title='G4int' data-type='int' data-ref="G4int">G4int</a> <dfn class="local col6 decl" id="146mLocal2" title='mLocal2' data-type='G4int' data-ref="146mLocal2">mLocal2</dfn>=<var>0</var>; <a class="local col6 ref" href="#146mLocal2" title='mLocal2' data-ref="146mLocal2">mLocal2</a>&lt;<a class="local col5 ref" href="#145nMaterials" title='nMaterials' data-ref="145nMaterials">nMaterials</a>; <a class="local col6 ref" href="#146mLocal2" title='mLocal2' data-ref="146mLocal2">mLocal2</a>++)</td></tr>
+<tr><th id="704">704</th><td>    {</td></tr>
+<tr><th id="705">705</th><td>      <em>const</em> <a class="type" href="../../../../materials/include/G4Material.hh.html#G4Material" title='G4Material' data-ref="G4Material">G4Material</a>* <dfn class="local col7 decl" id="147material" title='material' data-type='const G4Material *' data-ref="147material">material</dfn>= (*materialTable)[mLocal2];</td></tr>
+<tr><th id="706">706</th><td>      <em>const</em> <span class='error' title="unknown type name &apos;G4ElementVector&apos;">G4ElementVector</span>* <dfn class="local col8 decl" id="148elementVector" title='elementVector' data-type='const int *' data-ref="148elementVector">elementVector</dfn> = material-&gt;GetElementVector();</td></tr>
+<tr><th id="707">707</th><td>      <em>const</em> <a class="typedef" href="../../../../global/management/include/G4Types.hh.html#G4int" title='G4int' data-type='int' data-ref="G4int">G4int</a> <dfn class="local col9 decl" id="149nElements" title='nElements' data-type='const G4int' data-ref="149nElements">nElements</dfn> = material-&gt;GetNumberOfElements();</td></tr>
+<tr><th id="708">708</th><td></td></tr>
+<tr><th id="709">709</th><td>      <b>for</b> (<a class="typedef" href="../../../../global/management/include/G4Types.hh.html#G4int" title='G4int' data-type='int' data-ref="G4int">G4int</a> <dfn class="local col0 decl" id="150iEl" title='iEl' data-type='G4int' data-ref="150iEl">iEl</dfn>=<var>0</var>; <a class="local col0 ref" href="#150iEl" title='iEl' data-ref="150iEl">iEl</a>&lt;<a class="local col9 ref" href="#149nElements" title='nElements' data-ref="149nElements">nElements</a>; <a class="local col0 ref" href="#150iEl" title='iEl' data-ref="150iEl">iEl</a>++)</td></tr>
+<tr><th id="710">710</th><td>	{</td></tr>
+<tr><th id="711">711</th><td>	  <a class="type" href="../../../../materials/include/G4Element.hh.html#G4Element" title='G4Element' data-ref="G4Element">G4Element</a>* <dfn class="local col1 decl" id="151element" title='element' data-type='G4Element *' data-ref="151element">element</dfn> = (*elementVector)[iEl];</td></tr>
+<tr><th id="712">712</th><td>	  <a class="typedef" href="../../../../global/management/include/G4Types.hh.html#G4double" title='G4double' data-type='double' data-ref="G4double">G4double</a> <dfn class="local col2 decl" id="152Z" title='Z' data-type='G4double' data-ref="152Z">Z</dfn> = <a class="local col1 ref" href="#151element" title='element' data-ref="151element">element</a>-&gt;<a class="ref" href="../../../../materials/include/G4Element.hh.html#_ZNK9G4Element4GetZEv" title='G4Element::GetZ' data-ref="_ZNK9G4Element4GetZEv">GetZ</a>();</td></tr>
+<tr><th id="713">713</th><td>	  <b>if</b> (!(<a class="member" href="../include/G4VCrossSectionHandler.hh.html#G4VCrossSectionHandler::activeZ" title='G4VCrossSectionHandler::activeZ' data-ref="G4VCrossSectionHandler::activeZ">activeZ</a>.<a class="ref" href="../../../../global/management/include/G4DataVector.hh.html#_ZNK12G4DataVector8containsERKd" title='G4DataVector::contains' data-ref="_ZNK12G4DataVector8containsERKd">contains</a>(<a class="local col2 ref" href="#152Z" title='Z' data-ref="152Z">Z</a>)) &amp;&amp; <a class="local col2 ref" href="#152Z" title='Z' data-ref="152Z">Z</a> &gt;= <a class="member" href="../include/G4VCrossSectionHandler.hh.html#G4VCrossSectionHandler::zMin" title='G4VCrossSectionHandler::zMin' data-ref="G4VCrossSectionHandler::zMin">zMin</a> &amp;&amp; <a class="local col2 ref" href="#152Z" title='Z' data-ref="152Z">Z</a> &lt;= <a class="member" href="../include/G4VCrossSectionHandler.hh.html#G4VCrossSectionHandler::zMax" title='G4VCrossSectionHandler::zMax' data-ref="G4VCrossSectionHandler::zMax">zMax</a>)</td></tr>
+<tr><th id="714">714</th><td>	    {</td></tr>
+<tr><th id="715">715</th><td>	      activeZ.<span class='error' title="no member named &apos;push_back&apos; in &apos;G4DataVector&apos;">push_back</span>(Z);</td></tr>
+<tr><th id="716">716</th><td>	    }</td></tr>
+<tr><th id="717">717</th><td>	}</td></tr>
+<tr><th id="718">718</th><td>    }</td></tr>
+<tr><th id="719">719</th><td>}</td></tr>
+<tr><th id="720">720</th><td></td></tr>
+<tr><th id="721">721</th><td><a class="type" href="../include/G4VDataSetAlgorithm.hh.html#G4VDataSetAlgorithm" title='G4VDataSetAlgorithm' data-ref="G4VDataSetAlgorithm">G4VDataSetAlgorithm</a>* <a class="type" href="../include/G4VCrossSectionHandler.hh.html#G4VCrossSectionHandler" title='G4VCrossSectionHandler' data-ref="G4VCrossSectionHandler">G4VCrossSectionHandler</a>::<dfn class="virtual decl def" id="_ZN22G4VCrossSectionHandler19CreateInterpolationEv" title='G4VCrossSectionHandler::CreateInterpolation' data-ref="_ZN22G4VCrossSectionHandler19CreateInterpolationEv">CreateInterpolation</dfn>()</td></tr>
+<tr><th id="722">722</th><td>{</td></tr>
+<tr><th id="723">723</th><td>  <a class="type" href="../include/G4VDataSetAlgorithm.hh.html#G4VDataSetAlgorithm" title='G4VDataSetAlgorithm' data-ref="G4VDataSetAlgorithm">G4VDataSetAlgorithm</a>* <dfn class="local col3 decl" id="153algorithm" title='algorithm' data-type='G4VDataSetAlgorithm *' data-ref="153algorithm">algorithm</dfn> = <b>new</b> <a class="ref fake" href="../include/G4LogLogInterpolation.hh.html#_ZN21G4LogLogInterpolationC1Ev" title='G4LogLogInterpolation::G4LogLogInterpolation' data-ref="_ZN21G4LogLogInterpolationC1Ev"></a><a class="type" href="../include/G4LogLogInterpolation.hh.html#G4LogLogInterpolation" title='G4LogLogInterpolation' data-ref="G4LogLogInterpolation">G4LogLogInterpolation</a>;</td></tr>
+<tr><th id="724">724</th><td>  <b>return</b> <a class="local col3 ref" href="#153algorithm" title='algorithm' data-ref="153algorithm">algorithm</a>;</td></tr>
+<tr><th id="725">725</th><td>}</td></tr>
+<tr><th id="726">726</th><td></td></tr>
+<tr><th id="727">727</th><td><a class="typedef" href="../../../../global/management/include/G4Types.hh.html#G4int" title='G4int' data-type='int' data-ref="G4int">G4int</a> <a class="type" href="../include/G4VCrossSectionHandler.hh.html#G4VCrossSectionHandler" title='G4VCrossSectionHandler' data-ref="G4VCrossSectionHandler">G4VCrossSectionHandler</a>::<dfn class="decl def" id="_ZNK22G4VCrossSectionHandler18NumberOfComponentsEi" title='G4VCrossSectionHandler::NumberOfComponents' data-ref="_ZNK22G4VCrossSectionHandler18NumberOfComponentsEi">NumberOfComponents</dfn>(<a class="typedef" href="../../../../global/management/include/G4Types.hh.html#G4int" title='G4int' data-type='int' data-ref="G4int">G4int</a> <dfn class="local col4 decl" id="154Z" title='Z' data-type='G4int' data-ref="154Z">Z</dfn>) <em>const</em></td></tr>
+<tr><th id="728">728</th><td>{</td></tr>
+<tr><th id="729">729</th><td>  <a class="typedef" href="../../../../global/management/include/G4Types.hh.html#G4int" title='G4int' data-type='int' data-ref="G4int">G4int</a> <dfn class="local col5 decl" id="155n" title='n' data-type='G4int' data-ref="155n">n</dfn> = <var>0</var>;</td></tr>
+<tr><th id="730">730</th><td></td></tr>
+<tr><th id="731">731</th><td>  <span class='error' title="use of undeclared identifier &apos;std&apos;">std</span>::map&lt;<span class='error' title="unexpected type name &apos;G4int&apos;: expected expression">G4int</span>,G4VEMDataSet*,std::less&lt;G4int&gt; &gt;::const_iterator pos;</td></tr>
+<tr><th id="732">732</th><td>  <span class='error' title="use of undeclared identifier &apos;pos&apos;">pos</span> = <span class='error' title="use of undeclared identifier &apos;dataMap&apos;">dataMap</span>.find(Z);</td></tr>
+<tr><th id="733">733</th><td>  <b>if</b> (<span class='error' title="use of undeclared identifier &apos;pos&apos;">pos</span>!= <span class='error' title="use of undeclared identifier &apos;dataMap&apos;">dataMap</span>.end())</td></tr>
+<tr><th id="734">734</th><td>    {</td></tr>
+<tr><th id="735">735</th><td>      <a class="type" href="../include/G4VEMDataSet.hh.html#G4VEMDataSet" title='G4VEMDataSet' data-ref="G4VEMDataSet">G4VEMDataSet</a>* <dfn class="local col6 decl" id="156dataSet" title='dataSet' data-type='G4VEMDataSet *' data-ref="156dataSet">dataSet</dfn> = (*<span class='error' title="use of undeclared identifier &apos;pos&apos;">pos</span>).second;</td></tr>
+<tr><th id="736">736</th><td>      n = dataSet-&gt;NumberOfComponents();</td></tr>
+<tr><th id="737">737</th><td>    }</td></tr>
+<tr><th id="738">738</th><td>  <b>else</b></td></tr>
+<tr><th id="739">739</th><td>    {</td></tr>
+<tr><th id="740">740</th><td>      <a class="macro" href="../../../../global/management/include/G4ios.hh.html#46" title="(*_G4cout_p())" data-ref="_M/G4cout">G4cout</a> <span class='error' title="invalid operands to binary expression (&apos;int&apos; and &apos;const char *&apos;)">&lt;&lt;</span> <q>"WARNING: G4VCrossSectionHandler::NumberOfComponents did not "</q></td></tr>
+<tr><th id="741">741</th><td>             &lt;&lt; <q>"find Z = "</q></td></tr>
+<tr><th id="742">742</th><td>             &lt;&lt; Z &lt;&lt; <a class="macro" href="../../../../global/management/include/G4ios.hh.html#60" title="std::endl" data-ref="_M/G4endl">G4endl</a>;</td></tr>
+<tr><th id="743">743</th><td>    }</td></tr>
+<tr><th id="744">744</th><td>  <b>return</b> <a class="local col5 ref" href="#155n" title='n' data-ref="155n">n</a>;</td></tr>
+<tr><th id="745">745</th><td>}</td></tr>
+<tr><th id="746">746</th><td></td></tr>
+<tr><th id="747">747</th><td></td></tr>
+<tr><th id="748">748</th><td></td></tr>
+</table><hr/><p id='footer'>
+Generated on <em>2019-Aug-28</em> from project codebrowser<br />Powered by <a href='https://woboq.com'><img alt='Woboq' src='https://code.woboq.org/woboq-16.png' width='41' height='16' /></a> <a href='https://code.woboq.org'>Code Browser</a> 2.1
+<br/>Generator usage only permitted with license.</p>
+</div></body></html>

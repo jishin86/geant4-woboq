@@ -1,0 +1,89 @@
+<dec f='codebrowser/source/processes/electromagnetic/pii/include/G4PixeCrossSectionHandler.hh' l='123' type='void G4PixeCrossSectionHandler::BuildForMaterials()'/>
+<use f='codebrowser/source/processes/electromagnetic/pii/src/G4PixeCrossSectionHandler.cc' l='204' u='c' c='_ZN25G4PixeCrossSectionHandler13LoadShellDataERK8G4String'/>
+<def f='codebrowser/source/processes/electromagnetic/pii/src/G4PixeCrossSectionHandler.cc' l='405' ll='444' type='void G4PixeCrossSectionHandler::BuildForMaterials()'/>
+<doc f='codebrowser/source/processes/electromagnetic/pii/src/G4PixeCrossSectionHandler.cc' l='318'>/*
+  G4IDataSet* G4PixeCrossSectionHandler::BuildMeanFreePathForMaterials(const G4DataVector*  energyCuts )
+  {
+  // Builds a CompositeDataSet containing the mean free path for each material
+  // in the material table
+
+  G4DataVector energyVector;
+  G4double dBin = std::log10(eMax/eMin) / nBins;
+
+  for (G4int i=0; i&lt;nBins+1; i++)
+  {
+  energyVector.push_back(std::pow(10., std::log10(eMin)+i*dBin));
+  }
+
+  // Factory method to build cross sections in derived classes,
+  // related to the type of physics process
+
+  if (crossSections != 0)
+  {  // Reset the list of cross sections
+  std::vector&lt;G4IDataSet*&gt;::iterator mat;
+  if (! crossSections-&gt;empty())
+  {
+  for (mat = crossSections-&gt;begin(); mat!= crossSections-&gt;end(); ++mat)
+  {
+  G4IDataSet* set = *mat;
+  delete set;
+  set = 0;
+  }
+  crossSections-&gt;clear();
+  delete crossSections;
+  crossSections = 0;
+  }
+  }
+
+  crossSections = BuildCrossSectionsForMaterials(energyVector);
+
+  if (crossSections == 0)
+  G4Exception(&quot;G4PixeCrossSectionHandler::BuildMeanFreePathForMaterials&quot;, 
+  &quot;pii00000201&quot;,
+  FatalException,
+  &quot;crossSections = 0&quot;);
+  
+  G4IInterpolator* algo = CreateInterpolation();
+  G4IDataSet* materialSet = new G4CompositeDataSet(algo);
+
+  G4DataVector* energies;
+  G4DataVector* data;
+  
+  const G4ProductionCutsTable* theCoupleTable=
+  G4ProductionCutsTable::GetProductionCutsTable();
+  size_t numOfCouples = theCoupleTable-&gt;GetTableSize();
+
+
+  for (size_t m=0; m&lt;numOfCouples; m++)
+  {
+  energies = new G4DataVector;
+  data = new G4DataVector;
+  for (G4int bin=0; bin&lt;nBins; bin++)
+  {
+  G4double energy = energyVector[bin];
+  energies-&gt;push_back(energy);
+  G4IDataSet* matCrossSet = (*crossSections)[m];
+  G4double materialCrossSection = 0.0;
+  G4int nElm = matCrossSet-&gt;NumberOfComponents();
+  for(G4int j=0; j&lt;nElm; j++) {
+  materialCrossSection += matCrossSet-&gt;GetComponent(j)-&gt;FindValue(energy);
+  }
+
+  if (materialCrossSection &gt; 0.)
+  {
+  data-&gt;push_back(1./materialCrossSection);
+  }
+  else
+  {
+  data-&gt;push_back(DBL_MAX);
+  }
+  }
+  G4IInterpolator* algo = CreateInterpolation();
+  G4IDataSet* dataSet = new G4DataSet(m,energies,data,algo,1.,1.);
+  materialSet-&gt;AddComponent(dataSet);
+  }
+
+  return materialSet;
+  }
+
+*/</doc>

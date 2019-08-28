@@ -1,0 +1,198 @@
+<!doctype html>
+<html>
+<head>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"><title>RandomEngine.h source code [codebrowser/source/externals/clhep/include/CLHEP/Random/RandomEngine.h] - Woboq Code Browser</title>
+<meta name="woboq:interestingDefinitions" content="CLHEP::HepRandomEngine "/>
+<link rel="stylesheet" href="../../../../../../../../data/qtcreator.css" title="QtCreator"/>
+<link rel="alternate stylesheet" href="../../../../../../../../data/kdevelop.css" title="KDevelop"/>
+<script type="text/javascript" src="../../../../../../../../data/jquery/jquery.min.js"></script>
+<script type="text/javascript" src="../../../../../../../../data/jquery/jquery-ui.min.js"></script>
+<script>var file = 'codebrowser/source/externals/clhep/include/CLHEP/Random/RandomEngine.h'; var root_path = '../../../../../../..'; var data_path = '../../../../../../../../data';</script>
+<script src='../../../../../../../../data/codebrowser.js'></script>
+</head>
+<body><div id='header'><h1 id='breadcrumb'><span>Browse the source code of </span><a href='../../../../../..'>codebrowser</a>/<a href='../../../../..'>source</a>/<a href='../../../..'>externals</a>/<a href='../../..'>clhep</a>/<a href='../..'>include</a>/<a href='..'>CLHEP</a>/<a href='./'>Random</a>/<a href='RandomEngine.h.html'>RandomEngine.h</a></h1></div>
+<hr/><div id='content'><table class="code">
+<tr><th id="1">1</th><td><i>// -*- C++ -*-</i></td></tr>
+<tr><th id="2">2</th><td><i>//</i></td></tr>
+<tr><th id="3">3</th><td><i>// -----------------------------------------------------------------------</i></td></tr>
+<tr><th id="4">4</th><td><i>//                             HEP Random</i></td></tr>
+<tr><th id="5">5</th><td><i>//                        --- HepRandomEngine ---</i></td></tr>
+<tr><th id="6">6</th><td><i>//                          class header file</i></td></tr>
+<tr><th id="7">7</th><td><i>// -----------------------------------------------------------------------</i></td></tr>
+<tr><th id="8">8</th><td><i>// This file is part of Geant4 (simulation toolkit for HEP).</i></td></tr>
+<tr><th id="9">9</th><td><i>//</i></td></tr>
+<tr><th id="10">10</th><td><i>// Is the abstract class defining the interface for each random engine. It</i></td></tr>
+<tr><th id="11">11</th><td><i>// implements the getSeed() and getSeeds() methods which return the initial</i></td></tr>
+<tr><th id="12">12</th><td><i>// seed value and the initial array of seeds respectively. It defines 7</i></td></tr>
+<tr><th id="13">13</th><td><i>// pure virtual functions: flat(), flatArray(), setSeed(), setSeeds(),</i></td></tr>
+<tr><th id="14">14</th><td><i>// saveStatus(), restoreStatus() and showStatus(), which are implemented by</i></td></tr>
+<tr><th id="15">15</th><td><i>// the concrete random engines each one inheriting from this abstract class.</i></td></tr>
+<tr><th id="16">16</th><td><i>// Many concrete random engines can be defined and added to the structure,</i></td></tr>
+<tr><th id="17">17</th><td><i>// simply making them inheriting from HepRandomEngine and defining the six</i></td></tr>
+<tr><th id="18">18</th><td><i>// functions flat(), flatArray(), setSeed(), setSeeds(), saveStatus(),</i></td></tr>
+<tr><th id="19">19</th><td><i>// restoreStatus() and showStatus() in such a way that flat() and</i></td></tr>
+<tr><th id="20">20</th><td><i>// flatArray() return double random values ranging between ]0,1[.</i></td></tr>
+<tr><th id="21">21</th><td><i>// All the random engines have a default seed value already set but they</i></td></tr>
+<tr><th id="22">22</th><td><i>// can be instantiated with a different seed value set up by the user.</i></td></tr>
+<tr><th id="23">23</th><td><i></i></td></tr>
+<tr><th id="24">24</th><td><i>// =======================================================================</i></td></tr>
+<tr><th id="25">25</th><td><i>// Gabriele Cosmo - Created: 5th September 1995</i></td></tr>
+<tr><th id="26">26</th><td><i>//                - Minor corrections: 31st October 1996</i></td></tr>
+<tr><th id="27">27</th><td><i>//                - Added methods for engine status: 19th November 1996</i></td></tr>
+<tr><th id="28">28</th><td><i>//                - Removed default values to setSeed() and</i></td></tr>
+<tr><th id="29">29</th><td><i>//                  setSeeds() pure virtual methods: 16th Oct 1997</i></td></tr>
+<tr><th id="30">30</th><td><i>//                - Moved seeds table to HepRandom: 19th Mar 1998</i></td></tr>
+<tr><th id="31">31</th><td><i>// Ken Smith      - Added conversion operators:  6th Aug 1998</i></td></tr>
+<tr><th id="32">32</th><td><i>// Mark Fischler  - Added static twoToMinus_xx constants: 11 Sept 1998</i></td></tr>
+<tr><th id="33">33</th><td><i>// Mark Fischler  - Removed getTableSeeds, which was migrated to HepRandom</i></td></tr>
+<tr><th id="34">34</th><td><i>//                  in 1998.  10 Feb 2005.</i></td></tr>
+<tr><th id="35">35</th><td><i>// =======================================================================</i></td></tr>
+<tr><th id="36">36</th><td></td></tr>
+<tr><th id="37">37</th><td><u>#<span data-ppcond="37">ifndef</span> <span class="macro" data-ref="_M/HepRandomEngine_h">HepRandomEngine_h</span></u></td></tr>
+<tr><th id="38">38</th><td><u>#define <dfn class="macro" id="_M/HepRandomEngine_h" data-ref="_M/HepRandomEngine_h">HepRandomEngine_h</dfn> 1</u></td></tr>
+<tr><th id="39">39</th><td></td></tr>
+<tr><th id="40">40</th><td><u>#include <span class='error' title="&apos;iostream&apos; file not found">&lt;</span>iostream&gt;</u></td></tr>
+<tr><th id="41">41</th><td><u>#include &lt;fstream&gt;</u></td></tr>
+<tr><th id="42">42</th><td><u>#include &lt;iomanip&gt;</u></td></tr>
+<tr><th id="43">43</th><td><u>#include &lt;string&gt;</u></td></tr>
+<tr><th id="44">44</th><td><u>#include &lt;sstream&gt;</u></td></tr>
+<tr><th id="45">45</th><td><u>#include &lt;vector&gt;</u></td></tr>
+<tr><th id="46">46</th><td></td></tr>
+<tr><th id="47">47</th><td><b>namespace</b> <span class="namespace">CLHEP</span> {</td></tr>
+<tr><th id="48">48</th><td></td></tr>
+<tr><th id="49">49</th><td><i class="doc">/**</i></td></tr>
+<tr><th id="50">50</th><td><i class="doc"> * <span class="command">@author</span> &lt;Gabriele.Cosm<span class="command">o@cern</span>.ch&gt;</i></td></tr>
+<tr><th id="51">51</th><td><i class="doc"> * <span class="command">@ingroup</span> <span class="verb">random</span></i></td></tr>
+<tr><th id="52">52</th><td><i class="doc"> */</i></td></tr>
+<tr><th id="53">53</th><td><b>class</b> <dfn class="type def" id="CLHEP::HepRandomEngine" title='CLHEP::HepRandomEngine' data-ref="CLHEP::HepRandomEngine">HepRandomEngine</dfn> {</td></tr>
+<tr><th id="54">54</th><td></td></tr>
+<tr><th id="55">55</th><td><b>public</b>:</td></tr>
+<tr><th id="56">56</th><td></td></tr>
+<tr><th id="57">57</th><td>  <dfn class="decl" id="_ZN5CLHEP15HepRandomEngineC1Ev" title='CLHEP::HepRandomEngine::HepRandomEngine' data-ref="_ZN5CLHEP15HepRandomEngineC1Ev">HepRandomEngine</dfn>();</td></tr>
+<tr><th id="58">58</th><td>  <b>virtual</b> <dfn class="virtual decl" id="_ZN5CLHEP15HepRandomEngineD1Ev" title='CLHEP::HepRandomEngine::~HepRandomEngine' data-ref="_ZN5CLHEP15HepRandomEngineD1Ev">~HepRandomEngine</dfn>();</td></tr>
+<tr><th id="59">59</th><td>  <i>// Constructor and destructor</i></td></tr>
+<tr><th id="60">60</th><td></td></tr>
+<tr><th id="61">61</th><td>  <b>inline</b> <em>bool</em> <a class="decl" href="RandomEngine.icc.html#_ZN5CLHEP15HepRandomEngineeqERKS0_" title='CLHEP::HepRandomEngine::operator==' data-ref="_ZN5CLHEP15HepRandomEngineeqERKS0_" id="_ZN5CLHEP15HepRandomEngineeqERKS0_"><b>operator</b>==</a>(<em>const</em> <a class="type" href="#CLHEP::HepRandomEngine" title='CLHEP::HepRandomEngine' data-ref="CLHEP::HepRandomEngine">HepRandomEngine</a>&amp; <dfn class="local col6 decl" id="176engine" title='engine' data-type='const CLHEP::HepRandomEngine &amp;' data-ref="176engine">engine</dfn>);</td></tr>
+<tr><th id="62">62</th><td>  <b>inline</b> <em>bool</em> <a class="decl" href="RandomEngine.icc.html#_ZN5CLHEP15HepRandomEngineneERKS0_" title='CLHEP::HepRandomEngine::operator!=' data-ref="_ZN5CLHEP15HepRandomEngineneERKS0_" id="_ZN5CLHEP15HepRandomEngineneERKS0_"><b>operator</b>!=</a>(<em>const</em> <a class="type" href="#CLHEP::HepRandomEngine" title='CLHEP::HepRandomEngine' data-ref="CLHEP::HepRandomEngine">HepRandomEngine</a>&amp; <dfn class="local col7 decl" id="177engine" title='engine' data-type='const CLHEP::HepRandomEngine &amp;' data-ref="177engine">engine</dfn>);</td></tr>
+<tr><th id="63">63</th><td>  <i>// Overloaded operators, ==, !=</i></td></tr>
+<tr><th id="64">64</th><td></td></tr>
+<tr><th id="65">65</th><td>  <b>virtual</b> <em>double</em> <dfn class="virtual decl" id="_ZN5CLHEP15HepRandomEngine4flatEv" title='CLHEP::HepRandomEngine::flat' data-ref="_ZN5CLHEP15HepRandomEngine4flatEv">flat</dfn>() = <var>0</var>;</td></tr>
+<tr><th id="66">66</th><td>  <i>// Should return a pseudo random number between 0 and 1 </i></td></tr>
+<tr><th id="67">67</th><td><i>  // (excluding the end points)</i></td></tr>
+<tr><th id="68">68</th><td></td></tr>
+<tr><th id="69">69</th><td>  <b>virtual</b> <em>void</em> <dfn class="virtual decl" id="_ZN5CLHEP15HepRandomEngine9flatArrayEiPd" title='CLHEP::HepRandomEngine::flatArray' data-ref="_ZN5CLHEP15HepRandomEngine9flatArrayEiPd">flatArray</dfn>(<em>const</em> <em>int</em> <dfn class="local col8 decl" id="178size" title='size' data-type='const int' data-ref="178size">size</dfn>, <em>double</em>* <dfn class="local col9 decl" id="179vect" title='vect' data-type='double *' data-ref="179vect">vect</dfn>) = <var>0</var>;</td></tr>
+<tr><th id="70">70</th><td>  <i>// Fills an array "vect" of specified size with flat random values.</i></td></tr>
+<tr><th id="71">71</th><td></td></tr>
+<tr><th id="72">72</th><td>  <b>virtual</b> <em>void</em> <dfn class="virtual decl" id="_ZN5CLHEP15HepRandomEngine7setSeedEli" title='CLHEP::HepRandomEngine::setSeed' data-ref="_ZN5CLHEP15HepRandomEngine7setSeedEli">setSeed</dfn>(<em>long</em> <dfn class="local col0 decl" id="180seed" title='seed' data-type='long' data-ref="180seed">seed</dfn>, <em>int</em>) = <var>0</var>;</td></tr>
+<tr><th id="73">73</th><td>  <i>// Should initialise the status of the algorithm according to seed.</i></td></tr>
+<tr><th id="74">74</th><td></td></tr>
+<tr><th id="75">75</th><td>  <b>virtual</b> <em>void</em> <dfn class="virtual decl" id="_ZN5CLHEP15HepRandomEngine8setSeedsEPKli" title='CLHEP::HepRandomEngine::setSeeds' data-ref="_ZN5CLHEP15HepRandomEngine8setSeedsEPKli">setSeeds</dfn>(<em>const</em> <em>long</em> * <dfn class="local col1 decl" id="181seeds" title='seeds' data-type='const long *' data-ref="181seeds">seeds</dfn>, <em>int</em>) = <var>0</var>;</td></tr>
+<tr><th id="76">76</th><td>  <i>// Should initialise the status of the algorithm according to the zero terminated</i></td></tr>
+<tr><th id="77">77</th><td><i>  // array of seeds. It is allowed to ignore one or many seeds in this array.</i></td></tr>
+<tr><th id="78">78</th><td></td></tr>
+<tr><th id="79">79</th><td>  <b>virtual</b> <em>void</em> <dfn class="virtual decl" id="_ZNK5CLHEP15HepRandomEngine10saveStatusEPKc" title='CLHEP::HepRandomEngine::saveStatus' data-ref="_ZNK5CLHEP15HepRandomEngine10saveStatusEPKc">saveStatus</dfn>( <em>const</em> <em>char</em> <dfn class="local col2 decl" id="182filename" title='filename' data-type='const char *' data-ref="182filename">filename</dfn>[] = <q>"Config.conf"</q>) <em>const</em> = <var>0</var>;</td></tr>
+<tr><th id="80">80</th><td>  <i>// Should save on a file specific to the instantiated engine in use</i></td></tr>
+<tr><th id="81">81</th><td><i>  // the current status.</i></td></tr>
+<tr><th id="82">82</th><td></td></tr>
+<tr><th id="83">83</th><td>  <b>virtual</b> <em>void</em> <dfn class="virtual decl" id="_ZN5CLHEP15HepRandomEngine13restoreStatusEPKc" title='CLHEP::HepRandomEngine::restoreStatus' data-ref="_ZN5CLHEP15HepRandomEngine13restoreStatusEPKc">restoreStatus</dfn>( <em>const</em> <em>char</em> <dfn class="local col3 decl" id="183filename" title='filename' data-type='const char *' data-ref="183filename">filename</dfn>[] = <q>"Config.conf"</q> ) = <var>0</var>;</td></tr>
+<tr><th id="84">84</th><td>  <i>// Should read from a file (specific to the instantiated engine in use)</i></td></tr>
+<tr><th id="85">85</th><td><i>  // and restore the last saved engine configuration.</i></td></tr>
+<tr><th id="86">86</th><td></td></tr>
+<tr><th id="87">87</th><td>  <b>virtual</b> <em>void</em> <dfn class="virtual decl" id="_ZNK5CLHEP15HepRandomEngine10showStatusEv" title='CLHEP::HepRandomEngine::showStatus' data-ref="_ZNK5CLHEP15HepRandomEngine10showStatusEv">showStatus</dfn>() <em>const</em> = <var>0</var>;</td></tr>
+<tr><th id="88">88</th><td>  <i>// Should dump the current engine status on the screen.</i></td></tr>
+<tr><th id="89">89</th><td></td></tr>
+<tr><th id="90">90</th><td>  <b>virtual</b> <span class='error' title="use of undeclared identifier &apos;std&apos;">std</span>::string <dfn class="decl" id="_ZNK5CLHEP15HepRandomEngine4nameEv" title='CLHEP::HepRandomEngine::name' data-ref="_ZNK5CLHEP15HepRandomEngine4nameEv">name</dfn>() <em>const</em> = <var>0</var>;</td></tr>
+<tr><th id="91">91</th><td>  <i>// Engine name.</i></td></tr>
+<tr><th id="92">92</th><td></td></tr>
+<tr><th id="93">93</th><td>  <b>virtual</b> <span class='error' title="use of undeclared identifier &apos;std&apos;">std</span>::ostream &amp; <dfn class="decl" id="_ZNK5CLHEP15HepRandomEngine3putERi" title='CLHEP::HepRandomEngine::put' data-ref="_ZNK5CLHEP15HepRandomEngine3putERi">put</dfn> (<span class='error' title="use of undeclared identifier &apos;std&apos;">std</span>::ostream &amp; os) <em>const</em>;</td></tr>
+<tr><th id="94">94</th><td>  <b>virtual</b> <span class='error' title="use of undeclared identifier &apos;std&apos;">std</span>::istream &amp; <dfn class="decl" id="_ZN5CLHEP15HepRandomEngine3getERi" title='CLHEP::HepRandomEngine::get' data-ref="_ZN5CLHEP15HepRandomEngine3getERi">get</dfn> (<span class='error' title="use of undeclared identifier &apos;std&apos;">std</span>::istream &amp; is);</td></tr>
+<tr><th id="95">95</th><td>  <i>// Save and restore to/from streams</i></td></tr>
+<tr><th id="96">96</th><td></td></tr>
+<tr><th id="97">97</th><td>  <em>static</em> <span class='error' title="use of undeclared identifier &apos;std&apos;">std</span>::string <dfn class="decl" id="_ZN5CLHEP15HepRandomEngine8beginTagEv" title='CLHEP::HepRandomEngine::beginTag' data-ref="_ZN5CLHEP15HepRandomEngine8beginTagEv">beginTag</dfn> ( );</td></tr>
+<tr><th id="98">98</th><td>  <b>virtual</b> <span class='error' title="use of undeclared identifier &apos;std&apos;">std</span>::istream &amp; <dfn class="decl" id="_ZN5CLHEP15HepRandomEngine8getStateERi" title='CLHEP::HepRandomEngine::getState' data-ref="_ZN5CLHEP15HepRandomEngine8getStateERi">getState</dfn> ( <span class='error' title="use of undeclared identifier &apos;std&apos;">std</span>::istream &amp; is );</td></tr>
+<tr><th id="99">99</th><td>  <i>// Helpers for EngineFactory which restores anonymous engine from istream</i></td></tr>
+<tr><th id="100">100</th><td></td></tr>
+<tr><th id="101">101</th><td>  <em>static</em> <a class="type" href="#CLHEP::HepRandomEngine" title='CLHEP::HepRandomEngine' data-ref="CLHEP::HepRandomEngine">HepRandomEngine</a>* <dfn class="decl" id="_ZN5CLHEP15HepRandomEngine9newEngineERi" title='CLHEP::HepRandomEngine::newEngine' data-ref="_ZN5CLHEP15HepRandomEngine9newEngineERi">newEngine</dfn>(<span class='error' title="use of undeclared identifier &apos;std&apos;">std</span>::istream &amp; <dfn class="local col4 decl" id="184is" title='is' data-type='int &amp;' data-ref="184is">is</dfn>);</td></tr>
+<tr><th id="102">102</th><td>  <i>// Instantiates on the heap a new engine of type specified by content of is</i></td></tr>
+<tr><th id="103">103</th><td></td></tr>
+<tr><th id="104">104</th><td>  <em>static</em> HepRandomEngine* newEngine(<em>const</em> <span class='error' title="use of undeclared identifier &apos;std&apos;">std</span>::vector<span class='error' title="expected &apos;)&apos;">&lt;</span><em>unsigned</em> <em>long</em>&gt; &amp; v);</td></tr>
+<tr><th id="105">105</th><td>  <i>// Instantiates on the heap a new engine of type specified by content of v</i></td></tr>
+<tr><th id="106">106</th><td></td></tr>
+<tr><th id="107">107</th><td>  <b>virtual</b> <span class='error' title="use of undeclared identifier &apos;std&apos;">std</span>::vector<span class='error' title="expected member name or &apos;;&apos; after declaration specifiers">&lt;</span><em>unsigned</em> <em>long</em>&gt; put () <em>const</em>;</td></tr>
+<tr><th id="108">108</th><td>  <b>virtual</b> <em>bool</em> get (<em>const</em> <span class='error' title="use of undeclared identifier &apos;std&apos;">std</span>::vector<span class='error' title="expected &apos;)&apos;">&lt;</span><em>unsigned</em> <em>long</em>&gt; &amp; v);</td></tr>
+<tr><th id="109">109</th><td>  <b>virtual</b> <em>bool</em> getState (<em>const</em> <span class='error' title="use of undeclared identifier &apos;std&apos;">std</span>::vector<span class='error' title="expected &apos;)&apos;">&lt;</span><em>unsigned</em> <em>long</em>&gt; &amp; v);</td></tr>
+<tr><th id="110">110</th><td>  <i>// Save and restore to/from vectors</i></td></tr>
+<tr><th id="111">111</th><td></td></tr>
+<tr><th id="112">112</th><td>  <em>long</em> <dfn class="decl def" id="_ZNK5CLHEP15HepRandomEngine7getSeedEv" title='CLHEP::HepRandomEngine::getSeed' data-ref="_ZNK5CLHEP15HepRandomEngine7getSeedEv">getSeed</dfn>() <em>const</em> { <b>return</b> <a class="member" href="#CLHEP::HepRandomEngine::theSeed" title='CLHEP::HepRandomEngine::theSeed' data-ref="CLHEP::HepRandomEngine::theSeed">theSeed</a>; }</td></tr>
+<tr><th id="113">113</th><td>  <i>// Gets the current seed.</i></td></tr>
+<tr><th id="114">114</th><td></td></tr>
+<tr><th id="115">115</th><td>  <em>const</em> <em>long</em>* <dfn class="decl def" id="_ZNK5CLHEP15HepRandomEngine8getSeedsEv" title='CLHEP::HepRandomEngine::getSeeds' data-ref="_ZNK5CLHEP15HepRandomEngine8getSeedsEv">getSeeds</dfn>() <em>const</em> { <b>return</b> <a class="member" href="#CLHEP::HepRandomEngine::theSeeds" title='CLHEP::HepRandomEngine::theSeeds' data-ref="CLHEP::HepRandomEngine::theSeeds">theSeeds</a>; }</td></tr>
+<tr><th id="116">116</th><td>  <i>// Gets the current array of seeds.</i></td></tr>
+<tr><th id="117">117</th><td></td></tr>
+<tr><th id="118">118</th><td>  <b>virtual</b> <dfn class="virtual decl" id="_ZN5CLHEP15HepRandomEnginecvdEv" title='CLHEP::HepRandomEngine::operator double' data-ref="_ZN5CLHEP15HepRandomEnginecvdEv"><b>operator</b> <em>double</em></dfn>();        <i>// Returns same as flat()</i></td></tr>
+<tr><th id="119">119</th><td>  <b>virtual</b> <dfn class="virtual decl" id="_ZN5CLHEP15HepRandomEnginecvfEv" title='CLHEP::HepRandomEngine::operator float' data-ref="_ZN5CLHEP15HepRandomEnginecvfEv"><b>operator</b> <em>float</em></dfn>();         <i>// less precise flat, faster if possible</i></td></tr>
+<tr><th id="120">120</th><td>  <b>virtual</b> <dfn class="virtual decl" id="_ZN5CLHEP15HepRandomEnginecvjEv" title='CLHEP::HepRandomEngine::operator unsigned int' data-ref="_ZN5CLHEP15HepRandomEnginecvjEv"><b>operator</b> <em>unsigned</em></dfn> <em>int</em>();     <i>// 32-bit int flat, faster if possible</i></td></tr>
+<tr><th id="121">121</th><td></td></tr>
+<tr><th id="122">122</th><td>  <i>// The above three conversion operators permit one to retrieve a pseudo-</i></td></tr>
+<tr><th id="123">123</th><td><i>  // random number as either a double-precision float, a single-precision</i></td></tr>
+<tr><th id="124">124</th><td><i>  // float, or a 32-bit unsigned integer. The usage, presuming an object</i></td></tr>
+<tr><th id="125">125</th><td><i>  // of the respective engine class "e", is as follows:</i></td></tr>
+<tr><th id="126">126</th><td><i></i></td></tr>
+<tr><th id="127">127</th><td><i>  // Recommended:</i></td></tr>
+<tr><th id="128">128</th><td><i>  //    float x;</i></td></tr>
+<tr><th id="129">129</th><td><i>  //    x = float( e );</i></td></tr>
+<tr><th id="130">130</th><td><i></i></td></tr>
+<tr><th id="131">131</th><td><i>  // Reasonable:</i></td></tr>
+<tr><th id="132">132</th><td><i>  //    x = e;</i></td></tr>
+<tr><th id="133">133</th><td><i></i></td></tr>
+<tr><th id="134">134</th><td><i>  // Works, but bad practice:</i></td></tr>
+<tr><th id="135">135</th><td><i>  //    x = 1.5 + e;</i></td></tr>
+<tr><th id="136">136</th><td><i></i></td></tr>
+<tr><th id="137">137</th><td><i>  // Won't compile:</i></td></tr>
+<tr><th id="138">138</th><td><i>  //    x = e + 1.5;</i></td></tr>
+<tr><th id="139">139</th><td></td></tr>
+<tr><th id="140">140</th><td><b>protected</b>:</td></tr>
+<tr><th id="141">141</th><td></td></tr>
+<tr><th id="142">142</th><td>  <em>long</em> <dfn class="decl" id="CLHEP::HepRandomEngine::theSeed" title='CLHEP::HepRandomEngine::theSeed' data-ref="CLHEP::HepRandomEngine::theSeed">theSeed</dfn>;</td></tr>
+<tr><th id="143">143</th><td>  <em>const</em> <em>long</em>* <dfn class="decl" id="CLHEP::HepRandomEngine::theSeeds" title='CLHEP::HepRandomEngine::theSeeds' data-ref="CLHEP::HepRandomEngine::theSeeds">theSeeds</dfn>;</td></tr>
+<tr><th id="144">144</th><td></td></tr>
+<tr><th id="145">145</th><td>  <em>static</em>  <b>inline</b> <em>double</em> <a class="decl" href="RandomEngine.icc.html#_ZN5CLHEP15HepRandomEngine15exponent_bit_32Ev" title='CLHEP::HepRandomEngine::exponent_bit_32' data-ref="_ZN5CLHEP15HepRandomEngine15exponent_bit_32Ev" id="_ZN5CLHEP15HepRandomEngine15exponent_bit_32Ev">exponent_bit_32</a>();</td></tr>
+<tr><th id="146">146</th><td>  <em>static</em>  <b>inline</b> <em>double</em> <a class="decl" href="RandomEngine.icc.html#_ZN5CLHEP15HepRandomEngine15mantissa_bit_12Ev" title='CLHEP::HepRandomEngine::mantissa_bit_12' data-ref="_ZN5CLHEP15HepRandomEngine15mantissa_bit_12Ev" id="_ZN5CLHEP15HepRandomEngine15mantissa_bit_12Ev">mantissa_bit_12</a>();</td></tr>
+<tr><th id="147">147</th><td>  <em>static</em>  <b>inline</b> <em>double</em> <a class="decl" href="RandomEngine.icc.html#_ZN5CLHEP15HepRandomEngine15mantissa_bit_24Ev" title='CLHEP::HepRandomEngine::mantissa_bit_24' data-ref="_ZN5CLHEP15HepRandomEngine15mantissa_bit_24Ev" id="_ZN5CLHEP15HepRandomEngine15mantissa_bit_24Ev">mantissa_bit_24</a>();</td></tr>
+<tr><th id="148">148</th><td>  <em>static</em>  <b>inline</b> <em>double</em> <dfn class="decl" id="_ZN5CLHEP15HepRandomEngine15mantissa_bit_32Ev" title='CLHEP::HepRandomEngine::mantissa_bit_32' data-ref="_ZN5CLHEP15HepRandomEngine15mantissa_bit_32Ev">mantissa_bit_32</dfn>();</td></tr>
+<tr><th id="149">149</th><td>  <em>static</em>  <b>inline</b> <em>double</em> <a class="decl" href="RandomEngine.icc.html#_ZN5CLHEP15HepRandomEngine13twoToMinus_32Ev" title='CLHEP::HepRandomEngine::twoToMinus_32' data-ref="_ZN5CLHEP15HepRandomEngine13twoToMinus_32Ev" id="_ZN5CLHEP15HepRandomEngine13twoToMinus_32Ev">twoToMinus_32</a>();</td></tr>
+<tr><th id="150">150</th><td>  <em>static</em>  <b>inline</b> <em>double</em> <a class="decl" href="RandomEngine.icc.html#_ZN5CLHEP15HepRandomEngine13twoToMinus_48Ev" title='CLHEP::HepRandomEngine::twoToMinus_48' data-ref="_ZN5CLHEP15HepRandomEngine13twoToMinus_48Ev" id="_ZN5CLHEP15HepRandomEngine13twoToMinus_48Ev">twoToMinus_48</a>();</td></tr>
+<tr><th id="151">151</th><td>  <em>static</em>  <b>inline</b> <em>double</em> <a class="decl" href="RandomEngine.icc.html#_ZN5CLHEP15HepRandomEngine13twoToMinus_49Ev" title='CLHEP::HepRandomEngine::twoToMinus_49' data-ref="_ZN5CLHEP15HepRandomEngine13twoToMinus_49Ev" id="_ZN5CLHEP15HepRandomEngine13twoToMinus_49Ev">twoToMinus_49</a>();</td></tr>
+<tr><th id="152">152</th><td>  <em>static</em>  <b>inline</b> <em>double</em> <a class="decl" href="RandomEngine.icc.html#_ZN5CLHEP15HepRandomEngine13twoToMinus_53Ev" title='CLHEP::HepRandomEngine::twoToMinus_53' data-ref="_ZN5CLHEP15HepRandomEngine13twoToMinus_53Ev" id="_ZN5CLHEP15HepRandomEngine13twoToMinus_53Ev">twoToMinus_53</a>();</td></tr>
+<tr><th id="153">153</th><td>  <em>static</em>  <b>inline</b> <em>double</em> <a class="decl" href="RandomEngine.icc.html#_ZN5CLHEP15HepRandomEngine19nearlyTwoToMinus_54Ev" title='CLHEP::HepRandomEngine::nearlyTwoToMinus_54' data-ref="_ZN5CLHEP15HepRandomEngine19nearlyTwoToMinus_54Ev" id="_ZN5CLHEP15HepRandomEngine19nearlyTwoToMinus_54Ev">nearlyTwoToMinus_54</a>();</td></tr>
+<tr><th id="154">154</th><td></td></tr>
+<tr><th id="155">155</th><td>  <em>static</em> <em>bool</em> <dfn class="decl" id="_ZN5CLHEP15HepRandomEngine9checkFileERiRKiS3_S3_" title='CLHEP::HepRandomEngine::checkFile' data-ref="_ZN5CLHEP15HepRandomEngine9checkFileERiRKiS3_S3_">checkFile</dfn> (<span class='error' title="use of undeclared identifier &apos;std&apos;">std</span>::istream &amp; <dfn class="local col5 decl" id="185file" title='file' data-type='int &amp;' data-ref="185file">file</dfn>, </td></tr>
+<tr><th id="156">156</th><td>  		         <em>const</em> <span class='error' title="use of undeclared identifier &apos;std&apos;">std</span>::string &amp; <dfn class="local col6 decl" id="186filename" title='filename' data-type='const int &amp;' data-ref="186filename">filename</dfn>, </td></tr>
+<tr><th id="157">157</th><td>  		         <em>const</em> <span class='error' title="use of undeclared identifier &apos;std&apos;">std</span>::string &amp; <dfn class="local col7 decl" id="187classname" title='classname' data-type='const int &amp;' data-ref="187classname">classname</dfn>, </td></tr>
+<tr><th id="158">158</th><td>		         <em>const</em> <span class='error' title="use of undeclared identifier &apos;std&apos;">std</span>::string &amp; <dfn class="local col8 decl" id="188methodname" title='methodname' data-type='const int &amp;' data-ref="188methodname">methodname</dfn>); </td></tr>
+<tr><th id="159">159</th><td></td></tr>
+<tr><th id="160">160</th><td>};</td></tr>
+<tr><th id="161">161</th><td></td></tr>
+<tr><th id="162">162</th><td><span class='error' title="use of undeclared identifier &apos;std&apos;">std</span>::ostream &amp; <b>operator</b>&lt;&lt; (<span class='error' title="use of undeclared identifier &apos;std&apos;">std</span>::ostream &amp; os, <em>const</em> HepRandomEngine &amp; e);</td></tr>
+<tr><th id="163">163</th><td><span class='error' title="use of undeclared identifier &apos;std&apos;">std</span>::istream &amp; <b>operator</b>&gt;&gt; (<span class='error' title="use of undeclared identifier &apos;std&apos;">std</span>::istream &amp; is, HepRandomEngine &amp; e);</td></tr>
+<tr><th id="164">164</th><td></td></tr>
+<tr><th id="165">165</th><td><b>template</b> &lt;<b>class</b> IS, <b>class</b> T&gt; </td></tr>
+<tr><th id="166">166</th><td><em>bool</em> <dfn class="decl def" id="_ZN5CLHEP20possibleKeywordInputERT_RKiRT0_" title='CLHEP::possibleKeywordInput' data-ref="_ZN5CLHEP20possibleKeywordInputERT_RKiRT0_">possibleKeywordInput</dfn> (IS &amp; <dfn class="local col9 decl" id="189is" title='is' data-type='IS &amp;' data-ref="189is">is</dfn>, <em>const</em> <span class='error' title="use of undeclared identifier &apos;std&apos;">std</span>::string &amp; <dfn class="local col0 decl" id="190key" title='key' data-type='const int &amp;' data-ref="190key">key</dfn>, T &amp; <dfn class="local col1 decl" id="191t" title='t' data-type='T &amp;' data-ref="191t">t</dfn>) {</td></tr>
+<tr><th id="167">167</th><td>  <span class='error' title="use of undeclared identifier &apos;std&apos;">std</span>::string <dfn class="local col2 decl" id="192firstWord" title='firstWord' data-type='int' data-ref="192firstWord">firstWord</dfn>;</td></tr>
+<tr><th id="168">168</th><td>  is &gt;&gt; firstWord;</td></tr>
+<tr><th id="169">169</th><td>  <b>if</b> (firstWord == key) <b>return</b> <b>true</b>;</td></tr>
+<tr><th id="170">170</th><td>  <span class='error' title="use of undeclared identifier &apos;std&apos;">std</span>::istringstream reread(firstWord);</td></tr>
+<tr><th id="171">171</th><td>  <span class='error' title="use of undeclared identifier &apos;reread&apos;">reread</span> &gt;&gt; t;</td></tr>
+<tr><th id="172">172</th><td>  <b>return</b> <b>false</b>;</td></tr>
+<tr><th id="173">173</th><td>}</td></tr>
+<tr><th id="174">174</th><td></td></tr>
+<tr><th id="175">175</th><td>}  <i>// namespace CLHEP</i></td></tr>
+<tr><th id="176">176</th><td></td></tr>
+<tr><th id="177">177</th><td><u>#include <a href="RandomEngine.icc.html">"CLHEP/Random/RandomEngine.icc"</a></u></td></tr>
+<tr><th id="178">178</th><td></td></tr>
+<tr><th id="179">179</th><td><u>#<span data-ppcond="37">endif</span></u></td></tr>
+<tr><th id="180">180</th><td></td></tr>
+</table><hr/><p id='footer'>
+Generated while processing <a href='../../../../../error_propagation/src/G4ErrorMagFieldLimitProcess.cc.html'>codebrowser/source/error_propagation/src/G4ErrorMagFieldLimitProcess.cc</a><br/>Generated on <em>2019-Aug-28</em> from project codebrowser<br />Powered by <a href='https://woboq.com'><img alt='Woboq' src='https://code.woboq.org/woboq-16.png' width='41' height='16' /></a> <a href='https://code.woboq.org'>Code Browser</a> 2.1
+<br/>Generator usage only permitted with license.</p>
+</div></body></html>

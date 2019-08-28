@@ -1,0 +1,343 @@
+<!doctype html>
+<html>
+<head>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"><title>G4OpRayleigh.cc source code [codebrowser/source/processes/optical/src/G4OpRayleigh.cc] - Woboq Code Browser</title>
+<link rel="stylesheet" href="../../../../../../data/qtcreator.css" title="QtCreator"/>
+<link rel="alternate stylesheet" href="../../../../../../data/kdevelop.css" title="KDevelop"/>
+<script type="text/javascript" src="../../../../../../data/jquery/jquery.min.js"></script>
+<script type="text/javascript" src="../../../../../../data/jquery/jquery-ui.min.js"></script>
+<script>var file = 'codebrowser/source/processes/optical/src/G4OpRayleigh.cc'; var root_path = '../../../../..'; var data_path = '../../../../../../data';</script>
+<script src='../../../../../../data/codebrowser.js'></script>
+</head>
+<body><div id='header'><h1 id='breadcrumb'><span>Browse the source code of </span><a href='../../../..'>codebrowser</a>/<a href='../../..'>source</a>/<a href='../..'>processes</a>/<a href='..'>optical</a>/<a href='./'>src</a>/<a href='G4OpRayleigh.cc.html'>G4OpRayleigh.cc</a></h1></div>
+<hr/><div id='content'><table class="code">
+<tr><th id="1">1</th><td><i>//</i></td></tr>
+<tr><th id="2">2</th><td><i>// ********************************************************************</i></td></tr>
+<tr><th id="3">3</th><td><i>// * License and Disclaimer                                           *</i></td></tr>
+<tr><th id="4">4</th><td><i>// *                                                                  *</i></td></tr>
+<tr><th id="5">5</th><td><i>// * The  Geant4 software  is  copyright of the Copyright Holders  of *</i></td></tr>
+<tr><th id="6">6</th><td><i>// * the Geant4 Collaboration.  It is provided  under  the terms  and *</i></td></tr>
+<tr><th id="7">7</th><td><i>// * conditions of the Geant4 Software License,  included in the file *</i></td></tr>
+<tr><th id="8">8</th><td><i>// * LICENSE and available at  <a href="http://cern.ch/geant4/license">http://cern.ch/geant4/license</a> .  These *</i></td></tr>
+<tr><th id="9">9</th><td><i>// * include a list of copyright holders.                             *</i></td></tr>
+<tr><th id="10">10</th><td><i>// *                                                                  *</i></td></tr>
+<tr><th id="11">11</th><td><i>// * Neither the authors of this software system, nor their employing *</i></td></tr>
+<tr><th id="12">12</th><td><i>// * institutes,nor the agencies providing financial support for this *</i></td></tr>
+<tr><th id="13">13</th><td><i>// * work  make  any representation or  warranty, express or implied, *</i></td></tr>
+<tr><th id="14">14</th><td><i>// * regarding  this  software system or assume any liability for its *</i></td></tr>
+<tr><th id="15">15</th><td><i>// * use.  Please see the license in the file  LICENSE  and URL above *</i></td></tr>
+<tr><th id="16">16</th><td><i>// * for the full disclaimer and the limitation of liability.         *</i></td></tr>
+<tr><th id="17">17</th><td><i>// *                                                                  *</i></td></tr>
+<tr><th id="18">18</th><td><i>// * This  code  implementation is the result of  the  scientific and *</i></td></tr>
+<tr><th id="19">19</th><td><i>// * technical work of the GEANT4 collaboration.                      *</i></td></tr>
+<tr><th id="20">20</th><td><i>// * By using,  copying,  modifying or  distributing the software (or *</i></td></tr>
+<tr><th id="21">21</th><td><i>// * any work based  on the software)  you  agree  to acknowledge its *</i></td></tr>
+<tr><th id="22">22</th><td><i>// * use  in  resulting  scientific  publications,  and indicate your *</i></td></tr>
+<tr><th id="23">23</th><td><i>// * acceptance of all terms of the Geant4 Software license.          *</i></td></tr>
+<tr><th id="24">24</th><td><i>// ********************************************************************</i></td></tr>
+<tr><th id="25">25</th><td><i>//</i></td></tr>
+<tr><th id="26">26</th><td><i>//</i></td></tr>
+<tr><th id="27">27</th><td><i>//</i></td></tr>
+<tr><th id="28">28</th><td><i>// </i></td></tr>
+<tr><th id="29">29</th><td><i>////////////////////////////////////////////////////////////////////////</i></td></tr>
+<tr><th id="30">30</th><td><i>// Optical Photon Rayleigh Scattering Class Implementation</i></td></tr>
+<tr><th id="31">31</th><td><i>////////////////////////////////////////////////////////////////////////</i></td></tr>
+<tr><th id="32">32</th><td><i>//</i></td></tr>
+<tr><th id="33">33</th><td><i>// File:        G4OpRayleigh.cc</i></td></tr>
+<tr><th id="34">34</th><td><i>// Description: Discrete Process -- Rayleigh scattering of optical</i></td></tr>
+<tr><th id="35">35</th><td><i>//		photons</i></td></tr>
+<tr><th id="36">36</th><td><i>// Version:     1.0</i></td></tr>
+<tr><th id="37">37</th><td><i>// Created:     1996-05-31</i></td></tr>
+<tr><th id="38">38</th><td><i>// Author:      Juliet Armstrong</i></td></tr>
+<tr><th id="39">39</th><td><i>// Updated:     2014-10-10 -  This version calculates the Rayleigh scattering   </i></td></tr>
+<tr><th id="40">40</th><td><i>//              length for more materials than just Water (although the Water</i></td></tr>
+<tr><th id="41">41</th><td><i>//              default is kept). To do this the user would need to specify the</i></td></tr>
+<tr><th id="42">42</th><td><i>//              ISOTHERMAL_COMPRESSIBILITY as a material property and</i></td></tr>
+<tr><th id="43">43</th><td><i>//              optionally an RS_SCALE_LENGTH (useful for testing). Code comes</i></td></tr>
+<tr><th id="44">44</th><td><i>//              from Philip Graham (Queen Mary University of London).</i></td></tr>
+<tr><th id="45">45</th><td><i>//              2010-06-11 - Fix Bug 207; Thanks to Xin Qian</i></td></tr>
+<tr><th id="46">46</th><td><i>//              (Kellogg Radiation Lab of Caltech)</i></td></tr>
+<tr><th id="47">47</th><td><i>//              2005-07-28 - add G4ProcessType to constructor</i></td></tr>
+<tr><th id="48">48</th><td><i>//              2001-10-18 by Peter Gumplinger</i></td></tr>
+<tr><th id="49">49</th><td><i>//              eliminate unused variable warning on Linux (gcc-2.95.2)</i></td></tr>
+<tr><th id="50">50</th><td><i>//              2001-09-18 by mma</i></td></tr>
+<tr><th id="51">51</th><td><i>//		&gt;numOfMaterials=G4Material::GetNumberOfMaterials() in BuildPhy</i></td></tr>
+<tr><th id="52">52</th><td><i>//              2001-01-30 by Peter Gumplinger</i></td></tr>
+<tr><th id="53">53</th><td><i>//              &gt; allow for positiv and negative CosTheta and force the</i></td></tr>
+<tr><th id="54">54</th><td><i>//              &gt; new momentum direction to be in the same plane as the</i></td></tr>
+<tr><th id="55">55</th><td><i>//              &gt; new and old polarization vectors</i></td></tr>
+<tr><th id="56">56</th><td><i>//              2001-01-29 by Peter Gumplinger</i></td></tr>
+<tr><th id="57">57</th><td><i>//              &gt; fix calculation of SinTheta (from CosTheta)</i></td></tr>
+<tr><th id="58">58</th><td><i>//              1997-04-09 by Peter Gumplinger</i></td></tr>
+<tr><th id="59">59</th><td><i>//              &gt; new physics/tracking scheme</i></td></tr>
+<tr><th id="60">60</th><td><i>// mail:        gum@triumf.ca</i></td></tr>
+<tr><th id="61">61</th><td><i>//</i></td></tr>
+<tr><th id="62">62</th><td><i>////////////////////////////////////////////////////////////////////////</i></td></tr>
+<tr><th id="63">63</th><td></td></tr>
+<tr><th id="64">64</th><td><u>#include <a href="../include/G4OpRayleigh.hh.html">"G4OpRayleigh.hh"</a></u></td></tr>
+<tr><th id="65">65</th><td></td></tr>
+<tr><th id="66">66</th><td><u>#include <a href="../../../global/management/include/G4ios.hh.html">"G4ios.hh"</a></u></td></tr>
+<tr><th id="67">67</th><td><u>#include <a href="../../../global/management/include/G4PhysicalConstants.hh.html">"G4PhysicalConstants.hh"</a></u></td></tr>
+<tr><th id="68">68</th><td><u>#include <a href="../../../global/management/include/G4SystemOfUnits.hh.html">"G4SystemOfUnits.hh"</a></u></td></tr>
+<tr><th id="69">69</th><td><u>#include <a href="../include/G4OpProcessSubType.hh.html">"G4OpProcessSubType.hh"</a></u></td></tr>
+<tr><th id="70">70</th><td></td></tr>
+<tr><th id="71">71</th><td><i>/////////////////////////</i></td></tr>
+<tr><th id="72">72</th><td><i>// Class Implementation</i></td></tr>
+<tr><th id="73">73</th><td><i>/////////////////////////</i></td></tr>
+<tr><th id="74">74</th><td><i></i></td></tr>
+<tr><th id="75">75</th><td><i>        //////////////</i></td></tr>
+<tr><th id="76">76</th><td><i>        // Operators</i></td></tr>
+<tr><th id="77">77</th><td><i>        //////////////</i></td></tr>
+<tr><th id="78">78</th><td><i></i></td></tr>
+<tr><th id="79">79</th><td><i>// G4OpRayleigh::operator=(const G4OpRayleigh &amp;right)</i></td></tr>
+<tr><th id="80">80</th><td><i>// {</i></td></tr>
+<tr><th id="81">81</th><td><i>// }</i></td></tr>
+<tr><th id="82">82</th><td><i></i></td></tr>
+<tr><th id="83">83</th><td><i>        /////////////////</i></td></tr>
+<tr><th id="84">84</th><td><i>        // Constructors</i></td></tr>
+<tr><th id="85">85</th><td><i>        /////////////////</i></td></tr>
+<tr><th id="86">86</th><td></td></tr>
+<tr><th id="87">87</th><td><a class="type" href="../include/G4OpRayleigh.hh.html#G4OpRayleigh" title='G4OpRayleigh' data-ref="G4OpRayleigh">G4OpRayleigh</a>::<dfn class="decl def" id="_ZN12G4OpRayleighC1ERK8G4String13G4ProcessType" title='G4OpRayleigh::G4OpRayleigh' data-ref="_ZN12G4OpRayleighC1ERK8G4String13G4ProcessType">G4OpRayleigh</dfn>(<em>const</em> <a class="type" href="../../../global/management/include/G4String.hh.html#G4String" title='G4String' data-ref="G4String">G4String</a>&amp; <dfn class="local col1 decl" id="1processName" title='processName' data-type='const G4String &amp;' data-ref="1processName">processName</dfn>, <a class="type" href="../../management/include/G4ProcessType.hh.html#G4ProcessType" title='G4ProcessType' data-ref="G4ProcessType">G4ProcessType</a> <dfn class="local col2 decl" id="2type" title='type' data-type='G4ProcessType' data-ref="2type">type</dfn>)</td></tr>
+<tr><th id="88">88</th><td>           : <a class="type" href="../../management/include/G4VDiscreteProcess.hh.html#G4VDiscreteProcess" title='G4VDiscreteProcess' data-ref="G4VDiscreteProcess">G4VDiscreteProcess</a><a class="ref" href="../../management/include/G4VDiscreteProcess.hh.html#_ZN18G4VDiscreteProcessC1ERK8G4String13G4ProcessType" title='G4VDiscreteProcess::G4VDiscreteProcess' data-ref="_ZN18G4VDiscreteProcessC1ERK8G4String13G4ProcessType">(</a><a class="local col1 ref" href="#1processName" title='processName' data-ref="1processName">processName</a>, <a class="local col2 ref" href="#2type" title='type' data-ref="2type">type</a>)</td></tr>
+<tr><th id="89">89</th><td>{</td></tr>
+<tr><th id="90">90</th><td>        <a class="member" href="../../management/include/G4VProcess.hh.html#_ZN10G4VProcess17SetProcessSubTypeEi" title='G4VProcess::SetProcessSubType' data-ref="_ZN10G4VProcess17SetProcessSubTypeEi">SetProcessSubType</a>(<a class="enum" href="../include/G4OpProcessSubType.hh.html#G4OpProcessSubType::fOpRayleigh" title='G4OpProcessSubType::fOpRayleigh' data-ref="G4OpProcessSubType::fOpRayleigh">fOpRayleigh</a>);</td></tr>
+<tr><th id="91">91</th><td></td></tr>
+<tr><th id="92">92</th><td>        thePhysicsTable = <span class='error' title="use of undeclared identifier &apos;NULL&apos;">NULL</span>;</td></tr>
+<tr><th id="93">93</th><td></td></tr>
+<tr><th id="94">94</th><td>        <b>if</b> (<a class="member" href="../../management/include/G4VProcess.hh.html#G4VProcess::verboseLevel" title='G4VProcess::verboseLevel' data-ref="G4VProcess::verboseLevel">verboseLevel</a>&gt;<var>0</var>) {</td></tr>
+<tr><th id="95">95</th><td>           <a class="macro" href="../../../global/management/include/G4ios.hh.html#46" title="(*_G4cout_p())" data-ref="_M/G4cout">G4cout</a> <span class='error' title="invalid operands to binary expression (&apos;int&apos; and &apos;const G4String&apos;)">&lt;&lt;</span> GetProcessName() &lt;&lt; <q>" is created "</q> &lt;&lt; <a class="macro" href="../../../global/management/include/G4ios.hh.html#60" title="std::endl" data-ref="_M/G4endl">G4endl</a>;</td></tr>
+<tr><th id="96">96</th><td>        }</td></tr>
+<tr><th id="97">97</th><td>}</td></tr>
+<tr><th id="98">98</th><td></td></tr>
+<tr><th id="99">99</th><td><i>// G4OpRayleigh::G4OpRayleigh(const G4OpRayleigh &amp;right)</i></td></tr>
+<tr><th id="100">100</th><td><i>// {</i></td></tr>
+<tr><th id="101">101</th><td><i>// }</i></td></tr>
+<tr><th id="102">102</th><td><i></i></td></tr>
+<tr><th id="103">103</th><td><i>        ////////////////</i></td></tr>
+<tr><th id="104">104</th><td><i>        // Destructors</i></td></tr>
+<tr><th id="105">105</th><td><i>        ////////////////</i></td></tr>
+<tr><th id="106">106</th><td></td></tr>
+<tr><th id="107">107</th><td><a class="type" href="../include/G4OpRayleigh.hh.html#G4OpRayleigh" title='G4OpRayleigh' data-ref="G4OpRayleigh">G4OpRayleigh</a>::<dfn class="virtual decl def" id="_ZN12G4OpRayleighD1Ev" title='G4OpRayleigh::~G4OpRayleigh' data-ref="_ZN12G4OpRayleighD1Ev">~G4OpRayleigh</dfn>()</td></tr>
+<tr><th id="108">108</th><td>{</td></tr>
+<tr><th id="109">109</th><td>        <b>if</b> (<a class="member" href="../include/G4OpRayleigh.hh.html#G4OpRayleigh::thePhysicsTable" title='G4OpRayleigh::thePhysicsTable' data-ref="G4OpRayleigh::thePhysicsTable">thePhysicsTable</a>) {</td></tr>
+<tr><th id="110">110</th><td>           <a class="member" href="../include/G4OpRayleigh.hh.html#G4OpRayleigh::thePhysicsTable" title='G4OpRayleigh::thePhysicsTable' data-ref="G4OpRayleigh::thePhysicsTable">thePhysicsTable</a>-&gt;<a class="ref" href="../../../global/management/include/G4PhysicsTable.hh.html#_ZN14G4PhysicsTable15clearAndDestroyEv" title='G4PhysicsTable::clearAndDestroy' data-ref="_ZN14G4PhysicsTable15clearAndDestroyEv">clearAndDestroy</a>();</td></tr>
+<tr><th id="111">111</th><td>           <b>delete</b> <a class="member" href="../include/G4OpRayleigh.hh.html#G4OpRayleigh::thePhysicsTable" title='G4OpRayleigh::thePhysicsTable' data-ref="G4OpRayleigh::thePhysicsTable">thePhysicsTable</a>;</td></tr>
+<tr><th id="112">112</th><td>        }</td></tr>
+<tr><th id="113">113</th><td>}</td></tr>
+<tr><th id="114">114</th><td></td></tr>
+<tr><th id="115">115</th><td>        <i>////////////</i></td></tr>
+<tr><th id="116">116</th><td><i>        // Methods</i></td></tr>
+<tr><th id="117">117</th><td><i>        ////////////</i></td></tr>
+<tr><th id="118">118</th><td><i></i></td></tr>
+<tr><th id="119">119</th><td><i>// PostStepDoIt</i></td></tr>
+<tr><th id="120">120</th><td><i>// -------------</i></td></tr>
+<tr><th id="121">121</th><td><i>//</i></td></tr>
+<tr><th id="122">122</th><td><a class="type" href="../../../track/include/G4VParticleChange.hh.html#G4VParticleChange" title='G4VParticleChange' data-ref="G4VParticleChange">G4VParticleChange</a>*</td></tr>
+<tr><th id="123">123</th><td><a class="type" href="../include/G4OpRayleigh.hh.html#G4OpRayleigh" title='G4OpRayleigh' data-ref="G4OpRayleigh">G4OpRayleigh</a>::<dfn class="virtual decl def" id="_ZN12G4OpRayleigh12PostStepDoItERK7G4TrackRK6G4Step" title='G4OpRayleigh::PostStepDoIt' data-ref="_ZN12G4OpRayleigh12PostStepDoItERK7G4TrackRK6G4Step">PostStepDoIt</dfn>(<em>const</em> <a class="type" href="../../../track/include/G4Track.hh.html#G4Track" title='G4Track' data-ref="G4Track">G4Track</a>&amp; <dfn class="local col3 decl" id="3aTrack" title='aTrack' data-type='const G4Track &amp;' data-ref="3aTrack">aTrack</dfn>, <em>const</em> <a class="type" href="../../../track/include/G4Step.hh.html#G4Step" title='G4Step' data-ref="G4Step">G4Step</a>&amp; <dfn class="local col4 decl" id="4aStep" title='aStep' data-type='const G4Step &amp;' data-ref="4aStep">aStep</dfn>)</td></tr>
+<tr><th id="124">124</th><td>{</td></tr>
+<tr><th id="125">125</th><td>        <a class="member" href="../../management/include/G4VProcess.hh.html#G4VProcess::aParticleChange" title='G4VProcess::aParticleChange' data-ref="G4VProcess::aParticleChange">aParticleChange</a>.<a class="virtual ref" href="../../../track/include/G4ParticleChange.hh.html#_ZN16G4ParticleChange10InitializeERK7G4Track" title='G4ParticleChange::Initialize' data-ref="_ZN16G4ParticleChange10InitializeERK7G4Track">Initialize</a>(<a class="local col3 ref" href="#3aTrack" title='aTrack' data-ref="3aTrack">aTrack</a>);</td></tr>
+<tr><th id="126">126</th><td></td></tr>
+<tr><th id="127">127</th><td>        <em>const</em> <a class="type" href="../../../particles/management/include/G4DynamicParticle.hh.html#G4DynamicParticle" title='G4DynamicParticle' data-ref="G4DynamicParticle">G4DynamicParticle</a>* <dfn class="local col5 decl" id="5aParticle" title='aParticle' data-type='const G4DynamicParticle *' data-ref="5aParticle">aParticle</dfn> = <a class="local col3 ref" href="#3aTrack" title='aTrack' data-ref="3aTrack">aTrack</a>.<a class="ref" href="../../../track/include/G4Track.hh.html#_ZNK7G4Track18GetDynamicParticleEv" title='G4Track::GetDynamicParticle' data-ref="_ZNK7G4Track18GetDynamicParticleEv">GetDynamicParticle</a>();</td></tr>
+<tr><th id="128">128</th><td></td></tr>
+<tr><th id="129">129</th><td>        <b>if</b> (<a class="member" href="../../management/include/G4VProcess.hh.html#G4VProcess::verboseLevel" title='G4VProcess::verboseLevel' data-ref="G4VProcess::verboseLevel">verboseLevel</a>&gt;<var>0</var>) {</td></tr>
+<tr><th id="130">130</th><td>                <a class="macro" href="../../../global/management/include/G4ios.hh.html#46" title="(*_G4cout_p())" data-ref="_M/G4cout">G4cout</a> <span class='error' title="invalid operands to binary expression (&apos;int&apos; and &apos;const char *&apos;)">&lt;&lt;</span> <q>"Scattering Photon!"</q> &lt;&lt; <a class="macro" href="../../../global/management/include/G4ios.hh.html#60" title="std::endl" data-ref="_M/G4endl">G4endl</a>;</td></tr>
+<tr><th id="131">131</th><td>                <a class="macro" href="../../../global/management/include/G4ios.hh.html#46" title="(*_G4cout_p())" data-ref="_M/G4cout">G4cout</a> <span class='error' title="invalid operands to binary expression (&apos;int&apos; and &apos;const char *&apos;)">&lt;&lt;</span> <q>"Old Momentum Direction: "</q></td></tr>
+<tr><th id="132">132</th><td>                       &lt;&lt; aParticle-&gt;GetMomentumDirection() &lt;&lt; <a class="macro" href="../../../global/management/include/G4ios.hh.html#60" title="std::endl" data-ref="_M/G4endl">G4endl</a>;</td></tr>
+<tr><th id="133">133</th><td>                <a class="macro" href="../../../global/management/include/G4ios.hh.html#46" title="(*_G4cout_p())" data-ref="_M/G4cout">G4cout</a> <span class='error' title="invalid operands to binary expression (&apos;int&apos; and &apos;const char *&apos;)">&lt;&lt;</span> <q>"Old Polarization: "</q></td></tr>
+<tr><th id="134">134</th><td>                       &lt;&lt; aParticle-&gt;GetPolarization() &lt;&lt; <a class="macro" href="../../../global/management/include/G4ios.hh.html#60" title="std::endl" data-ref="_M/G4endl">G4endl</a>;</td></tr>
+<tr><th id="135">135</th><td>        }</td></tr>
+<tr><th id="136">136</th><td></td></tr>
+<tr><th id="137">137</th><td>        <a class="typedef" href="../../../global/management/include/G4Types.hh.html#G4double" title='G4double' data-type='double' data-ref="G4double">G4double</a> <dfn class="local col6 decl" id="6cosTheta" title='cosTheta' data-type='G4double' data-ref="6cosTheta">cosTheta</dfn>;</td></tr>
+<tr><th id="138">138</th><td>        <a class="typedef" href="../../../global/management/include/G4ThreeVector.hh.html#G4ThreeVector" title='G4ThreeVector' data-type='CLHEP::Hep3Vector' data-ref="G4ThreeVector">G4ThreeVector</a> <a class="ref fake" href="../../../externals/clhep/include/CLHEP/Vector/ThreeVector.h.html#_ZN5CLHEP10Hep3VectorC1Ev" title='CLHEP::Hep3Vector::Hep3Vector' data-ref="_ZN5CLHEP10Hep3VectorC1Ev"></a><dfn class="local col7 decl" id="7OldMomentumDirection" title='OldMomentumDirection' data-type='G4ThreeVector' data-ref="7OldMomentumDirection">OldMomentumDirection</dfn>, <a class="ref fake" href="../../../externals/clhep/include/CLHEP/Vector/ThreeVector.h.html#_ZN5CLHEP10Hep3VectorC1Ev" title='CLHEP::Hep3Vector::Hep3Vector' data-ref="_ZN5CLHEP10Hep3VectorC1Ev"></a><dfn class="local col8 decl" id="8NewMomentumDirection" title='NewMomentumDirection' data-type='G4ThreeVector' data-ref="8NewMomentumDirection">NewMomentumDirection</dfn>;</td></tr>
+<tr><th id="139">139</th><td>        <a class="typedef" href="../../../global/management/include/G4ThreeVector.hh.html#G4ThreeVector" title='G4ThreeVector' data-type='CLHEP::Hep3Vector' data-ref="G4ThreeVector">G4ThreeVector</a> <a class="ref fake" href="../../../externals/clhep/include/CLHEP/Vector/ThreeVector.h.html#_ZN5CLHEP10Hep3VectorC1Ev" title='CLHEP::Hep3Vector::Hep3Vector' data-ref="_ZN5CLHEP10Hep3VectorC1Ev"></a><dfn class="local col9 decl" id="9OldPolarization" title='OldPolarization' data-type='G4ThreeVector' data-ref="9OldPolarization">OldPolarization</dfn>, <a class="ref fake" href="../../../externals/clhep/include/CLHEP/Vector/ThreeVector.h.html#_ZN5CLHEP10Hep3VectorC1Ev" title='CLHEP::Hep3Vector::Hep3Vector' data-ref="_ZN5CLHEP10Hep3VectorC1Ev"></a><dfn class="local col0 decl" id="10NewPolarization" title='NewPolarization' data-type='G4ThreeVector' data-ref="10NewPolarization">NewPolarization</dfn>;</td></tr>
+<tr><th id="140">140</th><td></td></tr>
+<tr><th id="141">141</th><td>        <a class="typedef" href="../../../global/management/include/G4Types.hh.html#G4double" title='G4double' data-type='double' data-ref="G4double">G4double</a> <dfn class="local col1 decl" id="11rand" title='rand' data-type='G4double' data-ref="11rand">rand</dfn>, <dfn class="local col2 decl" id="12constant" title='constant' data-type='G4double' data-ref="12constant">constant</dfn>;</td></tr>
+<tr><th id="142">142</th><td>        <a class="typedef" href="../../../global/management/include/G4Types.hh.html#G4double" title='G4double' data-type='double' data-ref="G4double">G4double</a> <dfn class="local col3 decl" id="13CosTheta" title='CosTheta' data-type='G4double' data-ref="13CosTheta">CosTheta</dfn>, <dfn class="local col4 decl" id="14SinTheta" title='SinTheta' data-type='G4double' data-ref="14SinTheta">SinTheta</dfn>, <dfn class="local col5 decl" id="15SinPhi" title='SinPhi' data-type='G4double' data-ref="15SinPhi">SinPhi</dfn>, <dfn class="local col6 decl" id="16CosPhi" title='CosPhi' data-type='G4double' data-ref="16CosPhi">CosPhi</dfn>, <dfn class="local col7 decl" id="17unit_x" title='unit_x' data-type='G4double' data-ref="17unit_x">unit_x</dfn>, <dfn class="local col8 decl" id="18unit_y" title='unit_y' data-type='G4double' data-ref="18unit_y">unit_y</dfn>, <dfn class="local col9 decl" id="19unit_z" title='unit_z' data-type='G4double' data-ref="19unit_z">unit_z</dfn>;</td></tr>
+<tr><th id="143">143</th><td></td></tr>
+<tr><th id="144">144</th><td>        <b>do</b> {</td></tr>
+<tr><th id="145">145</th><td>           <i>// Try to simulate the scattered photon momentum direction</i></td></tr>
+<tr><th id="146">146</th><td><i>           // w.r.t. the initial photon momentum direction</i></td></tr>
+<tr><th id="147">147</th><td></td></tr>
+<tr><th id="148">148</th><td>           CosTheta = <a class="macro" href="../../../global/HEPRandom/include/Randomize.hh.html#52" title="CLHEP::HepRandom::getTheEngine()-&gt;flat()" data-ref="_M/G4UniformRand">G4UniformRand</a>();</td></tr>
+<tr><th id="149">149</th><td>           SinTheta = <span class='error' title="use of undeclared identifier &apos;std&apos;">std</span>::sqrt(<var>1.</var>-CosTheta*CosTheta);</td></tr>
+<tr><th id="150">150</th><td>           <i>// consider for the angle 90-180 degrees</i></td></tr>
+<tr><th id="151">151</th><td>           <b>if</b> (<a class="macro" href="../../../global/HEPRandom/include/Randomize.hh.html#52" title="CLHEP::HepRandom::getTheEngine()-&gt;flat()" data-ref="_M/G4UniformRand">G4UniformRand</a>() &lt; <var>0.5</var>) CosTheta = -CosTheta;</td></tr>
+<tr><th id="152">152</th><td></td></tr>
+<tr><th id="153">153</th><td>           <i>// simulate the phi angle</i></td></tr>
+<tr><th id="154">154</th><td>           rand = twopi*<a class="macro" href="../../../global/HEPRandom/include/Randomize.hh.html#52" title="CLHEP::HepRandom::getTheEngine()-&gt;flat()" data-ref="_M/G4UniformRand">G4UniformRand</a>();</td></tr>
+<tr><th id="155">155</th><td>           SinPhi = <span class='error' title="use of undeclared identifier &apos;std&apos;">std</span>::sin(rand);</td></tr>
+<tr><th id="156">156</th><td>           CosPhi = <span class='error' title="use of undeclared identifier &apos;std&apos;">std</span>::cos(rand);</td></tr>
+<tr><th id="157">157</th><td></td></tr>
+<tr><th id="158">158</th><td>           <i>// start constructing the new momentum direction</i></td></tr>
+<tr><th id="159">159</th><td>	   unit_x = SinTheta * CosPhi; </td></tr>
+<tr><th id="160">160</th><td>	   unit_y = SinTheta * SinPhi;  </td></tr>
+<tr><th id="161">161</th><td>	   unit_z = CosTheta; </td></tr>
+<tr><th id="162">162</th><td>	   NewMomentumDirection.set (unit_x,unit_y,unit_z);</td></tr>
+<tr><th id="163">163</th><td></td></tr>
+<tr><th id="164">164</th><td>           <i>// Rotate the new momentum direction into global reference system</i></td></tr>
+<tr><th id="165">165</th><td>           OldMomentumDirection = aParticle-&gt;GetMomentumDirection();</td></tr>
+<tr><th id="166">166</th><td>           OldMomentumDirection = OldMomentumDirection.unit();</td></tr>
+<tr><th id="167">167</th><td>           NewMomentumDirection.rotateUz(OldMomentumDirection);</td></tr>
+<tr><th id="168">168</th><td>           NewMomentumDirection = NewMomentumDirection.unit();</td></tr>
+<tr><th id="169">169</th><td></td></tr>
+<tr><th id="170">170</th><td>           <i>// calculate the new polarization direction</i></td></tr>
+<tr><th id="171">171</th><td><i>           // The new polarization needs to be in the same plane as the new</i></td></tr>
+<tr><th id="172">172</th><td><i>           // momentum direction and the old polarization direction</i></td></tr>
+<tr><th id="173">173</th><td>           OldPolarization = aParticle-&gt;GetPolarization();</td></tr>
+<tr><th id="174">174</th><td>           constant = -NewMomentumDirection.dot(OldPolarization);</td></tr>
+<tr><th id="175">175</th><td></td></tr>
+<tr><th id="176">176</th><td>           NewPolarization = OldPolarization + constant*NewMomentumDirection;</td></tr>
+<tr><th id="177">177</th><td>           NewPolarization = NewPolarization.unit();</td></tr>
+<tr><th id="178">178</th><td></td></tr>
+<tr><th id="179">179</th><td>           <i>// There is a corner case, where the Newmomentum direction</i></td></tr>
+<tr><th id="180">180</th><td><i>           // is the same as oldpolariztion direction:</i></td></tr>
+<tr><th id="181">181</th><td><i>           // random generate the azimuthal angle w.r.t. Newmomentum direction</i></td></tr>
+<tr><th id="182">182</th><td>           <b>if</b> (NewPolarization.mag() == <var>0.</var>) {</td></tr>
+<tr><th id="183">183</th><td>              rand = <a class="macro" href="../../../global/HEPRandom/include/Randomize.hh.html#52" title="CLHEP::HepRandom::getTheEngine()-&gt;flat()" data-ref="_M/G4UniformRand">G4UniformRand</a>()*twopi;</td></tr>
+<tr><th id="184">184</th><td>              NewPolarization.set(<span class='error' title="use of undeclared identifier &apos;std&apos;">std</span>::cos(rand),<span class='error' title="use of undeclared identifier &apos;std&apos;">std</span>::sin(rand),<var>0.</var>);</td></tr>
+<tr><th id="185">185</th><td>              NewPolarization.rotateUz(NewMomentumDirection);</td></tr>
+<tr><th id="186">186</th><td>           } <b>else</b> {</td></tr>
+<tr><th id="187">187</th><td>              <i>// There are two directions which are perpendicular</i></td></tr>
+<tr><th id="188">188</th><td><i>              // to the new momentum direction</i></td></tr>
+<tr><th id="189">189</th><td>              <b>if</b> (<a class="macro" href="../../../global/HEPRandom/include/Randomize.hh.html#52" title="CLHEP::HepRandom::getTheEngine()-&gt;flat()" data-ref="_M/G4UniformRand">G4UniformRand</a>() &lt; <var>0.5</var>) NewPolarization = -NewPolarization;</td></tr>
+<tr><th id="190">190</th><td>           }</td></tr>
+<tr><th id="191">191</th><td>	  </td></tr>
+<tr><th id="192">192</th><td>	   <i>// simulate according to the distribution cos^2(theta)</i></td></tr>
+<tr><th id="193">193</th><td>           cosTheta = NewPolarization.dot(OldPolarization);</td></tr>
+<tr><th id="194">194</th><td>          <i>// Loop checking, 13-Aug-2015, Peter Gumplinger</i></td></tr>
+<tr><th id="195">195</th><td>        } <b>while</b> (<span class='error' title="use of undeclared identifier &apos;std&apos;">std</span>::pow(cosTheta,<var>2</var>) &lt; <a class="macro" href="../../../global/HEPRandom/include/Randomize.hh.html#52" title="CLHEP::HepRandom::getTheEngine()-&gt;flat()" data-ref="_M/G4UniformRand">G4UniformRand</a>());</td></tr>
+<tr><th id="196">196</th><td></td></tr>
+<tr><th id="197">197</th><td>        <a class="member" href="../../management/include/G4VProcess.hh.html#G4VProcess::aParticleChange" title='G4VProcess::aParticleChange' data-ref="G4VProcess::aParticleChange">aParticleChange</a>.<a class="ref" href="../../../track/include/G4ParticleChange.hh.html#_ZN16G4ParticleChange19ProposePolarizationERKN5CLHEP10Hep3VectorE" title='G4ParticleChange::ProposePolarization' data-ref="_ZN16G4ParticleChange19ProposePolarizationERKN5CLHEP10Hep3VectorE">ProposePolarization</a>(<a class="local col0 ref" href="#10NewPolarization" title='NewPolarization' data-ref="10NewPolarization">NewPolarization</a>);</td></tr>
+<tr><th id="198">198</th><td>        <a class="member" href="../../management/include/G4VProcess.hh.html#G4VProcess::aParticleChange" title='G4VProcess::aParticleChange' data-ref="G4VProcess::aParticleChange">aParticleChange</a>.<a class="ref" href="../../../track/include/G4ParticleChange.hh.html#_ZN16G4ParticleChange24ProposeMomentumDirectionERKN5CLHEP10Hep3VectorE" title='G4ParticleChange::ProposeMomentumDirection' data-ref="_ZN16G4ParticleChange24ProposeMomentumDirectionERKN5CLHEP10Hep3VectorE">ProposeMomentumDirection</a>(<a class="local col8 ref" href="#8NewMomentumDirection" title='NewMomentumDirection' data-ref="8NewMomentumDirection">NewMomentumDirection</a>);</td></tr>
+<tr><th id="199">199</th><td></td></tr>
+<tr><th id="200">200</th><td>        <b>if</b> (<a class="member" href="../../management/include/G4VProcess.hh.html#G4VProcess::verboseLevel" title='G4VProcess::verboseLevel' data-ref="G4VProcess::verboseLevel">verboseLevel</a>&gt;<var>0</var>) {</td></tr>
+<tr><th id="201">201</th><td>                <a class="macro" href="../../../global/management/include/G4ios.hh.html#46" title="(*_G4cout_p())" data-ref="_M/G4cout">G4cout</a> <span class='error' title="invalid operands to binary expression (&apos;int&apos; and &apos;const char *&apos;)">&lt;&lt;</span> <q>"New Polarization: "</q> </td></tr>
+<tr><th id="202">202</th><td>                     &lt;&lt; NewPolarization &lt;&lt; <a class="macro" href="../../../global/management/include/G4ios.hh.html#60" title="std::endl" data-ref="_M/G4endl">G4endl</a>;</td></tr>
+<tr><th id="203">203</th><td>                <a class="macro" href="../../../global/management/include/G4ios.hh.html#46" title="(*_G4cout_p())" data-ref="_M/G4cout">G4cout</a> <span class='error' title="invalid operands to binary expression (&apos;int&apos; and &apos;const char *&apos;)">&lt;&lt;</span> <q>"Polarization Change: "</q></td></tr>
+<tr><th id="204">204</th><td>                     &lt;&lt; *(aParticleChange.GetPolarization()) &lt;&lt; <a class="macro" href="../../../global/management/include/G4ios.hh.html#60" title="std::endl" data-ref="_M/G4endl">G4endl</a>;  </td></tr>
+<tr><th id="205">205</th><td>                <a class="macro" href="../../../global/management/include/G4ios.hh.html#46" title="(*_G4cout_p())" data-ref="_M/G4cout">G4cout</a> <span class='error' title="invalid operands to binary expression (&apos;int&apos; and &apos;const char *&apos;)">&lt;&lt;</span> <q>"New Momentum Direction: "</q> </td></tr>
+<tr><th id="206">206</th><td>                     &lt;&lt; NewMomentumDirection &lt;&lt; <a class="macro" href="../../../global/management/include/G4ios.hh.html#60" title="std::endl" data-ref="_M/G4endl">G4endl</a>;</td></tr>
+<tr><th id="207">207</th><td>                <a class="macro" href="../../../global/management/include/G4ios.hh.html#46" title="(*_G4cout_p())" data-ref="_M/G4cout">G4cout</a> <span class='error' title="invalid operands to binary expression (&apos;int&apos; and &apos;const char *&apos;)">&lt;&lt;</span> <q>"Momentum Change: "</q></td></tr>
+<tr><th id="208">208</th><td>                     &lt;&lt; *(aParticleChange.GetMomentumDirection()) &lt;&lt; <a class="macro" href="../../../global/management/include/G4ios.hh.html#60" title="std::endl" data-ref="_M/G4endl">G4endl</a>; </td></tr>
+<tr><th id="209">209</th><td>        }</td></tr>
+<tr><th id="210">210</th><td></td></tr>
+<tr><th id="211">211</th><td>        <b>return</b> <a class="type" href="../../management/include/G4VDiscreteProcess.hh.html#G4VDiscreteProcess" title='G4VDiscreteProcess' data-ref="G4VDiscreteProcess">G4VDiscreteProcess</a>::<a class="virtual member" href="../../management/include/G4VDiscreteProcess.hh.html#_ZN18G4VDiscreteProcess12PostStepDoItERK7G4TrackRK6G4Step" title='G4VDiscreteProcess::PostStepDoIt' data-ref="_ZN18G4VDiscreteProcess12PostStepDoItERK7G4TrackRK6G4Step">PostStepDoIt</a>(<a class="local col3 ref" href="#3aTrack" title='aTrack' data-ref="3aTrack">aTrack</a>, <a class="local col4 ref" href="#4aStep" title='aStep' data-ref="4aStep">aStep</a>);</td></tr>
+<tr><th id="212">212</th><td>}</td></tr>
+<tr><th id="213">213</th><td></td></tr>
+<tr><th id="214">214</th><td><i>// BuildPhysicsTable for the Rayleigh Scattering process</i></td></tr>
+<tr><th id="215">215</th><td><i>// --------------------------------------------------------</i></td></tr>
+<tr><th id="216">216</th><td><em>void</em> <a class="type" href="../include/G4OpRayleigh.hh.html#G4OpRayleigh" title='G4OpRayleigh' data-ref="G4OpRayleigh">G4OpRayleigh</a>::<dfn class="virtual decl def" id="_ZN12G4OpRayleigh17BuildPhysicsTableERK20G4ParticleDefinition" title='G4OpRayleigh::BuildPhysicsTable' data-ref="_ZN12G4OpRayleigh17BuildPhysicsTableERK20G4ParticleDefinition">BuildPhysicsTable</dfn>(<em>const</em> <a class="type" href="../../../particles/management/include/G4ParticleDefinition.hh.html#G4ParticleDefinition" title='G4ParticleDefinition' data-ref="G4ParticleDefinition">G4ParticleDefinition</a>&amp;)</td></tr>
+<tr><th id="217">217</th><td>{</td></tr>
+<tr><th id="218">218</th><td>  <b>if</b> (<a class="member" href="../include/G4OpRayleigh.hh.html#G4OpRayleigh::thePhysicsTable" title='G4OpRayleigh::thePhysicsTable' data-ref="G4OpRayleigh::thePhysicsTable">thePhysicsTable</a>) {</td></tr>
+<tr><th id="219">219</th><td>     <a class="member" href="../include/G4OpRayleigh.hh.html#G4OpRayleigh::thePhysicsTable" title='G4OpRayleigh::thePhysicsTable' data-ref="G4OpRayleigh::thePhysicsTable">thePhysicsTable</a>-&gt;<a class="ref" href="../../../global/management/include/G4PhysicsTable.hh.html#_ZN14G4PhysicsTable15clearAndDestroyEv" title='G4PhysicsTable::clearAndDestroy' data-ref="_ZN14G4PhysicsTable15clearAndDestroyEv">clearAndDestroy</a>();</td></tr>
+<tr><th id="220">220</th><td>     <b>delete</b> <a class="member" href="../include/G4OpRayleigh.hh.html#G4OpRayleigh::thePhysicsTable" title='G4OpRayleigh::thePhysicsTable' data-ref="G4OpRayleigh::thePhysicsTable">thePhysicsTable</a>;</td></tr>
+<tr><th id="221">221</th><td>     thePhysicsTable = <span class='error' title="use of undeclared identifier &apos;NULL&apos;">NULL</span>;</td></tr>
+<tr><th id="222">222</th><td>  }</td></tr>
+<tr><th id="223">223</th><td></td></tr>
+<tr><th id="224">224</th><td>  <em>const</em> <span class='error' title="unknown type name &apos;G4MaterialTable&apos;">G4MaterialTable</span>* <dfn class="local col0 decl" id="20theMaterialTable" title='theMaterialTable' data-type='const int *' data-ref="20theMaterialTable">theMaterialTable</dfn> = G4Material::GetMaterialTable();</td></tr>
+<tr><th id="225">225</th><td>  <em>const</em> <a class="typedef" href="../../../global/management/include/G4Types.hh.html#G4int" title='G4int' data-type='int' data-ref="G4int">G4int</a> <dfn class="local col1 decl" id="21numOfMaterials" title='numOfMaterials' data-type='const G4int' data-ref="21numOfMaterials">numOfMaterials</dfn> = G4Material::GetNumberOfMaterials();</td></tr>
+<tr><th id="226">226</th><td></td></tr>
+<tr><th id="227">227</th><td>  thePhysicsTable = <b>new</b> <span class='error' title="no matching constructor for initialization of &apos;G4PhysicsTable&apos;">G4PhysicsTable</span>( numOfMaterials );</td></tr>
+<tr><th id="228">228</th><td>  </td></tr>
+<tr><th id="229">229</th><td>  <b>for</b>( <a class="typedef" href="../../../global/management/include/G4Types.hh.html#G4int" title='G4int' data-type='int' data-ref="G4int">G4int</a> <dfn class="local col2 decl" id="22iMaterial" title='iMaterial' data-type='G4int' data-ref="22iMaterial">iMaterial</dfn> = <var>0</var>; <a class="local col2 ref" href="#22iMaterial" title='iMaterial' data-ref="22iMaterial">iMaterial</a> &lt; <a class="local col1 ref" href="#21numOfMaterials" title='numOfMaterials' data-ref="21numOfMaterials">numOfMaterials</a>; <a class="local col2 ref" href="#22iMaterial" title='iMaterial' data-ref="22iMaterial">iMaterial</a>++ )</td></tr>
+<tr><th id="230">230</th><td>  {</td></tr>
+<tr><th id="231">231</th><td>      <a class="type" href="../../../materials/include/G4Material.hh.html#G4Material" title='G4Material' data-ref="G4Material">G4Material</a>* <dfn class="local col3 decl" id="23material" title='material' data-type='G4Material *' data-ref="23material">material</dfn> = (*theMaterialTable)[iMaterial];</td></tr>
+<tr><th id="232">232</th><td>      <a class="type" href="../../../materials/include/G4MaterialPropertiesTable.hh.html#G4MaterialPropertiesTable" title='G4MaterialPropertiesTable' data-ref="G4MaterialPropertiesTable">G4MaterialPropertiesTable</a>* <dfn class="local col4 decl" id="24materialProperties" title='materialProperties' data-type='G4MaterialPropertiesTable *' data-ref="24materialProperties">materialProperties</dfn> = </td></tr>
+<tr><th id="233">233</th><td>                                       <a class="local col3 ref" href="#23material" title='material' data-ref="23material">material</a>-&gt;<a class="ref" href="../../../materials/include/G4Material.hh.html#_ZNK10G4Material26GetMaterialPropertiesTableEv" title='G4Material::GetMaterialPropertiesTable' data-ref="_ZNK10G4Material26GetMaterialPropertiesTableEv">GetMaterialPropertiesTable</a>();</td></tr>
+<tr><th id="234">234</th><td>      <a class="type" href="../../../global/management/include/G4PhysicsOrderedFreeVector.hh.html#G4PhysicsOrderedFreeVector" title='G4PhysicsOrderedFreeVector' data-ref="G4PhysicsOrderedFreeVector">G4PhysicsOrderedFreeVector</a>* <dfn class="local col5 decl" id="25rayleigh" title='rayleigh' data-type='G4PhysicsOrderedFreeVector *' data-ref="25rayleigh">rayleigh</dfn> = <span class='error' title="use of undeclared identifier &apos;NULL&apos;">NULL</span>;</td></tr>
+<tr><th id="235">235</th><td>      <b>if</b> ( materialProperties != <span class='error' title="use of undeclared identifier &apos;NULL&apos;">NULL</span> ) {</td></tr>
+<tr><th id="236">236</th><td>         <a class="local col5 ref" href="#25rayleigh" title='rayleigh' data-ref="25rayleigh">rayleigh</a> = <a class="local col4 ref" href="#24materialProperties" title='materialProperties' data-ref="24materialProperties">materialProperties</a>-&gt;<a class="ref" href="../../../materials/include/G4MaterialPropertiesTable.hh.html#_ZN25G4MaterialPropertiesTable11GetPropertyEib" title='G4MaterialPropertiesTable::GetProperty' data-ref="_ZN25G4MaterialPropertiesTable11GetPropertyEib">GetProperty</a>( <a class="enum" href="../../../materials/include/G4MaterialPropertiesIndex.hh.html#G4MaterialPropertyIndex::kRAYLEIGH" title='G4MaterialPropertyIndex::kRAYLEIGH' data-ref="G4MaterialPropertyIndex::kRAYLEIGH">kRAYLEIGH</a> );</td></tr>
+<tr><th id="237">237</th><td>         <b>if</b> ( rayleigh == <span class='error' title="use of undeclared identifier &apos;NULL&apos;">NULL</span> ) <a class="local col5 ref" href="#25rayleigh" title='rayleigh' data-ref="25rayleigh">rayleigh</a> = </td></tr>
+<tr><th id="238">238</th><td>                                   <a class="member" href="#_ZNK12G4OpRayleigh30CalculateRayleighMeanFreePathsEPK10G4Material" title='G4OpRayleigh::CalculateRayleighMeanFreePaths' data-ref="_ZNK12G4OpRayleigh30CalculateRayleighMeanFreePathsEPK10G4Material">CalculateRayleighMeanFreePaths</a>( <a class="local col3 ref" href="#23material" title='material' data-ref="23material">material</a> );</td></tr>
+<tr><th id="239">239</th><td>      }</td></tr>
+<tr><th id="240">240</th><td>      thePhysicsTable-&gt;insertAt( iMaterial, rayleigh );</td></tr>
+<tr><th id="241">241</th><td>  }</td></tr>
+<tr><th id="242">242</th><td>}</td></tr>
+<tr><th id="243">243</th><td></td></tr>
+<tr><th id="244">244</th><td><i>// GetMeanFreePath()</i></td></tr>
+<tr><th id="245">245</th><td><i>// -----------------</i></td></tr>
+<tr><th id="246">246</th><td><i>//</i></td></tr>
+<tr><th id="247">247</th><td><a class="typedef" href="../../../global/management/include/G4Types.hh.html#G4double" title='G4double' data-type='double' data-ref="G4double">G4double</a> <a class="type" href="../include/G4OpRayleigh.hh.html#G4OpRayleigh" title='G4OpRayleigh' data-ref="G4OpRayleigh">G4OpRayleigh</a>::<dfn class="virtual decl def" id="_ZN12G4OpRayleigh15GetMeanFreePathERK7G4TrackdP16G4ForceCondition" title='G4OpRayleigh::GetMeanFreePath' data-ref="_ZN12G4OpRayleigh15GetMeanFreePathERK7G4TrackdP16G4ForceCondition">GetMeanFreePath</dfn>(<em>const</em> <a class="type" href="../../../track/include/G4Track.hh.html#G4Track" title='G4Track' data-ref="G4Track">G4Track</a>&amp; <dfn class="local col6 decl" id="26aTrack" title='aTrack' data-type='const G4Track &amp;' data-ref="26aTrack">aTrack</dfn>,</td></tr>
+<tr><th id="248">248</th><td>                                       <a class="typedef" href="../../../global/management/include/G4Types.hh.html#G4double" title='G4double' data-type='double' data-ref="G4double">G4double</a> ,</td></tr>
+<tr><th id="249">249</th><td>                                       <a class="type" href="../../../track/include/G4ForceCondition.hh.html#G4ForceCondition" title='G4ForceCondition' data-ref="G4ForceCondition">G4ForceCondition</a>* )</td></tr>
+<tr><th id="250">250</th><td>{</td></tr>
+<tr><th id="251">251</th><td>  <em>const</em> <a class="type" href="../../../particles/management/include/G4DynamicParticle.hh.html#G4DynamicParticle" title='G4DynamicParticle' data-ref="G4DynamicParticle">G4DynamicParticle</a>* <dfn class="local col7 decl" id="27particle" title='particle' data-type='const G4DynamicParticle *' data-ref="27particle">particle</dfn> = <a class="local col6 ref" href="#26aTrack" title='aTrack' data-ref="26aTrack">aTrack</a>.<a class="ref" href="../../../track/include/G4Track.hh.html#_ZNK7G4Track18GetDynamicParticleEv" title='G4Track::GetDynamicParticle' data-ref="_ZNK7G4Track18GetDynamicParticleEv">GetDynamicParticle</a>();</td></tr>
+<tr><th id="252">252</th><td>  <em>const</em> <a class="typedef" href="../../../global/management/include/G4Types.hh.html#G4double" title='G4double' data-type='double' data-ref="G4double">G4double</a> <dfn class="local col8 decl" id="28photonMomentum" title='photonMomentum' data-type='const G4double' data-ref="28photonMomentum">photonMomentum</dfn> = <a class="local col7 ref" href="#27particle" title='particle' data-ref="27particle">particle</a>-&gt;<a class="ref" href="../../../particles/management/include/G4DynamicParticle.hh.html#_ZNK17G4DynamicParticle16GetTotalMomentumEv" title='G4DynamicParticle::GetTotalMomentum' data-ref="_ZNK17G4DynamicParticle16GetTotalMomentumEv">GetTotalMomentum</a>();</td></tr>
+<tr><th id="253">253</th><td>  <em>const</em> <a class="type" href="../../../materials/include/G4Material.hh.html#G4Material" title='G4Material' data-ref="G4Material">G4Material</a>* <dfn class="local col9 decl" id="29material" title='material' data-type='const G4Material *' data-ref="29material">material</dfn> = <a class="local col6 ref" href="#26aTrack" title='aTrack' data-ref="26aTrack">aTrack</a>.<a class="ref" href="../../../track/include/G4Track.hh.html#_ZNK7G4Track11GetMaterialEv" title='G4Track::GetMaterial' data-ref="_ZNK7G4Track11GetMaterialEv">GetMaterial</a>();</td></tr>
+<tr><th id="254">254</th><td></td></tr>
+<tr><th id="255">255</th><td>  <a class="type" href="../../../global/management/include/G4PhysicsOrderedFreeVector.hh.html#G4PhysicsOrderedFreeVector" title='G4PhysicsOrderedFreeVector' data-ref="G4PhysicsOrderedFreeVector">G4PhysicsOrderedFreeVector</a>* <dfn class="local col0 decl" id="30rayleigh" title='rayleigh' data-type='G4PhysicsOrderedFreeVector *' data-ref="30rayleigh">rayleigh</dfn> = </td></tr>
+<tr><th id="256">256</th><td>                              <b>static_cast</b>&lt;G4PhysicsOrderedFreeVector*&gt;</td></tr>
+<tr><th id="257">257</th><td>                              ((*thePhysicsTable)(material-&gt;GetIndex()));</td></tr>
+<tr><th id="258">258</th><td>  </td></tr>
+<tr><th id="259">259</th><td>  <a class="typedef" href="../../../global/management/include/G4Types.hh.html#G4double" title='G4double' data-type='double' data-ref="G4double">G4double</a> <dfn class="local col1 decl" id="31rsLength" title='rsLength' data-type='G4double' data-ref="31rsLength">rsLength</dfn> = <a class="macro" href="../../../global/management/include/templates.hh.html#82" title="std::numeric_limits&lt;double&gt;::max()" data-ref="_M/DBL_MAX">DBL_MAX</a>;</td></tr>
+<tr><th id="260">260</th><td>  <b>if</b>( rayleigh != <span class='error' title="use of undeclared identifier &apos;NULL&apos;">NULL</span> ) rsLength = <span class='error' title="cannot initialize object parameter of type &apos;const G4PhysicsVector&apos; with an expression of type &apos;G4PhysicsOrderedFreeVector&apos;">rayleigh</span>-&gt;Value( photonMomentum );</td></tr>
+<tr><th id="261">261</th><td>  <b>return</b> <a class="local col1 ref" href="#31rsLength" title='rsLength' data-ref="31rsLength">rsLength</a>;</td></tr>
+<tr><th id="262">262</th><td>}</td></tr>
+<tr><th id="263">263</th><td></td></tr>
+<tr><th id="264">264</th><td><i>// CalculateRayleighMeanFreePaths()</i></td></tr>
+<tr><th id="265">265</th><td><i>// --------------------------------</i></td></tr>
+<tr><th id="266">266</th><td><i>// Private method to compute Rayleigh Scattering Lengths</i></td></tr>
+<tr><th id="267">267</th><td><a class="type" href="../../../global/management/include/G4PhysicsOrderedFreeVector.hh.html#G4PhysicsOrderedFreeVector" title='G4PhysicsOrderedFreeVector' data-ref="G4PhysicsOrderedFreeVector">G4PhysicsOrderedFreeVector</a>* </td></tr>
+<tr><th id="268">268</th><td><a class="type" href="../include/G4OpRayleigh.hh.html#G4OpRayleigh" title='G4OpRayleigh' data-ref="G4OpRayleigh">G4OpRayleigh</a>::<dfn class="decl def" id="_ZNK12G4OpRayleigh30CalculateRayleighMeanFreePathsEPK10G4Material" title='G4OpRayleigh::CalculateRayleighMeanFreePaths' data-ref="_ZNK12G4OpRayleigh30CalculateRayleighMeanFreePathsEPK10G4Material">CalculateRayleighMeanFreePaths</dfn>( <em>const</em> <a class="type" href="../../../materials/include/G4Material.hh.html#G4Material" title='G4Material' data-ref="G4Material">G4Material</a>* <dfn class="local col2 decl" id="32material" title='material' data-type='const G4Material *' data-ref="32material">material</dfn> ) <em>const</em></td></tr>
+<tr><th id="269">269</th><td>{</td></tr>
+<tr><th id="270">270</th><td>  <a class="type" href="../../../materials/include/G4MaterialPropertiesTable.hh.html#G4MaterialPropertiesTable" title='G4MaterialPropertiesTable' data-ref="G4MaterialPropertiesTable">G4MaterialPropertiesTable</a>* <dfn class="local col3 decl" id="33materialProperties" title='materialProperties' data-type='G4MaterialPropertiesTable *' data-ref="33materialProperties">materialProperties</dfn> = </td></tr>
+<tr><th id="271">271</th><td>                                       <a class="local col2 ref" href="#32material" title='material' data-ref="32material">material</a>-&gt;<a class="ref" href="../../../materials/include/G4Material.hh.html#_ZNK10G4Material26GetMaterialPropertiesTableEv" title='G4Material::GetMaterialPropertiesTable' data-ref="_ZNK10G4Material26GetMaterialPropertiesTableEv">GetMaterialPropertiesTable</a>();</td></tr>
+<tr><th id="272">272</th><td></td></tr>
+<tr><th id="273">273</th><td>  <i>// Retrieve the beta_T or isothermal compressibility value. For backwards</i></td></tr>
+<tr><th id="274">274</th><td><i>  // compatibility use a constant if the material is "Water". If the material</i></td></tr>
+<tr><th id="275">275</th><td><i>  // doesn't have an ISOTHERMAL_COMPRESSIBILITY constant then return</i></td></tr>
+<tr><th id="276">276</th><td>  <a class="typedef" href="../../../global/management/include/G4Types.hh.html#G4double" title='G4double' data-type='double' data-ref="G4double">G4double</a> <dfn class="local col4 decl" id="34betat" title='betat' data-type='G4double' data-ref="34betat">betat</dfn>;</td></tr>
+<tr><th id="277">277</th><td>  <b>if</b> ( <a class="local col2 ref" href="#32material" title='material' data-ref="32material">material</a>-&gt;<a class="ref" href="../../../materials/include/G4Material.hh.html#_ZNK10G4Material7GetNameEv" title='G4Material::GetName' data-ref="_ZNK10G4Material7GetNameEv">GetName</a>() <a class="ref" href="../../../global/management/include/G4String.hh.html#_ZNK8G4StringeqEPKc" title='G4String::operator==' data-ref="_ZNK8G4StringeqEPKc">==</a> <q>"Water"</q> )</td></tr>
+<tr><th id="278">278</th><td>    <a class="local col4 ref" href="#34betat" title='betat' data-ref="34betat">betat</a> = <var>7.658e-23</var>*<a class="ref" href="../../../externals/clhep/include/CLHEP/Units/SystemOfUnits.h.html#CLHEP::m3" title='CLHEP::m3' data-ref="CLHEP::m3">m3</a>/<a class="ref" href="../../../externals/clhep/include/CLHEP/Units/SystemOfUnits.h.html#CLHEP::MeV" title='CLHEP::MeV' data-ref="CLHEP::MeV">MeV</a>;</td></tr>
+<tr><th id="279">279</th><td>  <b>else</b> <b>if</b>(<a class="local col3 ref" href="#33materialProperties" title='materialProperties' data-ref="33materialProperties">materialProperties</a>-&gt;<a class="ref" href="../../../materials/include/G4MaterialPropertiesTable.hh.html#_ZNK25G4MaterialPropertiesTable19ConstPropertyExistsEPKc" title='G4MaterialPropertiesTable::ConstPropertyExists' data-ref="_ZNK25G4MaterialPropertiesTable19ConstPropertyExistsEPKc">ConstPropertyExists</a>(<q>"ISOTHERMAL_COMPRESSIBILITY"</q>))</td></tr>
+<tr><th id="280">280</th><td>    <a class="local col4 ref" href="#34betat" title='betat' data-ref="34betat">betat</a> = <a class="local col3 ref" href="#33materialProperties" title='materialProperties' data-ref="33materialProperties">materialProperties</a>-&gt;<a class="ref" href="../../../materials/include/G4MaterialPropertiesTable.hh.html#_ZNK25G4MaterialPropertiesTable16GetConstPropertyEi" title='G4MaterialPropertiesTable::GetConstProperty' data-ref="_ZNK25G4MaterialPropertiesTable16GetConstPropertyEi">GetConstProperty</a>(<a class="enum" href="../../../materials/include/G4MaterialPropertiesIndex.hh.html#G4MaterialConstPropertyIndex::kISOTHERMAL_COMPRESSIBILITY" title='G4MaterialConstPropertyIndex::kISOTHERMAL_COMPRESSIBILITY' data-ref="G4MaterialConstPropertyIndex::kISOTHERMAL_COMPRESSIBILITY">kISOTHERMAL_COMPRESSIBILITY</a>);</td></tr>
+<tr><th id="281">281</th><td>  <b>else</b></td></tr>
+<tr><th id="282">282</th><td>    <b>return</b> <span class='error' title="use of undeclared identifier &apos;NULL&apos;">NULL</span>;</td></tr>
+<tr><th id="283">283</th><td></td></tr>
+<tr><th id="284">284</th><td>  <i>// If the material doesn't have a RINDEX property vector then return</i></td></tr>
+<tr><th id="285">285</th><td>  <a class="typedef" href="../../../materials/include/G4MaterialPropertyVector.hh.html#G4MaterialPropertyVector" title='G4MaterialPropertyVector' data-type='G4PhysicsOrderedFreeVector' data-ref="G4MaterialPropertyVector">G4MaterialPropertyVector</a>* <dfn class="local col5 decl" id="35rIndex" title='rIndex' data-type='G4MaterialPropertyVector *' data-ref="35rIndex">rIndex</dfn> = <a class="local col3 ref" href="#33materialProperties" title='materialProperties' data-ref="33materialProperties">materialProperties</a>-&gt;<a class="ref" href="../../../materials/include/G4MaterialPropertiesTable.hh.html#_ZN25G4MaterialPropertiesTable11GetPropertyEib" title='G4MaterialPropertiesTable::GetProperty' data-ref="_ZN25G4MaterialPropertiesTable11GetPropertyEib">GetProperty</a>(<a class="enum" href="../../../materials/include/G4MaterialPropertiesIndex.hh.html#G4MaterialPropertyIndex::kRINDEX" title='G4MaterialPropertyIndex::kRINDEX' data-ref="G4MaterialPropertyIndex::kRINDEX">kRINDEX</a>);</td></tr>
+<tr><th id="286">286</th><td>  <b>if</b> ( rIndex == <span class='error' title="use of undeclared identifier &apos;NULL&apos;">NULL</span> ) <b>return</b> <span class='error' title="use of undeclared identifier &apos;NULL&apos;">NULL</span>;</td></tr>
+<tr><th id="287">287</th><td></td></tr>
+<tr><th id="288">288</th><td>  <i>// Retrieve the optional scale factor, (this just scales the scattering length</i></td></tr>
+<tr><th id="289">289</th><td>  <a class="typedef" href="../../../global/management/include/G4Types.hh.html#G4double" title='G4double' data-type='double' data-ref="G4double">G4double</a> <dfn class="local col6 decl" id="36scaleFactor" title='scaleFactor' data-type='G4double' data-ref="36scaleFactor">scaleFactor</dfn> = <var>1.0</var>;</td></tr>
+<tr><th id="290">290</th><td>  <b>if</b>( <a class="local col3 ref" href="#33materialProperties" title='materialProperties' data-ref="33materialProperties">materialProperties</a>-&gt;<a class="ref" href="../../../materials/include/G4MaterialPropertiesTable.hh.html#_ZNK25G4MaterialPropertiesTable19ConstPropertyExistsEPKc" title='G4MaterialPropertiesTable::ConstPropertyExists' data-ref="_ZNK25G4MaterialPropertiesTable19ConstPropertyExistsEPKc">ConstPropertyExists</a>( <q>"RS_SCALE_FACTOR"</q> ) )</td></tr>
+<tr><th id="291">291</th><td>    <a class="local col6 ref" href="#36scaleFactor" title='scaleFactor' data-ref="36scaleFactor">scaleFactor</a>= <a class="local col3 ref" href="#33materialProperties" title='materialProperties' data-ref="33materialProperties">materialProperties</a>-&gt;<a class="ref" href="../../../materials/include/G4MaterialPropertiesTable.hh.html#_ZNK25G4MaterialPropertiesTable16GetConstPropertyEi" title='G4MaterialPropertiesTable::GetConstProperty' data-ref="_ZNK25G4MaterialPropertiesTable16GetConstPropertyEi">GetConstProperty</a>(<a class="enum" href="../../../materials/include/G4MaterialPropertiesIndex.hh.html#G4MaterialConstPropertyIndex::kRS_SCALE_FACTOR" title='G4MaterialConstPropertyIndex::kRS_SCALE_FACTOR' data-ref="G4MaterialConstPropertyIndex::kRS_SCALE_FACTOR">kRS_SCALE_FACTOR</a> );</td></tr>
+<tr><th id="292">292</th><td></td></tr>
+<tr><th id="293">293</th><td>  <i>// Retrieve the material temperature. For backwards compatibility use a </i></td></tr>
+<tr><th id="294">294</th><td><i>  // constant if the material is "Water"</i></td></tr>
+<tr><th id="295">295</th><td>  <a class="typedef" href="../../../global/management/include/G4Types.hh.html#G4double" title='G4double' data-type='double' data-ref="G4double">G4double</a> <dfn class="local col7 decl" id="37temperature" title='temperature' data-type='G4double' data-ref="37temperature">temperature</dfn>;</td></tr>
+<tr><th id="296">296</th><td>  <b>if</b>( <a class="local col2 ref" href="#32material" title='material' data-ref="32material">material</a>-&gt;<a class="ref" href="../../../materials/include/G4Material.hh.html#_ZNK10G4Material7GetNameEv" title='G4Material::GetName' data-ref="_ZNK10G4Material7GetNameEv">GetName</a>() <a class="ref" href="../../../global/management/include/G4String.hh.html#_ZNK8G4StringeqEPKc" title='G4String::operator==' data-ref="_ZNK8G4StringeqEPKc">==</a> <q>"Water"</q> )</td></tr>
+<tr><th id="297">297</th><td>    <a class="local col7 ref" href="#37temperature" title='temperature' data-ref="37temperature">temperature</a> = <var>283.15</var>*<a class="ref" href="../../../externals/clhep/include/CLHEP/Units/SystemOfUnits.h.html#CLHEP::kelvin" title='CLHEP::kelvin' data-ref="CLHEP::kelvin">kelvin</a>; <i>// Temperature of water is 10 degrees celsius</i></td></tr>
+<tr><th id="298">298</th><td>  <b>else</b></td></tr>
+<tr><th id="299">299</th><td>    <a class="local col7 ref" href="#37temperature" title='temperature' data-ref="37temperature">temperature</a> = <a class="local col2 ref" href="#32material" title='material' data-ref="32material">material</a>-&gt;<a class="ref" href="../../../materials/include/G4Material.hh.html#_ZNK10G4Material14GetTemperatureEv" title='G4Material::GetTemperature' data-ref="_ZNK10G4Material14GetTemperatureEv">GetTemperature</a>();</td></tr>
+<tr><th id="300">300</th><td></td></tr>
+<tr><th id="301">301</th><td>  <a class="type" href="../../../global/management/include/G4PhysicsOrderedFreeVector.hh.html#G4PhysicsOrderedFreeVector" title='G4PhysicsOrderedFreeVector' data-ref="G4PhysicsOrderedFreeVector">G4PhysicsOrderedFreeVector</a>* <dfn class="local col8 decl" id="38rayleighMeanFreePaths" title='rayleighMeanFreePaths' data-type='G4PhysicsOrderedFreeVector *' data-ref="38rayleighMeanFreePaths">rayleighMeanFreePaths</dfn> =</td></tr>
+<tr><th id="302">302</th><td>                                             <b>new</b> <a class="type" href="../../../global/management/include/G4PhysicsOrderedFreeVector.hh.html#G4PhysicsOrderedFreeVector" title='G4PhysicsOrderedFreeVector' data-ref="G4PhysicsOrderedFreeVector">G4PhysicsOrderedFreeVector</a><a class="ref" href="../../../global/management/include/G4PhysicsOrderedFreeVector.hh.html#_ZN26G4PhysicsOrderedFreeVectorC1Ev" title='G4PhysicsOrderedFreeVector::G4PhysicsOrderedFreeVector' data-ref="_ZN26G4PhysicsOrderedFreeVectorC1Ev">(</a>);</td></tr>
+<tr><th id="303">303</th><td>  <i>// This calculates the meanFreePath via the Einstein-Smoluchowski formula</i></td></tr>
+<tr><th id="304">304</th><td>  <em>const</em> <a class="typedef" href="../../../global/management/include/G4Types.hh.html#G4double" title='G4double' data-type='double' data-ref="G4double">G4double</a> <dfn class="local col9 decl" id="39c1" title='c1' data-type='const G4double' data-ref="39c1">c1</dfn> = <a class="local col6 ref" href="#36scaleFactor" title='scaleFactor' data-ref="36scaleFactor">scaleFactor</a> * <a class="local col4 ref" href="#34betat" title='betat' data-ref="34betat">betat</a> * <a class="local col7 ref" href="#37temperature" title='temperature' data-ref="37temperature">temperature</a> * <a class="ref" href="../../../externals/clhep/include/CLHEP/Units/PhysicalConstants.h.html#CLHEP::k_Boltzmann" title='CLHEP::k_Boltzmann' data-ref="CLHEP::k_Boltzmann">k_Boltzmann</a> / </td></tr>
+<tr><th id="305">305</th><td>                      ( <var>6.0</var> * <a class="ref" href="../../../externals/clhep/include/CLHEP/Units/SystemOfUnits.h.html#CLHEP::pi" title='CLHEP::pi' data-ref="CLHEP::pi">pi</a> );</td></tr>
+<tr><th id="306">306</th><td></td></tr>
+<tr><th id="307">307</th><td>  <b>for</b>( <span class='error' title="unknown type name &apos;size_t&apos;">size_t</span> <dfn class="local col0 decl" id="40uRIndex" title='uRIndex' data-type='int' data-ref="40uRIndex">uRIndex</dfn> = <var>0</var>; uRIndex &lt; rIndex-&gt;GetVectorLength(); uRIndex++ )</td></tr>
+<tr><th id="308">308</th><td>  {</td></tr>
+<tr><th id="309">309</th><td>     <em>const</em> <a class="typedef" href="../../../global/management/include/G4Types.hh.html#G4double" title='G4double' data-type='double' data-ref="G4double">G4double</a> <dfn class="local col1 decl" id="41energy" title='energy' data-type='const G4double' data-ref="41energy">energy</dfn> = rIndex-&gt;Energy( uRIndex );</td></tr>
+<tr><th id="310">310</th><td>     <em>const</em> <a class="typedef" href="../../../global/management/include/G4Types.hh.html#G4double" title='G4double' data-type='double' data-ref="G4double">G4double</a> <dfn class="local col2 decl" id="42rIndexSquared" title='rIndexSquared' data-type='const G4double' data-ref="42rIndexSquared">rIndexSquared</dfn> = (*rIndex)[uRIndex] * (*rIndex)[uRIndex];</td></tr>
+<tr><th id="311">311</th><td>     <em>const</em> <a class="typedef" href="../../../global/management/include/G4Types.hh.html#G4double" title='G4double' data-type='double' data-ref="G4double">G4double</a> <dfn class="local col3 decl" id="43xlambda" title='xlambda' data-type='const G4double' data-ref="43xlambda">xlambda</dfn> = <a class="ref" href="../../../externals/clhep/include/CLHEP/Units/PhysicalConstants.h.html#CLHEP::h_Planck" title='CLHEP::h_Planck' data-ref="CLHEP::h_Planck">h_Planck</a> * <a class="ref" href="../../../externals/clhep/include/CLHEP/Units/PhysicalConstants.h.html#CLHEP::c_light" title='CLHEP::c_light' data-ref="CLHEP::c_light">c_light</a> / <a class="local col1 ref" href="#41energy" title='energy' data-ref="41energy">energy</a>;</td></tr>
+<tr><th id="312">312</th><td>     <em>const</em> <a class="typedef" href="../../../global/management/include/G4Types.hh.html#G4double" title='G4double' data-type='double' data-ref="G4double">G4double</a> <dfn class="local col4 decl" id="44c2" title='c2' data-type='const G4double' data-ref="44c2">c2</dfn> = <span class='error' title="use of undeclared identifier &apos;std&apos;">std</span>::pow(twopi/xlambda,<var>4</var>);</td></tr>
+<tr><th id="313">313</th><td>     <em>const</em> <a class="typedef" href="../../../global/management/include/G4Types.hh.html#G4double" title='G4double' data-type='double' data-ref="G4double">G4double</a> <dfn class="local col5 decl" id="45c3" title='c3' data-type='const G4double' data-ref="45c3">c3</dfn> = </td></tr>
+<tr><th id="314">314</th><td>                    <span class='error' title="use of undeclared identifier &apos;std&apos;">std</span>::pow(((rIndexSquared-<var>1.0</var>)*(rIndexSquared+<var>2.0</var> )/<var>3.0</var>),<var>2</var>);</td></tr>
+<tr><th id="315">315</th><td></td></tr>
+<tr><th id="316">316</th><td>     <em>const</em> <a class="typedef" href="../../../global/management/include/G4Types.hh.html#G4double" title='G4double' data-type='double' data-ref="G4double">G4double</a> <dfn class="local col6 decl" id="46meanFreePath" title='meanFreePath' data-type='const G4double' data-ref="46meanFreePath">meanFreePath</dfn> = <var>1.0</var> / ( <a class="local col9 ref" href="#39c1" title='c1' data-ref="39c1">c1</a> * <a class="local col4 ref" href="#44c2" title='c2' data-ref="44c2">c2</a> * <a class="local col5 ref" href="#45c3" title='c3' data-ref="45c3">c3</a> );</td></tr>
+<tr><th id="317">317</th><td></td></tr>
+<tr><th id="318">318</th><td>     <b>if</b>( verboseLevel&gt;<var>0</var> )</td></tr>
+<tr><th id="319">319</th><td>       <a class="macro" href="../../../global/management/include/G4ios.hh.html#46" title="(*_G4cout_p())" data-ref="_M/G4cout">G4cout</a> <span class='error' title="invalid operands to binary expression (&apos;int&apos; and &apos;G4double&apos; (aka &apos;double&apos;))">&lt;&lt;</span> energy &lt;&lt; <q>"MeV\t"</q> &lt;&lt; meanFreePath &lt;&lt; <q>"mm"</q> &lt;&lt; <a class="macro" href="../../../global/management/include/G4ios.hh.html#60" title="std::endl" data-ref="_M/G4endl">G4endl</a>;</td></tr>
+<tr><th id="320">320</th><td></td></tr>
+<tr><th id="321">321</th><td>     <a class="local col8 ref" href="#38rayleighMeanFreePaths" title='rayleighMeanFreePaths' data-ref="38rayleighMeanFreePaths">rayleighMeanFreePaths</a>-&gt;<a class="ref" href="../../../global/management/include/G4PhysicsOrderedFreeVector.hh.html#_ZN26G4PhysicsOrderedFreeVector12InsertValuesEdd" title='G4PhysicsOrderedFreeVector::InsertValues' data-ref="_ZN26G4PhysicsOrderedFreeVector12InsertValuesEdd">InsertValues</a>( <a class="local col1 ref" href="#41energy" title='energy' data-ref="41energy">energy</a>, <a class="local col6 ref" href="#46meanFreePath" title='meanFreePath' data-ref="46meanFreePath">meanFreePath</a> );</td></tr>
+<tr><th id="322">322</th><td>  }</td></tr>
+<tr><th id="323">323</th><td></td></tr>
+<tr><th id="324">324</th><td>  <b>return</b> <a class="local col8 ref" href="#38rayleighMeanFreePaths" title='rayleighMeanFreePaths' data-ref="38rayleighMeanFreePaths">rayleighMeanFreePaths</a>;</td></tr>
+<tr><th id="325">325</th><td>}</td></tr>
+<tr><th id="326">326</th><td></td></tr>
+</table><hr/><p id='footer'>
+Generated on <em>2019-Aug-28</em> from project codebrowser<br />Powered by <a href='https://woboq.com'><img alt='Woboq' src='https://code.woboq.org/woboq-16.png' width='41' height='16' /></a> <a href='https://code.woboq.org'>Code Browser</a> 2.1
+<br/>Generator usage only permitted with license.</p>
+</div></body></html>

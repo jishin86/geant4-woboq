@@ -1,0 +1,353 @@
+<!doctype html>
+<html>
+<head>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"><title>G4EnergySplitter.cc source code [codebrowser/source/processes/scoring/src/G4EnergySplitter.cc] - Woboq Code Browser</title>
+<link rel="stylesheet" href="../../../../../../data/qtcreator.css" title="QtCreator"/>
+<link rel="alternate stylesheet" href="../../../../../../data/kdevelop.css" title="KDevelop"/>
+<script type="text/javascript" src="../../../../../../data/jquery/jquery.min.js"></script>
+<script type="text/javascript" src="../../../../../../data/jquery/jquery-ui.min.js"></script>
+<script>var file = 'codebrowser/source/processes/scoring/src/G4EnergySplitter.cc'; var root_path = '../../../../..'; var data_path = '../../../../../../data';</script>
+<script src='../../../../../../data/codebrowser.js'></script>
+</head>
+<body><div id='header'><h1 id='breadcrumb'><span>Browse the source code of </span><a href='../../../..'>codebrowser</a>/<a href='../../..'>source</a>/<a href='../..'>processes</a>/<a href='..'>scoring</a>/<a href='./'>src</a>/<a href='G4EnergySplitter.cc.html'>G4EnergySplitter.cc</a></h1></div>
+<hr/><div id='content'><table class="code">
+<tr><th id="1">1</th><td><i>//</i></td></tr>
+<tr><th id="2">2</th><td><i>// ********************************************************************</i></td></tr>
+<tr><th id="3">3</th><td><i>// * License and Disclaimer                                           *</i></td></tr>
+<tr><th id="4">4</th><td><i>// *                                                                  *</i></td></tr>
+<tr><th id="5">5</th><td><i>// * The  Geant4 software  is  copyright of the Copyright Holders  of *</i></td></tr>
+<tr><th id="6">6</th><td><i>// * the Geant4 Collaboration.  It is provided  under  the terms  and *</i></td></tr>
+<tr><th id="7">7</th><td><i>// * conditions of the Geant4 Software License,  included in the file *</i></td></tr>
+<tr><th id="8">8</th><td><i>// * LICENSE and available at  <a href="http://cern.ch/geant4/license">http://cern.ch/geant4/license</a> .  These *</i></td></tr>
+<tr><th id="9">9</th><td><i>// * include a list of copyright holders.                             *</i></td></tr>
+<tr><th id="10">10</th><td><i>// *                                                                  *</i></td></tr>
+<tr><th id="11">11</th><td><i>// * Neither the authors of this software system, nor their employing *</i></td></tr>
+<tr><th id="12">12</th><td><i>// * institutes,nor the agencies providing financial support for this *</i></td></tr>
+<tr><th id="13">13</th><td><i>// * work  make  any representation or  warranty, express or implied, *</i></td></tr>
+<tr><th id="14">14</th><td><i>// * regarding  this  software system or assume any liability for its *</i></td></tr>
+<tr><th id="15">15</th><td><i>// * use.  Please see the license in the file  LICENSE  and URL above *</i></td></tr>
+<tr><th id="16">16</th><td><i>// * for the full disclaimer and the limitation of liability.         *</i></td></tr>
+<tr><th id="17">17</th><td><i>// *                                                                  *</i></td></tr>
+<tr><th id="18">18</th><td><i>// * This  code  implementation is the result of  the  scientific and *</i></td></tr>
+<tr><th id="19">19</th><td><i>// * technical work of the GEANT4 collaboration.                      *</i></td></tr>
+<tr><th id="20">20</th><td><i>// * By using,  copying,  modifying or  distributing the software (or *</i></td></tr>
+<tr><th id="21">21</th><td><i>// * any work based  on the software)  you  agree  to acknowledge its *</i></td></tr>
+<tr><th id="22">22</th><td><i>// * use  in  resulting  scientific  publications,  and indicate your *</i></td></tr>
+<tr><th id="23">23</th><td><i>// * acceptance of all terms of the Geant4 Software license.          *</i></td></tr>
+<tr><th id="24">24</th><td><i>// ********************************************************************</i></td></tr>
+<tr><th id="25">25</th><td><i>//</i></td></tr>
+<tr><th id="26">26</th><td><u>#include <a href="../include/G4EnergySplitter.hh.html">"G4EnergySplitter.hh"</a></u></td></tr>
+<tr><th id="27">27</th><td><u>#include <a href="../../../geometry/management/include/G4VSolid.hh.html">"G4VSolid.hh"</a></u></td></tr>
+<tr><th id="28">28</th><td><u>#include <a href="../../../global/management/include/G4UnitsTable.hh.html">"G4UnitsTable.hh"</a></u></td></tr>
+<tr><th id="29">29</th><td><u>#include <a href="../../../geometry/navigation/include/G4RegularNavigationHelper.hh.html">"G4RegularNavigationHelper.hh"</a></u></td></tr>
+<tr><th id="30">30</th><td><u>#include <a href="../../electromagnetic/muons/include/G4EnergyLossForExtrapolator.hh.html">"G4EnergyLossForExtrapolator.hh"</a></u></td></tr>
+<tr><th id="31">31</th><td><u>#include <a href="../../electromagnetic/utils/include/G4EmCalculator.hh.html">"G4EmCalculator.hh"</a></u></td></tr>
+<tr><th id="32">32</th><td><u>#include <a href="../../../geometry/management/include/G4PhysicalVolumeStore.hh.html">"G4PhysicalVolumeStore.hh"</a></u></td></tr>
+<tr><th id="33">33</th><td><u>#include <a href="../../../track/include/G4Step.hh.html">"G4Step.hh"</a></u></td></tr>
+<tr><th id="34">34</th><td><u>#include <a href="../../../geometry/volumes/include/G4PVParameterised.hh.html">"G4PVParameterised.hh"</a></u></td></tr>
+<tr><th id="35">35</th><td></td></tr>
+<tr><th id="36">36</th><td><i>////////////////////////////////////////////////////////////////////////////////</i></td></tr>
+<tr><th id="37">37</th><td><i>// (Description)</i></td></tr>
+<tr><th id="38">38</th><td><i>//</i></td></tr>
+<tr><th id="39">39</th><td><i>// Created: </i></td></tr>
+<tr><th id="40">40</th><td><i>// </i></td></tr>
+<tr><th id="41">41</th><td><i>///////////////////////////////////////////////////////////////////////////////</i></td></tr>
+<tr><th id="42">42</th><td></td></tr>
+<tr><th id="43">43</th><td><a class="type" href="../include/G4EnergySplitter.hh.html#G4EnergySplitter" title='G4EnergySplitter' data-ref="G4EnergySplitter">G4EnergySplitter</a>::<dfn class="decl def" id="_ZN16G4EnergySplitterC1Ev" title='G4EnergySplitter::G4EnergySplitter' data-ref="_ZN16G4EnergySplitterC1Ev">G4EnergySplitter</dfn>()</td></tr>
+<tr><th id="44">44</th><td>{</td></tr>
+<tr><th id="45">45</th><td>   <a class="member" href="../include/G4EnergySplitter.hh.html#G4EnergySplitter::theElossExt" title='G4EnergySplitter::theElossExt' data-ref="G4EnergySplitter::theElossExt">theElossExt</a> = <b>new</b> <a class="type" href="../../electromagnetic/muons/include/G4EnergyLossForExtrapolator.hh.html#G4EnergyLossForExtrapolator" title='G4EnergyLossForExtrapolator' data-ref="G4EnergyLossForExtrapolator">G4EnergyLossForExtrapolator</a><a class="ref" href="../../electromagnetic/muons/include/G4EnergyLossForExtrapolator.hh.html#_ZN27G4EnergyLossForExtrapolatorC1Ei" title='G4EnergyLossForExtrapolator::G4EnergyLossForExtrapolator' data-ref="_ZN27G4EnergyLossForExtrapolatorC1Ei">(</a><var>0</var>);</td></tr>
+<tr><th id="46">46</th><td>   <a class="member" href="../include/G4EnergySplitter.hh.html#G4EnergySplitter::thePhantomParam" title='G4EnergySplitter::thePhantomParam' data-ref="G4EnergySplitter::thePhantomParam">thePhantomParam</a> = <var>0</var>;</td></tr>
+<tr><th id="47">47</th><td>   <a class="member" href="../include/G4EnergySplitter.hh.html#G4EnergySplitter::theNIterations" title='G4EnergySplitter::theNIterations' data-ref="G4EnergySplitter::theNIterations">theNIterations</a> = <var>2</var>;</td></tr>
+<tr><th id="48">48</th><td>}</td></tr>
+<tr><th id="49">49</th><td></td></tr>
+<tr><th id="50">50</th><td><a class="type" href="../include/G4EnergySplitter.hh.html#G4EnergySplitter" title='G4EnergySplitter' data-ref="G4EnergySplitter">G4EnergySplitter</a>::<dfn class="virtual decl def" id="_ZN16G4EnergySplitterD1Ev" title='G4EnergySplitter::~G4EnergySplitter' data-ref="_ZN16G4EnergySplitterD1Ev">~G4EnergySplitter</dfn>()</td></tr>
+<tr><th id="51">51</th><td>{</td></tr>
+<tr><th id="52">52</th><td>	<b>delete</b> <a class="member" href="../include/G4EnergySplitter.hh.html#G4EnergySplitter::theElossExt" title='G4EnergySplitter::theElossExt' data-ref="G4EnergySplitter::theElossExt">theElossExt</a>;</td></tr>
+<tr><th id="53">53</th><td>}</td></tr>
+<tr><th id="54">54</th><td></td></tr>
+<tr><th id="55">55</th><td><a class="typedef" href="../../../global/management/include/G4Types.hh.html#G4int" title='G4int' data-type='int' data-ref="G4int">G4int</a> <a class="type" href="../include/G4EnergySplitter.hh.html#G4EnergySplitter" title='G4EnergySplitter' data-ref="G4EnergySplitter">G4EnergySplitter</a>::<dfn class="decl def" id="_ZN16G4EnergySplitter20SplitEnergyInVolumesEPK6G4Step" title='G4EnergySplitter::SplitEnergyInVolumes' data-ref="_ZN16G4EnergySplitter20SplitEnergyInVolumesEPK6G4Step">SplitEnergyInVolumes</dfn>(<em>const</em> <a class="type" href="../../../track/include/G4Step.hh.html#G4Step" title='G4Step' data-ref="G4Step">G4Step</a>* <dfn class="local col4 decl" id="24aStep" title='aStep' data-type='const G4Step *' data-ref="24aStep">aStep</dfn> )</td></tr>
+<tr><th id="56">56</th><td>{</td></tr>
+<tr><th id="57">57</th><td>  <span class='error' title="use of undeclared identifier &apos;theEnergies&apos;">theEnergies</span>.clear();</td></tr>
+<tr><th id="58">58</th><td></td></tr>
+<tr><th id="59">59</th><td>  <a class="typedef" href="../../../global/management/include/G4Types.hh.html#G4double" title='G4double' data-type='double' data-ref="G4double">G4double</a> <dfn class="local col5 decl" id="25edep" title='edep' data-type='G4double' data-ref="25edep">edep</dfn> = <a class="local col4 ref" href="#24aStep" title='aStep' data-ref="24aStep">aStep</a>-&gt;<a class="ref" href="../../../track/include/G4Step.hh.html#_ZNK6G4Step21GetTotalEnergyDepositEv" title='G4Step::GetTotalEnergyDeposit' data-ref="_ZNK6G4Step21GetTotalEnergyDepositEv">GetTotalEnergyDeposit</a>();</td></tr>
+<tr><th id="60">60</th><td> </td></tr>
+<tr><th id="61">61</th><td><u>#<span data-ppcond="61">ifdef</span> <span class="macro" data-ref="_M/VERBOSE_ENERSPLIT">VERBOSE_ENERSPLIT</span></u></td></tr>
+<tr><th id="62">62</th><td>  G4bool verbose = <var>1</var>;</td></tr>
+<tr><th id="63">63</th><td>  <b>if</b>( verbose ) G4cout &lt;&lt; <q>"G4EnergySplitter::SplitEnergyInVolumes totalEdepo "</q> &lt;&lt; aStep-&gt;GetTotalEnergyDeposit() </td></tr>
+<tr><th id="64">64</th><td>		       &lt;&lt; <q>" Nsteps "</q> &lt;&lt; G4RegularNavigationHelper::Instance()-&gt;GetStepLengths().size() &lt;&lt; G4endl;</td></tr>
+<tr><th id="65">65</th><td><u>#<span data-ppcond="61">endif</span></u>    </td></tr>
+<tr><th id="66">66</th><td>  <b>if</b>( G4RegularNavigationHelper::Instance()-&gt;<span class='error' title="no member named &apos;GetStepLengths&apos; in &apos;G4RegularNavigationHelper&apos;">GetStepLengths</span>().size() == <var>0</var> ||</td></tr>
+<tr><th id="67">67</th><td>      aStep-&gt;GetTrack()-&gt;GetDefinition()-&gt;GetPDGCharge() == <var>0</var>)  { <i>// we are only counting dose deposit</i></td></tr>
+<tr><th id="68">68</th><td>    <b>return</b> <span class='error' title="use of undeclared identifier &apos;theEnergies&apos;">theEnergies</span>.size();</td></tr>
+<tr><th id="69">69</th><td>  }</td></tr>
+<tr><th id="70">70</th><td>  <b>if</b>( G4RegularNavigationHelper::Instance()-&gt;<span class='error' title="no member named &apos;GetStepLengths&apos; in &apos;G4RegularNavigationHelper&apos;">GetStepLengths</span>().size() == <var>1</var> ) {</td></tr>
+<tr><th id="71">71</th><td>    <span class='error' title="use of undeclared identifier &apos;theEnergies&apos;">theEnergies</span>.push_back(edep);</td></tr>
+<tr><th id="72">72</th><td>    <b>return</b> <span class='error' title="use of undeclared identifier &apos;theEnergies&apos;">theEnergies</span>.size();</td></tr>
+<tr><th id="73">73</th><td>  }</td></tr>
+<tr><th id="74">74</th><td></td></tr>
+<tr><th id="75">75</th><td>  <b>if</b>( !<a class="member" href="../include/G4EnergySplitter.hh.html#G4EnergySplitter::thePhantomParam" title='G4EnergySplitter::thePhantomParam' data-ref="G4EnergySplitter::thePhantomParam">thePhantomParam</a> ) <a class="member" href="#_ZN16G4EnergySplitter15GetPhantomParamEb" title='G4EnergySplitter::GetPhantomParam' data-ref="_ZN16G4EnergySplitter15GetPhantomParamEb">GetPhantomParam</a>(<a class="macro" href="../../../global/management/include/globals.hh.html#54" title="1" data-ref="_M/TRUE">TRUE</a>);</td></tr>
+<tr><th id="76">76</th><td>  </td></tr>
+<tr><th id="77">77</th><td>  <b>if</b>( <a class="local col4 ref" href="#24aStep" title='aStep' data-ref="24aStep">aStep</a> == <var>0</var> ) <b>return</b> <a class="macro" href="../../../global/management/include/globals.hh.html#51" title="0" data-ref="_M/FALSE">FALSE</a>; <i>// it is 0 when called by GmScoringMgr after last event</i></td></tr>
+<tr><th id="78">78</th><td>  </td></tr>
+<tr><th id="79">79</th><td>  <i>//----- Distribute energy deposited in voxels </i></td></tr>
+<tr><th id="80">80</th><td>  <span class='error' title="use of undeclared identifier &apos;std&apos;">std</span>::vector&lt; <span class='error' title="use of undeclared identifier &apos;std&apos;">std</span>::pair&lt;<span class='error' title="unexpected type name &apos;G4int&apos;: expected expression">G4int</span>,G4double&gt; &gt; rnsl = G4RegularNavigationHelper::Instance()-&gt;GetStepLengths(); </td></tr>
+<tr><th id="81">81</th><td></td></tr>
+<tr><th id="82">82</th><td>  <em>const</em> <a class="type" href="../../../particles/management/include/G4ParticleDefinition.hh.html#G4ParticleDefinition" title='G4ParticleDefinition' data-ref="G4ParticleDefinition">G4ParticleDefinition</a>* <dfn class="local col6 decl" id="26part" title='part' data-type='const G4ParticleDefinition *' data-ref="26part">part</dfn> = <a class="local col4 ref" href="#24aStep" title='aStep' data-ref="24aStep">aStep</a>-&gt;<a class="ref" href="../../../track/include/G4Step.hh.html#_ZNK6G4Step8GetTrackEv" title='G4Step::GetTrack' data-ref="_ZNK6G4Step8GetTrackEv">GetTrack</a>()-&gt;<a class="ref" href="../../../track/include/G4Track.hh.html#_ZNK7G4Track13GetDefinitionEv" title='G4Track::GetDefinition' data-ref="_ZNK7G4Track13GetDefinitionEv">GetDefinition</a>();</td></tr>
+<tr><th id="83">83</th><td>  <a class="typedef" href="../../../global/management/include/G4Types.hh.html#G4double" title='G4double' data-type='double' data-ref="G4double">G4double</a> <dfn class="local col7 decl" id="27kinEnergyPreOrig" title='kinEnergyPreOrig' data-type='G4double' data-ref="27kinEnergyPreOrig">kinEnergyPreOrig</dfn> = <a class="local col4 ref" href="#24aStep" title='aStep' data-ref="24aStep">aStep</a>-&gt;<a class="ref" href="../../../track/include/G4Step.hh.html#_ZNK6G4Step15GetPreStepPointEv" title='G4Step::GetPreStepPoint' data-ref="_ZNK6G4Step15GetPreStepPointEv">GetPreStepPoint</a>()-&gt;<a class="ref" href="../../../track/include/G4StepPoint.hh.html#_ZNK11G4StepPoint16GetKineticEnergyEv" title='G4StepPoint::GetKineticEnergy' data-ref="_ZNK11G4StepPoint16GetKineticEnergyEv">GetKineticEnergy</a>();</td></tr>
+<tr><th id="84">84</th><td>  <a class="typedef" href="../../../global/management/include/G4Types.hh.html#G4double" title='G4double' data-type='double' data-ref="G4double">G4double</a> <dfn class="local col8 decl" id="28kinEnergyPre" title='kinEnergyPre' data-type='G4double' data-ref="28kinEnergyPre">kinEnergyPre</dfn> = <a class="local col7 ref" href="#27kinEnergyPreOrig" title='kinEnergyPreOrig' data-ref="27kinEnergyPreOrig">kinEnergyPreOrig</a>;</td></tr>
+<tr><th id="85">85</th><td>  </td></tr>
+<tr><th id="86">86</th><td>  <a class="typedef" href="../../../global/management/include/G4Types.hh.html#G4double" title='G4double' data-type='double' data-ref="G4double">G4double</a> <dfn class="local col9 decl" id="29stepLength" title='stepLength' data-type='G4double' data-ref="29stepLength">stepLength</dfn> = <a class="local col4 ref" href="#24aStep" title='aStep' data-ref="24aStep">aStep</a>-&gt;<a class="ref" href="../../../track/include/G4Step.hh.html#_ZNK6G4Step13GetStepLengthEv" title='G4Step::GetStepLength' data-ref="_ZNK6G4Step13GetStepLengthEv">GetStepLength</a>();</td></tr>
+<tr><th id="87">87</th><td>  <a class="typedef" href="../../../global/management/include/G4Types.hh.html#G4double" title='G4double' data-type='double' data-ref="G4double">G4double</a> <dfn class="local col0 decl" id="30slSum" title='slSum' data-type='G4double' data-ref="30slSum">slSum</dfn> = <var>0.</var>;</td></tr>
+<tr><th id="88">88</th><td>  <em>unsigned</em> <em>int</em> <dfn class="local col1 decl" id="31ii" title='ii' data-type='unsigned int' data-ref="31ii">ii</dfn>;</td></tr>
+<tr><th id="89">89</th><td>  <b>for</b>( <a class="local col1 ref" href="#31ii" title='ii' data-ref="31ii">ii</a> = <var>0</var>; ii &lt; <span class='error' title="use of undeclared identifier &apos;rnsl&apos;">rnsl</span>.size(); <a class="local col1 ref" href="#31ii" title='ii' data-ref="31ii">ii</a>++ ){</td></tr>
+<tr><th id="90">90</th><td>    <a class="typedef" href="../../../global/management/include/G4Types.hh.html#G4double" title='G4double' data-type='double' data-ref="G4double">G4double</a> <dfn class="local col2 decl" id="32sl" title='sl' data-type='G4double' data-ref="32sl">sl</dfn> = <span class='error' title="use of undeclared identifier &apos;rnsl&apos;">rnsl</span>[ii].second;</td></tr>
+<tr><th id="91">91</th><td>    <a class="local col0 ref" href="#30slSum" title='slSum' data-ref="30slSum">slSum</a> += <a class="local col2 ref" href="#32sl" title='sl' data-ref="32sl">sl</a>;</td></tr>
+<tr><th id="92">92</th><td><u>#<span data-ppcond="92">ifdef</span> <span class="macro" data-ref="_M/VERBOSE_ENERSPLIT">VERBOSE_ENERSPLIT</span></u></td></tr>
+<tr><th id="93">93</th><td>    <b>if</b>(verbose) G4cout  &lt;&lt; <q>"G4EnergySplitter::SplitEnergyInVolumes"</q>&lt;&lt; ii &lt;&lt; <q>" RN: iter1 step length geom "</q> &lt;&lt; sl &lt;&lt; G4endl;</td></tr>
+<tr><th id="94">94</th><td><u>#<span data-ppcond="92">endif</span></u></td></tr>
+<tr><th id="95">95</th><td>  }</td></tr>
+<tr><th id="96">96</th><td>  </td></tr>
+<tr><th id="97">97</th><td><u>#<span data-ppcond="97">ifdef</span> <span class="macro" data-ref="_M/VERBOSE_ENERSPLIT">VERBOSE_ENERSPLIT</span></u></td></tr>
+<tr><th id="98">98</th><td>  <b>if</b>( verbose )</td></tr>
+<tr><th id="99">99</th><td>    G4cout &lt;&lt; <q>"G4EnergySplitter RN:  step length geom TOTAL "</q> &lt;&lt; slSum </td></tr>
+<tr><th id="100">100</th><td>	   &lt;&lt; <q>" true TOTAL "</q> &lt;&lt; stepLength </td></tr>
+<tr><th id="101">101</th><td>	   &lt;&lt; <q>" ratio "</q> &lt;&lt; stepLength/slSum </td></tr>
+<tr><th id="102">102</th><td>	   &lt;&lt; <q>" Energy "</q> &lt;&lt; aStep-&gt;GetPreStepPoint()-&gt;GetKineticEnergy() </td></tr>
+<tr><th id="103">103</th><td>	   &lt;&lt; <q>" Material "</q> &lt;&lt; aStep-&gt;GetPreStepPoint()-&gt;GetMaterial()-&gt;GetName() </td></tr>
+<tr><th id="104">104</th><td>	   &lt;&lt; <q>" Number of geom steps "</q> &lt;&lt; rnsl.size() &lt;&lt; G4endl;</td></tr>
+<tr><th id="105">105</th><td><u>#<span data-ppcond="97">endif</span></u></td></tr>
+<tr><th id="106">106</th><td>  <i>//----- No iterations to correct elost and msc =&gt; distribute energy deposited according to geometrical step length in each voxel</i></td></tr>
+<tr><th id="107">107</th><td>  <b>if</b>( <a class="member" href="../include/G4EnergySplitter.hh.html#G4EnergySplitter::theNIterations" title='G4EnergySplitter::theNIterations' data-ref="G4EnergySplitter::theNIterations">theNIterations</a> == <var>0</var> ) { </td></tr>
+<tr><th id="108">108</th><td>    <b>for</b>( <a class="local col1 ref" href="#31ii" title='ii' data-ref="31ii">ii</a> = <var>0</var>; ii &lt; <span class='error' title="use of undeclared identifier &apos;rnsl&apos;">rnsl</span>.size(); <a class="local col1 ref" href="#31ii" title='ii' data-ref="31ii">ii</a>++ ){</td></tr>
+<tr><th id="109">109</th><td>      <a class="typedef" href="../../../global/management/include/G4Types.hh.html#G4double" title='G4double' data-type='double' data-ref="G4double">G4double</a> <dfn class="local col3 decl" id="33sl" title='sl' data-type='G4double' data-ref="33sl">sl</dfn> = <span class='error' title="use of undeclared identifier &apos;rnsl&apos;">rnsl</span>[ii].second;</td></tr>
+<tr><th id="110">110</th><td>      <a class="typedef" href="../../../global/management/include/G4Types.hh.html#G4double" title='G4double' data-type='double' data-ref="G4double">G4double</a> <dfn class="local col4 decl" id="34edepStep" title='edepStep' data-type='G4double' data-ref="34edepStep">edepStep</dfn> = <a class="local col5 ref" href="#25edep" title='edep' data-ref="25edep">edep</a> * <a class="local col3 ref" href="#33sl" title='sl' data-ref="33sl">sl</a>/<a class="local col0 ref" href="#30slSum" title='slSum' data-ref="30slSum">slSum</a>; <i>//divide edep along steps, proportional to step length</i></td></tr>
+<tr><th id="111">111</th><td><u>#<span data-ppcond="111">ifdef</span> <span class="macro" data-ref="_M/VERBOSE_ENERSPLIT">VERBOSE_ENERSPLIT</span></u></td></tr>
+<tr><th id="112">112</th><td>      <b>if</b>(verbose) G4cout  &lt;&lt; <q>"G4EnergySplitter::SplitEnergyInVolumes"</q>&lt;&lt; ii </td></tr>
+<tr><th id="113">113</th><td>			  &lt;&lt; <q>" edep "</q> &lt;&lt; edepStep &lt;&lt; G4endl;</td></tr>
+<tr><th id="114">114</th><td><u>#<span data-ppcond="111">endif</span></u></td></tr>
+<tr><th id="115">115</th><td>	</td></tr>
+<tr><th id="116">116</th><td>      <span class='error' title="use of undeclared identifier &apos;theEnergies&apos;">theEnergies</span>.push_back(edepStep);</td></tr>
+<tr><th id="117">117</th><td>	</td></tr>
+<tr><th id="118">118</th><td>    }</td></tr>
+<tr><th id="119">119</th><td>  } <b>else</b> { <i>//  1 or more iterations demanded</i></td></tr>
+<tr><th id="120">120</th><td>      </td></tr>
+<tr><th id="121">121</th><td><u>#<span data-ppcond="121">ifdef</span> <span class="macro" data-ref="_M/VERBOSE_ENERSPLIT">VERBOSE_ENERSPLIT</span></u></td></tr>
+<tr><th id="122">122</th><td>    <i>// print corrected energy at iteration 0 </i></td></tr>
+<tr><th id="123">123</th><td>    <b>if</b>(verbose)  {</td></tr>
+<tr><th id="124">124</th><td>      G4double slSum = <var>0.</var>;</td></tr>
+<tr><th id="125">125</th><td>      <b>for</b>( ii = <var>0</var>; ii &lt; rnsl.size(); ii++ ){</td></tr>
+<tr><th id="126">126</th><td>	G4double sl = rnsl[ii].second;</td></tr>
+<tr><th id="127">127</th><td>	slSum += sl;</td></tr>
+<tr><th id="128">128</th><td>      }</td></tr>
+<tr><th id="129">129</th><td>      <b>for</b>( ii = <var>0</var>; ii &lt; rnsl.size(); ii++ ){</td></tr>
+<tr><th id="130">130</th><td>	G4cout  &lt;&lt; <q>"G4EnergySplitter::SplitEnergyInVolumes "</q>&lt;&lt; ii</td></tr>
+<tr><th id="131">131</th><td>		&lt;&lt; <q>" RN: iter0 corrected energy lost "</q> &lt;&lt; edep*rnsl[ii].second/slSum  </td></tr>
+<tr><th id="132">132</th><td>		&lt;&lt; G4endl;</td></tr>
+<tr><th id="133">133</th><td>      }</td></tr>
+<tr><th id="134">134</th><td>    }</td></tr>
+<tr><th id="135">135</th><td><u>#<span data-ppcond="121">endif</span></u></td></tr>
+<tr><th id="136">136</th><td></td></tr>
+<tr><th id="137">137</th><td>    <a class="typedef" href="../../../global/management/include/G4Types.hh.html#G4double" title='G4double' data-type='double' data-ref="G4double">G4double</a> <dfn class="local col5 decl" id="35slRatio" title='slRatio' data-type='G4double' data-ref="35slRatio">slRatio</dfn> = <a class="local col9 ref" href="#29stepLength" title='stepLength' data-ref="29stepLength">stepLength</a>/<a class="local col0 ref" href="#30slSum" title='slSum' data-ref="30slSum">slSum</a>;</td></tr>
+<tr><th id="138">138</th><td><u>#<span data-ppcond="138">ifdef</span> <span class="macro" data-ref="_M/VERBOSE_ENERSPLIT">VERBOSE_ENERSPLIT</span></u></td></tr>
+<tr><th id="139">139</th><td>    <b>if</b>(verbose) G4cout &lt;&lt; <q>"G4EnergySplitter::SplitEnergyInVolumes  RN: iter 0, step ratio "</q> &lt;&lt; slRatio &lt;&lt; G4endl;</td></tr>
+<tr><th id="140">140</th><td><u>#<span data-ppcond="138">endif</span></u></td></tr>
+<tr><th id="141">141</th><td>      </td></tr>
+<tr><th id="142">142</th><td>    <i>//--- energy at each interaction</i></td></tr>
+<tr><th id="143">143</th><td>    <a class="type" href="../../electromagnetic/utils/include/G4EmCalculator.hh.html#G4EmCalculator" title='G4EmCalculator' data-ref="G4EmCalculator">G4EmCalculator</a> <a class="ref fake" href="../../electromagnetic/utils/include/G4EmCalculator.hh.html#_ZN14G4EmCalculatorC1Ev" title='G4EmCalculator::G4EmCalculator' data-ref="_ZN14G4EmCalculatorC1Ev"></a><dfn class="local col6 decl" id="36emcalc" title='emcalc' data-type='G4EmCalculator' data-ref="36emcalc">emcalc</dfn>;</td></tr>
+<tr><th id="144">144</th><td>    <a class="typedef" href="../../../global/management/include/G4Types.hh.html#G4double" title='G4double' data-type='double' data-ref="G4double">G4double</a> <dfn class="local col7 decl" id="37totalELost" title='totalELost' data-type='G4double' data-ref="37totalELost">totalELost</dfn> = <var>0.</var>;</td></tr>
+<tr><th id="145">145</th><td>    <span class='error' title="use of undeclared identifier &apos;std&apos;">std</span>::vector&lt;<span class='error' title="unexpected type name &apos;G4double&apos;: expected expression">G4double</span>&gt; <span class='error' title="use of undeclared identifier &apos;stepLengths&apos;">stepLengths</span>;</td></tr>
+<tr><th id="146">146</th><td>    <b>for</b>( <em>int</em> <dfn class="local col8 decl" id="38iiter" title='iiter' data-type='int' data-ref="38iiter">iiter</dfn> = <var>1</var>; <a class="local col8 ref" href="#38iiter" title='iiter' data-ref="38iiter">iiter</a> &lt;= <a class="member" href="../include/G4EnergySplitter.hh.html#G4EnergySplitter::theNIterations" title='G4EnergySplitter::theNIterations' data-ref="G4EnergySplitter::theNIterations">theNIterations</a>; <a class="local col8 ref" href="#38iiter" title='iiter' data-ref="38iiter">iiter</a>++ ) {</td></tr>
+<tr><th id="147">147</th><td>      <i>//--- iter1: distribute true step length in each voxel: geom SL in each voxel is multiplied by a constant so that the sum gives the total true step length</i></td></tr>
+<tr><th id="148">148</th><td>      <b>if</b>( <a class="local col8 ref" href="#38iiter" title='iiter' data-ref="38iiter">iiter</a> == <var>1</var> ) {</td></tr>
+<tr><th id="149">149</th><td>	<b>for</b>( <a class="local col1 ref" href="#31ii" title='ii' data-ref="31ii">ii</a> = <var>0</var>; ii &lt; <span class='error' title="use of undeclared identifier &apos;rnsl&apos;">rnsl</span>.size(); <a class="local col1 ref" href="#31ii" title='ii' data-ref="31ii">ii</a>++ ){</td></tr>
+<tr><th id="150">150</th><td>	  <a class="typedef" href="../../../global/management/include/G4Types.hh.html#G4double" title='G4double' data-type='double' data-ref="G4double">G4double</a> <dfn class="local col9 decl" id="39sl" title='sl' data-type='G4double' data-ref="39sl">sl</dfn> = <span class='error' title="use of undeclared identifier &apos;rnsl&apos;">rnsl</span>[ii].second;</td></tr>
+<tr><th id="151">151</th><td>	  <span class='error' title="use of undeclared identifier &apos;stepLengths&apos;">stepLengths</span>.push_back( sl * slRatio );</td></tr>
+<tr><th id="152">152</th><td><u>#<span data-ppcond="152">ifdef</span> <span class="macro" data-ref="_M/VERBOSE_ENERSPLIT">VERBOSE_ENERSPLIT</span></u></td></tr>
+<tr><th id="153">153</th><td>	  <b>if</b>(verbose) G4cout  &lt;&lt; <q>"G4EnergySplitter::SplitEnergyInVolumes"</q>&lt;&lt; ii &lt;&lt; <q>" RN: iter"</q> &lt;&lt; iiter &lt;&lt; <q>" corrected step length "</q> &lt;&lt; sl*slRatio &lt;&lt; G4endl;</td></tr>
+<tr><th id="154">154</th><td><u>#<span data-ppcond="152">endif</span></u></td></tr>
+<tr><th id="155">155</th><td>	}</td></tr>
+<tr><th id="156">156</th><td>	</td></tr>
+<tr><th id="157">157</th><td>	<b>for</b>( <a class="local col1 ref" href="#31ii" title='ii' data-ref="31ii">ii</a> = <var>0</var>; ii &lt; <span class='error' title="use of undeclared identifier &apos;rnsl&apos;">rnsl</span>.size(); <a class="local col1 ref" href="#31ii" title='ii' data-ref="31ii">ii</a>++ ){</td></tr>
+<tr><th id="158">158</th><td>	  <em>const</em> <a class="type" href="../../../materials/include/G4Material.hh.html#G4Material" title='G4Material' data-ref="G4Material">G4Material</a>* <dfn class="local col0 decl" id="40mate" title='mate' data-type='const G4Material *' data-ref="40mate">mate</dfn> = thePhantomParam-&gt;GetMaterial( <span class='error' title="use of undeclared identifier &apos;rnsl&apos;">rnsl</span>[ii].first );</td></tr>
+<tr><th id="159">159</th><td>	  <a class="typedef" href="../../../global/management/include/G4Types.hh.html#G4double" title='G4double' data-type='double' data-ref="G4double">G4double</a> <dfn class="local col1 decl" id="41dEdx" title='dEdx' data-type='G4double' data-ref="41dEdx">dEdx</dfn> = <var>0.</var>;</td></tr>
+<tr><th id="160">160</th><td>	  <b>if</b>( <a class="local col8 ref" href="#28kinEnergyPre" title='kinEnergyPre' data-ref="28kinEnergyPre">kinEnergyPre</a> &gt; <var>0.</var> ) {  <i>//t check this </i></td></tr>
+<tr><th id="161">161</th><td>	    <a class="local col1 ref" href="#41dEdx" title='dEdx' data-ref="41dEdx">dEdx</a> = <a class="local col6 ref" href="#36emcalc" title='emcalc' data-ref="36emcalc">emcalc</a>.<a class="ref" href="../../electromagnetic/utils/include/G4EmCalculator.hh.html#_ZN14G4EmCalculator7GetDEDXEdPK20G4ParticleDefinitionPK10G4MaterialPK8G4Region" title='G4EmCalculator::GetDEDX' data-ref="_ZN14G4EmCalculator7GetDEDXEdPK20G4ParticleDefinitionPK10G4MaterialPK8G4Region">GetDEDX</a>(<a class="local col8 ref" href="#28kinEnergyPre" title='kinEnergyPre' data-ref="28kinEnergyPre">kinEnergyPre</a>, <a class="local col6 ref" href="#26part" title='part' data-ref="26part">part</a>, <a class="local col0 ref" href="#40mate" title='mate' data-ref="40mate">mate</a>);</td></tr>
+<tr><th id="162">162</th><td>	  }</td></tr>
+<tr><th id="163">163</th><td>	  <a class="typedef" href="../../../global/management/include/G4Types.hh.html#G4double" title='G4double' data-type='double' data-ref="G4double">G4double</a> <dfn class="local col2 decl" id="42elost" title='elost' data-type='G4double' data-ref="42elost">elost</dfn> = <span class='error' title="use of undeclared identifier &apos;stepLengths&apos;">stepLengths</span>[ii] * dEdx;</td></tr>
+<tr><th id="164">164</th><td>	  </td></tr>
+<tr><th id="165">165</th><td><u>#<span data-ppcond="165">ifdef</span> <span class="macro" data-ref="_M/VERBOSE_ENERSPLIT">VERBOSE_ENERSPLIT</span></u></td></tr>
+<tr><th id="166">166</th><td>	  <b>if</b>(verbose) G4cout  &lt;&lt; <q>"G4EnergySplitter::SplitEnergyInVolumes"</q>&lt;&lt; ii &lt;&lt; <q>" RN: iter1 energy lost "</q>  &lt;&lt; elost </td></tr>
+<tr><th id="167">167</th><td>			      &lt;&lt; <q>" energy at interaction "</q> &lt;&lt; kinEnergyPre </td></tr>
+<tr><th id="168">168</th><td>			      &lt;&lt; <q>" = stepLength "</q> &lt;&lt; stepLengths[ii] </td></tr>
+<tr><th id="169">169</th><td>			      &lt;&lt; <q>" * dEdx "</q> &lt;&lt; dEdx &lt;&lt; G4endl;</td></tr>
+<tr><th id="170">170</th><td><u>#<span data-ppcond="165">endif</span></u></td></tr>
+<tr><th id="171">171</th><td>	  <a class="local col8 ref" href="#28kinEnergyPre" title='kinEnergyPre' data-ref="28kinEnergyPre">kinEnergyPre</a> -= <a class="local col2 ref" href="#42elost" title='elost' data-ref="42elost">elost</a>;</td></tr>
+<tr><th id="172">172</th><td>	  <span class='error' title="use of undeclared identifier &apos;theEnergies&apos;">theEnergies</span>.push_back( elost );</td></tr>
+<tr><th id="173">173</th><td>	  <a class="local col7 ref" href="#37totalELost" title='totalELost' data-ref="37totalELost">totalELost</a> += <a class="local col2 ref" href="#42elost" title='elost' data-ref="42elost">elost</a>;</td></tr>
+<tr><th id="174">174</th><td>	}</td></tr>
+<tr><th id="175">175</th><td>	</td></tr>
+<tr><th id="176">176</th><td>      } <b>else</b>{</td></tr>
+<tr><th id="177">177</th><td>	<i>//------ 2nd and other iterations</i></td></tr>
+<tr><th id="178">178</th><td><i>	//----- Get step lengths corrected by changing geom2true correction</i></td></tr>
+<tr><th id="179">179</th><td><i>	//-- Get ratios for each energy </i></td></tr>
+<tr><th id="180">180</th><td>	<a class="local col0 ref" href="#30slSum" title='slSum' data-ref="30slSum">slSum</a> = <var>0.</var>;</td></tr>
+<tr><th id="181">181</th><td>	<a class="local col8 ref" href="#28kinEnergyPre" title='kinEnergyPre' data-ref="28kinEnergyPre">kinEnergyPre</a> = <a class="local col7 ref" href="#27kinEnergyPreOrig" title='kinEnergyPreOrig' data-ref="27kinEnergyPreOrig">kinEnergyPreOrig</a>;</td></tr>
+<tr><th id="182">182</th><td>	<b>for</b>( <a class="local col1 ref" href="#31ii" title='ii' data-ref="31ii">ii</a> = <var>0</var>; ii &lt; <span class='error' title="use of undeclared identifier &apos;rnsl&apos;">rnsl</span>.size(); <a class="local col1 ref" href="#31ii" title='ii' data-ref="31ii">ii</a>++ ){</td></tr>
+<tr><th id="183">183</th><td>	  <em>const</em> <a class="type" href="../../../materials/include/G4Material.hh.html#G4Material" title='G4Material' data-ref="G4Material">G4Material</a>* <dfn class="local col3 decl" id="43mate" title='mate' data-type='const G4Material *' data-ref="43mate">mate</dfn> = thePhantomParam-&gt;GetMaterial( <span class='error' title="use of undeclared identifier &apos;rnsl&apos;">rnsl</span>[ii].first );</td></tr>
+<tr><th id="184">184</th><td>	  <span class='error' title="use of undeclared identifier &apos;stepLengths&apos;">stepLengths</span>[ii] = theElossExt-&gt;TrueStepLength( kinEnergyPre, <span class='error' title="use of undeclared identifier &apos;rnsl&apos;">rnsl</span>[ii].second , mate, part );</td></tr>
+<tr><th id="185">185</th><td>	  kinEnergyPre -= <span class='error' title="use of undeclared identifier &apos;theEnergies&apos;">theEnergies</span>[ii];</td></tr>
+<tr><th id="186">186</th><td>	  </td></tr>
+<tr><th id="187">187</th><td><u>#<span data-ppcond="187">ifdef</span> <span class="macro" data-ref="_M/VERBOSE_ENERSPLIT">VERBOSE_ENERSPLIT</span></u></td></tr>
+<tr><th id="188">188</th><td>	  <b>if</b>(verbose) G4cout &lt;&lt; <q>"G4EnergySplitter::SplitEnergyInVolumes"</q> &lt;&lt; ii </td></tr>
+<tr><th id="189">189</th><td>			     &lt;&lt; <q>" RN: iter"</q> &lt;&lt; iiter &lt;&lt; <q>" step length geom "</q> &lt;&lt; stepLengths[ii] </td></tr>
+<tr><th id="190">190</th><td>			     &lt;&lt; <q>" geom2true "</q> &lt;&lt; rnsl[ii].second / stepLengths[ii]  &lt;&lt; G4endl;</td></tr>
+<tr><th id="191">191</th><td><u>#<span data-ppcond="187">endif</span></u></td></tr>
+<tr><th id="192">192</th><td>	  </td></tr>
+<tr><th id="193">193</th><td>	  slSum += <span class='error' title="use of undeclared identifier &apos;stepLengths&apos;">stepLengths</span>[ii];</td></tr>
+<tr><th id="194">194</th><td>	}</td></tr>
+<tr><th id="195">195</th><td>	</td></tr>
+<tr><th id="196">196</th><td>	<i>//Correct step lengths so that they sum the total step length</i></td></tr>
+<tr><th id="197">197</th><td>	<a class="typedef" href="../../../global/management/include/G4Types.hh.html#G4double" title='G4double' data-type='double' data-ref="G4double">G4double</a> <dfn class="local col4 decl" id="44slratio" title='slratio' data-type='G4double' data-ref="44slratio">slratio</dfn> = <a class="local col4 ref" href="#24aStep" title='aStep' data-ref="24aStep">aStep</a>-&gt;<a class="ref" href="../../../track/include/G4Step.hh.html#_ZNK6G4Step13GetStepLengthEv" title='G4Step::GetStepLength' data-ref="_ZNK6G4Step13GetStepLengthEv">GetStepLength</a>()/<a class="local col0 ref" href="#30slSum" title='slSum' data-ref="30slSum">slSum</a>;</td></tr>
+<tr><th id="198">198</th><td><u>#<span data-ppcond="198">ifdef</span> <span class="macro" data-ref="_M/VERBOSE_ENERSPLIT">VERBOSE_ENERSPLIT</span></u></td></tr>
+<tr><th id="199">199</th><td>	<b>if</b>(verbose) G4cout &lt;&lt; <q>"G4EnergySplitter::SplitEnergyInVolumes"</q> &lt;&lt; ii &lt;&lt; <q>" RN: iter"</q> &lt;&lt; iiter &lt;&lt; <q>" step ratio "</q> &lt;&lt; slRatio &lt;&lt; G4endl;</td></tr>
+<tr><th id="200">200</th><td><u>#<span data-ppcond="198">endif</span></u></td></tr>
+<tr><th id="201">201</th><td>	<b>for</b>( <a class="local col1 ref" href="#31ii" title='ii' data-ref="31ii">ii</a> = <var>0</var>; ii &lt; <span class='error' title="use of undeclared identifier &apos;rnsl&apos;">rnsl</span>.size(); <a class="local col1 ref" href="#31ii" title='ii' data-ref="31ii">ii</a>++ ){</td></tr>
+<tr><th id="202">202</th><td>	  <span class='error' title="use of undeclared identifier &apos;stepLengths&apos;">stepLengths</span>[ii] *= slratio;</td></tr>
+<tr><th id="203">203</th><td><u>#<span data-ppcond="203">ifdef</span> <span class="macro" data-ref="_M/VERBOSE_ENERSPLIT">VERBOSE_ENERSPLIT</span></u></td></tr>
+<tr><th id="204">204</th><td>	  <b>if</b>(verbose) G4cout  &lt;&lt; <q>"G4EnergySplitter::SplitEnergyInVolumes"</q>&lt;&lt; ii &lt;&lt; <q>" RN: iter"</q> &lt;&lt; iiter &lt;&lt; <q>" corrected step length "</q> &lt;&lt; stepLengths[ii] &lt;&lt; G4endl;</td></tr>
+<tr><th id="205">205</th><td><u>#<span data-ppcond="203">endif</span></u></td></tr>
+<tr><th id="206">206</th><td>	}</td></tr>
+<tr><th id="207">207</th><td>	</td></tr>
+<tr><th id="208">208</th><td>	<i>//---- Recalculate energy lost with this new step lengths</i></td></tr>
+<tr><th id="209">209</th><td>        <a class="local col8 ref" href="#28kinEnergyPre" title='kinEnergyPre' data-ref="28kinEnergyPre">kinEnergyPre</a> = <a class="local col4 ref" href="#24aStep" title='aStep' data-ref="24aStep">aStep</a>-&gt;<a class="ref" href="../../../track/include/G4Step.hh.html#_ZNK6G4Step15GetPreStepPointEv" title='G4Step::GetPreStepPoint' data-ref="_ZNK6G4Step15GetPreStepPointEv">GetPreStepPoint</a>()-&gt;<a class="ref" href="../../../track/include/G4StepPoint.hh.html#_ZNK11G4StepPoint16GetKineticEnergyEv" title='G4StepPoint::GetKineticEnergy' data-ref="_ZNK11G4StepPoint16GetKineticEnergyEv">GetKineticEnergy</a>();</td></tr>
+<tr><th id="210">210</th><td>	<a class="local col7 ref" href="#37totalELost" title='totalELost' data-ref="37totalELost">totalELost</a> = <var>0.</var>;</td></tr>
+<tr><th id="211">211</th><td>	<b>for</b>( <a class="local col1 ref" href="#31ii" title='ii' data-ref="31ii">ii</a> = <var>0</var>; ii &lt; <span class='error' title="use of undeclared identifier &apos;rnsl&apos;">rnsl</span>.size(); <a class="local col1 ref" href="#31ii" title='ii' data-ref="31ii">ii</a>++ ){</td></tr>
+<tr><th id="212">212</th><td>	  <em>const</em> <a class="type" href="../../../materials/include/G4Material.hh.html#G4Material" title='G4Material' data-ref="G4Material">G4Material</a>* <dfn class="local col5 decl" id="45mate" title='mate' data-type='const G4Material *' data-ref="45mate">mate</dfn> = thePhantomParam-&gt;GetMaterial( <span class='error' title="use of undeclared identifier &apos;rnsl&apos;">rnsl</span>[ii].first );</td></tr>
+<tr><th id="213">213</th><td>	  <a class="typedef" href="../../../global/management/include/G4Types.hh.html#G4double" title='G4double' data-type='double' data-ref="G4double">G4double</a> <dfn class="local col6 decl" id="46dEdx" title='dEdx' data-type='G4double' data-ref="46dEdx">dEdx</dfn> = <var>0.</var>;</td></tr>
+<tr><th id="214">214</th><td>	  <b>if</b>( <a class="local col8 ref" href="#28kinEnergyPre" title='kinEnergyPre' data-ref="28kinEnergyPre">kinEnergyPre</a> &gt; <var>0.</var> ) {</td></tr>
+<tr><th id="215">215</th><td>	    <a class="local col6 ref" href="#46dEdx" title='dEdx' data-ref="46dEdx">dEdx</a> = <a class="local col6 ref" href="#36emcalc" title='emcalc' data-ref="36emcalc">emcalc</a>.<a class="ref" href="../../electromagnetic/utils/include/G4EmCalculator.hh.html#_ZN14G4EmCalculator7GetDEDXEdPK20G4ParticleDefinitionPK10G4MaterialPK8G4Region" title='G4EmCalculator::GetDEDX' data-ref="_ZN14G4EmCalculator7GetDEDXEdPK20G4ParticleDefinitionPK10G4MaterialPK8G4Region">GetDEDX</a>(<a class="local col8 ref" href="#28kinEnergyPre" title='kinEnergyPre' data-ref="28kinEnergyPre">kinEnergyPre</a>, <a class="local col6 ref" href="#26part" title='part' data-ref="26part">part</a>, <a class="local col5 ref" href="#45mate" title='mate' data-ref="45mate">mate</a>);</td></tr>
+<tr><th id="216">216</th><td>	  }</td></tr>
+<tr><th id="217">217</th><td>	  <a class="typedef" href="../../../global/management/include/G4Types.hh.html#G4double" title='G4double' data-type='double' data-ref="G4double">G4double</a> <dfn class="local col7 decl" id="47elost" title='elost' data-type='G4double' data-ref="47elost">elost</dfn> = <span class='error' title="use of undeclared identifier &apos;stepLengths&apos;">stepLengths</span>[ii] * dEdx;</td></tr>
+<tr><th id="218">218</th><td><u>#<span data-ppcond="218">ifdef</span> <span class="macro" data-ref="_M/VERBOSE_ENERSPLIT">VERBOSE_ENERSPLIT</span></u></td></tr>
+<tr><th id="219">219</th><td>	  <b>if</b>(verbose) G4cout  &lt;&lt; <q>"G4EnergySplitter::SplitEnergyInVolumes"</q>&lt;&lt; ii &lt;&lt; <q>" RN: iter"</q> &lt;&lt; iiter &lt;&lt; <q>" energy lost "</q> &lt;&lt; elost </td></tr>
+<tr><th id="220">220</th><td>			      &lt;&lt; <q>" energy at interaction "</q> &lt;&lt; kinEnergyPre </td></tr>
+<tr><th id="221">221</th><td>			      &lt;&lt; <q>" = stepLength "</q> &lt;&lt; stepLengths[ii] </td></tr>
+<tr><th id="222">222</th><td>			      &lt;&lt; <q>" * dEdx "</q> &lt;&lt; dEdx &lt;&lt; G4endl;</td></tr>
+<tr><th id="223">223</th><td><u>#<span data-ppcond="218">endif</span></u></td></tr>
+<tr><th id="224">224</th><td>	  <a class="local col8 ref" href="#28kinEnergyPre" title='kinEnergyPre' data-ref="28kinEnergyPre">kinEnergyPre</a> -= <a class="local col7 ref" href="#47elost" title='elost' data-ref="47elost">elost</a>;</td></tr>
+<tr><th id="225">225</th><td>	  <span class='error' title="use of undeclared identifier &apos;theEnergies&apos;">theEnergies</span>[ii] = elost;</td></tr>
+<tr><th id="226">226</th><td>	  <a class="local col7 ref" href="#37totalELost" title='totalELost' data-ref="37totalELost">totalELost</a> += <a class="local col7 ref" href="#47elost" title='elost' data-ref="47elost">elost</a>;</td></tr>
+<tr><th id="227">227</th><td>	}</td></tr>
+<tr><th id="228">228</th><td>	</td></tr>
+<tr><th id="229">229</th><td>      }</td></tr>
+<tr><th id="230">230</th><td>      </td></tr>
+<tr><th id="231">231</th><td>      <i>//correct energies so that they reproduce the real step energy lost</i></td></tr>
+<tr><th id="232">232</th><td>      <a class="typedef" href="../../../global/management/include/G4Types.hh.html#G4double" title='G4double' data-type='double' data-ref="G4double">G4double</a> <dfn class="local col8 decl" id="48enerRatio" title='enerRatio' data-type='G4double' data-ref="48enerRatio">enerRatio</dfn> = (<a class="local col5 ref" href="#25edep" title='edep' data-ref="25edep">edep</a>/<a class="local col7 ref" href="#37totalELost" title='totalELost' data-ref="37totalELost">totalELost</a>);</td></tr>
+<tr><th id="233">233</th><td>      </td></tr>
+<tr><th id="234">234</th><td><u>#<span data-ppcond="234">ifdef</span> <span class="macro" data-ref="_M/VERBOSE_ENERSPLIT">VERBOSE_ENERSPLIT</span></u></td></tr>
+<tr><th id="235">235</th><td>      <b>if</b>(verbose) G4cout  &lt;&lt; <q>"G4EnergySplitter::SplitEnergyInVolumes"</q>&lt;&lt; ii &lt;&lt; <q>" RN: iter"</q> &lt;&lt; iiter &lt;&lt; <q>" energy ratio "</q> &lt;&lt; enerRatio &lt;&lt; G4endl;</td></tr>
+<tr><th id="236">236</th><td><u>#<span data-ppcond="234">endif</span></u></td></tr>
+<tr><th id="237">237</th><td>	</td></tr>
+<tr><th id="238">238</th><td><u>#<span data-ppcond="238">ifdef</span> <span class="macro" data-ref="_M/VERBOSE_ENERSPLIT">VERBOSE_ENERSPLIT</span></u></td></tr>
+<tr><th id="239">239</th><td>      G4double elostTot = <var>0.</var>; </td></tr>
+<tr><th id="240">240</th><td><u>#<span data-ppcond="238">endif</span></u></td></tr>
+<tr><th id="241">241</th><td>      <b>for</b>( <a class="local col1 ref" href="#31ii" title='ii' data-ref="31ii">ii</a> = <var>0</var>; ii &lt; <span class='error' title="use of undeclared identifier &apos;theEnergies&apos;">theEnergies</span>.size(); <a class="local col1 ref" href="#31ii" title='ii' data-ref="31ii">ii</a>++ ){</td></tr>
+<tr><th id="242">242</th><td>	<span class='error' title="use of undeclared identifier &apos;theEnergies&apos;">theEnergies</span>[ii] *= enerRatio;</td></tr>
+<tr><th id="243">243</th><td><u>#<span data-ppcond="243">ifdef</span> <span class="macro" data-ref="_M/VERBOSE_ENERSPLIT">VERBOSE_ENERSPLIT</span></u></td></tr>
+<tr><th id="244">244</th><td>	elostTot += theEnergies[ii];</td></tr>
+<tr><th id="245">245</th><td>	<b>if</b>(verbose) G4cout  &lt;&lt; <q>"G4EnergySplitter::SplitEnergyInVolumes "</q>&lt;&lt; ii &lt;&lt; <q>" RN: iter"</q> &lt;&lt; iiter &lt;&lt; <q>" corrected energy lost "</q> &lt;&lt; theEnergies[ii] </td></tr>
+<tr><th id="246">246</th><td>			    &lt;&lt; <q>" orig elost "</q> &lt;&lt; theEnergies[ii]/enerRatio </td></tr>
+<tr><th id="247">247</th><td>			    &lt;&lt; <q>" energy before interaction "</q> &lt;&lt; kinEnergyPreOrig-elostTot+theEnergies[ii]</td></tr>
+<tr><th id="248">248</th><td>			    &lt;&lt; <q>" energy after interaction "</q> &lt;&lt; kinEnergyPreOrig-elostTot</td></tr>
+<tr><th id="249">249</th><td>			    &lt;&lt; G4endl;</td></tr>
+<tr><th id="250">250</th><td><u>#<span data-ppcond="243">endif</span></u></td></tr>
+<tr><th id="251">251</th><td>      }</td></tr>
+<tr><th id="252">252</th><td>    }</td></tr>
+<tr><th id="253">253</th><td>    </td></tr>
+<tr><th id="254">254</th><td>  }</td></tr>
+<tr><th id="255">255</th><td>  </td></tr>
+<tr><th id="256">256</th><td>  <b>return</b> <span class='error' title="use of undeclared identifier &apos;theEnergies&apos;">theEnergies</span>.size();</td></tr>
+<tr><th id="257">257</th><td>}</td></tr>
+<tr><th id="258">258</th><td></td></tr>
+<tr><th id="259">259</th><td></td></tr>
+<tr><th id="260">260</th><td><i>//-----------------------------------------------------------------------</i></td></tr>
+<tr><th id="261">261</th><td><em>void</em> <a class="type" href="../include/G4EnergySplitter.hh.html#G4EnergySplitter" title='G4EnergySplitter' data-ref="G4EnergySplitter">G4EnergySplitter</a>::<dfn class="decl def" id="_ZN16G4EnergySplitter15GetPhantomParamEb" title='G4EnergySplitter::GetPhantomParam' data-ref="_ZN16G4EnergySplitter15GetPhantomParamEb">GetPhantomParam</dfn>(<a class="typedef" href="../../../global/management/include/G4Types.hh.html#G4bool" title='G4bool' data-type='bool' data-ref="G4bool">G4bool</a> <dfn class="local col9 decl" id="49mustExist" title='mustExist' data-type='G4bool' data-ref="49mustExist">mustExist</dfn>)</td></tr>
+<tr><th id="262">262</th><td>{</td></tr>
+<tr><th id="263">263</th><td>  <a class="type" href="../../../geometry/management/include/G4PhysicalVolumeStore.hh.html#G4PhysicalVolumeStore" title='G4PhysicalVolumeStore' data-ref="G4PhysicalVolumeStore">G4PhysicalVolumeStore</a>* <dfn class="local col0 decl" id="50pvs" title='pvs' data-type='G4PhysicalVolumeStore *' data-ref="50pvs">pvs</dfn> = <a class="type" href="../../../geometry/management/include/G4PhysicalVolumeStore.hh.html#G4PhysicalVolumeStore" title='G4PhysicalVolumeStore' data-ref="G4PhysicalVolumeStore">G4PhysicalVolumeStore</a>::<a class="ref" href="../../../geometry/management/include/G4PhysicalVolumeStore.hh.html#_ZN21G4PhysicalVolumeStore11GetInstanceEv" title='G4PhysicalVolumeStore::GetInstance' data-ref="_ZN21G4PhysicalVolumeStore11GetInstanceEv">GetInstance</a>();</td></tr>
+<tr><th id="264">264</th><td>  <span class='error' title="use of undeclared identifier &apos;std&apos;">std</span>::vector&lt;<span class='error' title="&apos;G4VPhysicalVolume&apos; does not refer to a value">G4VPhysicalVolume</span>*<span class='error' title="expected expression">&gt;</span>::<span class='error' title="no member named &apos;iterator&apos; in the global namespace">iterator</span> cite;</td></tr>
+<tr><th id="265">265</th><td>  <b>for</b>( <span class='error' title="use of undeclared identifier &apos;cite&apos;">cite</span> = pvs-&gt;<span class='error' title="no member named &apos;begin&apos; in &apos;G4PhysicalVolumeStore&apos;">begin</span>(); <span class='error' title="use of undeclared identifier &apos;cite&apos;">cite</span> != pvs-&gt;<span class='error' title="no member named &apos;end&apos; in &apos;G4PhysicalVolumeStore&apos;">end</span>(); <span class='error' title="use of undeclared identifier &apos;cite&apos;">cite</span>++ ) {</td></tr>
+<tr><th id="266">266</th><td>    <i>//    G4cout &lt;&lt; " PV " &lt;&lt; (*cite)-&gt;GetName() &lt;&lt; " " &lt;&lt; (*cite)-&gt;GetTranslation() &lt;&lt; G4endl;</i></td></tr>
+<tr><th id="267">267</th><td>    <b>if</b>( IsPhantomVolume( *<span class='error' title="use of undeclared identifier &apos;cite&apos;">cite</span> ) ) {</td></tr>
+<tr><th id="268">268</th><td>      <em>const</em> <a class="type" href="../../../geometry/volumes/include/G4PVParameterised.hh.html#G4PVParameterised" title='G4PVParameterised' data-ref="G4PVParameterised">G4PVParameterised</a>* <dfn class="local col1 decl" id="51pvparam" title='pvparam' data-type='const G4PVParameterised *' data-ref="51pvparam">pvparam</dfn> = <b>static_cast</b>&lt;<em>const</em> G4PVParameterised*&gt;(*<span class='error' title="use of undeclared identifier &apos;cite&apos;">cite</span>);</td></tr>
+<tr><th id="269">269</th><td>      <a class="type" href="../../../geometry/management/include/G4VPVParameterisation.hh.html#G4VPVParameterisation" title='G4VPVParameterisation' data-ref="G4VPVParameterisation">G4VPVParameterisation</a>* <dfn class="local col2 decl" id="52param" title='param' data-type='G4VPVParameterisation *' data-ref="52param">param</dfn> = <a class="local col1 ref" href="#51pvparam" title='pvparam' data-ref="51pvparam">pvparam</a>-&gt;<a class="virtual ref" href="../../../geometry/volumes/include/G4PVParameterised.hh.html#_ZNK17G4PVParameterised19GetParameterisationEv" title='G4PVParameterised::GetParameterisation' data-ref="_ZNK17G4PVParameterised19GetParameterisationEv">GetParameterisation</a>();</td></tr>
+<tr><th id="270">270</th><td>      <i>//    if( static_cast&lt;const G4PhantomParameterisation*&gt;(param) ){</i></td></tr>
+<tr><th id="271">271</th><td><i>      //    if( static_cast&lt;const G4PhantomParameterisation*&gt;(param) ){</i></td></tr>
+<tr><th id="272">272</th><td><i>      //      G4cout &lt;&lt; "G4PhantomParameterisation volume found  " &lt;&lt; (*cite)-&gt;GetName() &lt;&lt; G4endl;</i></td></tr>
+<tr><th id="273">273</th><td>      <a class="member" href="../include/G4EnergySplitter.hh.html#G4EnergySplitter::thePhantomParam" title='G4EnergySplitter::thePhantomParam' data-ref="G4EnergySplitter::thePhantomParam">thePhantomParam</a> = <b>static_cast</b>&lt;<a class="type" href="../../../geometry/navigation/include/G4PhantomParameterisation.hh.html#G4PhantomParameterisation" title='G4PhantomParameterisation' data-ref="G4PhantomParameterisation">G4PhantomParameterisation</a>*&gt;(<a class="local col2 ref" href="#52param" title='param' data-ref="52param">param</a>);</td></tr>
+<tr><th id="274">274</th><td>    }</td></tr>
+<tr><th id="275">275</th><td>  }</td></tr>
+<tr><th id="276">276</th><td>  </td></tr>
+<tr><th id="277">277</th><td>  <b>if</b>( !<a class="member" href="../include/G4EnergySplitter.hh.html#G4EnergySplitter::thePhantomParam" title='G4EnergySplitter::thePhantomParam' data-ref="G4EnergySplitter::thePhantomParam">thePhantomParam</a> &amp;&amp; <a class="local col9 ref" href="#49mustExist" title='mustExist' data-ref="49mustExist">mustExist</a> )</td></tr>
+<tr><th id="278">278</th><td>    <a class="ref" href="../../../global/management/include/G4Exception.hh.html#_Z11G4ExceptionPKcS0_19G4ExceptionSeverityS0_" title='G4Exception' data-ref="_Z11G4ExceptionPKcS0_19G4ExceptionSeverityS0_">G4Exception</a>(<q>"G4EnergySplitter::GetPhantomParam"</q>,</td></tr>
+<tr><th id="279">279</th><td>                <q>"PhantomParamError"</q>, <a class="enum" href="../../../global/management/include/G4ExceptionSeverity.hh.html#G4ExceptionSeverity::FatalException" title='G4ExceptionSeverity::FatalException' data-ref="G4ExceptionSeverity::FatalException">FatalException</a>,</td></tr>
+<tr><th id="280">280</th><td>                <q>"No G4PhantomParameterisation found !"</q>);</td></tr>
+<tr><th id="281">281</th><td>}</td></tr>
+<tr><th id="282">282</th><td></td></tr>
+<tr><th id="283">283</th><td></td></tr>
+<tr><th id="284">284</th><td><i>//-----------------------------------------------------------------------</i></td></tr>
+<tr><th id="285">285</th><td><a class="typedef" href="../../../global/management/include/G4Types.hh.html#G4bool" title='G4bool' data-type='bool' data-ref="G4bool">G4bool</a> <a class="type" href="../include/G4EnergySplitter.hh.html#G4EnergySplitter" title='G4EnergySplitter' data-ref="G4EnergySplitter">G4EnergySplitter</a>::<dfn class="decl def" id="_ZN16G4EnergySplitter15IsPhantomVolumeEP17G4VPhysicalVolume" title='G4EnergySplitter::IsPhantomVolume' data-ref="_ZN16G4EnergySplitter15IsPhantomVolumeEP17G4VPhysicalVolume">IsPhantomVolume</dfn>( <a class="type" href="../../../geometry/management/include/G4VPhysicalVolume.hh.html#G4VPhysicalVolume" title='G4VPhysicalVolume' data-ref="G4VPhysicalVolume">G4VPhysicalVolume</a>* <dfn class="local col3 decl" id="53pv" title='pv' data-type='G4VPhysicalVolume *' data-ref="53pv">pv</dfn> )</td></tr>
+<tr><th id="286">286</th><td>{</td></tr>
+<tr><th id="287">287</th><td>  <a class="type" href="../../../global/HEPGeometry/include/geomdefs.hh.html#EAxis" title='EAxis' data-ref="EAxis">EAxis</a> <dfn class="local col4 decl" id="54axis" title='axis' data-type='EAxis' data-ref="54axis">axis</dfn>;</td></tr>
+<tr><th id="288">288</th><td>  <a class="typedef" href="../../../global/management/include/G4Types.hh.html#G4int" title='G4int' data-type='int' data-ref="G4int">G4int</a> <dfn class="local col5 decl" id="55nReplicas" title='nReplicas' data-type='G4int' data-ref="55nReplicas">nReplicas</dfn>;</td></tr>
+<tr><th id="289">289</th><td>  <a class="typedef" href="../../../global/management/include/G4Types.hh.html#G4double" title='G4double' data-type='double' data-ref="G4double">G4double</a> <dfn class="local col6 decl" id="56width" title='width' data-type='G4double' data-ref="56width">width</dfn>,<dfn class="local col7 decl" id="57offset" title='offset' data-type='G4double' data-ref="57offset">offset</dfn>;</td></tr>
+<tr><th id="290">290</th><td>  <a class="typedef" href="../../../global/management/include/G4Types.hh.html#G4bool" title='G4bool' data-type='bool' data-ref="G4bool">G4bool</a> <dfn class="local col8 decl" id="58consuming" title='consuming' data-type='G4bool' data-ref="58consuming">consuming</dfn>;</td></tr>
+<tr><th id="291">291</th><td>  <a class="local col3 ref" href="#53pv" title='pv' data-ref="53pv">pv</a>-&gt;<a class="virtual ref" href="../../../geometry/management/include/G4VPhysicalVolume.hh.html#_ZNK17G4VPhysicalVolume18GetReplicationDataER5EAxisRiRdS3_Rb" title='G4VPhysicalVolume::GetReplicationData' data-ref="_ZNK17G4VPhysicalVolume18GetReplicationDataER5EAxisRiRdS3_Rb">GetReplicationData</a>(<span class='refarg'><a class="local col4 ref" href="#54axis" title='axis' data-ref="54axis">axis</a></span>,<span class='refarg'><a class="local col5 ref" href="#55nReplicas" title='nReplicas' data-ref="55nReplicas">nReplicas</a></span>,<span class='refarg'><a class="local col6 ref" href="#56width" title='width' data-ref="56width">width</a></span>,<span class='refarg'><a class="local col7 ref" href="#57offset" title='offset' data-ref="57offset">offset</a></span>,<span class='refarg'><a class="local col8 ref" href="#58consuming" title='consuming' data-ref="58consuming">consuming</a></span>);</td></tr>
+<tr><th id="292">292</th><td>  <a class="type" href="../../../global/HEPGeometry/include/geomdefs.hh.html#EVolume" title='EVolume' data-ref="EVolume">EVolume</a> <dfn class="local col9 decl" id="59type" title='type' data-type='EVolume' data-ref="59type">type</dfn> = (<a class="local col8 ref" href="#58consuming" title='consuming' data-ref="58consuming">consuming</a>) ? <a class="enum" href="../../../global/HEPGeometry/include/geomdefs.hh.html#EVolume::kReplica" title='EVolume::kReplica' data-ref="EVolume::kReplica">kReplica</a> : <a class="enum" href="../../../global/HEPGeometry/include/geomdefs.hh.html#EVolume::kParameterised" title='EVolume::kParameterised' data-ref="EVolume::kParameterised">kParameterised</a>;</td></tr>
+<tr><th id="293">293</th><td>  <b>if</b>( <a class="local col9 ref" href="#59type" title='type' data-ref="59type">type</a> == <a class="enum" href="../../../global/HEPGeometry/include/geomdefs.hh.html#EVolume::kParameterised" title='EVolume::kParameterised' data-ref="EVolume::kParameterised">kParameterised</a> &amp;&amp; <a class="local col3 ref" href="#53pv" title='pv' data-ref="53pv">pv</a>-&gt;<a class="virtual ref" href="../../../geometry/management/include/G4VPhysicalVolume.hh.html#_ZNK17G4VPhysicalVolume21GetRegularStructureIdEv" title='G4VPhysicalVolume::GetRegularStructureId' data-ref="_ZNK17G4VPhysicalVolume21GetRegularStructureIdEv">GetRegularStructureId</a>() == <var>1</var> ) {  </td></tr>
+<tr><th id="294">294</th><td>    <b>return</b> <a class="macro" href="../../../global/management/include/globals.hh.html#54" title="1" data-ref="_M/TRUE">TRUE</a>;</td></tr>
+<tr><th id="295">295</th><td>  } <b>else</b> {</td></tr>
+<tr><th id="296">296</th><td>    <b>return</b> <a class="macro" href="../../../global/management/include/globals.hh.html#51" title="0" data-ref="_M/FALSE">FALSE</a>;</td></tr>
+<tr><th id="297">297</th><td>  }</td></tr>
+<tr><th id="298">298</th><td></td></tr>
+<tr><th id="299">299</th><td>} </td></tr>
+<tr><th id="300">300</th><td></td></tr>
+<tr><th id="301">301</th><td><i>//-----------------------------------------------------------------------</i></td></tr>
+<tr><th id="302">302</th><td><em>void</em> <a class="type" href="../include/G4EnergySplitter.hh.html#G4EnergySplitter" title='G4EnergySplitter' data-ref="G4EnergySplitter">G4EnergySplitter</a>::<dfn class="decl def" id="_ZN16G4EnergySplitter14GetLastVoxelIDERi" title='G4EnergySplitter::GetLastVoxelID' data-ref="_ZN16G4EnergySplitter14GetLastVoxelIDERi">GetLastVoxelID</dfn>( <a class="typedef" href="../../../global/management/include/G4Types.hh.html#G4int" title='G4int' data-type='int' data-ref="G4int">G4int</a>&amp; <dfn class="local col0 decl" id="60voxelID" title='voxelID' data-type='G4int &amp;' data-ref="60voxelID">voxelID</dfn>)</td></tr>
+<tr><th id="303">303</th><td>{	</td></tr>
+<tr><th id="304">304</th><td>  voxelID = (*(G4RegularNavigationHelper::Instance()-&gt;<span class='error' title="no member named &apos;GetStepLengths&apos; in &apos;G4RegularNavigationHelper&apos;">GetStepLengths</span>().begin())).first;</td></tr>
+<tr><th id="305">305</th><td>}</td></tr>
+<tr><th id="306">306</th><td></td></tr>
+<tr><th id="307">307</th><td><i>//-----------------------------------------------------------------------</i></td></tr>
+<tr><th id="308">308</th><td><em>void</em> <a class="type" href="../include/G4EnergySplitter.hh.html#G4EnergySplitter" title='G4EnergySplitter' data-ref="G4EnergySplitter">G4EnergySplitter</a>::<dfn class="decl def" id="_ZN16G4EnergySplitter15GetFirstVoxelIDERi" title='G4EnergySplitter::GetFirstVoxelID' data-ref="_ZN16G4EnergySplitter15GetFirstVoxelIDERi">GetFirstVoxelID</dfn>( <a class="typedef" href="../../../global/management/include/G4Types.hh.html#G4int" title='G4int' data-type='int' data-ref="G4int">G4int</a>&amp; <dfn class="local col1 decl" id="61voxelID" title='voxelID' data-type='G4int &amp;' data-ref="61voxelID">voxelID</dfn>)</td></tr>
+<tr><th id="309">309</th><td>{</td></tr>
+<tr><th id="310">310</th><td>  voxelID =  (*(G4RegularNavigationHelper::Instance()-&gt;<span class='error' title="no member named &apos;GetStepLengths&apos; in &apos;G4RegularNavigationHelper&apos;">GetStepLengths</span>().rbegin())).first;</td></tr>
+<tr><th id="311">311</th><td>}</td></tr>
+<tr><th id="312">312</th><td></td></tr>
+<tr><th id="313">313</th><td><i>//-----------------------------------------------------------------------</i></td></tr>
+<tr><th id="314">314</th><td><em>void</em> <a class="type" href="../include/G4EnergySplitter.hh.html#G4EnergySplitter" title='G4EnergySplitter' data-ref="G4EnergySplitter">G4EnergySplitter</a>::<dfn class="decl def" id="_ZN16G4EnergySplitter10GetVoxelIDEiRi" title='G4EnergySplitter::GetVoxelID' data-ref="_ZN16G4EnergySplitter10GetVoxelIDEiRi">GetVoxelID</dfn>( <a class="typedef" href="../../../global/management/include/G4Types.hh.html#G4int" title='G4int' data-type='int' data-ref="G4int">G4int</a> <dfn class="local col2 decl" id="62stepNo" title='stepNo' data-type='G4int' data-ref="62stepNo">stepNo</dfn>, <a class="typedef" href="../../../global/management/include/G4Types.hh.html#G4int" title='G4int' data-type='int' data-ref="G4int">G4int</a>&amp; <dfn class="local col3 decl" id="63voxelID" title='voxelID' data-type='G4int &amp;' data-ref="63voxelID">voxelID</dfn> )</td></tr>
+<tr><th id="315">315</th><td>{</td></tr>
+<tr><th id="316">316</th><td>  <b>if</b>( stepNo &lt; <var>0</var> || stepNo &gt;= G4int(G4RegularNavigationHelper::Instance()-&gt;<span class='error' title="no member named &apos;GetStepLengths&apos; in &apos;G4RegularNavigationHelper&apos;">GetStepLengths</span>().size()) ) {</td></tr>
+<tr><th id="317">317</th><td>  G4Exception(<q>"G4EnergySplitter::GetVoxelID"</q>,</td></tr>
+<tr><th id="318">318</th><td>	      <q>"Invalid stepNo, smaller than 0 or bigger or equal to number of voxels traversed"</q>,</td></tr>
+<tr><th id="319">319</th><td>	      FatalErrorInArgument,</td></tr>
+<tr><th id="320">320</th><td>	      G4String(<q>"stepNo = "</q> <span class='error' title="invalid operands to binary expression (&apos;const char *&apos; and &apos;G4String&apos;)">+</span> G4UIcommand::ConvertToString(stepNo) + <q>", number of voxels = "</q> + G4UIcommand::ConvertToString(G4int(G4RegularNavigationHelper::Instance()-&gt;<span class='error' title="no member named &apos;GetStepLengths&apos; in &apos;G4RegularNavigationHelper&apos;">GetStepLengths</span>().size())) ).c_str());</td></tr>
+<tr><th id="321">321</th><td>  }</td></tr>
+<tr><th id="322">322</th><td>  <span class='error' title="use of undeclared identifier &apos;std&apos;">std</span>::vector&lt; <span class='error' title="use of undeclared identifier &apos;std&apos;">std</span>::pair&lt;<span class='error' title="unexpected type name &apos;G4int&apos;: expected expression">G4int</span>,G4double&gt; &gt;::const_iterator ite = G4RegularNavigationHelper::Instance()-&gt;GetStepLengths().begin();</td></tr>
+<tr><th id="323">323</th><td>  advance( <span class='error' title="use of undeclared identifier &apos;ite&apos;">ite</span>, stepNo );</td></tr>
+<tr><th id="324">324</th><td>  voxelID = (*<span class='error' title="use of undeclared identifier &apos;ite&apos;">ite</span>).first;</td></tr>
+<tr><th id="325">325</th><td></td></tr>
+<tr><th id="326">326</th><td>}</td></tr>
+<tr><th id="327">327</th><td></td></tr>
+<tr><th id="328">328</th><td></td></tr>
+<tr><th id="329">329</th><td><i>//-----------------------------------------------------------------------</i></td></tr>
+<tr><th id="330">330</th><td><em>void</em> <a class="type" href="../include/G4EnergySplitter.hh.html#G4EnergySplitter" title='G4EnergySplitter' data-ref="G4EnergySplitter">G4EnergySplitter</a>::<dfn class="decl def" id="_ZN16G4EnergySplitter13GetStepLengthEiRd" title='G4EnergySplitter::GetStepLength' data-ref="_ZN16G4EnergySplitter13GetStepLengthEiRd">GetStepLength</dfn>( <a class="typedef" href="../../../global/management/include/G4Types.hh.html#G4int" title='G4int' data-type='int' data-ref="G4int">G4int</a> <dfn class="local col4 decl" id="64stepNo" title='stepNo' data-type='G4int' data-ref="64stepNo">stepNo</dfn>, <a class="typedef" href="../../../global/management/include/G4Types.hh.html#G4double" title='G4double' data-type='double' data-ref="G4double">G4double</a>&amp; <dfn class="local col5 decl" id="65stepLength" title='stepLength' data-type='G4double &amp;' data-ref="65stepLength">stepLength</dfn> )</td></tr>
+<tr><th id="331">331</th><td>{</td></tr>
+<tr><th id="332">332</th><td>  <span class='error' title="use of undeclared identifier &apos;std&apos;">std</span>::vector&lt; <span class='error' title="use of undeclared identifier &apos;std&apos;">std</span>::pair&lt;<span class='error' title="unexpected type name &apos;G4int&apos;: expected expression">G4int</span>,G4double&gt; &gt;::const_iterator ite = G4RegularNavigationHelper::Instance()-&gt;GetStepLengths().begin();</td></tr>
+<tr><th id="333">333</th><td>  advance( <span class='error' title="use of undeclared identifier &apos;ite&apos;">ite</span>, stepNo );</td></tr>
+<tr><th id="334">334</th><td>  stepLength = (*<span class='error' title="use of undeclared identifier &apos;ite&apos;">ite</span>).second;</td></tr>
+<tr><th id="335">335</th><td>}</td></tr>
+<tr><th id="336">336</th><td></td></tr>
+</table><hr/><p id='footer'>
+Generated on <em>2019-Aug-28</em> from project codebrowser<br />Powered by <a href='https://woboq.com'><img alt='Woboq' src='https://code.woboq.org/woboq-16.png' width='41' height='16' /></a> <a href='https://code.woboq.org'>Code Browser</a> 2.1
+<br/>Generator usage only permitted with license.</p>
+</div></body></html>

@@ -1,0 +1,141 @@
+<!doctype html>
+<html>
+<head>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"><title>G4CascadeSampler.icc source code [codebrowser/source/processes/hadronic/models/cascade/cascade/include/G4CascadeSampler.icc] - Woboq Code Browser</title>
+<link rel="stylesheet" href="../../../../../../../../../data/qtcreator.css" title="QtCreator"/>
+<link rel="alternate stylesheet" href="../../../../../../../../../data/kdevelop.css" title="KDevelop"/>
+<script type="text/javascript" src="../../../../../../../../../data/jquery/jquery.min.js"></script>
+<script type="text/javascript" src="../../../../../../../../../data/jquery/jquery-ui.min.js"></script>
+<script>var file = 'codebrowser/source/processes/hadronic/models/cascade/cascade/include/G4CascadeSampler.icc'; var root_path = '../../../../../../../..'; var data_path = '../../../../../../../../../data';</script>
+<script src='../../../../../../../../../data/codebrowser.js'></script>
+</head>
+<body><div id='header'><h1 id='breadcrumb'><span>Browse the source code of </span><a href='../../../../../../..'>codebrowser</a>/<a href='../../../../../..'>source</a>/<a href='../../../../..'>processes</a>/<a href='../../../..'>hadronic</a>/<a href='../../..'>models</a>/<a href='../..'>cascade</a>/<a href='..'>cascade</a>/<a href='./'>include</a>/<a href='G4CascadeSampler.icc.html'>G4CascadeSampler.icc</a></h1></div>
+<hr/><div id='content'><table class="code">
+<tr><th id="1">1</th><td><i>//</i></td></tr>
+<tr><th id="2">2</th><td><i>// ********************************************************************</i></td></tr>
+<tr><th id="3">3</th><td><i>// * License and Disclaimer                                           *</i></td></tr>
+<tr><th id="4">4</th><td><i>// *                                                                  *</i></td></tr>
+<tr><th id="5">5</th><td><i>// * The  Geant4 software  is  copyright of the Copyright Holders  of *</i></td></tr>
+<tr><th id="6">6</th><td><i>// * the Geant4 Collaboration.  It is provided  under  the terms  and *</i></td></tr>
+<tr><th id="7">7</th><td><i>// * conditions of the Geant4 Software License,  included in the file *</i></td></tr>
+<tr><th id="8">8</th><td><i>// * LICENSE and available at  <a href="http://cern.ch/geant4/license">http://cern.ch/geant4/license</a> .  These *</i></td></tr>
+<tr><th id="9">9</th><td><i>// * include a list of copyright holders.                             *</i></td></tr>
+<tr><th id="10">10</th><td><i>// *                                                                  *</i></td></tr>
+<tr><th id="11">11</th><td><i>// * Neither the authors of this software system, nor their employing *</i></td></tr>
+<tr><th id="12">12</th><td><i>// * institutes,nor the agencies providing financial support for this *</i></td></tr>
+<tr><th id="13">13</th><td><i>// * work  make  any representation or  warranty, express or implied, *</i></td></tr>
+<tr><th id="14">14</th><td><i>// * regarding  this  software system or assume any liability for its *</i></td></tr>
+<tr><th id="15">15</th><td><i>// * use.  Please see the license in the file  LICENSE  and URL above *</i></td></tr>
+<tr><th id="16">16</th><td><i>// * for the full disclaimer and the limitation of liability.         *</i></td></tr>
+<tr><th id="17">17</th><td><i>// *                                                                  *</i></td></tr>
+<tr><th id="18">18</th><td><i>// * This  code  implementation is the result of  the  scientific and *</i></td></tr>
+<tr><th id="19">19</th><td><i>// * technical work of the GEANT4 collaboration.                      *</i></td></tr>
+<tr><th id="20">20</th><td><i>// * By using,  copying,  modifying or  distributing the software (or *</i></td></tr>
+<tr><th id="21">21</th><td><i>// * any work based  on the software)  you  agree  to acknowledge its *</i></td></tr>
+<tr><th id="22">22</th><td><i>// * use  in  resulting  scientific  publications,  and indicate your *</i></td></tr>
+<tr><th id="23">23</th><td><i>// * acceptance of all terms of the Geant4 Software license.          *</i></td></tr>
+<tr><th id="24">24</th><td><i>// ********************************************************************</i></td></tr>
+<tr><th id="25">25</th><td><i>//</i></td></tr>
+<tr><th id="26">26</th><td><u>#<span data-ppcond="26">ifndef</span> <span class="macro" data-ref="_M/G4CASCADE_SAMPLER_ICC">G4CASCADE_SAMPLER_ICC</span></u></td></tr>
+<tr><th id="27">27</th><td><u>#define <dfn class="macro" id="_M/G4CASCADE_SAMPLER_ICC" data-ref="_M/G4CASCADE_SAMPLER_ICC">G4CASCADE_SAMPLER_ICC</dfn></u></td></tr>
+<tr><th id="28">28</th><td><i>//</i></td></tr>
+<tr><th id="29">29</th><td><i>// 20100506 M. Kelsey -- Move functionity of G4CascadeChannel here,</i></td></tr>
+<tr><th id="30">30</th><td><i>//		use as base class to G4CascadeFunctions&lt;T&gt;.</i></td></tr>
+<tr><th id="31">31</th><td><i>// 20100512 M. Kelsey -- Move implementation to .icc with templating</i></td></tr>
+<tr><th id="32">32</th><td><i>// 20100803 M. Kelsey -- Add print function for debugging.</i></td></tr>
+<tr><th id="33">33</th><td><i>// 20101019 M. Kelsey -- CoVerity report: recursive #include</i></td></tr>
+<tr><th id="34">34</th><td><i>// 20110728 M. Kelsey -- Fix Coverity #20231, recursive #include</i></td></tr>
+<tr><th id="35">35</th><td><i>// 20110923 M. Kelsey -- Add optional ostream&amp; argument to print(), pass</i></td></tr>
+<tr><th id="36">36</th><td><i>//		to interpolator.</i></td></tr>
+<tr><th id="37">37</th><td><i>// 20120608  M. Kelsey -- Fix variable-name "shadowing" compiler warnings.</i></td></tr>
+<tr><th id="38">38</th><td></td></tr>
+<tr><th id="39">39</th><td><u>#include <a href="../../../../../../global/HEPRandom/include/Randomize.hh.html">"Randomize.hh"</a></u></td></tr>
+<tr><th id="40">40</th><td><u>#include <span class='error' title="&apos;iostream&apos; file not found">&lt;</span>iostream&gt;</u></td></tr>
+<tr><th id="41">41</th><td><u>#include &lt;vector&gt;</u></td></tr>
+<tr><th id="42">42</th><td></td></tr>
+<tr><th id="43">43</th><td></td></tr>
+<tr><th id="44">44</th><td><b>template</b> &lt;<em>int</em> NBINS, <em>int</em> NMULT&gt; <b>inline</b></td></tr>
+<tr><th id="45">45</th><td><a class="typedef" href="../../../../../../global/management/include/G4Types.hh.html#G4double" title='G4double' data-type='double' data-ref="G4double">G4double</a> <a class="type" href="G4CascadeSampler.hh.html#G4CascadeSampler" title='G4CascadeSampler' data-ref="G4CascadeSampler">G4CascadeSampler</a>&lt;<a class="tu ref" href="#NBINS" title='NBINS' data-ref="NBINS">NBINS</a>,<a class="tu ref" href="#NMULT" title='NMULT' data-ref="NMULT">NMULT</a>&gt;::</td></tr>
+<tr><th id="46">46</th><td><dfn class="virtual decl def" id="_ZNK16G4CascadeSampler16findCrossSectionEdRALNS_Ut_E0E_Kd" title='G4CascadeSampler::findCrossSection' data-ref="_ZNK16G4CascadeSampler16findCrossSectionEdRALNS_Ut_E0E_Kd">findCrossSection</dfn>(<em>double</em> <dfn class="local col9 decl" id="39ke" title='ke' data-type='double' data-ref="39ke">ke</dfn>,</td></tr>
+<tr><th id="47">47</th><td>		 <em>const</em> <a class="typedef" href="../../../../../../global/management/include/G4Types.hh.html#G4double" title='G4double' data-type='double' data-ref="G4double">G4double</a> (&amp;<dfn class="local col0 decl" id="40xsec" title='xsec' data-type='const G4double (&amp;)[energyBins]' data-ref="40xsec">xsec</dfn>)[<a class="enum" href="G4CascadeSampler.hh.html#G4CascadeSampler::energyBins" title='G4CascadeSampler::energyBins' data-ref="G4CascadeSampler::energyBins">energyBins</a>]) <em>const</em> {</td></tr>
+<tr><th id="48">48</th><td>  <b>return</b> <a class="member" href="G4CascadeSampler.hh.html#G4CascadeSampler::interpolator" title='G4CascadeSampler::interpolator' data-ref="G4CascadeSampler::interpolator">interpolator</a>.interpolate(<a class="local col9 ref" href="#39ke" title='ke' data-ref="39ke">ke</a>, <a class="local col0 ref" href="#40xsec" title='xsec' data-ref="40xsec">xsec</a>);</td></tr>
+<tr><th id="49">49</th><td>}</td></tr>
+<tr><th id="50">50</th><td></td></tr>
+<tr><th id="51">51</th><td><b>template</b> &lt;<em>int</em> NBINS, <em>int</em> NMULT&gt; <b>inline</b></td></tr>
+<tr><th id="52">52</th><td><a class="typedef" href="../../../../../../global/management/include/G4Types.hh.html#G4int" title='G4int' data-type='int' data-ref="G4int">G4int</a> <a class="type" href="G4CascadeSampler.hh.html#G4CascadeSampler" title='G4CascadeSampler' data-ref="G4CascadeSampler">G4CascadeSampler</a>&lt;<a class="tu ref" href="#NBINS" title='NBINS' data-ref="NBINS">NBINS</a>,<a class="tu ref" href="#NMULT" title='NMULT' data-ref="NMULT">NMULT</a>&gt;::</td></tr>
+<tr><th id="53">53</th><td><dfn class="virtual decl def" id="_ZNK16G4CascadeSampler16findMultiplicityEdPALNS_Ut_E0E_Kd" title='G4CascadeSampler::findMultiplicity' data-ref="_ZNK16G4CascadeSampler16findMultiplicityEdPALNS_Ut_E0E_Kd">findMultiplicity</dfn>(<a class="typedef" href="../../../../../../global/management/include/G4Types.hh.html#G4double" title='G4double' data-type='double' data-ref="G4double">G4double</a> <dfn class="local col1 decl" id="41ke" title='ke' data-type='G4double' data-ref="41ke">ke</dfn>,</td></tr>
+<tr><th id="54">54</th><td>		 <em>const</em> <a class="typedef" href="../../../../../../global/management/include/G4Types.hh.html#G4double" title='G4double' data-type='double' data-ref="G4double">G4double</a> <dfn class="local col2 decl" id="42xmult" title='xmult' data-type='const G4double (*)[energyBins]' data-ref="42xmult">xmult</dfn>[][<a class="enum" href="G4CascadeSampler.hh.html#G4CascadeSampler::energyBins" title='G4CascadeSampler::energyBins' data-ref="G4CascadeSampler::energyBins">energyBins</a>]) <em>const</em> {</td></tr>
+<tr><th id="55">55</th><td>  <a class="member" href="#_ZNK16G4CascadeSampler15fillSigmaBufferEdPALNS_Ut_E0E_Kdii" title='G4CascadeSampler::fillSigmaBuffer' data-ref="_ZNK16G4CascadeSampler15fillSigmaBufferEdPALNS_Ut_E0E_Kdii">fillSigmaBuffer</a>(<a class="local col1 ref" href="#41ke" title='ke' data-ref="41ke">ke</a>, <a class="local col2 ref" href="#42xmult" title='xmult' data-ref="42xmult">xmult</a>);</td></tr>
+<tr><th id="56">56</th><td>  <b>return</b> <a class="member" href="#_ZNK16G4CascadeSampler10sampleFlatEv" title='G4CascadeSampler::sampleFlat' data-ref="_ZNK16G4CascadeSampler10sampleFlatEv">sampleFlat</a>() + <var>2</var>;	<i>// Convert array index to actual mult (2 to 7)</i></td></tr>
+<tr><th id="57">57</th><td>}</td></tr>
+<tr><th id="58">58</th><td></td></tr>
+<tr><th id="59">59</th><td><b>template</b> &lt;<em>int</em> NBINS, <em>int</em> NMULT&gt; <b>inline</b></td></tr>
+<tr><th id="60">60</th><td><a class="typedef" href="../../../../../../global/management/include/G4Types.hh.html#G4int" title='G4int' data-type='int' data-ref="G4int">G4int</a> <a class="type" href="G4CascadeSampler.hh.html#G4CascadeSampler" title='G4CascadeSampler' data-ref="G4CascadeSampler">G4CascadeSampler</a>&lt;<a class="tu ref" href="#NBINS" title='NBINS' data-ref="NBINS">NBINS</a>,<a class="tu ref" href="#NMULT" title='NMULT' data-ref="NMULT">NMULT</a>&gt;::</td></tr>
+<tr><th id="61">61</th><td><dfn class="virtual decl def" id="_ZNK16G4CascadeSampler19findFinalStateIndexEidPKiPALNS_Ut_E0E_Kd" title='G4CascadeSampler::findFinalStateIndex' data-ref="_ZNK16G4CascadeSampler19findFinalStateIndexEidPKiPALNS_Ut_E0E_Kd">findFinalStateIndex</dfn>(<a class="typedef" href="../../../../../../global/management/include/G4Types.hh.html#G4int" title='G4int' data-type='int' data-ref="G4int">G4int</a> <dfn class="local col3 decl" id="43mult" title='mult' data-type='G4int' data-ref="43mult">mult</dfn>, <a class="typedef" href="../../../../../../global/management/include/G4Types.hh.html#G4double" title='G4double' data-type='double' data-ref="G4double">G4double</a> <dfn class="local col4 decl" id="44ke" title='ke' data-type='G4double' data-ref="44ke">ke</dfn>, <em>const</em> <a class="typedef" href="../../../../../../global/management/include/G4Types.hh.html#G4int" title='G4int' data-type='int' data-ref="G4int">G4int</a> <dfn class="local col5 decl" id="45index" title='index' data-type='const G4int *' data-ref="45index">index</dfn>[],</td></tr>
+<tr><th id="62">62</th><td>		    <em>const</em> <a class="typedef" href="../../../../../../global/management/include/G4Types.hh.html#G4double" title='G4double' data-type='double' data-ref="G4double">G4double</a> <dfn class="local col6 decl" id="46xsec" title='xsec' data-type='const G4double (*)[energyBins]' data-ref="46xsec">xsec</dfn>[][<a class="enum" href="G4CascadeSampler.hh.html#G4CascadeSampler::energyBins" title='G4CascadeSampler::energyBins' data-ref="G4CascadeSampler::energyBins">energyBins</a>]) <em>const</em> {</td></tr>
+<tr><th id="63">63</th><td>  <a class="typedef" href="../../../../../../global/management/include/G4Types.hh.html#G4int" title='G4int' data-type='int' data-ref="G4int">G4int</a> <dfn class="local col7 decl" id="47start" title='start' data-type='G4int' data-ref="47start">start</dfn> = <a class="local col5 ref" href="#45index" title='index' data-ref="45index">index</a>[<a class="local col3 ref" href="#43mult" title='mult' data-ref="43mult">mult</a>-<var>2</var>];</td></tr>
+<tr><th id="64">64</th><td>  <a class="typedef" href="../../../../../../global/management/include/G4Types.hh.html#G4int" title='G4int' data-type='int' data-ref="G4int">G4int</a> <dfn class="local col8 decl" id="48stop" title='stop' data-type='G4int' data-ref="48stop">stop</dfn> = <a class="local col5 ref" href="#45index" title='index' data-ref="45index">index</a>[<a class="local col3 ref" href="#43mult" title='mult' data-ref="43mult">mult</a>-<var>1</var>];</td></tr>
+<tr><th id="65">65</th><td>  <b>if</b> (<a class="local col8 ref" href="#48stop" title='stop' data-ref="48stop">stop</a>-<a class="local col7 ref" href="#47start" title='start' data-ref="47start">start</a> &lt;= <var>1</var>) <b>return</b> <a class="local col7 ref" href="#47start" title='start' data-ref="47start">start</a>;	<i>// Avoid unnecessary work</i></td></tr>
+<tr><th id="66">66</th><td></td></tr>
+<tr><th id="67">67</th><td>  <a class="member" href="#_ZNK16G4CascadeSampler15fillSigmaBufferEdPALNS_Ut_E0E_Kdii" title='G4CascadeSampler::fillSigmaBuffer' data-ref="_ZNK16G4CascadeSampler15fillSigmaBufferEdPALNS_Ut_E0E_Kdii">fillSigmaBuffer</a>(<a class="local col4 ref" href="#44ke" title='ke' data-ref="44ke">ke</a>, <a class="local col6 ref" href="#46xsec" title='xsec' data-ref="46xsec">xsec</a>, <a class="local col7 ref" href="#47start" title='start' data-ref="47start">start</a>, <a class="local col8 ref" href="#48stop" title='stop' data-ref="48stop">stop</a>);</td></tr>
+<tr><th id="68">68</th><td>  <b>return</b> <a class="member" href="#_ZNK16G4CascadeSampler10sampleFlatEv" title='G4CascadeSampler::sampleFlat' data-ref="_ZNK16G4CascadeSampler10sampleFlatEv">sampleFlat</a>();</td></tr>
+<tr><th id="69">69</th><td>}</td></tr>
+<tr><th id="70">70</th><td></td></tr>
+<tr><th id="71">71</th><td><i>// Optional start/stop arguments default to multiplicity arrays</i></td></tr>
+<tr><th id="72">72</th><td><b>template</b> &lt;<em>int</em> NBINS, <em>int</em> NMULT&gt; <b>inline</b></td></tr>
+<tr><th id="73">73</th><td><em>void</em> <a class="type" href="G4CascadeSampler.hh.html#G4CascadeSampler" title='G4CascadeSampler' data-ref="G4CascadeSampler">G4CascadeSampler</a>&lt;<a class="tu ref" href="#NBINS" title='NBINS' data-ref="NBINS">NBINS</a>,<a class="tu ref" href="#NMULT" title='NMULT' data-ref="NMULT">NMULT</a>&gt;::</td></tr>
+<tr><th id="74">74</th><td><dfn class="decl def" id="_ZNK16G4CascadeSampler15fillSigmaBufferEdPALNS_Ut_E0E_Kdii" title='G4CascadeSampler::fillSigmaBuffer' data-ref="_ZNK16G4CascadeSampler15fillSigmaBufferEdPALNS_Ut_E0E_Kdii">fillSigmaBuffer</dfn>(<a class="typedef" href="../../../../../../global/management/include/G4Types.hh.html#G4double" title='G4double' data-type='double' data-ref="G4double">G4double</a> <dfn class="local col9 decl" id="49ke" title='ke' data-type='G4double' data-ref="49ke">ke</dfn>, <em>const</em> <a class="typedef" href="../../../../../../global/management/include/G4Types.hh.html#G4double" title='G4double' data-type='double' data-ref="G4double">G4double</a> <dfn class="local col0 decl" id="50x" title='x' data-type='const G4double (*)[energyBins]' data-ref="50x">x</dfn>[][<a class="enum" href="G4CascadeSampler.hh.html#G4CascadeSampler::energyBins" title='G4CascadeSampler::energyBins' data-ref="G4CascadeSampler::energyBins">energyBins</a>],</td></tr>
+<tr><th id="75">75</th><td>		<a class="typedef" href="../../../../../../global/management/include/G4Types.hh.html#G4int" title='G4int' data-type='int' data-ref="G4int">G4int</a> <dfn class="local col1 decl" id="51startBin" title='startBin' data-type='G4int' data-ref="51startBin">startBin</dfn>, <a class="typedef" href="../../../../../../global/management/include/G4Types.hh.html#G4int" title='G4int' data-type='int' data-ref="G4int">G4int</a> <dfn class="local col2 decl" id="52stopBin" title='stopBin' data-type='G4int' data-ref="52stopBin">stopBin</dfn>) <em>const</em> {</td></tr>
+<tr><th id="76">76</th><td>  <span class='error' title="use of undeclared identifier &apos;sigmaBuf&apos;">sigmaBuf</span>.clear();</td></tr>
+<tr><th id="77">77</th><td>  <b>if</b> (<a class="local col2 ref" href="#52stopBin" title='stopBin' data-ref="52stopBin">stopBin</a>-<a class="local col1 ref" href="#51startBin" title='startBin' data-ref="51startBin">startBin</a> &lt;= <var>1</var>) <b>return</b>;	<i>// Avoid unnecessary work</i></td></tr>
+<tr><th id="78">78</th><td></td></tr>
+<tr><th id="79">79</th><td>  <i>// NOTE:  push_back() must be used to ensure that size() gets set!</i></td></tr>
+<tr><th id="80">80</th><td>  <span class='error' title="use of undeclared identifier &apos;sigmaBuf&apos;">sigmaBuf</span>.reserve(stopBin-startBin);</td></tr>
+<tr><th id="81">81</th><td>  <b>for</b>(G4int i = startBin; i &lt; stopBin; i++)</td></tr>
+<tr><th id="82">82</th><td>    <span class='error' title="use of undeclared identifier &apos;sigmaBuf&apos;">sigmaBuf</span>.push_back(interpolator.interpolate(ke, x[i]));</td></tr>
+<tr><th id="83">83</th><td>}</td></tr>
+<tr><th id="84">84</th><td></td></tr>
+<tr><th id="85">85</th><td></td></tr>
+<tr><th id="86">86</th><td><b>template</b> &lt;<em>int</em> NBINS, <em>int</em> NMULT&gt; <b>inline</b></td></tr>
+<tr><th id="87">87</th><td><a class="typedef" href="../../../../../../global/management/include/G4Types.hh.html#G4int" title='G4int' data-type='int' data-ref="G4int">G4int</a> <a class="type" href="G4CascadeSampler.hh.html#G4CascadeSampler" title='G4CascadeSampler' data-ref="G4CascadeSampler">G4CascadeSampler</a>&lt;<a class="tu ref" href="#NBINS" title='NBINS' data-ref="NBINS">NBINS</a>,<a class="tu ref" href="#NMULT" title='NMULT' data-ref="NMULT">NMULT</a>&gt;::<dfn class="decl def" id="_ZNK16G4CascadeSampler10sampleFlatEv" title='G4CascadeSampler::sampleFlat' data-ref="_ZNK16G4CascadeSampler10sampleFlatEv">sampleFlat</dfn>() <em>const</em> {</td></tr>
+<tr><th id="88">88</th><td>  <a class="typedef" href="../../../../../../global/management/include/G4Types.hh.html#G4int" title='G4int' data-type='int' data-ref="G4int">G4int</a> <dfn class="local col3 decl" id="53nbins" title='nbins' data-type='G4int' data-ref="53nbins">nbins</dfn> = <span class='error' title="use of undeclared identifier &apos;sigmaBuf&apos;">sigmaBuf</span>.size();</td></tr>
+<tr><th id="89">89</th><td>  <b>if</b> (<a class="local col3 ref" href="#53nbins" title='nbins' data-ref="53nbins">nbins</a> &lt;= <var>1</var>) <b>return</b> <var>0</var>;		<i>// Avoid unnecessary work</i></td></tr>
+<tr><th id="90">90</th><td></td></tr>
+<tr><th id="91">91</th><td><u>#<span data-ppcond="91">ifdef</span> <span class="macro" data-ref="_M/G4CASCADE_DEBUG_SAMPLER">G4CASCADE_DEBUG_SAMPLER</span></u></td></tr>
+<tr><th id="92">92</th><td>  G4cout &lt;&lt; <q>"G4CascadeSampler::sampleFlat() has "</q> &lt;&lt; nbins &lt;&lt; <q>"bins:"</q> &lt;&lt; G4endl;</td></tr>
+<tr><th id="93">93</th><td>  <b>for</b> (G4int sbi=<var>0</var>; sbi&lt;nbins; sbi++) G4cout &lt;&lt; <q>" "</q> &lt;&lt; sigmaBuf[sbi];</td></tr>
+<tr><th id="94">94</th><td>  G4cout &lt;&lt; G4endl;</td></tr>
+<tr><th id="95">95</th><td><u>#<span data-ppcond="91">endif</span></u></td></tr>
+<tr><th id="96">96</th><td></td></tr>
+<tr><th id="97">97</th><td>  <a class="typedef" href="../../../../../../global/management/include/G4Types.hh.html#G4int" title='G4int' data-type='int' data-ref="G4int">G4int</a> <dfn class="local col4 decl" id="54i" title='i' data-type='G4int' data-ref="54i">i</dfn>;</td></tr>
+<tr><th id="98">98</th><td>  <a class="typedef" href="../../../../../../global/management/include/G4Types.hh.html#G4double" title='G4double' data-type='double' data-ref="G4double">G4double</a> <dfn class="local col5 decl" id="55fsum" title='fsum' data-type='G4double' data-ref="55fsum">fsum</dfn> = <var>0.</var>;</td></tr>
+<tr><th id="99">99</th><td>  <b>for</b> (i = <var>0</var>; i &lt; nbins; i++) fsum += <span class='error' title="use of undeclared identifier &apos;sigmaBuf&apos;">sigmaBuf</span>[i];</td></tr>
+<tr><th id="100">100</th><td><u>#<span data-ppcond="100">ifdef</span> <span class="macro" data-ref="_M/G4CASCADE_DEBUG_SAMPLER">G4CASCADE_DEBUG_SAMPLER</span></u></td></tr>
+<tr><th id="101">101</th><td>  G4cout &lt;&lt; <q>" buffer total (fsum) "</q> &lt;&lt; fsum;</td></tr>
+<tr><th id="102">102</th><td><u>#<span data-ppcond="100">endif</span></u></td></tr>
+<tr><th id="103">103</th><td>  <a class="local col5 ref" href="#55fsum" title='fsum' data-ref="55fsum">fsum</a> *= <a class="macro" href="../../../../../../global/HEPRandom/include/Randomize.hh.html#52" title="CLHEP::HepRandom::getTheEngine()-&gt;flat()" data-ref="_M/G4UniformRand">G4UniformRand</a>();</td></tr>
+<tr><th id="104">104</th><td><u>#<span data-ppcond="104">ifdef</span> <span class="macro" data-ref="_M/G4CASCADE_DEBUG_SAMPLER">G4CASCADE_DEBUG_SAMPLER</span></u></td></tr>
+<tr><th id="105">105</th><td>  G4cout &lt;&lt; <q>" *random-scale "</q> &lt;&lt; fsum &lt;&lt; G4endl;</td></tr>
+<tr><th id="106">106</th><td><u>#<span data-ppcond="104">endif</span></u></td></tr>
+<tr><th id="107">107</th><td></td></tr>
+<tr><th id="108">108</th><td>  <a class="typedef" href="../../../../../../global/management/include/G4Types.hh.html#G4double" title='G4double' data-type='double' data-ref="G4double">G4double</a> <dfn class="local col6 decl" id="56partialSum" title='partialSum' data-type='G4double' data-ref="56partialSum">partialSum</dfn> = <var>0.0</var>;</td></tr>
+<tr><th id="109">109</th><td>  <b>for</b> (<a class="local col4 ref" href="#54i" title='i' data-ref="54i">i</a> = <var>0</var>; <a class="local col4 ref" href="#54i" title='i' data-ref="54i">i</a> &lt; <a class="local col3 ref" href="#53nbins" title='nbins' data-ref="53nbins">nbins</a>; <a class="local col4 ref" href="#54i" title='i' data-ref="54i">i</a>++) {</td></tr>
+<tr><th id="110">110</th><td>    partialSum += <span class='error' title="use of undeclared identifier &apos;sigmaBuf&apos;">sigmaBuf</span>[i];</td></tr>
+<tr><th id="111">111</th><td>    <b>if</b> (<a class="local col5 ref" href="#55fsum" title='fsum' data-ref="55fsum">fsum</a> &lt; <a class="local col6 ref" href="#56partialSum" title='partialSum' data-ref="56partialSum">partialSum</a>) <b>return</b> <a class="local col4 ref" href="#54i" title='i' data-ref="54i">i</a>;	<i>// Breaks out of loop automatically</i></td></tr>
+<tr><th id="112">112</th><td>  }</td></tr>
+<tr><th id="113">113</th><td></td></tr>
+<tr><th id="114">114</th><td>  <b>return</b> <var>0</var>;	<i>// Is this right?  Shouldn't it return maximum, not minimum?</i></td></tr>
+<tr><th id="115">115</th><td>}</td></tr>
+<tr><th id="116">116</th><td></td></tr>
+<tr><th id="117">117</th><td></td></tr>
+<tr><th id="118">118</th><td><b>template</b> &lt;<em>int</em> NBINS, <em>int</em> NMULT&gt; <b>inline</b></td></tr>
+<tr><th id="119">119</th><td><em>void</em> G4CascadeSampler&lt;NBINS,NMULT&gt;::print(<span class='error' title="use of undeclared identifier &apos;std&apos;">std</span>::ostream&amp; os) <em>const</em> {</td></tr>
+<tr><th id="120">120</th><td>  interpolator.printBins(os);</td></tr>
+<tr><th id="121">121</th><td>}</td></tr>
+<tr><th id="122">122</th><td></td></tr>
+<tr><th id="123">123</th><td><u>#<span data-ppcond="26">endif</span>	/* G4CASCADE_SAMPLER_ICC */</u></td></tr>
+<tr><th id="124">124</th><td></td></tr>
+</table><hr/><p id='footer'>
+Generated while processing <a href='../src/G4CascadeChannelTables.cc.html'>codebrowser/source/processes/hadronic/models/cascade/cascade/src/G4CascadeChannelTables.cc</a><br/>Generated on <em>2019-Aug-28</em> from project codebrowser<br />Powered by <a href='https://woboq.com'><img alt='Woboq' src='https://code.woboq.org/woboq-16.png' width='41' height='16' /></a> <a href='https://code.woboq.org'>Code Browser</a> 2.1
+<br/>Generator usage only permitted with license.</p>
+</div></body></html>

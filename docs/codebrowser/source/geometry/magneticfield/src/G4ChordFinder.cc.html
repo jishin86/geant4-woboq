@@ -1,0 +1,501 @@
+<!doctype html>
+<html>
+<head>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"><title>G4ChordFinder.cc source code [codebrowser/source/geometry/magneticfield/src/G4ChordFinder.cc] - Woboq Code Browser</title>
+<link rel="stylesheet" href="../../../../../../data/qtcreator.css" title="QtCreator"/>
+<link rel="alternate stylesheet" href="../../../../../../data/kdevelop.css" title="KDevelop"/>
+<script type="text/javascript" src="../../../../../../data/jquery/jquery.min.js"></script>
+<script type="text/javascript" src="../../../../../../data/jquery/jquery-ui.min.js"></script>
+<script>var file = 'codebrowser/source/geometry/magneticfield/src/G4ChordFinder.cc'; var root_path = '../../../../..'; var data_path = '../../../../../../data';</script>
+<script src='../../../../../../data/codebrowser.js'></script>
+</head>
+<body><div id='header'><h1 id='breadcrumb'><span>Browse the source code of </span><a href='../../../..'>codebrowser</a>/<a href='../../..'>source</a>/<a href='../..'>geometry</a>/<a href='..'>magneticfield</a>/<a href='./'>src</a>/<a href='G4ChordFinder.cc.html'>G4ChordFinder.cc</a></h1></div>
+<hr/><div id='content'><table class="code">
+<tr><th id="1">1</th><td><i>//</i></td></tr>
+<tr><th id="2">2</th><td><i>// ********************************************************************</i></td></tr>
+<tr><th id="3">3</th><td><i>// * License and Disclaimer                                           *</i></td></tr>
+<tr><th id="4">4</th><td><i>// *                                                                  *</i></td></tr>
+<tr><th id="5">5</th><td><i>// * The  Geant4 software  is  copyright of the Copyright Holders  of *</i></td></tr>
+<tr><th id="6">6</th><td><i>// * the Geant4 Collaboration.  It is provided  under  the terms  and *</i></td></tr>
+<tr><th id="7">7</th><td><i>// * conditions of the Geant4 Software License,  included in the file *</i></td></tr>
+<tr><th id="8">8</th><td><i>// * LICENSE and available at  <a href="http://cern.ch/geant4/license">http://cern.ch/geant4/license</a> .  These *</i></td></tr>
+<tr><th id="9">9</th><td><i>// * include a list of copyright holders.                             *</i></td></tr>
+<tr><th id="10">10</th><td><i>// *                                                                  *</i></td></tr>
+<tr><th id="11">11</th><td><i>// * Neither the authors of this software system, nor their employing *</i></td></tr>
+<tr><th id="12">12</th><td><i>// * institutes,nor the agencies providing financial support for this *</i></td></tr>
+<tr><th id="13">13</th><td><i>// * work  make  any representation or  warranty, express or implied, *</i></td></tr>
+<tr><th id="14">14</th><td><i>// * regarding  this  software system or assume any liability for its *</i></td></tr>
+<tr><th id="15">15</th><td><i>// * use.  Please see the license in the file  LICENSE  and URL above *</i></td></tr>
+<tr><th id="16">16</th><td><i>// * for the full disclaimer and the limitation of liability.         *</i></td></tr>
+<tr><th id="17">17</th><td><i>// *                                                                  *</i></td></tr>
+<tr><th id="18">18</th><td><i>// * This  code  implementation is the result of  the  scientific and *</i></td></tr>
+<tr><th id="19">19</th><td><i>// * technical work of the GEANT4 collaboration.                      *</i></td></tr>
+<tr><th id="20">20</th><td><i>// * By using,  copying,  modifying or  distributing the software (or *</i></td></tr>
+<tr><th id="21">21</th><td><i>// * any work based  on the software)  you  agree  to acknowledge its *</i></td></tr>
+<tr><th id="22">22</th><td><i>// * use  in  resulting  scientific  publications,  and indicate your *</i></td></tr>
+<tr><th id="23">23</th><td><i>// * acceptance of all terms of the Geant4 Software license.          *</i></td></tr>
+<tr><th id="24">24</th><td><i>// ********************************************************************</i></td></tr>
+<tr><th id="25">25</th><td><i>//</i></td></tr>
+<tr><th id="26">26</th><td><i>//</i></td></tr>
+<tr><th id="27">27</th><td><i>//</i></td></tr>
+<tr><th id="28">28</th><td><i>//</i></td></tr>
+<tr><th id="29">29</th><td><i>// 25.02.97 - John Apostolakis - Design and implementation </i></td></tr>
+<tr><th id="30">30</th><td><i>// -------------------------------------------------------------------</i></td></tr>
+<tr><th id="31">31</th><td></td></tr>
+<tr><th id="32">32</th><td><u>#include <span class='error' title="&apos;iomanip&apos; file not found">&lt;</span>iomanip&gt;</u></td></tr>
+<tr><th id="33">33</th><td></td></tr>
+<tr><th id="34">34</th><td><u>#include <a href="../include/G4ChordFinder.hh.html">"G4ChordFinder.hh"</a></u></td></tr>
+<tr><th id="35">35</th><td><u>#include <a href="../../../global/management/include/G4SystemOfUnits.hh.html">"G4SystemOfUnits.hh"</a></u></td></tr>
+<tr><th id="36">36</th><td><u>#include <a href="../include/G4MagneticField.hh.html">"G4MagneticField.hh"</a></u></td></tr>
+<tr><th id="37">37</th><td><u>#include <a href="../include/G4Mag_UsualEqRhs.hh.html">"G4Mag_UsualEqRhs.hh"</a></u></td></tr>
+<tr><th id="38">38</th><td><u>#include <a href="../include/G4MagIntegratorDriver.hh.html">"G4MagIntegratorDriver.hh"</a></u></td></tr>
+<tr><th id="39">39</th><td><i>// #include "G4ClassicalRK4.hh"</i></td></tr>
+<tr><th id="40">40</th><td><i>// #include "G4CashKarpRKF45.hh"</i></td></tr>
+<tr><th id="41">41</th><td><i>// #include "G4BogackiShampine23.hh"</i></td></tr>
+<tr><th id="42">42</th><td><i>// #include "G4BogackiShampine45.hh"</i></td></tr>
+<tr><th id="43">43</th><td><u>#include <a href="../include/G4DormandPrince745.hh.html">"G4DormandPrince745.hh"</a></u></td></tr>
+<tr><th id="44">44</th><td></td></tr>
+<tr><th id="45">45</th><td><i>// New FSAL type driver / steppers -----</i></td></tr>
+<tr><th id="46">46</th><td><u>#include <a href="../include/G4FSALIntegrationDriver.hh.html">"G4FSALIntegrationDriver.hh"</a></u></td></tr>
+<tr><th id="47">47</th><td><u>#include <a href="../include/G4VFSALIntegrationStepper.hh.html">"G4VFSALIntegrationStepper.hh"</a></u></td></tr>
+<tr><th id="48">48</th><td><u>#include <a href="../include/G4RK547FEq1.hh.html">"G4RK547FEq1.hh"</a></u></td></tr>
+<tr><th id="49">49</th><td><i>// #include "G4RK547FEq2.hh"</i></td></tr>
+<tr><th id="50">50</th><td><i>// #include "G4RK547FEq3.hh"</i></td></tr>
+<tr><th id="51">51</th><td><u>#include <a href="../include/G4NystromRK4.hh.html">"G4NystromRK4.hh"</a></u></td></tr>
+<tr><th id="52">52</th><td></td></tr>
+<tr><th id="53">53</th><td><i>// New FSAL type driver / steppers -----</i></td></tr>
+<tr><th id="54">54</th><td><u>#include <a href="../include/G4IntegrationDriver.hh.html">"G4IntegrationDriver.hh"</a></u></td></tr>
+<tr><th id="55">55</th><td><i>// #include "G4FSALBogackiShampine45.hh"</i></td></tr>
+<tr><th id="56">56</th><td><i>// #include "G4FSALDormandPrince745.hh"</i></td></tr>
+<tr><th id="57">57</th><td></td></tr>
+<tr><th id="58">58</th><td><u>#include <span class='error' title="&apos;cassert&apos; file not found">&lt;</span>cassert&gt;</u></td></tr>
+<tr><th id="59">59</th><td></td></tr>
+<tr><th id="60">60</th><td></td></tr>
+<tr><th id="61">61</th><td><i>// ..........................................................................</i></td></tr>
+<tr><th id="62">62</th><td></td></tr>
+<tr><th id="63">63</th><td><a class="type" href="../include/G4ChordFinder.hh.html#G4ChordFinder" title='G4ChordFinder' data-ref="G4ChordFinder">G4ChordFinder</a>::<dfn class="decl def" id="_ZN13G4ChordFinderC1EP20G4VIntegrationDriver" title='G4ChordFinder::G4ChordFinder' data-ref="_ZN13G4ChordFinderC1EP20G4VIntegrationDriver">G4ChordFinder</dfn>(<a class="type" href="../include/G4VIntegrationDriver.hh.html#G4VIntegrationDriver" title='G4VIntegrationDriver' data-ref="G4VIntegrationDriver">G4VIntegrationDriver</a>* <dfn class="local col4 decl" id="304pIntegrationDriver" title='pIntegrationDriver' data-type='G4VIntegrationDriver *' data-ref="304pIntegrationDriver">pIntegrationDriver</dfn>)</td></tr>
+<tr><th id="64">64</th><td>  : <a class="member" href="../include/G4ChordFinder.hh.html#G4ChordFinder::fDefaultDeltaChord" title='G4ChordFinder::fDefaultDeltaChord' data-ref="G4ChordFinder::fDefaultDeltaChord">fDefaultDeltaChord</a>( <var>0.25</var> * <a class="ref" href="../../../externals/clhep/include/CLHEP/Units/SystemOfUnits.h.html#CLHEP::mm" title='CLHEP::mm' data-ref="CLHEP::mm">mm</a> ),      <i>// Parameters</i></td></tr>
+<tr><th id="65">65</th><td>    <a class="member" href="../include/G4ChordFinder.hh.html#G4ChordFinder::fDeltaChord" title='G4ChordFinder::fDeltaChord' data-ref="G4ChordFinder::fDeltaChord">fDeltaChord</a>( <a class="member" href="../include/G4ChordFinder.hh.html#G4ChordFinder::fDefaultDeltaChord" title='G4ChordFinder::fDefaultDeltaChord' data-ref="G4ChordFinder::fDefaultDeltaChord">fDefaultDeltaChord</a> ),    <i>//   Internal parameters</i></td></tr>
+<tr><th id="66">66</th><td>    <a class="member" href="../include/G4ChordFinder.hh.html#G4ChordFinder::fStatsVerbose" title='G4ChordFinder::fStatsVerbose' data-ref="G4ChordFinder::fStatsVerbose">fStatsVerbose</a>(<var>0</var>),</td></tr>
+<tr><th id="67">67</th><td>    <a class="member" href="../include/G4ChordFinder.hh.html#G4ChordFinder::fRegularStepperOwned" title='G4ChordFinder::fRegularStepperOwned' data-ref="G4ChordFinder::fRegularStepperOwned">fRegularStepperOwned</a>(<b>nullptr</b>),                    <i>// Dependent objects </i></td></tr>
+<tr><th id="68">68</th><td>    <a class="member" href="../include/G4ChordFinder.hh.html#G4ChordFinder::fEquation" title='G4ChordFinder::fEquation' data-ref="G4ChordFinder::fEquation">fEquation</a>(<var>0</var>)    </td></tr>
+<tr><th id="69">69</th><td>{</td></tr>
+<tr><th id="70">70</th><td>  <i>// Simple constructor -- it does not create equation</i></td></tr>
+<tr><th id="71">71</th><td>  <a class="member" href="../include/G4ChordFinder.hh.html#G4ChordFinder::fIntgrDriver" title='G4ChordFinder::fIntgrDriver' data-ref="G4ChordFinder::fIntgrDriver">fIntgrDriver</a>= <a class="local col4 ref" href="#304pIntegrationDriver" title='pIntegrationDriver' data-ref="304pIntegrationDriver">pIntegrationDriver</a>; </td></tr>
+<tr><th id="72">72</th><td>}</td></tr>
+<tr><th id="73">73</th><td></td></tr>
+<tr><th id="74">74</th><td></td></tr>
+<tr><th id="75">75</th><td><i>// ..........................................................................</i></td></tr>
+<tr><th id="76">76</th><td></td></tr>
+<tr><th id="77">77</th><td><a class="type" href="../include/G4ChordFinder.hh.html#G4ChordFinder" title='G4ChordFinder' data-ref="G4ChordFinder">G4ChordFinder</a>::<dfn class="decl def" id="_ZN13G4ChordFinderC1EP15G4MagneticFielddP22G4MagIntegratorStepperb" title='G4ChordFinder::G4ChordFinder' data-ref="_ZN13G4ChordFinderC1EP15G4MagneticFielddP22G4MagIntegratorStepperb">G4ChordFinder</dfn>( <a class="type" href="../include/G4MagneticField.hh.html#G4MagneticField" title='G4MagneticField' data-ref="G4MagneticField">G4MagneticField</a>*        <dfn class="local col5 decl" id="305theMagField" title='theMagField' data-type='G4MagneticField *' data-ref="305theMagField">theMagField</dfn>,</td></tr>
+<tr><th id="78">78</th><td>                              <a class="typedef" href="../../../global/management/include/G4Types.hh.html#G4double" title='G4double' data-type='double' data-ref="G4double">G4double</a>                <dfn class="local col6 decl" id="306stepMinimum" title='stepMinimum' data-type='G4double' data-ref="306stepMinimum">stepMinimum</dfn>, </td></tr>
+<tr><th id="79">79</th><td>                              <a class="type" href="../include/G4MagIntegratorStepper.hh.html#G4MagIntegratorStepper" title='G4MagIntegratorStepper' data-ref="G4MagIntegratorStepper">G4MagIntegratorStepper</a>* <dfn class="local col7 decl" id="307pItsStepper" title='pItsStepper' data-type='G4MagIntegratorStepper *' data-ref="307pItsStepper">pItsStepper</dfn>,     <i>// nullptr is default</i></td></tr>
+<tr><th id="80">80</th><td>                              <a class="typedef" href="../../../global/management/include/G4Types.hh.html#G4bool" title='G4bool' data-type='bool' data-ref="G4bool">G4bool</a>                  <dfn class="local col8 decl" id="308useFSALstepper" title='useFSALstepper' data-type='G4bool' data-ref="308useFSALstepper">useFSALstepper</dfn> ) <i>// false by default</i></td></tr>
+<tr><th id="81">81</th><td>  : <a class="member" href="../include/G4ChordFinder.hh.html#G4ChordFinder::fDefaultDeltaChord" title='G4ChordFinder::fDefaultDeltaChord' data-ref="G4ChordFinder::fDefaultDeltaChord">fDefaultDeltaChord</a>( <var>0.25</var> * <a class="ref" href="../../../externals/clhep/include/CLHEP/Units/SystemOfUnits.h.html#CLHEP::mm" title='CLHEP::mm' data-ref="CLHEP::mm">mm</a> ),     <i>// Constants </i></td></tr>
+<tr><th id="82">82</th><td>    <a class="member" href="../include/G4ChordFinder.hh.html#G4ChordFinder::fDeltaChord" title='G4ChordFinder::fDeltaChord' data-ref="G4ChordFinder::fDeltaChord">fDeltaChord</a>( <a class="member" href="../include/G4ChordFinder.hh.html#G4ChordFinder::fDefaultDeltaChord" title='G4ChordFinder::fDefaultDeltaChord' data-ref="G4ChordFinder::fDefaultDeltaChord">fDefaultDeltaChord</a> ),   <i>// Parameters</i></td></tr>
+<tr><th id="83">83</th><td>    <a class="member" href="../include/G4ChordFinder.hh.html#G4ChordFinder::fStatsVerbose" title='G4ChordFinder::fStatsVerbose' data-ref="G4ChordFinder::fStatsVerbose">fStatsVerbose</a>(<var>0</var>),</td></tr>
+<tr><th id="84">84</th><td>    <i>// fRegularStepperOwned(nullptr),                    // Dependent objects     </i></td></tr>
+<tr><th id="85">85</th><td>    <a class="member" href="../include/G4ChordFinder.hh.html#G4ChordFinder::fEquation" title='G4ChordFinder::fEquation' data-ref="G4ChordFinder::fEquation">fEquation</a>(<var>0</var>)</td></tr>
+<tr><th id="86">86</th><td>{</td></tr>
+<tr><th id="87">87</th><td>  <i>//  Construct the Chord Finder</i></td></tr>
+<tr><th id="88">88</th><td><i>  //  by creating in inverse order the  Driver, the Stepper and EqRhs ...</i></td></tr>
+<tr><th id="89">89</th><td></td></tr>
+<tr><th id="90">90</th><td>  <b>using</b> <dfn class="local col9 typedef" id="309NewFsalStepperType" title='NewFsalStepperType' data-type='G4RK547FEq1' data-ref="309NewFsalStepperType">NewFsalStepperType</dfn> = <a class="type" href="../include/G4RK547FEq1.hh.html#G4RK547FEq1" title='G4RK547FEq1' data-ref="G4RK547FEq1">G4RK547FEq1</a>; <i>// or 2 or 3</i></td></tr>
+<tr><th id="91">91</th><td>  <em>const</em> <em>char</em>* <dfn class="local col0 decl" id="310NewFSALStepperName" title='NewFSALStepperName' data-type='const char *' data-ref="310NewFSALStepperName">NewFSALStepperName</dfn> =</td></tr>
+<tr><th id="92">92</th><td>      <q>"G4RK574FEq1&gt; FSAL 4th/5th order 7-stage 'Equilibrium-type' #1."</q>;</td></tr>
+<tr><th id="93">93</th><td>  <b>using</b> <dfn class="local col1 typedef" id="311RegularStepperType" title='RegularStepperType' data-type='G4DormandPrince745' data-ref="311RegularStepperType">RegularStepperType</dfn> =</td></tr>
+<tr><th id="94">94</th><td>         <a class="type" href="../include/G4DormandPrince745.hh.html#G4DormandPrince745" title='G4DormandPrince745' data-ref="G4DormandPrince745">G4DormandPrince745</a>; <i>// DOPRI5 (MatLab) 5th order embedded method. High efficiency.</i></td></tr>
+<tr><th id="95">95</th><td>         <i>// G4ClassicalRK4;        // The old default</i></td></tr>
+<tr><th id="96">96</th><td><i>         // G4CashKarpRKF45;       // First embedded method in G4</i></td></tr>
+<tr><th id="97">97</th><td><i>         // G4BogackiShampine45;   // High efficiency 5th order embedded method</i></td></tr>
+<tr><th id="98">98</th><td><i>         // G4NystromRK4;          // Nystrom stepper 4th order </i></td></tr>
+<tr><th id="99">99</th><td><i>         // G4RK547FEq1;  // or 2 or 3 </i></td></tr>
+<tr><th id="100">100</th><td>  <em>const</em> <em>char</em>* <dfn class="local col2 decl" id="312RegularStepperName" title='RegularStepperName' data-type='const char *' data-ref="312RegularStepperName">RegularStepperName</dfn> = </td></tr>
+<tr><th id="101">101</th><td>      <q>"G4DormandPrince745 (aka DOPRI5): 5th/4th Order 7-stage embedded stepper"</q>;</td></tr>
+<tr><th id="102">102</th><td>      <i>// "BogackiShampine 45 (Embedded 5th/4th Order, 7-stage)";</i></td></tr>
+<tr><th id="103">103</th><td><i>      // "Nystrom stepper 4th order";</i></td></tr>
+<tr><th id="104">104</th><td><i></i></td></tr>
+<tr><th id="105">105</th><td><i>  // Configurable</i></td></tr>
+<tr><th id="106">106</th><td>  <a class="typedef" href="../../../global/management/include/G4Types.hh.html#G4bool" title='G4bool' data-type='bool' data-ref="G4bool">G4bool</a> <dfn class="local col3 decl" id="313forceFSALstepper" title='forceFSALstepper' data-type='G4bool' data-ref="313forceFSALstepper">forceFSALstepper</dfn>= <b>false</b>; <i>//  Choice - true to enable !!</i></td></tr>
+<tr><th id="107">107</th><td>  <a class="typedef" href="../../../global/management/include/G4Types.hh.html#G4bool" title='G4bool' data-type='bool' data-ref="G4bool">G4bool</a> <dfn class="local col4 decl" id="314recallFSALflag" title='recallFSALflag' data-type='G4bool' data-ref="314recallFSALflag">recallFSALflag</dfn>  = <a class="local col8 ref" href="#308useFSALstepper" title='useFSALstepper' data-ref="308useFSALstepper">useFSALstepper</a>;</td></tr>
+<tr><th id="108">108</th><td>  <a class="local col8 ref" href="#308useFSALstepper" title='useFSALstepper' data-ref="308useFSALstepper">useFSALstepper</a>   = <a class="local col3 ref" href="#313forceFSALstepper" title='forceFSALstepper' data-ref="313forceFSALstepper">forceFSALstepper</a> || <a class="local col8 ref" href="#308useFSALstepper" title='useFSALstepper' data-ref="308useFSALstepper">useFSALstepper</a>;</td></tr>
+<tr><th id="109">109</th><td></td></tr>
+<tr><th id="110">110</th><td><u>#<span data-ppcond="110">ifdef</span> <span class="macro" data-ref="_M/G4DEBUG_FIELD">G4DEBUG_FIELD</span></u></td></tr>
+<tr><th id="111">111</th><td>     G4cout &lt;&lt; <q>"G4ChordFinder 2nd Constructor called. "</q> &lt;&lt; G4endl;</td></tr>
+<tr><th id="112">112</th><td>     G4cout &lt;&lt; <q>" Parameters: "</q> &lt;&lt; G4endl;</td></tr>
+<tr><th id="113">113</th><td>     G4cout &lt;&lt; <q>"    useFSAL stepper= "</q> &lt;&lt; useFSALstepper</td></tr>
+<tr><th id="114">114</th><td>            &lt;&lt; <q>" (request = "</q> &lt;&lt; recallFSALflag </td></tr>
+<tr><th id="115">115</th><td>            &lt;&lt; <q>" force FSAL = "</q> &lt;&lt; forceFSALstepper &lt;&lt; <q>" )"</q> &lt;&lt; G4endl;</td></tr>
+<tr><th id="116">116</th><td><u>#<span data-ppcond="110">endif</span></u></td></tr>
+<tr><th id="117">117</th><td></td></tr>
+<tr><th id="118">118</th><td>  <i>// useHigherStepper = forceHigherEffiencyStepper || useHigherStepper;</i></td></tr>
+<tr><th id="119">119</th><td>  </td></tr>
+<tr><th id="120">120</th><td>  <a class="type" href="../include/G4Mag_EqRhs.hh.html#G4Mag_EqRhs" title='G4Mag_EqRhs' data-ref="G4Mag_EqRhs">G4Mag_EqRhs</a> *<dfn class="local col5 decl" id="315pEquation" title='pEquation' data-type='G4Mag_EqRhs *' data-ref="315pEquation">pEquation</dfn> = <b>new</b> <a class="type" href="../include/G4Mag_UsualEqRhs.hh.html#G4Mag_UsualEqRhs" title='G4Mag_UsualEqRhs' data-ref="G4Mag_UsualEqRhs">G4Mag_UsualEqRhs</a><a class="ref" href="../include/G4Mag_UsualEqRhs.hh.html#_ZN16G4Mag_UsualEqRhsC1EP15G4MagneticField" title='G4Mag_UsualEqRhs::G4Mag_UsualEqRhs' data-ref="_ZN16G4Mag_UsualEqRhsC1EP15G4MagneticField">(</a><a class="local col5 ref" href="#305theMagField" title='theMagField' data-ref="305theMagField">theMagField</a>);</td></tr>
+<tr><th id="121">121</th><td>  <a class="member" href="../include/G4ChordFinder.hh.html#G4ChordFinder::fEquation" title='G4ChordFinder::fEquation' data-ref="G4ChordFinder::fEquation">fEquation</a> = <a class="local col5 ref" href="#315pEquation" title='pEquation' data-ref="315pEquation">pEquation</a>;                            </td></tr>
+<tr><th id="122">122</th><td></td></tr>
+<tr><th id="123">123</th><td>  <i>// G4MagIntegratorStepper* regularStepper = nullptr;</i></td></tr>
+<tr><th id="124">124</th><td><i>  // G4VFSALIntegrationStepper*  fsalSepper = nullptr; // for new-type FSAL steppers only</i></td></tr>
+<tr><th id="125">125</th><td><i>  // NewFsalStepperType*        fsalStepper = nullptr;</i></td></tr>
+<tr><th id="126">126</th><td><i>  // G4MagIntegratorStepper* oldFSALStepper = nullptr;</i></td></tr>
+<tr><th id="127">127</th><td></td></tr>
+<tr><th id="128">128</th><td>  <a class="typedef" href="../../../global/management/include/G4Types.hh.html#G4bool" title='G4bool' data-type='bool' data-ref="G4bool">G4bool</a> <dfn class="local col6 decl" id="316errorInStepperCreation" title='errorInStepperCreation' data-type='G4bool' data-ref="316errorInStepperCreation">errorInStepperCreation</dfn> = <b>false</b>;</td></tr>
+<tr><th id="129">129</th><td></td></tr>
+<tr><th id="130">130</th><td>  <span class='error' title="use of undeclared identifier &apos;std&apos;">std</span>::ostringstream <dfn class="local col7 decl" id="317message" title='message' data-type='int' data-ref="317message">message</dfn>;  <i>// In case of failure, load with description !</i></td></tr>
+<tr><th id="131">131</th><td></td></tr>
+<tr><th id="132">132</th><td>  <b>if</b>( <a class="local col7 ref" href="#307pItsStepper" title='pItsStepper' data-ref="307pItsStepper">pItsStepper</a> != <b>nullptr</b> )</td></tr>
+<tr><th id="133">133</th><td>  {</td></tr>
+<tr><th id="134">134</th><td>     <i>// Type is not known - so must use old class</i></td></tr>
+<tr><th id="135">135</th><td>     fIntgrDriver = <b>new</b> G4IntegrationDriver&lt;G4MagIntegratorStepper&gt;(</td></tr>
+<tr><th id="136">136</th><td>        stepMinimum, pItsStepper, pItsStepper-&gt;GetNumberOfVariables());</td></tr>
+<tr><th id="137">137</th><td>  }</td></tr>
+<tr><th id="138">138</th><td>  <b>else</b> <b>if</b> ( !<a class="local col8 ref" href="#308useFSALstepper" title='useFSALstepper' data-ref="308useFSALstepper">useFSALstepper</a> )</td></tr>
+<tr><th id="139">139</th><td>  {</td></tr>
+<tr><th id="140">140</th><td>     <i>// RegularStepperType* regularStepper =nullptr;  // To check the exception</i></td></tr>
+<tr><th id="141">141</th><td>     <em>auto</em> <dfn class="local col8 decl" id="318regularStepper" title='regularStepper' data-type='G4DormandPrince745 *' data-ref="318regularStepper">regularStepper</dfn> = <b>new</b> <a class="local col1 typedef" href="#311RegularStepperType" title='RegularStepperType' data-type='G4DormandPrince745' data-ref="311RegularStepperType">RegularStepperType</a><a class="ref" href="../include/G4DormandPrince745.hh.html#_ZN18G4DormandPrince745C1EP18G4EquationOfMotionib" title='G4DormandPrince745::G4DormandPrince745' data-ref="_ZN18G4DormandPrince745C1EP18G4EquationOfMotionib">(</a><a class="local col5 ref" href="#315pEquation" title='pEquation' data-ref="315pEquation">pEquation</a>);</td></tr>
+<tr><th id="142">142</th><td>     <i>//                   *** ******************</i></td></tr>
+<tr><th id="143">143</th><td><i>     //</i></td></tr>
+<tr><th id="144">144</th><td><i>     // Alternative - for G4NystromRK4:</i></td></tr>
+<tr><th id="145">145</th><td><i>     // = new G4NystromRK4(pEquation, 0.1*millimeter ); // *clhep::millimeter );</i></td></tr>
+<tr><th id="146">146</th><td>     <a class="member" href="../include/G4ChordFinder.hh.html#G4ChordFinder::fRegularStepperOwned" title='G4ChordFinder::fRegularStepperOwned' data-ref="G4ChordFinder::fRegularStepperOwned">fRegularStepperOwned</a> = <a class="local col8 ref" href="#318regularStepper" title='regularStepper' data-ref="318regularStepper">regularStepper</a>;</td></tr>
+<tr><th id="147">147</th><td></td></tr>
+<tr><th id="148">148</th><td>     <b>if</b>( <a class="local col8 ref" href="#318regularStepper" title='regularStepper' data-ref="318regularStepper">regularStepper</a> == <b>nullptr</b> )</td></tr>
+<tr><th id="149">149</th><td>     {</td></tr>
+<tr><th id="150">150</th><td>        message &lt;&lt; <q>"Stepper instantiation FAILED."</q> &lt;&lt; <a class="macro" href="../../../global/management/include/G4ios.hh.html#60" title="std::endl" data-ref="_M/G4endl">G4endl</a>;        </td></tr>
+<tr><th id="151">151</th><td>        message &lt;&lt; <q>"G4ChordFinder: Attempted to instantiate "</q></td></tr>
+<tr><th id="152">152</th><td>                &lt;&lt; RegularStepperName &lt;&lt; <q>" type stepper "</q> &lt;&lt; <a class="macro" href="../../../global/management/include/G4ios.hh.html#60" title="std::endl" data-ref="_M/G4endl">G4endl</a>;</td></tr>
+<tr><th id="153">153</th><td>        G4Exception(<q>"G4ChordFinder::G4ChordFinder()"</q>,</td></tr>
+<tr><th id="154">154</th><td>                    <q>"GeomField1001"</q>, JustWarning, message);</td></tr>
+<tr><th id="155">155</th><td>        <a class="local col6 ref" href="#316errorInStepperCreation" title='errorInStepperCreation' data-ref="316errorInStepperCreation">errorInStepperCreation</a> = <b>true</b>;</td></tr>
+<tr><th id="156">156</th><td>     }</td></tr>
+<tr><th id="157">157</th><td>     <b>else</b></td></tr>
+<tr><th id="158">158</th><td>     {</td></tr>
+<tr><th id="159">159</th><td>        fIntgrDriver <span class='error' title="assigning to &apos;G4VIntegrationDriver *&apos; from incompatible type &apos;G4IntegrationDriver&lt;G4MagIntegratorStepper&gt; *&apos;">=</span> <b>new</b> G4IntegrationDriver&lt;G4MagIntegratorStepper&gt;(</td></tr>
+<tr><th id="160">160</th><td>              stepMinimum, regularStepper, regularStepper-&gt;GetNumberOfVariables());</td></tr>
+<tr><th id="161">161</th><td>        </td></tr>
+<tr><th id="162">162</th><td>        <b>if</b>( <a class="member" href="../include/G4ChordFinder.hh.html#G4ChordFinder::fIntgrDriver" title='G4ChordFinder::fIntgrDriver' data-ref="G4ChordFinder::fIntgrDriver">fIntgrDriver</a>==<b>nullptr</b>)</td></tr>
+<tr><th id="163">163</th><td>        {        </td></tr>
+<tr><th id="164">164</th><td>           message &lt;&lt; <q>"Using G4IntegrationDriver with "</q></td></tr>
+<tr><th id="165">165</th><td>                   &lt;&lt; RegularStepperName &lt;&lt; <q>" type stepper "</q> &lt;&lt; <a class="macro" href="../../../global/management/include/G4ios.hh.html#60" title="std::endl" data-ref="_M/G4endl">G4endl</a>;</td></tr>
+<tr><th id="166">166</th><td>           message &lt;&lt; <q>"Driver instantiation FAILED."</q> &lt;&lt; <a class="macro" href="../../../global/management/include/G4ios.hh.html#60" title="std::endl" data-ref="_M/G4endl">G4endl</a>;</td></tr>
+<tr><th id="167">167</th><td>           G4Exception(<q>"G4ChordFinder::G4ChordFinder()"</q>,</td></tr>
+<tr><th id="168">168</th><td>                       <q>"GeomField1001"</q>, JustWarning, message);</td></tr>
+<tr><th id="169">169</th><td>        }</td></tr>
+<tr><th id="170">170</th><td>     }</td></tr>
+<tr><th id="171">171</th><td>  }</td></tr>
+<tr><th id="172">172</th><td>  <b>else</b></td></tr>
+<tr><th id="173">173</th><td>  {</td></tr>
+<tr><th id="174">174</th><td>     <em>auto</em> <dfn class="local col9 decl" id="319fsalStepper" title='fsalStepper' data-type='G4RK547FEq1 *' data-ref="319fsalStepper">fsalStepper</dfn>=  <b>new</b> <a class="local col9 typedef" href="#309NewFsalStepperType" title='NewFsalStepperType' data-type='G4RK547FEq1' data-ref="309NewFsalStepperType">NewFsalStepperType</a><a class="ref" href="../include/G4RK547FEq1.hh.html#_ZN11G4RK547FEq1C1EP18G4EquationOfMotioni" title='G4RK547FEq1::G4RK547FEq1' data-ref="_ZN11G4RK547FEq1C1EP18G4EquationOfMotioni">(</a><a class="local col5 ref" href="#315pEquation" title='pEquation' data-ref="315pEquation">pEquation</a>);</td></tr>
+<tr><th id="175">175</th><td>     <i>//                     ******************</i></td></tr>
+<tr><th id="176">176</th><td>     <a class="member" href="../include/G4ChordFinder.hh.html#G4ChordFinder::fNewFSALStepperOwned" title='G4ChordFinder::fNewFSALStepperOwned' data-ref="G4ChordFinder::fNewFSALStepperOwned">fNewFSALStepperOwned</a> = <a class="local col9 ref" href="#319fsalStepper" title='fsalStepper' data-ref="319fsalStepper">fsalStepper</a>;</td></tr>
+<tr><th id="177">177</th><td></td></tr>
+<tr><th id="178">178</th><td>     <b>if</b>( <a class="local col9 ref" href="#319fsalStepper" title='fsalStepper' data-ref="319fsalStepper">fsalStepper</a> == <b>nullptr</b> )</td></tr>
+<tr><th id="179">179</th><td>     {</td></tr>
+<tr><th id="180">180</th><td>        message &lt;&lt; <q>"Stepper instantiation FAILED."</q> &lt;&lt; <a class="macro" href="../../../global/management/include/G4ios.hh.html#60" title="std::endl" data-ref="_M/G4endl">G4endl</a>;        </td></tr>
+<tr><th id="181">181</th><td>        message &lt;&lt; <q>"Attempted to instantiate "</q></td></tr>
+<tr><th id="182">182</th><td>                &lt;&lt; NewFSALStepperName &lt;&lt; <q>" type stepper "</q> &lt;&lt; <a class="macro" href="../../../global/management/include/G4ios.hh.html#60" title="std::endl" data-ref="_M/G4endl">G4endl</a>;</td></tr>
+<tr><th id="183">183</th><td>        G4Exception(<q>"G4ChordFinder::G4ChordFinder()"</q>,</td></tr>
+<tr><th id="184">184</th><td>                    <q>"GeomField1001"</q>, JustWarning, message);</td></tr>
+<tr><th id="185">185</th><td>        <a class="local col6 ref" href="#316errorInStepperCreation" title='errorInStepperCreation' data-ref="316errorInStepperCreation">errorInStepperCreation</a> = <b>true</b>;</td></tr>
+<tr><th id="186">186</th><td>     }</td></tr>
+<tr><th id="187">187</th><td>     <b>else</b></td></tr>
+<tr><th id="188">188</th><td>     {</td></tr>
+<tr><th id="189">189</th><td>        fIntgrDriver = <b>new</b></td></tr>
+<tr><th id="190">190</th><td>           G4FSALIntegrationDriver&lt;NewFsalStepperType&gt;(stepMinimum,</td></tr>
+<tr><th id="191">191</th><td>                                                       fsalStepper,</td></tr>
+<tr><th id="192">192</th><td>                                                       fsalStepper-&gt;GetNumberOfVariables() );</td></tr>
+<tr><th id="193">193</th><td>           <i>//  ====  Create the driver which knows the class type</i></td></tr>
+<tr><th id="194">194</th><td>        </td></tr>
+<tr><th id="195">195</th><td>        <b>if</b>( <a class="member" href="../include/G4ChordFinder.hh.html#G4ChordFinder::fIntgrDriver" title='G4ChordFinder::fIntgrDriver' data-ref="G4ChordFinder::fIntgrDriver">fIntgrDriver</a>==<b>nullptr</b> )</td></tr>
+<tr><th id="196">196</th><td>        {</td></tr>
+<tr><th id="197">197</th><td>           message &lt;&lt; <q>"Using G4FSALIntegrationDriver with stepper type: "</q></td></tr>
+<tr><th id="198">198</th><td>                   &lt;&lt; NewFSALStepperName &lt;&lt; <a class="macro" href="../../../global/management/include/G4ios.hh.html#60" title="std::endl" data-ref="_M/G4endl">G4endl</a>;</td></tr>
+<tr><th id="199">199</th><td>           message &lt;&lt; <q>"Integration Driver instantiation FAILED."</q> &lt;&lt; <a class="macro" href="../../../global/management/include/G4ios.hh.html#60" title="std::endl" data-ref="_M/G4endl">G4endl</a>;</td></tr>
+<tr><th id="200">200</th><td>           G4Exception(<q>"G4ChordFinder::G4ChordFinder()"</q>,</td></tr>
+<tr><th id="201">201</th><td>                       <q>"GeomField1001"</q>, JustWarning, message);</td></tr>
+<tr><th id="202">202</th><td>        }</td></tr>
+<tr><th id="203">203</th><td>     }</td></tr>
+<tr><th id="204">204</th><td>  }</td></tr>
+<tr><th id="205">205</th><td></td></tr>
+<tr><th id="206">206</th><td>  <i>// -- Main work is now done</i></td></tr>
+<tr><th id="207">207</th><td><i>  </i></td></tr>
+<tr><th id="208">208</th><td><i>  //    Now check that no error occured, and report it if one did.</i></td></tr>
+<tr><th id="209">209</th><td><i>  </i></td></tr>
+<tr><th id="210">210</th><td><i>  // To test failure to create driver</i></td></tr>
+<tr><th id="211">211</th><td><i>  // delete fIntgrDriver;</i></td></tr>
+<tr><th id="212">212</th><td><i>  // fIntgrDriver= nullptr;</i></td></tr>
+<tr><th id="213">213</th><td><i></i></td></tr>
+<tr><th id="214">214</th><td><i>  // Detect and report Error conditions</i></td></tr>
+<tr><th id="215">215</th><td>  <b>if</b>( <a class="local col6 ref" href="#316errorInStepperCreation" title='errorInStepperCreation' data-ref="316errorInStepperCreation">errorInStepperCreation</a> || (<a class="member" href="../include/G4ChordFinder.hh.html#G4ChordFinder::fIntgrDriver" title='G4ChordFinder::fIntgrDriver' data-ref="G4ChordFinder::fIntgrDriver">fIntgrDriver</a> == <b>nullptr</b> ))</td></tr>
+<tr><th id="216">216</th><td>  {</td></tr>
+<tr><th id="217">217</th><td>     <span class='error' title="use of undeclared identifier &apos;std&apos;">std</span>::ostringstream <dfn class="local col0 decl" id="320errmsg" title='errmsg' data-type='int' data-ref="320errmsg">errmsg</dfn>;</td></tr>
+<tr><th id="218">218</th><td>     </td></tr>
+<tr><th id="219">219</th><td>     <b>if</b>( <a class="local col6 ref" href="#316errorInStepperCreation" title='errorInStepperCreation' data-ref="316errorInStepperCreation">errorInStepperCreation</a> )</td></tr>
+<tr><th id="220">220</th><td>     {</td></tr>
+<tr><th id="221">221</th><td>        errmsg  &lt;&lt; <q>"ERROR&gt; Failure to create Stepper object."</q> &lt;&lt; <a class="macro" href="../../../global/management/include/G4ios.hh.html#60" title="std::endl" data-ref="_M/G4endl">G4endl</a></td></tr>
+<tr><th id="222">222</th><td>                &lt;&lt; <q>"       --------------------------------"</q> &lt;&lt; <a class="macro" href="../../../global/management/include/G4ios.hh.html#60" title="std::endl" data-ref="_M/G4endl">G4endl</a>;</td></tr>
+<tr><th id="223">223</th><td>     }</td></tr>
+<tr><th id="224">224</th><td>     <b>if</b> (<a class="member" href="../include/G4ChordFinder.hh.html#G4ChordFinder::fIntgrDriver" title='G4ChordFinder::fIntgrDriver' data-ref="G4ChordFinder::fIntgrDriver">fIntgrDriver</a> == <b>nullptr</b> )</td></tr>
+<tr><th id="225">225</th><td>     {</td></tr>
+<tr><th id="226">226</th><td>        errmsg  &lt;&lt; <q>"ERROR&gt; Failure to create Integration-Driver object."</q> &lt;&lt; <a class="macro" href="../../../global/management/include/G4ios.hh.html#60" title="std::endl" data-ref="_M/G4endl">G4endl</a></td></tr>
+<tr><th id="227">227</th><td>                &lt;&lt; <q>"       -------------------------------------------"</q> &lt;&lt; <a class="macro" href="../../../global/management/include/G4ios.hh.html#60" title="std::endl" data-ref="_M/G4endl">G4endl</a>;</td></tr>
+<tr><th id="228">228</th><td>     }</td></tr>
+<tr><th id="229">229</th><td>     <em>const</em> <span class='error' title="use of undeclared identifier &apos;std&apos;">std</span>::string <dfn class="local col1 decl" id="321BoolName" title='BoolName' data-type='const int [2]' data-ref="321BoolName">BoolName</dfn>[<var>2</var>]= { <q>"False"</q>, <q>"True"</q> }; </td></tr>
+<tr><th id="230">230</th><td>     errmsg &lt;&lt; <q>"  Configuration:  (constructor arguments) "</q> &lt;&lt; <a class="macro" href="../../../global/management/include/G4ios.hh.html#60" title="std::endl" data-ref="_M/G4endl">G4endl</a>        </td></tr>
+<tr><th id="231">231</th><td>            &lt;&lt; <q>"    provided Stepper = "</q> &lt;&lt; pItsStepper &lt;&lt; <a class="macro" href="../../../global/management/include/G4ios.hh.html#60" title="std::endl" data-ref="_M/G4endl">G4endl</a></td></tr>
+<tr><th id="232">232</th><td>            &lt;&lt; <q>"    use FSAL stepper = "</q> &lt;&lt; BoolName[useFSALstepper]</td></tr>
+<tr><th id="233">233</th><td>            &lt;&lt; <q>" (request = "</q> &lt;&lt; BoolName[recallFSALflag]</td></tr>
+<tr><th id="234">234</th><td>            &lt;&lt; <q>" force FSAL = "</q> &lt;&lt; BoolName[forceFSALstepper] &lt;&lt; <q>" )"</q> &lt;&lt; <a class="macro" href="../../../global/management/include/G4ios.hh.html#60" title="std::endl" data-ref="_M/G4endl">G4endl</a>;</td></tr>
+<tr><th id="235">235</th><td>     errmsg &lt;&lt; message.str(); </td></tr>
+<tr><th id="236">236</th><td>     errmsg &lt;&lt; <q>"Aborting."</q>;</td></tr>
+<tr><th id="237">237</th><td>     G4Exception(<q>"G4ChordFinder::G4ChordFinder() - constructor 2"</q>,</td></tr>
+<tr><th id="238">238</th><td>                 <q>"GeomField0003"</q>, FatalException, errmsg);     </td></tr>
+<tr><th id="239">239</th><td>  }</td></tr>
+<tr><th id="240">240</th><td></td></tr>
+<tr><th id="241">241</th><td>  <span class='error' title="use of undeclared identifier &apos;assert&apos;">assert</span>(    ( pItsStepper    != <b>nullptr</b> ) </td></tr>
+<tr><th id="242">242</th><td>          || ( fRegularStepperOwned != <b>nullptr</b> )</td></tr>
+<tr><th id="243">243</th><td>          || ( fNewFSALStepperOwned  != <b>nullptr</b> )</td></tr>
+<tr><th id="244">244</th><td>     );</td></tr>
+<tr><th id="245">245</th><td>  <span class='error' title="use of undeclared identifier &apos;assert&apos;">assert</span>( fIntgrDriver != <b>nullptr</b> );</td></tr>
+<tr><th id="246">246</th><td>}</td></tr>
+<tr><th id="247">247</th><td></td></tr>
+<tr><th id="248">248</th><td></td></tr>
+<tr><th id="249">249</th><td><i>// ......................................................................</i></td></tr>
+<tr><th id="250">250</th><td></td></tr>
+<tr><th id="251">251</th><td><a class="type" href="../include/G4ChordFinder.hh.html#G4ChordFinder" title='G4ChordFinder' data-ref="G4ChordFinder">G4ChordFinder</a>::<dfn class="virtual decl def" id="_ZN13G4ChordFinderD1Ev" title='G4ChordFinder::~G4ChordFinder' data-ref="_ZN13G4ChordFinderD1Ev">~G4ChordFinder</dfn>()</td></tr>
+<tr><th id="252">252</th><td>{</td></tr>
+<tr><th id="253">253</th><td>  <b>delete</b>   <a class="member" href="../include/G4ChordFinder.hh.html#G4ChordFinder::fEquation" title='G4ChordFinder::fEquation' data-ref="G4ChordFinder::fEquation">fEquation</a>;</td></tr>
+<tr><th id="254">254</th><td>  <b>delete</b>   <a class="member" href="../include/G4ChordFinder.hh.html#G4ChordFinder::fRegularStepperOwned" title='G4ChordFinder::fRegularStepperOwned' data-ref="G4ChordFinder::fRegularStepperOwned">fRegularStepperOwned</a>;</td></tr>
+<tr><th id="255">255</th><td>  <b>delete</b>   <a class="member" href="../include/G4ChordFinder.hh.html#G4ChordFinder::fNewFSALStepperOwned" title='G4ChordFinder::fNewFSALStepperOwned' data-ref="G4ChordFinder::fNewFSALStepperOwned">fNewFSALStepperOwned</a>;</td></tr>
+<tr><th id="256">256</th><td>  <b>delete</b>   <a class="member" href="../include/G4ChordFinder.hh.html#G4ChordFinder::fCachedField" title='G4ChordFinder::fCachedField' data-ref="G4ChordFinder::fCachedField">fCachedField</a>;</td></tr>
+<tr><th id="257">257</th><td>  <b>delete</b>   <a class="member" href="../include/G4ChordFinder.hh.html#G4ChordFinder::fIntgrDriver" title='G4ChordFinder::fIntgrDriver' data-ref="G4ChordFinder::fIntgrDriver">fIntgrDriver</a>;</td></tr>
+<tr><th id="258">258</th><td>}</td></tr>
+<tr><th id="259">259</th><td></td></tr>
+<tr><th id="260">260</th><td><i>// ...........................................................................</i></td></tr>
+<tr><th id="261">261</th><td></td></tr>
+<tr><th id="262">262</th><td><a class="type" href="../include/G4FieldTrack.hh.html#G4FieldTrack" title='G4FieldTrack' data-ref="G4FieldTrack">G4FieldTrack</a></td></tr>
+<tr><th id="263">263</th><td><a class="type" href="../include/G4ChordFinder.hh.html#G4ChordFinder" title='G4ChordFinder' data-ref="G4ChordFinder">G4ChordFinder</a>::<dfn class="decl def" id="_ZN13G4ChordFinder17ApproxCurvePointSERK12G4FieldTrackS2_S2_RKN5CLHEP10Hep3VectorES6_S6_bd" title='G4ChordFinder::ApproxCurvePointS' data-ref="_ZN13G4ChordFinder17ApproxCurvePointSERK12G4FieldTrackS2_S2_RKN5CLHEP10Hep3VectorES6_S6_bd">ApproxCurvePointS</dfn>( <em>const</em> <a class="type" href="../include/G4FieldTrack.hh.html#G4FieldTrack" title='G4FieldTrack' data-ref="G4FieldTrack">G4FieldTrack</a>&amp;  <dfn class="local col2 decl" id="322CurveA_PointVelocity" title='CurveA_PointVelocity' data-type='const G4FieldTrack &amp;' data-ref="322CurveA_PointVelocity">CurveA_PointVelocity</dfn>, </td></tr>
+<tr><th id="264">264</th><td>                                  <em>const</em> <a class="type" href="../include/G4FieldTrack.hh.html#G4FieldTrack" title='G4FieldTrack' data-ref="G4FieldTrack">G4FieldTrack</a>&amp;  <dfn class="local col3 decl" id="323CurveB_PointVelocity" title='CurveB_PointVelocity' data-type='const G4FieldTrack &amp;' data-ref="323CurveB_PointVelocity">CurveB_PointVelocity</dfn>, </td></tr>
+<tr><th id="265">265</th><td>                                  <em>const</em> <a class="type" href="../include/G4FieldTrack.hh.html#G4FieldTrack" title='G4FieldTrack' data-ref="G4FieldTrack">G4FieldTrack</a>&amp;  <dfn class="local col4 decl" id="324ApproxCurveV" title='ApproxCurveV' data-type='const G4FieldTrack &amp;' data-ref="324ApproxCurveV">ApproxCurveV</dfn>,</td></tr>
+<tr><th id="266">266</th><td>                                  <em>const</em> <a class="typedef" href="../../../global/management/include/G4ThreeVector.hh.html#G4ThreeVector" title='G4ThreeVector' data-type='CLHEP::Hep3Vector' data-ref="G4ThreeVector">G4ThreeVector</a>&amp; <dfn class="local col5 decl" id="325CurrentE_Point" title='CurrentE_Point' data-type='const G4ThreeVector &amp;' data-ref="325CurrentE_Point">CurrentE_Point</dfn>,</td></tr>
+<tr><th id="267">267</th><td>                                  <em>const</em> <a class="typedef" href="../../../global/management/include/G4ThreeVector.hh.html#G4ThreeVector" title='G4ThreeVector' data-type='CLHEP::Hep3Vector' data-ref="G4ThreeVector">G4ThreeVector</a>&amp; <dfn class="local col6 decl" id="326CurrentF_Point" title='CurrentF_Point' data-type='const G4ThreeVector &amp;' data-ref="326CurrentF_Point">CurrentF_Point</dfn>,</td></tr>
+<tr><th id="268">268</th><td>                                  <em>const</em> <a class="typedef" href="../../../global/management/include/G4ThreeVector.hh.html#G4ThreeVector" title='G4ThreeVector' data-type='CLHEP::Hep3Vector' data-ref="G4ThreeVector">G4ThreeVector</a>&amp; <dfn class="local col7 decl" id="327PointG" title='PointG' data-type='const G4ThreeVector &amp;' data-ref="327PointG">PointG</dfn>,</td></tr>
+<tr><th id="269">269</th><td>                                       <a class="typedef" href="../../../global/management/include/G4Types.hh.html#G4bool" title='G4bool' data-type='bool' data-ref="G4bool">G4bool</a> <dfn class="local col8 decl" id="328first" title='first' data-type='G4bool' data-ref="328first">first</dfn>, <a class="typedef" href="../../../global/management/include/G4Types.hh.html#G4double" title='G4double' data-type='double' data-ref="G4double">G4double</a> <dfn class="local col9 decl" id="329eps_step" title='eps_step' data-type='G4double' data-ref="329eps_step">eps_step</dfn>)</td></tr>
+<tr><th id="270">270</th><td>{</td></tr>
+<tr><th id="271">271</th><td>  <i>// ApproxCurvePointS is 2nd implementation of ApproxCurvePoint.</i></td></tr>
+<tr><th id="272">272</th><td><i>  // Use Brent Algorithm (or InvParabolic) when possible.</i></td></tr>
+<tr><th id="273">273</th><td><i>  // Given a starting curve point A (CurveA_PointVelocity), curve point B</i></td></tr>
+<tr><th id="274">274</th><td><i>  // (CurveB_PointVelocity), a point E which is (generally) not on the curve</i></td></tr>
+<tr><th id="275">275</th><td><i>  // and  a point F which is on the curve (first approximation), find new</i></td></tr>
+<tr><th id="276">276</th><td><i>  // point S on the curve closer to point E. </i></td></tr>
+<tr><th id="277">277</th><td><i>  // While advancing towards S utilise 'eps_step' as a measure of the</i></td></tr>
+<tr><th id="278">278</th><td><i>  // relative accuracy of each Step.</i></td></tr>
+<tr><th id="279">279</th><td></td></tr>
+<tr><th id="280">280</th><td>  <a class="type" href="../include/G4FieldTrack.hh.html#G4FieldTrack" title='G4FieldTrack' data-ref="G4FieldTrack">G4FieldTrack</a> <dfn class="local col0 decl" id="330EndPoint" title='EndPoint' data-type='G4FieldTrack' data-ref="330EndPoint">EndPoint</dfn><a class="ref" href="../include/G4FieldTrack.hh.html#_ZN12G4FieldTrackC1ERKS_" title='G4FieldTrack::G4FieldTrack' data-ref="_ZN12G4FieldTrackC1ERKS_">(</a><a class="local col2 ref" href="#322CurveA_PointVelocity" title='CurveA_PointVelocity' data-ref="322CurveA_PointVelocity">CurveA_PointVelocity</a>);</td></tr>
+<tr><th id="281">281</th><td>  <b>if</b>(!<a class="local col8 ref" href="#328first" title='first' data-ref="328first">first</a>){<a class="local col0 ref" href="#330EndPoint" title='EndPoint' data-ref="330EndPoint">EndPoint</a><a class="ref" href="../include/G4FieldTrack.hh.html#_ZN12G4FieldTrackaSERKS_" title='G4FieldTrack::operator=' data-ref="_ZN12G4FieldTrackaSERKS_">=</a> <a class="local col4 ref" href="#324ApproxCurveV" title='ApproxCurveV' data-ref="324ApproxCurveV">ApproxCurveV</a>;}</td></tr>
+<tr><th id="282">282</th><td></td></tr>
+<tr><th id="283">283</th><td>  <a class="typedef" href="../../../global/management/include/G4ThreeVector.hh.html#G4ThreeVector" title='G4ThreeVector' data-type='CLHEP::Hep3Vector' data-ref="G4ThreeVector">G4ThreeVector</a> <a class="ref fake" href="../../../externals/clhep/include/CLHEP/Vector/ThreeVector.h.html#_ZN5CLHEP10Hep3VectorC1Ev" title='CLHEP::Hep3Vector::Hep3Vector' data-ref="_ZN5CLHEP10Hep3VectorC1Ev"></a><dfn class="local col1 decl" id="331Point_A" title='Point_A' data-type='G4ThreeVector' data-ref="331Point_A">Point_A</dfn>,<a class="ref fake" href="../../../externals/clhep/include/CLHEP/Vector/ThreeVector.h.html#_ZN5CLHEP10Hep3VectorC1Ev" title='CLHEP::Hep3Vector::Hep3Vector' data-ref="_ZN5CLHEP10Hep3VectorC1Ev"></a><dfn class="local col2 decl" id="332Point_B" title='Point_B' data-type='G4ThreeVector' data-ref="332Point_B">Point_B</dfn>;</td></tr>
+<tr><th id="284">284</th><td>  <a class="local col1 ref" href="#331Point_A" title='Point_A' data-ref="331Point_A">Point_A</a><a class="ref" href="../../../externals/clhep/include/CLHEP/Vector/ThreeVector.h.html#_ZN5CLHEP10Hep3VectoraSERKS0_" title='CLHEP::Hep3Vector::operator=' data-ref="_ZN5CLHEP10Hep3VectoraSERKS0_">=</a><a class="local col2 ref" href="#322CurveA_PointVelocity" title='CurveA_PointVelocity' data-ref="322CurveA_PointVelocity">CurveA_PointVelocity</a>.<a class="ref" href="../include/G4FieldTrack.hh.html#_ZNK12G4FieldTrack11GetPositionEv" title='G4FieldTrack::GetPosition' data-ref="_ZNK12G4FieldTrack11GetPositionEv">GetPosition</a>();</td></tr>
+<tr><th id="285">285</th><td>  <a class="local col2 ref" href="#332Point_B" title='Point_B' data-ref="332Point_B">Point_B</a><a class="ref" href="../../../externals/clhep/include/CLHEP/Vector/ThreeVector.h.html#_ZN5CLHEP10Hep3VectoraSERKS0_" title='CLHEP::Hep3Vector::operator=' data-ref="_ZN5CLHEP10Hep3VectoraSERKS0_">=</a><a class="local col3 ref" href="#323CurveB_PointVelocity" title='CurveB_PointVelocity' data-ref="323CurveB_PointVelocity">CurveB_PointVelocity</a>.<a class="ref" href="../include/G4FieldTrack.hh.html#_ZNK12G4FieldTrack11GetPositionEv" title='G4FieldTrack::GetPosition' data-ref="_ZNK12G4FieldTrack11GetPositionEv">GetPosition</a>();</td></tr>
+<tr><th id="286">286</th><td></td></tr>
+<tr><th id="287">287</th><td>  <a class="typedef" href="../../../global/management/include/G4Types.hh.html#G4double" title='G4double' data-type='double' data-ref="G4double">G4double</a> <dfn class="local col3 decl" id="333xa" title='xa' data-type='G4double' data-ref="333xa">xa</dfn>,<dfn class="local col4 decl" id="334xb" title='xb' data-type='G4double' data-ref="334xb">xb</dfn>,<dfn class="local col5 decl" id="335xc" title='xc' data-type='G4double' data-ref="335xc">xc</dfn>,<dfn class="local col6 decl" id="336ya" title='ya' data-type='G4double' data-ref="336ya">ya</dfn>,<dfn class="local col7 decl" id="337yb" title='yb' data-type='G4double' data-ref="337yb">yb</dfn>,<dfn class="local col8 decl" id="338yc" title='yc' data-type='G4double' data-ref="338yc">yc</dfn>;</td></tr>
+<tr><th id="288">288</th><td> </td></tr>
+<tr><th id="289">289</th><td>  <i>// InverseParabolic. AF Intersects (First Part of Curve) </i></td></tr>
+<tr><th id="290">290</th><td></td></tr>
+<tr><th id="291">291</th><td>  <b>if</b>(<a class="local col8 ref" href="#328first" title='first' data-ref="328first">first</a>)</td></tr>
+<tr><th id="292">292</th><td>  {</td></tr>
+<tr><th id="293">293</th><td>    <a class="local col3 ref" href="#333xa" title='xa' data-ref="333xa">xa</a>=<var>0.</var>;</td></tr>
+<tr><th id="294">294</th><td>    <a class="local col6 ref" href="#336ya" title='ya' data-ref="336ya">ya</a>=(<a class="local col7 ref" href="#327PointG" title='PointG' data-ref="327PointG">PointG</a><a class="ref" href="../../../externals/clhep/include/CLHEP/Vector/ThreeVector.h.html#_ZN5CLHEPmiERKNS_10Hep3VectorES2_" title='CLHEP::operator-' data-ref="_ZN5CLHEPmiERKNS_10Hep3VectorES2_">-</a><a class="local col1 ref" href="#331Point_A" title='Point_A' data-ref="331Point_A">Point_A</a>).<a class="ref" href="../../../externals/clhep/include/CLHEP/Vector/ThreeVector.h.html#_ZNK5CLHEP10Hep3Vector3magEv" title='CLHEP::Hep3Vector::mag' data-ref="_ZNK5CLHEP10Hep3Vector3magEv">mag</a>();</td></tr>
+<tr><th id="295">295</th><td>    <a class="local col4 ref" href="#334xb" title='xb' data-ref="334xb">xb</a>=(<a class="local col1 ref" href="#331Point_A" title='Point_A' data-ref="331Point_A">Point_A</a><a class="ref" href="../../../externals/clhep/include/CLHEP/Vector/ThreeVector.h.html#_ZN5CLHEPmiERKNS_10Hep3VectorES2_" title='CLHEP::operator-' data-ref="_ZN5CLHEPmiERKNS_10Hep3VectorES2_">-</a><a class="local col6 ref" href="#326CurrentF_Point" title='CurrentF_Point' data-ref="326CurrentF_Point">CurrentF_Point</a>).<a class="ref" href="../../../externals/clhep/include/CLHEP/Vector/ThreeVector.h.html#_ZNK5CLHEP10Hep3Vector3magEv" title='CLHEP::Hep3Vector::mag' data-ref="_ZNK5CLHEP10Hep3Vector3magEv">mag</a>();</td></tr>
+<tr><th id="296">296</th><td>    <a class="local col7 ref" href="#337yb" title='yb' data-ref="337yb">yb</a>=-(<a class="local col7 ref" href="#327PointG" title='PointG' data-ref="327PointG">PointG</a><a class="ref" href="../../../externals/clhep/include/CLHEP/Vector/ThreeVector.h.html#_ZN5CLHEPmiERKNS_10Hep3VectorES2_" title='CLHEP::operator-' data-ref="_ZN5CLHEPmiERKNS_10Hep3VectorES2_">-</a><a class="local col6 ref" href="#326CurrentF_Point" title='CurrentF_Point' data-ref="326CurrentF_Point">CurrentF_Point</a>).<a class="ref" href="../../../externals/clhep/include/CLHEP/Vector/ThreeVector.h.html#_ZNK5CLHEP10Hep3Vector3magEv" title='CLHEP::Hep3Vector::mag' data-ref="_ZNK5CLHEP10Hep3Vector3magEv">mag</a>();</td></tr>
+<tr><th id="297">297</th><td>    <a class="local col5 ref" href="#335xc" title='xc' data-ref="335xc">xc</a>=(<a class="local col1 ref" href="#331Point_A" title='Point_A' data-ref="331Point_A">Point_A</a><a class="ref" href="../../../externals/clhep/include/CLHEP/Vector/ThreeVector.h.html#_ZN5CLHEPmiERKNS_10Hep3VectorES2_" title='CLHEP::operator-' data-ref="_ZN5CLHEPmiERKNS_10Hep3VectorES2_">-</a><a class="local col2 ref" href="#332Point_B" title='Point_B' data-ref="332Point_B">Point_B</a>).<a class="ref" href="../../../externals/clhep/include/CLHEP/Vector/ThreeVector.h.html#_ZNK5CLHEP10Hep3Vector3magEv" title='CLHEP::Hep3Vector::mag' data-ref="_ZNK5CLHEP10Hep3Vector3magEv">mag</a>();</td></tr>
+<tr><th id="298">298</th><td>    <a class="local col8 ref" href="#338yc" title='yc' data-ref="338yc">yc</a>=-(<a class="local col5 ref" href="#325CurrentE_Point" title='CurrentE_Point' data-ref="325CurrentE_Point">CurrentE_Point</a><a class="ref" href="../../../externals/clhep/include/CLHEP/Vector/ThreeVector.h.html#_ZN5CLHEPmiERKNS_10Hep3VectorES2_" title='CLHEP::operator-' data-ref="_ZN5CLHEPmiERKNS_10Hep3VectorES2_">-</a><a class="local col2 ref" href="#332Point_B" title='Point_B' data-ref="332Point_B">Point_B</a>).<a class="ref" href="../../../externals/clhep/include/CLHEP/Vector/ThreeVector.h.html#_ZNK5CLHEP10Hep3Vector3magEv" title='CLHEP::Hep3Vector::mag' data-ref="_ZNK5CLHEP10Hep3Vector3magEv">mag</a>();</td></tr>
+<tr><th id="299">299</th><td>  }    </td></tr>
+<tr><th id="300">300</th><td>  <b>else</b></td></tr>
+<tr><th id="301">301</th><td>  {</td></tr>
+<tr><th id="302">302</th><td>    <a class="local col3 ref" href="#333xa" title='xa' data-ref="333xa">xa</a>=<var>0.</var>;</td></tr>
+<tr><th id="303">303</th><td>    <a class="local col6 ref" href="#336ya" title='ya' data-ref="336ya">ya</a>=(<a class="local col1 ref" href="#331Point_A" title='Point_A' data-ref="331Point_A">Point_A</a><a class="ref" href="../../../externals/clhep/include/CLHEP/Vector/ThreeVector.h.html#_ZN5CLHEPmiERKNS_10Hep3VectorES2_" title='CLHEP::operator-' data-ref="_ZN5CLHEPmiERKNS_10Hep3VectorES2_">-</a><a class="local col5 ref" href="#325CurrentE_Point" title='CurrentE_Point' data-ref="325CurrentE_Point">CurrentE_Point</a>).<a class="ref" href="../../../externals/clhep/include/CLHEP/Vector/ThreeVector.h.html#_ZNK5CLHEP10Hep3Vector3magEv" title='CLHEP::Hep3Vector::mag' data-ref="_ZNK5CLHEP10Hep3Vector3magEv">mag</a>();</td></tr>
+<tr><th id="304">304</th><td>    <a class="local col4 ref" href="#334xb" title='xb' data-ref="334xb">xb</a>=(<a class="local col1 ref" href="#331Point_A" title='Point_A' data-ref="331Point_A">Point_A</a><a class="ref" href="../../../externals/clhep/include/CLHEP/Vector/ThreeVector.h.html#_ZN5CLHEPmiERKNS_10Hep3VectorES2_" title='CLHEP::operator-' data-ref="_ZN5CLHEPmiERKNS_10Hep3VectorES2_">-</a><a class="local col6 ref" href="#326CurrentF_Point" title='CurrentF_Point' data-ref="326CurrentF_Point">CurrentF_Point</a>).<a class="ref" href="../../../externals/clhep/include/CLHEP/Vector/ThreeVector.h.html#_ZNK5CLHEP10Hep3Vector3magEv" title='CLHEP::Hep3Vector::mag' data-ref="_ZNK5CLHEP10Hep3Vector3magEv">mag</a>();</td></tr>
+<tr><th id="305">305</th><td>    <a class="local col7 ref" href="#337yb" title='yb' data-ref="337yb">yb</a>=(<a class="local col7 ref" href="#327PointG" title='PointG' data-ref="327PointG">PointG</a><a class="ref" href="../../../externals/clhep/include/CLHEP/Vector/ThreeVector.h.html#_ZN5CLHEPmiERKNS_10Hep3VectorES2_" title='CLHEP::operator-' data-ref="_ZN5CLHEPmiERKNS_10Hep3VectorES2_">-</a><a class="local col6 ref" href="#326CurrentF_Point" title='CurrentF_Point' data-ref="326CurrentF_Point">CurrentF_Point</a>).<a class="ref" href="../../../externals/clhep/include/CLHEP/Vector/ThreeVector.h.html#_ZNK5CLHEP10Hep3Vector3magEv" title='CLHEP::Hep3Vector::mag' data-ref="_ZNK5CLHEP10Hep3Vector3magEv">mag</a>();</td></tr>
+<tr><th id="306">306</th><td>    <a class="local col5 ref" href="#335xc" title='xc' data-ref="335xc">xc</a>=(<a class="local col1 ref" href="#331Point_A" title='Point_A' data-ref="331Point_A">Point_A</a><a class="ref" href="../../../externals/clhep/include/CLHEP/Vector/ThreeVector.h.html#_ZN5CLHEPmiERKNS_10Hep3VectorES2_" title='CLHEP::operator-' data-ref="_ZN5CLHEPmiERKNS_10Hep3VectorES2_">-</a><a class="local col2 ref" href="#332Point_B" title='Point_B' data-ref="332Point_B">Point_B</a>).<a class="ref" href="../../../externals/clhep/include/CLHEP/Vector/ThreeVector.h.html#_ZNK5CLHEP10Hep3Vector3magEv" title='CLHEP::Hep3Vector::mag' data-ref="_ZNK5CLHEP10Hep3Vector3magEv">mag</a>();</td></tr>
+<tr><th id="307">307</th><td>    <a class="local col8 ref" href="#338yc" title='yc' data-ref="338yc">yc</a>=-(<a class="local col2 ref" href="#332Point_B" title='Point_B' data-ref="332Point_B">Point_B</a><a class="ref" href="../../../externals/clhep/include/CLHEP/Vector/ThreeVector.h.html#_ZN5CLHEPmiERKNS_10Hep3VectorES2_" title='CLHEP::operator-' data-ref="_ZN5CLHEPmiERKNS_10Hep3VectorES2_">-</a><a class="local col7 ref" href="#327PointG" title='PointG' data-ref="327PointG">PointG</a>).<a class="ref" href="../../../externals/clhep/include/CLHEP/Vector/ThreeVector.h.html#_ZNK5CLHEP10Hep3Vector3magEv" title='CLHEP::Hep3Vector::mag' data-ref="_ZNK5CLHEP10Hep3Vector3magEv">mag</a>();</td></tr>
+<tr><th id="308">308</th><td>    <b>if</b>(<a class="local col4 ref" href="#334xb" title='xb' data-ref="334xb">xb</a>==<var>0.</var>)</td></tr>
+<tr><th id="309">309</th><td>    {</td></tr>
+<tr><th id="310">310</th><td>      <a class="local col0 ref" href="#330EndPoint" title='EndPoint' data-ref="330EndPoint">EndPoint</a><a class="ref" href="../include/G4FieldTrack.hh.html#_ZN12G4FieldTrackaSERKS_" title='G4FieldTrack::operator=' data-ref="_ZN12G4FieldTrackaSERKS_">=</a></td></tr>
+<tr><th id="311">311</th><td>      <a class="member" href="#_ZN13G4ChordFinder17ApproxCurvePointVERK12G4FieldTrackS2_RKN5CLHEP10Hep3VectorEd" title='G4ChordFinder::ApproxCurvePointV' data-ref="_ZN13G4ChordFinder17ApproxCurvePointVERK12G4FieldTrackS2_RKN5CLHEP10Hep3VectorEd">ApproxCurvePointV</a>(<a class="local col2 ref" href="#322CurveA_PointVelocity" title='CurveA_PointVelocity' data-ref="322CurveA_PointVelocity">CurveA_PointVelocity</a>, <a class="local col3 ref" href="#323CurveB_PointVelocity" title='CurveB_PointVelocity' data-ref="323CurveB_PointVelocity">CurveB_PointVelocity</a>,</td></tr>
+<tr><th id="312">312</th><td>                        <a class="local col5 ref" href="#325CurrentE_Point" title='CurrentE_Point' data-ref="325CurrentE_Point">CurrentE_Point</a>, <a class="local col9 ref" href="#329eps_step" title='eps_step' data-ref="329eps_step">eps_step</a>);</td></tr>
+<tr><th id="313">313</th><td>      <b>return</b> <a class="local col0 ref" href="#330EndPoint" title='EndPoint' data-ref="330EndPoint">EndPoint</a>;</td></tr>
+<tr><th id="314">314</th><td>    }</td></tr>
+<tr><th id="315">315</th><td>  }</td></tr>
+<tr><th id="316">316</th><td></td></tr>
+<tr><th id="317">317</th><td>  <em>const</em> <a class="typedef" href="../../../global/management/include/G4Types.hh.html#G4double" title='G4double' data-type='double' data-ref="G4double">G4double</a> <dfn class="local col9 decl" id="339tolerance" title='tolerance' data-type='const G4double' data-ref="339tolerance">tolerance</dfn>= <var>1.e-12</var>;</td></tr>
+<tr><th id="318">318</th><td>  <b>if</b>(<span class='error' title="use of undeclared identifier &apos;std&apos;">std</span>::abs(ya)&lt;=tolerance||<span class='error' title="use of undeclared identifier &apos;std&apos;">std</span>::abs(yc)&lt;=tolerance)</td></tr>
+<tr><th id="319">319</th><td>  {</td></tr>
+<tr><th id="320">320</th><td>    ; <i>// What to do for the moment: return the same point as at start</i></td></tr>
+<tr><th id="321">321</th><td>      <i>// then PropagatorInField will take care</i></td></tr>
+<tr><th id="322">322</th><td>  }</td></tr>
+<tr><th id="323">323</th><td>  <b>else</b></td></tr>
+<tr><th id="324">324</th><td>  {</td></tr>
+<tr><th id="325">325</th><td>    <a class="typedef" href="../../../global/management/include/G4Types.hh.html#G4double" title='G4double' data-type='double' data-ref="G4double">G4double</a> <dfn class="local col0 decl" id="340test_step" title='test_step' data-type='G4double' data-ref="340test_step">test_step</dfn> = <a class="member" href="../include/G4ChordFinder.hh.html#_ZN13G4ChordFinder12InvParabolicEdddddd" title='G4ChordFinder::InvParabolic' data-ref="_ZN13G4ChordFinder12InvParabolicEdddddd">InvParabolic</a>(<a class="local col3 ref" href="#333xa" title='xa' data-ref="333xa">xa</a>,<a class="local col6 ref" href="#336ya" title='ya' data-ref="336ya">ya</a>,<a class="local col4 ref" href="#334xb" title='xb' data-ref="334xb">xb</a>,<a class="local col7 ref" href="#337yb" title='yb' data-ref="337yb">yb</a>,<a class="local col5 ref" href="#335xc" title='xc' data-ref="335xc">xc</a>,<a class="local col8 ref" href="#338yc" title='yc' data-ref="338yc">yc</a>);</td></tr>
+<tr><th id="326">326</th><td>    <a class="typedef" href="../../../global/management/include/G4Types.hh.html#G4double" title='G4double' data-type='double' data-ref="G4double">G4double</a> <dfn class="local col1 decl" id="341curve" title='curve' data-type='G4double' data-ref="341curve">curve</dfn>;</td></tr>
+<tr><th id="327">327</th><td>    <b>if</b>(<a class="local col8 ref" href="#328first" title='first' data-ref="328first">first</a>)</td></tr>
+<tr><th id="328">328</th><td>    {</td></tr>
+<tr><th id="329">329</th><td>      curve=<span class='error' title="use of undeclared identifier &apos;std&apos;">std</span>::abs(EndPoint.GetCurveLength()</td></tr>
+<tr><th id="330">330</th><td>                    -ApproxCurveV.GetCurveLength());</td></tr>
+<tr><th id="331">331</th><td>    }</td></tr>
+<tr><th id="332">332</th><td>    <b>else</b></td></tr>
+<tr><th id="333">333</th><td>    {</td></tr>
+<tr><th id="334">334</th><td>      <a class="local col0 ref" href="#340test_step" title='test_step' data-ref="340test_step">test_step</a>=(<a class="local col0 ref" href="#340test_step" title='test_step' data-ref="340test_step">test_step</a>-<a class="local col4 ref" href="#334xb" title='xb' data-ref="334xb">xb</a>);</td></tr>
+<tr><th id="335">335</th><td>      curve=<span class='error' title="use of undeclared identifier &apos;std&apos;">std</span>::abs(EndPoint.GetCurveLength()</td></tr>
+<tr><th id="336">336</th><td>                    -CurveB_PointVelocity.GetCurveLength());</td></tr>
+<tr><th id="337">337</th><td>      <a class="local col4 ref" href="#334xb" title='xb' data-ref="334xb">xb</a>=(<a class="local col6 ref" href="#326CurrentF_Point" title='CurrentF_Point' data-ref="326CurrentF_Point">CurrentF_Point</a><a class="ref" href="../../../externals/clhep/include/CLHEP/Vector/ThreeVector.h.html#_ZN5CLHEPmiERKNS_10Hep3VectorES2_" title='CLHEP::operator-' data-ref="_ZN5CLHEPmiERKNS_10Hep3VectorES2_">-</a><a class="local col2 ref" href="#332Point_B" title='Point_B' data-ref="332Point_B">Point_B</a>).<a class="ref" href="../../../externals/clhep/include/CLHEP/Vector/ThreeVector.h.html#_ZNK5CLHEP10Hep3Vector3magEv" title='CLHEP::Hep3Vector::mag' data-ref="_ZNK5CLHEP10Hep3Vector3magEv">mag</a>();</td></tr>
+<tr><th id="338">338</th><td>    }</td></tr>
+<tr><th id="339">339</th><td>      </td></tr>
+<tr><th id="340">340</th><td>    <b>if</b>(<a class="local col0 ref" href="#340test_step" title='test_step' data-ref="340test_step">test_step</a>&lt;=<var>0</var>)    { <a class="local col0 ref" href="#340test_step" title='test_step' data-ref="340test_step">test_step</a>=<var>0.1</var>*<a class="local col4 ref" href="#334xb" title='xb' data-ref="334xb">xb</a>; }</td></tr>
+<tr><th id="341">341</th><td>    <b>if</b>(<a class="local col0 ref" href="#340test_step" title='test_step' data-ref="340test_step">test_step</a>&gt;=<a class="local col4 ref" href="#334xb" title='xb' data-ref="334xb">xb</a>)   { <a class="local col0 ref" href="#340test_step" title='test_step' data-ref="340test_step">test_step</a>=<var>0.5</var>*<a class="local col4 ref" href="#334xb" title='xb' data-ref="334xb">xb</a>; }</td></tr>
+<tr><th id="342">342</th><td>    <b>if</b>(<a class="local col0 ref" href="#340test_step" title='test_step' data-ref="340test_step">test_step</a>&gt;=<a class="local col1 ref" href="#341curve" title='curve' data-ref="341curve">curve</a>){ <a class="local col0 ref" href="#340test_step" title='test_step' data-ref="340test_step">test_step</a>=<var>0.5</var>*<a class="local col1 ref" href="#341curve" title='curve' data-ref="341curve">curve</a>; } </td></tr>
+<tr><th id="343">343</th><td></td></tr>
+<tr><th id="344">344</th><td>    <b>if</b>(<a class="local col1 ref" href="#341curve" title='curve' data-ref="341curve">curve</a>*(<var>1.</var>+<a class="local col9 ref" href="#329eps_step" title='eps_step' data-ref="329eps_step">eps_step</a>)&lt;<a class="local col4 ref" href="#334xb" title='xb' data-ref="334xb">xb</a>) <i>// Similar to ReEstimate Step from</i></td></tr>
+<tr><th id="345">345</th><td>    {                          <i>// G4VIntersectionLocator</i></td></tr>
+<tr><th id="346">346</th><td>      <a class="local col0 ref" href="#340test_step" title='test_step' data-ref="340test_step">test_step</a>=<var>0.5</var>*<a class="local col1 ref" href="#341curve" title='curve' data-ref="341curve">curve</a>;</td></tr>
+<tr><th id="347">347</th><td>    }</td></tr>
+<tr><th id="348">348</th><td></td></tr>
+<tr><th id="349">349</th><td>    <a class="member" href="../include/G4ChordFinder.hh.html#G4ChordFinder::fIntgrDriver" title='G4ChordFinder::fIntgrDriver' data-ref="G4ChordFinder::fIntgrDriver">fIntgrDriver</a>-&gt;<a class="virtual ref" href="../include/G4VIntegrationDriver.hh.html#_ZN20G4VIntegrationDriver15AccurateAdvanceER12G4FieldTrackddd" title='G4VIntegrationDriver::AccurateAdvance' data-ref="_ZN20G4VIntegrationDriver15AccurateAdvanceER12G4FieldTrackddd">AccurateAdvance</a>(<span class='refarg'><a class="local col0 ref" href="#330EndPoint" title='EndPoint' data-ref="330EndPoint">EndPoint</a></span>,<a class="local col0 ref" href="#340test_step" title='test_step' data-ref="340test_step">test_step</a>, <a class="local col9 ref" href="#329eps_step" title='eps_step' data-ref="329eps_step">eps_step</a>);</td></tr>
+<tr><th id="350">350</th><td>      </td></tr>
+<tr><th id="351">351</th><td><u>#<span data-ppcond="351">ifdef</span> <span class="macro" data-ref="_M/G4DEBUG_FIELD">G4DEBUG_FIELD</span></u></td></tr>
+<tr><th id="352">352</th><td>    <i>// Printing Brent and Linear Approximation</i></td></tr>
+<tr><th id="353">353</th><td><i>    //</i></td></tr>
+<tr><th id="354">354</th><td>    G4cout &lt;&lt; <q>"G4ChordFinder::ApproxCurvePointS() - test-step ShF = "</q></td></tr>
+<tr><th id="355">355</th><td>           &lt;&lt; test_step &lt;&lt; <q>"  EndPoint = "</q> &lt;&lt; EndPoint &lt;&lt; G4endl;</td></tr>
+<tr><th id="356">356</th><td></td></tr>
+<tr><th id="357">357</th><td>    <i>//  Test Track</i></td></tr>
+<tr><th id="358">358</th><td><i>    //</i></td></tr>
+<tr><th id="359">359</th><td>    G4FieldTrack TestTrack( CurveA_PointVelocity);</td></tr>
+<tr><th id="360">360</th><td>    TestTrack = ApproxCurvePointV( CurveA_PointVelocity, </td></tr>
+<tr><th id="361">361</th><td>                                   CurveB_PointVelocity, </td></tr>
+<tr><th id="362">362</th><td>                                   CurrentE_Point, eps_step );</td></tr>
+<tr><th id="363">363</th><td>    G4cout.precision(<var>14</var>);</td></tr>
+<tr><th id="364">364</th><td>    G4cout &lt;&lt; <q>"G4ChordFinder::BrentApprox = "</q> &lt;&lt; EndPoint  &lt;&lt; G4endl;</td></tr>
+<tr><th id="365">365</th><td>    G4cout &lt;&lt; <q>"G4ChordFinder::LinearApprox= "</q> &lt;&lt; TestTrack &lt;&lt; G4endl; </td></tr>
+<tr><th id="366">366</th><td><u>#<span data-ppcond="351">endif</span></u></td></tr>
+<tr><th id="367">367</th><td>  }</td></tr>
+<tr><th id="368">368</th><td>  <b>return</b> <a class="local col0 ref" href="#330EndPoint" title='EndPoint' data-ref="330EndPoint">EndPoint</a>;</td></tr>
+<tr><th id="369">369</th><td>}</td></tr>
+<tr><th id="370">370</th><td></td></tr>
+<tr><th id="371">371</th><td></td></tr>
+<tr><th id="372">372</th><td><i>// ...........................................................................</i></td></tr>
+<tr><th id="373">373</th><td></td></tr>
+<tr><th id="374">374</th><td><a class="type" href="../include/G4FieldTrack.hh.html#G4FieldTrack" title='G4FieldTrack' data-ref="G4FieldTrack">G4FieldTrack</a> <a class="type" href="../include/G4ChordFinder.hh.html#G4ChordFinder" title='G4ChordFinder' data-ref="G4ChordFinder">G4ChordFinder</a>::</td></tr>
+<tr><th id="375">375</th><td><dfn class="decl def" id="_ZN13G4ChordFinder17ApproxCurvePointVERK12G4FieldTrackS2_RKN5CLHEP10Hep3VectorEd" title='G4ChordFinder::ApproxCurvePointV' data-ref="_ZN13G4ChordFinder17ApproxCurvePointVERK12G4FieldTrackS2_RKN5CLHEP10Hep3VectorEd">ApproxCurvePointV</dfn>( <em>const</em> <a class="type" href="../include/G4FieldTrack.hh.html#G4FieldTrack" title='G4FieldTrack' data-ref="G4FieldTrack">G4FieldTrack</a>&amp; <dfn class="local col2 decl" id="342CurveA_PointVelocity" title='CurveA_PointVelocity' data-type='const G4FieldTrack &amp;' data-ref="342CurveA_PointVelocity">CurveA_PointVelocity</dfn>, </td></tr>
+<tr><th id="376">376</th><td>                   <em>const</em> <a class="type" href="../include/G4FieldTrack.hh.html#G4FieldTrack" title='G4FieldTrack' data-ref="G4FieldTrack">G4FieldTrack</a>&amp; <dfn class="local col3 decl" id="343CurveB_PointVelocity" title='CurveB_PointVelocity' data-type='const G4FieldTrack &amp;' data-ref="343CurveB_PointVelocity">CurveB_PointVelocity</dfn>, </td></tr>
+<tr><th id="377">377</th><td>                   <em>const</em> <a class="typedef" href="../../../global/management/include/G4ThreeVector.hh.html#G4ThreeVector" title='G4ThreeVector' data-type='CLHEP::Hep3Vector' data-ref="G4ThreeVector">G4ThreeVector</a>&amp; <dfn class="local col4 decl" id="344CurrentE_Point" title='CurrentE_Point' data-type='const G4ThreeVector &amp;' data-ref="344CurrentE_Point">CurrentE_Point</dfn>,</td></tr>
+<tr><th id="378">378</th><td>                         <a class="typedef" href="../../../global/management/include/G4Types.hh.html#G4double" title='G4double' data-type='double' data-ref="G4double">G4double</a> <dfn class="local col5 decl" id="345eps_step" title='eps_step' data-type='G4double' data-ref="345eps_step">eps_step</dfn>)</td></tr>
+<tr><th id="379">379</th><td>{</td></tr>
+<tr><th id="380">380</th><td>  <i>// If r=|AE|/|AB|, and s=true path lenght (AB)</i></td></tr>
+<tr><th id="381">381</th><td><i>  // return the point that is r*s along the curve!</i></td></tr>
+<tr><th id="382">382</th><td> </td></tr>
+<tr><th id="383">383</th><td>  <a class="type" href="../include/G4FieldTrack.hh.html#G4FieldTrack" title='G4FieldTrack' data-ref="G4FieldTrack">G4FieldTrack</a>   <dfn class="local col6 decl" id="346Current_PointVelocity" title='Current_PointVelocity' data-type='G4FieldTrack' data-ref="346Current_PointVelocity">Current_PointVelocity</dfn> = <a class="ref fake" href="../include/G4FieldTrack.hh.html#_ZN12G4FieldTrackC1ERKS_" title='G4FieldTrack::G4FieldTrack' data-ref="_ZN12G4FieldTrackC1ERKS_"></a><a class="local col2 ref" href="#342CurveA_PointVelocity" title='CurveA_PointVelocity' data-ref="342CurveA_PointVelocity">CurveA_PointVelocity</a>; </td></tr>
+<tr><th id="384">384</th><td></td></tr>
+<tr><th id="385">385</th><td>  <a class="typedef" href="../../../global/management/include/G4ThreeVector.hh.html#G4ThreeVector" title='G4ThreeVector' data-type='CLHEP::Hep3Vector' data-ref="G4ThreeVector">G4ThreeVector</a>  <dfn class="local col7 decl" id="347CurveA_Point" title='CurveA_Point' data-type='G4ThreeVector' data-ref="347CurveA_Point">CurveA_Point</dfn>= <a class="local col2 ref" href="#342CurveA_PointVelocity" title='CurveA_PointVelocity' data-ref="342CurveA_PointVelocity">CurveA_PointVelocity</a>.<a class="ref" href="../include/G4FieldTrack.hh.html#_ZNK12G4FieldTrack11GetPositionEv" title='G4FieldTrack::GetPosition' data-ref="_ZNK12G4FieldTrack11GetPositionEv">GetPosition</a>();</td></tr>
+<tr><th id="386">386</th><td>  <a class="typedef" href="../../../global/management/include/G4ThreeVector.hh.html#G4ThreeVector" title='G4ThreeVector' data-type='CLHEP::Hep3Vector' data-ref="G4ThreeVector">G4ThreeVector</a>  <dfn class="local col8 decl" id="348CurveB_Point" title='CurveB_Point' data-type='G4ThreeVector' data-ref="348CurveB_Point">CurveB_Point</dfn>= <a class="local col3 ref" href="#343CurveB_PointVelocity" title='CurveB_PointVelocity' data-ref="343CurveB_PointVelocity">CurveB_PointVelocity</a>.<a class="ref" href="../include/G4FieldTrack.hh.html#_ZNK12G4FieldTrack11GetPositionEv" title='G4FieldTrack::GetPosition' data-ref="_ZNK12G4FieldTrack11GetPositionEv">GetPosition</a>();</td></tr>
+<tr><th id="387">387</th><td></td></tr>
+<tr><th id="388">388</th><td>  <a class="typedef" href="../../../global/management/include/G4ThreeVector.hh.html#G4ThreeVector" title='G4ThreeVector' data-type='CLHEP::Hep3Vector' data-ref="G4ThreeVector">G4ThreeVector</a>  <dfn class="local col9 decl" id="349ChordAB_Vector" title='ChordAB_Vector' data-type='G4ThreeVector' data-ref="349ChordAB_Vector">ChordAB_Vector</dfn>= <a class="local col8 ref" href="#348CurveB_Point" title='CurveB_Point' data-ref="348CurveB_Point">CurveB_Point</a>   <a class="ref" href="../../../externals/clhep/include/CLHEP/Vector/ThreeVector.h.html#_ZN5CLHEPmiERKNS_10Hep3VectorES2_" title='CLHEP::operator-' data-ref="_ZN5CLHEPmiERKNS_10Hep3VectorES2_">-</a> <a class="local col7 ref" href="#347CurveA_Point" title='CurveA_Point' data-ref="347CurveA_Point">CurveA_Point</a>;</td></tr>
+<tr><th id="389">389</th><td>  <a class="typedef" href="../../../global/management/include/G4ThreeVector.hh.html#G4ThreeVector" title='G4ThreeVector' data-type='CLHEP::Hep3Vector' data-ref="G4ThreeVector">G4ThreeVector</a>  <dfn class="local col0 decl" id="350ChordAE_Vector" title='ChordAE_Vector' data-type='G4ThreeVector' data-ref="350ChordAE_Vector">ChordAE_Vector</dfn>= <a class="local col4 ref" href="#344CurrentE_Point" title='CurrentE_Point' data-ref="344CurrentE_Point">CurrentE_Point</a> <a class="ref" href="../../../externals/clhep/include/CLHEP/Vector/ThreeVector.h.html#_ZN5CLHEPmiERKNS_10Hep3VectorES2_" title='CLHEP::operator-' data-ref="_ZN5CLHEPmiERKNS_10Hep3VectorES2_">-</a> <a class="local col7 ref" href="#347CurveA_Point" title='CurveA_Point' data-ref="347CurveA_Point">CurveA_Point</a>;</td></tr>
+<tr><th id="390">390</th><td></td></tr>
+<tr><th id="391">391</th><td>  <a class="typedef" href="../../../global/management/include/G4Types.hh.html#G4double" title='G4double' data-type='double' data-ref="G4double">G4double</a>       <dfn class="local col1 decl" id="351ABdist" title='ABdist' data-type='G4double' data-ref="351ABdist">ABdist</dfn>= <a class="local col9 ref" href="#349ChordAB_Vector" title='ChordAB_Vector' data-ref="349ChordAB_Vector">ChordAB_Vector</a>.<a class="ref" href="../../../externals/clhep/include/CLHEP/Vector/ThreeVector.h.html#_ZNK5CLHEP10Hep3Vector3magEv" title='CLHEP::Hep3Vector::mag' data-ref="_ZNK5CLHEP10Hep3Vector3magEv">mag</a>();</td></tr>
+<tr><th id="392">392</th><td>  <a class="typedef" href="../../../global/management/include/G4Types.hh.html#G4double" title='G4double' data-type='double' data-ref="G4double">G4double</a>  <dfn class="local col2 decl" id="352curve_length" title='curve_length' data-type='G4double' data-ref="352curve_length">curve_length</dfn>;  <i>//  A curve length  of AB</i></td></tr>
+<tr><th id="393">393</th><td>  <a class="typedef" href="../../../global/management/include/G4Types.hh.html#G4double" title='G4double' data-type='double' data-ref="G4double">G4double</a>  <dfn class="local col3 decl" id="353AE_fraction" title='AE_fraction' data-type='G4double' data-ref="353AE_fraction">AE_fraction</dfn>; </td></tr>
+<tr><th id="394">394</th><td>  </td></tr>
+<tr><th id="395">395</th><td>  <a class="local col2 ref" href="#352curve_length" title='curve_length' data-ref="352curve_length">curve_length</a>= <a class="local col3 ref" href="#343CurveB_PointVelocity" title='CurveB_PointVelocity' data-ref="343CurveB_PointVelocity">CurveB_PointVelocity</a>.<a class="ref" href="../include/G4FieldTrack.hh.html#_ZNK12G4FieldTrack14GetCurveLengthEv" title='G4FieldTrack::GetCurveLength' data-ref="_ZNK12G4FieldTrack14GetCurveLengthEv">GetCurveLength</a>()</td></tr>
+<tr><th id="396">396</th><td>              - <a class="local col2 ref" href="#342CurveA_PointVelocity" title='CurveA_PointVelocity' data-ref="342CurveA_PointVelocity">CurveA_PointVelocity</a>.<a class="ref" href="../include/G4FieldTrack.hh.html#_ZNK12G4FieldTrack14GetCurveLengthEv" title='G4FieldTrack::GetCurveLength' data-ref="_ZNK12G4FieldTrack14GetCurveLengthEv">GetCurveLength</a>();  </td></tr>
+<tr><th id="397">397</th><td> </td></tr>
+<tr><th id="398">398</th><td>  <a class="typedef" href="../../../global/management/include/G4Types.hh.html#G4double" title='G4double' data-type='double' data-ref="G4double">G4double</a>  <dfn class="local col4 decl" id="354integrationInaccuracyLimit" title='integrationInaccuracyLimit' data-type='G4double' data-ref="354integrationInaccuracyLimit">integrationInaccuracyLimit</dfn>= <span class='error' title="use of undeclared identifier &apos;std&apos;">std</span>::max( perMillion, <var>0.5</var>*eps_step ); </td></tr>
+<tr><th id="399">399</th><td>  <b>if</b>( <a class="local col2 ref" href="#352curve_length" title='curve_length' data-ref="352curve_length">curve_length</a> &lt; <a class="local col1 ref" href="#351ABdist" title='ABdist' data-ref="351ABdist">ABdist</a> * (<var>1.</var> - <a class="local col4 ref" href="#354integrationInaccuracyLimit" title='integrationInaccuracyLimit' data-ref="354integrationInaccuracyLimit">integrationInaccuracyLimit</a>) )</td></tr>
+<tr><th id="400">400</th><td>  { </td></tr>
+<tr><th id="401">401</th><td><u>#<span data-ppcond="401">ifdef</span> <span class="macro" data-ref="_M/G4DEBUG_FIELD">G4DEBUG_FIELD</span></u></td></tr>
+<tr><th id="402">402</th><td>    G4cerr &lt;&lt; <q>" Warning in G4ChordFinder::ApproxCurvePoint: "</q></td></tr>
+<tr><th id="403">403</th><td>           &lt;&lt; G4endl</td></tr>
+<tr><th id="404">404</th><td>           &lt;&lt; <q>" The two points are further apart than the curve length "</q></td></tr>
+<tr><th id="405">405</th><td>           &lt;&lt; G4endl</td></tr>
+<tr><th id="406">406</th><td>           &lt;&lt; <q>" Dist = "</q>         &lt;&lt; ABdist</td></tr>
+<tr><th id="407">407</th><td>           &lt;&lt; <q>" curve length = "</q> &lt;&lt; curve_length </td></tr>
+<tr><th id="408">408</th><td>           &lt;&lt; <q>" relativeDiff = "</q> &lt;&lt; (curve_length-ABdist)/ABdist </td></tr>
+<tr><th id="409">409</th><td>           &lt;&lt; G4endl;</td></tr>
+<tr><th id="410">410</th><td>    <b>if</b>( curve_length &lt; ABdist * (<var>1.</var> - <var>10</var>*eps_step) )</td></tr>
+<tr><th id="411">411</th><td>    {</td></tr>
+<tr><th id="412">412</th><td>      std::ostringstream message;</td></tr>
+<tr><th id="413">413</th><td>      message &lt;&lt; <q>"Unphysical curve length."</q> &lt;&lt; G4endl</td></tr>
+<tr><th id="414">414</th><td>              &lt;&lt; <q>"The size of the above difference exceeds allowed limits."</q></td></tr>
+<tr><th id="415">415</th><td>              &lt;&lt; G4endl</td></tr>
+<tr><th id="416">416</th><td>              &lt;&lt; <q>"Aborting."</q>;</td></tr>
+<tr><th id="417">417</th><td>      G4Exception(<q>"G4ChordFinder::ApproxCurvePointV()"</q>, <q>"GeomField0003"</q>,</td></tr>
+<tr><th id="418">418</th><td>                  FatalException, message);</td></tr>
+<tr><th id="419">419</th><td>    }</td></tr>
+<tr><th id="420">420</th><td><u>#<span data-ppcond="401">endif</span></u></td></tr>
+<tr><th id="421">421</th><td>    <i>// Take default corrective action: adjust the maximum curve length. </i></td></tr>
+<tr><th id="422">422</th><td><i>    // NOTE: this case only happens for relatively straight paths.</i></td></tr>
+<tr><th id="423">423</th><td><i>    // curve_length = ABdist; </i></td></tr>
+<tr><th id="424">424</th><td>  }</td></tr>
+<tr><th id="425">425</th><td></td></tr>
+<tr><th id="426">426</th><td>  <a class="typedef" href="../../../global/management/include/G4Types.hh.html#G4double" title='G4double' data-type='double' data-ref="G4double">G4double</a>  <dfn class="local col5 decl" id="355new_st_length" title='new_st_length' data-type='G4double' data-ref="355new_st_length">new_st_length</dfn>; </td></tr>
+<tr><th id="427">427</th><td></td></tr>
+<tr><th id="428">428</th><td>  <b>if</b> ( <a class="local col1 ref" href="#351ABdist" title='ABdist' data-ref="351ABdist">ABdist</a> &gt; <var>0.0</var> )</td></tr>
+<tr><th id="429">429</th><td>  {</td></tr>
+<tr><th id="430">430</th><td>     <a class="local col3 ref" href="#353AE_fraction" title='AE_fraction' data-ref="353AE_fraction">AE_fraction</a> = <a class="local col0 ref" href="#350ChordAE_Vector" title='ChordAE_Vector' data-ref="350ChordAE_Vector">ChordAE_Vector</a>.<a class="ref" href="../../../externals/clhep/include/CLHEP/Vector/ThreeVector.h.html#_ZNK5CLHEP10Hep3Vector3magEv" title='CLHEP::Hep3Vector::mag' data-ref="_ZNK5CLHEP10Hep3Vector3magEv">mag</a>() / <a class="local col1 ref" href="#351ABdist" title='ABdist' data-ref="351ABdist">ABdist</a>;</td></tr>
+<tr><th id="431">431</th><td>  }</td></tr>
+<tr><th id="432">432</th><td>  <b>else</b></td></tr>
+<tr><th id="433">433</th><td>  {</td></tr>
+<tr><th id="434">434</th><td>     <a class="local col3 ref" href="#353AE_fraction" title='AE_fraction' data-ref="353AE_fraction">AE_fraction</a> = <var>0.5</var>;                         <i>// Guess .. ?; </i></td></tr>
+<tr><th id="435">435</th><td><u>#<span data-ppcond="435">ifdef</span> <span class="macro" data-ref="_M/G4DEBUG_FIELD">G4DEBUG_FIELD</span></u></td></tr>
+<tr><th id="436">436</th><td>     G4cout &lt;&lt; <q>"Warning in G4ChordFinder::ApproxCurvePointV():"</q></td></tr>
+<tr><th id="437">437</th><td>            &lt;&lt; <q>" A and B are the same point!"</q> &lt;&lt; G4endl</td></tr>
+<tr><th id="438">438</th><td>            &lt;&lt; <q>" Chord AB length = "</q> &lt;&lt; ChordAE_Vector.mag() &lt;&lt; G4endl</td></tr>
+<tr><th id="439">439</th><td>            &lt;&lt; G4endl;</td></tr>
+<tr><th id="440">440</th><td><u>#<span data-ppcond="435">endif</span></u></td></tr>
+<tr><th id="441">441</th><td>  }</td></tr>
+<tr><th id="442">442</th><td>  </td></tr>
+<tr><th id="443">443</th><td>  <b>if</b>( (<a class="local col3 ref" href="#353AE_fraction" title='AE_fraction' data-ref="353AE_fraction">AE_fraction</a>&gt; <var>1.0</var> + <a class="ref" href="../../../externals/clhep/include/CLHEP/Units/SystemOfUnits.h.html#CLHEP::perMillion" title='CLHEP::perMillion' data-ref="CLHEP::perMillion">perMillion</a>) || (<a class="local col3 ref" href="#353AE_fraction" title='AE_fraction' data-ref="353AE_fraction">AE_fraction</a>&lt; <var>0.</var>) )</td></tr>
+<tr><th id="444">444</th><td>  {</td></tr>
+<tr><th id="445">445</th><td><u>#<span data-ppcond="445">ifdef</span> <span class="macro" data-ref="_M/G4DEBUG_FIELD">G4DEBUG_FIELD</span></u></td></tr>
+<tr><th id="446">446</th><td>    G4cerr &lt;&lt; <q>" G4ChordFinder::ApproxCurvePointV() - Warning:"</q></td></tr>
+<tr><th id="447">447</th><td>           &lt;&lt; <q>" Anomalous condition:AE &gt; AB or AE/AB &lt;= 0 "</q> &lt;&lt; G4endl</td></tr>
+<tr><th id="448">448</th><td>           &lt;&lt; <q>"   AE_fraction = "</q> &lt;&lt;  AE_fraction &lt;&lt; G4endl</td></tr>
+<tr><th id="449">449</th><td>           &lt;&lt; <q>"   Chord AE length = "</q> &lt;&lt; ChordAE_Vector.mag() &lt;&lt; G4endl</td></tr>
+<tr><th id="450">450</th><td>           &lt;&lt; <q>"   Chord AB length = "</q> &lt;&lt; ABdist &lt;&lt; G4endl &lt;&lt; G4endl;</td></tr>
+<tr><th id="451">451</th><td>    G4cerr &lt;&lt; <q>" OK if this condition occurs after a recalculation of 'B'"</q></td></tr>
+<tr><th id="452">452</th><td>           &lt;&lt; G4endl &lt;&lt; <q>" Otherwise it is an error. "</q> &lt;&lt; G4endl ; </td></tr>
+<tr><th id="453">453</th><td><u>#<span data-ppcond="445">endif</span></u></td></tr>
+<tr><th id="454">454</th><td>     <i>// This course can now result if B has been re-evaluated, </i></td></tr>
+<tr><th id="455">455</th><td><i>     // without E being recomputed (1 July 99).</i></td></tr>
+<tr><th id="456">456</th><td><i>     // In this case this is not a "real error" - but it is undesired</i></td></tr>
+<tr><th id="457">457</th><td><i>     // and we cope with it by a default corrective action ...</i></td></tr>
+<tr><th id="458">458</th><td><i>     //</i></td></tr>
+<tr><th id="459">459</th><td>     <a class="local col3 ref" href="#353AE_fraction" title='AE_fraction' data-ref="353AE_fraction">AE_fraction</a> = <var>0.5</var>;                         <i>// Default value</i></td></tr>
+<tr><th id="460">460</th><td>  }</td></tr>
+<tr><th id="461">461</th><td></td></tr>
+<tr><th id="462">462</th><td>  <a class="local col5 ref" href="#355new_st_length" title='new_st_length' data-ref="355new_st_length">new_st_length</a>= <a class="local col3 ref" href="#353AE_fraction" title='AE_fraction' data-ref="353AE_fraction">AE_fraction</a> * <a class="local col2 ref" href="#352curve_length" title='curve_length' data-ref="352curve_length">curve_length</a>; </td></tr>
+<tr><th id="463">463</th><td></td></tr>
+<tr><th id="464">464</th><td>  <b>if</b> ( <a class="local col3 ref" href="#353AE_fraction" title='AE_fraction' data-ref="353AE_fraction">AE_fraction</a> &gt; <var>0.0</var> )</td></tr>
+<tr><th id="465">465</th><td>  { </td></tr>
+<tr><th id="466">466</th><td>     <a class="member" href="../include/G4ChordFinder.hh.html#G4ChordFinder::fIntgrDriver" title='G4ChordFinder::fIntgrDriver' data-ref="G4ChordFinder::fIntgrDriver">fIntgrDriver</a>-&gt;<a class="virtual ref" href="../include/G4VIntegrationDriver.hh.html#_ZN20G4VIntegrationDriver15AccurateAdvanceER12G4FieldTrackddd" title='G4VIntegrationDriver::AccurateAdvance' data-ref="_ZN20G4VIntegrationDriver15AccurateAdvanceER12G4FieldTrackddd">AccurateAdvance</a>(<span class='refarg'><a class="local col6 ref" href="#346Current_PointVelocity" title='Current_PointVelocity' data-ref="346Current_PointVelocity">Current_PointVelocity</a></span>, </td></tr>
+<tr><th id="467">467</th><td>                                   <a class="local col5 ref" href="#355new_st_length" title='new_st_length' data-ref="355new_st_length">new_st_length</a>, <a class="local col5 ref" href="#345eps_step" title='eps_step' data-ref="345eps_step">eps_step</a> );</td></tr>
+<tr><th id="468">468</th><td>     <i>//</i></td></tr>
+<tr><th id="469">469</th><td><i>     // In this case it does not matter if it cannot advance the full distance</i></td></tr>
+<tr><th id="470">470</th><td>  }</td></tr>
+<tr><th id="471">471</th><td></td></tr>
+<tr><th id="472">472</th><td>  <i>// If there was a memory of the step_length actually required at the start </i></td></tr>
+<tr><th id="473">473</th><td><i>  // of the integration Step, this could be re-used ...</i></td></tr>
+<tr><th id="474">474</th><td></td></tr>
+<tr><th id="475">475</th><td>  <a class="macro" href="../../../global/management/include/G4ios.hh.html#46" title="(*_G4cout_p())" data-ref="_M/G4cout">G4cout</a><span class='error' title="member reference base type &apos;int&apos; is not a structure or union">.</span>precision(<var>14</var>);</td></tr>
+<tr><th id="476">476</th><td></td></tr>
+<tr><th id="477">477</th><td>  <b>return</b> <a class="local col6 ref" href="#346Current_PointVelocity" title='Current_PointVelocity' data-ref="346Current_PointVelocity">Current_PointVelocity</a>;</td></tr>
+<tr><th id="478">478</th><td>}</td></tr>
+<tr><th id="479">479</th><td></td></tr>
+<tr><th id="480">480</th><td></td></tr>
+<tr><th id="481">481</th><td><i>// ...........................................................................</i></td></tr>
+<tr><th id="482">482</th><td></td></tr>
+<tr><th id="483">483</th><td></td></tr>
+<tr><th id="484">484</th><td></td></tr>
+</table><hr/><p id='footer'>
+Generated on <em>2019-Aug-28</em> from project codebrowser<br />Powered by <a href='https://woboq.com'><img alt='Woboq' src='https://code.woboq.org/woboq-16.png' width='41' height='16' /></a> <a href='https://code.woboq.org'>Code Browser</a> 2.1
+<br/>Generator usage only permitted with license.</p>
+</div></body></html>

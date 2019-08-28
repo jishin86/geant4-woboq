@@ -1,0 +1,130 @@
+<!doctype html>
+<html>
+<head>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"><title>G4InuclSpecialFunctions.hh source code [codebrowser/source/processes/hadronic/models/cascade/cascade/include/G4InuclSpecialFunctions.hh] - Woboq Code Browser</title>
+<meta name="woboq:interestingDefinitions" content="G4InuclSpecialFunctions::paraMaker "/>
+<link rel="stylesheet" href="../../../../../../../../../data/qtcreator.css" title="QtCreator"/>
+<link rel="alternate stylesheet" href="../../../../../../../../../data/kdevelop.css" title="KDevelop"/>
+<script type="text/javascript" src="../../../../../../../../../data/jquery/jquery.min.js"></script>
+<script type="text/javascript" src="../../../../../../../../../data/jquery/jquery-ui.min.js"></script>
+<script>var file = 'codebrowser/source/processes/hadronic/models/cascade/cascade/include/G4InuclSpecialFunctions.hh'; var root_path = '../../../../../../../..'; var data_path = '../../../../../../../../../data';</script>
+<script src='../../../../../../../../../data/codebrowser.js'></script>
+</head>
+<body><div id='header'><h1 id='breadcrumb'><span>Browse the source code of </span><a href='../../../../../../..'>codebrowser</a>/<a href='../../../../../..'>source</a>/<a href='../../../../..'>processes</a>/<a href='../../../..'>hadronic</a>/<a href='../../..'>models</a>/<a href='../..'>cascade</a>/<a href='..'>cascade</a>/<a href='./'>include</a>/<a href='G4InuclSpecialFunctions.hh.html'>G4InuclSpecialFunctions.hh</a></h1></div>
+<hr/><div id='content'><table class="code">
+<tr><th id="1">1</th><td><i>//</i></td></tr>
+<tr><th id="2">2</th><td><i>// ********************************************************************</i></td></tr>
+<tr><th id="3">3</th><td><i>// * License and Disclaimer                                           *</i></td></tr>
+<tr><th id="4">4</th><td><i>// *                                                                  *</i></td></tr>
+<tr><th id="5">5</th><td><i>// * The  Geant4 software  is  copyright of the Copyright Holders  of *</i></td></tr>
+<tr><th id="6">6</th><td><i>// * the Geant4 Collaboration.  It is provided  under  the terms  and *</i></td></tr>
+<tr><th id="7">7</th><td><i>// * conditions of the Geant4 Software License,  included in the file *</i></td></tr>
+<tr><th id="8">8</th><td><i>// * LICENSE and available at  <a href="http://cern.ch/geant4/license">http://cern.ch/geant4/license</a> .  These *</i></td></tr>
+<tr><th id="9">9</th><td><i>// * include a list of copyright holders.                             *</i></td></tr>
+<tr><th id="10">10</th><td><i>// *                                                                  *</i></td></tr>
+<tr><th id="11">11</th><td><i>// * Neither the authors of this software system, nor their employing *</i></td></tr>
+<tr><th id="12">12</th><td><i>// * institutes,nor the agencies providing financial support for this *</i></td></tr>
+<tr><th id="13">13</th><td><i>// * work  make  any representation or  warranty, express or implied, *</i></td></tr>
+<tr><th id="14">14</th><td><i>// * regarding  this  software system or assume any liability for its *</i></td></tr>
+<tr><th id="15">15</th><td><i>// * use.  Please see the license in the file  LICENSE  and URL above *</i></td></tr>
+<tr><th id="16">16</th><td><i>// * for the full disclaimer and the limitation of liability.         *</i></td></tr>
+<tr><th id="17">17</th><td><i>// *                                                                  *</i></td></tr>
+<tr><th id="18">18</th><td><i>// * This  code  implementation is the result of  the  scientific and *</i></td></tr>
+<tr><th id="19">19</th><td><i>// * technical work of the GEANT4 collaboration.                      *</i></td></tr>
+<tr><th id="20">20</th><td><i>// * By using,  copying,  modifying or  distributing the software (or *</i></td></tr>
+<tr><th id="21">21</th><td><i>// * any work based  on the software)  you  agree  to acknowledge its *</i></td></tr>
+<tr><th id="22">22</th><td><i>// * use  in  resulting  scientific  publications,  and indicate your *</i></td></tr>
+<tr><th id="23">23</th><td><i>// * acceptance of all terms of the Geant4 Software license.          *</i></td></tr>
+<tr><th id="24">24</th><td><i>// ********************************************************************</i></td></tr>
+<tr><th id="25">25</th><td><i>//</i></td></tr>
+<tr><th id="26">26</th><td><i>//</i></td></tr>
+<tr><th id="27">27</th><td><i>// 20100114  M. Kelsey -- Remove G4CascadeMomentum, use G4LorentzVector directly</i></td></tr>
+<tr><th id="28">28</th><td><i>// 20100319  M. Kelsey -- Add optional mass argument to generateWithFixedTheta;</i></td></tr>
+<tr><th id="29">29</th><td><i>//		define new generateWithRandomAngles, encapsulating code; define</i></td></tr>
+<tr><th id="30">30</th><td><i>//		cbrt() cube-root function (in math.h, but not in &lt;math&gt;!)</i></td></tr>
+<tr><th id="31">31</th><td><i>// 20100412  M. Kelsey -- Modify paraMaker[Truncated] to take buffer as argument</i></td></tr>
+<tr><th id="32">32</th><td><i>// 20100914  M. Kelsey -- Migrate to integer A and Z.  Discard unused binding</i></td></tr>
+<tr><th id="33">33</th><td><i>//		energy functions</i></td></tr>
+<tr><th id="34">34</th><td><i>// 20120608  M. Kelsey -- Fix variable-name "shadowing" compiler warnings.</i></td></tr>
+<tr><th id="35">35</th><td><i>// 20130308  M. Kelsey -- New function to encapsulate INUCL power expansion</i></td></tr>
+<tr><th id="36">36</th><td><i>// 20130808  M. Kelsey -- Convert paraMaker[Truncated] to class object, to</i></td></tr>
+<tr><th id="37">37</th><td><i>//		allow thread isolation</i></td></tr>
+<tr><th id="38">38</th><td><i>// 20130829  M. Kelsey -- Address Coverity #52158, 52161 for copy actions.</i></td></tr>
+<tr><th id="39">39</th><td><i>// 20150619  M. Kelsey -- Overload G4cbrt for case of integer arguments</i></td></tr>
+<tr><th id="40">40</th><td></td></tr>
+<tr><th id="41">41</th><td><u>#<span data-ppcond="41">ifndef</span> <span class="macro" data-ref="_M/G4INUCL_SPECIAL_FUNC_HH">G4INUCL_SPECIAL_FUNC_HH</span></u></td></tr>
+<tr><th id="42">42</th><td><u>#define <dfn class="macro" id="_M/G4INUCL_SPECIAL_FUNC_HH" data-ref="_M/G4INUCL_SPECIAL_FUNC_HH">G4INUCL_SPECIAL_FUNC_HH</dfn></u></td></tr>
+<tr><th id="43">43</th><td></td></tr>
+<tr><th id="44">44</th><td><u>#include <a href="../../../../../../global/management/include/globals.hh.html">"globals.hh"</a></u></td></tr>
+<tr><th id="45">45</th><td><u>#include <a href="../../../../../../global/HEPGeometry/include/G4LorentzVector.hh.html">"G4LorentzVector.hh"</a></u></td></tr>
+<tr><th id="46">46</th><td><u>#include <span class='error' title="&apos;algorithm&apos; file not found">&lt;</span>algorithm&gt;</u></td></tr>
+<tr><th id="47">47</th><td><u>#include &lt;vector&gt;</u></td></tr>
+<tr><th id="48">48</th><td></td></tr>
+<tr><th id="49">49</th><td><b>template</b> &lt;<em>int</em> N&gt; <b>class</b> <dfn class="type" id="G4CascadeInterpolator" title='G4CascadeInterpolator' data-ref="G4CascadeInterpolator">G4CascadeInterpolator</dfn>;</td></tr>
+<tr><th id="50">50</th><td></td></tr>
+<tr><th id="51">51</th><td></td></tr>
+<tr><th id="52">52</th><td><b>namespace</b> <span class="namespace">G4InuclSpecialFunctions</span> {</td></tr>
+<tr><th id="53">53</th><td>  <a class="typedef" href="../../../../../../global/management/include/G4Types.hh.html#G4double" title='G4double' data-type='double' data-ref="G4double">G4double</a> <dfn class="decl" id="_ZN23G4InuclSpecialFunctions13bindingEnergyEii" title='G4InuclSpecialFunctions::bindingEnergy' data-ref="_ZN23G4InuclSpecialFunctions13bindingEnergyEii">bindingEnergy</dfn>(<a class="typedef" href="../../../../../../global/management/include/G4Types.hh.html#G4int" title='G4int' data-type='int' data-ref="G4int">G4int</a> <dfn class="local col3 decl" id="43A" title='A' data-type='G4int' data-ref="43A">A</dfn>, <a class="typedef" href="../../../../../../global/management/include/G4Types.hh.html#G4int" title='G4int' data-type='int' data-ref="G4int">G4int</a> <dfn class="local col4 decl" id="44Z" title='Z' data-type='G4int' data-ref="44Z">Z</dfn>);</td></tr>
+<tr><th id="54">54</th><td></td></tr>
+<tr><th id="55">55</th><td>  <i>// NOTE:  Used only by G4Fissioner</i></td></tr>
+<tr><th id="56">56</th><td>  <a class="typedef" href="../../../../../../global/management/include/G4Types.hh.html#G4double" title='G4double' data-type='double' data-ref="G4double">G4double</a> <dfn class="decl" id="_ZN23G4InuclSpecialFunctions23bindingEnergyAsymptoticEii" title='G4InuclSpecialFunctions::bindingEnergyAsymptotic' data-ref="_ZN23G4InuclSpecialFunctions23bindingEnergyAsymptoticEii">bindingEnergyAsymptotic</dfn>(<a class="typedef" href="../../../../../../global/management/include/G4Types.hh.html#G4int" title='G4int' data-type='int' data-ref="G4int">G4int</a> <dfn class="local col5 decl" id="45A" title='A' data-type='G4int' data-ref="45A">A</dfn>, <a class="typedef" href="../../../../../../global/management/include/G4Types.hh.html#G4int" title='G4int' data-type='int' data-ref="G4int">G4int</a> <dfn class="local col6 decl" id="46Z" title='Z' data-type='G4int' data-ref="46Z">Z</dfn>);</td></tr>
+<tr><th id="57">57</th><td></td></tr>
+<tr><th id="58">58</th><td>  <a class="typedef" href="../../../../../../global/management/include/G4Types.hh.html#G4double" title='G4double' data-type='double' data-ref="G4double">G4double</a> <dfn class="decl" id="_ZN23G4InuclSpecialFunctions11FermiEnergyEiii" title='G4InuclSpecialFunctions::FermiEnergy' data-ref="_ZN23G4InuclSpecialFunctions11FermiEnergyEiii">FermiEnergy</dfn>(<a class="typedef" href="../../../../../../global/management/include/G4Types.hh.html#G4int" title='G4int' data-type='int' data-ref="G4int">G4int</a> <dfn class="local col7 decl" id="47A" title='A' data-type='G4int' data-ref="47A">A</dfn>, <a class="typedef" href="../../../../../../global/management/include/G4Types.hh.html#G4int" title='G4int' data-type='int' data-ref="G4int">G4int</a> <dfn class="local col8 decl" id="48Z" title='Z' data-type='G4int' data-ref="48Z">Z</dfn>, <a class="typedef" href="../../../../../../global/management/include/G4Types.hh.html#G4int" title='G4int' data-type='int' data-ref="G4int">G4int</a> <dfn class="local col9 decl" id="49ntype" title='ntype' data-type='G4int' data-ref="49ntype">ntype</dfn>);</td></tr>
+<tr><th id="59">59</th><td>  </td></tr>
+<tr><th id="60">60</th><td>  <a class="typedef" href="../../../../../../global/management/include/G4Types.hh.html#G4double" title='G4double' data-type='double' data-ref="G4double">G4double</a> <dfn class="decl" id="_ZN23G4InuclSpecialFunctions5getALEi" title='G4InuclSpecialFunctions::getAL' data-ref="_ZN23G4InuclSpecialFunctions5getALEi">getAL</dfn>(<a class="typedef" href="../../../../../../global/management/include/G4Types.hh.html#G4int" title='G4int' data-type='int' data-ref="G4int">G4int</a> <dfn class="local col0 decl" id="50A" title='A' data-type='G4int' data-ref="50A">A</dfn>);</td></tr>
+<tr><th id="61">61</th><td> </td></tr>
+<tr><th id="62">62</th><td>  <a class="typedef" href="../../../../../../global/management/include/G4Types.hh.html#G4double" title='G4double' data-type='double' data-ref="G4double">G4double</a> <dfn class="decl" id="_ZN23G4InuclSpecialFunctions4csNNEd" title='G4InuclSpecialFunctions::csNN' data-ref="_ZN23G4InuclSpecialFunctions4csNNEd">csNN</dfn>(<a class="typedef" href="../../../../../../global/management/include/G4Types.hh.html#G4double" title='G4double' data-type='double' data-ref="G4double">G4double</a> <dfn class="local col1 decl" id="51e" title='e' data-type='G4double' data-ref="51e">e</dfn>);</td></tr>
+<tr><th id="63">63</th><td></td></tr>
+<tr><th id="64">64</th><td>  <a class="typedef" href="../../../../../../global/management/include/G4Types.hh.html#G4double" title='G4double' data-type='double' data-ref="G4double">G4double</a> <dfn class="decl" id="_ZN23G4InuclSpecialFunctions4csPNEd" title='G4InuclSpecialFunctions::csPN' data-ref="_ZN23G4InuclSpecialFunctions4csPNEd">csPN</dfn>(<a class="typedef" href="../../../../../../global/management/include/G4Types.hh.html#G4double" title='G4double' data-type='double' data-ref="G4double">G4double</a> <dfn class="local col2 decl" id="52e" title='e' data-type='G4double' data-ref="52e">e</dfn>);</td></tr>
+<tr><th id="65">65</th><td></td></tr>
+<tr><th id="66">66</th><td>  <a class="typedef" href="../../../../../../global/management/include/G4Types.hh.html#G4double" title='G4double' data-type='double' data-ref="G4double">G4double</a> <dfn class="decl" id="_ZN23G4InuclSpecialFunctions6G4cbrtEd" title='G4InuclSpecialFunctions::G4cbrt' data-ref="_ZN23G4InuclSpecialFunctions6G4cbrtEd">G4cbrt</dfn>(<a class="typedef" href="../../../../../../global/management/include/G4Types.hh.html#G4double" title='G4double' data-type='double' data-ref="G4double">G4double</a> <dfn class="local col3 decl" id="53x" title='x' data-type='G4double' data-ref="53x">x</dfn>);	<i>// Can't use "cbrt" name, clashes with &lt;math.h&gt;</i></td></tr>
+<tr><th id="67">67</th><td>  <a class="typedef" href="../../../../../../global/management/include/G4Types.hh.html#G4double" title='G4double' data-type='double' data-ref="G4double">G4double</a> <dfn class="decl" id="_ZN23G4InuclSpecialFunctions6G4cbrtEi" title='G4InuclSpecialFunctions::G4cbrt' data-ref="_ZN23G4InuclSpecialFunctions6G4cbrtEi">G4cbrt</dfn>(<a class="typedef" href="../../../../../../global/management/include/G4Types.hh.html#G4int" title='G4int' data-type='int' data-ref="G4int">G4int</a> <dfn class="local col4 decl" id="54n" title='n' data-type='G4int' data-ref="54n">n</dfn>);	<i>// Use G4Pow::powN() here for speedup</i></td></tr>
+<tr><th id="68">68</th><td></td></tr>
+<tr><th id="69">69</th><td>  <a class="typedef" href="../../../../../../global/management/include/G4Types.hh.html#G4double" title='G4double' data-type='double' data-ref="G4double">G4double</a> <dfn class="decl" id="_ZN23G4InuclSpecialFunctions9inuclRndmEv" title='G4InuclSpecialFunctions::inuclRndm' data-ref="_ZN23G4InuclSpecialFunctions9inuclRndmEv">inuclRndm</dfn>();				<i>// Wrapper for G4UniformRand()</i></td></tr>
+<tr><th id="70">70</th><td></td></tr>
+<tr><th id="71">71</th><td>  <a class="typedef" href="../../../../../../global/management/include/G4Types.hh.html#G4double" title='G4double' data-type='double' data-ref="G4double">G4double</a> <dfn class="decl" id="_ZN23G4InuclSpecialFunctions17randomInuclPowersEdRA4_A4_Kd" title='G4InuclSpecialFunctions::randomInuclPowers' data-ref="_ZN23G4InuclSpecialFunctions17randomInuclPowersEdRA4_A4_Kd">randomInuclPowers</dfn>(<a class="typedef" href="../../../../../../global/management/include/G4Types.hh.html#G4double" title='G4double' data-type='double' data-ref="G4double">G4double</a> <dfn class="local col5 decl" id="55ekin" title='ekin' data-type='G4double' data-ref="55ekin">ekin</dfn>, 	<i>// Power series in Ekin, S</i></td></tr>
+<tr><th id="72">72</th><td>			     <em>const</em> <a class="typedef" href="../../../../../../global/management/include/G4Types.hh.html#G4double" title='G4double' data-type='double' data-ref="G4double">G4double</a> (&amp;<dfn class="local col6 decl" id="56coeff" title='coeff' data-type='const G4double (&amp;)[4][4]' data-ref="56coeff">coeff</dfn>)[<var>4</var>][<var>4</var>]);</td></tr>
+<tr><th id="73">73</th><td></td></tr>
+<tr><th id="74">74</th><td>  <a class="typedef" href="../../../../../../global/management/include/G4Types.hh.html#G4double" title='G4double' data-type='double' data-ref="G4double">G4double</a> <dfn class="decl" id="_ZN23G4InuclSpecialFunctions11randomGaussEd" title='G4InuclSpecialFunctions::randomGauss' data-ref="_ZN23G4InuclSpecialFunctions11randomGaussEd">randomGauss</dfn>(<a class="typedef" href="../../../../../../global/management/include/G4Types.hh.html#G4double" title='G4double' data-type='double' data-ref="G4double">G4double</a> <dfn class="local col7 decl" id="57sigma" title='sigma' data-type='G4double' data-ref="57sigma">sigma</dfn>);		<i>// Gaussian distribution</i></td></tr>
+<tr><th id="75">75</th><td></td></tr>
+<tr><th id="76">76</th><td>  <a class="typedef" href="../../../../../../global/management/include/G4Types.hh.html#G4double" title='G4double' data-type='double' data-ref="G4double">G4double</a> <dfn class="decl" id="_ZN23G4InuclSpecialFunctions9randomPHIEv" title='G4InuclSpecialFunctions::randomPHI' data-ref="_ZN23G4InuclSpecialFunctions9randomPHIEv">randomPHI</dfn>();</td></tr>
+<tr><th id="77">77</th><td></td></tr>
+<tr><th id="78">78</th><td>  <span class='error' title="use of undeclared identifier &apos;std&apos;">std</span>::pair<span class='error' title="expected unqualified-id">&lt;</span>G4double, G4double&gt; randomCOS_SIN();</td></tr>
+<tr><th id="79">79</th><td></td></tr>
+<tr><th id="80">80</th><td>  <a class="typedef" href="../../../../../../global/management/include/G4Types.hh.html#G4double" title='G4double' data-type='double' data-ref="G4double">G4double</a> <dfn class="decl" id="_ZN23G4InuclSpecialFunctions18nucleiLevelDensityEi" title='G4InuclSpecialFunctions::nucleiLevelDensity' data-ref="_ZN23G4InuclSpecialFunctions18nucleiLevelDensityEi">nucleiLevelDensity</dfn>(<a class="typedef" href="../../../../../../global/management/include/G4Types.hh.html#G4int" title='G4int' data-type='int' data-ref="G4int">G4int</a> <dfn class="local col8 decl" id="58A" title='A' data-type='G4int' data-ref="58A">A</dfn>);</td></tr>
+<tr><th id="81">81</th><td></td></tr>
+<tr><th id="82">82</th><td>  <i>// Optional mass argument will be used to fill G4LorentzVector correctly</i></td></tr>
+<tr><th id="83">83</th><td>  <a class="typedef" href="../../../../../../global/HEPGeometry/include/G4LorentzVector.hh.html#G4LorentzVector" title='G4LorentzVector' data-type='CLHEP::HepLorentzVector' data-ref="G4LorentzVector">G4LorentzVector</a> <dfn class="decl" id="_ZN23G4InuclSpecialFunctions22generateWithFixedThetaEddd" title='G4InuclSpecialFunctions::generateWithFixedTheta' data-ref="_ZN23G4InuclSpecialFunctions22generateWithFixedThetaEddd">generateWithFixedTheta</dfn>(<a class="typedef" href="../../../../../../global/management/include/G4Types.hh.html#G4double" title='G4double' data-type='double' data-ref="G4double">G4double</a> <dfn class="local col9 decl" id="59ct" title='ct' data-type='G4double' data-ref="59ct">ct</dfn>, <a class="typedef" href="../../../../../../global/management/include/G4Types.hh.html#G4double" title='G4double' data-type='double' data-ref="G4double">G4double</a> <dfn class="local col0 decl" id="60p" title='p' data-type='G4double' data-ref="60p">p</dfn>,</td></tr>
+<tr><th id="84">84</th><td>					 <a class="typedef" href="../../../../../../global/management/include/G4Types.hh.html#G4double" title='G4double' data-type='double' data-ref="G4double">G4double</a> <dfn class="local col1 decl" id="61mass" title='mass' data-type='G4double' data-ref="61mass">mass</dfn>=<var>0.</var>);</td></tr>
+<tr><th id="85">85</th><td></td></tr>
+<tr><th id="86">86</th><td>  <a class="typedef" href="../../../../../../global/HEPGeometry/include/G4LorentzVector.hh.html#G4LorentzVector" title='G4LorentzVector' data-type='CLHEP::HepLorentzVector' data-ref="G4LorentzVector">G4LorentzVector</a> <dfn class="decl" id="_ZN23G4InuclSpecialFunctions24generateWithRandomAnglesEdd" title='G4InuclSpecialFunctions::generateWithRandomAngles' data-ref="_ZN23G4InuclSpecialFunctions24generateWithRandomAnglesEdd">generateWithRandomAngles</dfn>(<a class="typedef" href="../../../../../../global/management/include/G4Types.hh.html#G4double" title='G4double' data-type='double' data-ref="G4double">G4double</a> <dfn class="local col2 decl" id="62p" title='p' data-type='G4double' data-ref="62p">p</dfn>, <a class="typedef" href="../../../../../../global/management/include/G4Types.hh.html#G4double" title='G4double' data-type='double' data-ref="G4double">G4double</a> <dfn class="local col3 decl" id="63mass" title='mass' data-type='G4double' data-ref="63mass">mass</dfn>=<var>0.</var>);</td></tr>
+<tr><th id="87">87</th><td></td></tr>
+<tr><th id="88">88</th><td>  <i>// This is an object to be instantiated by client code</i></td></tr>
+<tr><th id="89">89</th><td>  <b>class</b> <dfn class="type def" id="G4InuclSpecialFunctions::paraMaker" title='G4InuclSpecialFunctions::paraMaker' data-ref="G4InuclSpecialFunctions::paraMaker">paraMaker</dfn> {</td></tr>
+<tr><th id="90">90</th><td>  <b>public</b>:</td></tr>
+<tr><th id="91">91</th><td>    <dfn class="decl" id="_ZN23G4InuclSpecialFunctions9paraMakerC1Ei" title='G4InuclSpecialFunctions::paraMaker::paraMaker' data-ref="_ZN23G4InuclSpecialFunctions9paraMakerC1Ei">paraMaker</dfn>(<a class="typedef" href="../../../../../../global/management/include/G4Types.hh.html#G4int" title='G4int' data-type='int' data-ref="G4int">G4int</a> <dfn class="local col4 decl" id="64verbose" title='verbose' data-type='G4int' data-ref="64verbose">verbose</dfn>=<var>0</var>);</td></tr>
+<tr><th id="92">92</th><td>    <dfn class="decl" id="_ZN23G4InuclSpecialFunctions9paraMakerD1Ev" title='G4InuclSpecialFunctions::paraMaker::~paraMaker' data-ref="_ZN23G4InuclSpecialFunctions9paraMakerD1Ev">~paraMaker</dfn>();</td></tr>
+<tr><th id="93">93</th><td></td></tr>
+<tr><th id="94">94</th><td>  <i>// NOTE:  Passing Z as double here, to be used as interpolation argument</i></td></tr>
+<tr><th id="95">95</th><td>    <em>void</em> <dfn class="decl" id="_ZN23G4InuclSpecialFunctions9paraMaker9getParamsEdi" title='G4InuclSpecialFunctions::paraMaker::getParams' data-ref="_ZN23G4InuclSpecialFunctions9paraMaker9getParamsEdi">getParams</dfn>(<a class="typedef" href="../../../../../../global/management/include/G4Types.hh.html#G4double" title='G4double' data-type='double' data-ref="G4double">G4double</a> <dfn class="local col5 decl" id="65Z" title='Z' data-type='G4double' data-ref="65Z">Z</dfn>, <span class='error' title="use of undeclared identifier &apos;std&apos;">std</span>::pair<span class='error' title="expected &apos;)&apos;">&lt;</span>std::vector&lt;G4double&gt;,</td></tr>
+<tr><th id="96">96</th><td>		                         std::vector&lt;G4double&gt; &gt;&amp; parms);</td></tr>
+<tr><th id="97">97</th><td></td></tr>
+<tr><th id="98">98</th><td>    <em>void</em> <dfn class="decl" id="_ZN23G4InuclSpecialFunctions9paraMaker12getTruncatedEdi" title='G4InuclSpecialFunctions::paraMaker::getTruncated' data-ref="_ZN23G4InuclSpecialFunctions9paraMaker12getTruncatedEdi">getTruncated</dfn>(<a class="typedef" href="../../../../../../global/management/include/G4Types.hh.html#G4double" title='G4double' data-type='double' data-ref="G4double">G4double</a> <dfn class="local col6 decl" id="66Z" title='Z' data-type='G4double' data-ref="66Z">Z</dfn>, <span class='error' title="use of undeclared identifier &apos;std&apos;">std</span>::pair<span class='error' title="expected &apos;)&apos;">&lt;</span>G4double, G4double&gt;&amp; parms); </td></tr>
+<tr><th id="99">99</th><td></td></tr>
+<tr><th id="100">100</th><td>  <b>private</b>:</td></tr>
+<tr><th id="101">101</th><td>    <a class="typedef" href="../../../../../../global/management/include/G4Types.hh.html#G4int" title='G4int' data-type='int' data-ref="G4int">G4int</a> <dfn class="decl" id="G4InuclSpecialFunctions::paraMaker::verboseLevel" title='G4InuclSpecialFunctions::paraMaker::verboseLevel' data-ref="G4InuclSpecialFunctions::paraMaker::verboseLevel">verboseLevel</dfn>;</td></tr>
+<tr><th id="102">102</th><td>    <a class="type" href="#G4CascadeInterpolator" title='G4CascadeInterpolator' data-ref="G4CascadeInterpolator">G4CascadeInterpolator</a>&lt;<var>5</var>&gt;* <dfn class="decl" id="G4InuclSpecialFunctions::paraMaker::interp" title='G4InuclSpecialFunctions::paraMaker::interp' data-ref="G4InuclSpecialFunctions::paraMaker::interp">interp</dfn>;</td></tr>
+<tr><th id="103">103</th><td></td></tr>
+<tr><th id="104">104</th><td>    <i>// No copy actions</i></td></tr>
+<tr><th id="105">105</th><td>    <dfn class="decl" id="_ZN23G4InuclSpecialFunctions9paraMakerC1ERKS0_" title='G4InuclSpecialFunctions::paraMaker::paraMaker' data-ref="_ZN23G4InuclSpecialFunctions9paraMakerC1ERKS0_">paraMaker</dfn>(<em>const</em> <a class="type" href="#G4InuclSpecialFunctions::paraMaker" title='G4InuclSpecialFunctions::paraMaker' data-ref="G4InuclSpecialFunctions::paraMaker">paraMaker</a>&amp; <dfn class="local col7 decl" id="67right" title='right' data-type='const G4InuclSpecialFunctions::paraMaker &amp;' data-ref="67right">right</dfn>);</td></tr>
+<tr><th id="106">106</th><td>    <a class="type" href="#G4InuclSpecialFunctions::paraMaker" title='G4InuclSpecialFunctions::paraMaker' data-ref="G4InuclSpecialFunctions::paraMaker">paraMaker</a>&amp; <dfn class="decl" id="_ZN23G4InuclSpecialFunctions9paraMakeraSERKS0_" title='G4InuclSpecialFunctions::paraMaker::operator=' data-ref="_ZN23G4InuclSpecialFunctions9paraMakeraSERKS0_"><b>operator</b>=</dfn>(<em>const</em> <a class="type" href="#G4InuclSpecialFunctions::paraMaker" title='G4InuclSpecialFunctions::paraMaker' data-ref="G4InuclSpecialFunctions::paraMaker">paraMaker</a>&amp; <dfn class="local col8 decl" id="68right" title='right' data-type='const G4InuclSpecialFunctions::paraMaker &amp;' data-ref="68right">right</dfn>);</td></tr>
+<tr><th id="107">107</th><td>  };</td></tr>
+<tr><th id="108">108</th><td>}</td></tr>
+<tr><th id="109">109</th><td></td></tr>
+<tr><th id="110">110</th><td></td></tr>
+<tr><th id="111">111</th><td><u>#<span data-ppcond="41">endif</span></u></td></tr>
+<tr><th id="112">112</th><td></td></tr>
+</table><hr/><p id='footer'>
+Generated while processing <a href='../src/G4BigBanger.cc.html'>codebrowser/source/processes/hadronic/models/cascade/cascade/src/G4BigBanger.cc</a><br/>Generated on <em>2019-Aug-28</em> from project codebrowser<br />Powered by <a href='https://woboq.com'><img alt='Woboq' src='https://code.woboq.org/woboq-16.png' width='41' height='16' /></a> <a href='https://code.woboq.org'>Code Browser</a> 2.1
+<br/>Generator usage only permitted with license.</p>
+</div></body></html>

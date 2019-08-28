@@ -1,0 +1,436 @@
+<!doctype html>
+<html>
+<head>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"><title>G4INCLNaturalIsotopicDistributions.cc source code [codebrowser/source/processes/hadronic/models/inclxx/utils/src/G4INCLNaturalIsotopicDistributions.cc] - Woboq Code Browser</title>
+<link rel="stylesheet" href="../../../../../../../../../data/qtcreator.css" title="QtCreator"/>
+<link rel="alternate stylesheet" href="../../../../../../../../../data/kdevelop.css" title="KDevelop"/>
+<script type="text/javascript" src="../../../../../../../../../data/jquery/jquery.min.js"></script>
+<script type="text/javascript" src="../../../../../../../../../data/jquery/jquery-ui.min.js"></script>
+<script>var file = 'codebrowser/source/processes/hadronic/models/inclxx/utils/src/G4INCLNaturalIsotopicDistributions.cc'; var root_path = '../../../../../../../..'; var data_path = '../../../../../../../../../data';</script>
+<script src='../../../../../../../../../data/codebrowser.js'></script>
+</head>
+<body><div id='header'><h1 id='breadcrumb'><span>Browse the source code of </span><a href='../../../../../../..'>codebrowser</a>/<a href='../../../../../..'>source</a>/<a href='../../../../..'>processes</a>/<a href='../../../..'>hadronic</a>/<a href='../../..'>models</a>/<a href='../..'>inclxx</a>/<a href='..'>utils</a>/<a href='./'>src</a>/<a href='G4INCLNaturalIsotopicDistributions.cc.html'>G4INCLNaturalIsotopicDistributions.cc</a></h1></div>
+<hr/><div id='content'><table class="code">
+<tr><th id="1">1</th><td><i>//</i></td></tr>
+<tr><th id="2">2</th><td><i>// ********************************************************************</i></td></tr>
+<tr><th id="3">3</th><td><i>// * License and Disclaimer                                           *</i></td></tr>
+<tr><th id="4">4</th><td><i>// *                                                                  *</i></td></tr>
+<tr><th id="5">5</th><td><i>// * The  Geant4 software  is  copyright of the Copyright Holders  of *</i></td></tr>
+<tr><th id="6">6</th><td><i>// * the Geant4 Collaboration.  It is provided  under  the terms  and *</i></td></tr>
+<tr><th id="7">7</th><td><i>// * conditions of the Geant4 Software License,  included in the file *</i></td></tr>
+<tr><th id="8">8</th><td><i>// * LICENSE and available at  <a href="http://cern.ch/geant4/license">http://cern.ch/geant4/license</a> .  These *</i></td></tr>
+<tr><th id="9">9</th><td><i>// * include a list of copyright holders.                             *</i></td></tr>
+<tr><th id="10">10</th><td><i>// *                                                                  *</i></td></tr>
+<tr><th id="11">11</th><td><i>// * Neither the authors of this software system, nor their employing *</i></td></tr>
+<tr><th id="12">12</th><td><i>// * institutes,nor the agencies providing financial support for this *</i></td></tr>
+<tr><th id="13">13</th><td><i>// * work  make  any representation or  warranty, express or implied, *</i></td></tr>
+<tr><th id="14">14</th><td><i>// * regarding  this  software system or assume any liability for its *</i></td></tr>
+<tr><th id="15">15</th><td><i>// * use.  Please see the license in the file  LICENSE  and URL above *</i></td></tr>
+<tr><th id="16">16</th><td><i>// * for the full disclaimer and the limitation of liability.         *</i></td></tr>
+<tr><th id="17">17</th><td><i>// *                                                                  *</i></td></tr>
+<tr><th id="18">18</th><td><i>// * This  code  implementation is the result of  the  scientific and *</i></td></tr>
+<tr><th id="19">19</th><td><i>// * technical work of the GEANT4 collaboration.                      *</i></td></tr>
+<tr><th id="20">20</th><td><i>// * By using,  copying,  modifying or  distributing the software (or *</i></td></tr>
+<tr><th id="21">21</th><td><i>// * any work based  on the software)  you  agree  to acknowledge its *</i></td></tr>
+<tr><th id="22">22</th><td><i>// * use  in  resulting  scientific  publications,  and indicate your *</i></td></tr>
+<tr><th id="23">23</th><td><i>// * acceptance of all terms of the Geant4 Software license.          *</i></td></tr>
+<tr><th id="24">24</th><td><i>// ********************************************************************</i></td></tr>
+<tr><th id="25">25</th><td><i>//</i></td></tr>
+<tr><th id="26">26</th><td><i>// INCL++ intra-nuclear cascade model</i></td></tr>
+<tr><th id="27">27</th><td><i>// Alain Boudard, CEA-Saclay, France</i></td></tr>
+<tr><th id="28">28</th><td><i>// Joseph Cugnon, University of Liege, Belgium</i></td></tr>
+<tr><th id="29">29</th><td><i>// Jean-Christophe David, CEA-Saclay, France</i></td></tr>
+<tr><th id="30">30</th><td><i>// Pekka Kaitaniemi, CEA-Saclay, France, and Helsinki Institute of Physics, Finland</i></td></tr>
+<tr><th id="31">31</th><td><i>// Sylvie Leray, CEA-Saclay, France</i></td></tr>
+<tr><th id="32">32</th><td><i>// Davide Mancusi, CEA-Saclay, France</i></td></tr>
+<tr><th id="33">33</th><td><i>//</i></td></tr>
+<tr><th id="34">34</th><td><u>#define <dfn class="macro" id="_M/INCLXX_IN_GEANT4_MODE" data-ref="_M/INCLXX_IN_GEANT4_MODE">INCLXX_IN_GEANT4_MODE</dfn> 1</u></td></tr>
+<tr><th id="35">35</th><td></td></tr>
+<tr><th id="36">36</th><td><u>#include <a href="../../../../../../global/management/include/globals.hh.html">"globals.hh"</a></u></td></tr>
+<tr><th id="37">37</th><td></td></tr>
+<tr><th id="38">38</th><td><i class="doc">/**<span class="command"> \file</span> G4INCLNaturalIsotopicDistributions.cc</i></td></tr>
+<tr><th id="39">39</th><td><i class="doc"> * <span class="command">\brief</span> Classes that stores isotopic abundances</i></td></tr>
+<tr><th id="40">40</th><td><i class="doc"> *</i></td></tr>
+<tr><th id="41">41</th><td><i class="doc"> * <span class="command">\date</span> 21st October 2012</i></td></tr>
+<tr><th id="42">42</th><td><i class="doc"> * <span class="command">\author</span> Davide Mancusi</i></td></tr>
+<tr><th id="43">43</th><td><i class="doc"> */</i></td></tr>
+<tr><th id="44">44</th><td></td></tr>
+<tr><th id="45">45</th><td><u>#include <a href="../include/G4INCLNaturalIsotopicDistributions.hh.html">"G4INCLNaturalIsotopicDistributions.hh"</a></u></td></tr>
+<tr><th id="46">46</th><td><u>#include <a href="../include/G4INCLRandom.hh.html">"G4INCLRandom.hh"</a></u></td></tr>
+<tr><th id="47">47</th><td><u>#include <a href="../include/G4INCLLogger.hh.html">"G4INCLLogger.hh"</a></u></td></tr>
+<tr><th id="48">48</th><td><i>// #include &lt;cassert&gt;</i></td></tr>
+<tr><th id="49">49</th><td><u>#include <span class='error' title="&apos;utility&apos; file not found">&lt;</span>utility&gt;</u></td></tr>
+<tr><th id="50">50</th><td><u>#include &lt;iostream&gt;</u></td></tr>
+<tr><th id="51">51</th><td></td></tr>
+<tr><th id="52">52</th><td><b>namespace</b> <span class="namespace">G4INCL</span> {</td></tr>
+<tr><th id="53">53</th><td></td></tr>
+<tr><th id="54">54</th><td>  <a class="type" href="../include/G4INCLNaturalIsotopicDistributions.hh.html#G4INCL::Isotope" title='G4INCL::Isotope' data-ref="G4INCL::Isotope">Isotope</a>::<dfn class="decl def" id="_ZN6G4INCL7IsotopeC1Eid" title='G4INCL::Isotope::Isotope' data-ref="_ZN6G4INCL7IsotopeC1Eid">Isotope</dfn>(<em>const</em> <a class="typedef" href="../../../../../../global/management/include/G4Types.hh.html#G4int" title='G4int' data-type='int' data-ref="G4int">G4int</a> <dfn class="local col1 decl" id="1A" title='A' data-type='const G4int' data-ref="1A">A</dfn>, <em>const</em> <a class="typedef" href="../../../../../../global/management/include/G4Types.hh.html#G4double" title='G4double' data-type='double' data-ref="G4double">G4double</a> <dfn class="local col2 decl" id="2abundance" title='abundance' data-type='const G4double' data-ref="2abundance">abundance</dfn>) :</td></tr>
+<tr><th id="55">55</th><td>    <a class="member" href="../include/G4INCLNaturalIsotopicDistributions.hh.html#G4INCL::Isotope::theA" title='G4INCL::Isotope::theA' data-ref="G4INCL::Isotope::theA">theA</a>(<a class="local col1 ref" href="#1A" title='A' data-ref="1A">A</a>),</td></tr>
+<tr><th id="56">56</th><td>    <a class="member" href="../include/G4INCLNaturalIsotopicDistributions.hh.html#G4INCL::Isotope::theAbundance" title='G4INCL::Isotope::theAbundance' data-ref="G4INCL::Isotope::theAbundance">theAbundance</a>(<a class="local col2 ref" href="#2abundance" title='abundance' data-ref="2abundance">abundance</a>)</td></tr>
+<tr><th id="57">57</th><td>  {}</td></tr>
+<tr><th id="58">58</th><td></td></tr>
+<tr><th id="59">59</th><td>  IsotopicDistribution::IsotopicDistribution(<span class='error' title="unknown type name &apos;IsotopeVector&apos;">IsotopeVector</span> <span class='error' title="expected &apos;)&apos;"><em>const</em></span> &amp;aVector) :</td></tr>
+<tr><th id="60">60</th><td>    theIsotopes(<span class='error' title="use of undeclared identifier &apos;aVector&apos;">aVector</span>)</td></tr>
+<tr><th id="61">61</th><td>  {</td></tr>
+<tr><th id="62">62</th><td>    G4double previousAbundance = <var>0.</var>;</td></tr>
+<tr><th id="63">63</th><td>    <i>// Cumulate the abundances</i></td></tr>
+<tr><th id="64">64</th><td>    <b>for</b>(IsotopeIter i=theIsotopes.begin(), e=theIsotopes.end(); i!=e; ++i) {</td></tr>
+<tr><th id="65">65</th><td>      i-&gt;<span class='error' title="member reference type &apos;IsotopeIter&apos; (aka &apos;int&apos;) is not a pointer">theAbundance</span> += previousAbundance;</td></tr>
+<tr><th id="66">66</th><td>      previousAbundance = i-&gt;<span class='error' title="member reference type &apos;IsotopeIter&apos; (aka &apos;int&apos;) is not a pointer">theAbundance</span>;</td></tr>
+<tr><th id="67">67</th><td>    }</td></tr>
+<tr><th id="68">68</th><td>    <i>// Normalize the abundances to 1</i></td></tr>
+<tr><th id="69">69</th><td>    <em>const</em> G4double normalisation = <var>1.</var>/theIsotopes.back().theAbundance;</td></tr>
+<tr><th id="70">70</th><td>    <b>for</b>(IsotopeIter i=theIsotopes.begin(), e=theIsotopes.end(); i!=e; ++i)</td></tr>
+<tr><th id="71">71</th><td>      i-&gt;<span class='error' title="member reference type &apos;IsotopeIter&apos; (aka &apos;int&apos;) is not a pointer">theAbundance</span> *= normalisation;</td></tr>
+<tr><th id="72">72</th><td>  }</td></tr>
+<tr><th id="73">73</th><td></td></tr>
+<tr><th id="74">74</th><td>  <a class="typedef" href="../../../../../../global/management/include/G4Types.hh.html#G4int" title='G4int' data-type='int' data-ref="G4int">G4int</a> <a class="type" href="../include/G4INCLNaturalIsotopicDistributions.hh.html#G4INCL::IsotopicDistribution" title='G4INCL::IsotopicDistribution' data-ref="G4INCL::IsotopicDistribution">IsotopicDistribution</a>::<dfn class="decl def" id="_ZNK6G4INCL20IsotopicDistribution17drawRandomIsotopeEv" title='G4INCL::IsotopicDistribution::drawRandomIsotope' data-ref="_ZNK6G4INCL20IsotopicDistribution17drawRandomIsotopeEv">drawRandomIsotope</dfn>() <em>const</em> {</td></tr>
+<tr><th id="75">75</th><td>    <em>const</em> <a class="typedef" href="../../../../../../global/management/include/G4Types.hh.html#G4double" title='G4double' data-type='double' data-ref="G4double">G4double</a> <dfn class="local col3 decl" id="3r" title='r' data-type='const G4double' data-ref="3r">r</dfn> = <span class="namespace">Random::</span><a class="ref" href="../include/G4INCLRandom.hh.html#_ZN6G4INCL6Random5shootEv" title='G4INCL::Random::shoot' data-ref="_ZN6G4INCL6Random5shootEv">shoot</a>();</td></tr>
+<tr><th id="76">76</th><td>    <b>for</b>(<em>unsigned</em> <em>int</em> <dfn class="local col4 decl" id="4i" title='i' data-type='unsigned int' data-ref="4i">i</dfn>=<var>0</var>; i&lt;theIsotopes.size()-<var>1</var>; ++<a class="local col4 ref" href="#4i" title='i' data-ref="4i">i</a>) {</td></tr>
+<tr><th id="77">77</th><td>      <b>if</b>(r&lt;=theIsotopes.at(i).theAbundance)</td></tr>
+<tr><th id="78">78</th><td>        <b>return</b> theIsotopes.at(i).theA;</td></tr>
+<tr><th id="79">79</th><td>    }</td></tr>
+<tr><th id="80">80</th><td>    <b>return</b> theIsotopes.back().theA;</td></tr>
+<tr><th id="81">81</th><td>  }</td></tr>
+<tr><th id="82">82</th><td></td></tr>
+<tr><th id="83">83</th><td>  <span class='error' title="unknown type name &apos;IsotopeVector&apos;">IsotopeVector</span> <span class='error' title="expected unqualified-id"><em>const</em></span> &amp;IsotopicDistribution::getIsotopes() <em>const</em> {</td></tr>
+<tr><th id="84">84</th><td>    <b>return</b> theIsotopes;</td></tr>
+<tr><th id="85">85</th><td>  }</td></tr>
+<tr><th id="86">86</th><td></td></tr>
+<tr><th id="87">87</th><td>  <a class="type" href="../include/G4INCLNaturalIsotopicDistributions.hh.html#G4INCL::IsotopicDistribution" title='G4INCL::IsotopicDistribution' data-ref="G4INCL::IsotopicDistribution">IsotopicDistribution</a> <em>const</em> &amp;<a class="type" href="../include/G4INCLNaturalIsotopicDistributions.hh.html#G4INCL::NaturalIsotopicDistributions" title='G4INCL::NaturalIsotopicDistributions' data-ref="G4INCL::NaturalIsotopicDistributions">NaturalIsotopicDistributions</a>::<dfn class="decl def" id="_ZNK6G4INCL28NaturalIsotopicDistributions23getIsotopicDistributionEi" title='G4INCL::NaturalIsotopicDistributions::getIsotopicDistribution' data-ref="_ZNK6G4INCL28NaturalIsotopicDistributions23getIsotopicDistributionEi">getIsotopicDistribution</dfn>(<a class="typedef" href="../../../../../../global/management/include/G4Types.hh.html#G4int" title='G4int' data-type='int' data-ref="G4int">G4int</a> <dfn class="local col5 decl" id="5Z" title='Z' data-type='G4int' data-ref="5Z">Z</dfn>) <em>const</em> {</td></tr>
+<tr><th id="88">88</th><td>    <span class='error' title="use of undeclared identifier &apos;std&apos;">std</span>::map&lt;<span class='error' title="unexpected type name &apos;G4int&apos;: expected expression">G4int</span>, IsotopicDistribution&gt;::const_iterator i = theDistributions.find(Z);</td></tr>
+<tr><th id="89">89</th><td>    <b>if</b>(<span class='error' title="use of undeclared identifier &apos;i&apos;">i</span>!=<span class='error' title="use of undeclared identifier &apos;theDistributions&apos;">theDistributions</span>.end())</td></tr>
+<tr><th id="90">90</th><td>      <b>return</b> <span class='error' title="use of undeclared identifier &apos;i&apos;">i</span>-&gt;second;</td></tr>
+<tr><th id="91">91</th><td>    <b>else</b> {</td></tr>
+<tr><th id="92">92</th><td>      <a class="macro" href="../include/G4INCLLogger.hh.html#216" title="if(true) { std::stringstream ss_; ss_ &lt;&lt; &quot;Requested natural isotopic distribution for synthetic element Z = &quot; &lt;&lt; Z &lt;&lt; &apos;\n&apos;; std::stringstream location_; std::string fileName_(&quot;/home/jishin/app/geant4/1005p1/geant4.10.05.p01/source/processes/hadronic/models/inclxx/utils/src/G4INCLNaturalIsotopicDistributions.cc&quot;); location_ &lt;&lt; fileName_.substr(fileName_.find_last_of(&quot;/&quot;)+1) &lt;&lt; &quot;:&quot; &lt;&lt; 92; G4Exception(location_.str().c_str(), &quot;INCLXX0000&quot;, EventMustBeAborted, ss_.str().c_str()); } else (void)0" data-ref="_M/INCL_FATAL">INCL_FATAL</a>(<q>"Requested natural isotopic distribution for synthetic element Z = "</q> &lt;&lt; Z &lt;&lt; <kbd>'\n'</kbd>);</td></tr>
+<tr><th id="93">93</th><td>      <b>return</b> <span class='error' title="use of undeclared identifier &apos;theDistributions&apos;">theDistributions</span>.begin()-&gt;second;</td></tr>
+<tr><th id="94">94</th><td>    }</td></tr>
+<tr><th id="95">95</th><td>  }</td></tr>
+<tr><th id="96">96</th><td></td></tr>
+<tr><th id="97">97</th><td>  <a class="typedef" href="../../../../../../global/management/include/G4Types.hh.html#G4int" title='G4int' data-type='int' data-ref="G4int">G4int</a> <a class="type" href="../include/G4INCLNaturalIsotopicDistributions.hh.html#G4INCL::NaturalIsotopicDistributions" title='G4INCL::NaturalIsotopicDistributions' data-ref="G4INCL::NaturalIsotopicDistributions">NaturalIsotopicDistributions</a>::<dfn class="decl def" id="_ZNK6G4INCL28NaturalIsotopicDistributions17drawRandomIsotopeEi" title='G4INCL::NaturalIsotopicDistributions::drawRandomIsotope' data-ref="_ZNK6G4INCL28NaturalIsotopicDistributions17drawRandomIsotopeEi">drawRandomIsotope</dfn>(<a class="typedef" href="../../../../../../global/management/include/G4Types.hh.html#G4int" title='G4int' data-type='int' data-ref="G4int">G4int</a> <dfn class="local col6 decl" id="6Z" title='Z' data-type='G4int' data-ref="6Z">Z</dfn>) <em>const</em> {</td></tr>
+<tr><th id="98">98</th><td>    <b>return</b> <a class="member" href="#_ZNK6G4INCL28NaturalIsotopicDistributions23getIsotopicDistributionEi" title='G4INCL::NaturalIsotopicDistributions::getIsotopicDistribution' data-ref="_ZNK6G4INCL28NaturalIsotopicDistributions23getIsotopicDistributionEi">getIsotopicDistribution</a>(<a class="local col6 ref" href="#6Z" title='Z' data-ref="6Z">Z</a>).<a class="ref" href="#_ZNK6G4INCL20IsotopicDistribution17drawRandomIsotopeEv" title='G4INCL::IsotopicDistribution::drawRandomIsotope' data-ref="_ZNK6G4INCL20IsotopicDistribution17drawRandomIsotopeEv">drawRandomIsotope</a>();</td></tr>
+<tr><th id="99">99</th><td>  }</td></tr>
+<tr><th id="100">100</th><td></td></tr>
+<tr><th id="101">101</th><td>  <b>namespace</b> {</td></tr>
+<tr><th id="102">102</th><td>    <span class='error' title="use of undeclared identifier &apos;std&apos;">std</span>::pair<span class='error' title="expected unqualified-id">&lt;</span>G4int, Isotope&gt; theRawDistributions[] = {</td></tr>
+<tr><th id="103">103</th><td>      std::pair&lt;G4int, Isotope&gt;(<var>1</var>, Isotope(<var>1</var>, <var>99.985</var>)),</td></tr>
+<tr><th id="104">104</th><td>      std::pair&lt;G4int, Isotope&gt;(<var>1</var>, Isotope(<var>2</var>, <var>0.015</var>)),</td></tr>
+<tr><th id="105">105</th><td>      std::pair&lt;G4int, Isotope&gt;(<var>2</var>, Isotope(<var>3</var>, <var>0.000137</var>)),</td></tr>
+<tr><th id="106">106</th><td>      std::pair&lt;G4int, Isotope&gt;(<var>2</var>, Isotope(<var>4</var>, <var>99.999863</var>)),</td></tr>
+<tr><th id="107">107</th><td>      std::pair&lt;G4int, Isotope&gt;(<var>3</var>, Isotope(<var>6</var>, <var>7.5</var>)),</td></tr>
+<tr><th id="108">108</th><td>      std::pair&lt;G4int, Isotope&gt;(<var>3</var>, Isotope(<var>7</var>, <var>92.5</var>)),</td></tr>
+<tr><th id="109">109</th><td>      std::pair&lt;G4int, Isotope&gt;(<var>4</var>, Isotope(<var>9</var>, <var>100.0</var>)),</td></tr>
+<tr><th id="110">110</th><td>      std::pair&lt;G4int, Isotope&gt;(<var>5</var>, Isotope(<var>10</var>, <var>19.9</var>)),</td></tr>
+<tr><th id="111">111</th><td>      std::pair&lt;G4int, Isotope&gt;(<var>5</var>, Isotope(<var>11</var>, <var>80.1</var>)),</td></tr>
+<tr><th id="112">112</th><td>      std::pair&lt;G4int, Isotope&gt;(<var>6</var>, Isotope(<var>12</var>, <var>98.90</var>)),</td></tr>
+<tr><th id="113">113</th><td>      std::pair&lt;G4int, Isotope&gt;(<var>6</var>, Isotope(<var>13</var>, <var>1.10</var>)),</td></tr>
+<tr><th id="114">114</th><td>      std::pair&lt;G4int, Isotope&gt;(<var>7</var>, Isotope(<var>14</var>, <var>99.634</var>)),</td></tr>
+<tr><th id="115">115</th><td>      std::pair&lt;G4int, Isotope&gt;(<var>7</var>, Isotope(<var>15</var>, <var>0.366</var>)),</td></tr>
+<tr><th id="116">116</th><td>      std::pair&lt;G4int, Isotope&gt;(<var>8</var>, Isotope(<var>16</var>, <var>99.762</var>)),</td></tr>
+<tr><th id="117">117</th><td>      std::pair&lt;G4int, Isotope&gt;(<var>8</var>, Isotope(<var>17</var>, <var>0.038</var>)),</td></tr>
+<tr><th id="118">118</th><td>      std::pair&lt;G4int, Isotope&gt;(<var>8</var>, Isotope(<var>18</var>, <var>0.200</var>)),</td></tr>
+<tr><th id="119">119</th><td>      std::pair&lt;G4int, Isotope&gt;(<var>9</var>, Isotope(<var>19</var>, <var>100.0</var>)),</td></tr>
+<tr><th id="120">120</th><td>      std::pair&lt;G4int, Isotope&gt;(<var>10</var>, Isotope(<var>20</var>, <var>90.48</var>)),</td></tr>
+<tr><th id="121">121</th><td>      std::pair&lt;G4int, Isotope&gt;(<var>10</var>, Isotope(<var>21</var>, <var>0.27</var>)),</td></tr>
+<tr><th id="122">122</th><td>      std::pair&lt;G4int, Isotope&gt;(<var>10</var>, Isotope(<var>22</var>, <var>9.25</var>)),</td></tr>
+<tr><th id="123">123</th><td>      std::pair&lt;G4int, Isotope&gt;(<var>11</var>, Isotope(<var>23</var>, <var>100.0</var>)),</td></tr>
+<tr><th id="124">124</th><td>      std::pair&lt;G4int, Isotope&gt;(<var>12</var>, Isotope(<var>24</var>, <var>78.99</var>)),</td></tr>
+<tr><th id="125">125</th><td>      std::pair&lt;G4int, Isotope&gt;(<var>12</var>, Isotope(<var>25</var>, <var>10.00</var>)),</td></tr>
+<tr><th id="126">126</th><td>      std::pair&lt;G4int, Isotope&gt;(<var>12</var>, Isotope(<var>26</var>, <var>11.01</var>)),</td></tr>
+<tr><th id="127">127</th><td>      std::pair&lt;G4int, Isotope&gt;(<var>13</var>, Isotope(<var>27</var>, <var>100.0</var>)),</td></tr>
+<tr><th id="128">128</th><td>      std::pair&lt;G4int, Isotope&gt;(<var>14</var>, Isotope(<var>28</var>, <var>92.23</var>)),</td></tr>
+<tr><th id="129">129</th><td>      std::pair&lt;G4int, Isotope&gt;(<var>14</var>, Isotope(<var>29</var>, <var>4.67</var>)),</td></tr>
+<tr><th id="130">130</th><td>      std::pair&lt;G4int, Isotope&gt;(<var>14</var>, Isotope(<var>30</var>, <var>3.10</var>)),</td></tr>
+<tr><th id="131">131</th><td>      std::pair&lt;G4int, Isotope&gt;(<var>15</var>, Isotope(<var>31</var>, <var>100.0</var>)),</td></tr>
+<tr><th id="132">132</th><td>      std::pair&lt;G4int, Isotope&gt;(<var>16</var>, Isotope(<var>32</var>, <var>95.02</var>)),</td></tr>
+<tr><th id="133">133</th><td>      std::pair&lt;G4int, Isotope&gt;(<var>16</var>, Isotope(<var>33</var>, <var>0.75</var>)),</td></tr>
+<tr><th id="134">134</th><td>      std::pair&lt;G4int, Isotope&gt;(<var>16</var>, Isotope(<var>34</var>, <var>4.21</var>)),</td></tr>
+<tr><th id="135">135</th><td>      std::pair&lt;G4int, Isotope&gt;(<var>16</var>, Isotope(<var>36</var>, <var>0.02</var>)),</td></tr>
+<tr><th id="136">136</th><td>      std::pair&lt;G4int, Isotope&gt;(<var>17</var>, Isotope(<var>35</var>, <var>75.77</var>)),</td></tr>
+<tr><th id="137">137</th><td>      std::pair&lt;G4int, Isotope&gt;(<var>17</var>, Isotope(<var>37</var>, <var>24.23</var>)),</td></tr>
+<tr><th id="138">138</th><td>      std::pair&lt;G4int, Isotope&gt;(<var>18</var>, Isotope(<var>36</var>, <var>0.337</var>)),</td></tr>
+<tr><th id="139">139</th><td>      std::pair&lt;G4int, Isotope&gt;(<var>18</var>, Isotope(<var>38</var>, <var>0.063</var>)),</td></tr>
+<tr><th id="140">140</th><td>      std::pair&lt;G4int, Isotope&gt;(<var>18</var>, Isotope(<var>40</var>, <var>99.600</var>)),</td></tr>
+<tr><th id="141">141</th><td>      std::pair&lt;G4int, Isotope&gt;(<var>19</var>, Isotope(<var>39</var>, <var>93.2581</var>)),</td></tr>
+<tr><th id="142">142</th><td>      std::pair&lt;G4int, Isotope&gt;(<var>19</var>, Isotope(<var>40</var>, <var>0.0117</var>)),</td></tr>
+<tr><th id="143">143</th><td>      std::pair&lt;G4int, Isotope&gt;(<var>19</var>, Isotope(<var>41</var>, <var>6.7302</var>)),</td></tr>
+<tr><th id="144">144</th><td>      std::pair&lt;G4int, Isotope&gt;(<var>20</var>, Isotope(<var>40</var>, <var>96.941</var>)),</td></tr>
+<tr><th id="145">145</th><td>      std::pair&lt;G4int, Isotope&gt;(<var>20</var>, Isotope(<var>42</var>, <var>0.647</var>)),</td></tr>
+<tr><th id="146">146</th><td>      std::pair&lt;G4int, Isotope&gt;(<var>20</var>, Isotope(<var>43</var>, <var>0.135</var>)),</td></tr>
+<tr><th id="147">147</th><td>      std::pair&lt;G4int, Isotope&gt;(<var>20</var>, Isotope(<var>44</var>, <var>2.086</var>)),</td></tr>
+<tr><th id="148">148</th><td>      std::pair&lt;G4int, Isotope&gt;(<var>20</var>, Isotope(<var>46</var>, <var>0.004</var>)),</td></tr>
+<tr><th id="149">149</th><td>      std::pair&lt;G4int, Isotope&gt;(<var>20</var>, Isotope(<var>48</var>, <var>0.187</var>)),</td></tr>
+<tr><th id="150">150</th><td>      std::pair&lt;G4int, Isotope&gt;(<var>21</var>, Isotope(<var>45</var>, <var>100.0</var>)),</td></tr>
+<tr><th id="151">151</th><td>      std::pair&lt;G4int, Isotope&gt;(<var>22</var>, Isotope(<var>46</var>, <var>8.0</var>)),</td></tr>
+<tr><th id="152">152</th><td>      std::pair&lt;G4int, Isotope&gt;(<var>22</var>, Isotope(<var>47</var>, <var>7.3</var>)),</td></tr>
+<tr><th id="153">153</th><td>      std::pair&lt;G4int, Isotope&gt;(<var>22</var>, Isotope(<var>48</var>, <var>73.8</var>)),</td></tr>
+<tr><th id="154">154</th><td>      std::pair&lt;G4int, Isotope&gt;(<var>22</var>, Isotope(<var>49</var>, <var>5.5</var>)),</td></tr>
+<tr><th id="155">155</th><td>      std::pair&lt;G4int, Isotope&gt;(<var>22</var>, Isotope(<var>50</var>, <var>5.4</var>)),</td></tr>
+<tr><th id="156">156</th><td>      std::pair&lt;G4int, Isotope&gt;(<var>23</var>, Isotope(<var>50</var>, <var>0.250</var>)),</td></tr>
+<tr><th id="157">157</th><td>      std::pair&lt;G4int, Isotope&gt;(<var>23</var>, Isotope(<var>51</var>, <var>99.750</var>)),</td></tr>
+<tr><th id="158">158</th><td>      std::pair&lt;G4int, Isotope&gt;(<var>24</var>, Isotope(<var>50</var>, <var>4.345</var>)),</td></tr>
+<tr><th id="159">159</th><td>      std::pair&lt;G4int, Isotope&gt;(<var>24</var>, Isotope(<var>52</var>, <var>83.789</var>)),</td></tr>
+<tr><th id="160">160</th><td>      std::pair&lt;G4int, Isotope&gt;(<var>24</var>, Isotope(<var>53</var>, <var>9.501</var>)),</td></tr>
+<tr><th id="161">161</th><td>      std::pair&lt;G4int, Isotope&gt;(<var>24</var>, Isotope(<var>54</var>, <var>2.365</var>)),</td></tr>
+<tr><th id="162">162</th><td>      std::pair&lt;G4int, Isotope&gt;(<var>25</var>, Isotope(<var>55</var>, <var>100.0</var>)),</td></tr>
+<tr><th id="163">163</th><td>      std::pair&lt;G4int, Isotope&gt;(<var>26</var>, Isotope(<var>54</var>, <var>5.8</var>)),</td></tr>
+<tr><th id="164">164</th><td>      std::pair&lt;G4int, Isotope&gt;(<var>26</var>, Isotope(<var>56</var>, <var>91.72</var>)),</td></tr>
+<tr><th id="165">165</th><td>      std::pair&lt;G4int, Isotope&gt;(<var>26</var>, Isotope(<var>57</var>, <var>2.2</var>)),</td></tr>
+<tr><th id="166">166</th><td>      std::pair&lt;G4int, Isotope&gt;(<var>26</var>, Isotope(<var>58</var>, <var>0.28</var>)),</td></tr>
+<tr><th id="167">167</th><td>      std::pair&lt;G4int, Isotope&gt;(<var>27</var>, Isotope(<var>59</var>, <var>100.0</var>)),</td></tr>
+<tr><th id="168">168</th><td>      std::pair&lt;G4int, Isotope&gt;(<var>28</var>, Isotope(<var>58</var>, <var>68.077</var>)),</td></tr>
+<tr><th id="169">169</th><td>      std::pair&lt;G4int, Isotope&gt;(<var>28</var>, Isotope(<var>60</var>, <var>26.223</var>)),</td></tr>
+<tr><th id="170">170</th><td>      std::pair&lt;G4int, Isotope&gt;(<var>28</var>, Isotope(<var>61</var>, <var>1.140</var>)),</td></tr>
+<tr><th id="171">171</th><td>      std::pair&lt;G4int, Isotope&gt;(<var>28</var>, Isotope(<var>62</var>, <var>3.634</var>)),</td></tr>
+<tr><th id="172">172</th><td>      std::pair&lt;G4int, Isotope&gt;(<var>28</var>, Isotope(<var>64</var>, <var>0.926</var>)),</td></tr>
+<tr><th id="173">173</th><td>      std::pair&lt;G4int, Isotope&gt;(<var>29</var>, Isotope(<var>63</var>, <var>69.17</var>)),</td></tr>
+<tr><th id="174">174</th><td>      std::pair&lt;G4int, Isotope&gt;(<var>29</var>, Isotope(<var>65</var>, <var>30.83</var>)),</td></tr>
+<tr><th id="175">175</th><td>      std::pair&lt;G4int, Isotope&gt;(<var>30</var>, Isotope(<var>64</var>, <var>48.6</var>)),</td></tr>
+<tr><th id="176">176</th><td>      std::pair&lt;G4int, Isotope&gt;(<var>30</var>, Isotope(<var>66</var>, <var>27.9</var>)),</td></tr>
+<tr><th id="177">177</th><td>      std::pair&lt;G4int, Isotope&gt;(<var>30</var>, Isotope(<var>67</var>, <var>4.1</var>)),</td></tr>
+<tr><th id="178">178</th><td>      std::pair&lt;G4int, Isotope&gt;(<var>30</var>, Isotope(<var>68</var>, <var>18.8</var>)),</td></tr>
+<tr><th id="179">179</th><td>      std::pair&lt;G4int, Isotope&gt;(<var>30</var>, Isotope(<var>70</var>, <var>0.6</var>)),</td></tr>
+<tr><th id="180">180</th><td>      std::pair&lt;G4int, Isotope&gt;(<var>31</var>, Isotope(<var>69</var>, <var>60.108</var>)),</td></tr>
+<tr><th id="181">181</th><td>      std::pair&lt;G4int, Isotope&gt;(<var>31</var>, Isotope(<var>71</var>, <var>39.892</var>)),</td></tr>
+<tr><th id="182">182</th><td>      std::pair&lt;G4int, Isotope&gt;(<var>32</var>, Isotope(<var>70</var>, <var>21.23</var>)),</td></tr>
+<tr><th id="183">183</th><td>      std::pair&lt;G4int, Isotope&gt;(<var>32</var>, Isotope(<var>72</var>, <var>27.66</var>)),</td></tr>
+<tr><th id="184">184</th><td>      std::pair&lt;G4int, Isotope&gt;(<var>32</var>, Isotope(<var>73</var>, <var>7.73</var>)),</td></tr>
+<tr><th id="185">185</th><td>      std::pair&lt;G4int, Isotope&gt;(<var>32</var>, Isotope(<var>74</var>, <var>35.94</var>)),</td></tr>
+<tr><th id="186">186</th><td>      std::pair&lt;G4int, Isotope&gt;(<var>32</var>, Isotope(<var>76</var>, <var>7.44</var>)),</td></tr>
+<tr><th id="187">187</th><td>      std::pair&lt;G4int, Isotope&gt;(<var>33</var>, Isotope(<var>75</var>, <var>100.0</var>)),</td></tr>
+<tr><th id="188">188</th><td>      std::pair&lt;G4int, Isotope&gt;(<var>34</var>, Isotope(<var>74</var>, <var>0.89</var>)),</td></tr>
+<tr><th id="189">189</th><td>      std::pair&lt;G4int, Isotope&gt;(<var>34</var>, Isotope(<var>76</var>, <var>9.36</var>)),</td></tr>
+<tr><th id="190">190</th><td>      std::pair&lt;G4int, Isotope&gt;(<var>34</var>, Isotope(<var>77</var>, <var>7.63</var>)),</td></tr>
+<tr><th id="191">191</th><td>      std::pair&lt;G4int, Isotope&gt;(<var>34</var>, Isotope(<var>78</var>, <var>23.78</var>)),</td></tr>
+<tr><th id="192">192</th><td>      std::pair&lt;G4int, Isotope&gt;(<var>34</var>, Isotope(<var>80</var>, <var>49.61</var>)),</td></tr>
+<tr><th id="193">193</th><td>      std::pair&lt;G4int, Isotope&gt;(<var>34</var>, Isotope(<var>82</var>, <var>8.73</var>)),</td></tr>
+<tr><th id="194">194</th><td>      std::pair&lt;G4int, Isotope&gt;(<var>35</var>, Isotope(<var>79</var>, <var>50.69</var>)),</td></tr>
+<tr><th id="195">195</th><td>      std::pair&lt;G4int, Isotope&gt;(<var>35</var>, Isotope(<var>81</var>, <var>49.31</var>)),</td></tr>
+<tr><th id="196">196</th><td>      std::pair&lt;G4int, Isotope&gt;(<var>36</var>, Isotope(<var>78</var>, <var>0.35</var>)),</td></tr>
+<tr><th id="197">197</th><td>      std::pair&lt;G4int, Isotope&gt;(<var>36</var>, Isotope(<var>80</var>, <var>2.25</var>)),</td></tr>
+<tr><th id="198">198</th><td>      std::pair&lt;G4int, Isotope&gt;(<var>36</var>, Isotope(<var>82</var>, <var>11.6</var>)),</td></tr>
+<tr><th id="199">199</th><td>      std::pair&lt;G4int, Isotope&gt;(<var>36</var>, Isotope(<var>83</var>, <var>11.5</var>)),</td></tr>
+<tr><th id="200">200</th><td>      std::pair&lt;G4int, Isotope&gt;(<var>36</var>, Isotope(<var>84</var>, <var>57.0</var>)),</td></tr>
+<tr><th id="201">201</th><td>      std::pair&lt;G4int, Isotope&gt;(<var>36</var>, Isotope(<var>86</var>, <var>17.3</var>)),</td></tr>
+<tr><th id="202">202</th><td>      std::pair&lt;G4int, Isotope&gt;(<var>37</var>, Isotope(<var>85</var>, <var>72.165</var>)),</td></tr>
+<tr><th id="203">203</th><td>      std::pair&lt;G4int, Isotope&gt;(<var>37</var>, Isotope(<var>87</var>, <var>27.835</var>)),</td></tr>
+<tr><th id="204">204</th><td>      std::pair&lt;G4int, Isotope&gt;(<var>38</var>, Isotope(<var>84</var>, <var>0.56</var>)),</td></tr>
+<tr><th id="205">205</th><td>      std::pair&lt;G4int, Isotope&gt;(<var>38</var>, Isotope(<var>86</var>, <var>9.86</var>)),</td></tr>
+<tr><th id="206">206</th><td>      std::pair&lt;G4int, Isotope&gt;(<var>38</var>, Isotope(<var>87</var>, <var>7.00</var>)),</td></tr>
+<tr><th id="207">207</th><td>      std::pair&lt;G4int, Isotope&gt;(<var>38</var>, Isotope(<var>88</var>, <var>82.58</var>)),</td></tr>
+<tr><th id="208">208</th><td>      std::pair&lt;G4int, Isotope&gt;(<var>39</var>, Isotope(<var>89</var>, <var>100.0</var>)),</td></tr>
+<tr><th id="209">209</th><td>      std::pair&lt;G4int, Isotope&gt;(<var>40</var>, Isotope(<var>90</var>, <var>51.45</var>)),</td></tr>
+<tr><th id="210">210</th><td>      std::pair&lt;G4int, Isotope&gt;(<var>40</var>, Isotope(<var>91</var>, <var>11.22</var>)),</td></tr>
+<tr><th id="211">211</th><td>      std::pair&lt;G4int, Isotope&gt;(<var>40</var>, Isotope(<var>92</var>, <var>17.15</var>)),</td></tr>
+<tr><th id="212">212</th><td>      std::pair&lt;G4int, Isotope&gt;(<var>40</var>, Isotope(<var>94</var>, <var>17.38</var>)),</td></tr>
+<tr><th id="213">213</th><td>      std::pair&lt;G4int, Isotope&gt;(<var>40</var>, Isotope(<var>96</var>, <var>2.80</var>)),</td></tr>
+<tr><th id="214">214</th><td>      std::pair&lt;G4int, Isotope&gt;(<var>41</var>, Isotope(<var>93</var>, <var>100.0</var>)),</td></tr>
+<tr><th id="215">215</th><td>      std::pair&lt;G4int, Isotope&gt;(<var>42</var>, Isotope(<var>92</var>, <var>14.84</var>)),</td></tr>
+<tr><th id="216">216</th><td>      std::pair&lt;G4int, Isotope&gt;(<var>42</var>, Isotope(<var>94</var>, <var>9.25</var>)),</td></tr>
+<tr><th id="217">217</th><td>      std::pair&lt;G4int, Isotope&gt;(<var>42</var>, Isotope(<var>95</var>, <var>15.92</var>)),</td></tr>
+<tr><th id="218">218</th><td>      std::pair&lt;G4int, Isotope&gt;(<var>42</var>, Isotope(<var>96</var>, <var>16.68</var>)),</td></tr>
+<tr><th id="219">219</th><td>      std::pair&lt;G4int, Isotope&gt;(<var>42</var>, Isotope(<var>97</var>, <var>9.55</var>)),</td></tr>
+<tr><th id="220">220</th><td>      std::pair&lt;G4int, Isotope&gt;(<var>42</var>, Isotope(<var>98</var>, <var>24.13</var>)),</td></tr>
+<tr><th id="221">221</th><td>      std::pair&lt;G4int, Isotope&gt;(<var>42</var>, Isotope(<var>100</var>, <var>9.63</var>)),</td></tr>
+<tr><th id="222">222</th><td>      std::pair&lt;G4int, Isotope&gt;(<var>44</var>, Isotope(<var>96</var>, <var>5.52</var>)),</td></tr>
+<tr><th id="223">223</th><td>      std::pair&lt;G4int, Isotope&gt;(<var>44</var>, Isotope(<var>98</var>, <var>1.88</var>)),</td></tr>
+<tr><th id="224">224</th><td>      std::pair&lt;G4int, Isotope&gt;(<var>44</var>, Isotope(<var>99</var>, <var>12.7</var>)),</td></tr>
+<tr><th id="225">225</th><td>      std::pair&lt;G4int, Isotope&gt;(<var>44</var>, Isotope(<var>100</var>, <var>12.6</var>)),</td></tr>
+<tr><th id="226">226</th><td>      std::pair&lt;G4int, Isotope&gt;(<var>44</var>, Isotope(<var>101</var>, <var>17.0</var>)),</td></tr>
+<tr><th id="227">227</th><td>      std::pair&lt;G4int, Isotope&gt;(<var>44</var>, Isotope(<var>102</var>, <var>31.6</var>)),</td></tr>
+<tr><th id="228">228</th><td>      std::pair&lt;G4int, Isotope&gt;(<var>44</var>, Isotope(<var>104</var>, <var>18.7</var>)),</td></tr>
+<tr><th id="229">229</th><td>      std::pair&lt;G4int, Isotope&gt;(<var>45</var>, Isotope(<var>103</var>, <var>100.0</var>)),</td></tr>
+<tr><th id="230">230</th><td>      std::pair&lt;G4int, Isotope&gt;(<var>46</var>, Isotope(<var>102</var>, <var>1.02</var>)),</td></tr>
+<tr><th id="231">231</th><td>      std::pair&lt;G4int, Isotope&gt;(<var>46</var>, Isotope(<var>104</var>, <var>11.14</var>)),</td></tr>
+<tr><th id="232">232</th><td>      std::pair&lt;G4int, Isotope&gt;(<var>46</var>, Isotope(<var>105</var>, <var>22.33</var>)),</td></tr>
+<tr><th id="233">233</th><td>      std::pair&lt;G4int, Isotope&gt;(<var>46</var>, Isotope(<var>106</var>, <var>27.33</var>)),</td></tr>
+<tr><th id="234">234</th><td>      std::pair&lt;G4int, Isotope&gt;(<var>46</var>, Isotope(<var>108</var>, <var>26.46</var>)),</td></tr>
+<tr><th id="235">235</th><td>      std::pair&lt;G4int, Isotope&gt;(<var>46</var>, Isotope(<var>110</var>, <var>11.72</var>)),</td></tr>
+<tr><th id="236">236</th><td>      std::pair&lt;G4int, Isotope&gt;(<var>47</var>, Isotope(<var>107</var>, <var>51.839</var>)),</td></tr>
+<tr><th id="237">237</th><td>      std::pair&lt;G4int, Isotope&gt;(<var>47</var>, Isotope(<var>109</var>, <var>48.161</var>)),</td></tr>
+<tr><th id="238">238</th><td>      std::pair&lt;G4int, Isotope&gt;(<var>48</var>, Isotope(<var>106</var>, <var>1.25</var>)),</td></tr>
+<tr><th id="239">239</th><td>      std::pair&lt;G4int, Isotope&gt;(<var>48</var>, Isotope(<var>108</var>, <var>0.89</var>)),</td></tr>
+<tr><th id="240">240</th><td>      std::pair&lt;G4int, Isotope&gt;(<var>48</var>, Isotope(<var>110</var>, <var>12.49</var>)),</td></tr>
+<tr><th id="241">241</th><td>      std::pair&lt;G4int, Isotope&gt;(<var>48</var>, Isotope(<var>111</var>, <var>12.80</var>)),</td></tr>
+<tr><th id="242">242</th><td>      std::pair&lt;G4int, Isotope&gt;(<var>48</var>, Isotope(<var>112</var>, <var>24.13</var>)),</td></tr>
+<tr><th id="243">243</th><td>      std::pair&lt;G4int, Isotope&gt;(<var>48</var>, Isotope(<var>113</var>, <var>12.22</var>)),</td></tr>
+<tr><th id="244">244</th><td>      std::pair&lt;G4int, Isotope&gt;(<var>48</var>, Isotope(<var>114</var>, <var>28.73</var>)),</td></tr>
+<tr><th id="245">245</th><td>      std::pair&lt;G4int, Isotope&gt;(<var>48</var>, Isotope(<var>116</var>, <var>7.49</var>)),</td></tr>
+<tr><th id="246">246</th><td>      std::pair&lt;G4int, Isotope&gt;(<var>49</var>, Isotope(<var>113</var>, <var>4.3</var>)),</td></tr>
+<tr><th id="247">247</th><td>      std::pair&lt;G4int, Isotope&gt;(<var>49</var>, Isotope(<var>115</var>, <var>95.7</var>)),</td></tr>
+<tr><th id="248">248</th><td>      std::pair&lt;G4int, Isotope&gt;(<var>50</var>, Isotope(<var>112</var>, <var>0.97</var>)),</td></tr>
+<tr><th id="249">249</th><td>      std::pair&lt;G4int, Isotope&gt;(<var>50</var>, Isotope(<var>114</var>, <var>0.65</var>)),</td></tr>
+<tr><th id="250">250</th><td>      std::pair&lt;G4int, Isotope&gt;(<var>50</var>, Isotope(<var>115</var>, <var>0.34</var>)),</td></tr>
+<tr><th id="251">251</th><td>      std::pair&lt;G4int, Isotope&gt;(<var>50</var>, Isotope(<var>116</var>, <var>14.53</var>)),</td></tr>
+<tr><th id="252">252</th><td>      std::pair&lt;G4int, Isotope&gt;(<var>50</var>, Isotope(<var>117</var>, <var>7.68</var>)),</td></tr>
+<tr><th id="253">253</th><td>      std::pair&lt;G4int, Isotope&gt;(<var>50</var>, Isotope(<var>118</var>, <var>24.23</var>)),</td></tr>
+<tr><th id="254">254</th><td>      std::pair&lt;G4int, Isotope&gt;(<var>50</var>, Isotope(<var>119</var>, <var>8.59</var>)),</td></tr>
+<tr><th id="255">255</th><td>      std::pair&lt;G4int, Isotope&gt;(<var>50</var>, Isotope(<var>120</var>, <var>32.59</var>)),</td></tr>
+<tr><th id="256">256</th><td>      std::pair&lt;G4int, Isotope&gt;(<var>50</var>, Isotope(<var>122</var>, <var>4.63</var>)),</td></tr>
+<tr><th id="257">257</th><td>      std::pair&lt;G4int, Isotope&gt;(<var>50</var>, Isotope(<var>124</var>, <var>5.79</var>)),</td></tr>
+<tr><th id="258">258</th><td>      std::pair&lt;G4int, Isotope&gt;(<var>51</var>, Isotope(<var>121</var>, <var>57.36</var>)),</td></tr>
+<tr><th id="259">259</th><td>      std::pair&lt;G4int, Isotope&gt;(<var>51</var>, Isotope(<var>123</var>, <var>42.64</var>)),</td></tr>
+<tr><th id="260">260</th><td>      std::pair&lt;G4int, Isotope&gt;(<var>52</var>, Isotope(<var>120</var>, <var>0.096</var>)),</td></tr>
+<tr><th id="261">261</th><td>      std::pair&lt;G4int, Isotope&gt;(<var>52</var>, Isotope(<var>122</var>, <var>2.603</var>)),</td></tr>
+<tr><th id="262">262</th><td>      std::pair&lt;G4int, Isotope&gt;(<var>52</var>, Isotope(<var>123</var>, <var>0.908</var>)),</td></tr>
+<tr><th id="263">263</th><td>      std::pair&lt;G4int, Isotope&gt;(<var>52</var>, Isotope(<var>124</var>, <var>4.816</var>)),</td></tr>
+<tr><th id="264">264</th><td>      std::pair&lt;G4int, Isotope&gt;(<var>52</var>, Isotope(<var>125</var>, <var>7.139</var>)),</td></tr>
+<tr><th id="265">265</th><td>      std::pair&lt;G4int, Isotope&gt;(<var>52</var>, Isotope(<var>126</var>, <var>18.95</var>)),</td></tr>
+<tr><th id="266">266</th><td>      std::pair&lt;G4int, Isotope&gt;(<var>52</var>, Isotope(<var>128</var>, <var>31.69</var>)),</td></tr>
+<tr><th id="267">267</th><td>      std::pair&lt;G4int, Isotope&gt;(<var>52</var>, Isotope(<var>130</var>, <var>33.80</var>)),</td></tr>
+<tr><th id="268">268</th><td>      std::pair&lt;G4int, Isotope&gt;(<var>53</var>, Isotope(<var>127</var>, <var>100.0</var>)),</td></tr>
+<tr><th id="269">269</th><td>      std::pair&lt;G4int, Isotope&gt;(<var>54</var>, Isotope(<var>124</var>, <var>0.10</var>)),</td></tr>
+<tr><th id="270">270</th><td>      std::pair&lt;G4int, Isotope&gt;(<var>54</var>, Isotope(<var>126</var>, <var>0.09</var>)),</td></tr>
+<tr><th id="271">271</th><td>      std::pair&lt;G4int, Isotope&gt;(<var>54</var>, Isotope(<var>128</var>, <var>1.91</var>)),</td></tr>
+<tr><th id="272">272</th><td>      std::pair&lt;G4int, Isotope&gt;(<var>54</var>, Isotope(<var>129</var>, <var>26.4</var>)),</td></tr>
+<tr><th id="273">273</th><td>      std::pair&lt;G4int, Isotope&gt;(<var>54</var>, Isotope(<var>130</var>, <var>4.1</var>)),</td></tr>
+<tr><th id="274">274</th><td>      std::pair&lt;G4int, Isotope&gt;(<var>54</var>, Isotope(<var>131</var>, <var>21.2</var>)),</td></tr>
+<tr><th id="275">275</th><td>      std::pair&lt;G4int, Isotope&gt;(<var>54</var>, Isotope(<var>132</var>, <var>26.9</var>)),</td></tr>
+<tr><th id="276">276</th><td>      std::pair&lt;G4int, Isotope&gt;(<var>54</var>, Isotope(<var>134</var>, <var>10.4</var>)),</td></tr>
+<tr><th id="277">277</th><td>      std::pair&lt;G4int, Isotope&gt;(<var>54</var>, Isotope(<var>136</var>, <var>8.9</var>)),</td></tr>
+<tr><th id="278">278</th><td>      std::pair&lt;G4int, Isotope&gt;(<var>55</var>, Isotope(<var>133</var>, <var>100.0</var>)),</td></tr>
+<tr><th id="279">279</th><td>      std::pair&lt;G4int, Isotope&gt;(<var>56</var>, Isotope(<var>130</var>, <var>0.106</var>)),</td></tr>
+<tr><th id="280">280</th><td>      std::pair&lt;G4int, Isotope&gt;(<var>56</var>, Isotope(<var>132</var>, <var>0.101</var>)),</td></tr>
+<tr><th id="281">281</th><td>      std::pair&lt;G4int, Isotope&gt;(<var>56</var>, Isotope(<var>134</var>, <var>2.417</var>)),</td></tr>
+<tr><th id="282">282</th><td>      std::pair&lt;G4int, Isotope&gt;(<var>56</var>, Isotope(<var>135</var>, <var>6.592</var>)),</td></tr>
+<tr><th id="283">283</th><td>      std::pair&lt;G4int, Isotope&gt;(<var>56</var>, Isotope(<var>136</var>, <var>7.854</var>)),</td></tr>
+<tr><th id="284">284</th><td>      std::pair&lt;G4int, Isotope&gt;(<var>56</var>, Isotope(<var>137</var>, <var>11.23</var>)),</td></tr>
+<tr><th id="285">285</th><td>      std::pair&lt;G4int, Isotope&gt;(<var>56</var>, Isotope(<var>138</var>, <var>71.70</var>)),</td></tr>
+<tr><th id="286">286</th><td>      std::pair&lt;G4int, Isotope&gt;(<var>57</var>, Isotope(<var>138</var>, <var>0.0902</var>)),</td></tr>
+<tr><th id="287">287</th><td>      std::pair&lt;G4int, Isotope&gt;(<var>57</var>, Isotope(<var>139</var>, <var>99.9098</var>)),</td></tr>
+<tr><th id="288">288</th><td>      std::pair&lt;G4int, Isotope&gt;(<var>58</var>, Isotope(<var>136</var>, <var>0.19</var>)),</td></tr>
+<tr><th id="289">289</th><td>      std::pair&lt;G4int, Isotope&gt;(<var>58</var>, Isotope(<var>138</var>, <var>0.25</var>)),</td></tr>
+<tr><th id="290">290</th><td>      std::pair&lt;G4int, Isotope&gt;(<var>58</var>, Isotope(<var>140</var>, <var>88.48</var>)),</td></tr>
+<tr><th id="291">291</th><td>      std::pair&lt;G4int, Isotope&gt;(<var>58</var>, Isotope(<var>142</var>, <var>11.08</var>)),</td></tr>
+<tr><th id="292">292</th><td>      std::pair&lt;G4int, Isotope&gt;(<var>59</var>, Isotope(<var>141</var>, <var>100.0</var>)),</td></tr>
+<tr><th id="293">293</th><td>      std::pair&lt;G4int, Isotope&gt;(<var>60</var>, Isotope(<var>142</var>, <var>27.13</var>)),</td></tr>
+<tr><th id="294">294</th><td>      std::pair&lt;G4int, Isotope&gt;(<var>60</var>, Isotope(<var>143</var>, <var>12.18</var>)),</td></tr>
+<tr><th id="295">295</th><td>      std::pair&lt;G4int, Isotope&gt;(<var>60</var>, Isotope(<var>144</var>, <var>23.80</var>)),</td></tr>
+<tr><th id="296">296</th><td>      std::pair&lt;G4int, Isotope&gt;(<var>60</var>, Isotope(<var>145</var>, <var>8.30</var>)),</td></tr>
+<tr><th id="297">297</th><td>      std::pair&lt;G4int, Isotope&gt;(<var>60</var>, Isotope(<var>146</var>, <var>17.19</var>)),</td></tr>
+<tr><th id="298">298</th><td>      std::pair&lt;G4int, Isotope&gt;(<var>60</var>, Isotope(<var>148</var>, <var>5.76</var>)),</td></tr>
+<tr><th id="299">299</th><td>      std::pair&lt;G4int, Isotope&gt;(<var>60</var>, Isotope(<var>150</var>, <var>5.64</var>)),</td></tr>
+<tr><th id="300">300</th><td>      std::pair&lt;G4int, Isotope&gt;(<var>62</var>, Isotope(<var>144</var>, <var>3.1</var>)),</td></tr>
+<tr><th id="301">301</th><td>      std::pair&lt;G4int, Isotope&gt;(<var>62</var>, Isotope(<var>147</var>, <var>15.0</var>)),</td></tr>
+<tr><th id="302">302</th><td>      std::pair&lt;G4int, Isotope&gt;(<var>62</var>, Isotope(<var>148</var>, <var>11.3</var>)),</td></tr>
+<tr><th id="303">303</th><td>      std::pair&lt;G4int, Isotope&gt;(<var>62</var>, Isotope(<var>149</var>, <var>13.8</var>)),</td></tr>
+<tr><th id="304">304</th><td>      std::pair&lt;G4int, Isotope&gt;(<var>62</var>, Isotope(<var>150</var>, <var>7.4</var>)),</td></tr>
+<tr><th id="305">305</th><td>      std::pair&lt;G4int, Isotope&gt;(<var>62</var>, Isotope(<var>152</var>, <var>26.7</var>)),</td></tr>
+<tr><th id="306">306</th><td>      std::pair&lt;G4int, Isotope&gt;(<var>62</var>, Isotope(<var>154</var>, <var>22.7</var>)),</td></tr>
+<tr><th id="307">307</th><td>      std::pair&lt;G4int, Isotope&gt;(<var>63</var>, Isotope(<var>151</var>, <var>47.8</var>)),</td></tr>
+<tr><th id="308">308</th><td>      std::pair&lt;G4int, Isotope&gt;(<var>63</var>, Isotope(<var>153</var>, <var>52.2</var>)),</td></tr>
+<tr><th id="309">309</th><td>      std::pair&lt;G4int, Isotope&gt;(<var>64</var>, Isotope(<var>152</var>, <var>0.20</var>)),</td></tr>
+<tr><th id="310">310</th><td>      std::pair&lt;G4int, Isotope&gt;(<var>64</var>, Isotope(<var>154</var>, <var>2.18</var>)),</td></tr>
+<tr><th id="311">311</th><td>      std::pair&lt;G4int, Isotope&gt;(<var>64</var>, Isotope(<var>155</var>, <var>14.80</var>)),</td></tr>
+<tr><th id="312">312</th><td>      std::pair&lt;G4int, Isotope&gt;(<var>64</var>, Isotope(<var>156</var>, <var>20.47</var>)),</td></tr>
+<tr><th id="313">313</th><td>      std::pair&lt;G4int, Isotope&gt;(<var>64</var>, Isotope(<var>157</var>, <var>15.65</var>)),</td></tr>
+<tr><th id="314">314</th><td>      std::pair&lt;G4int, Isotope&gt;(<var>64</var>, Isotope(<var>158</var>, <var>24.84</var>)),</td></tr>
+<tr><th id="315">315</th><td>      std::pair&lt;G4int, Isotope&gt;(<var>64</var>, Isotope(<var>160</var>, <var>21.86</var>)),</td></tr>
+<tr><th id="316">316</th><td>      std::pair&lt;G4int, Isotope&gt;(<var>65</var>, Isotope(<var>159</var>, <var>100.0</var>)),</td></tr>
+<tr><th id="317">317</th><td>      std::pair&lt;G4int, Isotope&gt;(<var>66</var>, Isotope(<var>156</var>, <var>0.06</var>)),</td></tr>
+<tr><th id="318">318</th><td>      std::pair&lt;G4int, Isotope&gt;(<var>66</var>, Isotope(<var>158</var>, <var>0.10</var>)),</td></tr>
+<tr><th id="319">319</th><td>      std::pair&lt;G4int, Isotope&gt;(<var>66</var>, Isotope(<var>160</var>, <var>2.34</var>)),</td></tr>
+<tr><th id="320">320</th><td>      std::pair&lt;G4int, Isotope&gt;(<var>66</var>, Isotope(<var>161</var>, <var>18.9</var>)),</td></tr>
+<tr><th id="321">321</th><td>      std::pair&lt;G4int, Isotope&gt;(<var>66</var>, Isotope(<var>162</var>, <var>25.5</var>)),</td></tr>
+<tr><th id="322">322</th><td>      std::pair&lt;G4int, Isotope&gt;(<var>66</var>, Isotope(<var>163</var>, <var>24.9</var>)),</td></tr>
+<tr><th id="323">323</th><td>      std::pair&lt;G4int, Isotope&gt;(<var>66</var>, Isotope(<var>164</var>, <var>28.2</var>)),</td></tr>
+<tr><th id="324">324</th><td>      std::pair&lt;G4int, Isotope&gt;(<var>67</var>, Isotope(<var>165</var>, <var>100.0</var>)),</td></tr>
+<tr><th id="325">325</th><td>      std::pair&lt;G4int, Isotope&gt;(<var>68</var>, Isotope(<var>162</var>, <var>0.14</var>)),</td></tr>
+<tr><th id="326">326</th><td>      std::pair&lt;G4int, Isotope&gt;(<var>68</var>, Isotope(<var>164</var>, <var>1.61</var>)),</td></tr>
+<tr><th id="327">327</th><td>      std::pair&lt;G4int, Isotope&gt;(<var>68</var>, Isotope(<var>166</var>, <var>33.6</var>)),</td></tr>
+<tr><th id="328">328</th><td>      std::pair&lt;G4int, Isotope&gt;(<var>68</var>, Isotope(<var>167</var>, <var>22.95</var>)),</td></tr>
+<tr><th id="329">329</th><td>      std::pair&lt;G4int, Isotope&gt;(<var>68</var>, Isotope(<var>168</var>, <var>26.8</var>)),</td></tr>
+<tr><th id="330">330</th><td>      std::pair&lt;G4int, Isotope&gt;(<var>68</var>, Isotope(<var>170</var>, <var>14.9</var>)),</td></tr>
+<tr><th id="331">331</th><td>      std::pair&lt;G4int, Isotope&gt;(<var>69</var>, Isotope(<var>169</var>, <var>100.0</var>)),</td></tr>
+<tr><th id="332">332</th><td>      std::pair&lt;G4int, Isotope&gt;(<var>70</var>, Isotope(<var>168</var>, <var>0.13</var>)),</td></tr>
+<tr><th id="333">333</th><td>      std::pair&lt;G4int, Isotope&gt;(<var>70</var>, Isotope(<var>170</var>, <var>3.05</var>)),</td></tr>
+<tr><th id="334">334</th><td>      std::pair&lt;G4int, Isotope&gt;(<var>70</var>, Isotope(<var>171</var>, <var>14.3</var>)),</td></tr>
+<tr><th id="335">335</th><td>      std::pair&lt;G4int, Isotope&gt;(<var>70</var>, Isotope(<var>172</var>, <var>21.9</var>)),</td></tr>
+<tr><th id="336">336</th><td>      std::pair&lt;G4int, Isotope&gt;(<var>70</var>, Isotope(<var>173</var>, <var>16.12</var>)),</td></tr>
+<tr><th id="337">337</th><td>      std::pair&lt;G4int, Isotope&gt;(<var>70</var>, Isotope(<var>174</var>, <var>31.8</var>)),</td></tr>
+<tr><th id="338">338</th><td>      std::pair&lt;G4int, Isotope&gt;(<var>70</var>, Isotope(<var>176</var>, <var>12.7</var>)),</td></tr>
+<tr><th id="339">339</th><td>      std::pair&lt;G4int, Isotope&gt;(<var>71</var>, Isotope(<var>175</var>, <var>97.41</var>)),</td></tr>
+<tr><th id="340">340</th><td>      std::pair&lt;G4int, Isotope&gt;(<var>71</var>, Isotope(<var>176</var>, <var>2.59</var>)),</td></tr>
+<tr><th id="341">341</th><td>      std::pair&lt;G4int, Isotope&gt;(<var>72</var>, Isotope(<var>174</var>, <var>0.162</var>)),</td></tr>
+<tr><th id="342">342</th><td>      std::pair&lt;G4int, Isotope&gt;(<var>72</var>, Isotope(<var>176</var>, <var>5.206</var>)),</td></tr>
+<tr><th id="343">343</th><td>      std::pair&lt;G4int, Isotope&gt;(<var>72</var>, Isotope(<var>177</var>, <var>18.606</var>)),</td></tr>
+<tr><th id="344">344</th><td>      std::pair&lt;G4int, Isotope&gt;(<var>72</var>, Isotope(<var>178</var>, <var>27.297</var>)),</td></tr>
+<tr><th id="345">345</th><td>      std::pair&lt;G4int, Isotope&gt;(<var>72</var>, Isotope(<var>179</var>, <var>13.629</var>)),</td></tr>
+<tr><th id="346">346</th><td>      std::pair&lt;G4int, Isotope&gt;(<var>72</var>, Isotope(<var>180</var>, <var>35.100</var>)),</td></tr>
+<tr><th id="347">347</th><td>      std::pair&lt;G4int, Isotope&gt;(<var>73</var>, Isotope(<var>180</var>, <var>0.012</var>)),</td></tr>
+<tr><th id="348">348</th><td>      std::pair&lt;G4int, Isotope&gt;(<var>73</var>, Isotope(<var>181</var>, <var>99.988</var>)),</td></tr>
+<tr><th id="349">349</th><td>      std::pair&lt;G4int, Isotope&gt;(<var>74</var>, Isotope(<var>180</var>, <var>0.13</var>)),</td></tr>
+<tr><th id="350">350</th><td>      std::pair&lt;G4int, Isotope&gt;(<var>74</var>, Isotope(<var>182</var>, <var>26.3</var>)),</td></tr>
+<tr><th id="351">351</th><td>      std::pair&lt;G4int, Isotope&gt;(<var>74</var>, Isotope(<var>183</var>, <var>14.3</var>)),</td></tr>
+<tr><th id="352">352</th><td>      std::pair&lt;G4int, Isotope&gt;(<var>74</var>, Isotope(<var>184</var>, <var>30.67</var>)),</td></tr>
+<tr><th id="353">353</th><td>      std::pair&lt;G4int, Isotope&gt;(<var>74</var>, Isotope(<var>186</var>, <var>28.6</var>)),</td></tr>
+<tr><th id="354">354</th><td>      std::pair&lt;G4int, Isotope&gt;(<var>75</var>, Isotope(<var>185</var>, <var>37.40</var>)),</td></tr>
+<tr><th id="355">355</th><td>      std::pair&lt;G4int, Isotope&gt;(<var>75</var>, Isotope(<var>187</var>, <var>62.60</var>)),</td></tr>
+<tr><th id="356">356</th><td>      std::pair&lt;G4int, Isotope&gt;(<var>76</var>, Isotope(<var>184</var>, <var>0.02</var>)),</td></tr>
+<tr><th id="357">357</th><td>      std::pair&lt;G4int, Isotope&gt;(<var>76</var>, Isotope(<var>186</var>, <var>1.58</var>)),</td></tr>
+<tr><th id="358">358</th><td>      std::pair&lt;G4int, Isotope&gt;(<var>76</var>, Isotope(<var>187</var>, <var>1.6</var>)),</td></tr>
+<tr><th id="359">359</th><td>      std::pair&lt;G4int, Isotope&gt;(<var>76</var>, Isotope(<var>188</var>, <var>13.3</var>)),</td></tr>
+<tr><th id="360">360</th><td>      std::pair&lt;G4int, Isotope&gt;(<var>76</var>, Isotope(<var>189</var>, <var>16.1</var>)),</td></tr>
+<tr><th id="361">361</th><td>      std::pair&lt;G4int, Isotope&gt;(<var>76</var>, Isotope(<var>190</var>, <var>26.4</var>)),</td></tr>
+<tr><th id="362">362</th><td>      std::pair&lt;G4int, Isotope&gt;(<var>76</var>, Isotope(<var>192</var>, <var>41.0</var>)),</td></tr>
+<tr><th id="363">363</th><td>      std::pair&lt;G4int, Isotope&gt;(<var>77</var>, Isotope(<var>191</var>, <var>37.3</var>)),</td></tr>
+<tr><th id="364">364</th><td>      std::pair&lt;G4int, Isotope&gt;(<var>77</var>, Isotope(<var>193</var>, <var>62.7</var>)),</td></tr>
+<tr><th id="365">365</th><td>      std::pair&lt;G4int, Isotope&gt;(<var>78</var>, Isotope(<var>190</var>, <var>0.01</var>)),</td></tr>
+<tr><th id="366">366</th><td>      std::pair&lt;G4int, Isotope&gt;(<var>78</var>, Isotope(<var>192</var>, <var>0.79</var>)),</td></tr>
+<tr><th id="367">367</th><td>      std::pair&lt;G4int, Isotope&gt;(<var>78</var>, Isotope(<var>194</var>, <var>32.9</var>)),</td></tr>
+<tr><th id="368">368</th><td>      std::pair&lt;G4int, Isotope&gt;(<var>78</var>, Isotope(<var>195</var>, <var>33.8</var>)),</td></tr>
+<tr><th id="369">369</th><td>      std::pair&lt;G4int, Isotope&gt;(<var>78</var>, Isotope(<var>196</var>, <var>25.3</var>)),</td></tr>
+<tr><th id="370">370</th><td>      std::pair&lt;G4int, Isotope&gt;(<var>78</var>, Isotope(<var>198</var>, <var>7.2</var>)),</td></tr>
+<tr><th id="371">371</th><td>      std::pair&lt;G4int, Isotope&gt;(<var>79</var>, Isotope(<var>197</var>, <var>100.0</var>)),</td></tr>
+<tr><th id="372">372</th><td>      std::pair&lt;G4int, Isotope&gt;(<var>80</var>, Isotope(<var>196</var>, <var>0.15</var>)),</td></tr>
+<tr><th id="373">373</th><td>      std::pair&lt;G4int, Isotope&gt;(<var>80</var>, Isotope(<var>198</var>, <var>9.97</var>)),</td></tr>
+<tr><th id="374">374</th><td>      std::pair&lt;G4int, Isotope&gt;(<var>80</var>, Isotope(<var>199</var>, <var>16.87</var>)),</td></tr>
+<tr><th id="375">375</th><td>      std::pair&lt;G4int, Isotope&gt;(<var>80</var>, Isotope(<var>200</var>, <var>23.10</var>)),</td></tr>
+<tr><th id="376">376</th><td>      std::pair&lt;G4int, Isotope&gt;(<var>80</var>, Isotope(<var>201</var>, <var>13.18</var>)),</td></tr>
+<tr><th id="377">377</th><td>      std::pair&lt;G4int, Isotope&gt;(<var>80</var>, Isotope(<var>202</var>, <var>29.86</var>)),</td></tr>
+<tr><th id="378">378</th><td>      std::pair&lt;G4int, Isotope&gt;(<var>80</var>, Isotope(<var>204</var>, <var>6.87</var>)),</td></tr>
+<tr><th id="379">379</th><td>      std::pair&lt;G4int, Isotope&gt;(<var>81</var>, Isotope(<var>203</var>, <var>29.524</var>)),</td></tr>
+<tr><th id="380">380</th><td>      std::pair&lt;G4int, Isotope&gt;(<var>81</var>, Isotope(<var>205</var>, <var>70.476</var>)),</td></tr>
+<tr><th id="381">381</th><td>      std::pair&lt;G4int, Isotope&gt;(<var>82</var>, Isotope(<var>204</var>, <var>1.4</var>)),</td></tr>
+<tr><th id="382">382</th><td>      std::pair&lt;G4int, Isotope&gt;(<var>82</var>, Isotope(<var>206</var>, <var>24.1</var>)),</td></tr>
+<tr><th id="383">383</th><td>      std::pair&lt;G4int, Isotope&gt;(<var>82</var>, Isotope(<var>207</var>, <var>22.1</var>)),</td></tr>
+<tr><th id="384">384</th><td>      std::pair&lt;G4int, Isotope&gt;(<var>82</var>, Isotope(<var>208</var>, <var>52.4</var>)),</td></tr>
+<tr><th id="385">385</th><td>      std::pair&lt;G4int, Isotope&gt;(<var>83</var>, Isotope(<var>209</var>, <var>100.0</var>)),</td></tr>
+<tr><th id="386">386</th><td>      std::pair&lt;G4int, Isotope&gt;(<var>90</var>, Isotope(<var>232</var>, <var>100.0</var>)),</td></tr>
+<tr><th id="387">387</th><td>      std::pair&lt;G4int, Isotope&gt;(<var>92</var>, Isotope(<var>234</var>, <var>0.0055</var>)),</td></tr>
+<tr><th id="388">388</th><td>      std::pair&lt;G4int, Isotope&gt;(<var>92</var>, Isotope(<var>235</var>, <var>0.7200</var>)),</td></tr>
+<tr><th id="389">389</th><td>      std::pair&lt;G4int, Isotope&gt;(<var>92</var>, Isotope(<var>238</var>, <var>99.2745</var>))</td></tr>
+<tr><th id="390">390</th><td>    };</td></tr>
+<tr><th id="391">391</th><td></td></tr>
+<tr><th id="392">392</th><td>    <i  data-doc="_ZN6G4INCL12_GLOBAL__N_111sizeOfArrayERAT0__KT_">// Cool hack to get the size of an array in C++</i></td></tr>
+<tr><th id="393">393</th><td>    <b>template</b>&lt;<b>typename</b> T, ::<span class='error' title="no member named &apos;std&apos; in the global namespace">std</span>::size_t N&gt; ::<span class='error' title="no member named &apos;std&apos; in the global namespace">std</span>::size_t <dfn class="tu decl def" id="_ZN6G4INCL12_GLOBAL__N_111sizeOfArrayERAT0__KT_" title='G4INCL::(anonymous namespace)::sizeOfArray' data-type='int G4INCL::(anonymous namespace)::sizeOfArray(const T (&amp;)[N] )' data-ref="_ZN6G4INCL12_GLOBAL__N_111sizeOfArrayERAT0__KT_">sizeOfArray</dfn>(<em>const</em> T(&amp;)[ <a class="tu ref" href="#N" title='N' data-ref="N">N</a> ] ) {</td></tr>
+<tr><th id="394">394</th><td>      <b>return</b> <a class="tu ref" href="#N" title='N' data-use='r' data-ref="N">N</a>;</td></tr>
+<tr><th id="395">395</th><td>    }</td></tr>
+<tr><th id="396">396</th><td>  }</td></tr>
+<tr><th id="397">397</th><td></td></tr>
+<tr><th id="398">398</th><td>  <a class="type" href="../include/G4INCLNaturalIsotopicDistributions.hh.html#G4INCL::NaturalIsotopicDistributions" title='G4INCL::NaturalIsotopicDistributions' data-ref="G4INCL::NaturalIsotopicDistributions">NaturalIsotopicDistributions</a>::<dfn class="decl def" id="_ZN6G4INCL28NaturalIsotopicDistributionsC1Ev" title='G4INCL::NaturalIsotopicDistributions::NaturalIsotopicDistributions' data-ref="_ZN6G4INCL28NaturalIsotopicDistributionsC1Ev">NaturalIsotopicDistributions</dfn>() {</td></tr>
+<tr><th id="399">399</th><td>    <a class="typedef" href="../../../../../../global/management/include/G4Types.hh.html#G4int" title='G4int' data-type='int' data-ref="G4int">G4int</a> <dfn class="local col7 decl" id="7oldZ" title='oldZ' data-type='G4int' data-ref="7oldZ">oldZ</dfn> = -<var>1</var>;</td></tr>
+<tr><th id="400">400</th><td>    <span class='error' title="unknown type name &apos;IsotopeVector&apos;">IsotopeVector</span> <dfn class="local col8 decl" id="8aVector" title='aVector' data-type='int' data-ref="8aVector">aVector</dfn>;</td></tr>
+<tr><th id="401">401</th><td>    <b>for</b>(<em>unsigned</em> <em>int</em> <dfn class="local col9 decl" id="9i" title='i' data-type='unsigned int' data-ref="9i">i</dfn>=<var>0</var>; i&lt;sizeOfArray(<span class='error' title="use of undeclared identifier &apos;theRawDistributions&apos;">theRawDistributions</span>); ++<a class="local col9 ref" href="#9i" title='i' data-ref="9i">i</a>) {</td></tr>
+<tr><th id="402">402</th><td>      <span class='error' title="use of undeclared identifier &apos;std&apos;">std</span>::pair&lt;<span class='error' title="unexpected type name &apos;G4int&apos;: expected expression">G4int</span>, Isotope&gt; <em>const</em> &amp;aPair = theRawDistributions[i];</td></tr>
+<tr><th id="403">403</th><td>      <b>if</b>(<span class='error' title="use of undeclared identifier &apos;aPair&apos;">aPair</span>.first == oldZ) {</td></tr>
+<tr><th id="404">404</th><td>        aVector.push_back(<span class='error' title="use of undeclared identifier &apos;aPair&apos;">aPair</span>.second);</td></tr>
+<tr><th id="405">405</th><td>      } <b>else</b> {</td></tr>
+<tr><th id="406">406</th><td>        <b>if</b>(oldZ!=-<var>1</var>)</td></tr>
+<tr><th id="407">407</th><td>          <span class='error' title="use of undeclared identifier &apos;theDistributions&apos;">theDistributions</span>.insert(<span class='error' title="use of undeclared identifier &apos;std&apos;">std</span>::pair&lt;<span class='error' title="unexpected type name &apos;G4int&apos;: expected expression">G4int</span>, <span class='error' title="&apos;IsotopicDistribution&apos; does not refer to a value">IsotopicDistribution</span>&gt;(oldZ, IsotopicDistribution(aVector)));</td></tr>
+<tr><th id="408">408</th><td>        oldZ = <span class='error' title="use of undeclared identifier &apos;aPair&apos;">aPair</span>.first;</td></tr>
+<tr><th id="409">409</th><td>        aVector.clear();</td></tr>
+<tr><th id="410">410</th><td>        aVector.push_back(<span class='error' title="use of undeclared identifier &apos;aPair&apos;">aPair</span>.second);</td></tr>
+<tr><th id="411">411</th><td>      }</td></tr>
+<tr><th id="412">412</th><td>    }</td></tr>
+<tr><th id="413">413</th><td>    <i>// last element</i></td></tr>
+<tr><th id="414">414</th><td>    <span class='error' title="use of undeclared identifier &apos;theDistributions&apos;">theDistributions</span>.insert(<span class='error' title="use of undeclared identifier &apos;std&apos;">std</span>::pair&lt;<span class='error' title="unexpected type name &apos;G4int&apos;: expected expression">G4int</span>, <span class='error' title="&apos;IsotopicDistribution&apos; does not refer to a value">IsotopicDistribution</span>&gt;(oldZ, IsotopicDistribution(aVector)));</td></tr>
+<tr><th id="415">415</th><td>  }</td></tr>
+<tr><th id="416">416</th><td></td></tr>
+<tr><th id="417">417</th><td>}</td></tr>
+<tr><th id="418">418</th><td></td></tr>
+<tr><th id="419">419</th><td></td></tr>
+</table><hr/><p id='footer'>
+Generated on <em>2019-Aug-28</em> from project codebrowser<br />Powered by <a href='https://woboq.com'><img alt='Woboq' src='https://code.woboq.org/woboq-16.png' width='41' height='16' /></a> <a href='https://code.woboq.org'>Code Browser</a> 2.1
+<br/>Generator usage only permitted with license.</p>
+</div></body></html>

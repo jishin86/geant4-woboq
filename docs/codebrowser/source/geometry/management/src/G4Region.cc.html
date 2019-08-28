@@ -1,0 +1,518 @@
+<!doctype html>
+<html>
+<head>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"><title>G4Region.cc source code [codebrowser/source/geometry/management/src/G4Region.cc] - Woboq Code Browser</title>
+<link rel="stylesheet" href="../../../../../../data/qtcreator.css" title="QtCreator"/>
+<link rel="alternate stylesheet" href="../../../../../../data/kdevelop.css" title="KDevelop"/>
+<script type="text/javascript" src="../../../../../../data/jquery/jquery.min.js"></script>
+<script type="text/javascript" src="../../../../../../data/jquery/jquery-ui.min.js"></script>
+<script>var file = 'codebrowser/source/geometry/management/src/G4Region.cc'; var root_path = '../../../../..'; var data_path = '../../../../../../data';</script>
+<script src='../../../../../../data/codebrowser.js'></script>
+</head>
+<body><div id='header'><h1 id='breadcrumb'><span>Browse the source code of </span><a href='../../../..'>codebrowser</a>/<a href='../../..'>source</a>/<a href='../..'>geometry</a>/<a href='..'>management</a>/<a href='./'>src</a>/<a href='G4Region.cc.html'>G4Region.cc</a></h1></div>
+<hr/><div id='content'><table class="code">
+<tr><th id="1">1</th><td><i>//</i></td></tr>
+<tr><th id="2">2</th><td><i>// ********************************************************************</i></td></tr>
+<tr><th id="3">3</th><td><i>// * License and Disclaimer                                           *</i></td></tr>
+<tr><th id="4">4</th><td><i>// *                                                                  *</i></td></tr>
+<tr><th id="5">5</th><td><i>// * The  Geant4 software  is  copyright of the Copyright Holders  of *</i></td></tr>
+<tr><th id="6">6</th><td><i>// * the Geant4 Collaboration.  It is provided  under  the terms  and *</i></td></tr>
+<tr><th id="7">7</th><td><i>// * conditions of the Geant4 Software License,  included in the file *</i></td></tr>
+<tr><th id="8">8</th><td><i>// * LICENSE and available at  <a href="http://cern.ch/geant4/license">http://cern.ch/geant4/license</a> .  These *</i></td></tr>
+<tr><th id="9">9</th><td><i>// * include a list of copyright holders.                             *</i></td></tr>
+<tr><th id="10">10</th><td><i>// *                                                                  *</i></td></tr>
+<tr><th id="11">11</th><td><i>// * Neither the authors of this software system, nor their employing *</i></td></tr>
+<tr><th id="12">12</th><td><i>// * institutes,nor the agencies providing financial support for this *</i></td></tr>
+<tr><th id="13">13</th><td><i>// * work  make  any representation or  warranty, express or implied, *</i></td></tr>
+<tr><th id="14">14</th><td><i>// * regarding  this  software system or assume any liability for its *</i></td></tr>
+<tr><th id="15">15</th><td><i>// * use.  Please see the license in the file  LICENSE  and URL above *</i></td></tr>
+<tr><th id="16">16</th><td><i>// * for the full disclaimer and the limitation of liability.         *</i></td></tr>
+<tr><th id="17">17</th><td><i>// *                                                                  *</i></td></tr>
+<tr><th id="18">18</th><td><i>// * This  code  implementation is the result of  the  scientific and *</i></td></tr>
+<tr><th id="19">19</th><td><i>// * technical work of the GEANT4 collaboration.                      *</i></td></tr>
+<tr><th id="20">20</th><td><i>// * By using,  copying,  modifying or  distributing the software (or *</i></td></tr>
+<tr><th id="21">21</th><td><i>// * any work based  on the software)  you  agree  to acknowledge its *</i></td></tr>
+<tr><th id="22">22</th><td><i>// * use  in  resulting  scientific  publications,  and indicate your *</i></td></tr>
+<tr><th id="23">23</th><td><i>// * acceptance of all terms of the Geant4 Software license.          *</i></td></tr>
+<tr><th id="24">24</th><td><i>// ********************************************************************</i></td></tr>
+<tr><th id="25">25</th><td><i>//</i></td></tr>
+<tr><th id="26">26</th><td><i>//</i></td></tr>
+<tr><th id="27">27</th><td><i>//</i></td></tr>
+<tr><th id="28">28</th><td><i>// </i></td></tr>
+<tr><th id="29">29</th><td><i>// class G4Region Implementation</i></td></tr>
+<tr><th id="30">30</th><td><i>//</i></td></tr>
+<tr><th id="31">31</th><td><i>// --------------------------------------------------------------------</i></td></tr>
+<tr><th id="32">32</th><td></td></tr>
+<tr><th id="33">33</th><td><u>#include <a href="../include/G4Region.hh.html">"G4Region.hh"</a></u></td></tr>
+<tr><th id="34">34</th><td><u>#include <a href="../include/G4RegionStore.hh.html">"G4RegionStore.hh"</a></u></td></tr>
+<tr><th id="35">35</th><td><u>#include <a href="../include/G4LogicalVolume.hh.html">"G4LogicalVolume.hh"</a></u></td></tr>
+<tr><th id="36">36</th><td><u>#include <a href="../include/G4VPhysicalVolume.hh.html">"G4VPhysicalVolume.hh"</a></u></td></tr>
+<tr><th id="37">37</th><td><u>#include <a href="../include/G4LogicalVolumeStore.hh.html">"G4LogicalVolumeStore.hh"</a></u></td></tr>
+<tr><th id="38">38</th><td><u>#include <a href="../include/G4VNestedParameterisation.hh.html">"G4VNestedParameterisation.hh"</a></u></td></tr>
+<tr><th id="39">39</th><td><u>#include <a href="../include/G4VUserRegionInformation.hh.html">"G4VUserRegionInformation.hh"</a></u></td></tr>
+<tr><th id="40">40</th><td><u>#include <a href="../../../materials/include/G4Material.hh.html">"G4Material.hh"</a></u></td></tr>
+<tr><th id="41">41</th><td></td></tr>
+<tr><th id="42">42</th><td><i>// These macros changes the references to fields that are now encapsulated</i></td></tr>
+<tr><th id="43">43</th><td><i>// in the class G4RegionData.</i></td></tr>
+<tr><th id="44">44</th><td><i>//</i></td></tr>
+<tr><th id="45">45</th><td><u>#define <dfn class="macro" id="_M/G4MT_fsmanager" data-ref="_M/G4MT_fsmanager">G4MT_fsmanager</dfn> ((subInstanceManager.offset[instanceID]).fFastSimulationManager)</u></td></tr>
+<tr><th id="46">46</th><td><u>#define <dfn class="macro" id="_M/G4MT_rsaction" data-ref="_M/G4MT_rsaction">G4MT_rsaction</dfn> ((subInstanceManager.offset[instanceID]).fRegionalSteppingAction)</u></td></tr>
+<tr><th id="47">47</th><td></td></tr>
+<tr><th id="48">48</th><td><i  data-doc="G4Region::subInstanceManager">// This new field helps to use the class G4RegionManager</i></td></tr>
+<tr><th id="49">49</th><td><i  data-doc="G4Region::subInstanceManager">//</i></td></tr>
+<tr><th id="50">50</th><td><a class="typedef" href="../include/G4Region.hh.html#G4RegionManager" title='G4RegionManager' data-type='G4GeomSplitter&lt;G4RegionData&gt;' data-ref="G4RegionManager">G4RegionManager</a> <a class="type" href="../include/G4Region.hh.html#G4Region" title='G4Region' data-ref="G4Region">G4Region</a>::<dfn class="tu decl def" id="G4Region::subInstanceManager" title='G4Region::subInstanceManager' data-type='G4RegionManager' data-ref="G4Region::subInstanceManager">subInstanceManager</dfn>;</td></tr>
+<tr><th id="51">51</th><td></td></tr>
+<tr><th id="52">52</th><td><i>// *******************************************************************</i></td></tr>
+<tr><th id="53">53</th><td><i>// GetSubInstanceManager:</i></td></tr>
+<tr><th id="54">54</th><td><i>//  - Returns the private data instance manager.</i></td></tr>
+<tr><th id="55">55</th><td><i>// *******************************************************************</i></td></tr>
+<tr><th id="56">56</th><td><i>//</i></td></tr>
+<tr><th id="57">57</th><td><em>const</em> <a class="typedef" href="../include/G4Region.hh.html#G4RegionManager" title='G4RegionManager' data-type='G4GeomSplitter&lt;G4RegionData&gt;' data-ref="G4RegionManager">G4RegionManager</a>&amp; <a class="type" href="../include/G4Region.hh.html#G4Region" title='G4Region' data-ref="G4Region">G4Region</a>::<dfn class="decl def" id="_ZN8G4Region21GetSubInstanceManagerEv" title='G4Region::GetSubInstanceManager' data-ref="_ZN8G4Region21GetSubInstanceManagerEv">GetSubInstanceManager</dfn>()</td></tr>
+<tr><th id="58">58</th><td>{</td></tr>
+<tr><th id="59">59</th><td>  <b>return</b> subInstanceManager;</td></tr>
+<tr><th id="60">60</th><td>}</td></tr>
+<tr><th id="61">61</th><td></td></tr>
+<tr><th id="62">62</th><td><i>// *******************************************************************</i></td></tr>
+<tr><th id="63">63</th><td><i>// Constructor:</i></td></tr>
+<tr><th id="64">64</th><td><i>//  - Adds self to region Store</i></td></tr>
+<tr><th id="65">65</th><td><i>// *******************************************************************</i></td></tr>
+<tr><th id="66">66</th><td><i>//</i></td></tr>
+<tr><th id="67">67</th><td><a class="type" href="../include/G4Region.hh.html#G4Region" title='G4Region' data-ref="G4Region">G4Region</a>::<dfn class="decl def" id="_ZN8G4RegionC1ERK8G4String" title='G4Region::G4Region' data-ref="_ZN8G4RegionC1ERK8G4String">G4Region</dfn>(<em>const</em> <a class="type" href="../../../global/management/include/G4String.hh.html#G4String" title='G4String' data-ref="G4String">G4String</a>&amp; <dfn class="local col9 decl" id="19pName" title='pName' data-type='const G4String &amp;' data-ref="19pName">pName</dfn>)</td></tr>
+<tr><th id="68">68</th><td>  : <a class="member" href="../include/G4Region.hh.html#G4Region::fName" title='G4Region::fName' data-ref="G4Region::fName">fName</a><a class="ref" href="../../../global/management/include/G4String.hh.html#_ZN8G4StringC1ERKS_" title='G4String::G4String' data-ref="_ZN8G4StringC1ERKS_">(</a><a class="local col9 ref" href="#19pName" title='pName' data-ref="19pName">pName</a>), <a class="member" href="../include/G4Region.hh.html#G4Region::fRegionMod" title='G4Region::fRegionMod' data-ref="G4Region::fRegionMod">fRegionMod</a>(<b>true</b>), <a class="member" href="../include/G4Region.hh.html#G4Region::fCut" title='G4Region::fCut' data-ref="G4Region::fCut">fCut</a>(<var>0</var>), <a class="member" href="../include/G4Region.hh.html#G4Region::fUserInfo" title='G4Region::fUserInfo' data-ref="G4Region::fUserInfo">fUserInfo</a>(<var>0</var>), <a class="member" href="../include/G4Region.hh.html#G4Region::fUserLimits" title='G4Region::fUserLimits' data-ref="G4Region::fUserLimits">fUserLimits</a>(<var>0</var>),</td></tr>
+<tr><th id="69">69</th><td>    <a class="member" href="../include/G4Region.hh.html#G4Region::fFieldManager" title='G4Region::fFieldManager' data-ref="G4Region::fFieldManager">fFieldManager</a>(<var>0</var>), <a class="member" href="../include/G4Region.hh.html#G4Region::fWorldPhys" title='G4Region::fWorldPhys' data-ref="G4Region::fWorldPhys">fWorldPhys</a>(<var>0</var>),</td></tr>
+<tr><th id="70">70</th><td>    <a class="member" href="../include/G4Region.hh.html#G4Region::fInMassGeometry" title='G4Region::fInMassGeometry' data-ref="G4Region::fInMassGeometry">fInMassGeometry</a>(<b>false</b>), <a class="member" href="../include/G4Region.hh.html#G4Region::fInParallelGeometry" title='G4Region::fInParallelGeometry' data-ref="G4Region::fInParallelGeometry">fInParallelGeometry</a>(<b>false</b>)</td></tr>
+<tr><th id="71">71</th><td>{</td></tr>
+<tr><th id="72">72</th><td></td></tr>
+<tr><th id="73">73</th><td>  instanceID = subInstanceManager.CreateSubInstance();</td></tr>
+<tr><th id="74">74</th><td>  <a class="macro" href="#45" title="((subInstanceManager.offset[instanceID]).fFastSimulationManager)" data-ref="_M/G4MT_fsmanager">G4MT_fsmanager</a> = <var>0</var>;</td></tr>
+<tr><th id="75">75</th><td>  <a class="macro" href="#46" title="((subInstanceManager.offset[instanceID]).fRegionalSteppingAction)" data-ref="_M/G4MT_rsaction">G4MT_rsaction</a> = <var>0</var>;</td></tr>
+<tr><th id="76">76</th><td></td></tr>
+<tr><th id="77">77</th><td>  <a class="type" href="../include/G4RegionStore.hh.html#G4RegionStore" title='G4RegionStore' data-ref="G4RegionStore">G4RegionStore</a>* <dfn class="local col0 decl" id="20rStore" title='rStore' data-type='G4RegionStore *' data-ref="20rStore">rStore</dfn> = <a class="type" href="../include/G4RegionStore.hh.html#G4RegionStore" title='G4RegionStore' data-ref="G4RegionStore">G4RegionStore</a>::<a class="ref" href="../include/G4RegionStore.hh.html#_ZN13G4RegionStore11GetInstanceEv" title='G4RegionStore::GetInstance' data-ref="_ZN13G4RegionStore11GetInstanceEv">GetInstance</a>();</td></tr>
+<tr><th id="78">78</th><td>  <b>if</b> (<a class="local col0 ref" href="#20rStore" title='rStore' data-ref="20rStore">rStore</a>-&gt;<a class="ref" href="../include/G4RegionStore.hh.html#_ZNK13G4RegionStore9GetRegionERK8G4Stringb" title='G4RegionStore::GetRegion' data-ref="_ZNK13G4RegionStore9GetRegionERK8G4Stringb">GetRegion</a>(<a class="local col9 ref" href="#19pName" title='pName' data-ref="19pName">pName</a>,<b>false</b>))</td></tr>
+<tr><th id="79">79</th><td>  {</td></tr>
+<tr><th id="80">80</th><td>    <span class='error' title="use of undeclared identifier &apos;std&apos;">std</span>::ostringstream <dfn class="local col1 decl" id="21message" title='message' data-type='int' data-ref="21message">message</dfn>;</td></tr>
+<tr><th id="81">81</th><td>    message &lt;&lt; <q>"The region has NOT been registered !"</q> &lt;&lt; <a class="macro" href="../../../global/management/include/G4ios.hh.html#60" title="std::endl" data-ref="_M/G4endl">G4endl</a></td></tr>
+<tr><th id="82">82</th><td>            &lt;&lt; <q>"          Region "</q> &lt;&lt; pName &lt;&lt; <q>" already existing in store !"</q></td></tr>
+<tr><th id="83">83</th><td>            &lt;&lt; <a class="macro" href="../../../global/management/include/G4ios.hh.html#60" title="std::endl" data-ref="_M/G4endl">G4endl</a>;</td></tr>
+<tr><th id="84">84</th><td>    G4Exception(<q>"G4Region::G4Region()"</q>, <q>"GeomMgt1001"</q>,</td></tr>
+<tr><th id="85">85</th><td>                JustWarning, message);</td></tr>
+<tr><th id="86">86</th><td>  }</td></tr>
+<tr><th id="87">87</th><td>  <b>else</b></td></tr>
+<tr><th id="88">88</th><td>  {</td></tr>
+<tr><th id="89">89</th><td>    <a class="local col0 ref" href="#20rStore" title='rStore' data-ref="20rStore">rStore</a>-&gt;<a class="ref" href="../include/G4RegionStore.hh.html#_ZN13G4RegionStore8RegisterEP8G4Region" title='G4RegionStore::Register' data-ref="_ZN13G4RegionStore8RegisterEP8G4Region">Register</a>(<b>this</b>);</td></tr>
+<tr><th id="90">90</th><td>  }</td></tr>
+<tr><th id="91">91</th><td>}</td></tr>
+<tr><th id="92">92</th><td></td></tr>
+<tr><th id="93">93</th><td><i>// ********************************************************************</i></td></tr>
+<tr><th id="94">94</th><td><i>// Fake default constructor - sets only member data and allocates memory</i></td></tr>
+<tr><th id="95">95</th><td><i>//                            for usage restricted to object persistency.</i></td></tr>
+<tr><th id="96">96</th><td><i>// ********************************************************************</i></td></tr>
+<tr><th id="97">97</th><td><i>//</i></td></tr>
+<tr><th id="98">98</th><td><a class="type" href="../include/G4Region.hh.html#G4Region" title='G4Region' data-ref="G4Region">G4Region</a>::<dfn class="decl def" id="_ZN8G4RegionC1ER8__void__" title='G4Region::G4Region' data-ref="_ZN8G4RegionC1ER8__void__">G4Region</dfn>( <a class="type" href="../../../global/management/include/G4Types.hh.html#__void__" title='__void__' data-ref="__void__">__void__</a>&amp; )</td></tr>
+<tr><th id="99">99</th><td>  : <a class="member" href="../include/G4Region.hh.html#G4Region::fName" title='G4Region::fName' data-ref="G4Region::fName">fName</a><a class="ref" href="../../../global/management/include/G4String.hh.html#_ZN8G4StringC1EPKc" title='G4String::G4String' data-ref="_ZN8G4StringC1EPKc">(</a><q>""</q>), <a class="member" href="../include/G4Region.hh.html#G4Region::fRegionMod" title='G4Region::fRegionMod' data-ref="G4Region::fRegionMod">fRegionMod</a>(<b>true</b>), <a class="member" href="../include/G4Region.hh.html#G4Region::fCut" title='G4Region::fCut' data-ref="G4Region::fCut">fCut</a>(<var>0</var>), <a class="member" href="../include/G4Region.hh.html#G4Region::fUserInfo" title='G4Region::fUserInfo' data-ref="G4Region::fUserInfo">fUserInfo</a>(<var>0</var>), <a class="member" href="../include/G4Region.hh.html#G4Region::fUserLimits" title='G4Region::fUserLimits' data-ref="G4Region::fUserLimits">fUserLimits</a>(<var>0</var>),</td></tr>
+<tr><th id="100">100</th><td>    <a class="member" href="../include/G4Region.hh.html#G4Region::fFieldManager" title='G4Region::fFieldManager' data-ref="G4Region::fFieldManager">fFieldManager</a>(<var>0</var>), <a class="member" href="../include/G4Region.hh.html#G4Region::fWorldPhys" title='G4Region::fWorldPhys' data-ref="G4Region::fWorldPhys">fWorldPhys</a>(<var>0</var>),</td></tr>
+<tr><th id="101">101</th><td>    <a class="member" href="../include/G4Region.hh.html#G4Region::fInMassGeometry" title='G4Region::fInMassGeometry' data-ref="G4Region::fInMassGeometry">fInMassGeometry</a>(<b>false</b>), <a class="member" href="../include/G4Region.hh.html#G4Region::fInParallelGeometry" title='G4Region::fInParallelGeometry' data-ref="G4Region::fInParallelGeometry">fInParallelGeometry</a>(<b>false</b>)</td></tr>
+<tr><th id="102">102</th><td>{</td></tr>
+<tr><th id="103">103</th><td>  instanceID = subInstanceManager.CreateSubInstance();</td></tr>
+<tr><th id="104">104</th><td>  <a class="macro" href="#45" title="((subInstanceManager.offset[instanceID]).fFastSimulationManager)" data-ref="_M/G4MT_fsmanager">G4MT_fsmanager</a> = <var>0</var>;</td></tr>
+<tr><th id="105">105</th><td>  <a class="macro" href="#46" title="((subInstanceManager.offset[instanceID]).fRegionalSteppingAction)" data-ref="_M/G4MT_rsaction">G4MT_rsaction</a> = <var>0</var>;</td></tr>
+<tr><th id="106">106</th><td></td></tr>
+<tr><th id="107">107</th><td>  <i>// Register to store</i></td></tr>
+<tr><th id="108">108</th><td><i>  //</i></td></tr>
+<tr><th id="109">109</th><td>  <a class="type" href="../include/G4RegionStore.hh.html#G4RegionStore" title='G4RegionStore' data-ref="G4RegionStore">G4RegionStore</a>::<a class="ref" href="../include/G4RegionStore.hh.html#_ZN13G4RegionStore11GetInstanceEv" title='G4RegionStore::GetInstance' data-ref="_ZN13G4RegionStore11GetInstanceEv">GetInstance</a>()-&gt;<a class="ref" href="../include/G4RegionStore.hh.html#_ZN13G4RegionStore8RegisterEP8G4Region" title='G4RegionStore::Register' data-ref="_ZN13G4RegionStore8RegisterEP8G4Region">Register</a>(<b>this</b>);</td></tr>
+<tr><th id="110">110</th><td>}</td></tr>
+<tr><th id="111">111</th><td></td></tr>
+<tr><th id="112">112</th><td><i>// *******************************************************************</i></td></tr>
+<tr><th id="113">113</th><td><i>// Destructor:</i></td></tr>
+<tr><th id="114">114</th><td><i>//  - Removes self from region Store</i></td></tr>
+<tr><th id="115">115</th><td><i>// *******************************************************************</i></td></tr>
+<tr><th id="116">116</th><td><i>//</i></td></tr>
+<tr><th id="117">117</th><td>G4Region::<span class='error' title="exception specification in declaration does not match previous declaration">~</span>G4Region()</td></tr>
+<tr><th id="118">118</th><td>{</td></tr>
+<tr><th id="119">119</th><td>  G4RegionStore::GetInstance()-&gt;DeRegister(<b>this</b>);</td></tr>
+<tr><th id="120">120</th><td>  <b>if</b>(fUserInfo) <b>delete</b> fUserInfo;</td></tr>
+<tr><th id="121">121</th><td>}</td></tr>
+<tr><th id="122">122</th><td></td></tr>
+<tr><th id="123">123</th><td><i>// ********************************************************************</i></td></tr>
+<tr><th id="124">124</th><td><i>// SetFastSimulationManager</i></td></tr>
+<tr><th id="125">125</th><td><i>// ********************************************************************</i></td></tr>
+<tr><th id="126">126</th><td><i>//</i></td></tr>
+<tr><th id="127">127</th><td><em>void</em> <a class="type" href="../include/G4Region.hh.html#G4Region" title='G4Region' data-ref="G4Region">G4Region</a>::<dfn class="decl def" id="_ZN8G4Region24SetFastSimulationManagerEP23G4FastSimulationManager" title='G4Region::SetFastSimulationManager' data-ref="_ZN8G4Region24SetFastSimulationManagerEP23G4FastSimulationManager">SetFastSimulationManager</dfn>(<a class="type" href="../include/G4Region.hh.html#G4FastSimulationManager" title='G4FastSimulationManager' data-ref="G4FastSimulationManager">G4FastSimulationManager</a>* <dfn class="local col2 decl" id="22fsm" title='fsm' data-type='G4FastSimulationManager *' data-ref="22fsm">fsm</dfn>)</td></tr>
+<tr><th id="128">128</th><td>{</td></tr>
+<tr><th id="129">129</th><td>  <a class="macro" href="#45" title="((subInstanceManager.offset[instanceID]).fFastSimulationManager)" data-ref="_M/G4MT_fsmanager">G4MT_fsmanager</a> = fsm;</td></tr>
+<tr><th id="130">130</th><td>}</td></tr>
+<tr><th id="131">131</th><td></td></tr>
+<tr><th id="132">132</th><td><i>// ********************************************************************</i></td></tr>
+<tr><th id="133">133</th><td><i>// GetFastSimulationManager</i></td></tr>
+<tr><th id="134">134</th><td><i>// ********************************************************************</i></td></tr>
+<tr><th id="135">135</th><td><i>//</i></td></tr>
+<tr><th id="136">136</th><td><a class="type" href="../include/G4Region.hh.html#G4FastSimulationManager" title='G4FastSimulationManager' data-ref="G4FastSimulationManager">G4FastSimulationManager</a>* <a class="type" href="../include/G4Region.hh.html#G4Region" title='G4Region' data-ref="G4Region">G4Region</a>::<dfn class="decl def" id="_ZNK8G4Region24GetFastSimulationManagerEv" title='G4Region::GetFastSimulationManager' data-ref="_ZNK8G4Region24GetFastSimulationManagerEv">GetFastSimulationManager</dfn>() <em>const</em></td></tr>
+<tr><th id="137">137</th><td>{</td></tr>
+<tr><th id="138">138</th><td>  <b>return</b> <a class="macro" href="#45" title="((subInstanceManager.offset[instanceID]).fFastSimulationManager)" data-ref="_M/G4MT_fsmanager">G4MT_fsmanager</a>;</td></tr>
+<tr><th id="139">139</th><td>}</td></tr>
+<tr><th id="140">140</th><td></td></tr>
+<tr><th id="141">141</th><td><i>// ********************************************************************</i></td></tr>
+<tr><th id="142">142</th><td><i>// SetRegionalSteppingAction</i></td></tr>
+<tr><th id="143">143</th><td><i>// ********************************************************************</i></td></tr>
+<tr><th id="144">144</th><td><i>//</i></td></tr>
+<tr><th id="145">145</th><td><em>void</em> <a class="type" href="../include/G4Region.hh.html#G4Region" title='G4Region' data-ref="G4Region">G4Region</a>::<dfn class="decl def" id="_ZN8G4Region25SetRegionalSteppingActionEP20G4UserSteppingAction" title='G4Region::SetRegionalSteppingAction' data-ref="_ZN8G4Region25SetRegionalSteppingActionEP20G4UserSteppingAction">SetRegionalSteppingAction</dfn>(<a class="type" href="../include/G4Region.hh.html#G4UserSteppingAction" title='G4UserSteppingAction' data-ref="G4UserSteppingAction">G4UserSteppingAction</a>* <dfn class="local col3 decl" id="23rusa" title='rusa' data-type='G4UserSteppingAction *' data-ref="23rusa">rusa</dfn>)</td></tr>
+<tr><th id="146">146</th><td>{</td></tr>
+<tr><th id="147">147</th><td>  <a class="macro" href="#46" title="((subInstanceManager.offset[instanceID]).fRegionalSteppingAction)" data-ref="_M/G4MT_rsaction">G4MT_rsaction</a> = rusa;</td></tr>
+<tr><th id="148">148</th><td>}</td></tr>
+<tr><th id="149">149</th><td></td></tr>
+<tr><th id="150">150</th><td><i>// ********************************************************************</i></td></tr>
+<tr><th id="151">151</th><td><i>// GetRegionalSteppingAction</i></td></tr>
+<tr><th id="152">152</th><td><i>// ********************************************************************</i></td></tr>
+<tr><th id="153">153</th><td><i>//</i></td></tr>
+<tr><th id="154">154</th><td><a class="type" href="../include/G4Region.hh.html#G4UserSteppingAction" title='G4UserSteppingAction' data-ref="G4UserSteppingAction">G4UserSteppingAction</a>* <a class="type" href="../include/G4Region.hh.html#G4Region" title='G4Region' data-ref="G4Region">G4Region</a>::<dfn class="decl def" id="_ZNK8G4Region25GetRegionalSteppingActionEv" title='G4Region::GetRegionalSteppingAction' data-ref="_ZNK8G4Region25GetRegionalSteppingActionEv">GetRegionalSteppingAction</dfn>() <em>const</em></td></tr>
+<tr><th id="155">155</th><td>{</td></tr>
+<tr><th id="156">156</th><td>  <b>return</b> <a class="macro" href="#46" title="((subInstanceManager.offset[instanceID]).fRegionalSteppingAction)" data-ref="_M/G4MT_rsaction">G4MT_rsaction</a>;</td></tr>
+<tr><th id="157">157</th><td>}</td></tr>
+<tr><th id="158">158</th><td></td></tr>
+<tr><th id="159">159</th><td><i>// *******************************************************************</i></td></tr>
+<tr><th id="160">160</th><td><i>// ScanVolumeTree:</i></td></tr>
+<tr><th id="161">161</th><td><i>//  - Scans recursively the 'lv' logical volume tree, retrieves</i></td></tr>
+<tr><th id="162">162</th><td><i>//    and places all materials in the list.</i></td></tr>
+<tr><th id="163">163</th><td><i>//  - The boolean flag 'region' identifies if the volume tree must</i></td></tr>
+<tr><th id="164">164</th><td><i>//    have region reset (false) or if the current region must be</i></td></tr>
+<tr><th id="165">165</th><td><i>//    associated to the logical volume 'lv' and its tree (true).</i></td></tr>
+<tr><th id="166">166</th><td><i>// *******************************************************************</i></td></tr>
+<tr><th id="167">167</th><td><i>//</i></td></tr>
+<tr><th id="168">168</th><td><em>void</em> <a class="type" href="../include/G4Region.hh.html#G4Region" title='G4Region' data-ref="G4Region">G4Region</a>::<dfn class="decl def" id="_ZN8G4Region14ScanVolumeTreeEP15G4LogicalVolumeb" title='G4Region::ScanVolumeTree' data-ref="_ZN8G4Region14ScanVolumeTreeEP15G4LogicalVolumeb">ScanVolumeTree</dfn>(<a class="type" href="../include/G4LogicalVolume.hh.html#G4LogicalVolume" title='G4LogicalVolume' data-ref="G4LogicalVolume">G4LogicalVolume</a>* <dfn class="local col4 decl" id="24lv" title='lv' data-type='G4LogicalVolume *' data-ref="24lv">lv</dfn>, <a class="typedef" href="../../../global/management/include/G4Types.hh.html#G4bool" title='G4bool' data-type='bool' data-ref="G4bool">G4bool</a> <dfn class="local col5 decl" id="25region" title='region' data-type='G4bool' data-ref="25region">region</dfn>)</td></tr>
+<tr><th id="169">169</th><td>{</td></tr>
+<tr><th id="170">170</th><td>  <i>// If logical volume is going to become a region, add </i></td></tr>
+<tr><th id="171">171</th><td><i>  // its material to the list if not already present</i></td></tr>
+<tr><th id="172">172</th><td><i>  //</i></td></tr>
+<tr><th id="173">173</th><td>  <a class="type" href="../include/G4Region.hh.html#G4Region" title='G4Region' data-ref="G4Region">G4Region</a>* <dfn class="local col6 decl" id="26currentRegion" title='currentRegion' data-type='G4Region *' data-ref="26currentRegion">currentRegion</dfn> = <var>0</var>;</td></tr>
+<tr><th id="174">174</th><td>  <span class='error' title="unknown type name &apos;size_t&apos;">size_t</span> <dfn class="local col7 decl" id="27noDaughters" title='noDaughters' data-type='int' data-ref="27noDaughters">noDaughters</dfn> = lv-&gt;GetNoDaughters();</td></tr>
+<tr><th id="175">175</th><td>  <a class="type" href="../../../materials/include/G4Material.hh.html#G4Material" title='G4Material' data-ref="G4Material">G4Material</a>* <dfn class="local col8 decl" id="28volMat" title='volMat' data-type='G4Material *' data-ref="28volMat">volMat</dfn> = <a class="local col4 ref" href="#24lv" title='lv' data-ref="24lv">lv</a>-&gt;<a class="ref" href="../include/G4LogicalVolume.hh.html#_ZNK15G4LogicalVolume11GetMaterialEv" title='G4LogicalVolume::GetMaterial' data-ref="_ZNK15G4LogicalVolume11GetMaterialEv">GetMaterial</a>();</td></tr>
+<tr><th id="176">176</th><td>  <b>if</b>(!<a class="local col8 ref" href="#28volMat" title='volMat' data-ref="28volMat">volMat</a> &amp;&amp; <a class="member" href="../include/G4Region.hh.html#G4Region::fInMassGeometry" title='G4Region::fInMassGeometry' data-ref="G4Region::fInMassGeometry">fInMassGeometry</a>)</td></tr>
+<tr><th id="177">177</th><td>  {</td></tr>
+<tr><th id="178">178</th><td>    <span class='error' title="use of undeclared identifier &apos;std&apos;">std</span>::ostringstream <dfn class="local col9 decl" id="29message" title='message' data-type='int' data-ref="29message">message</dfn>;</td></tr>
+<tr><th id="179">179</th><td>    message &lt;&lt; <q>"Logical volume &lt;"</q> &lt;&lt; lv-&gt;GetName() &lt;&lt; <q>"&gt;"</q> &lt;&lt; <a class="macro" href="../../../global/management/include/G4ios.hh.html#60" title="std::endl" data-ref="_M/G4endl">G4endl</a></td></tr>
+<tr><th id="180">180</th><td>            &lt;&lt; <q>"does not have a valid material pointer."</q> &lt;&lt; <a class="macro" href="../../../global/management/include/G4ios.hh.html#60" title="std::endl" data-ref="_M/G4endl">G4endl</a></td></tr>
+<tr><th id="181">181</th><td>            &lt;&lt; <q>"A logical volume belonging to the (tracking) world volume "</q></td></tr>
+<tr><th id="182">182</th><td>            &lt;&lt; <q>"must have a valid material."</q>;</td></tr>
+<tr><th id="183">183</th><td>    G4Exception(<q>"G4Region::ScanVolumeTree()"</q>, <q>"GeomMgt0002"</q>,</td></tr>
+<tr><th id="184">184</th><td>                FatalException, message, <q>"Check your geometry construction."</q>);</td></tr>
+<tr><th id="185">185</th><td>  }</td></tr>
+<tr><th id="186">186</th><td>  <b>if</b> (<a class="local col5 ref" href="#25region" title='region' data-ref="25region">region</a>)</td></tr>
+<tr><th id="187">187</th><td>  {</td></tr>
+<tr><th id="188">188</th><td>    <a class="local col6 ref" href="#26currentRegion" title='currentRegion' data-ref="26currentRegion">currentRegion</a> = <b>this</b>;</td></tr>
+<tr><th id="189">189</th><td>    <b>if</b> (<a class="local col8 ref" href="#28volMat" title='volMat' data-ref="28volMat">volMat</a>)</td></tr>
+<tr><th id="190">190</th><td>    { </td></tr>
+<tr><th id="191">191</th><td>      <a class="member" href="../include/G4Region.hh.html#_ZN8G4Region11AddMaterialEP10G4Material" title='G4Region::AddMaterial' data-ref="_ZN8G4Region11AddMaterialEP10G4Material">AddMaterial</a>(<a class="local col8 ref" href="#28volMat" title='volMat' data-ref="28volMat">volMat</a>); </td></tr>
+<tr><th id="192">192</th><td>      <a class="type" href="../../../materials/include/G4Material.hh.html#G4Material" title='G4Material' data-ref="G4Material">G4Material</a>* <dfn class="local col0 decl" id="30baseMat" title='baseMat' data-type='G4Material *' data-ref="30baseMat">baseMat</dfn> = <b>const_cast</b>&lt;<a class="type" href="../../../materials/include/G4Material.hh.html#G4Material" title='G4Material' data-ref="G4Material">G4Material</a>*&gt;(<a class="local col8 ref" href="#28volMat" title='volMat' data-ref="28volMat">volMat</a>-&gt;<a class="ref" href="../../../materials/include/G4Material.hh.html#_ZNK10G4Material15GetBaseMaterialEv" title='G4Material::GetBaseMaterial' data-ref="_ZNK10G4Material15GetBaseMaterialEv">GetBaseMaterial</a>());</td></tr>
+<tr><th id="193">193</th><td>      <b>if</b> (<a class="local col0 ref" href="#30baseMat" title='baseMat' data-ref="30baseMat">baseMat</a>) { <a class="member" href="../include/G4Region.hh.html#_ZN8G4Region11AddMaterialEP10G4Material" title='G4Region::AddMaterial' data-ref="_ZN8G4Region11AddMaterialEP10G4Material">AddMaterial</a>(<a class="local col0 ref" href="#30baseMat" title='baseMat' data-ref="30baseMat">baseMat</a>); }</td></tr>
+<tr><th id="194">194</th><td>    }</td></tr>
+<tr><th id="195">195</th><td>  }</td></tr>
+<tr><th id="196">196</th><td></td></tr>
+<tr><th id="197">197</th><td>  <i>// Set the LV region to be either the current region or NULL,</i></td></tr>
+<tr><th id="198">198</th><td><i>  // according to the boolean selector</i></td></tr>
+<tr><th id="199">199</th><td><i>  //</i></td></tr>
+<tr><th id="200">200</th><td>  <a class="local col4 ref" href="#24lv" title='lv' data-ref="24lv">lv</a>-&gt;<a class="ref" href="../include/G4LogicalVolume.hh.html#_ZN15G4LogicalVolume9SetRegionEP8G4Region" title='G4LogicalVolume::SetRegion' data-ref="_ZN15G4LogicalVolume9SetRegionEP8G4Region">SetRegion</a>(<a class="local col6 ref" href="#26currentRegion" title='currentRegion' data-ref="26currentRegion">currentRegion</a>);</td></tr>
+<tr><th id="201">201</th><td></td></tr>
+<tr><th id="202">202</th><td>  <i>// Stop recursion here if no further daughters are involved</i></td></tr>
+<tr><th id="203">203</th><td><i>  //</i></td></tr>
+<tr><th id="204">204</th><td>  <b>if</b>(noDaughters==<var>0</var>) <b>return</b>;</td></tr>
+<tr><th id="205">205</th><td></td></tr>
+<tr><th id="206">206</th><td>  <a class="type" href="../include/G4VPhysicalVolume.hh.html#G4VPhysicalVolume" title='G4VPhysicalVolume' data-ref="G4VPhysicalVolume">G4VPhysicalVolume</a>* <dfn class="local col1 decl" id="31daughterPVol" title='daughterPVol' data-type='G4VPhysicalVolume *' data-ref="31daughterPVol">daughterPVol</dfn> = <a class="local col4 ref" href="#24lv" title='lv' data-ref="24lv">lv</a>-&gt;<a class="ref" href="../include/G4LogicalVolume.hh.html#_ZNK15G4LogicalVolume11GetDaughterEi" title='G4LogicalVolume::GetDaughter' data-ref="_ZNK15G4LogicalVolume11GetDaughterEi">GetDaughter</a>(<var>0</var>);</td></tr>
+<tr><th id="207">207</th><td>  <b>if</b> (<a class="local col1 ref" href="#31daughterPVol" title='daughterPVol' data-ref="31daughterPVol">daughterPVol</a>-&gt;<a class="virtual ref" href="../include/G4VPhysicalVolume.hh.html#_ZNK17G4VPhysicalVolume15IsParameterisedEv" title='G4VPhysicalVolume::IsParameterised' data-ref="_ZNK17G4VPhysicalVolume15IsParameterisedEv">IsParameterised</a>())</td></tr>
+<tr><th id="208">208</th><td>  {</td></tr>
+<tr><th id="209">209</th><td>    <i>// Adopt special treatment in case of parameterised volumes,</i></td></tr>
+<tr><th id="210">210</th><td><i>    // where parameterisation involves a new material scan</i></td></tr>
+<tr><th id="211">211</th><td><i>    //</i></td></tr>
+<tr><th id="212">212</th><td>    <a class="type" href="../include/G4VPVParameterisation.hh.html#G4VPVParameterisation" title='G4VPVParameterisation' data-ref="G4VPVParameterisation">G4VPVParameterisation</a>* <dfn class="local col2 decl" id="32pParam" title='pParam' data-type='G4VPVParameterisation *' data-ref="32pParam">pParam</dfn> = <a class="local col1 ref" href="#31daughterPVol" title='daughterPVol' data-ref="31daughterPVol">daughterPVol</a>-&gt;<a class="virtual ref" href="../include/G4VPhysicalVolume.hh.html#_ZNK17G4VPhysicalVolume19GetParameterisationEv" title='G4VPhysicalVolume::GetParameterisation' data-ref="_ZNK17G4VPhysicalVolume19GetParameterisationEv">GetParameterisation</a>();</td></tr>
+<tr><th id="213">213</th><td></td></tr>
+<tr><th id="214">214</th><td>    <b>if</b> (<a class="local col2 ref" href="#32pParam" title='pParam' data-ref="32pParam">pParam</a>-&gt;<a class="virtual ref" href="../include/G4VPVParameterisation.hh.html#_ZN21G4VPVParameterisation18GetMaterialScannerEv" title='G4VPVParameterisation::GetMaterialScanner' data-ref="_ZN21G4VPVParameterisation18GetMaterialScannerEv">GetMaterialScanner</a>())</td></tr>
+<tr><th id="215">215</th><td>    {</td></tr>
+<tr><th id="216">216</th><td>      <span class='error' title="unknown type name &apos;size_t&apos;">size_t</span> <dfn class="local col3 decl" id="33matNo" title='matNo' data-type='int' data-ref="33matNo">matNo</dfn> = pParam-&gt;GetMaterialScanner()-&gt;GetNumberOfMaterials();</td></tr>
+<tr><th id="217">217</th><td>      <b>for</b> (<span class='error' title="unknown type name &apos;size_t&apos;">size_t</span> <dfn class="local col4 decl" id="34mat" title='mat' data-type='int' data-ref="34mat">mat</dfn>=<var>0</var>; mat&lt;matNo; mat++)</td></tr>
+<tr><th id="218">218</th><td>      {</td></tr>
+<tr><th id="219">219</th><td>        volMat = pParam-&gt;GetMaterialScanner()-&gt;GetMaterial(mat);</td></tr>
+<tr><th id="220">220</th><td>        <b>if</b>(!<a class="local col8 ref" href="#28volMat" title='volMat' data-ref="28volMat">volMat</a> &amp;&amp; <a class="member" href="../include/G4Region.hh.html#G4Region::fInMassGeometry" title='G4Region::fInMassGeometry' data-ref="G4Region::fInMassGeometry">fInMassGeometry</a>)</td></tr>
+<tr><th id="221">221</th><td>        {</td></tr>
+<tr><th id="222">222</th><td>          <span class='error' title="use of undeclared identifier &apos;std&apos;">std</span>::ostringstream <dfn class="local col5 decl" id="35message" title='message' data-type='int' data-ref="35message">message</dfn>;</td></tr>
+<tr><th id="223">223</th><td>          message &lt;&lt; <q>"The parameterisation for the physical volume &lt;"</q></td></tr>
+<tr><th id="224">224</th><td>                  &lt;&lt; daughterPVol-&gt;GetName() &lt;&lt; <q>"&gt;"</q> &lt;&lt; <a class="macro" href="../../../global/management/include/G4ios.hh.html#60" title="std::endl" data-ref="_M/G4endl">G4endl</a></td></tr>
+<tr><th id="225">225</th><td>                  &lt;&lt; <q>"does not return a valid material pointer."</q> &lt;&lt; <a class="macro" href="../../../global/management/include/G4ios.hh.html#60" title="std::endl" data-ref="_M/G4endl">G4endl</a></td></tr>
+<tr><th id="226">226</th><td>                  &lt;&lt; <q>"A volume belonging to the (tracking) world volume must "</q></td></tr>
+<tr><th id="227">227</th><td>                  &lt;&lt; <q>"have a valid material."</q>;</td></tr>
+<tr><th id="228">228</th><td>          G4Exception(<q>"G4Region::ScanVolumeTree()"</q>, <q>"GeomMgt0002"</q>,</td></tr>
+<tr><th id="229">229</th><td>                      FatalException, message, <q>"Check your parameterisation."</q>);</td></tr>
+<tr><th id="230">230</th><td>        }</td></tr>
+<tr><th id="231">231</th><td>        <b>if</b> (<a class="local col8 ref" href="#28volMat" title='volMat' data-ref="28volMat">volMat</a>)</td></tr>
+<tr><th id="232">232</th><td>        { </td></tr>
+<tr><th id="233">233</th><td>          <a class="member" href="../include/G4Region.hh.html#_ZN8G4Region11AddMaterialEP10G4Material" title='G4Region::AddMaterial' data-ref="_ZN8G4Region11AddMaterialEP10G4Material">AddMaterial</a>(<a class="local col8 ref" href="#28volMat" title='volMat' data-ref="28volMat">volMat</a>); </td></tr>
+<tr><th id="234">234</th><td>          <a class="type" href="../../../materials/include/G4Material.hh.html#G4Material" title='G4Material' data-ref="G4Material">G4Material</a>* <dfn class="local col6 decl" id="36baseMat" title='baseMat' data-type='G4Material *' data-ref="36baseMat">baseMat</dfn> = <b>const_cast</b>&lt;<a class="type" href="../../../materials/include/G4Material.hh.html#G4Material" title='G4Material' data-ref="G4Material">G4Material</a>*&gt;(<a class="local col8 ref" href="#28volMat" title='volMat' data-ref="28volMat">volMat</a>-&gt;<a class="ref" href="../../../materials/include/G4Material.hh.html#_ZNK10G4Material15GetBaseMaterialEv" title='G4Material::GetBaseMaterial' data-ref="_ZNK10G4Material15GetBaseMaterialEv">GetBaseMaterial</a>());</td></tr>
+<tr><th id="235">235</th><td>          <b>if</b> (<a class="local col6 ref" href="#36baseMat" title='baseMat' data-ref="36baseMat">baseMat</a>) { <a class="member" href="../include/G4Region.hh.html#_ZN8G4Region11AddMaterialEP10G4Material" title='G4Region::AddMaterial' data-ref="_ZN8G4Region11AddMaterialEP10G4Material">AddMaterial</a>(<a class="local col6 ref" href="#36baseMat" title='baseMat' data-ref="36baseMat">baseMat</a>); }</td></tr>
+<tr><th id="236">236</th><td>        }</td></tr>
+<tr><th id="237">237</th><td>      }</td></tr>
+<tr><th id="238">238</th><td>    }</td></tr>
+<tr><th id="239">239</th><td>    <b>else</b></td></tr>
+<tr><th id="240">240</th><td>    {</td></tr>
+<tr><th id="241">241</th><td>      <span class='error' title="unknown type name &apos;size_t&apos;">size_t</span> <dfn class="local col7 decl" id="37repNo" title='repNo' data-type='int' data-ref="37repNo">repNo</dfn> = daughterPVol-&gt;GetMultiplicity();</td></tr>
+<tr><th id="242">242</th><td>      <b>for</b> (<span class='error' title="unknown type name &apos;size_t&apos;">size_t</span> <dfn class="local col8 decl" id="38rep" title='rep' data-type='int' data-ref="38rep">rep</dfn>=<var>0</var>; rep&lt;repNo; rep++)</td></tr>
+<tr><th id="243">243</th><td>      {</td></tr>
+<tr><th id="244">244</th><td>        volMat = pParam-&gt;ComputeMaterial(rep, daughterPVol);</td></tr>
+<tr><th id="245">245</th><td>        <b>if</b>(!<a class="local col8 ref" href="#28volMat" title='volMat' data-ref="28volMat">volMat</a> &amp;&amp; <a class="member" href="../include/G4Region.hh.html#G4Region::fInMassGeometry" title='G4Region::fInMassGeometry' data-ref="G4Region::fInMassGeometry">fInMassGeometry</a>)</td></tr>
+<tr><th id="246">246</th><td>        {</td></tr>
+<tr><th id="247">247</th><td>          <span class='error' title="use of undeclared identifier &apos;std&apos;">std</span>::ostringstream <dfn class="local col9 decl" id="39message" title='message' data-type='int' data-ref="39message">message</dfn>;</td></tr>
+<tr><th id="248">248</th><td>          message &lt;&lt; <q>"The parameterisation for the physical volume &lt;"</q></td></tr>
+<tr><th id="249">249</th><td>                  &lt;&lt; daughterPVol-&gt;GetName() &lt;&lt; <q>"&gt;"</q> &lt;&lt; <a class="macro" href="../../../global/management/include/G4ios.hh.html#60" title="std::endl" data-ref="_M/G4endl">G4endl</a></td></tr>
+<tr><th id="250">250</th><td>                  &lt;&lt; <q>"does not return a valid material pointer."</q> &lt;&lt; <a class="macro" href="../../../global/management/include/G4ios.hh.html#60" title="std::endl" data-ref="_M/G4endl">G4endl</a></td></tr>
+<tr><th id="251">251</th><td>                  &lt;&lt; <q>"A volume belonging to the (tracking) world volume must "</q></td></tr>
+<tr><th id="252">252</th><td>                  &lt;&lt; <q>"have a valid material."</q>;</td></tr>
+<tr><th id="253">253</th><td>          G4Exception(<q>"G4Region::ScanVolumeTree()"</q>, <q>"GeomMgt0002"</q>,</td></tr>
+<tr><th id="254">254</th><td>                      FatalException, message, <q>"Check your parameterisation."</q>);</td></tr>
+<tr><th id="255">255</th><td>        }</td></tr>
+<tr><th id="256">256</th><td>        <b>if</b>(<a class="local col8 ref" href="#28volMat" title='volMat' data-ref="28volMat">volMat</a>)</td></tr>
+<tr><th id="257">257</th><td>        { </td></tr>
+<tr><th id="258">258</th><td>          <a class="member" href="../include/G4Region.hh.html#_ZN8G4Region11AddMaterialEP10G4Material" title='G4Region::AddMaterial' data-ref="_ZN8G4Region11AddMaterialEP10G4Material">AddMaterial</a>(<a class="local col8 ref" href="#28volMat" title='volMat' data-ref="28volMat">volMat</a>);</td></tr>
+<tr><th id="259">259</th><td>          <a class="type" href="../../../materials/include/G4Material.hh.html#G4Material" title='G4Material' data-ref="G4Material">G4Material</a>* <dfn class="local col0 decl" id="40baseMat" title='baseMat' data-type='G4Material *' data-ref="40baseMat">baseMat</dfn> = <b>const_cast</b>&lt;<a class="type" href="../../../materials/include/G4Material.hh.html#G4Material" title='G4Material' data-ref="G4Material">G4Material</a>*&gt;(<a class="local col8 ref" href="#28volMat" title='volMat' data-ref="28volMat">volMat</a>-&gt;<a class="ref" href="../../../materials/include/G4Material.hh.html#_ZNK10G4Material15GetBaseMaterialEv" title='G4Material::GetBaseMaterial' data-ref="_ZNK10G4Material15GetBaseMaterialEv">GetBaseMaterial</a>());</td></tr>
+<tr><th id="260">260</th><td>          <b>if</b> (<a class="local col0 ref" href="#40baseMat" title='baseMat' data-ref="40baseMat">baseMat</a>) { <a class="member" href="../include/G4Region.hh.html#_ZN8G4Region11AddMaterialEP10G4Material" title='G4Region::AddMaterial' data-ref="_ZN8G4Region11AddMaterialEP10G4Material">AddMaterial</a>(<a class="local col0 ref" href="#40baseMat" title='baseMat' data-ref="40baseMat">baseMat</a>); }</td></tr>
+<tr><th id="261">261</th><td>        }</td></tr>
+<tr><th id="262">262</th><td>      }</td></tr>
+<tr><th id="263">263</th><td>    }</td></tr>
+<tr><th id="264">264</th><td>    <a class="type" href="../include/G4LogicalVolume.hh.html#G4LogicalVolume" title='G4LogicalVolume' data-ref="G4LogicalVolume">G4LogicalVolume</a>* <dfn class="local col1 decl" id="41daughterLVol" title='daughterLVol' data-type='G4LogicalVolume *' data-ref="41daughterLVol">daughterLVol</dfn> = <a class="local col1 ref" href="#31daughterPVol" title='daughterPVol' data-ref="31daughterPVol">daughterPVol</a>-&gt;<a class="ref" href="../include/G4VPhysicalVolume.hh.html#_ZNK17G4VPhysicalVolume16GetLogicalVolumeEv" title='G4VPhysicalVolume::GetLogicalVolume' data-ref="_ZNK17G4VPhysicalVolume16GetLogicalVolumeEv">GetLogicalVolume</a>();</td></tr>
+<tr><th id="265">265</th><td>    <a class="member" href="#_ZN8G4Region14ScanVolumeTreeEP15G4LogicalVolumeb" title='G4Region::ScanVolumeTree' data-ref="_ZN8G4Region14ScanVolumeTreeEP15G4LogicalVolumeb">ScanVolumeTree</a>(<a class="local col1 ref" href="#41daughterLVol" title='daughterLVol' data-ref="41daughterLVol">daughterLVol</a>, <a class="local col5 ref" href="#25region" title='region' data-ref="25region">region</a>);</td></tr>
+<tr><th id="266">266</th><td>  }</td></tr>
+<tr><th id="267">267</th><td>  <b>else</b></td></tr>
+<tr><th id="268">268</th><td>  {</td></tr>
+<tr><th id="269">269</th><td>    <b>for</b> (<span class='error' title="unknown type name &apos;size_t&apos;">size_t</span> <dfn class="local col2 decl" id="42i" title='i' data-type='int' data-ref="42i">i</dfn>=<var>0</var>; i&lt;noDaughters; i++)</td></tr>
+<tr><th id="270">270</th><td>    {</td></tr>
+<tr><th id="271">271</th><td>      <a class="type" href="../include/G4LogicalVolume.hh.html#G4LogicalVolume" title='G4LogicalVolume' data-ref="G4LogicalVolume">G4LogicalVolume</a>* <dfn class="local col3 decl" id="43daughterLVol" title='daughterLVol' data-type='G4LogicalVolume *' data-ref="43daughterLVol">daughterLVol</dfn> = lv-&gt;GetDaughter(i)-&gt;GetLogicalVolume();</td></tr>
+<tr><th id="272">272</th><td>      <b>if</b> (!<a class="local col3 ref" href="#43daughterLVol" title='daughterLVol' data-ref="43daughterLVol">daughterLVol</a>-&gt;<a class="ref" href="../include/G4LogicalVolume.hh.html#_ZNK15G4LogicalVolume12IsRootRegionEv" title='G4LogicalVolume::IsRootRegion' data-ref="_ZNK15G4LogicalVolume12IsRootRegionEv">IsRootRegion</a>())</td></tr>
+<tr><th id="273">273</th><td>      {</td></tr>
+<tr><th id="274">274</th><td>        <i>// Set daughter's LV to be a region and store materials in</i></td></tr>
+<tr><th id="275">275</th><td><i>        // the materials list, if the LV is not already a root region</i></td></tr>
+<tr><th id="276">276</th><td><i>        //</i></td></tr>
+<tr><th id="277">277</th><td>        <a class="member" href="#_ZN8G4Region14ScanVolumeTreeEP15G4LogicalVolumeb" title='G4Region::ScanVolumeTree' data-ref="_ZN8G4Region14ScanVolumeTreeEP15G4LogicalVolumeb">ScanVolumeTree</a>(<a class="local col3 ref" href="#43daughterLVol" title='daughterLVol' data-ref="43daughterLVol">daughterLVol</a>, <a class="local col5 ref" href="#25region" title='region' data-ref="25region">region</a>);</td></tr>
+<tr><th id="278">278</th><td>      }</td></tr>
+<tr><th id="279">279</th><td>    }</td></tr>
+<tr><th id="280">280</th><td>  }</td></tr>
+<tr><th id="281">281</th><td>}</td></tr>
+<tr><th id="282">282</th><td></td></tr>
+<tr><th id="283">283</th><td><i>// *******************************************************************</i></td></tr>
+<tr><th id="284">284</th><td><i>// AddRootLogicalVolume:</i></td></tr>
+<tr><th id="285">285</th><td><i>//  - Adds a root logical volume and sets its daughters flags as</i></td></tr>
+<tr><th id="286">286</th><td><i>//    regions. It also recomputes the materials list for the region.</i></td></tr>
+<tr><th id="287">287</th><td><i>// *******************************************************************</i></td></tr>
+<tr><th id="288">288</th><td><i>//</i></td></tr>
+<tr><th id="289">289</th><td><em>void</em> <a class="type" href="../include/G4Region.hh.html#G4Region" title='G4Region' data-ref="G4Region">G4Region</a>::<dfn class="decl def" id="_ZN8G4Region20AddRootLogicalVolumeEP15G4LogicalVolumeb" title='G4Region::AddRootLogicalVolume' data-ref="_ZN8G4Region20AddRootLogicalVolumeEP15G4LogicalVolumeb">AddRootLogicalVolume</dfn>(<a class="type" href="../include/G4LogicalVolume.hh.html#G4LogicalVolume" title='G4LogicalVolume' data-ref="G4LogicalVolume">G4LogicalVolume</a>* <dfn class="local col4 decl" id="44lv" title='lv' data-type='G4LogicalVolume *' data-ref="44lv">lv</dfn>, <a class="typedef" href="../../../global/management/include/G4Types.hh.html#G4bool" title='G4bool' data-type='bool' data-ref="G4bool">G4bool</a> <dfn class="local col5 decl" id="45search" title='search' data-type='G4bool' data-ref="45search">search</dfn>)</td></tr>
+<tr><th id="290">290</th><td>{</td></tr>
+<tr><th id="291">291</th><td>  <i>// Check the logical volume is not already in the list</i></td></tr>
+<tr><th id="292">292</th><td><i>  //</i></td></tr>
+<tr><th id="293">293</th><td>  <b>if</b> (<a class="local col5 ref" href="#45search" title='search' data-ref="45search">search</a>) </td></tr>
+<tr><th id="294">294</th><td>  {</td></tr>
+<tr><th id="295">295</th><td>    <span class='error' title="use of undeclared identifier &apos;G4RootLVList&apos;">G4RootLVList</span>::iterator <dfn class="local col6 decl" id="46pos" title='pos' data-type='int' data-ref="46pos">pos</dfn>;</td></tr>
+<tr><th id="296">296</th><td>    pos = <span class='error' title="use of undeclared identifier &apos;std&apos;">std</span>::find(fRootVolumes.begin(),fRootVolumes.end(),lv);</td></tr>
+<tr><th id="297">297</th><td>    <b>if</b> (pos == fRootVolumes.end())</td></tr>
+<tr><th id="298">298</th><td>    {</td></tr>
+<tr><th id="299">299</th><td>      <i>// Insert the root volume in the list and set it as root region</i></td></tr>
+<tr><th id="300">300</th><td><i>      //</i></td></tr>
+<tr><th id="301">301</th><td>      fRootVolumes.push_back(lv);</td></tr>
+<tr><th id="302">302</th><td>      <a class="local col4 ref" href="#44lv" title='lv' data-ref="44lv">lv</a>-&gt;<a class="ref" href="../include/G4LogicalVolume.hh.html#_ZN15G4LogicalVolume17SetRegionRootFlagEb" title='G4LogicalVolume::SetRegionRootFlag' data-ref="_ZN15G4LogicalVolume17SetRegionRootFlagEb">SetRegionRootFlag</a>(<b>true</b>);</td></tr>
+<tr><th id="303">303</th><td>    }</td></tr>
+<tr><th id="304">304</th><td>  }</td></tr>
+<tr><th id="305">305</th><td>  <b>else</b>  <i>// WARNING: user *MUST* guarantee lv is not already inserted.</i></td></tr>
+<tr><th id="306">306</th><td>  {     <i>// Providing speedup for very complex flat geometries</i></td></tr>
+<tr><th id="307">307</th><td>    fRootVolumes.push_back(lv);</td></tr>
+<tr><th id="308">308</th><td>    <a class="local col4 ref" href="#44lv" title='lv' data-ref="44lv">lv</a>-&gt;<a class="ref" href="../include/G4LogicalVolume.hh.html#_ZN15G4LogicalVolume17SetRegionRootFlagEb" title='G4LogicalVolume::SetRegionRootFlag' data-ref="_ZN15G4LogicalVolume17SetRegionRootFlagEb">SetRegionRootFlag</a>(<b>true</b>);</td></tr>
+<tr><th id="309">309</th><td>  }</td></tr>
+<tr><th id="310">310</th><td>  <i>// Scan recursively the tree of daugther volumes and set regions</i></td></tr>
+<tr><th id="311">311</th><td><i>  //</i></td></tr>
+<tr><th id="312">312</th><td>  <a class="member" href="#_ZN8G4Region14ScanVolumeTreeEP15G4LogicalVolumeb" title='G4Region::ScanVolumeTree' data-ref="_ZN8G4Region14ScanVolumeTreeEP15G4LogicalVolumeb">ScanVolumeTree</a>(<a class="local col4 ref" href="#44lv" title='lv' data-ref="44lv">lv</a>, <b>true</b>);</td></tr>
+<tr><th id="313">313</th><td></td></tr>
+<tr><th id="314">314</th><td>  <i>// Set region as modified</i></td></tr>
+<tr><th id="315">315</th><td><i>  //</i></td></tr>
+<tr><th id="316">316</th><td>  <a class="member" href="../include/G4Region.hh.html#G4Region::fRegionMod" title='G4Region::fRegionMod' data-ref="G4Region::fRegionMod">fRegionMod</a> = <b>true</b>;</td></tr>
+<tr><th id="317">317</th><td>}</td></tr>
+<tr><th id="318">318</th><td></td></tr>
+<tr><th id="319">319</th><td><i>// *******************************************************************</i></td></tr>
+<tr><th id="320">320</th><td><i>// RemoveRootLogicalVolume:</i></td></tr>
+<tr><th id="321">321</th><td><i>//  - Removes a root logical volume and resets its daughters flags as</i></td></tr>
+<tr><th id="322">322</th><td><i>//    regions. It also recomputes the materials list for the region.</i></td></tr>
+<tr><th id="323">323</th><td><i>// *******************************************************************</i></td></tr>
+<tr><th id="324">324</th><td><i>//</i></td></tr>
+<tr><th id="325">325</th><td><em>void</em> <a class="type" href="../include/G4Region.hh.html#G4Region" title='G4Region' data-ref="G4Region">G4Region</a>::<dfn class="decl def" id="_ZN8G4Region23RemoveRootLogicalVolumeEP15G4LogicalVolumeb" title='G4Region::RemoveRootLogicalVolume' data-ref="_ZN8G4Region23RemoveRootLogicalVolumeEP15G4LogicalVolumeb">RemoveRootLogicalVolume</dfn>(<a class="type" href="../include/G4LogicalVolume.hh.html#G4LogicalVolume" title='G4LogicalVolume' data-ref="G4LogicalVolume">G4LogicalVolume</a>* <dfn class="local col7 decl" id="47lv" title='lv' data-type='G4LogicalVolume *' data-ref="47lv">lv</dfn>, <a class="typedef" href="../../../global/management/include/G4Types.hh.html#G4bool" title='G4bool' data-type='bool' data-ref="G4bool">G4bool</a> <dfn class="local col8 decl" id="48scan" title='scan' data-type='G4bool' data-ref="48scan">scan</dfn>)</td></tr>
+<tr><th id="326">326</th><td>{</td></tr>
+<tr><th id="327">327</th><td>  <i>// Find and remove logical volume from the list</i></td></tr>
+<tr><th id="328">328</th><td><i>  //</i></td></tr>
+<tr><th id="329">329</th><td>  <span class='error' title="use of undeclared identifier &apos;G4RootLVList&apos;">G4RootLVList</span>::iterator <dfn class="local col9 decl" id="49pos" title='pos' data-type='int' data-ref="49pos">pos</dfn>;</td></tr>
+<tr><th id="330">330</th><td>  pos = <span class='error' title="use of undeclared identifier &apos;std&apos;">std</span>::find(fRootVolumes.begin(),fRootVolumes.end(),lv);</td></tr>
+<tr><th id="331">331</th><td>  <b>if</b> (pos != fRootVolumes.end())</td></tr>
+<tr><th id="332">332</th><td>  {</td></tr>
+<tr><th id="333">333</th><td>    <b>if</b> (fRootVolumes.size() != <var>1</var>)  <i>// Avoid resetting flag for world since</i></td></tr>
+<tr><th id="334">334</th><td>    {                              <i>// volume may be already deleted !</i></td></tr>
+<tr><th id="335">335</th><td>      <a class="local col7 ref" href="#47lv" title='lv' data-ref="47lv">lv</a>-&gt;<a class="ref" href="../include/G4LogicalVolume.hh.html#_ZN15G4LogicalVolume17SetRegionRootFlagEb" title='G4LogicalVolume::SetRegionRootFlag' data-ref="_ZN15G4LogicalVolume17SetRegionRootFlagEb">SetRegionRootFlag</a>(<b>false</b>);</td></tr>
+<tr><th id="336">336</th><td>    }</td></tr>
+<tr><th id="337">337</th><td>    fRootVolumes.erase(pos);</td></tr>
+<tr><th id="338">338</th><td>  }</td></tr>
+<tr><th id="339">339</th><td></td></tr>
+<tr><th id="340">340</th><td>  <b>if</b> (<a class="local col8 ref" href="#48scan" title='scan' data-ref="48scan">scan</a>)  <i>// Update the materials list</i></td></tr>
+<tr><th id="341">341</th><td>  {</td></tr>
+<tr><th id="342">342</th><td>    <a class="member" href="#_ZN8G4Region18UpdateMaterialListEv" title='G4Region::UpdateMaterialList' data-ref="_ZN8G4Region18UpdateMaterialListEv">UpdateMaterialList</a>();</td></tr>
+<tr><th id="343">343</th><td>  }</td></tr>
+<tr><th id="344">344</th><td></td></tr>
+<tr><th id="345">345</th><td>  <i>// Set region as modified</i></td></tr>
+<tr><th id="346">346</th><td><i>  //</i></td></tr>
+<tr><th id="347">347</th><td>  <a class="member" href="../include/G4Region.hh.html#G4Region::fRegionMod" title='G4Region::fRegionMod' data-ref="G4Region::fRegionMod">fRegionMod</a> = <b>true</b>;</td></tr>
+<tr><th id="348">348</th><td>}</td></tr>
+<tr><th id="349">349</th><td></td></tr>
+<tr><th id="350">350</th><td><i>// ********************************************************************</i></td></tr>
+<tr><th id="351">351</th><td><i>// Clean</i></td></tr>
+<tr><th id="352">352</th><td><i>// ********************************************************************</i></td></tr>
+<tr><th id="353">353</th><td><i>//</i></td></tr>
+<tr><th id="354">354</th><td><em>void</em> <a class="type" href="../include/G4Region.hh.html#G4Region" title='G4Region' data-ref="G4Region">G4Region</a>::<dfn class="decl def" id="_ZN8G4Region5CleanEv" title='G4Region::Clean' data-ref="_ZN8G4Region5CleanEv">Clean</dfn>()</td></tr>
+<tr><th id="355">355</th><td>{</td></tr>
+<tr><th id="356">356</th><td>  subInstanceManager.FreeSlave();</td></tr>
+<tr><th id="357">357</th><td>}</td></tr>
+<tr><th id="358">358</th><td></td></tr>
+<tr><th id="359">359</th><td><i>// *******************************************************************</i></td></tr>
+<tr><th id="360">360</th><td><i>// ClearMaterialList:</i></td></tr>
+<tr><th id="361">361</th><td><i>//  - Clears the material list.</i></td></tr>
+<tr><th id="362">362</th><td><i>// *******************************************************************</i></td></tr>
+<tr><th id="363">363</th><td><i>//</i></td></tr>
+<tr><th id="364">364</th><td><em>void</em> <a class="type" href="../include/G4Region.hh.html#G4Region" title='G4Region' data-ref="G4Region">G4Region</a>::<dfn class="decl def" id="_ZN8G4Region17ClearMaterialListEv" title='G4Region::ClearMaterialList' data-ref="_ZN8G4Region17ClearMaterialListEv">ClearMaterialList</dfn>()</td></tr>
+<tr><th id="365">365</th><td>{</td></tr>
+<tr><th id="366">366</th><td>  fMaterials.clear();</td></tr>
+<tr><th id="367">367</th><td>}</td></tr>
+<tr><th id="368">368</th><td></td></tr>
+<tr><th id="369">369</th><td><i>// *******************************************************************</i></td></tr>
+<tr><th id="370">370</th><td><i>// UpdateMaterialList:</i></td></tr>
+<tr><th id="371">371</th><td><i>//  - computes material list looping through</i></td></tr>
+<tr><th id="372">372</th><td><i>//    each root logical volume in the region.</i></td></tr>
+<tr><th id="373">373</th><td><i>// *******************************************************************</i></td></tr>
+<tr><th id="374">374</th><td><i>//</i></td></tr>
+<tr><th id="375">375</th><td><em>void</em> <a class="type" href="../include/G4Region.hh.html#G4Region" title='G4Region' data-ref="G4Region">G4Region</a>::<dfn class="decl def" id="_ZN8G4Region18UpdateMaterialListEv" title='G4Region::UpdateMaterialList' data-ref="_ZN8G4Region18UpdateMaterialListEv">UpdateMaterialList</dfn>()</td></tr>
+<tr><th id="376">376</th><td>{</td></tr>
+<tr><th id="377">377</th><td>  <i>// Reset the materials list</i></td></tr>
+<tr><th id="378">378</th><td><i>  //</i></td></tr>
+<tr><th id="379">379</th><td>  <a class="member" href="#_ZN8G4Region17ClearMaterialListEv" title='G4Region::ClearMaterialList' data-ref="_ZN8G4Region17ClearMaterialListEv">ClearMaterialList</a>();</td></tr>
+<tr><th id="380">380</th><td></td></tr>
+<tr><th id="381">381</th><td>  <i>// Loop over the root logical volumes and rebuild the list</i></td></tr>
+<tr><th id="382">382</th><td><i>  // of materials from scratch</i></td></tr>
+<tr><th id="383">383</th><td><i>  //</i></td></tr>
+<tr><th id="384">384</th><td>  <span class='error' title="use of undeclared identifier &apos;G4RootLVList&apos;">G4RootLVList</span>::iterator <dfn class="local col0 decl" id="50pLV" title='pLV' data-type='int' data-ref="50pLV">pLV</dfn>;</td></tr>
+<tr><th id="385">385</th><td>  <b>for</b> (pLV=fRootVolumes.begin(); pLV!=fRootVolumes.end(); pLV++)</td></tr>
+<tr><th id="386">386</th><td>  {</td></tr>
+<tr><th id="387">387</th><td>    ScanVolumeTree(*pLV, <b>true</b>);</td></tr>
+<tr><th id="388">388</th><td>  }</td></tr>
+<tr><th id="389">389</th><td>}</td></tr>
+<tr><th id="390">390</th><td></td></tr>
+<tr><th id="391">391</th><td><i>// *******************************************************************</i></td></tr>
+<tr><th id="392">392</th><td><i>// SetWorld:</i></td></tr>
+<tr><th id="393">393</th><td><i>//  - Set the world physical volume if this region belongs to this</i></td></tr>
+<tr><th id="394">394</th><td><i>//    world. If the given pointer is null, reset the pointer.</i></td></tr>
+<tr><th id="395">395</th><td><i>// *******************************************************************</i></td></tr>
+<tr><th id="396">396</th><td><i>//</i></td></tr>
+<tr><th id="397">397</th><td><em>void</em> <a class="type" href="../include/G4Region.hh.html#G4Region" title='G4Region' data-ref="G4Region">G4Region</a>::<dfn class="decl def" id="_ZN8G4Region8SetWorldEP17G4VPhysicalVolume" title='G4Region::SetWorld' data-ref="_ZN8G4Region8SetWorldEP17G4VPhysicalVolume">SetWorld</dfn>(<a class="type" href="../include/G4VPhysicalVolume.hh.html#G4VPhysicalVolume" title='G4VPhysicalVolume' data-ref="G4VPhysicalVolume">G4VPhysicalVolume</a>* <dfn class="local col1 decl" id="51wp" title='wp' data-type='G4VPhysicalVolume *' data-ref="51wp">wp</dfn>)</td></tr>
+<tr><th id="398">398</th><td>{</td></tr>
+<tr><th id="399">399</th><td>  <b>if</b>(!<a class="local col1 ref" href="#51wp" title='wp' data-ref="51wp">wp</a>)</td></tr>
+<tr><th id="400">400</th><td>  { <a class="member" href="../include/G4Region.hh.html#G4Region::fWorldPhys" title='G4Region::fWorldPhys' data-ref="G4Region::fWorldPhys">fWorldPhys</a> = <var>0</var>; }</td></tr>
+<tr><th id="401">401</th><td>  <b>else</b></td></tr>
+<tr><th id="402">402</th><td>  { <b>if</b>(<a class="member" href="#_ZNK8G4Region9BelongsToEP17G4VPhysicalVolume" title='G4Region::BelongsTo' data-ref="_ZNK8G4Region9BelongsToEP17G4VPhysicalVolume">BelongsTo</a>(<a class="local col1 ref" href="#51wp" title='wp' data-ref="51wp">wp</a>)) <a class="member" href="../include/G4Region.hh.html#G4Region::fWorldPhys" title='G4Region::fWorldPhys' data-ref="G4Region::fWorldPhys">fWorldPhys</a> = <a class="local col1 ref" href="#51wp" title='wp' data-ref="51wp">wp</a>; }</td></tr>
+<tr><th id="403">403</th><td></td></tr>
+<tr><th id="404">404</th><td>  <b>return</b>;</td></tr>
+<tr><th id="405">405</th><td>}</td></tr>
+<tr><th id="406">406</th><td></td></tr>
+<tr><th id="407">407</th><td><i>// *******************************************************************</i></td></tr>
+<tr><th id="408">408</th><td><i>// BelongsTo:</i></td></tr>
+<tr><th id="409">409</th><td><i>//  - Returns whether this region belongs to the given physical volume</i></td></tr>
+<tr><th id="410">410</th><td><i>//    (recursively scanned to the bottom of the hierarchy)</i></td></tr>
+<tr><th id="411">411</th><td><i>// *******************************************************************</i></td></tr>
+<tr><th id="412">412</th><td><i>// </i></td></tr>
+<tr><th id="413">413</th><td><a class="typedef" href="../../../global/management/include/G4Types.hh.html#G4bool" title='G4bool' data-type='bool' data-ref="G4bool">G4bool</a> <a class="type" href="../include/G4Region.hh.html#G4Region" title='G4Region' data-ref="G4Region">G4Region</a>::<dfn class="decl def" id="_ZNK8G4Region9BelongsToEP17G4VPhysicalVolume" title='G4Region::BelongsTo' data-ref="_ZNK8G4Region9BelongsToEP17G4VPhysicalVolume">BelongsTo</dfn>(<a class="type" href="../include/G4VPhysicalVolume.hh.html#G4VPhysicalVolume" title='G4VPhysicalVolume' data-ref="G4VPhysicalVolume">G4VPhysicalVolume</a>* <dfn class="local col2 decl" id="52thePhys" title='thePhys' data-type='G4VPhysicalVolume *' data-ref="52thePhys">thePhys</dfn>) <em>const</em></td></tr>
+<tr><th id="414">414</th><td>{</td></tr>
+<tr><th id="415">415</th><td>  <a class="type" href="../include/G4LogicalVolume.hh.html#G4LogicalVolume" title='G4LogicalVolume' data-ref="G4LogicalVolume">G4LogicalVolume</a>* <dfn class="local col3 decl" id="53currLog" title='currLog' data-type='G4LogicalVolume *' data-ref="53currLog">currLog</dfn> = <a class="local col2 ref" href="#52thePhys" title='thePhys' data-ref="52thePhys">thePhys</a>-&gt;<a class="ref" href="../include/G4VPhysicalVolume.hh.html#_ZNK17G4VPhysicalVolume16GetLogicalVolumeEv" title='G4VPhysicalVolume::GetLogicalVolume' data-ref="_ZNK17G4VPhysicalVolume16GetLogicalVolumeEv">GetLogicalVolume</a>();</td></tr>
+<tr><th id="416">416</th><td>  <b>if</b> (<a class="local col3 ref" href="#53currLog" title='currLog' data-ref="53currLog">currLog</a>-&gt;<a class="ref" href="../include/G4LogicalVolume.hh.html#_ZNK15G4LogicalVolume9GetRegionEv" title='G4LogicalVolume::GetRegion' data-ref="_ZNK15G4LogicalVolume9GetRegionEv">GetRegion</a>()==<b>this</b>) {<b>return</b> <b>true</b>;}</td></tr>
+<tr><th id="417">417</th><td></td></tr>
+<tr><th id="418">418</th><td>  <a class="typedef" href="../../../global/management/include/G4Types.hh.html#G4int" title='G4int' data-type='int' data-ref="G4int">G4int</a> <dfn class="local col4 decl" id="54nDaughters" title='nDaughters' data-type='G4int' data-ref="54nDaughters">nDaughters</dfn> = <a class="local col3 ref" href="#53currLog" title='currLog' data-ref="53currLog">currLog</a>-&gt;<a class="ref" href="../include/G4LogicalVolume.hh.html#_ZNK15G4LogicalVolume14GetNoDaughtersEv" title='G4LogicalVolume::GetNoDaughters' data-ref="_ZNK15G4LogicalVolume14GetNoDaughtersEv">GetNoDaughters</a>();</td></tr>
+<tr><th id="419">419</th><td>  <b>while</b> (<a class="local col4 ref" href="#54nDaughters" title='nDaughters' data-ref="54nDaughters">nDaughters</a>--)  <i>// Loop checking, 06.08.2015, G.Cosmo</i></td></tr>
+<tr><th id="420">420</th><td>  {</td></tr>
+<tr><th id="421">421</th><td>    <b>if</b> (<a class="member" href="#_ZNK8G4Region9BelongsToEP17G4VPhysicalVolume" title='G4Region::BelongsTo' data-ref="_ZNK8G4Region9BelongsToEP17G4VPhysicalVolume">BelongsTo</a>(<a class="local col3 ref" href="#53currLog" title='currLog' data-ref="53currLog">currLog</a>-&gt;<a class="ref" href="../include/G4LogicalVolume.hh.html#_ZNK15G4LogicalVolume11GetDaughterEi" title='G4LogicalVolume::GetDaughter' data-ref="_ZNK15G4LogicalVolume11GetDaughterEi">GetDaughter</a>(<a class="local col4 ref" href="#54nDaughters" title='nDaughters' data-ref="54nDaughters">nDaughters</a>))) {<b>return</b> <b>true</b>;}</td></tr>
+<tr><th id="422">422</th><td>  }</td></tr>
+<tr><th id="423">423</th><td></td></tr>
+<tr><th id="424">424</th><td>  <b>return</b> <b>false</b>;</td></tr>
+<tr><th id="425">425</th><td>}</td></tr>
+<tr><th id="426">426</th><td></td></tr>
+<tr><th id="427">427</th><td><i>// *******************************************************************</i></td></tr>
+<tr><th id="428">428</th><td><i>// ClearFastSimulationManager:</i></td></tr>
+<tr><th id="429">429</th><td><i>//  - Set G4FastSimulationManager pointer to the one for the parent region</i></td></tr>
+<tr><th id="430">430</th><td><i>//    if it exists. Otherwise set to null.</i></td></tr>
+<tr><th id="431">431</th><td><i>// *******************************************************************</i></td></tr>
+<tr><th id="432">432</th><td><i>//</i></td></tr>
+<tr><th id="433">433</th><td><em>void</em> <a class="type" href="../include/G4Region.hh.html#G4Region" title='G4Region' data-ref="G4Region">G4Region</a>::<dfn class="decl def" id="_ZN8G4Region26ClearFastSimulationManagerEv" title='G4Region::ClearFastSimulationManager' data-ref="_ZN8G4Region26ClearFastSimulationManagerEv">ClearFastSimulationManager</dfn>()</td></tr>
+<tr><th id="434">434</th><td>{</td></tr>
+<tr><th id="435">435</th><td>  <a class="typedef" href="../../../global/management/include/G4Types.hh.html#G4bool" title='G4bool' data-type='bool' data-ref="G4bool">G4bool</a> <dfn class="local col5 decl" id="55isUnique" title='isUnique' data-type='G4bool' data-ref="55isUnique">isUnique</dfn>;</td></tr>
+<tr><th id="436">436</th><td>  <a class="type" href="../include/G4Region.hh.html#G4Region" title='G4Region' data-ref="G4Region">G4Region</a>* <dfn class="local col6 decl" id="56parent" title='parent' data-type='G4Region *' data-ref="56parent">parent</dfn> = <a class="member" href="#_ZNK8G4Region15GetParentRegionERb" title='G4Region::GetParentRegion' data-ref="_ZNK8G4Region15GetParentRegionERb">GetParentRegion</a>(<span class='refarg'><a class="local col5 ref" href="#55isUnique" title='isUnique' data-ref="55isUnique">isUnique</a></span>);</td></tr>
+<tr><th id="437">437</th><td>  <b>if</b>(<a class="local col6 ref" href="#56parent" title='parent' data-ref="56parent">parent</a>)</td></tr>
+<tr><th id="438">438</th><td>  {</td></tr>
+<tr><th id="439">439</th><td>    <b>if</b> (<a class="local col5 ref" href="#55isUnique" title='isUnique' data-ref="55isUnique">isUnique</a>)</td></tr>
+<tr><th id="440">440</th><td>    {</td></tr>
+<tr><th id="441">441</th><td>      <a class="macro" href="#45" title="((subInstanceManager.offset[instanceID]).fFastSimulationManager)" data-ref="_M/G4MT_fsmanager">G4MT_fsmanager</a> = parent-&gt;GetFastSimulationManager();</td></tr>
+<tr><th id="442">442</th><td>    }</td></tr>
+<tr><th id="443">443</th><td>    <b>else</b></td></tr>
+<tr><th id="444">444</th><td>    {</td></tr>
+<tr><th id="445">445</th><td>      <span class='error' title="use of undeclared identifier &apos;std&apos;">std</span>::ostringstream <dfn class="local col7 decl" id="57message" title='message' data-type='int' data-ref="57message">message</dfn>;</td></tr>
+<tr><th id="446">446</th><td>      message &lt;&lt; <q>"Region &lt;"</q> &lt;&lt; fName &lt;&lt; <q>"&gt; belongs to more than"</q></td></tr>
+<tr><th id="447">447</th><td>              &lt;&lt; <q>" one parent region !"</q> &lt;&lt; <a class="macro" href="../../../global/management/include/G4ios.hh.html#60" title="std::endl" data-ref="_M/G4endl">G4endl</a></td></tr>
+<tr><th id="448">448</th><td>              &lt;&lt; <q>"A region cannot belong to more than one direct parent region,"</q></td></tr>
+<tr><th id="449">449</th><td>              &lt;&lt; <a class="macro" href="../../../global/management/include/G4ios.hh.html#60" title="std::endl" data-ref="_M/G4endl">G4endl</a></td></tr>
+<tr><th id="450">450</th><td>              &lt;&lt; <q>"to have fast-simulation assigned."</q>;</td></tr>
+<tr><th id="451">451</th><td>      G4Exception(<q>"G4Region::ClearFastSimulationManager()"</q>,</td></tr>
+<tr><th id="452">452</th><td>                  <q>"GeomMgt1002"</q>, JustWarning, message);</td></tr>
+<tr><th id="453">453</th><td>      <a class="macro" href="#45" title="((subInstanceManager.offset[instanceID]).fFastSimulationManager)" data-ref="_M/G4MT_fsmanager">G4MT_fsmanager</a> = <var>0</var>;</td></tr>
+<tr><th id="454">454</th><td>    }</td></tr>
+<tr><th id="455">455</th><td>  }</td></tr>
+<tr><th id="456">456</th><td>  <b>else</b></td></tr>
+<tr><th id="457">457</th><td>  {</td></tr>
+<tr><th id="458">458</th><td>    <a class="macro" href="#45" title="((subInstanceManager.offset[instanceID]).fFastSimulationManager)" data-ref="_M/G4MT_fsmanager">G4MT_fsmanager</a> = <var>0</var>;</td></tr>
+<tr><th id="459">459</th><td>  }</td></tr>
+<tr><th id="460">460</th><td>}</td></tr>
+<tr><th id="461">461</th><td></td></tr>
+<tr><th id="462">462</th><td><i>// *******************************************************************</i></td></tr>
+<tr><th id="463">463</th><td><i>// GetParentRegion:</i></td></tr>
+<tr><th id="464">464</th><td><i>//  - Returns a region that contains this region.</i></td></tr>
+<tr><th id="465">465</th><td><i>//    Otherwise null is returned.</i></td></tr>
+<tr><th id="466">466</th><td><i>// *******************************************************************</i></td></tr>
+<tr><th id="467">467</th><td><i>// </i></td></tr>
+<tr><th id="468">468</th><td><a class="type" href="../include/G4Region.hh.html#G4Region" title='G4Region' data-ref="G4Region">G4Region</a>* <a class="type" href="../include/G4Region.hh.html#G4Region" title='G4Region' data-ref="G4Region">G4Region</a>::<dfn class="decl def" id="_ZNK8G4Region15GetParentRegionERb" title='G4Region::GetParentRegion' data-ref="_ZNK8G4Region15GetParentRegionERb">GetParentRegion</dfn>(<a class="typedef" href="../../../global/management/include/G4Types.hh.html#G4bool" title='G4bool' data-type='bool' data-ref="G4bool">G4bool</a>&amp; <dfn class="local col8 decl" id="58unique" title='unique' data-type='G4bool &amp;' data-ref="58unique">unique</dfn>) <em>const</em></td></tr>
+<tr><th id="469">469</th><td>{</td></tr>
+<tr><th id="470">470</th><td>  <a class="type" href="../include/G4Region.hh.html#G4Region" title='G4Region' data-ref="G4Region">G4Region</a>* <dfn class="local col9 decl" id="59parent" title='parent' data-type='G4Region *' data-ref="59parent">parent</dfn> = <var>0</var>; <a class="local col8 ref" href="#58unique" title='unique' data-ref="58unique">unique</a> = <b>true</b>;</td></tr>
+<tr><th id="471">471</th><td>  <a class="type" href="../include/G4LogicalVolumeStore.hh.html#G4LogicalVolumeStore" title='G4LogicalVolumeStore' data-ref="G4LogicalVolumeStore">G4LogicalVolumeStore</a>* <dfn class="local col0 decl" id="60lvStore" title='lvStore' data-type='G4LogicalVolumeStore *' data-ref="60lvStore">lvStore</dfn> = <a class="type" href="../include/G4LogicalVolumeStore.hh.html#G4LogicalVolumeStore" title='G4LogicalVolumeStore' data-ref="G4LogicalVolumeStore">G4LogicalVolumeStore</a>::<a class="ref" href="../include/G4LogicalVolumeStore.hh.html#_ZN20G4LogicalVolumeStore11GetInstanceEv" title='G4LogicalVolumeStore::GetInstance' data-ref="_ZN20G4LogicalVolumeStore11GetInstanceEv">GetInstance</a>();</td></tr>
+<tr><th id="472">472</th><td>  G4LogicalVolumeStore::<span class='error' title="no type named &apos;iterator&apos; in &apos;G4LogicalVolumeStore&apos;">iterator</span> <dfn class="local col1 decl" id="61lvItr" title='lvItr' data-type='int' data-ref="61lvItr">lvItr</dfn>;</td></tr>
+<tr><th id="473">473</th><td></td></tr>
+<tr><th id="474">474</th><td>  <i>// Loop over all logical volumes in the store</i></td></tr>
+<tr><th id="475">475</th><td><i>  //</i></td></tr>
+<tr><th id="476">476</th><td>  <b>for</b>(lvItr=lvStore-&gt;<span class='error' title="no member named &apos;begin&apos; in &apos;G4LogicalVolumeStore&apos;">begin</span>(); lvItr!=lvStore-&gt;<span class='error' title="no member named &apos;end&apos; in &apos;G4LogicalVolumeStore&apos;">end</span>(); lvItr++)</td></tr>
+<tr><th id="477">477</th><td>  {</td></tr>
+<tr><th id="478">478</th><td>    <a class="typedef" href="../../../global/management/include/G4Types.hh.html#G4int" title='G4int' data-type='int' data-ref="G4int">G4int</a> <dfn class="local col2 decl" id="62nD" title='nD' data-type='G4int' data-ref="62nD">nD</dfn> = (*lvItr)-&gt;GetNoDaughters();</td></tr>
+<tr><th id="479">479</th><td>    <a class="type" href="../include/G4Region.hh.html#G4Region" title='G4Region' data-ref="G4Region">G4Region</a>* <dfn class="local col3 decl" id="63aR" title='aR' data-type='G4Region *' data-ref="63aR">aR</dfn> = (*lvItr)-&gt;GetRegion();</td></tr>
+<tr><th id="480">480</th><td></td></tr>
+<tr><th id="481">481</th><td>    <i>// Loop over all daughters of each logical volume</i></td></tr>
+<tr><th id="482">482</th><td><i>    //</i></td></tr>
+<tr><th id="483">483</th><td>    <b>for</b>(<a class="typedef" href="../../../global/management/include/G4Types.hh.html#G4int" title='G4int' data-type='int' data-ref="G4int">G4int</a> <dfn class="local col4 decl" id="64iD" title='iD' data-type='G4int' data-ref="64iD">iD</dfn>=<var>0</var>; <a class="local col4 ref" href="#64iD" title='iD' data-ref="64iD">iD</a>&lt;<a class="local col2 ref" href="#62nD" title='nD' data-ref="62nD">nD</a>; <a class="local col4 ref" href="#64iD" title='iD' data-ref="64iD">iD</a>++)</td></tr>
+<tr><th id="484">484</th><td>    {</td></tr>
+<tr><th id="485">485</th><td>      <b>if</b>((*lvItr)-&gt;GetDaughter(iD)-&gt;GetLogicalVolume()-&gt;GetRegion()==<b>this</b>)</td></tr>
+<tr><th id="486">486</th><td>      { </td></tr>
+<tr><th id="487">487</th><td>        <b>if</b>(<a class="local col9 ref" href="#59parent" title='parent' data-ref="59parent">parent</a>)</td></tr>
+<tr><th id="488">488</th><td>        {</td></tr>
+<tr><th id="489">489</th><td>          <b>if</b>(<a class="local col9 ref" href="#59parent" title='parent' data-ref="59parent">parent</a>!=<a class="local col3 ref" href="#63aR" title='aR' data-ref="63aR">aR</a>) { <a class="local col8 ref" href="#58unique" title='unique' data-ref="58unique">unique</a> = <b>false</b>; }</td></tr>
+<tr><th id="490">490</th><td>        }</td></tr>
+<tr><th id="491">491</th><td>        <b>else</b>  <i>// Cache LV parent region which includes a daughter volume</i></td></tr>
+<tr><th id="492">492</th><td>              <i>// with the same associated region as the current one</i></td></tr>
+<tr><th id="493">493</th><td>        {</td></tr>
+<tr><th id="494">494</th><td>          <a class="local col9 ref" href="#59parent" title='parent' data-ref="59parent">parent</a> = <a class="local col3 ref" href="#63aR" title='aR' data-ref="63aR">aR</a>;</td></tr>
+<tr><th id="495">495</th><td>        }</td></tr>
+<tr><th id="496">496</th><td>      }</td></tr>
+<tr><th id="497">497</th><td>    }</td></tr>
+<tr><th id="498">498</th><td>  }</td></tr>
+<tr><th id="499">499</th><td>  <b>return</b> <a class="local col9 ref" href="#59parent" title='parent' data-ref="59parent">parent</a>;</td></tr>
+<tr><th id="500">500</th><td>}</td></tr>
+<tr><th id="501">501</th><td></td></tr>
+</table><hr/><p id='footer'>
+Generated on <em>2019-Aug-28</em> from project codebrowser<br />Powered by <a href='https://woboq.com'><img alt='Woboq' src='https://code.woboq.org/woboq-16.png' width='41' height='16' /></a> <a href='https://code.woboq.org'>Code Browser</a> 2.1
+<br/>Generator usage only permitted with license.</p>
+</div></body></html>

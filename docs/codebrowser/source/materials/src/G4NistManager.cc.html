@@ -1,0 +1,266 @@
+<!doctype html>
+<html>
+<head>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"><title>G4NistManager.cc source code [codebrowser/source/materials/src/G4NistManager.cc] - Woboq Code Browser</title>
+<link rel="stylesheet" href="../../../../../data/qtcreator.css" title="QtCreator"/>
+<link rel="alternate stylesheet" href="../../../../../data/kdevelop.css" title="KDevelop"/>
+<script type="text/javascript" src="../../../../../data/jquery/jquery.min.js"></script>
+<script type="text/javascript" src="../../../../../data/jquery/jquery-ui.min.js"></script>
+<script>var file = 'codebrowser/source/materials/src/G4NistManager.cc'; var root_path = '../../../..'; var data_path = '../../../../../data';</script>
+<script src='../../../../../data/codebrowser.js'></script>
+</head>
+<body><div id='header'><h1 id='breadcrumb'><span>Browse the source code of </span><a href='../../..'>codebrowser</a>/<a href='../..'>source</a>/<a href='..'>materials</a>/<a href='./'>src</a>/<a href='G4NistManager.cc.html'>G4NistManager.cc</a></h1></div>
+<hr/><div id='content'><table class="code">
+<tr><th id="1">1</th><td><i>//</i></td></tr>
+<tr><th id="2">2</th><td><i>// ********************************************************************</i></td></tr>
+<tr><th id="3">3</th><td><i>// * License and Disclaimer                                           *</i></td></tr>
+<tr><th id="4">4</th><td><i>// *                                                                  *</i></td></tr>
+<tr><th id="5">5</th><td><i>// * The  Geant4 software  is  copyright of the Copyright Holders  of *</i></td></tr>
+<tr><th id="6">6</th><td><i>// * the Geant4 Collaboration.  It is provided  under  the terms  and *</i></td></tr>
+<tr><th id="7">7</th><td><i>// * conditions of the Geant4 Software License,  included in the file *</i></td></tr>
+<tr><th id="8">8</th><td><i>// * LICENSE and available at  <a href="http://cern.ch/geant4/license">http://cern.ch/geant4/license</a> .  These *</i></td></tr>
+<tr><th id="9">9</th><td><i>// * include a list of copyright holders.                             *</i></td></tr>
+<tr><th id="10">10</th><td><i>// *                                                                  *</i></td></tr>
+<tr><th id="11">11</th><td><i>// * Neither the authors of this software system, nor their employing *</i></td></tr>
+<tr><th id="12">12</th><td><i>// * institutes,nor the agencies providing financial support for this *</i></td></tr>
+<tr><th id="13">13</th><td><i>// * work  make  any representation or  warranty, express or implied, *</i></td></tr>
+<tr><th id="14">14</th><td><i>// * regarding  this  software system or assume any liability for its *</i></td></tr>
+<tr><th id="15">15</th><td><i>// * use.  Please see the license in the file  LICENSE  and URL above *</i></td></tr>
+<tr><th id="16">16</th><td><i>// * for the full disclaimer and the limitation of liability.         *</i></td></tr>
+<tr><th id="17">17</th><td><i>// *                                                                  *</i></td></tr>
+<tr><th id="18">18</th><td><i>// * This  code  implementation is the result of  the  scientific and *</i></td></tr>
+<tr><th id="19">19</th><td><i>// * technical work of the GEANT4 collaboration.                      *</i></td></tr>
+<tr><th id="20">20</th><td><i>// * By using,  copying,  modifying or  distributing the software (or *</i></td></tr>
+<tr><th id="21">21</th><td><i>// * any work based  on the software)  you  agree  to acknowledge its *</i></td></tr>
+<tr><th id="22">22</th><td><i>// * use  in  resulting  scientific  publications,  and indicate your *</i></td></tr>
+<tr><th id="23">23</th><td><i>// * acceptance of all terms of the Geant4 Software license.          *</i></td></tr>
+<tr><th id="24">24</th><td><i>// ********************************************************************</i></td></tr>
+<tr><th id="25">25</th><td><i>//</i></td></tr>
+<tr><th id="26">26</th><td><i>//</i></td></tr>
+<tr><th id="27">27</th><td><i>// -------------------------------------------------------------------</i></td></tr>
+<tr><th id="28">28</th><td><i>//</i></td></tr>
+<tr><th id="29">29</th><td><i>// GEANT4 Class file</i></td></tr>
+<tr><th id="30">30</th><td><i>//</i></td></tr>
+<tr><th id="31">31</th><td><i>//</i></td></tr>
+<tr><th id="32">32</th><td><i>// File name:     G4NistManager</i></td></tr>
+<tr><th id="33">33</th><td><i>//</i></td></tr>
+<tr><th id="34">34</th><td><i>// Author:        Vladimir Ivanchenko</i></td></tr>
+<tr><th id="35">35</th><td><i>//</i></td></tr>
+<tr><th id="36">36</th><td><i>// Creation date: 23.12.2004</i></td></tr>
+<tr><th id="37">37</th><td><i>//</i></td></tr>
+<tr><th id="38">38</th><td><i>// Modifications:</i></td></tr>
+<tr><th id="39">39</th><td><i>// 27.02.06 V.Ivanchneko add ConstructNewGasMaterial</i></td></tr>
+<tr><th id="40">40</th><td><i>// 18.04.06 V.Ivanchneko add combined creation of materials (NIST + user)</i></td></tr>
+<tr><th id="41">41</th><td><i>// 11.05.06 V.Ivanchneko add warning flag to FindMaterial method</i></td></tr>
+<tr><th id="42">42</th><td><i>// 26.07.07 V.Ivanchneko modify destructor to provide complete destruction</i></td></tr>
+<tr><th id="43">43</th><td><i>//                       of all elements and materials</i></td></tr>
+<tr><th id="44">44</th><td><i>// 27-07-07, improve destructor (V.Ivanchenko) </i></td></tr>
+<tr><th id="45">45</th><td><i>// 28.07.07 V.Ivanchneko make simple methods inline</i></td></tr>
+<tr><th id="46">46</th><td><i>// 28.07.07 V.Ivanchneko simplify Print methods</i></td></tr>
+<tr><th id="47">47</th><td><i>// 26.10.11, new scheme for G4Exception  (mma) </i></td></tr>
+<tr><th id="48">48</th><td><i>//</i></td></tr>
+<tr><th id="49">49</th><td><i>// -------------------------------------------------------------------</i></td></tr>
+<tr><th id="50">50</th><td><i>//</i></td></tr>
+<tr><th id="51">51</th><td><i>// Class Description:</i></td></tr>
+<tr><th id="52">52</th><td><i>//</i></td></tr>
+<tr><th id="53">53</th><td><i>// Element data from the NIST DB on Atomic Weights and Isotope Compositions</i></td></tr>
+<tr><th id="54">54</th><td><i>// <a href="http://physics.nist.gov/PhysRefData/Compositions/index.html">http://physics.nist.gov/PhysRefData/Compositions/index.html</a></i></td></tr>
+<tr><th id="55">55</th><td><i>//</i></td></tr>
+<tr><th id="56">56</th><td><i>//....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......</i></td></tr>
+<tr><th id="57">57</th><td><i>//....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......</i></td></tr>
+<tr><th id="58">58</th><td></td></tr>
+<tr><th id="59">59</th><td><u>#include <a href="../include/G4NistManager.hh.html">"G4NistManager.hh"</a></u></td></tr>
+<tr><th id="60">60</th><td><u>#include <a href="../include/G4NistMessenger.hh.html">"G4NistMessenger.hh"</a></u></td></tr>
+<tr><th id="61">61</th><td><u>#include <a href="../include/G4Isotope.hh.html">"G4Isotope.hh"</a></u></td></tr>
+<tr><th id="62">62</th><td><u>#include <a href="../../global/management/include/G4Threading.hh.html">"G4Threading.hh"</a></u></td></tr>
+<tr><th id="63">63</th><td></td></tr>
+<tr><th id="64">64</th><td><a class="type" href="../include/G4NistManager.hh.html#G4NistManager" title='G4NistManager' data-ref="G4NistManager">G4NistManager</a>* <a class="type" href="../include/G4NistManager.hh.html#G4NistManager" title='G4NistManager' data-ref="G4NistManager">G4NistManager</a>::<dfn class="decl def" id="G4NistManager::instance" title='G4NistManager::instance' data-ref="G4NistManager::instance">instance</dfn> = <b>nullptr</b>;</td></tr>
+<tr><th id="65">65</th><td><u>#<span data-ppcond="65">ifdef</span> <span class="macro" data-ref="_M/G4MULTITHREADED">G4MULTITHREADED</span></u></td></tr>
+<tr><th id="66">66</th><td>  <span class='error' title="unknown type name &apos;G4Mutex&apos;">G4Mutex</span> <a class="type" href="../include/G4NistManager.hh.html#G4NistManager" title='G4NistManager' data-ref="G4NistManager">G4NistManager</a>::<dfn class="tu decl def" id="G4NistManager::nistManagerMutex" title='G4NistManager::nistManagerMutex' data-type='int' data-ref="G4NistManager::nistManagerMutex">nistManagerMutex</dfn> = <a class="macro" href="../../global/management/include/G4Threading.hh.html#88" title="{}" data-ref="_M/G4MUTEX_INITIALIZER">G4MUTEX_INITIALIZER</a>;</td></tr>
+<tr><th id="67">67</th><td><u>#<span data-ppcond="65">endif</span></u></td></tr>
+<tr><th id="68">68</th><td></td></tr>
+<tr><th id="69">69</th><td><i>//....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo.....</i></td></tr>
+<tr><th id="70">70</th><td></td></tr>
+<tr><th id="71">71</th><td><a class="type" href="../include/G4NistManager.hh.html#G4NistManager" title='G4NistManager' data-ref="G4NistManager">G4NistManager</a>* <a class="type" href="../include/G4NistManager.hh.html#G4NistManager" title='G4NistManager' data-ref="G4NistManager">G4NistManager</a>::<dfn class="decl def" id="_ZN13G4NistManager8InstanceEv" title='G4NistManager::Instance' data-ref="_ZN13G4NistManager8InstanceEv">Instance</dfn>()</td></tr>
+<tr><th id="72">72</th><td>{</td></tr>
+<tr><th id="73">73</th><td>  <b>if</b> (<a class="member" href="../include/G4NistManager.hh.html#G4NistManager::instance" title='G4NistManager::instance' data-ref="G4NistManager::instance">instance</a> == <b>nullptr</b>) {</td></tr>
+<tr><th id="74">74</th><td><u>#<span data-ppcond="74">ifdef</span> <span class="macro" data-ref="_M/G4MULTITHREADED">G4MULTITHREADED</span></u></td></tr>
+<tr><th id="75">75</th><td>    <a class="macro" href="../../global/management/include/G4Threading.hh.html#159" title="{ (&amp;nistManagerMutex)-&gt;lock(); }" data-ref="_M/G4MUTEXLOCK">G4MUTEXLOCK</a>(&amp;nistManagerMutex);</td></tr>
+<tr><th id="76">76</th><td>    <b>if</b> (<a class="member" href="../include/G4NistManager.hh.html#G4NistManager::instance" title='G4NistManager::instance' data-ref="G4NistManager::instance">instance</a> == <b>nullptr</b>) {</td></tr>
+<tr><th id="77">77</th><td><u>#<span data-ppcond="74">endif</span></u></td></tr>
+<tr><th id="78">78</th><td>      <em>static</em> <a class="type" href="../include/G4NistManager.hh.html#G4NistManager" title='G4NistManager' data-ref="G4NistManager">G4NistManager</a> <a class="ref fake" href="#_ZN13G4NistManagerC1Ev" title='G4NistManager::G4NistManager' data-ref="_ZN13G4NistManagerC1Ev"></a><dfn class="local col1 decl" id="1manager" title='manager' data-type='G4NistManager' data-ref="1manager">manager</dfn>;</td></tr>
+<tr><th id="79">79</th><td>      <a class="member" href="../include/G4NistManager.hh.html#G4NistManager::instance" title='G4NistManager::instance' data-ref="G4NistManager::instance">instance</a> = &amp;<a class="local col1 ref" href="#1manager" title='manager' data-ref="1manager">manager</a>;</td></tr>
+<tr><th id="80">80</th><td><u>#<span data-ppcond="80">ifdef</span> <span class="macro" data-ref="_M/G4MULTITHREADED">G4MULTITHREADED</span></u></td></tr>
+<tr><th id="81">81</th><td>    }</td></tr>
+<tr><th id="82">82</th><td>    <a class="macro" href="../../global/management/include/G4Threading.hh.html#160" title="{ (&amp;nistManagerMutex)-&gt;unlock(); }" data-ref="_M/G4MUTEXUNLOCK">G4MUTEXUNLOCK</a>(&amp;nistManagerMutex);</td></tr>
+<tr><th id="83">83</th><td><u>#<span data-ppcond="80">endif</span></u></td></tr>
+<tr><th id="84">84</th><td>  }</td></tr>
+<tr><th id="85">85</th><td>  <b>return</b> <a class="member" href="../include/G4NistManager.hh.html#G4NistManager::instance" title='G4NistManager::instance' data-ref="G4NistManager::instance">instance</a>;</td></tr>
+<tr><th id="86">86</th><td>}</td></tr>
+<tr><th id="87">87</th><td></td></tr>
+<tr><th id="88">88</th><td><i>//....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......</i></td></tr>
+<tr><th id="89">89</th><td></td></tr>
+<tr><th id="90">90</th><td>G4NistManager::<span class='error' title="exception specification in declaration does not match previous declaration">~</span>G4NistManager()</td></tr>
+<tr><th id="91">91</th><td>{</td></tr>
+<tr><th id="92">92</th><td>  <i>//  G4cout &lt;&lt; "NistManager: start material destruction" &lt;&lt; G4endl;</i></td></tr>
+<tr><th id="93">93</th><td>  <em>const</em> <span class='error' title="unknown type name &apos;G4MaterialTable&apos;">G4MaterialTable</span>* theMaterialTable = G4Material::GetMaterialTable();</td></tr>
+<tr><th id="94">94</th><td>  <span class='error' title="unknown type name &apos;size_t&apos;">size_t</span> nmat = theMaterialTable-&gt;size();</td></tr>
+<tr><th id="95">95</th><td>  <span class='error' title="unknown type name &apos;size_t&apos;">size_t</span> i;</td></tr>
+<tr><th id="96">96</th><td>  <b>for</b>(i=<var>0</var>; i&lt;nmat; i++) {</td></tr>
+<tr><th id="97">97</th><td>    <b>if</b>((*theMaterialTable)[i]) { <b>delete</b> (*theMaterialTable)[i]; }</td></tr>
+<tr><th id="98">98</th><td>  }</td></tr>
+<tr><th id="99">99</th><td>  <i>//  G4cout &lt;&lt; "NistManager: start element destruction" &lt;&lt; G4endl;</i></td></tr>
+<tr><th id="100">100</th><td>  <em>const</em> <span class='error' title="unknown type name &apos;G4ElementTable&apos;">G4ElementTable</span>* theElementTable = G4Element::GetElementTable();</td></tr>
+<tr><th id="101">101</th><td>  <span class='error' title="unknown type name &apos;size_t&apos;">size_t</span> nelm = theElementTable-&gt;size();</td></tr>
+<tr><th id="102">102</th><td>  <b>for</b>(i=<var>0</var>; i&lt;nelm; i++) {</td></tr>
+<tr><th id="103">103</th><td>    <b>if</b>((*theElementTable)[i]) { <b>delete</b> (*theElementTable)[i]; }</td></tr>
+<tr><th id="104">104</th><td>  }</td></tr>
+<tr><th id="105">105</th><td>  <i>//  G4cout &lt;&lt; "NistManager: start isotope destruction" &lt;&lt; G4endl;</i></td></tr>
+<tr><th id="106">106</th><td>  <em>const</em> <span class='error' title="unknown type name &apos;G4IsotopeTable&apos;">G4IsotopeTable</span>* theIsotopeTable = G4Isotope::GetIsotopeTable();</td></tr>
+<tr><th id="107">107</th><td>  <span class='error' title="unknown type name &apos;size_t&apos;">size_t</span> niso = theIsotopeTable-&gt;size();</td></tr>
+<tr><th id="108">108</th><td>  <b>for</b>(i=<var>0</var>; i&lt;niso; i++) {</td></tr>
+<tr><th id="109">109</th><td>    <b>if</b>((*theIsotopeTable)[i]) { <b>delete</b> (*theIsotopeTable)[i]; }</td></tr>
+<tr><th id="110">110</th><td>  }</td></tr>
+<tr><th id="111">111</th><td>  <i>//  G4cout &lt;&lt; "NistManager: end isotope destruction" &lt;&lt; G4endl;</i></td></tr>
+<tr><th id="112">112</th><td>  <b>delete</b> messenger;</td></tr>
+<tr><th id="113">113</th><td>  <b>delete</b> matBuilder;</td></tr>
+<tr><th id="114">114</th><td>  <b>delete</b> elmBuilder;</td></tr>
+<tr><th id="115">115</th><td>  <b>delete</b> fICRU90;</td></tr>
+<tr><th id="116">116</th><td>  <i>// G4cout &lt;&lt; "NistManager: end destruction" &lt;&lt; G4endl;</i></td></tr>
+<tr><th id="117">117</th><td>}</td></tr>
+<tr><th id="118">118</th><td></td></tr>
+<tr><th id="119">119</th><td><i>//....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......</i></td></tr>
+<tr><th id="120">120</th><td></td></tr>
+<tr><th id="121">121</th><td><a class="type" href="../include/G4Material.hh.html#G4Material" title='G4Material' data-ref="G4Material">G4Material</a>* </td></tr>
+<tr><th id="122">122</th><td><a class="type" href="../include/G4NistManager.hh.html#G4NistManager" title='G4NistManager' data-ref="G4NistManager">G4NistManager</a>::<dfn class="decl def" id="_ZN13G4NistManager27BuildMaterialWithNewDensityERK8G4StringS2_ddd" title='G4NistManager::BuildMaterialWithNewDensity' data-ref="_ZN13G4NistManager27BuildMaterialWithNewDensityERK8G4StringS2_ddd">BuildMaterialWithNewDensity</dfn>(<em>const</em> <a class="type" href="../../global/management/include/G4String.hh.html#G4String" title='G4String' data-ref="G4String">G4String</a>&amp; <dfn class="local col2 decl" id="2name" title='name' data-type='const G4String &amp;' data-ref="2name">name</dfn>,</td></tr>
+<tr><th id="123">123</th><td>					   <em>const</em> <a class="type" href="../../global/management/include/G4String.hh.html#G4String" title='G4String' data-ref="G4String">G4String</a>&amp; <dfn class="local col3 decl" id="3basename" title='basename' data-type='const G4String &amp;' data-ref="3basename">basename</dfn>, </td></tr>
+<tr><th id="124">124</th><td>					   <a class="typedef" href="../../global/management/include/G4Types.hh.html#G4double" title='G4double' data-type='double' data-ref="G4double">G4double</a> <dfn class="local col4 decl" id="4density" title='density' data-type='G4double' data-ref="4density">density</dfn>,</td></tr>
+<tr><th id="125">125</th><td>					   <a class="typedef" href="../../global/management/include/G4Types.hh.html#G4double" title='G4double' data-type='double' data-ref="G4double">G4double</a> <dfn class="local col5 decl" id="5temperature" title='temperature' data-type='G4double' data-ref="5temperature">temperature</dfn>,</td></tr>
+<tr><th id="126">126</th><td>					   <a class="typedef" href="../../global/management/include/G4Types.hh.html#G4double" title='G4double' data-type='double' data-ref="G4double">G4double</a> <dfn class="local col6 decl" id="6pressure" title='pressure' data-type='G4double' data-ref="6pressure">pressure</dfn>)</td></tr>
+<tr><th id="127">127</th><td>{</td></tr>
+<tr><th id="128">128</th><td>  <a class="type" href="../include/G4Material.hh.html#G4Material" title='G4Material' data-ref="G4Material">G4Material</a>* <dfn class="local col7 decl" id="7bmat" title='bmat' data-type='G4Material *' data-ref="7bmat">bmat</dfn> = <a class="member" href="../include/G4NistManager.hh.html#_ZN13G4NistManager19FindOrBuildMaterialERK8G4Stringbb" title='G4NistManager::FindOrBuildMaterial' data-ref="_ZN13G4NistManager19FindOrBuildMaterialERK8G4Stringbb">FindOrBuildMaterial</a>(<a class="local col2 ref" href="#2name" title='name' data-ref="2name">name</a>);</td></tr>
+<tr><th id="129">129</th><td>  <b>if</b>(<a class="local col7 ref" href="#7bmat" title='bmat' data-ref="7bmat">bmat</a>) {</td></tr>
+<tr><th id="130">130</th><td>    <a class="macro" href="../../global/management/include/G4ios.hh.html#46" title="(*_G4cout_p())" data-ref="_M/G4cout">G4cout</a> <span class='error' title="invalid operands to binary expression (&apos;int&apos; and &apos;const char *&apos;)">&lt;&lt;</span> <q>"G4NistManager::BuildMaterialWithNewDensity ERROR: "</q> &lt;&lt; <a class="macro" href="../../global/management/include/G4ios.hh.html#60" title="std::endl" data-ref="_M/G4endl">G4endl</a>;</td></tr>
+<tr><th id="131">131</th><td>    <a class="macro" href="../../global/management/include/G4ios.hh.html#46" title="(*_G4cout_p())" data-ref="_M/G4cout">G4cout</a> <span class='error' title="invalid operands to binary expression (&apos;int&apos; and &apos;const char *&apos;)">&lt;&lt;</span> <q>" New material &lt;"</q> &lt;&lt; name &lt;&lt; <q>"&gt; cannot be built because material"</q></td></tr>
+<tr><th id="132">132</th><td>	   &lt;&lt; <q>" with the same name already exist"</q> &lt;&lt; <a class="macro" href="../../global/management/include/G4ios.hh.html#60" title="std::endl" data-ref="_M/G4endl">G4endl</a>;</td></tr>
+<tr><th id="133">133</th><td>    <a class="ref" href="../../global/management/include/G4Exception.hh.html#_Z11G4ExceptionPKcS0_19G4ExceptionSeverityS0_" title='G4Exception' data-ref="_Z11G4ExceptionPKcS0_19G4ExceptionSeverityS0_">G4Exception</a>(<q>"G4NistManager::BuildMaterialWithNewDensity()"</q>, <q>"mat101"</q>,</td></tr>
+<tr><th id="134">134</th><td>                 <a class="enum" href="../../global/management/include/G4ExceptionSeverity.hh.html#G4ExceptionSeverity::FatalException" title='G4ExceptionSeverity::FatalException' data-ref="G4ExceptionSeverity::FatalException">FatalException</a>, <q>"Wrong material name"</q>);</td></tr>
+<tr><th id="135">135</th><td>    <b>return</b> <var>0</var>;</td></tr>
+<tr><th id="136">136</th><td>  }</td></tr>
+<tr><th id="137">137</th><td>  <a class="local col7 ref" href="#7bmat" title='bmat' data-ref="7bmat">bmat</a> = <a class="member" href="../include/G4NistManager.hh.html#_ZN13G4NistManager19FindOrBuildMaterialERK8G4Stringbb" title='G4NistManager::FindOrBuildMaterial' data-ref="_ZN13G4NistManager19FindOrBuildMaterialERK8G4Stringbb">FindOrBuildMaterial</a>(<a class="local col3 ref" href="#3basename" title='basename' data-ref="3basename">basename</a>);</td></tr>
+<tr><th id="138">138</th><td>  <b>if</b>(!<a class="local col7 ref" href="#7bmat" title='bmat' data-ref="7bmat">bmat</a>) {</td></tr>
+<tr><th id="139">139</th><td>    <a class="macro" href="../../global/management/include/G4ios.hh.html#46" title="(*_G4cout_p())" data-ref="_M/G4cout">G4cout</a> <span class='error' title="invalid operands to binary expression (&apos;int&apos; and &apos;const char *&apos;)">&lt;&lt;</span> <q>"G4NistManager::BuildMaterialWithNewDensity ERROR: "</q> &lt;&lt; <a class="macro" href="../../global/management/include/G4ios.hh.html#60" title="std::endl" data-ref="_M/G4endl">G4endl</a>;</td></tr>
+<tr><th id="140">140</th><td>    <a class="macro" href="../../global/management/include/G4ios.hh.html#46" title="(*_G4cout_p())" data-ref="_M/G4cout">G4cout</a> <span class='error' title="invalid operands to binary expression (&apos;int&apos; and &apos;const char *&apos;)">&lt;&lt;</span> <q>" New material &lt;"</q> &lt;&lt; name &lt;&lt; <q>"&gt; cannot be built because "</q> </td></tr>
+<tr><th id="141">141</th><td>	   &lt;&lt; <a class="macro" href="../../global/management/include/G4ios.hh.html#60" title="std::endl" data-ref="_M/G4endl">G4endl</a>;</td></tr>
+<tr><th id="142">142</th><td>    <a class="macro" href="../../global/management/include/G4ios.hh.html#46" title="(*_G4cout_p())" data-ref="_M/G4cout">G4cout</a> <span class='error' title="invalid operands to binary expression (&apos;int&apos; and &apos;const char *&apos;)">&lt;&lt;</span> <q>" base material &lt;"</q> &lt;&lt; basename &lt;&lt; <q>"&gt; does not exist"</q> &lt;&lt; <a class="macro" href="../../global/management/include/G4ios.hh.html#60" title="std::endl" data-ref="_M/G4endl">G4endl</a>;</td></tr>
+<tr><th id="143">143</th><td>    <a class="ref" href="../../global/management/include/G4Exception.hh.html#_Z11G4ExceptionPKcS0_19G4ExceptionSeverityS0_" title='G4Exception' data-ref="_Z11G4ExceptionPKcS0_19G4ExceptionSeverityS0_">G4Exception</a>(<q>"G4NistManager::BuildMaterialWithNewDensity()"</q>, <q>"mat102"</q>,</td></tr>
+<tr><th id="144">144</th><td>                 <a class="enum" href="../../global/management/include/G4ExceptionSeverity.hh.html#G4ExceptionSeverity::FatalException" title='G4ExceptionSeverity::FatalException' data-ref="G4ExceptionSeverity::FatalException">FatalException</a>, <q>"Wrong material name"</q>);    </td></tr>
+<tr><th id="145">145</th><td>    <b>return</b> <var>0</var>;</td></tr>
+<tr><th id="146">146</th><td>  }</td></tr>
+<tr><th id="147">147</th><td>  <a class="typedef" href="../../global/management/include/G4Types.hh.html#G4double" title='G4double' data-type='double' data-ref="G4double">G4double</a> <dfn class="local col8 decl" id="8dens" title='dens' data-type='G4double' data-ref="8dens">dens</dfn> = <a class="local col4 ref" href="#4density" title='density' data-ref="4density">density</a>;</td></tr>
+<tr><th id="148">148</th><td>  <a class="typedef" href="../../global/management/include/G4Types.hh.html#G4double" title='G4double' data-type='double' data-ref="G4double">G4double</a> <dfn class="local col9 decl" id="9temp" title='temp' data-type='G4double' data-ref="9temp">temp</dfn> = <a class="local col5 ref" href="#5temperature" title='temperature' data-ref="5temperature">temperature</a>;</td></tr>
+<tr><th id="149">149</th><td>  <a class="typedef" href="../../global/management/include/G4Types.hh.html#G4double" title='G4double' data-type='double' data-ref="G4double">G4double</a> <dfn class="local col0 decl" id="10pres" title='pres' data-type='G4double' data-ref="10pres">pres</dfn> = <a class="local col6 ref" href="#6pressure" title='pressure' data-ref="6pressure">pressure</a>;</td></tr>
+<tr><th id="150">150</th><td>  <b>if</b>(<a class="local col8 ref" href="#8dens" title='dens' data-ref="8dens">dens</a> == <var>0.0</var>) { </td></tr>
+<tr><th id="151">151</th><td>    <a class="local col8 ref" href="#8dens" title='dens' data-ref="8dens">dens</a> = <a class="local col7 ref" href="#7bmat" title='bmat' data-ref="7bmat">bmat</a>-&gt;<a class="ref" href="../include/G4Material.hh.html#_ZNK10G4Material10GetDensityEv" title='G4Material::GetDensity' data-ref="_ZNK10G4Material10GetDensityEv">GetDensity</a>();</td></tr>
+<tr><th id="152">152</th><td>    <a class="local col9 ref" href="#9temp" title='temp' data-ref="9temp">temp</a> = <a class="local col7 ref" href="#7bmat" title='bmat' data-ref="7bmat">bmat</a>-&gt;<a class="ref" href="../include/G4Material.hh.html#_ZNK10G4Material14GetTemperatureEv" title='G4Material::GetTemperature' data-ref="_ZNK10G4Material14GetTemperatureEv">GetTemperature</a>();</td></tr>
+<tr><th id="153">153</th><td>    <a class="local col0 ref" href="#10pres" title='pres' data-ref="10pres">pres</a> = <a class="local col7 ref" href="#7bmat" title='bmat' data-ref="7bmat">bmat</a>-&gt;<a class="ref" href="../include/G4Material.hh.html#_ZNK10G4Material11GetPressureEv" title='G4Material::GetPressure' data-ref="_ZNK10G4Material11GetPressureEv">GetPressure</a>(); </td></tr>
+<tr><th id="154">154</th><td>  }</td></tr>
+<tr><th id="155">155</th><td>  <a class="type" href="../include/G4Material.hh.html#G4Material" title='G4Material' data-ref="G4Material">G4Material</a>* <dfn class="local col1 decl" id="11mat" title='mat' data-type='G4Material *' data-ref="11mat">mat</dfn> = <b>new</b> <a class="type" href="../include/G4Material.hh.html#G4Material" title='G4Material' data-ref="G4Material">G4Material</a><a class="ref" href="../include/G4Material.hh.html#_ZN10G4MaterialC1ERK8G4StringdPKS_7G4Statedd" title='G4Material::G4Material' data-ref="_ZN10G4MaterialC1ERK8G4StringdPKS_7G4Statedd">(</a><a class="local col2 ref" href="#2name" title='name' data-ref="2name">name</a>, <a class="local col8 ref" href="#8dens" title='dens' data-ref="8dens">dens</a>, <a class="local col7 ref" href="#7bmat" title='bmat' data-ref="7bmat">bmat</a>, <a class="local col7 ref" href="#7bmat" title='bmat' data-ref="7bmat">bmat</a>-&gt;<a class="ref" href="../include/G4Material.hh.html#_ZNK10G4Material8GetStateEv" title='G4Material::GetState' data-ref="_ZNK10G4Material8GetStateEv">GetState</a>(),</td></tr>
+<tr><th id="156">156</th><td>				   <a class="local col9 ref" href="#9temp" title='temp' data-ref="9temp">temp</a>, <a class="local col0 ref" href="#10pres" title='pres' data-ref="10pres">pres</a>);</td></tr>
+<tr><th id="157">157</th><td>  <b>return</b> <a class="local col1 ref" href="#11mat" title='mat' data-ref="11mat">mat</a>;</td></tr>
+<tr><th id="158">158</th><td>}</td></tr>
+<tr><th id="159">159</th><td>  </td></tr>
+<tr><th id="160">160</th><td><i>//....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......</i></td></tr>
+<tr><th id="161">161</th><td></td></tr>
+<tr><th id="162">162</th><td><em>void</em> <a class="type" href="../include/G4NistManager.hh.html#G4NistManager" title='G4NistManager' data-ref="G4NistManager">G4NistManager</a>::<dfn class="decl def" id="_ZNK13G4NistManager12PrintElementERK8G4String" title='G4NistManager::PrintElement' data-ref="_ZNK13G4NistManager12PrintElementERK8G4String">PrintElement</dfn>(<em>const</em> <a class="type" href="../../global/management/include/G4String.hh.html#G4String" title='G4String' data-ref="G4String">G4String</a>&amp; <dfn class="local col2 decl" id="12symbol" title='symbol' data-type='const G4String &amp;' data-ref="12symbol">symbol</dfn>) <em>const</em></td></tr>
+<tr><th id="163">163</th><td>{</td></tr>
+<tr><th id="164">164</th><td>  <b>if</b> (<a class="local col2 ref" href="#12symbol" title='symbol' data-ref="12symbol">symbol</a> <a class="ref" href="../../global/management/include/G4String.hh.html#_ZNK8G4StringeqEPKc" title='G4String::operator==' data-ref="_ZNK8G4StringeqEPKc">==</a> <q>"all"</q>) { <a class="member" href="../include/G4NistManager.hh.html#G4NistManager::elmBuilder" title='G4NistManager::elmBuilder' data-ref="G4NistManager::elmBuilder">elmBuilder</a>-&gt;<a class="ref" href="../include/G4NistElementBuilder.hh.html#_ZNK20G4NistElementBuilder12PrintElementEi" title='G4NistElementBuilder::PrintElement' data-ref="_ZNK20G4NistElementBuilder12PrintElementEi">PrintElement</a>(<var>0</var>); }</td></tr>
+<tr><th id="165">165</th><td>  <b>else</b>                 { <a class="member" href="../include/G4NistManager.hh.html#G4NistManager::elmBuilder" title='G4NistManager::elmBuilder' data-ref="G4NistManager::elmBuilder">elmBuilder</a>-&gt;<a class="ref" href="../include/G4NistElementBuilder.hh.html#_ZNK20G4NistElementBuilder12PrintElementEi" title='G4NistElementBuilder::PrintElement' data-ref="_ZNK20G4NistElementBuilder12PrintElementEi">PrintElement</a>(<a class="member" href="../include/G4NistManager.hh.html#G4NistManager::elmBuilder" title='G4NistManager::elmBuilder' data-ref="G4NistManager::elmBuilder">elmBuilder</a>-&gt;<a class="ref" href="../include/G4NistElementBuilder.hh.html#_ZNK20G4NistElementBuilder4GetZERK8G4String" title='G4NistElementBuilder::GetZ' data-ref="_ZNK20G4NistElementBuilder4GetZERK8G4String">GetZ</a>(<a class="local col2 ref" href="#12symbol" title='symbol' data-ref="12symbol">symbol</a>)); }</td></tr>
+<tr><th id="166">166</th><td>}</td></tr>
+<tr><th id="167">167</th><td></td></tr>
+<tr><th id="168">168</th><td><i>//....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......</i></td></tr>
+<tr><th id="169">169</th><td></td></tr>
+<tr><th id="170">170</th><td><em>void</em> <a class="type" href="../include/G4NistManager.hh.html#G4NistManager" title='G4NistManager' data-ref="G4NistManager">G4NistManager</a>::<dfn class="decl def" id="_ZNK13G4NistManager14PrintG4ElementERK8G4String" title='G4NistManager::PrintG4Element' data-ref="_ZNK13G4NistManager14PrintG4ElementERK8G4String">PrintG4Element</dfn>(<em>const</em> <a class="type" href="../../global/management/include/G4String.hh.html#G4String" title='G4String' data-ref="G4String">G4String</a>&amp; <dfn class="local col3 decl" id="13name" title='name' data-type='const G4String &amp;' data-ref="13name">name</dfn>) <em>const</em></td></tr>
+<tr><th id="171">171</th><td>{</td></tr>
+<tr><th id="172">172</th><td>  <em>const</em> <span class='error' title="unknown type name &apos;G4ElementTable&apos;">G4ElementTable</span>* <dfn class="local col4 decl" id="14theElementTable" title='theElementTable' data-type='const int *' data-ref="14theElementTable">theElementTable</dfn> = G4Element::GetElementTable();</td></tr>
+<tr><th id="173">173</th><td>  <span class='error' title="unknown type name &apos;size_t&apos;">size_t</span> <dfn class="local col5 decl" id="15nelm" title='nelm' data-type='int' data-ref="15nelm">nelm</dfn> = theElementTable-&gt;size();</td></tr>
+<tr><th id="174">174</th><td>  <b>for</b>(<span class='error' title="unknown type name &apos;size_t&apos;">size_t</span> <dfn class="local col6 decl" id="16i" title='i' data-type='int' data-ref="16i">i</dfn>=<var>0</var>; i&lt;nelm; i++) {</td></tr>
+<tr><th id="175">175</th><td>    <a class="type" href="../include/G4Element.hh.html#G4Element" title='G4Element' data-ref="G4Element">G4Element</a>* <dfn class="local col7 decl" id="17elm" title='elm' data-type='G4Element *' data-ref="17elm">elm</dfn> = (*theElementTable)[i];</td></tr>
+<tr><th id="176">176</th><td>    <b>if</b> ( <a class="local col3 ref" href="#13name" title='name' data-ref="13name">name</a> <a class="ref" href="../../global/management/include/G4String.hh.html#_ZNK8G4StringeqERKS_" title='G4String::operator==' data-ref="_ZNK8G4StringeqERKS_">==</a> <a class="local col7 ref" href="#17elm" title='elm' data-ref="17elm">elm</a>-&gt;<a class="ref" href="../include/G4Element.hh.html#_ZNK9G4Element7GetNameEv" title='G4Element::GetName' data-ref="_ZNK9G4Element7GetNameEv">GetName</a>() || <q>"all"</q> == <a class="ref fake" href="../../global/management/include/G4String.hh.html#_ZNK8G4StringcvPKcEv" title='G4String::operator const char *' data-ref="_ZNK8G4StringcvPKcEv"></a><a class="local col3 ref" href="#13name" title='name' data-ref="13name">name</a>) {</td></tr>
+<tr><th id="177">177</th><td>      <a class="macro" href="../../global/management/include/G4ios.hh.html#46" title="(*_G4cout_p())" data-ref="_M/G4cout">G4cout</a> &lt;&lt; *elm &lt;&lt; <a class="macro" href="../../global/management/include/G4ios.hh.html#60" title="std::endl" data-ref="_M/G4endl">G4endl</a>;</td></tr>
+<tr><th id="178">178</th><td>    }</td></tr>
+<tr><th id="179">179</th><td>  }</td></tr>
+<tr><th id="180">180</th><td>}</td></tr>
+<tr><th id="181">181</th><td></td></tr>
+<tr><th id="182">182</th><td><i>//....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......</i></td></tr>
+<tr><th id="183">183</th><td></td></tr>
+<tr><th id="184">184</th><td><em>void</em> <a class="type" href="../include/G4NistManager.hh.html#G4NistManager" title='G4NistManager' data-ref="G4NistManager">G4NistManager</a>::<dfn class="decl def" id="_ZNK13G4NistManager15PrintG4MaterialERK8G4String" title='G4NistManager::PrintG4Material' data-ref="_ZNK13G4NistManager15PrintG4MaterialERK8G4String">PrintG4Material</dfn>(<em>const</em> <a class="type" href="../../global/management/include/G4String.hh.html#G4String" title='G4String' data-ref="G4String">G4String</a>&amp; <dfn class="local col8 decl" id="18name" title='name' data-type='const G4String &amp;' data-ref="18name">name</dfn>) <em>const</em></td></tr>
+<tr><th id="185">185</th><td>{</td></tr>
+<tr><th id="186">186</th><td>  <em>const</em> <span class='error' title="unknown type name &apos;G4MaterialTable&apos;">G4MaterialTable</span>* <dfn class="local col9 decl" id="19theMaterialTable" title='theMaterialTable' data-type='const int *' data-ref="19theMaterialTable">theMaterialTable</dfn> = G4Material::GetMaterialTable();</td></tr>
+<tr><th id="187">187</th><td>  <span class='error' title="unknown type name &apos;size_t&apos;">size_t</span> <dfn class="local col0 decl" id="20nmat" title='nmat' data-type='int' data-ref="20nmat">nmat</dfn> = theMaterialTable-&gt;size();</td></tr>
+<tr><th id="188">188</th><td>  <b>for</b>(<span class='error' title="unknown type name &apos;size_t&apos;">size_t</span> <dfn class="local col1 decl" id="21i" title='i' data-type='int' data-ref="21i">i</dfn>=<var>0</var>; i&lt;nmat; i++) {</td></tr>
+<tr><th id="189">189</th><td>    <a class="type" href="../include/G4Material.hh.html#G4Material" title='G4Material' data-ref="G4Material">G4Material</a>* <dfn class="local col2 decl" id="22mat" title='mat' data-type='G4Material *' data-ref="22mat">mat</dfn> = (*theMaterialTable)[i];</td></tr>
+<tr><th id="190">190</th><td>    <b>if</b> ( <a class="local col8 ref" href="#18name" title='name' data-ref="18name">name</a> <a class="ref" href="../../global/management/include/G4String.hh.html#_ZNK8G4StringeqERKS_" title='G4String::operator==' data-ref="_ZNK8G4StringeqERKS_">==</a> <a class="local col2 ref" href="#22mat" title='mat' data-ref="22mat">mat</a>-&gt;<a class="ref" href="../include/G4Material.hh.html#_ZNK10G4Material7GetNameEv" title='G4Material::GetName' data-ref="_ZNK10G4Material7GetNameEv">GetName</a>() || <q>"all"</q> == <a class="ref fake" href="../../global/management/include/G4String.hh.html#_ZNK8G4StringcvPKcEv" title='G4String::operator const char *' data-ref="_ZNK8G4StringcvPKcEv"></a><a class="local col8 ref" href="#18name" title='name' data-ref="18name">name</a>) {</td></tr>
+<tr><th id="191">191</th><td>      <a class="macro" href="../../global/management/include/G4ios.hh.html#46" title="(*_G4cout_p())" data-ref="_M/G4cout">G4cout</a> &lt;&lt; *mat &lt;&lt; <a class="macro" href="../../global/management/include/G4ios.hh.html#60" title="std::endl" data-ref="_M/G4endl">G4endl</a>;</td></tr>
+<tr><th id="192">192</th><td>    }</td></tr>
+<tr><th id="193">193</th><td>  }</td></tr>
+<tr><th id="194">194</th><td>}</td></tr>
+<tr><th id="195">195</th><td></td></tr>
+<tr><th id="196">196</th><td><i>//....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......</i></td></tr>
+<tr><th id="197">197</th><td></td></tr>
+<tr><th id="198">198</th><td><em>void</em> <a class="type" href="../include/G4NistManager.hh.html#G4NistManager" title='G4NistManager' data-ref="G4NistManager">G4NistManager</a>::<dfn class="decl def" id="_ZN13G4NistManager10SetVerboseEi" title='G4NistManager::SetVerbose' data-ref="_ZN13G4NistManager10SetVerboseEi">SetVerbose</dfn>(<a class="typedef" href="../../global/management/include/G4Types.hh.html#G4int" title='G4int' data-type='int' data-ref="G4int">G4int</a> <dfn class="local col3 decl" id="23val" title='val' data-type='G4int' data-ref="23val">val</dfn>)</td></tr>
+<tr><th id="199">199</th><td>{</td></tr>
+<tr><th id="200">200</th><td>  <a class="member" href="../include/G4NistManager.hh.html#G4NistManager::verbose" title='G4NistManager::verbose' data-ref="G4NistManager::verbose">verbose</a> = <a class="local col3 ref" href="#23val" title='val' data-ref="23val">val</a>;</td></tr>
+<tr><th id="201">201</th><td>  <a class="member" href="../include/G4NistManager.hh.html#G4NistManager::elmBuilder" title='G4NistManager::elmBuilder' data-ref="G4NistManager::elmBuilder">elmBuilder</a>-&gt;<a class="ref" href="../include/G4NistElementBuilder.hh.html#_ZN20G4NistElementBuilder10SetVerboseEi" title='G4NistElementBuilder::SetVerbose' data-ref="_ZN20G4NistElementBuilder10SetVerboseEi">SetVerbose</a>(<a class="local col3 ref" href="#23val" title='val' data-ref="23val">val</a>);</td></tr>
+<tr><th id="202">202</th><td>  <a class="member" href="../include/G4NistManager.hh.html#G4NistManager::matBuilder" title='G4NistManager::matBuilder' data-ref="G4NistManager::matBuilder">matBuilder</a>-&gt;<a class="ref" href="../include/G4NistMaterialBuilder.hh.html#_ZN21G4NistMaterialBuilder10SetVerboseEi" title='G4NistMaterialBuilder::SetVerbose' data-ref="_ZN21G4NistMaterialBuilder10SetVerboseEi">SetVerbose</a>(<a class="local col3 ref" href="#23val" title='val' data-ref="23val">val</a>);</td></tr>
+<tr><th id="203">203</th><td>}</td></tr>
+<tr><th id="204">204</th><td></td></tr>
+<tr><th id="205">205</th><td><i>//....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......</i></td></tr>
+<tr><th id="206">206</th><td></td></tr>
+<tr><th id="207">207</th><td><a class="type" href="../include/G4NistManager.hh.html#G4NistManager" title='G4NistManager' data-ref="G4NistManager">G4NistManager</a>::<dfn class="decl def" id="_ZN13G4NistManagerC1Ev" title='G4NistManager::G4NistManager' data-ref="_ZN13G4NistManagerC1Ev">G4NistManager</dfn>()</td></tr>
+<tr><th id="208">208</th><td>{</td></tr>
+<tr><th id="209">209</th><td>  nElements  = <var>0</var>;</td></tr>
+<tr><th id="210">210</th><td>  nMaterials = <var>0</var>;</td></tr>
+<tr><th id="211">211</th><td>  <a class="member" href="../include/G4NistManager.hh.html#G4NistManager::verbose" title='G4NistManager::verbose' data-ref="G4NistManager::verbose">verbose</a>    = <var>0</var>;</td></tr>
+<tr><th id="212">212</th><td></td></tr>
+<tr><th id="213">213</th><td>  <a class="member" href="../include/G4NistManager.hh.html#G4NistManager::elmBuilder" title='G4NistManager::elmBuilder' data-ref="G4NistManager::elmBuilder">elmBuilder</a> = <b>new</b> <a class="type" href="../include/G4NistElementBuilder.hh.html#G4NistElementBuilder" title='G4NistElementBuilder' data-ref="G4NistElementBuilder">G4NistElementBuilder</a><a class="ref" href="../include/G4NistElementBuilder.hh.html#_ZN20G4NistElementBuilderC1Ei" title='G4NistElementBuilder::G4NistElementBuilder' data-ref="_ZN20G4NistElementBuilderC1Ei">(</a><a class="member" href="../include/G4NistManager.hh.html#G4NistManager::verbose" title='G4NistManager::verbose' data-ref="G4NistManager::verbose">verbose</a>);</td></tr>
+<tr><th id="214">214</th><td>  <a class="member" href="../include/G4NistManager.hh.html#G4NistManager::matBuilder" title='G4NistManager::matBuilder' data-ref="G4NistManager::matBuilder">matBuilder</a> = <b>new</b> <a class="type" href="../include/G4NistMaterialBuilder.hh.html#G4NistMaterialBuilder" title='G4NistMaterialBuilder' data-ref="G4NistMaterialBuilder">G4NistMaterialBuilder</a><a class="ref" href="../include/G4NistMaterialBuilder.hh.html#_ZN21G4NistMaterialBuilderC1EP20G4NistElementBuilderi" title='G4NistMaterialBuilder::G4NistMaterialBuilder' data-ref="_ZN21G4NistMaterialBuilderC1EP20G4NistElementBuilderi">(</a><a class="member" href="../include/G4NistManager.hh.html#G4NistManager::elmBuilder" title='G4NistManager::elmBuilder' data-ref="G4NistManager::elmBuilder">elmBuilder</a>,<a class="member" href="../include/G4NistManager.hh.html#G4NistManager::verbose" title='G4NistManager::verbose' data-ref="G4NistManager::verbose">verbose</a>);</td></tr>
+<tr><th id="215">215</th><td>  </td></tr>
+<tr><th id="216">216</th><td>  <a class="member" href="../include/G4NistManager.hh.html#G4NistManager::messenger" title='G4NistManager::messenger' data-ref="G4NistManager::messenger">messenger</a>  = <b>new</b> <a class="type" href="../include/G4NistMessenger.hh.html#G4NistMessenger" title='G4NistMessenger' data-ref="G4NistMessenger">G4NistMessenger</a><a class="ref" href="../include/G4NistMessenger.hh.html#_ZN15G4NistMessengerC1EP13G4NistManager" title='G4NistMessenger::G4NistMessenger' data-ref="_ZN15G4NistMessengerC1EP13G4NistManager">(</a><b>this</b>);  </td></tr>
+<tr><th id="217">217</th><td>  <a class="member" href="../include/G4NistManager.hh.html#G4NistManager::g4pow" title='G4NistManager::g4pow' data-ref="G4NistManager::g4pow">g4pow</a> = <a class="type" href="../../global/management/include/G4Pow.hh.html#G4Pow" title='G4Pow' data-ref="G4Pow">G4Pow</a>::<a class="ref" href="../../global/management/include/G4Pow.hh.html#_ZN5G4Pow11GetInstanceEv" title='G4Pow::GetInstance' data-ref="_ZN5G4Pow11GetInstanceEv">GetInstance</a>();</td></tr>
+<tr><th id="218">218</th><td></td></tr>
+<tr><th id="219">219</th><td>  <i>// compute frequently used values for mean atomic numbers</i></td></tr>
+<tr><th id="220">220</th><td>  <b>for</b>(<a class="typedef" href="../../global/management/include/G4Types.hh.html#G4int" title='G4int' data-type='int' data-ref="G4int">G4int</a> <dfn class="local col4 decl" id="24j" title='j' data-type='G4int' data-ref="24j">j</dfn>=<var>1</var>; <a class="local col4 ref" href="#24j" title='j' data-ref="24j">j</a>&lt;<var>101</var>; ++<a class="local col4 ref" href="#24j" title='j' data-ref="24j">j</a>) {</td></tr>
+<tr><th id="221">221</th><td>    <a class="typedef" href="../../global/management/include/G4Types.hh.html#G4double" title='G4double' data-type='double' data-ref="G4double">G4double</a> <dfn class="local col5 decl" id="25A" title='A' data-type='G4double' data-ref="25A">A</dfn> = <a class="member" href="../include/G4NistManager.hh.html#G4NistManager::elmBuilder" title='G4NistManager::elmBuilder' data-ref="G4NistManager::elmBuilder">elmBuilder</a>-&gt;<a class="ref" href="../include/G4NistElementBuilder.hh.html#_ZNK20G4NistElementBuilder16GetAtomicMassAmuEi" title='G4NistElementBuilder::GetAtomicMassAmu' data-ref="_ZNK20G4NistElementBuilder16GetAtomicMassAmuEi">GetAtomicMassAmu</a>(<a class="local col4 ref" href="#24j" title='j' data-ref="24j">j</a>);</td></tr>
+<tr><th id="222">222</th><td>    POWERA27[j] = <span class='error' title="use of undeclared identifier &apos;std&apos;">std</span>::pow(A,<var>0.27</var>);</td></tr>
+<tr><th id="223">223</th><td>    LOGAZ[j]    = <span class='error' title="use of undeclared identifier &apos;std&apos;">std</span>::log(A);</td></tr>
+<tr><th id="224">224</th><td>  }</td></tr>
+<tr><th id="225">225</th><td>  <a class="member" href="../include/G4NistManager.hh.html#G4NistManager::POWERA27" title='G4NistManager::POWERA27' data-ref="G4NistManager::POWERA27">POWERA27</a>[<var>0</var>] = <var>1.0</var>;</td></tr>
+<tr><th id="226">226</th><td>  <a class="member" href="../include/G4NistManager.hh.html#G4NistManager::LOGAZ" title='G4NistManager::LOGAZ' data-ref="G4NistManager::LOGAZ">LOGAZ</a>[<var>0</var>]    = <var>0.0</var>;</td></tr>
+<tr><th id="227">227</th><td>  <a class="member" href="../include/G4NistManager.hh.html#G4NistManager::fICRU90" title='G4NistManager::fICRU90' data-ref="G4NistManager::fICRU90">fICRU90</a> = <b>nullptr</b>;</td></tr>
+<tr><th id="228">228</th><td>}</td></tr>
+<tr><th id="229">229</th><td></td></tr>
+<tr><th id="230">230</th><td><i>//....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......</i></td></tr>
+<tr><th id="231">231</th><td></td></tr>
+<tr><th id="232">232</th><td><a class="type" href="../include/G4ICRU90StoppingData.hh.html#G4ICRU90StoppingData" title='G4ICRU90StoppingData' data-ref="G4ICRU90StoppingData">G4ICRU90StoppingData</a>* <a class="type" href="../include/G4NistManager.hh.html#G4NistManager" title='G4NistManager' data-ref="G4NistManager">G4NistManager</a>::<dfn class="decl def" id="_ZN13G4NistManager21GetICRU90StoppingDataEv" title='G4NistManager::GetICRU90StoppingData' data-ref="_ZN13G4NistManager21GetICRU90StoppingDataEv">GetICRU90StoppingData</dfn>()</td></tr>
+<tr><th id="233">233</th><td>{</td></tr>
+<tr><th id="234">234</th><td>  <b>if</b> (!<a class="member" href="../include/G4NistManager.hh.html#G4NistManager::fICRU90" title='G4NistManager::fICRU90' data-ref="G4NistManager::fICRU90">fICRU90</a>) {</td></tr>
+<tr><th id="235">235</th><td><u>#<span data-ppcond="235">ifdef</span> <span class="macro" data-ref="_M/G4MULTITHREADED">G4MULTITHREADED</span></u></td></tr>
+<tr><th id="236">236</th><td>    <a class="macro" href="../../global/management/include/G4Threading.hh.html#159" title="{ (&amp;nistManagerMutex)-&gt;lock(); }" data-ref="_M/G4MUTEXLOCK">G4MUTEXLOCK</a>(&amp;nistManagerMutex);</td></tr>
+<tr><th id="237">237</th><td>    <b>if</b> (!<a class="member" href="../include/G4NistManager.hh.html#G4NistManager::fICRU90" title='G4NistManager::fICRU90' data-ref="G4NistManager::fICRU90">fICRU90</a>) {</td></tr>
+<tr><th id="238">238</th><td><u>#<span data-ppcond="235">endif</span></u></td></tr>
+<tr><th id="239">239</th><td>      <a class="member" href="../include/G4NistManager.hh.html#G4NistManager::fICRU90" title='G4NistManager::fICRU90' data-ref="G4NistManager::fICRU90">fICRU90</a> = <b>new</b> <a class="type" href="../include/G4ICRU90StoppingData.hh.html#G4ICRU90StoppingData" title='G4ICRU90StoppingData' data-ref="G4ICRU90StoppingData">G4ICRU90StoppingData</a><a class="ref" href="../include/G4ICRU90StoppingData.hh.html#_ZN20G4ICRU90StoppingDataC1Ev" title='G4ICRU90StoppingData::G4ICRU90StoppingData' data-ref="_ZN20G4ICRU90StoppingDataC1Ev">(</a>);</td></tr>
+<tr><th id="240">240</th><td><u>#<span data-ppcond="240">ifdef</span> <span class="macro" data-ref="_M/G4MULTITHREADED">G4MULTITHREADED</span></u></td></tr>
+<tr><th id="241">241</th><td>    }</td></tr>
+<tr><th id="242">242</th><td>    <a class="macro" href="../../global/management/include/G4Threading.hh.html#160" title="{ (&amp;nistManagerMutex)-&gt;unlock(); }" data-ref="_M/G4MUTEXUNLOCK">G4MUTEXUNLOCK</a>(&amp;nistManagerMutex);</td></tr>
+<tr><th id="243">243</th><td><u>#<span data-ppcond="240">endif</span></u></td></tr>
+<tr><th id="244">244</th><td>  }</td></tr>
+<tr><th id="245">245</th><td>  <b>return</b> <a class="member" href="../include/G4NistManager.hh.html#G4NistManager::fICRU90" title='G4NistManager::fICRU90' data-ref="G4NistManager::fICRU90">fICRU90</a>;</td></tr>
+<tr><th id="246">246</th><td>}</td></tr>
+<tr><th id="247">247</th><td></td></tr>
+<tr><th id="248">248</th><td><i>//....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......</i></td></tr>
+<tr><th id="249">249</th><td></td></tr>
+</table><hr/><p id='footer'>
+Generated on <em>2019-Aug-28</em> from project codebrowser<br />Powered by <a href='https://woboq.com'><img alt='Woboq' src='https://code.woboq.org/woboq-16.png' width='41' height='16' /></a> <a href='https://code.woboq.org'>Code Browser</a> 2.1
+<br/>Generator usage only permitted with license.</p>
+</div></body></html>

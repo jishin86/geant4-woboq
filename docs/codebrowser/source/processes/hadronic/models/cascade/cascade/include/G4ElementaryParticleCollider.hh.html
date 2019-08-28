@@ -1,0 +1,154 @@
+<!doctype html>
+<html>
+<head>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"><title>G4ElementaryParticleCollider.hh source code [codebrowser/source/processes/hadronic/models/cascade/cascade/include/G4ElementaryParticleCollider.hh] - Woboq Code Browser</title>
+<meta name="woboq:interestingDefinitions" content="G4ElementaryParticleCollider "/>
+<link rel="stylesheet" href="../../../../../../../../../data/qtcreator.css" title="QtCreator"/>
+<link rel="alternate stylesheet" href="../../../../../../../../../data/kdevelop.css" title="KDevelop"/>
+<script type="text/javascript" src="../../../../../../../../../data/jquery/jquery.min.js"></script>
+<script type="text/javascript" src="../../../../../../../../../data/jquery/jquery-ui.min.js"></script>
+<script>var file = 'codebrowser/source/processes/hadronic/models/cascade/cascade/include/G4ElementaryParticleCollider.hh'; var root_path = '../../../../../../../..'; var data_path = '../../../../../../../../../data';</script>
+<script src='../../../../../../../../../data/codebrowser.js'></script>
+</head>
+<body><div id='header'><h1 id='breadcrumb'><span>Browse the source code of </span><a href='../../../../../../..'>codebrowser</a>/<a href='../../../../../..'>source</a>/<a href='../../../../..'>processes</a>/<a href='../../../..'>hadronic</a>/<a href='../../..'>models</a>/<a href='../..'>cascade</a>/<a href='..'>cascade</a>/<a href='./'>include</a>/<a href='G4ElementaryParticleCollider.hh.html'>G4ElementaryParticleCollider.hh</a></h1></div>
+<hr/><div id='content'><table class="code">
+<tr><th id="1">1</th><td><i>//</i></td></tr>
+<tr><th id="2">2</th><td><i>// ********************************************************************</i></td></tr>
+<tr><th id="3">3</th><td><i>// * License and Disclaimer                                           *</i></td></tr>
+<tr><th id="4">4</th><td><i>// *                                                                  *</i></td></tr>
+<tr><th id="5">5</th><td><i>// * The  Geant4 software  is  copyright of the Copyright Holders  of *</i></td></tr>
+<tr><th id="6">6</th><td><i>// * the Geant4 Collaboration.  It is provided  under  the terms  and *</i></td></tr>
+<tr><th id="7">7</th><td><i>// * conditions of the Geant4 Software License,  included in the file *</i></td></tr>
+<tr><th id="8">8</th><td><i>// * LICENSE and available at  <a href="http://cern.ch/geant4/license">http://cern.ch/geant4/license</a> .  These *</i></td></tr>
+<tr><th id="9">9</th><td><i>// * include a list of copyright holders.                             *</i></td></tr>
+<tr><th id="10">10</th><td><i>// *                                                                  *</i></td></tr>
+<tr><th id="11">11</th><td><i>// * Neither the authors of this software system, nor their employing *</i></td></tr>
+<tr><th id="12">12</th><td><i>// * institutes,nor the agencies providing financial support for this *</i></td></tr>
+<tr><th id="13">13</th><td><i>// * work  make  any representation or  warranty, express or implied, *</i></td></tr>
+<tr><th id="14">14</th><td><i>// * regarding  this  software system or assume any liability for its *</i></td></tr>
+<tr><th id="15">15</th><td><i>// * use.  Please see the license in the file  LICENSE  and URL above *</i></td></tr>
+<tr><th id="16">16</th><td><i>// * for the full disclaimer and the limitation of liability.         *</i></td></tr>
+<tr><th id="17">17</th><td><i>// *                                                                  *</i></td></tr>
+<tr><th id="18">18</th><td><i>// * This  code  implementation is the result of  the  scientific and *</i></td></tr>
+<tr><th id="19">19</th><td><i>// * technical work of the GEANT4 collaboration.                      *</i></td></tr>
+<tr><th id="20">20</th><td><i>// * By using,  copying,  modifying or  distributing the software (or *</i></td></tr>
+<tr><th id="21">21</th><td><i>// * any work based  on the software)  you  agree  to acknowledge its *</i></td></tr>
+<tr><th id="22">22</th><td><i>// * use  in  resulting  scientific  publications,  and indicate your *</i></td></tr>
+<tr><th id="23">23</th><td><i>// * acceptance of all terms of the Geant4 Software license.          *</i></td></tr>
+<tr><th id="24">24</th><td><i>// ********************************************************************</i></td></tr>
+<tr><th id="25">25</th><td><i>//</i></td></tr>
+<tr><th id="26">26</th><td><i>//</i></td></tr>
+<tr><th id="27">27</th><td><i>// 20100114  M. Kelsey -- Remove G4CascadeMomentum, use G4LorentzVector directly</i></td></tr>
+<tr><th id="28">28</th><td><i>// 20100315  M. Kelsey -- Remove "using" directive and unnecessary #includes.</i></td></tr>
+<tr><th id="29">29</th><td><i>// 20100407  M. Kelsey -- Eliminate return-by-value std::vector&lt;&gt; by creating</i></td></tr>
+<tr><th id="30">30</th><td><i>//		three data buffers for particles, momenta, and particle types.</i></td></tr>
+<tr><th id="31">31</th><td><i>//		The following functions now return void and are non-const:</i></td></tr>
+<tr><th id="32">32</th><td><i>//		  ::generateSCMfinalState()</i></td></tr>
+<tr><th id="33">33</th><td><i>//		  ::generateMomModules() (also remove input vector)</i></td></tr>
+<tr><th id="34">34</th><td><i>//		  ::generateStrangeChannelPartTypes()</i></td></tr>
+<tr><th id="35">35</th><td><i>//		  ::generateSCMpionAbsorption()</i></td></tr>
+<tr><th id="36">36</th><td><i>// 20100413  M. Kelsey -- Pass G4CollisionOutput by ref to ::collide(); merge</i></td></tr>
+<tr><th id="37">37</th><td><i>//		public vs. private ::collide() functions.</i></td></tr>
+<tr><th id="38">38</th><td><i>// 20100511  M. Kelsey -- Remove G4PionSampler and G4NucleonSampler.  Expand</i></td></tr>
+<tr><th id="39">39</th><td><i>//		particle-types selector to all modes, not just strangeness.</i></td></tr>
+<tr><th id="40">40</th><td><i>// 20100517  M. Kelsey -- Inherit from common base class, make arrays static</i></td></tr>
+<tr><th id="41">41</th><td><i>// 20100714  M. Kelsey -- Switch to new G4CascadeColliderBase class</i></td></tr>
+<tr><th id="42">42</th><td><i>// 20100726  M. Kelsey -- Move remaining std::vector&lt;&gt; buffers here</i></td></tr>
+<tr><th id="43">43</th><td><i>// 20100804  M. Kelsey -- Add printFinalStateTables() function.</i></td></tr>
+<tr><th id="44">44</th><td><i>// 20110923  M. Kelsey -- Add optional stream&amp; to printFinalStateTables().</i></td></tr>
+<tr><th id="45">45</th><td><i>// 20130129  M. Kelsey -- Add static arrays and interpolators for two-body</i></td></tr>
+<tr><th id="46">46</th><td><i>//		angular distributions (addresses MT thread-local issue)</i></td></tr>
+<tr><th id="47">47</th><td><i>// 20130131  D. Wright -- Use new *AngDst classes for gamma-N two-body</i></td></tr>
+<tr><th id="48">48</th><td><i>// 20130220  M. Kelsey -- Replace two-body angular code with new *AngDst classes</i></td></tr>
+<tr><th id="49">49</th><td><i>// 20130221  M. Kelsey -- Move two-body angular dist classes to factory</i></td></tr>
+<tr><th id="50">50</th><td><i>// 20130306  M. Kelsey -- Move printFinalStateTables() to table factory</i></td></tr>
+<tr><th id="51">51</th><td><i>// 20130307  M. Kelsey -- Reverse order of dimensions for rmn array</i></td></tr>
+<tr><th id="52">52</th><td><i>// 20130422  M. Kelsey -- Move kinematics to G4CascadeFinalStateAlgorithm</i></td></tr>
+<tr><th id="53">53</th><td><i>// 20130508  D. Wright -- Add muon capture, with absorption on quasideuterons</i></td></tr>
+<tr><th id="54">54</th><td><i>// 20130620  Address Coverity complaint about missing copy actions</i></td></tr>
+<tr><th id="55">55</th><td><i>// 20130628  Add function to split dibaryon into particle_kinds list</i></td></tr>
+<tr><th id="56">56</th><td><i>// 20141009  M. Kelsey -- Add pion absorption by single nucleons, with</i></td></tr>
+<tr><th id="57">57</th><td><i>//		nuclear recoil.  Improves pi- capture performance.</i></td></tr>
+<tr><th id="58">58</th><td></td></tr>
+<tr><th id="59">59</th><td><u>#<span data-ppcond="59">ifndef</span> <span class="macro" data-ref="_M/G4ELEMENTARY_PARTICLE_COLLIDER_HH">G4ELEMENTARY_PARTICLE_COLLIDER_HH</span></u></td></tr>
+<tr><th id="60">60</th><td><u>#define <dfn class="macro" id="_M/G4ELEMENTARY_PARTICLE_COLLIDER_HH" data-ref="_M/G4ELEMENTARY_PARTICLE_COLLIDER_HH">G4ELEMENTARY_PARTICLE_COLLIDER_HH</dfn></u></td></tr>
+<tr><th id="61">61</th><td></td></tr>
+<tr><th id="62">62</th><td><u>#include <a href="G4CascadeColliderBase.hh.html">"G4CascadeColliderBase.hh"</a></u></td></tr>
+<tr><th id="63">63</th><td><u>#include <a href="G4CascadeFinalStateGenerator.hh.html">"G4CascadeFinalStateGenerator.hh"</a></u></td></tr>
+<tr><th id="64">64</th><td><u>#include <a href="G4CascadeInterpolator.hh.html">"G4CascadeInterpolator.hh"</a></u></td></tr>
+<tr><th id="65">65</th><td><u>#include <a href="G4InuclElementaryParticle.hh.html">"G4InuclElementaryParticle.hh"</a></u></td></tr>
+<tr><th id="66">66</th><td><u>#include <a href="../../../../../../global/HEPGeometry/include/G4LorentzVector.hh.html">"G4LorentzVector.hh"</a></u></td></tr>
+<tr><th id="67">67</th><td><u>#include <span class='error' title="&apos;iosfwd&apos; file not found">&lt;</span>iosfwd&gt;</u></td></tr>
+<tr><th id="68">68</th><td><u>#include &lt;vector&gt;</u></td></tr>
+<tr><th id="69">69</th><td></td></tr>
+<tr><th id="70">70</th><td><b>class</b> <a class="type" href="G4CollisionOutput.hh.html#G4CollisionOutput" title='G4CollisionOutput' data-ref="G4CollisionOutput" id="G4CollisionOutput">G4CollisionOutput</a>;</td></tr>
+<tr><th id="71">71</th><td></td></tr>
+<tr><th id="72">72</th><td></td></tr>
+<tr><th id="73">73</th><td><b>class</b> <dfn class="type def" id="G4ElementaryParticleCollider" title='G4ElementaryParticleCollider' data-ref="G4ElementaryParticleCollider">G4ElementaryParticleCollider</dfn> : <b>public</b> <a class="type" href="G4CascadeColliderBase.hh.html#G4CascadeColliderBase" title='G4CascadeColliderBase' data-ref="G4CascadeColliderBase">G4CascadeColliderBase</a> {</td></tr>
+<tr><th id="74">74</th><td><b>public</b>:</td></tr>
+<tr><th id="75">75</th><td>  <a class="decl" href="../src/G4ElementaryParticleCollider.cc.html#_ZN28G4ElementaryParticleColliderC1Ev" title='G4ElementaryParticleCollider::G4ElementaryParticleCollider' data-ref="_ZN28G4ElementaryParticleColliderC1Ev" id="_ZN28G4ElementaryParticleColliderC1Ev">G4ElementaryParticleCollider</a>();</td></tr>
+<tr><th id="76">76</th><td>  <b>virtual</b> <dfn class="virtual decl def" id="_ZN28G4ElementaryParticleColliderD1Ev" title='G4ElementaryParticleCollider::~G4ElementaryParticleCollider' data-ref="_ZN28G4ElementaryParticleColliderD1Ev">~G4ElementaryParticleCollider</dfn>() {};</td></tr>
+<tr><th id="77">77</th><td>  </td></tr>
+<tr><th id="78">78</th><td>  <em>void</em> <a class="virtual decl" href="../src/G4ElementaryParticleCollider.cc.html#_ZN28G4ElementaryParticleCollider7collideEP15G4InuclParticleS1_R17G4CollisionOutput" title='G4ElementaryParticleCollider::collide' data-ref="_ZN28G4ElementaryParticleCollider7collideEP15G4InuclParticleS1_R17G4CollisionOutput" id="_ZN28G4ElementaryParticleCollider7collideEP15G4InuclParticleS1_R17G4CollisionOutput">collide</a>(<a class="type" href="G4InuclParticle.hh.html#G4InuclParticle" title='G4InuclParticle' data-ref="G4InuclParticle">G4InuclParticle</a>* <dfn class="local col1 decl" id="1bullet" title='bullet' data-type='G4InuclParticle *' data-ref="1bullet">bullet</dfn>, <a class="type" href="G4InuclParticle.hh.html#G4InuclParticle" title='G4InuclParticle' data-ref="G4InuclParticle">G4InuclParticle</a>* <dfn class="local col2 decl" id="2target" title='target' data-type='G4InuclParticle *' data-ref="2target">target</dfn>,</td></tr>
+<tr><th id="79">79</th><td>	       <a class="type" href="G4CollisionOutput.hh.html#G4CollisionOutput" title='G4CollisionOutput' data-ref="G4CollisionOutput">G4CollisionOutput</a>&amp; <dfn class="local col3 decl" id="3output" title='output' data-type='G4CollisionOutput &amp;' data-ref="3output">output</dfn>);</td></tr>
+<tr><th id="80">80</th><td></td></tr>
+<tr><th id="81">81</th><td>  <em>void</em> <dfn class="decl def" id="_ZN28G4ElementaryParticleCollider15setNucleusStateEii" title='G4ElementaryParticleCollider::setNucleusState' data-ref="_ZN28G4ElementaryParticleCollider15setNucleusStateEii">setNucleusState</dfn>(<a class="typedef" href="../../../../../../global/management/include/G4Types.hh.html#G4int" title='G4int' data-type='int' data-ref="G4int">G4int</a> <dfn class="local col4 decl" id="4a" title='a' data-type='G4int' data-ref="4a">a</dfn>, <a class="typedef" href="../../../../../../global/management/include/G4Types.hh.html#G4int" title='G4int' data-type='int' data-ref="G4int">G4int</a> <dfn class="local col5 decl" id="5z" title='z' data-type='G4int' data-ref="5z">z</dfn>) {	<i>// Nucleus to use for recoil</i></td></tr>
+<tr><th id="82">82</th><td>    <a class="member" href="#G4ElementaryParticleCollider::nucleusA" title='G4ElementaryParticleCollider::nucleusA' data-ref="G4ElementaryParticleCollider::nucleusA">nucleusA</a> = <a class="local col4 ref" href="#4a" title='a' data-ref="4a">a</a>; <a class="member" href="#G4ElementaryParticleCollider::nucleusZ" title='G4ElementaryParticleCollider::nucleusZ' data-ref="G4ElementaryParticleCollider::nucleusZ">nucleusZ</a> = <a class="local col5 ref" href="#5z" title='z' data-ref="5z">z</a>;</td></tr>
+<tr><th id="83">83</th><td>  }</td></tr>
+<tr><th id="84">84</th><td></td></tr>
+<tr><th id="85">85</th><td><b>private</b>:</td></tr>
+<tr><th id="86">86</th><td>  <a class="typedef" href="../../../../../../global/management/include/G4Types.hh.html#G4int" title='G4int' data-type='int' data-ref="G4int">G4int</a> <a class="decl" href="../src/G4ElementaryParticleCollider.cc.html#_ZNK28G4ElementaryParticleCollider20generateMultiplicityEid" title='G4ElementaryParticleCollider::generateMultiplicity' data-ref="_ZNK28G4ElementaryParticleCollider20generateMultiplicityEid" id="_ZNK28G4ElementaryParticleCollider20generateMultiplicityEid">generateMultiplicity</a>(<a class="typedef" href="../../../../../../global/management/include/G4Types.hh.html#G4int" title='G4int' data-type='int' data-ref="G4int">G4int</a> <dfn class="local col6 decl" id="6is" title='is' data-type='G4int' data-ref="6is">is</dfn>, <a class="typedef" href="../../../../../../global/management/include/G4Types.hh.html#G4double" title='G4double' data-type='double' data-ref="G4double">G4double</a> <dfn class="local col7 decl" id="7ekin" title='ekin' data-type='G4double' data-ref="7ekin">ekin</dfn>) <em>const</em>;</td></tr>
+<tr><th id="87">87</th><td></td></tr>
+<tr><th id="88">88</th><td>  <em>void</em> <a class="decl" href="../src/G4ElementaryParticleCollider.cc.html#_ZN28G4ElementaryParticleCollider25generateOutgoingPartTypesEiid" title='G4ElementaryParticleCollider::generateOutgoingPartTypes' data-ref="_ZN28G4ElementaryParticleCollider25generateOutgoingPartTypesEiid" id="_ZN28G4ElementaryParticleCollider25generateOutgoingPartTypesEiid">generateOutgoingPartTypes</a>(<a class="typedef" href="../../../../../../global/management/include/G4Types.hh.html#G4int" title='G4int' data-type='int' data-ref="G4int">G4int</a> <dfn class="local col8 decl" id="8is" title='is' data-type='G4int' data-ref="8is">is</dfn>, <a class="typedef" href="../../../../../../global/management/include/G4Types.hh.html#G4int" title='G4int' data-type='int' data-ref="G4int">G4int</a> <dfn class="local col9 decl" id="9mult" title='mult' data-type='G4int' data-ref="9mult">mult</dfn>, <a class="typedef" href="../../../../../../global/management/include/G4Types.hh.html#G4double" title='G4double' data-type='double' data-ref="G4double">G4double</a> <dfn class="local col0 decl" id="10ekin" title='ekin' data-type='G4double' data-ref="10ekin">ekin</dfn>);</td></tr>
+<tr><th id="89">89</th><td></td></tr>
+<tr><th id="90">90</th><td>  <em>void</em> <a class="decl" href="../src/G4ElementaryParticleCollider.cc.html#_ZN28G4ElementaryParticleCollider21generateSCMfinalStateEddP25G4InuclElementaryParticleS1_" title='G4ElementaryParticleCollider::generateSCMfinalState' data-ref="_ZN28G4ElementaryParticleCollider21generateSCMfinalStateEddP25G4InuclElementaryParticleS1_" id="_ZN28G4ElementaryParticleCollider21generateSCMfinalStateEddP25G4InuclElementaryParticleS1_">generateSCMfinalState</a>(<a class="typedef" href="../../../../../../global/management/include/G4Types.hh.html#G4double" title='G4double' data-type='double' data-ref="G4double">G4double</a> <dfn class="local col1 decl" id="11ekin" title='ekin' data-type='G4double' data-ref="11ekin">ekin</dfn>, <a class="typedef" href="../../../../../../global/management/include/G4Types.hh.html#G4double" title='G4double' data-type='double' data-ref="G4double">G4double</a> <dfn class="local col2 decl" id="12etot_scm" title='etot_scm' data-type='G4double' data-ref="12etot_scm">etot_scm</dfn>,</td></tr>
+<tr><th id="91">91</th><td>			     <a class="type" href="G4InuclElementaryParticle.hh.html#G4InuclElementaryParticle" title='G4InuclElementaryParticle' data-ref="G4InuclElementaryParticle">G4InuclElementaryParticle</a>* <dfn class="local col3 decl" id="13particle1" title='particle1' data-type='G4InuclElementaryParticle *' data-ref="13particle1">particle1</dfn>,</td></tr>
+<tr><th id="92">92</th><td>			     <a class="type" href="G4InuclElementaryParticle.hh.html#G4InuclElementaryParticle" title='G4InuclElementaryParticle' data-ref="G4InuclElementaryParticle">G4InuclElementaryParticle</a>* <dfn class="local col4 decl" id="14particle2" title='particle2' data-type='G4InuclElementaryParticle *' data-ref="14particle2">particle2</dfn>); </td></tr>
+<tr><th id="93">93</th><td></td></tr>
+<tr><th id="94">94</th><td>  <i>// Pion (or photon) absorption on a dibaryon</i></td></tr>
+<tr><th id="95">95</th><td>  <em>void</em> <a class="decl" href="../src/G4ElementaryParticleCollider.cc.html#_ZN28G4ElementaryParticleCollider25generateSCMpionAbsorptionEdP25G4InuclElementaryParticleS1_" title='G4ElementaryParticleCollider::generateSCMpionAbsorption' data-ref="_ZN28G4ElementaryParticleCollider25generateSCMpionAbsorptionEdP25G4InuclElementaryParticleS1_" id="_ZN28G4ElementaryParticleCollider25generateSCMpionAbsorptionEdP25G4InuclElementaryParticleS1_">generateSCMpionAbsorption</a>(<a class="typedef" href="../../../../../../global/management/include/G4Types.hh.html#G4double" title='G4double' data-type='double' data-ref="G4double">G4double</a> <dfn class="local col5 decl" id="15etot_scm" title='etot_scm' data-type='G4double' data-ref="15etot_scm">etot_scm</dfn>,</td></tr>
+<tr><th id="96">96</th><td>				 <a class="type" href="G4InuclElementaryParticle.hh.html#G4InuclElementaryParticle" title='G4InuclElementaryParticle' data-ref="G4InuclElementaryParticle">G4InuclElementaryParticle</a>* <dfn class="local col6 decl" id="16particle1" title='particle1' data-type='G4InuclElementaryParticle *' data-ref="16particle1">particle1</dfn>,</td></tr>
+<tr><th id="97">97</th><td>				 <a class="type" href="G4InuclElementaryParticle.hh.html#G4InuclElementaryParticle" title='G4InuclElementaryParticle' data-ref="G4InuclElementaryParticle">G4InuclElementaryParticle</a>* <dfn class="local col7 decl" id="17particle2" title='particle2' data-type='G4InuclElementaryParticle *' data-ref="17particle2">particle2</dfn>); </td></tr>
+<tr><th id="98">98</th><td></td></tr>
+<tr><th id="99">99</th><td>  <i>// Muon absorption on a dibaryon (with outgoing neutrino)</i></td></tr>
+<tr><th id="100">100</th><td>  <em>void</em> <a class="decl" href="../src/G4ElementaryParticleCollider.cc.html#_ZN28G4ElementaryParticleCollider25generateSCMmuonAbsorptionEdP25G4InuclElementaryParticleS1_" title='G4ElementaryParticleCollider::generateSCMmuonAbsorption' data-ref="_ZN28G4ElementaryParticleCollider25generateSCMmuonAbsorptionEdP25G4InuclElementaryParticleS1_" id="_ZN28G4ElementaryParticleCollider25generateSCMmuonAbsorptionEdP25G4InuclElementaryParticleS1_">generateSCMmuonAbsorption</a>(<a class="typedef" href="../../../../../../global/management/include/G4Types.hh.html#G4double" title='G4double' data-type='double' data-ref="G4double">G4double</a> <dfn class="local col8 decl" id="18etot_scm" title='etot_scm' data-type='G4double' data-ref="18etot_scm">etot_scm</dfn>,</td></tr>
+<tr><th id="101">101</th><td>				 <a class="type" href="G4InuclElementaryParticle.hh.html#G4InuclElementaryParticle" title='G4InuclElementaryParticle' data-ref="G4InuclElementaryParticle">G4InuclElementaryParticle</a>* <dfn class="local col9 decl" id="19particle1" title='particle1' data-type='G4InuclElementaryParticle *' data-ref="19particle1">particle1</dfn>,</td></tr>
+<tr><th id="102">102</th><td>				 <a class="type" href="G4InuclElementaryParticle.hh.html#G4InuclElementaryParticle" title='G4InuclElementaryParticle' data-ref="G4InuclElementaryParticle">G4InuclElementaryParticle</a>* <dfn class="local col0 decl" id="20particle2" title='particle2' data-type='G4InuclElementaryParticle *' data-ref="20particle2">particle2</dfn>); </td></tr>
+<tr><th id="103">103</th><td></td></tr>
+<tr><th id="104">104</th><td>  <i>// Pion absorption on a single nucleon (charge exchange)</i></td></tr>
+<tr><th id="105">105</th><td>  <em>void</em> <a class="decl" href="../src/G4ElementaryParticleCollider.cc.html#_ZN28G4ElementaryParticleCollider26generateSCMpionNAbsorptionEdP25G4InuclElementaryParticleS1_" title='G4ElementaryParticleCollider::generateSCMpionNAbsorption' data-ref="_ZN28G4ElementaryParticleCollider26generateSCMpionNAbsorptionEdP25G4InuclElementaryParticleS1_" id="_ZN28G4ElementaryParticleCollider26generateSCMpionNAbsorptionEdP25G4InuclElementaryParticleS1_">generateSCMpionNAbsorption</a>(<a class="typedef" href="../../../../../../global/management/include/G4Types.hh.html#G4double" title='G4double' data-type='double' data-ref="G4double">G4double</a> <dfn class="local col1 decl" id="21etot_scm" title='etot_scm' data-type='G4double' data-ref="21etot_scm">etot_scm</dfn>,</td></tr>
+<tr><th id="106">106</th><td>				  <a class="type" href="G4InuclElementaryParticle.hh.html#G4InuclElementaryParticle" title='G4InuclElementaryParticle' data-ref="G4InuclElementaryParticle">G4InuclElementaryParticle</a>* <dfn class="local col2 decl" id="22particle1" title='particle1' data-type='G4InuclElementaryParticle *' data-ref="22particle1">particle1</dfn>,</td></tr>
+<tr><th id="107">107</th><td>				  <a class="type" href="G4InuclElementaryParticle.hh.html#G4InuclElementaryParticle" title='G4InuclElementaryParticle' data-ref="G4InuclElementaryParticle">G4InuclElementaryParticle</a>* <dfn class="local col3 decl" id="23particle2" title='particle2' data-type='G4InuclElementaryParticle *' data-ref="23particle2">particle2</dfn>); </td></tr>
+<tr><th id="108">108</th><td></td></tr>
+<tr><th id="109">109</th><td>  <a class="typedef" href="../../../../../../global/management/include/G4Types.hh.html#G4bool" title='G4bool' data-type='bool' data-ref="G4bool">G4bool</a> <a class="decl" href="../src/G4ElementaryParticleCollider.cc.html#_ZNK28G4ElementaryParticleCollider21pionNucleonAbsorptionEd" title='G4ElementaryParticleCollider::pionNucleonAbsorption' data-ref="_ZNK28G4ElementaryParticleCollider21pionNucleonAbsorptionEd" id="_ZNK28G4ElementaryParticleCollider21pionNucleonAbsorptionEd">pionNucleonAbsorption</a>(<a class="typedef" href="../../../../../../global/management/include/G4Types.hh.html#G4double" title='G4double' data-type='double' data-ref="G4double">G4double</a> <dfn class="local col4 decl" id="24ekin" title='ekin' data-type='G4double' data-ref="24ekin">ekin</dfn>) <em>const</em>;</td></tr>
+<tr><th id="110">110</th><td></td></tr>
+<tr><th id="111">111</th><td>  <em>void</em> <a class="decl" href="../src/G4ElementaryParticleCollider.cc.html#_ZN28G4ElementaryParticleCollider18fillOutgoingMassesEv" title='G4ElementaryParticleCollider::fillOutgoingMasses' data-ref="_ZN28G4ElementaryParticleCollider18fillOutgoingMassesEv" id="_ZN28G4ElementaryParticleCollider18fillOutgoingMassesEv">fillOutgoingMasses</a>();		<i>// Fill mass arrays from particle types</i></td></tr>
+<tr><th id="112">112</th><td></td></tr>
+<tr><th id="113">113</th><td>  <i>// Utility class to generate final-state kinematics</i></td></tr>
+<tr><th id="114">114</th><td>  <a class="type" href="G4CascadeFinalStateGenerator.hh.html#G4CascadeFinalStateGenerator" title='G4CascadeFinalStateGenerator' data-ref="G4CascadeFinalStateGenerator">G4CascadeFinalStateGenerator</a> <dfn class="decl" id="G4ElementaryParticleCollider::fsGenerator" title='G4ElementaryParticleCollider::fsGenerator' data-ref="G4ElementaryParticleCollider::fsGenerator">fsGenerator</dfn>;</td></tr>
+<tr><th id="115">115</th><td></td></tr>
+<tr><th id="116">116</th><td>  <i>// Internal buffers for lists of secondaries</i></td></tr>
+<tr><th id="117">117</th><td>  <span class='error' title="use of undeclared identifier &apos;std&apos;">std</span>::vector<span class='error' title="expected member name or &apos;;&apos; after declaration specifiers">&lt;</span>G4InuclElementaryParticle&gt; particles;</td></tr>
+<tr><th id="118">118</th><td>  <span class='error' title="use of undeclared identifier &apos;std&apos;">std</span>::vector<span class='error' title="expected member name or &apos;;&apos; after declaration specifiers">&lt;</span>G4LorentzVector&gt; scm_momentums;</td></tr>
+<tr><th id="119">119</th><td>  <span class='error' title="use of undeclared identifier &apos;std&apos;">std</span>::vector<span class='error' title="expected member name or &apos;;&apos; after declaration specifiers">&lt;</span>G4double&gt; modules;</td></tr>
+<tr><th id="120">120</th><td>  <span class='error' title="use of undeclared identifier &apos;std&apos;">std</span>::vector<span class='error' title="expected member name or &apos;;&apos; after declaration specifiers">&lt;</span>G4double&gt; masses;</td></tr>
+<tr><th id="121">121</th><td>  <span class='error' title="use of undeclared identifier &apos;std&apos;">std</span>::vector<span class='error' title="expected member name or &apos;;&apos; after declaration specifiers">&lt;</span>G4double&gt; masses2;</td></tr>
+<tr><th id="122">122</th><td>  <span class='error' title="use of undeclared identifier &apos;std&apos;">std</span>::vector<span class='error' title="expected member name or &apos;;&apos; after declaration specifiers">&lt;</span>G4int&gt; particle_kinds;</td></tr>
+<tr><th id="123">123</th><td></td></tr>
+<tr><th id="124">124</th><td>  <i>// Nuclear environment (to do pion-nucleon absorption)</i></td></tr>
+<tr><th id="125">125</th><td>  <a class="typedef" href="../../../../../../global/management/include/G4Types.hh.html#G4int" title='G4int' data-type='int' data-ref="G4int">G4int</a> <dfn class="decl" id="G4ElementaryParticleCollider::nucleusA" title='G4ElementaryParticleCollider::nucleusA' data-ref="G4ElementaryParticleCollider::nucleusA">nucleusA</dfn>, <dfn class="decl" id="G4ElementaryParticleCollider::nucleusZ" title='G4ElementaryParticleCollider::nucleusZ' data-ref="G4ElementaryParticleCollider::nucleusZ">nucleusZ</dfn>;</td></tr>
+<tr><th id="126">126</th><td></td></tr>
+<tr><th id="127">127</th><td><b>private</b>:</td></tr>
+<tr><th id="128">128</th><td>  <i>// Copying of modules is forbidden</i></td></tr>
+<tr><th id="129">129</th><td>  <dfn class="decl" id="_ZN28G4ElementaryParticleColliderC1ERKS_" title='G4ElementaryParticleCollider::G4ElementaryParticleCollider' data-ref="_ZN28G4ElementaryParticleColliderC1ERKS_">G4ElementaryParticleCollider</dfn>(<em>const</em> <a class="type" href="#G4ElementaryParticleCollider" title='G4ElementaryParticleCollider' data-ref="G4ElementaryParticleCollider">G4ElementaryParticleCollider</a>&amp;);</td></tr>
+<tr><th id="130">130</th><td>  <a class="type" href="#G4ElementaryParticleCollider" title='G4ElementaryParticleCollider' data-ref="G4ElementaryParticleCollider">G4ElementaryParticleCollider</a>&amp; <dfn class="decl" id="_ZN28G4ElementaryParticleCollideraSERKS_" title='G4ElementaryParticleCollider::operator=' data-ref="_ZN28G4ElementaryParticleCollideraSERKS_"><b>operator</b>=</dfn>(<em>const</em> <a class="type" href="#G4ElementaryParticleCollider" title='G4ElementaryParticleCollider' data-ref="G4ElementaryParticleCollider">G4ElementaryParticleCollider</a>&amp;);</td></tr>
+<tr><th id="131">131</th><td>};</td></tr>
+<tr><th id="132">132</th><td></td></tr>
+<tr><th id="133">133</th><td><u>#<span data-ppcond="59">endif</span>	/* G4ELEMENTARY_PARTICLE_COLLIDER_HH */</u></td></tr>
+<tr><th id="134">134</th><td></td></tr>
+<tr><th id="135">135</th><td></td></tr>
+<tr><th id="136">136</th><td></td></tr>
+</table><hr/><p id='footer'>
+Generated while processing <a href='../src/G4ElementaryParticleCollider.cc.html'>codebrowser/source/processes/hadronic/models/cascade/cascade/src/G4ElementaryParticleCollider.cc</a><br/>Generated on <em>2019-Aug-28</em> from project codebrowser<br />Powered by <a href='https://woboq.com'><img alt='Woboq' src='https://code.woboq.org/woboq-16.png' width='41' height='16' /></a> <a href='https://code.woboq.org'>Code Browser</a> 2.1
+<br/>Generator usage only permitted with license.</p>
+</div></body></html>

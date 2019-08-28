@@ -1,0 +1,280 @@
+<!doctype html>
+<html>
+<head>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"><title>line source code [codebrowser/source/analysis/g4tools/include/tools/zb/line] - Woboq Code Browser</title>
+<meta name="woboq:interestingDefinitions" content="_EdgeTableEntry,_ScanLineList,_ScanLineListBlock "/>
+<link rel="stylesheet" href="../../../../../../../../data/qtcreator.css" title="QtCreator"/>
+<link rel="alternate stylesheet" href="../../../../../../../../data/kdevelop.css" title="KDevelop"/>
+<script type="text/javascript" src="../../../../../../../../data/jquery/jquery.min.js"></script>
+<script type="text/javascript" src="../../../../../../../../data/jquery/jquery-ui.min.js"></script>
+<script>var file = 'codebrowser/source/analysis/g4tools/include/tools/zb/line'; var root_path = '../../../../../../..'; var data_path = '../../../../../../../../data';</script>
+<script src='../../../../../../../../data/codebrowser.js'></script>
+</head>
+<body><div id='header'><h1 id='breadcrumb'><span>Browse the source code of </span><a href='../../../../../..'>codebrowser</a>/<a href='../../../../..'>source</a>/<a href='../../../..'>analysis</a>/<a href='../../..'>g4tools</a>/<a href='../..'>include</a>/<a href='..'>tools</a>/<a href='./'>zb</a>/<a href='line.html'>line</a></h1></div>
+<hr/><div id='content'><table class="code">
+<tr><th id="1">1</th><td><i>// Copyright (C) 2010, Guy Barrand. All rights reserved.</i></td></tr>
+<tr><th id="2">2</th><td><i>// See the file tools.license for terms.</i></td></tr>
+<tr><th id="3">3</th><td></td></tr>
+<tr><th id="4">4</th><td><u>#<span data-ppcond="4">ifndef</span> <span class="macro" data-ref="_M/tools_zb_line">tools_zb_line</span></u></td></tr>
+<tr><th id="5">5</th><td><u>#define <dfn class="macro" id="_M/tools_zb_line" data-ref="_M/tools_zb_line">tools_zb_line</dfn></u></td></tr>
+<tr><th id="6">6</th><td> </td></tr>
+<tr><th id="7">7</th><td><i>/* from X/poly.h */</i></td></tr>
+<tr><th id="8">8</th><td></td></tr>
+<tr><th id="9">9</th><td><i>/*</i></td></tr>
+<tr><th id="10">10</th><td><i> *     This file contains a few macros to help track</i></td></tr>
+<tr><th id="11">11</th><td><i> *     the edge of a filled object.  The object is assumed</i></td></tr>
+<tr><th id="12">12</th><td><i> *     to be filled in scanline order, and thus the</i></td></tr>
+<tr><th id="13">13</th><td><i> *     algorithm used is an extension of Bresenham's line</i></td></tr>
+<tr><th id="14">14</th><td><i> *     drawing algorithm which assumes that y is always the</i></td></tr>
+<tr><th id="15">15</th><td><i> *     major axis.</i></td></tr>
+<tr><th id="16">16</th><td><i> *     Since these pieces of code are the same for any filled shape,</i></td></tr>
+<tr><th id="17">17</th><td><i> *     it is more convenient to gather the library in one</i></td></tr>
+<tr><th id="18">18</th><td><i> *     place, but since these pieces of code are also in</i></td></tr>
+<tr><th id="19">19</th><td><i> *     the inner loops of output primitives, procedure call</i></td></tr>
+<tr><th id="20">20</th><td><i> *     overhead is out of the question.</i></td></tr>
+<tr><th id="21">21</th><td><i> *     See the author for a derivation if needed.</i></td></tr>
+<tr><th id="22">22</th><td><i> */</i></td></tr>
+<tr><th id="23">23</th><td></td></tr>
+<tr><th id="24">24</th><td></td></tr>
+<tr><th id="25">25</th><td><i>/*</i></td></tr>
+<tr><th id="26">26</th><td><i> *  In scan converting polygons, we want to choose those pixels</i></td></tr>
+<tr><th id="27">27</th><td><i> *  which are inside the polygon.  Thus, we add .5 to the starting</i></td></tr>
+<tr><th id="28">28</th><td><i> *  x coordinate for both left and right edges.  Now we choose the</i></td></tr>
+<tr><th id="29">29</th><td><i> *  first pixel which is inside the pgon for the left edge and the</i></td></tr>
+<tr><th id="30">30</th><td><i> *  first pixel which is outside the pgon for the right edge.</i></td></tr>
+<tr><th id="31">31</th><td><i> *  Draw the left pixel, but not the right.</i></td></tr>
+<tr><th id="32">32</th><td><i> *</i></td></tr>
+<tr><th id="33">33</th><td><i> *  How to add .5 to the starting x coordinate:</i></td></tr>
+<tr><th id="34">34</th><td><i> *      If the edge is moving to the right, then subtract dy from the</i></td></tr>
+<tr><th id="35">35</th><td><i> *  error term from the general form of the algorithm.</i></td></tr>
+<tr><th id="36">36</th><td><i> *      If the edge is moving to the left, then add dy to the error term.</i></td></tr>
+<tr><th id="37">37</th><td><i> *</i></td></tr>
+<tr><th id="38">38</th><td><i> *  The reason for the difference between edges moving to the left</i></td></tr>
+<tr><th id="39">39</th><td><i> *  and edges moving to the right is simple:  If an edge is moving</i></td></tr>
+<tr><th id="40">40</th><td><i> *  to the right, then we want the algorithm to flip immediately.</i></td></tr>
+<tr><th id="41">41</th><td><i> *  If it is moving to the left, then we don't want it to flip until</i></td></tr>
+<tr><th id="42">42</th><td><i> *  we traverse an entire pixel.</i></td></tr>
+<tr><th id="43">43</th><td><i> */</i></td></tr>
+<tr><th id="44">44</th><td><u>#define <dfn class="macro" id="_M/LARGE_COORDINATE" data-ref="_M/LARGE_COORDINATE">LARGE_COORDINATE</dfn> 1000000</u></td></tr>
+<tr><th id="45">45</th><td><u>#define <dfn class="macro" id="_M/SMALL_COORDINATE" data-ref="_M/SMALL_COORDINATE">SMALL_COORDINATE</dfn> -LARGE_COORDINATE</u></td></tr>
+<tr><th id="46">46</th><td></td></tr>
+<tr><th id="47">47</th><td><u>#define <dfn class="macro" id="_M/BRESINITPGON" data-ref="_M/BRESINITPGON">BRESINITPGON</dfn>(dy, x1, x2, xStart, d, m, m1, incr1, incr2) { \</u></td></tr>
+<tr><th id="48">48</th><td><u>    int dx;      /* local storage */ \</u></td></tr>
+<tr><th id="49">49</th><td><u>\</u></td></tr>
+<tr><th id="50">50</th><td><u>    /* \</u></td></tr>
+<tr><th id="51">51</th><td><u>     *  if the edge is horizontal, then it is ignored \</u></td></tr>
+<tr><th id="52">52</th><td><u>     *  and assumed not to be processed.  Otherwise, do this stuff. \</u></td></tr>
+<tr><th id="53">53</th><td><u>     */ \</u></td></tr>
+<tr><th id="54">54</th><td><u>    if ((dy) != 0) { \</u></td></tr>
+<tr><th id="55">55</th><td><u>        xStart = (x1); \</u></td></tr>
+<tr><th id="56">56</th><td><u>        dx = (x2) - xStart; \</u></td></tr>
+<tr><th id="57">57</th><td><u>        if (dx &lt; 0) { \</u></td></tr>
+<tr><th id="58">58</th><td><u>            m = dx / (dy); \</u></td></tr>
+<tr><th id="59">59</th><td><u>            m1 = m - 1; \</u></td></tr>
+<tr><th id="60">60</th><td><u>            incr1 = -2 * dx + 2 * (dy) * m1; \</u></td></tr>
+<tr><th id="61">61</th><td><u>            incr2 = -2 * dx + 2 * (dy) * m; \</u></td></tr>
+<tr><th id="62">62</th><td><u>            d = 2 * m * (dy) - 2 * dx - 2 * (dy); \</u></td></tr>
+<tr><th id="63">63</th><td><u>        } else { \</u></td></tr>
+<tr><th id="64">64</th><td><u>            m = dx / (dy); \</u></td></tr>
+<tr><th id="65">65</th><td><u>            m1 = m + 1; \</u></td></tr>
+<tr><th id="66">66</th><td><u>            incr1 = 2 * dx - 2 * (dy) * m1; \</u></td></tr>
+<tr><th id="67">67</th><td><u>            incr2 = 2 * dx - 2 * (dy) * m; \</u></td></tr>
+<tr><th id="68">68</th><td><u>            d = -2 * m * (dy) + 2 * dx; \</u></td></tr>
+<tr><th id="69">69</th><td><u>        } \</u></td></tr>
+<tr><th id="70">70</th><td><u>    } \</u></td></tr>
+<tr><th id="71">71</th><td><u>}</u></td></tr>
+<tr><th id="72">72</th><td></td></tr>
+<tr><th id="73">73</th><td><u>#define <dfn class="macro" id="_M/BRESINCRPGON" data-ref="_M/BRESINCRPGON">BRESINCRPGON</dfn>(d, minval, m, m1, incr1, incr2) { \</u></td></tr>
+<tr><th id="74">74</th><td><u>    if (m1 &gt; 0) { \</u></td></tr>
+<tr><th id="75">75</th><td><u>        if (d &gt; 0) { \</u></td></tr>
+<tr><th id="76">76</th><td><u>            minval += m1; \</u></td></tr>
+<tr><th id="77">77</th><td><u>            d += incr1; \</u></td></tr>
+<tr><th id="78">78</th><td><u>        } \</u></td></tr>
+<tr><th id="79">79</th><td><u>        else { \</u></td></tr>
+<tr><th id="80">80</th><td><u>            minval += m; \</u></td></tr>
+<tr><th id="81">81</th><td><u>            d += incr2; \</u></td></tr>
+<tr><th id="82">82</th><td><u>        } \</u></td></tr>
+<tr><th id="83">83</th><td><u>    } else {\</u></td></tr>
+<tr><th id="84">84</th><td><u>        if (d &gt;= 0) { \</u></td></tr>
+<tr><th id="85">85</th><td><u>            minval += m1; \</u></td></tr>
+<tr><th id="86">86</th><td><u>            d += incr1; \</u></td></tr>
+<tr><th id="87">87</th><td><u>        } \</u></td></tr>
+<tr><th id="88">88</th><td><u>        else { \</u></td></tr>
+<tr><th id="89">89</th><td><u>            minval += m; \</u></td></tr>
+<tr><th id="90">90</th><td><u>            d += incr2; \</u></td></tr>
+<tr><th id="91">91</th><td><u>        } \</u></td></tr>
+<tr><th id="92">92</th><td><u>    } \</u></td></tr>
+<tr><th id="93">93</th><td><u>}</u></td></tr>
+<tr><th id="94">94</th><td></td></tr>
+<tr><th id="95">95</th><td></td></tr>
+<tr><th id="96">96</th><td><i>/*</i></td></tr>
+<tr><th id="97">97</th><td><i> *     This structure contains all of the information needed</i></td></tr>
+<tr><th id="98">98</th><td><i> *     to run the bresenham algorithm.</i></td></tr>
+<tr><th id="99">99</th><td><i> *     The variables may be hardcoded into the declarations</i></td></tr>
+<tr><th id="100">100</th><td><i> *     instead of using this structure to make use of</i></td></tr>
+<tr><th id="101">101</th><td><i> *     register declarations.</i></td></tr>
+<tr><th id="102">102</th><td><i> */</i></td></tr>
+<tr><th id="103">103</th><td><b>typedef</b> <b>struct</b> {</td></tr>
+<tr><th id="104">104</th><td>    <em>int</em> <dfn class="decl" id="(anonymous)::minor_axis" title='(anonymous struct)::minor_axis' data-ref="(anonymous)::minor_axis">minor_axis</dfn>;	<i>/* minor axis        */</i></td></tr>
+<tr><th id="105">105</th><td>    <em>int</em> <dfn class="decl" id="(anonymous)::d" title='(anonymous struct)::d' data-ref="(anonymous)::d">d</dfn>;		<i>/* decision variable */</i></td></tr>
+<tr><th id="106">106</th><td>    <em>int</em> <dfn class="decl" id="(anonymous)::m" title='(anonymous struct)::m' data-ref="(anonymous)::m">m</dfn>, <dfn class="decl" id="(anonymous)::m1" title='(anonymous struct)::m1' data-ref="(anonymous)::m1">m1</dfn>;		<i>/* slope and slope+1 */</i></td></tr>
+<tr><th id="107">107</th><td>    <em>int</em> <dfn class="decl" id="(anonymous)::incr1" title='(anonymous struct)::incr1' data-ref="(anonymous)::incr1">incr1</dfn>, <dfn class="decl" id="(anonymous)::incr2" title='(anonymous struct)::incr2' data-ref="(anonymous)::incr2">incr2</dfn>;	<i>/* error increments */</i></td></tr>
+<tr><th id="108">108</th><td>} <dfn class="typedef" id="BRESINFO" title='BRESINFO' data-type='struct BRESINFO' data-ref="BRESINFO">BRESINFO</dfn>;</td></tr>
+<tr><th id="109">109</th><td></td></tr>
+<tr><th id="110">110</th><td></td></tr>
+<tr><th id="111">111</th><td><u>#define <dfn class="macro" id="_M/BRESINITPGONSTRUCT" data-ref="_M/BRESINITPGONSTRUCT">BRESINITPGONSTRUCT</dfn>(dmaj, min1, min2, bres) \</u></td></tr>
+<tr><th id="112">112</th><td><u>	BRESINITPGON(dmaj, min1, min2, bres.minor_axis, bres.d, \</u></td></tr>
+<tr><th id="113">113</th><td><u>                     bres.m, bres.m1, bres.incr1, bres.incr2)</u></td></tr>
+<tr><th id="114">114</th><td></td></tr>
+<tr><th id="115">115</th><td><u>#define <dfn class="macro" id="_M/BRESINCRPGONSTRUCT" data-ref="_M/BRESINCRPGONSTRUCT">BRESINCRPGONSTRUCT</dfn>(bres) \</u></td></tr>
+<tr><th id="116">116</th><td><u>        BRESINCRPGON(bres.d, bres.minor_axis, bres.m, bres.m1, bres.incr1, bres.incr2)</u></td></tr>
+<tr><th id="117">117</th><td></td></tr>
+<tr><th id="118">118</th><td></td></tr>
+<tr><th id="119">119</th><td></td></tr>
+<tr><th id="120">120</th><td><i>/*</i></td></tr>
+<tr><th id="121">121</th><td><i> *     These are the data structures needed to scan</i></td></tr>
+<tr><th id="122">122</th><td><i> *     convert regions.  Two different scan conversion</i></td></tr>
+<tr><th id="123">123</th><td><i> *     methods are available -- the even-odd method, and</i></td></tr>
+<tr><th id="124">124</th><td><i> *     the winding number method.</i></td></tr>
+<tr><th id="125">125</th><td><i> *     The even-odd rule states that a point is inside</i></td></tr>
+<tr><th id="126">126</th><td><i> *     the polygon if a ray drawn from that point in any</i></td></tr>
+<tr><th id="127">127</th><td><i> *     direction will pass through an odd number of</i></td></tr>
+<tr><th id="128">128</th><td><i> *     path segments.</i></td></tr>
+<tr><th id="129">129</th><td><i> *     By the winding number rule, a point is decided</i></td></tr>
+<tr><th id="130">130</th><td><i> *     to be inside the polygon if a ray drawn from that</i></td></tr>
+<tr><th id="131">131</th><td><i> *     point in any direction passes through a different</i></td></tr>
+<tr><th id="132">132</th><td><i> *     number of clockwise and counter-clockwise path</i></td></tr>
+<tr><th id="133">133</th><td><i> *     segments.</i></td></tr>
+<tr><th id="134">134</th><td><i> *</i></td></tr>
+<tr><th id="135">135</th><td><i> *     These data structures are adapted somewhat from</i></td></tr>
+<tr><th id="136">136</th><td><i> *     the algorithm in (Foley/Van Dam) for scan converting</i></td></tr>
+<tr><th id="137">137</th><td><i> *     polygons.</i></td></tr>
+<tr><th id="138">138</th><td><i> *     The basic algorithm is to start at the top (smallest y)</i></td></tr>
+<tr><th id="139">139</th><td><i> *     of the polygon, stepping down to the bottom of</i></td></tr>
+<tr><th id="140">140</th><td><i> *     the polygon by incrementing the y coordinate.  We</i></td></tr>
+<tr><th id="141">141</th><td><i> *     keep a list of edges which the current scanline crosses,</i></td></tr>
+<tr><th id="142">142</th><td><i> *     sorted by x.  This list is called the Active Edge Table (AET)</i></td></tr>
+<tr><th id="143">143</th><td><i> *     As we change the y-coordinate, we update each entry in </i></td></tr>
+<tr><th id="144">144</th><td><i> *     in the active edge table to reflect the edges new xcoord.</i></td></tr>
+<tr><th id="145">145</th><td><i> *     This list must be sorted at each scanline in case</i></td></tr>
+<tr><th id="146">146</th><td><i> *     two edges intersect.</i></td></tr>
+<tr><th id="147">147</th><td><i> *     We also keep a data structure known as the Edge Table (ET),</i></td></tr>
+<tr><th id="148">148</th><td><i> *     which keeps track of all the edges which the current</i></td></tr>
+<tr><th id="149">149</th><td><i> *     scanline has not yet reached.  The ET is basically a</i></td></tr>
+<tr><th id="150">150</th><td><i> *     list of ScanLineList structures containing a list of</i></td></tr>
+<tr><th id="151">151</th><td><i> *     edges which are entered at a given scanline.  There is one</i></td></tr>
+<tr><th id="152">152</th><td><i> *     ScanLineList per scanline at which an edge is entered.</i></td></tr>
+<tr><th id="153">153</th><td><i> *     When we enter a new edge, we move it from the ET to the AET.</i></td></tr>
+<tr><th id="154">154</th><td><i> *</i></td></tr>
+<tr><th id="155">155</th><td><i> *     From the AET, we can implement the even-odd rule as in</i></td></tr>
+<tr><th id="156">156</th><td><i> *     (Foley/Van Dam).</i></td></tr>
+<tr><th id="157">157</th><td><i> *     The winding number rule is a little trickier.  We also</i></td></tr>
+<tr><th id="158">158</th><td><i> *     keep the EdgeTableEntries in the AET linked by the</i></td></tr>
+<tr><th id="159">159</th><td><i> *     nextWETE (winding EdgeTableEntry) link.  This allows</i></td></tr>
+<tr><th id="160">160</th><td><i> *     the edges to be linked just as before for updating</i></td></tr>
+<tr><th id="161">161</th><td><i> *     purposes, but only uses the edges linked by the nextWETE</i></td></tr>
+<tr><th id="162">162</th><td><i> *     link as edges representing spans of the polygon to</i></td></tr>
+<tr><th id="163">163</th><td><i> *     drawn (as with the even-odd rule).</i></td></tr>
+<tr><th id="164">164</th><td><i> */</i></td></tr>
+<tr><th id="165">165</th><td></td></tr>
+<tr><th id="166">166</th><td><i>/*</i></td></tr>
+<tr><th id="167">167</th><td><i> * for the winding number rule</i></td></tr>
+<tr><th id="168">168</th><td><i> */</i></td></tr>
+<tr><th id="169">169</th><td><i>//#define CLOCKWISE          1</i></td></tr>
+<tr><th id="170">170</th><td><i>//#define COUNTERCLOCKWISE  -1 </i></td></tr>
+<tr><th id="171">171</th><td></td></tr>
+<tr><th id="172">172</th><td><b>typedef</b> <b>struct</b> <dfn class="type def" id="_EdgeTableEntry" title='_EdgeTableEntry' data-ref="_EdgeTableEntry"><a class="type" href="#_EdgeTableEntry" title='_EdgeTableEntry' data-ref="_EdgeTableEntry">_EdgeTableEntry</a></dfn> {</td></tr>
+<tr><th id="173">173</th><td>     <em>int</em> <dfn class="decl" id="_EdgeTableEntry::ymax" title='_EdgeTableEntry::ymax' data-ref="_EdgeTableEntry::ymax">ymax</dfn>;             <i>/* ycoord at which we exit this edge. */</i></td></tr>
+<tr><th id="174">174</th><td>     <a class="typedef" href="#BRESINFO" title='BRESINFO' data-type='struct BRESINFO' data-ref="BRESINFO">BRESINFO</a> <dfn class="decl" id="_EdgeTableEntry::bres" title='_EdgeTableEntry::bres' data-ref="_EdgeTableEntry::bres">bres</dfn>;        <i>/* Bresenham info to run the edge     */</i></td></tr>
+<tr><th id="175">175</th><td>     <b>struct</b> <a class="type" href="#_EdgeTableEntry" title='_EdgeTableEntry' data-ref="_EdgeTableEntry">_EdgeTableEntry</a> *<dfn class="decl" id="_EdgeTableEntry::next" title='_EdgeTableEntry::next' data-ref="_EdgeTableEntry::next">next</dfn>;       <i>/* next in the list     */</i></td></tr>
+<tr><th id="176">176</th><td>     <b>struct</b> <a class="type" href="#_EdgeTableEntry" title='_EdgeTableEntry' data-ref="_EdgeTableEntry">_EdgeTableEntry</a> *<dfn class="decl" id="_EdgeTableEntry::back" title='_EdgeTableEntry::back' data-ref="_EdgeTableEntry::back">back</dfn>;       <i>/* for insertion sort   */</i></td></tr>
+<tr><th id="177">177</th><td>     <b>struct</b> <a class="type" href="#_EdgeTableEntry" title='_EdgeTableEntry' data-ref="_EdgeTableEntry">_EdgeTableEntry</a> *<dfn class="decl" id="_EdgeTableEntry::nextWETE" title='_EdgeTableEntry::nextWETE' data-ref="_EdgeTableEntry::nextWETE">nextWETE</dfn>;   <i>/* for winding num rule */</i></td></tr>
+<tr><th id="178">178</th><td>     <em>int</em> <dfn class="decl" id="_EdgeTableEntry::ClockWise" title='_EdgeTableEntry::ClockWise' data-ref="_EdgeTableEntry::ClockWise">ClockWise</dfn>;        <i>/* flag for winding number rule       */</i></td></tr>
+<tr><th id="179">179</th><td>} <dfn class="typedef" id="EdgeTableEntry" title='EdgeTableEntry' data-type='struct _EdgeTableEntry' data-ref="EdgeTableEntry">EdgeTableEntry</dfn>;</td></tr>
+<tr><th id="180">180</th><td></td></tr>
+<tr><th id="181">181</th><td></td></tr>
+<tr><th id="182">182</th><td><b>typedef</b> <b>struct</b> <dfn class="type def" id="_ScanLineList" title='_ScanLineList' data-ref="_ScanLineList"><a class="type" href="#_ScanLineList" title='_ScanLineList' data-ref="_ScanLineList">_ScanLineList</a></dfn>{</td></tr>
+<tr><th id="183">183</th><td>     <em>int</em> <dfn class="decl" id="_ScanLineList::scanline" title='_ScanLineList::scanline' data-ref="_ScanLineList::scanline">scanline</dfn>;              <i>/* the scanline represented */</i></td></tr>
+<tr><th id="184">184</th><td>     <a class="typedef" href="#EdgeTableEntry" title='EdgeTableEntry' data-type='struct _EdgeTableEntry' data-ref="EdgeTableEntry">EdgeTableEntry</a> *<dfn class="decl" id="_ScanLineList::edgelist" title='_ScanLineList::edgelist' data-ref="_ScanLineList::edgelist">edgelist</dfn>;  <i>/* header node              */</i></td></tr>
+<tr><th id="185">185</th><td>     <b>struct</b> <a class="type" href="#_ScanLineList" title='_ScanLineList' data-ref="_ScanLineList">_ScanLineList</a> *<dfn class="decl" id="_ScanLineList::next" title='_ScanLineList::next' data-ref="_ScanLineList::next">next</dfn>;  <i>/* next in the list       */</i></td></tr>
+<tr><th id="186">186</th><td>} <dfn class="typedef" id="ScanLineList" title='ScanLineList' data-type='struct _ScanLineList' data-ref="ScanLineList">ScanLineList</dfn>;</td></tr>
+<tr><th id="187">187</th><td></td></tr>
+<tr><th id="188">188</th><td></td></tr>
+<tr><th id="189">189</th><td><b>typedef</b> <b>struct</b> {</td></tr>
+<tr><th id="190">190</th><td>     <em>int</em> <dfn class="decl" id="(anonymous)::ymax" title='(anonymous struct)::ymax' data-ref="(anonymous)::ymax">ymax</dfn>;                 <i>/* ymax for the polygon     */</i></td></tr>
+<tr><th id="191">191</th><td>     <em>int</em> <dfn class="decl" id="(anonymous)::ymin" title='(anonymous struct)::ymin' data-ref="(anonymous)::ymin">ymin</dfn>;                 <i>/* ymin for the polygon     */</i></td></tr>
+<tr><th id="192">192</th><td>     <a class="typedef" href="#ScanLineList" title='ScanLineList' data-type='struct _ScanLineList' data-ref="ScanLineList">ScanLineList</a> <dfn class="decl" id="(anonymous)::scanlines" title='(anonymous struct)::scanlines' data-ref="(anonymous)::scanlines">scanlines</dfn>;   <i>/* header node              */</i></td></tr>
+<tr><th id="193">193</th><td>} <dfn class="typedef" id="EdgeTable" title='EdgeTable' data-type='struct EdgeTable' data-ref="EdgeTable">EdgeTable</dfn>;</td></tr>
+<tr><th id="194">194</th><td></td></tr>
+<tr><th id="195">195</th><td></td></tr>
+<tr><th id="196">196</th><td><i>/*</i></td></tr>
+<tr><th id="197">197</th><td><i> * Here is a struct to help with storage allocation</i></td></tr>
+<tr><th id="198">198</th><td><i> * so we can allocate a big chunk at a time, and then take</i></td></tr>
+<tr><th id="199">199</th><td><i> * pieces from this heap when we need to.</i></td></tr>
+<tr><th id="200">200</th><td><i> */</i></td></tr>
+<tr><th id="201">201</th><td><u>#define <dfn class="macro" id="_M/SLLSPERBLOCK" data-ref="_M/SLLSPERBLOCK">SLLSPERBLOCK</dfn> 25</u></td></tr>
+<tr><th id="202">202</th><td></td></tr>
+<tr><th id="203">203</th><td><b>typedef</b> <b>struct</b> <dfn class="type def" id="_ScanLineListBlock" title='_ScanLineListBlock' data-ref="_ScanLineListBlock"><a class="type" href="#_ScanLineListBlock" title='_ScanLineListBlock' data-ref="_ScanLineListBlock">_ScanLineListBlock</a></dfn> {</td></tr>
+<tr><th id="204">204</th><td>     <a class="typedef" href="#ScanLineList" title='ScanLineList' data-type='struct _ScanLineList' data-ref="ScanLineList">ScanLineList</a> <dfn class="decl" id="_ScanLineListBlock::SLLs" title='_ScanLineListBlock::SLLs' data-ref="_ScanLineListBlock::SLLs">SLLs</dfn>[<a class="macro" href="#201" title="25" data-ref="_M/SLLSPERBLOCK">SLLSPERBLOCK</a>];</td></tr>
+<tr><th id="205">205</th><td>     <b>struct</b> <a class="type" href="#_ScanLineListBlock" title='_ScanLineListBlock' data-ref="_ScanLineListBlock">_ScanLineListBlock</a> *<dfn class="decl" id="_ScanLineListBlock::next" title='_ScanLineListBlock::next' data-ref="_ScanLineListBlock::next">next</dfn>;</td></tr>
+<tr><th id="206">206</th><td>} <dfn class="typedef" id="ScanLineListBlock" title='ScanLineListBlock' data-type='struct _ScanLineListBlock' data-ref="ScanLineListBlock">ScanLineListBlock</dfn>;</td></tr>
+<tr><th id="207">207</th><td></td></tr>
+<tr><th id="208">208</th><td></td></tr>
+<tr><th id="209">209</th><td></td></tr>
+<tr><th id="210">210</th><td><i>/*</i></td></tr>
+<tr><th id="211">211</th><td><i> *</i></td></tr>
+<tr><th id="212">212</th><td><i> *     a few macros for the inner loops of the fill code where</i></td></tr>
+<tr><th id="213">213</th><td><i> *     performance considerations don't allow a procedure call.</i></td></tr>
+<tr><th id="214">214</th><td><i> *</i></td></tr>
+<tr><th id="215">215</th><td><i> *     Evaluate the given edge at the given scanline.</i></td></tr>
+<tr><th id="216">216</th><td><i> *     If the edge has expired, then we leave it and fix up</i></td></tr>
+<tr><th id="217">217</th><td><i> *     the active edge table; otherwise, we increment the</i></td></tr>
+<tr><th id="218">218</th><td><i> *     x value to be ready for the next scanline.</i></td></tr>
+<tr><th id="219">219</th><td><i> *     The winding number rule is in effect, so we must notify</i></td></tr>
+<tr><th id="220">220</th><td><i> *     the caller when the edge has been removed so he</i></td></tr>
+<tr><th id="221">221</th><td><i> *     can reorder the Winding Active Edge Table.</i></td></tr>
+<tr><th id="222">222</th><td><i> */</i></td></tr>
+<tr><th id="223">223</th><td><u>#define <dfn class="macro" id="_M/EVALUATEEDGEWINDING" data-ref="_M/EVALUATEEDGEWINDING">EVALUATEEDGEWINDING</dfn>(pAET, pPrevAET, y, fixWAET) { \</u></td></tr>
+<tr><th id="224">224</th><td><u>   if (pAET-&gt;ymax == y) {          /* leaving this edge */ \</u></td></tr>
+<tr><th id="225">225</th><td><u>      pPrevAET-&gt;next = pAET-&gt;next; \</u></td></tr>
+<tr><th id="226">226</th><td><u>      pAET = pPrevAET-&gt;next; \</u></td></tr>
+<tr><th id="227">227</th><td><u>      fixWAET = 1; \</u></td></tr>
+<tr><th id="228">228</th><td><u>      if (pAET) \</u></td></tr>
+<tr><th id="229">229</th><td><u>         pAET-&gt;back = pPrevAET; \</u></td></tr>
+<tr><th id="230">230</th><td><u>   } \</u></td></tr>
+<tr><th id="231">231</th><td><u>   else { \</u></td></tr>
+<tr><th id="232">232</th><td><u>      BRESINCRPGONSTRUCT(pAET-&gt;bres) \</u></td></tr>
+<tr><th id="233">233</th><td><u>      pPrevAET = pAET; \</u></td></tr>
+<tr><th id="234">234</th><td><u>      pAET = pAET-&gt;next; \</u></td></tr>
+<tr><th id="235">235</th><td><u>   } \</u></td></tr>
+<tr><th id="236">236</th><td><u>}</u></td></tr>
+<tr><th id="237">237</th><td></td></tr>
+<tr><th id="238">238</th><td></td></tr>
+<tr><th id="239">239</th><td><i>/*</i></td></tr>
+<tr><th id="240">240</th><td><i> *     Evaluate the given edge at the given scanline.</i></td></tr>
+<tr><th id="241">241</th><td><i> *     If the edge has expired, then we leave it and fix up</i></td></tr>
+<tr><th id="242">242</th><td><i> *     the active edge table; otherwise, we increment the</i></td></tr>
+<tr><th id="243">243</th><td><i> *     x value to be ready for the next scanline.</i></td></tr>
+<tr><th id="244">244</th><td><i> *     The even-odd rule is in effect.</i></td></tr>
+<tr><th id="245">245</th><td><i> */</i></td></tr>
+<tr><th id="246">246</th><td><u>#define <dfn class="macro" id="_M/EVALUATEEDGEEVENODD" data-ref="_M/EVALUATEEDGEEVENODD">EVALUATEEDGEEVENODD</dfn>(pAET, pPrevAET, y) { \</u></td></tr>
+<tr><th id="247">247</th><td><u>   if (pAET-&gt;ymax == y) {          /* leaving this edge */ \</u></td></tr>
+<tr><th id="248">248</th><td><u>      pPrevAET-&gt;next = pAET-&gt;next; \</u></td></tr>
+<tr><th id="249">249</th><td><u>      pAET = pPrevAET-&gt;next; \</u></td></tr>
+<tr><th id="250">250</th><td><u>      if (pAET) \</u></td></tr>
+<tr><th id="251">251</th><td><u>         pAET-&gt;back = pPrevAET; \</u></td></tr>
+<tr><th id="252">252</th><td><u>   } \</u></td></tr>
+<tr><th id="253">253</th><td><u>   else { \</u></td></tr>
+<tr><th id="254">254</th><td><u>      BRESINCRPGONSTRUCT(pAET-&gt;bres) \</u></td></tr>
+<tr><th id="255">255</th><td><u>      pPrevAET = pAET; \</u></td></tr>
+<tr><th id="256">256</th><td><u>      pAET = pAET-&gt;next; \</u></td></tr>
+<tr><th id="257">257</th><td><u>   } \</u></td></tr>
+<tr><th id="258">258</th><td><u>}</u></td></tr>
+<tr><th id="259">259</th><td> </td></tr>
+<tr><th id="260">260</th><td></td></tr>
+<tr><th id="261">261</th><td><u>#<span data-ppcond="4">endif</span></u></td></tr>
+<tr><th id="262">262</th><td></td></tr>
+</table><hr/><p id='footer'>
+Generated while processing <a href='../../../../hntools/src/G4ToolsAnalysisManager.cc.html'>codebrowser/source/analysis/hntools/src/G4ToolsAnalysisManager.cc</a><br/>Generated on <em>2019-Aug-28</em> from project codebrowser<br />Powered by <a href='https://woboq.com'><img alt='Woboq' src='https://code.woboq.org/woboq-16.png' width='41' height='16' /></a> <a href='https://code.woboq.org'>Code Browser</a> 2.1
+<br/>Generator usage only permitted with license.</p>
+</div></body></html>

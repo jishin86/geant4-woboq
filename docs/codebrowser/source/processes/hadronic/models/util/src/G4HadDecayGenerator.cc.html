@@ -1,0 +1,205 @@
+<!doctype html>
+<html>
+<head>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"><title>G4HadDecayGenerator.cc source code [codebrowser/source/processes/hadronic/models/util/src/G4HadDecayGenerator.cc] - Woboq Code Browser</title>
+<link rel="stylesheet" href="../../../../../../../../data/qtcreator.css" title="QtCreator"/>
+<link rel="alternate stylesheet" href="../../../../../../../../data/kdevelop.css" title="KDevelop"/>
+<script type="text/javascript" src="../../../../../../../../data/jquery/jquery.min.js"></script>
+<script type="text/javascript" src="../../../../../../../../data/jquery/jquery-ui.min.js"></script>
+<script>var file = 'codebrowser/source/processes/hadronic/models/util/src/G4HadDecayGenerator.cc'; var root_path = '../../../../../../..'; var data_path = '../../../../../../../../data';</script>
+<script src='../../../../../../../../data/codebrowser.js'></script>
+</head>
+<body><div id='header'><h1 id='breadcrumb'><span>Browse the source code of </span><a href='../../../../../..'>codebrowser</a>/<a href='../../../../..'>source</a>/<a href='../../../..'>processes</a>/<a href='../../..'>hadronic</a>/<a href='../..'>models</a>/<a href='..'>util</a>/<a href='./'>src</a>/<a href='G4HadDecayGenerator.cc.html'>G4HadDecayGenerator.cc</a></h1></div>
+<hr/><div id='content'><table class="code">
+<tr><th id="1">1</th><td><i>//</i></td></tr>
+<tr><th id="2">2</th><td><i>// ********************************************************************</i></td></tr>
+<tr><th id="3">3</th><td><i>// * License and Disclaimer                                           *</i></td></tr>
+<tr><th id="4">4</th><td><i>// *                                                                  *</i></td></tr>
+<tr><th id="5">5</th><td><i>// * The  Geant4 software  is  copyright of the Copyright Holders  of *</i></td></tr>
+<tr><th id="6">6</th><td><i>// * the Geant4 Collaboration.  It is provided  under  the terms  and *</i></td></tr>
+<tr><th id="7">7</th><td><i>// * conditions of the Geant4 Software License,  included in the file *</i></td></tr>
+<tr><th id="8">8</th><td><i>// * LICENSE and available at  <a href="http://cern.ch/geant4/license">http://cern.ch/geant4/license</a> .  These *</i></td></tr>
+<tr><th id="9">9</th><td><i>// * include a list of copyright holders.                             *</i></td></tr>
+<tr><th id="10">10</th><td><i>// *                                                                  *</i></td></tr>
+<tr><th id="11">11</th><td><i>// * Neither the authors of this software system, nor their employing *</i></td></tr>
+<tr><th id="12">12</th><td><i>// * institutes,nor the agencies providing financial support for this *</i></td></tr>
+<tr><th id="13">13</th><td><i>// * work  make  any representation or  warranty, express or implied, *</i></td></tr>
+<tr><th id="14">14</th><td><i>// * regarding  this  software system or assume any liability for its *</i></td></tr>
+<tr><th id="15">15</th><td><i>// * use.  Please see the license in the file  LICENSE  and URL above *</i></td></tr>
+<tr><th id="16">16</th><td><i>// * for the full disclaimer and the limitation of liability.         *</i></td></tr>
+<tr><th id="17">17</th><td><i>// *                                                                  *</i></td></tr>
+<tr><th id="18">18</th><td><i>// * This  code  implementation is the result of  the  scientific and *</i></td></tr>
+<tr><th id="19">19</th><td><i>// * technical work of the GEANT4 collaboration.                      *</i></td></tr>
+<tr><th id="20">20</th><td><i>// * By using,  copying,  modifying or  distributing the software (or *</i></td></tr>
+<tr><th id="21">21</th><td><i>// * any work based  on the software)  you  agree  to acknowledge its *</i></td></tr>
+<tr><th id="22">22</th><td><i>// * use  in  resulting  scientific  publications,  and indicate your *</i></td></tr>
+<tr><th id="23">23</th><td><i>// * acceptance of all terms of the Geant4 Software license.          *</i></td></tr>
+<tr><th id="24">24</th><td><i>// ********************************************************************</i></td></tr>
+<tr><th id="25">25</th><td><i>//</i></td></tr>
+<tr><th id="26">26</th><td><i>//</i></td></tr>
+<tr><th id="27">27</th><td><i>// Multibody "phase space" generator, which provides multiple algorithms</i></td></tr>
+<tr><th id="28">28</th><td><i>// for sampling.  Momentum vectors are generated in the center-of-mass</i></td></tr>
+<tr><th id="29">29</th><td><i>// frame of the decay, and returned in a user-supplied buffer.  A sampling</i></td></tr>
+<tr><th id="30">30</th><td><i>// algorithm is specified via constructor argument.</i></td></tr>
+<tr><th id="31">31</th><td><i>//</i></td></tr>
+<tr><th id="32">32</th><td><i>// Author:	Michael Kelsey (SLAC) &lt;kelsey@slac.stanford.edu&gt;</i></td></tr>
+<tr><th id="33">33</th><td></td></tr>
+<tr><th id="34">34</th><td><u>#include <a href="../include/G4HadDecayGenerator.hh.html">"G4HadDecayGenerator.hh"</a></u></td></tr>
+<tr><th id="35">35</th><td><u>#include <a href="../include/G4VHadDecayAlgorithm.hh.html">"G4VHadDecayAlgorithm.hh"</a></u></td></tr>
+<tr><th id="36">36</th><td><u>#include <a href="../include/G4HadPhaseSpaceKopylov.hh.html">"G4HadPhaseSpaceKopylov.hh"</a></u></td></tr>
+<tr><th id="37">37</th><td><u>#include <a href="../include/G4HadPhaseSpaceGenbod.hh.html">"G4HadPhaseSpaceGenbod.hh"</a></u></td></tr>
+<tr><th id="38">38</th><td><u>#include <a href="../include/G4HadPhaseSpaceNBodyAsai.hh.html">"G4HadPhaseSpaceNBodyAsai.hh"</a></u></td></tr>
+<tr><th id="39">39</th><td><u>#include <a href="../../../util/include/G4HadronicException.hh.html">"G4HadronicException.hh"</a></u></td></tr>
+<tr><th id="40">40</th><td><u>#include <a href="../../../../../global/HEPGeometry/include/G4LorentzVector.hh.html">"G4LorentzVector.hh"</a></u></td></tr>
+<tr><th id="41">41</th><td><u>#include <a href="../../../../../particles/management/include/G4ParticleDefinition.hh.html">"G4ParticleDefinition.hh"</a></u></td></tr>
+<tr><th id="42">42</th><td><u>#include <a href="../../../../../global/management/include/G4PhysicalConstants.hh.html">"G4PhysicalConstants.hh"</a></u></td></tr>
+<tr><th id="43">43</th><td><u>#include <a href="../../../../../global/management/include/G4SystemOfUnits.hh.html">"G4SystemOfUnits.hh"</a></u></td></tr>
+<tr><th id="44">44</th><td><u>#include <a href="../../../../../global/management/include/G4ThreeVector.hh.html">"G4ThreeVector.hh"</a></u></td></tr>
+<tr><th id="45">45</th><td><u>#include <a href="../../../../../global/HEPRandom/include/Randomize.hh.html">"Randomize.hh"</a></u></td></tr>
+<tr><th id="46">46</th><td><u>#include <span class='error' title="&apos;vector&apos; file not found">&lt;</span>vector&gt;</u></td></tr>
+<tr><th id="47">47</th><td><u>#include &lt;algorithm&gt;</u></td></tr>
+<tr><th id="48">48</th><td><u>#include &lt;numeric&gt;</u></td></tr>
+<tr><th id="49">49</th><td><u>#include &lt;iterator&gt;</u></td></tr>
+<tr><th id="50">50</th><td><u>#include &lt;iostream&gt;</u></td></tr>
+<tr><th id="51">51</th><td></td></tr>
+<tr><th id="52">52</th><td></td></tr>
+<tr><th id="53">53</th><td><i>// Constructors and destructor</i></td></tr>
+<tr><th id="54">54</th><td></td></tr>
+<tr><th id="55">55</th><td><a class="type" href="../include/G4HadDecayGenerator.hh.html#G4HadDecayGenerator" title='G4HadDecayGenerator' data-ref="G4HadDecayGenerator">G4HadDecayGenerator</a>::<dfn class="decl def" id="_ZN19G4HadDecayGeneratorC1ENS_9AlgorithmEi" title='G4HadDecayGenerator::G4HadDecayGenerator' data-ref="_ZN19G4HadDecayGeneratorC1ENS_9AlgorithmEi">G4HadDecayGenerator</dfn>(<a class="type" href="../include/G4HadDecayGenerator.hh.html#G4HadDecayGenerator::Algorithm" title='G4HadDecayGenerator::Algorithm' data-ref="G4HadDecayGenerator::Algorithm">Algorithm</a> <dfn class="local col5 decl" id="15alg" title='alg' data-type='G4HadDecayGenerator::Algorithm' data-ref="15alg">alg</dfn>, <a class="typedef" href="../../../../../global/management/include/G4Types.hh.html#G4int" title='G4int' data-type='int' data-ref="G4int">G4int</a> <dfn class="local col6 decl" id="16verbose" title='verbose' data-type='G4int' data-ref="16verbose">verbose</dfn>)</td></tr>
+<tr><th id="56">56</th><td>  : <a class="member" href="../include/G4HadDecayGenerator.hh.html#G4HadDecayGenerator::verboseLevel" title='G4HadDecayGenerator::verboseLevel' data-ref="G4HadDecayGenerator::verboseLevel">verboseLevel</a>(<a class="local col6 ref" href="#16verbose" title='verbose' data-ref="16verbose">verbose</a>), <a class="member" href="../include/G4HadDecayGenerator.hh.html#G4HadDecayGenerator::theAlgorithm" title='G4HadDecayGenerator::theAlgorithm' data-ref="G4HadDecayGenerator::theAlgorithm">theAlgorithm</a>(<var>0</var>) {</td></tr>
+<tr><th id="57">57</th><td>  <b>switch</b> (<a class="local col5 ref" href="#15alg" title='alg' data-ref="15alg">alg</a>) {</td></tr>
+<tr><th id="58">58</th><td>  <b>case</b> <a class="enum" href="../include/G4HadDecayGenerator.hh.html#G4HadDecayGenerator::Algorithm::Kopylov" title='G4HadDecayGenerator::Algorithm::Kopylov' data-ref="G4HadDecayGenerator::Algorithm::Kopylov">Kopylov</a>: theAlgorithm = <b>new</b> <span class='error' title="allocating an object of abstract class type &apos;G4HadPhaseSpaceKopylov&apos;">G4HadPhaseSpaceKopylov</span>(verboseLevel); <b>break</b>;</td></tr>
+<tr><th id="59">59</th><td>  <b>case</b> <a class="enum" href="../include/G4HadDecayGenerator.hh.html#G4HadDecayGenerator::Algorithm::GENBOD" title='G4HadDecayGenerator::Algorithm::GENBOD' data-ref="G4HadDecayGenerator::Algorithm::GENBOD">GENBOD</a>: theAlgorithm <span class='error' title="assigning to &apos;G4VHadDecayAlgorithm *&apos; from incompatible type &apos;G4HadPhaseSpaceGenbod *&apos;">=</span> <b>new</b> G4HadPhaseSpaceGenbod(verboseLevel); <b>break</b>;</td></tr>
+<tr><th id="60">60</th><td>  <b>case</b> <a class="enum" href="../include/G4HadDecayGenerator.hh.html#G4HadDecayGenerator::Algorithm::NBody" title='G4HadDecayGenerator::Algorithm::NBody' data-ref="G4HadDecayGenerator::Algorithm::NBody">NBody</a>: theAlgorithm = <b>new</b> <span class='error' title="allocating an object of abstract class type &apos;G4HadPhaseSpaceNBodyAsai&apos;">G4HadPhaseSpaceNBodyAsai</span>(verboseLevel); <b>break</b>;</td></tr>
+<tr><th id="61">61</th><td>  <b>case</b> <a class="enum" href="../include/G4HadDecayGenerator.hh.html#G4HadDecayGenerator::Algorithm::NONE" title='G4HadDecayGenerator::Algorithm::NONE' data-ref="G4HadDecayGenerator::Algorithm::NONE">NONE</a>: <a class="member" href="../include/G4HadDecayGenerator.hh.html#G4HadDecayGenerator::theAlgorithm" title='G4HadDecayGenerator::theAlgorithm' data-ref="G4HadDecayGenerator::theAlgorithm">theAlgorithm</a> = <var>0</var>; <b>break</b>;	<i>// User may explicitly set no algorithm</i></td></tr>
+<tr><th id="62">62</th><td>  <b>default</b>: <a class="member" href="#_ZNK19G4HadDecayGenerator22ReportInvalidAlgorithmENS_9AlgorithmE" title='G4HadDecayGenerator::ReportInvalidAlgorithm' data-ref="_ZNK19G4HadDecayGenerator22ReportInvalidAlgorithmENS_9AlgorithmE">ReportInvalidAlgorithm</a>(<a class="local col5 ref" href="#15alg" title='alg' data-ref="15alg">alg</a>);</td></tr>
+<tr><th id="63">63</th><td>  }</td></tr>
+<tr><th id="64">64</th><td></td></tr>
+<tr><th id="65">65</th><td>  <b>if</b> (<a class="member" href="../include/G4HadDecayGenerator.hh.html#G4HadDecayGenerator::verboseLevel" title='G4HadDecayGenerator::verboseLevel' data-ref="G4HadDecayGenerator::verboseLevel">verboseLevel</a>) {</td></tr>
+<tr><th id="66">66</th><td>    <a class="macro" href="../../../../../global/management/include/G4ios.hh.html#46" title="(*_G4cout_p())" data-ref="_M/G4cout">G4cout</a> <span class='error' title="invalid operands to binary expression (&apos;int&apos; and &apos;const char *&apos;)">&lt;&lt;</span> <q>" &gt;&gt;&gt; G4HadDecayGenerator"</q>;</td></tr>
+<tr><th id="67">67</th><td>    <b>if</b> (theAlgorithm) <a class="macro" href="../../../../../global/management/include/G4ios.hh.html#46" title="(*_G4cout_p())" data-ref="_M/G4cout">G4cout</a> <span class='error' title="invalid operands to binary expression (&apos;int&apos; and &apos;const char *&apos;)">&lt;&lt;</span> <q>" using "</q> &lt;&lt; theAlgorithm-&gt;GetName();</td></tr>
+<tr><th id="68">68</th><td>    <a class="macro" href="../../../../../global/management/include/G4ios.hh.html#46" title="(*_G4cout_p())" data-ref="_M/G4cout">G4cout</a> &lt;&lt; <a class="macro" href="../../../../../global/management/include/G4ios.hh.html#60" title="std::endl" data-ref="_M/G4endl">G4endl</a>;</td></tr>
+<tr><th id="69">69</th><td>  }</td></tr>
+<tr><th id="70">70</th><td>}</td></tr>
+<tr><th id="71">71</th><td></td></tr>
+<tr><th id="72">72</th><td><a class="type" href="../include/G4HadDecayGenerator.hh.html#G4HadDecayGenerator" title='G4HadDecayGenerator' data-ref="G4HadDecayGenerator">G4HadDecayGenerator</a>::<dfn class="decl def" id="_ZN19G4HadDecayGeneratorC1EP20G4VHadDecayAlgorithmi" title='G4HadDecayGenerator::G4HadDecayGenerator' data-ref="_ZN19G4HadDecayGeneratorC1EP20G4VHadDecayAlgorithmi">G4HadDecayGenerator</dfn>(<a class="type" href="../include/G4VHadDecayAlgorithm.hh.html#G4VHadDecayAlgorithm" title='G4VHadDecayAlgorithm' data-ref="G4VHadDecayAlgorithm">G4VHadDecayAlgorithm</a>* <dfn class="local col7 decl" id="17alg" title='alg' data-type='G4VHadDecayAlgorithm *' data-ref="17alg">alg</dfn>,</td></tr>
+<tr><th id="73">73</th><td>					 <a class="typedef" href="../../../../../global/management/include/G4Types.hh.html#G4int" title='G4int' data-type='int' data-ref="G4int">G4int</a> <dfn class="local col8 decl" id="18verbose" title='verbose' data-type='G4int' data-ref="18verbose">verbose</dfn>)</td></tr>
+<tr><th id="74">74</th><td>  : <a class="member" href="../include/G4HadDecayGenerator.hh.html#G4HadDecayGenerator::verboseLevel" title='G4HadDecayGenerator::verboseLevel' data-ref="G4HadDecayGenerator::verboseLevel">verboseLevel</a>(<a class="local col8 ref" href="#18verbose" title='verbose' data-ref="18verbose">verbose</a>), <a class="member" href="../include/G4HadDecayGenerator.hh.html#G4HadDecayGenerator::theAlgorithm" title='G4HadDecayGenerator::theAlgorithm' data-ref="G4HadDecayGenerator::theAlgorithm">theAlgorithm</a>(<a class="local col7 ref" href="#17alg" title='alg' data-ref="17alg">alg</a>) {</td></tr>
+<tr><th id="75">75</th><td>  <b>if</b> (<a class="member" href="../include/G4HadDecayGenerator.hh.html#G4HadDecayGenerator::verboseLevel" title='G4HadDecayGenerator::verboseLevel' data-ref="G4HadDecayGenerator::verboseLevel">verboseLevel</a>) {</td></tr>
+<tr><th id="76">76</th><td>    <a class="macro" href="../../../../../global/management/include/G4ios.hh.html#46" title="(*_G4cout_p())" data-ref="_M/G4cout">G4cout</a> <span class='error' title="invalid operands to binary expression (&apos;int&apos; and &apos;const char *&apos;)">&lt;&lt;</span> <q>" &gt;&gt;&gt; G4HadDecayGenerator"</q>;</td></tr>
+<tr><th id="77">77</th><td>    <b>if</b> (theAlgorithm) <a class="macro" href="../../../../../global/management/include/G4ios.hh.html#46" title="(*_G4cout_p())" data-ref="_M/G4cout">G4cout</a> <span class='error' title="invalid operands to binary expression (&apos;int&apos; and &apos;const char *&apos;)">&lt;&lt;</span> <q>" using "</q> &lt;&lt; theAlgorithm-&gt;GetName();</td></tr>
+<tr><th id="78">78</th><td>    <a class="macro" href="../../../../../global/management/include/G4ios.hh.html#46" title="(*_G4cout_p())" data-ref="_M/G4cout">G4cout</a> &lt;&lt; <a class="macro" href="../../../../../global/management/include/G4ios.hh.html#60" title="std::endl" data-ref="_M/G4endl">G4endl</a>;</td></tr>
+<tr><th id="79">79</th><td>  }</td></tr>
+<tr><th id="80">80</th><td>}</td></tr>
+<tr><th id="81">81</th><td></td></tr>
+<tr><th id="82">82</th><td><a class="type" href="../include/G4HadDecayGenerator.hh.html#G4HadDecayGenerator" title='G4HadDecayGenerator' data-ref="G4HadDecayGenerator">G4HadDecayGenerator</a>::<dfn class="virtual decl def" id="_ZN19G4HadDecayGeneratorD1Ev" title='G4HadDecayGenerator::~G4HadDecayGenerator' data-ref="_ZN19G4HadDecayGeneratorD1Ev">~G4HadDecayGenerator</dfn>() {</td></tr>
+<tr><th id="83">83</th><td>  <b>delete</b> <a class="member" href="../include/G4HadDecayGenerator.hh.html#G4HadDecayGenerator::theAlgorithm" title='G4HadDecayGenerator::theAlgorithm' data-ref="G4HadDecayGenerator::theAlgorithm">theAlgorithm</a>;</td></tr>
+<tr><th id="84">84</th><td>  <a class="member" href="../include/G4HadDecayGenerator.hh.html#G4HadDecayGenerator::theAlgorithm" title='G4HadDecayGenerator::theAlgorithm' data-ref="G4HadDecayGenerator::theAlgorithm">theAlgorithm</a> = <var>0</var>;</td></tr>
+<tr><th id="85">85</th><td>}</td></tr>
+<tr><th id="86">86</th><td></td></tr>
+<tr><th id="87">87</th><td></td></tr>
+<tr><th id="88">88</th><td><i>// Sanity checks -- throws exception if no algorithm chosen</i></td></tr>
+<tr><th id="89">89</th><td></td></tr>
+<tr><th id="90">90</th><td><em>void</em> <a class="type" href="../include/G4HadDecayGenerator.hh.html#G4HadDecayGenerator" title='G4HadDecayGenerator' data-ref="G4HadDecayGenerator">G4HadDecayGenerator</a>::<dfn class="decl def" id="_ZNK19G4HadDecayGenerator22ReportInvalidAlgorithmENS_9AlgorithmE" title='G4HadDecayGenerator::ReportInvalidAlgorithm' data-ref="_ZNK19G4HadDecayGenerator22ReportInvalidAlgorithmENS_9AlgorithmE">ReportInvalidAlgorithm</dfn>(<a class="type" href="../include/G4HadDecayGenerator.hh.html#G4HadDecayGenerator::Algorithm" title='G4HadDecayGenerator::Algorithm' data-ref="G4HadDecayGenerator::Algorithm">Algorithm</a> <dfn class="local col9 decl" id="19alg" title='alg' data-type='G4HadDecayGenerator::Algorithm' data-ref="19alg">alg</dfn>) <em>const</em> {</td></tr>
+<tr><th id="91">91</th><td>  <b>if</b> (verboseLevel) </td></tr>
+<tr><th id="92">92</th><td>    <a class="macro" href="../../../../../global/management/include/G4ios.hh.html#47" title="(*_G4cerr_p())" data-ref="_M/G4cerr">G4cerr</a> <span class='error' title="invalid operands to binary expression (&apos;int&apos; and &apos;const char *&apos;)">&lt;&lt;</span> <q>"G4HadDecayGenerator: bad algorithm code "</q> &lt;&lt; alg &lt;&lt; <a class="macro" href="../../../../../global/management/include/G4ios.hh.html#60" title="std::endl" data-ref="_M/G4endl">G4endl</a>;</td></tr>
+<tr><th id="93">93</th><td></td></tr>
+<tr><th id="94">94</th><td>  <b>throw</b> <a class="type" href="../../../util/include/G4HadronicException.hh.html#G4HadronicException" title='G4HadronicException' data-ref="G4HadronicException">G4HadronicException</a><a class="ref" href="../../../util/include/G4HadronicException.hh.html#_ZN19G4HadronicExceptionC1E8G4StringiS0_" title='G4HadronicException::G4HadronicException' data-ref="_ZN19G4HadronicExceptionC1E8G4StringiS0_">(</a><span class="macro" title="&quot;/home/jishin/app/geant4/1005p1/geant4.10.05.p01/source/processes/hadronic/models/util/src/G4HadDecayGenerator.cc&quot;" data-ref="_M/__FILE__">__FILE__</span>, <span class="macro" title="94" data-ref="_M/__LINE__">__LINE__</span>, <a class="ref fake" href="../../../../../global/management/include/G4String.hh.html#_ZN8G4StringC1EPKc" title='G4String::G4String' data-ref="_ZN8G4StringC1EPKc"></a><q>"Invalid algorithm code"</q>);</td></tr>
+<tr><th id="95">95</th><td>}</td></tr>
+<tr><th id="96">96</th><td></td></tr>
+<tr><th id="97">97</th><td><em>void</em> <a class="type" href="../include/G4HadDecayGenerator.hh.html#G4HadDecayGenerator" title='G4HadDecayGenerator' data-ref="G4HadDecayGenerator">G4HadDecayGenerator</a>::<dfn class="decl def" id="_ZNK19G4HadDecayGenerator22ReportMissingAlgorithmEv" title='G4HadDecayGenerator::ReportMissingAlgorithm' data-ref="_ZNK19G4HadDecayGenerator22ReportMissingAlgorithmEv">ReportMissingAlgorithm</dfn>() <em>const</em> {</td></tr>
+<tr><th id="98">98</th><td>  <b>if</b> (verboseLevel) </td></tr>
+<tr><th id="99">99</th><td>    <a class="macro" href="../../../../../global/management/include/G4ios.hh.html#47" title="(*_G4cerr_p())" data-ref="_M/G4cerr">G4cerr</a> <span class='error' title="invalid operands to binary expression (&apos;int&apos; and &apos;const char *&apos;)">&lt;&lt;</span> <q>"G4HadDecayGenerator: no algorithm specified"</q> &lt;&lt; <a class="macro" href="../../../../../global/management/include/G4ios.hh.html#60" title="std::endl" data-ref="_M/G4endl">G4endl</a>;</td></tr>
+<tr><th id="100">100</th><td></td></tr>
+<tr><th id="101">101</th><td>  <b>throw</b> <a class="type" href="../../../util/include/G4HadronicException.hh.html#G4HadronicException" title='G4HadronicException' data-ref="G4HadronicException">G4HadronicException</a><a class="ref" href="../../../util/include/G4HadronicException.hh.html#_ZN19G4HadronicExceptionC1E8G4StringiS0_" title='G4HadronicException::G4HadronicException' data-ref="_ZN19G4HadronicExceptionC1E8G4StringiS0_">(</a><span class="macro" title="&quot;/home/jishin/app/geant4/1005p1/geant4.10.05.p01/source/processes/hadronic/models/util/src/G4HadDecayGenerator.cc&quot;" data-ref="_M/__FILE__">__FILE__</span>, <span class="macro" title="101" data-ref="_M/__LINE__">__LINE__</span>, <a class="ref fake" href="../../../../../global/management/include/G4String.hh.html#_ZN8G4StringC1EPKc" title='G4String::G4String' data-ref="_ZN8G4StringC1EPKc"></a><q>"Null algorithm pointer"</q>);</td></tr>
+<tr><th id="102">102</th><td>}</td></tr>
+<tr><th id="103">103</th><td></td></tr>
+<tr><th id="104">104</th><td></td></tr>
+<tr><th id="105">105</th><td><i>// Enable (or disable if 0) diagnostic messages</i></td></tr>
+<tr><th id="106">106</th><td><em>void</em> <a class="type" href="../include/G4HadDecayGenerator.hh.html#G4HadDecayGenerator" title='G4HadDecayGenerator' data-ref="G4HadDecayGenerator">G4HadDecayGenerator</a>::<dfn class="decl def" id="_ZN19G4HadDecayGenerator15SetVerboseLevelEi" title='G4HadDecayGenerator::SetVerboseLevel' data-ref="_ZN19G4HadDecayGenerator15SetVerboseLevelEi">SetVerboseLevel</dfn>(<a class="typedef" href="../../../../../global/management/include/G4Types.hh.html#G4int" title='G4int' data-type='int' data-ref="G4int">G4int</a> <dfn class="local col0 decl" id="20verbose" title='verbose' data-type='G4int' data-ref="20verbose">verbose</dfn>) {</td></tr>
+<tr><th id="107">107</th><td>  <a class="member" href="../include/G4HadDecayGenerator.hh.html#G4HadDecayGenerator::verboseLevel" title='G4HadDecayGenerator::verboseLevel' data-ref="G4HadDecayGenerator::verboseLevel">verboseLevel</a> = <a class="local col0 ref" href="#20verbose" title='verbose' data-ref="20verbose">verbose</a>;</td></tr>
+<tr><th id="108">108</th><td>  <b>if</b> (<a class="member" href="../include/G4HadDecayGenerator.hh.html#G4HadDecayGenerator::theAlgorithm" title='G4HadDecayGenerator::theAlgorithm' data-ref="G4HadDecayGenerator::theAlgorithm">theAlgorithm</a>) <a class="member" href="../include/G4HadDecayGenerator.hh.html#G4HadDecayGenerator::theAlgorithm" title='G4HadDecayGenerator::theAlgorithm' data-ref="G4HadDecayGenerator::theAlgorithm">theAlgorithm</a>-&gt;<a class="virtual ref" href="../include/G4VHadDecayAlgorithm.hh.html#_ZN20G4VHadDecayAlgorithm15SetVerboseLevelEi" title='G4VHadDecayAlgorithm::SetVerboseLevel' data-ref="_ZN20G4VHadDecayAlgorithm15SetVerboseLevelEi">SetVerboseLevel</a>(<a class="local col0 ref" href="#20verbose" title='verbose' data-ref="20verbose">verbose</a>);</td></tr>
+<tr><th id="109">109</th><td>}</td></tr>
+<tr><th id="110">110</th><td></td></tr>
+<tr><th id="111">111</th><td><em>const</em> <a class="type" href="../../../../../global/management/include/G4String.hh.html#G4String" title='G4String' data-ref="G4String">G4String</a>&amp; <a class="type" href="../include/G4HadDecayGenerator.hh.html#G4HadDecayGenerator" title='G4HadDecayGenerator' data-ref="G4HadDecayGenerator">G4HadDecayGenerator</a>::<dfn class="decl def" id="_ZNK19G4HadDecayGenerator16GetAlgorithmNameEv" title='G4HadDecayGenerator::GetAlgorithmName' data-ref="_ZNK19G4HadDecayGenerator16GetAlgorithmNameEv">GetAlgorithmName</dfn>() <em>const</em> {</td></tr>
+<tr><th id="112">112</th><td>  <em>static</em> <em>const</em> <a class="type" href="../../../../../global/management/include/G4String.hh.html#G4String" title='G4String' data-ref="G4String">G4String</a>&amp; <dfn class="local col1 decl" id="21none" title='none' data-type='const G4String &amp;' data-ref="21none">none</dfn> = <a class="ref fake" href="../../../../../global/management/include/G4String.hh.html#_ZN8G4StringC1EPKc" title='G4String::G4String' data-ref="_ZN8G4StringC1EPKc"></a><q>"NONE"</q>;</td></tr>
+<tr><th id="113">113</th><td>  <b>return</b> (<a class="member" href="../include/G4HadDecayGenerator.hh.html#G4HadDecayGenerator::theAlgorithm" title='G4HadDecayGenerator::theAlgorithm' data-ref="G4HadDecayGenerator::theAlgorithm">theAlgorithm</a> ? <a class="member" href="../include/G4HadDecayGenerator.hh.html#G4HadDecayGenerator::theAlgorithm" title='G4HadDecayGenerator::theAlgorithm' data-ref="G4HadDecayGenerator::theAlgorithm">theAlgorithm</a>-&gt;<a class="ref" href="../include/G4VHadDecayAlgorithm.hh.html#_ZNK20G4VHadDecayAlgorithm7GetNameEv" title='G4VHadDecayAlgorithm::GetName' data-ref="_ZNK20G4VHadDecayAlgorithm7GetNameEv">GetName</a>() : <a class="local col1 ref" href="#21none" title='none' data-ref="21none">none</a>);</td></tr>
+<tr><th id="114">114</th><td>}</td></tr>
+<tr><th id="115">115</th><td></td></tr>
+<tr><th id="116">116</th><td></td></tr>
+<tr><th id="117">117</th><td><i>// Initial state (rest mass) and list of final masses</i></td></tr>
+<tr><th id="118">118</th><td></td></tr>
+<tr><th id="119">119</th><td>G4bool </td></tr>
+<tr><th id="120">120</th><td>G4HadDecayGenerator::Generate(G4double initialMass,</td></tr>
+<tr><th id="121">121</th><td>				   <em>const</em> <span class='error' title="use of undeclared identifier &apos;std&apos;">std</span>::vector<span class='error' title="expected &apos;)&apos;">&lt;</span>G4double&gt;&amp; masses,</td></tr>
+<tr><th id="122">122</th><td>				   std::vector&lt;G4LorentzVector&gt;&amp; finalState) {</td></tr>
+<tr><th id="123">123</th><td>  <b>if</b> (verboseLevel) </td></tr>
+<tr><th id="124">124</th><td>    <a class="macro" href="../../../../../global/management/include/G4ios.hh.html#46" title="(*_G4cout_p())" data-ref="_M/G4cout">G4cout</a> <span class='error' title="invalid operands to binary expression (&apos;int&apos; and &apos;const char *&apos;)">&lt;&lt;</span> <q>" &gt;&gt;&gt; G4HadDecayGenerator::Generate (mass)"</q> &lt;&lt; <a class="macro" href="../../../../../global/management/include/G4ios.hh.html#60" title="std::endl" data-ref="_M/G4endl">G4endl</a>;</td></tr>
+<tr><th id="125">125</th><td></td></tr>
+<tr><th id="126">126</th><td>  <b>if</b> (!theAlgorithm) ReportMissingAlgorithm();</td></tr>
+<tr><th id="127">127</th><td></td></tr>
+<tr><th id="128">128</th><td>  <b>if</b> (<span class='error' title="use of undeclared identifier &apos;masses&apos;">masses</span>.size() == <var>1U</var>)</td></tr>
+<tr><th id="129">129</th><td>    <b>return</b> GenerateOneBody(initialMass, <span class='error' title="use of undeclared identifier &apos;masses&apos;">masses</span>, <span class='error' title="use of undeclared identifier &apos;finalState&apos;">finalState</span>);</td></tr>
+<tr><th id="130">130</th><td></td></tr>
+<tr><th id="131">131</th><td>  theAlgorithm-&gt;Generate(initialMass, <span class='error' title="use of undeclared identifier &apos;masses&apos;">masses</span>, <span class='error' title="use of undeclared identifier &apos;finalState&apos;">finalState</span>);</td></tr>
+<tr><th id="132">132</th><td>  <b>return</b> !<span class='error' title="use of undeclared identifier &apos;finalState&apos;">finalState</span>.empty();		<i>// Generator failure returns empty state</i></td></tr>
+<tr><th id="133">133</th><td>}</td></tr>
+<tr><th id="134">134</th><td></td></tr>
+<tr><th id="135">135</th><td><i>// Initial state particle and list of final masses</i></td></tr>
+<tr><th id="136">136</th><td></td></tr>
+<tr><th id="137">137</th><td>G4bool </td></tr>
+<tr><th id="138">138</th><td>G4HadDecayGenerator::Generate(<em>const</em> G4ParticleDefinition* initialPD,</td></tr>
+<tr><th id="139">139</th><td>				   <em>const</em> <span class='error' title="use of undeclared identifier &apos;std&apos;">std</span>::vector<span class='error' title="expected &apos;)&apos;">&lt;</span>G4double&gt;&amp; masses,</td></tr>
+<tr><th id="140">140</th><td>				   std::vector&lt;G4LorentzVector&gt;&amp; finalState) {</td></tr>
+<tr><th id="141">141</th><td>  <b>if</b> (verboseLevel) </td></tr>
+<tr><th id="142">142</th><td>    <a class="macro" href="../../../../../global/management/include/G4ios.hh.html#46" title="(*_G4cout_p())" data-ref="_M/G4cout">G4cout</a> <span class='error' title="invalid operands to binary expression (&apos;int&apos; and &apos;const char *&apos;)">&lt;&lt;</span> <q>" &gt;&gt;&gt; G4HadDecayGenerator::Generate (particle)"</q> &lt;&lt; <a class="macro" href="../../../../../global/management/include/G4ios.hh.html#60" title="std::endl" data-ref="_M/G4endl">G4endl</a>;</td></tr>
+<tr><th id="143">143</th><td></td></tr>
+<tr><th id="144">144</th><td>  <b>return</b> (initialPD &amp;&amp; Generate(initialPD-&gt;GetPDGMass(), <span class='error' title="use of undeclared identifier &apos;masses&apos;">masses</span>, <span class='error' title="use of undeclared identifier &apos;finalState&apos;">finalState</span>));</td></tr>
+<tr><th id="145">145</th><td>}</td></tr>
+<tr><th id="146">146</th><td></td></tr>
+<tr><th id="147">147</th><td><i>// Final state particles will be boosted to initial-state frame</i></td></tr>
+<tr><th id="148">148</th><td></td></tr>
+<tr><th id="149">149</th><td>G4bool </td></tr>
+<tr><th id="150">150</th><td>G4HadDecayGenerator::Generate(<em>const</em> G4LorentzVector&amp; initialState,</td></tr>
+<tr><th id="151">151</th><td>				   <em>const</em> <span class='error' title="use of undeclared identifier &apos;std&apos;">std</span>::vector<span class='error' title="expected &apos;)&apos;">&lt;</span>G4double&gt;&amp; masses,</td></tr>
+<tr><th id="152">152</th><td>			      std::vector&lt;G4LorentzVector&gt;&amp; finalState) {</td></tr>
+<tr><th id="153">153</th><td>  <b>if</b> (verboseLevel) </td></tr>
+<tr><th id="154">154</th><td>    <a class="macro" href="../../../../../global/management/include/G4ios.hh.html#46" title="(*_G4cout_p())" data-ref="_M/G4cout">G4cout</a> <span class='error' title="invalid operands to binary expression (&apos;int&apos; and &apos;const char *&apos;)">&lt;&lt;</span> <q>" &gt;&gt;&gt; G4HadDecayGenerator::Generate (frame)"</q> &lt;&lt; <a class="macro" href="../../../../../global/management/include/G4ios.hh.html#60" title="std::endl" data-ref="_M/G4endl">G4endl</a>;</td></tr>
+<tr><th id="155">155</th><td></td></tr>
+<tr><th id="156">156</th><td>  G4bool good = Generate(initialState.m(), <span class='error' title="use of undeclared identifier &apos;masses&apos;">masses</span>, <span class='error' title="use of undeclared identifier &apos;finalState&apos;">finalState</span>);</td></tr>
+<tr><th id="157">157</th><td>  <b>if</b> (good) {</td></tr>
+<tr><th id="158">158</th><td>    G4ThreeVector bv = initialState.boostVector();</td></tr>
+<tr><th id="159">159</th><td>    <b>for</b> (<span class='error' title="unknown type name &apos;size_t&apos;">size_t</span> i=<var>0</var>; i&lt;<span class='error' title="use of undeclared identifier &apos;finalState&apos;">finalState</span>.size(); i++) {</td></tr>
+<tr><th id="160">160</th><td>      <span class='error' title="use of undeclared identifier &apos;finalState&apos;">finalState</span>[i].boost(bv);</td></tr>
+<tr><th id="161">161</th><td>    }</td></tr>
+<tr><th id="162">162</th><td>  }</td></tr>
+<tr><th id="163">163</th><td></td></tr>
+<tr><th id="164">164</th><td>  <b>return</b> good;</td></tr>
+<tr><th id="165">165</th><td>}</td></tr>
+<tr><th id="166">166</th><td></td></tr>
+<tr><th id="167">167</th><td></td></tr>
+<tr><th id="168">168</th><td><i>// Handle special case of "one body decay" (used for kaon mixing)</i></td></tr>
+<tr><th id="169">169</th><td></td></tr>
+<tr><th id="170">170</th><td>G4bool G4HadDecayGenerator::</td></tr>
+<tr><th id="171">171</th><td>GenerateOneBody(G4double initialMass,</td></tr>
+<tr><th id="172">172</th><td>		<em>const</em> <span class='error' title="use of undeclared identifier &apos;std&apos;">std</span>::vector<span class='error' title="expected &apos;)&apos;">&lt;</span>G4double&gt;&amp; masses,</td></tr>
+<tr><th id="173">173</th><td>		std::vector&lt;G4LorentzVector&gt;&amp; finalState) <em>const</em> {</td></tr>
+<tr><th id="174">174</th><td>  <b>if</b> (verboseLevel&gt;<var>1</var>) </td></tr>
+<tr><th id="175">175</th><td>    <a class="macro" href="../../../../../global/management/include/G4ios.hh.html#46" title="(*_G4cout_p())" data-ref="_M/G4cout">G4cout</a> <span class='error' title="invalid operands to binary expression (&apos;int&apos; and &apos;const char *&apos;)">&lt;&lt;</span> <q>" &gt;&gt;&gt; G4HadDecayGenerator::GenerateOneBody"</q> &lt;&lt; <a class="macro" href="../../../../../global/management/include/G4ios.hh.html#60" title="std::endl" data-ref="_M/G4endl">G4endl</a>;</td></tr>
+<tr><th id="176">176</th><td></td></tr>
+<tr><th id="177">177</th><td>  <i>// Initialization and sanity checks</i></td></tr>
+<tr><th id="178">178</th><td>  <span class='error' title="use of undeclared identifier &apos;finalState&apos;">finalState</span>.clear();</td></tr>
+<tr><th id="179">179</th><td></td></tr>
+<tr><th id="180">180</th><td>  <b>if</b> (<span class='error' title="use of undeclared identifier &apos;masses&apos;">masses</span>.size() != <var>1U</var>) <b>return</b> <b>false</b>;	<i>// Should not have been called</i></td></tr>
+<tr><th id="181">181</th><td>  <b>if</b> (<span class='error' title="use of undeclared identifier &apos;std&apos;">std</span>::fabs(initialMass-<span class='error' title="use of undeclared identifier &apos;masses&apos;">masses</span>[<var>0</var>]) &gt; eV) <b>return</b> <b>false</b>;</td></tr>
+<tr><th id="182">182</th><td></td></tr>
+<tr><th id="183">183</th><td>  <b>if</b> (verboseLevel&gt;<var>2</var>) <a class="macro" href="../../../../../global/management/include/G4ios.hh.html#46" title="(*_G4cout_p())" data-ref="_M/G4cout">G4cout</a> <span class='error' title="invalid operands to binary expression (&apos;int&apos; and &apos;const char *&apos;)">&lt;&lt;</span> <q>" finalState mass = "</q> &lt;&lt; <span class='error' title="use of undeclared identifier &apos;masses&apos;">masses</span>[<var>0</var>] &lt;&lt; <a class="macro" href="../../../../../global/management/include/G4ios.hh.html#60" title="std::endl" data-ref="_M/G4endl">G4endl</a>;</td></tr>
+<tr><th id="184">184</th><td></td></tr>
+<tr><th id="185">185</th><td>  <span class='error' title="use of undeclared identifier &apos;finalState&apos;">finalState</span>.push_back(G4LorentzVector(<var>0.</var>,<var>0.</var>,<var>0.</var>,<span class='error' title="use of undeclared identifier &apos;masses&apos;">masses</span>[<var>0</var>]));</td></tr>
+<tr><th id="186">186</th><td>  <b>return</b> <b>true</b>;</td></tr>
+<tr><th id="187">187</th><td>}</td></tr>
+<tr><th id="188">188</th><td></td></tr>
+</table><hr/><p id='footer'>
+Generated on <em>2019-Aug-28</em> from project codebrowser<br />Powered by <a href='https://woboq.com'><img alt='Woboq' src='https://code.woboq.org/woboq-16.png' width='41' height='16' /></a> <a href='https://code.woboq.org'>Code Browser</a> 2.1
+<br/>Generator usage only permitted with license.</p>
+</div></body></html>

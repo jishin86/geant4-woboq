@@ -1,0 +1,383 @@
+<!doctype html>
+<html>
+<head>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"><title>G4IonParametrisedLossModel.hh source code [codebrowser/source/processes/electromagnetic/lowenergy/include/G4IonParametrisedLossModel.hh] - Woboq Code Browser</title>
+<meta name="woboq:interestingDefinitions" content="G4IonParametrisedLossModel "/>
+<link rel="stylesheet" href="../../../../../../../data/qtcreator.css" title="QtCreator"/>
+<link rel="alternate stylesheet" href="../../../../../../../data/kdevelop.css" title="KDevelop"/>
+<script type="text/javascript" src="../../../../../../../data/jquery/jquery.min.js"></script>
+<script type="text/javascript" src="../../../../../../../data/jquery/jquery-ui.min.js"></script>
+<script>var file = 'codebrowser/source/processes/electromagnetic/lowenergy/include/G4IonParametrisedLossModel.hh'; var root_path = '../../../../../..'; var data_path = '../../../../../../../data';</script>
+<script src='../../../../../../../data/codebrowser.js'></script>
+</head>
+<body><div id='header'><h1 id='breadcrumb'><span>Browse the source code of </span><a href='../../../../..'>codebrowser</a>/<a href='../../../..'>source</a>/<a href='../../..'>processes</a>/<a href='../..'>electromagnetic</a>/<a href='..'>lowenergy</a>/<a href='./'>include</a>/<a href='G4IonParametrisedLossModel.hh.html'>G4IonParametrisedLossModel.hh</a></h1></div>
+<hr/><div id='content'><table class="code">
+<tr><th id="1">1</th><td><i>//</i></td></tr>
+<tr><th id="2">2</th><td><i>// ********************************************************************</i></td></tr>
+<tr><th id="3">3</th><td><i>// * License and Disclaimer                                           *</i></td></tr>
+<tr><th id="4">4</th><td><i>// *                                                                  *</i></td></tr>
+<tr><th id="5">5</th><td><i>// * The  Geant4 software  is  copyright of the Copyright Holders  of *</i></td></tr>
+<tr><th id="6">6</th><td><i>// * the Geant4 Collaboration.  It is provided  under  the terms  and *</i></td></tr>
+<tr><th id="7">7</th><td><i>// * conditions of the Geant4 Software License,  included in the file *</i></td></tr>
+<tr><th id="8">8</th><td><i>// * LICENSE and available at  <a href="http://cern.ch/geant4/license">http://cern.ch/geant4/license</a> .  These *</i></td></tr>
+<tr><th id="9">9</th><td><i>// * include a list of copyright holders.                             *</i></td></tr>
+<tr><th id="10">10</th><td><i>// *                                                                  *</i></td></tr>
+<tr><th id="11">11</th><td><i>// * Neither the authors of this software system, nor their employing *</i></td></tr>
+<tr><th id="12">12</th><td><i>// * institutes,nor the agencies providing financial support for this *</i></td></tr>
+<tr><th id="13">13</th><td><i>// * work  make  any representation or  warranty, express or implied, *</i></td></tr>
+<tr><th id="14">14</th><td><i>// * regarding  this  software system or assume any liability for its *</i></td></tr>
+<tr><th id="15">15</th><td><i>// * use.  Please see the license in the file  LICENSE  and URL above *</i></td></tr>
+<tr><th id="16">16</th><td><i>// * for the full disclaimer and the limitation of liability.         *</i></td></tr>
+<tr><th id="17">17</th><td><i>// *                                                                  *</i></td></tr>
+<tr><th id="18">18</th><td><i>// * This  code  implementation is the result of  the  scientific and *</i></td></tr>
+<tr><th id="19">19</th><td><i>// * technical work of the GEANT4 collaboration.                      *</i></td></tr>
+<tr><th id="20">20</th><td><i>// * By using,  copying,  modifying or  distributing the software (or *</i></td></tr>
+<tr><th id="21">21</th><td><i>// * any work based  on the software)  you  agree  to acknowledge its *</i></td></tr>
+<tr><th id="22">22</th><td><i>// * use  in  resulting  scientific  publications,  and indicate your *</i></td></tr>
+<tr><th id="23">23</th><td><i>// * acceptance of all terms of the Geant4 Software license.          *</i></td></tr>
+<tr><th id="24">24</th><td><i>// ********************************************************************</i></td></tr>
+<tr><th id="25">25</th><td><i>//</i></td></tr>
+<tr><th id="26">26</th><td><i>//</i></td></tr>
+<tr><th id="27">27</th><td><i>// ===========================================================================</i></td></tr>
+<tr><th id="28">28</th><td><i>// GEANT4 class header file</i></td></tr>
+<tr><th id="29">29</th><td><i>//</i></td></tr>
+<tr><th id="30">30</th><td><i>// Class:                G4IonParametrisedLossModel</i></td></tr>
+<tr><th id="31">31</th><td><i>//</i></td></tr>
+<tr><th id="32">32</th><td><i>// Base class:           G4VEmModel (utils)</i></td></tr>
+<tr><th id="33">33</th><td><i>// </i></td></tr>
+<tr><th id="34">34</th><td><i>// Author:               Anton Lechner (Anton.Lechner@cern.ch)</i></td></tr>
+<tr><th id="35">35</th><td><i>//</i></td></tr>
+<tr><th id="36">36</th><td><i>// First implementation: 10. 11. 2008</i></td></tr>
+<tr><th id="37">37</th><td><i>//</i></td></tr>
+<tr><th id="38">38</th><td><i>// Modifications: 03. 02. 2009 - Bug fix iterators (AL)</i></td></tr>
+<tr><th id="39">39</th><td><i>//                11. 03. 2009 - Introduced new table handler(G4IonDEDXHandler)</i></td></tr>
+<tr><th id="40">40</th><td><i>//                               and modified method to add/remove tables </i></td></tr>
+<tr><th id="41">41</th><td><i>//                               (tables are now built in init. phase),</i></td></tr>
+<tr><th id="42">42</th><td><i>//                               Minor bug fix in ComputeDEDXPerVolume (AL) </i></td></tr>
+<tr><th id="43">43</th><td><i>//                12. 11. 2009 - Added function for switching off scaling </i></td></tr>
+<tr><th id="44">44</th><td><i>//                               of heavy ions from ICRU 73 data</i></td></tr>
+<tr><th id="45">45</th><td><i>//                20. 11. 2009 - Added set-method for energy loss limit (AL)</i></td></tr>
+<tr><th id="46">46</th><td><i>//                24. 11. 2009 - Bug fix: Range calculation corrected if same </i></td></tr>
+<tr><th id="47">47</th><td><i>//                               materials appears with different cuts in diff.</i></td></tr>
+<tr><th id="48">48</th><td><i>//                               regions (added UpdateRangeCache function and</i></td></tr>
+<tr><th id="49">49</th><td><i>//                               modified BuildRangeVector, ComputeLossForStep</i></td></tr>
+<tr><th id="50">50</th><td><i>//                               functions accordingly, added new cache param.,</i></td></tr>
+<tr><th id="51">51</th><td><i>//                               changed typdef of IonMatCouple).</i></td></tr>
+<tr><th id="52">52</th><td><i>//                             - Removed GetRange function (AL)  </i></td></tr>
+<tr><th id="53">53</th><td><i>//</i></td></tr>
+<tr><th id="54">54</th><td><i>// Class description:</i></td></tr>
+<tr><th id="55">55</th><td><i>//    Model for computing the energy loss of ions by employing a </i></td></tr>
+<tr><th id="56">56</th><td><i>//    parameterisation of dE/dx tables (default ICRU 73 tables). For </i></td></tr>
+<tr><th id="57">57</th><td><i>//    ion-material combinations and/or projectile energies not covered </i></td></tr>
+<tr><th id="58">58</th><td><i>//    by this model, the G4BraggIonModel and G4BetheBloch models are</i></td></tr>
+<tr><th id="59">59</th><td><i>//    employed.</i></td></tr>
+<tr><th id="60">60</th><td><i>//</i></td></tr>
+<tr><th id="61">61</th><td><i>// Comments:</i></td></tr>
+<tr><th id="62">62</th><td><i>//</i></td></tr>
+<tr><th id="63">63</th><td><i>// =========================================================================== </i></td></tr>
+<tr><th id="64">64</th><td></td></tr>
+<tr><th id="65">65</th><td></td></tr>
+<tr><th id="66">66</th><td><u>#<span data-ppcond="66">ifndef</span> <span class="macro" data-ref="_M/G4IONPARAMETRISEDLOSSMODEL_HH">G4IONPARAMETRISEDLOSSMODEL_HH</span></u></td></tr>
+<tr><th id="67">67</th><td><u>#define <dfn class="macro" id="_M/G4IONPARAMETRISEDLOSSMODEL_HH" data-ref="_M/G4IONPARAMETRISEDLOSSMODEL_HH">G4IONPARAMETRISEDLOSSMODEL_HH</dfn></u></td></tr>
+<tr><th id="68">68</th><td></td></tr>
+<tr><th id="69">69</th><td><u>#include <span class='error' title="&apos;iomanip&apos; file not found">&lt;</span>iomanip&gt;</u></td></tr>
+<tr><th id="70">70</th><td><u>#include &lt;list&gt;</u></td></tr>
+<tr><th id="71">71</th><td><u>#include &lt;map&gt;</u></td></tr>
+<tr><th id="72">72</th><td><u>#include &lt;utility&gt;</u></td></tr>
+<tr><th id="73">73</th><td><u>#include <a href="../../../../externals/clhep/include/CLHEP/Units/PhysicalConstants.h.html">&lt;CLHEP/Units/PhysicalConstants.h&gt;</a></u></td></tr>
+<tr><th id="74">74</th><td></td></tr>
+<tr><th id="75">75</th><td><u>#include <a href="../../utils/include/G4VEmModel.hh.html">"G4VEmModel.hh"</a></u></td></tr>
+<tr><th id="76">76</th><td><u>#include <a href="../../utils/include/G4EmCorrections.hh.html">"G4EmCorrections.hh"</a></u></td></tr>
+<tr><th id="77">77</th><td><u>#include <a href="G4IonDEDXHandler.hh.html">"G4IonDEDXHandler.hh"</a></u></td></tr>
+<tr><th id="78">78</th><td></td></tr>
+<tr><th id="79">79</th><td><b>class</b> <dfn class="type" id="G4BraggIonModel" title='G4BraggIonModel' data-ref="G4BraggIonModel">G4BraggIonModel</dfn>;</td></tr>
+<tr><th id="80">80</th><td><b>class</b> <dfn class="type" id="G4BetheBlochModel" title='G4BetheBlochModel' data-ref="G4BetheBlochModel">G4BetheBlochModel</dfn>;</td></tr>
+<tr><th id="81">81</th><td><b>class</b> <a class="type" href="../../../../track/include/G4ParticleChangeForLoss.hh.html#G4ParticleChangeForLoss" title='G4ParticleChangeForLoss' data-ref="G4ParticleChangeForLoss" id="G4ParticleChangeForLoss">G4ParticleChangeForLoss</a>;</td></tr>
+<tr><th id="82">82</th><td><b>class</b> <a class="type" href="G4IonDEDXHandler.hh.html#G4VIonDEDXTable" title='G4VIonDEDXTable' data-ref="G4VIonDEDXTable" id="G4VIonDEDXTable">G4VIonDEDXTable</a>;</td></tr>
+<tr><th id="83">83</th><td><b>class</b> <a class="type" href="G4IonDEDXHandler.hh.html#G4VIonDEDXScalingAlgorithm" title='G4VIonDEDXScalingAlgorithm' data-ref="G4VIonDEDXScalingAlgorithm" id="G4VIonDEDXScalingAlgorithm">G4VIonDEDXScalingAlgorithm</a>;</td></tr>
+<tr><th id="84">84</th><td><b>class</b> <a class="type" href="../../../../global/management/include/G4LPhysicsFreeVector.hh.html#G4LPhysicsFreeVector" title='G4LPhysicsFreeVector' data-ref="G4LPhysicsFreeVector" id="G4LPhysicsFreeVector">G4LPhysicsFreeVector</a>;</td></tr>
+<tr><th id="85">85</th><td><b>class</b> <a class="type" href="../../../cuts/include/G4MaterialCutsCouple.hh.html#G4MaterialCutsCouple" title='G4MaterialCutsCouple' data-ref="G4MaterialCutsCouple" id="G4MaterialCutsCouple">G4MaterialCutsCouple</a>;</td></tr>
+<tr><th id="86">86</th><td></td></tr>
+<tr><th id="87">87</th><td><b>typedef</b> <span class='error' title="use of undeclared identifier &apos;std&apos;">std</span>::list<span class='error' title="expected unqualified-id">&lt;</span>G4IonDEDXHandler*&gt; LossTableList;</td></tr>
+<tr><th id="88">88</th><td><b>typedef</b> <span class='error' title="use of undeclared identifier &apos;std&apos;">std</span>::pair<span class='error' title="expected unqualified-id">&lt;</span><em>const</em> G4ParticleDefinition*, </td></tr>
+<tr><th id="89">89</th><td>                  <em>const</em> G4MaterialCutsCouple*&gt; IonMatCouple;</td></tr>
+<tr><th id="90">90</th><td></td></tr>
+<tr><th id="91">91</th><td></td></tr>
+<tr><th id="92">92</th><td><b>class</b> <dfn class="type def" id="G4IonParametrisedLossModel" title='G4IonParametrisedLossModel' data-ref="G4IonParametrisedLossModel">G4IonParametrisedLossModel</dfn> : <b>public</b> <a class="type" href="../../utils/include/G4VEmModel.hh.html#G4VEmModel" title='G4VEmModel' data-ref="G4VEmModel">G4VEmModel</a> {</td></tr>
+<tr><th id="93">93</th><td></td></tr>
+<tr><th id="94">94</th><td> <b>public</b>:</td></tr>
+<tr><th id="95">95</th><td>   <dfn class="decl" id="_ZN26G4IonParametrisedLossModelC1EPK20G4ParticleDefinitionRK8G4String" title='G4IonParametrisedLossModel::G4IonParametrisedLossModel' data-ref="_ZN26G4IonParametrisedLossModelC1EPK20G4ParticleDefinitionRK8G4String">G4IonParametrisedLossModel</dfn>(<em>const</em> <a class="type" href="../../../../particles/management/include/G4ParticleDefinition.hh.html#G4ParticleDefinition" title='G4ParticleDefinition' data-ref="G4ParticleDefinition">G4ParticleDefinition</a>* <dfn class="local col0 decl" id="250particle" title='particle' data-type='const G4ParticleDefinition *' data-ref="250particle">particle</dfn> = <var>0</var>,</td></tr>
+<tr><th id="96">96</th><td>                              <em>const</em> <a class="type" href="../../../../global/management/include/G4String.hh.html#G4String" title='G4String' data-ref="G4String">G4String</a>&amp; <dfn class="local col1 decl" id="251name" title='name' data-type='const G4String &amp;' data-ref="251name">name</dfn> = <a class="ref fake" href="../../../../global/management/include/G4String.hh.html#_ZN8G4StringC1EPKc" title='G4String::G4String' data-ref="_ZN8G4StringC1EPKc"></a><q>"ParamICRU73"</q>);</td></tr>
+<tr><th id="97">97</th><td></td></tr>
+<tr><th id="98">98</th><td>   <b>virtual</b> <dfn class="virtual decl" id="_ZN26G4IonParametrisedLossModelD1Ev" title='G4IonParametrisedLossModel::~G4IonParametrisedLossModel' data-ref="_ZN26G4IonParametrisedLossModelD1Ev">~G4IonParametrisedLossModel</dfn>();</td></tr>
+<tr><th id="99">99</th><td></td></tr>
+<tr><th id="100">100</th><td>   <b>virtual</b> <em>void</em> <dfn class="virtual decl" id="_ZN26G4IonParametrisedLossModel10InitialiseEPK20G4ParticleDefinitionRK12G4DataVector" title='G4IonParametrisedLossModel::Initialise' data-ref="_ZN26G4IonParametrisedLossModel10InitialiseEPK20G4ParticleDefinitionRK12G4DataVector">Initialise</dfn>(</td></tr>
+<tr><th id="101">101</th><td>                           <em>const</em> <a class="type" href="../../../../particles/management/include/G4ParticleDefinition.hh.html#G4ParticleDefinition" title='G4ParticleDefinition' data-ref="G4ParticleDefinition">G4ParticleDefinition</a>*, <i>// Projectile</i></td></tr>
+<tr><th id="102">102</th><td>                           <em>const</em> <a class="type" href="../../../../global/management/include/G4DataVector.hh.html#G4DataVector" title='G4DataVector' data-ref="G4DataVector">G4DataVector</a>&amp;); <i>// Cut energies</i></td></tr>
+<tr><th id="103">103</th><td></td></tr>
+<tr><th id="104">104</th><td>   <b>virtual</b> <a class="typedef" href="../../../../global/management/include/G4Types.hh.html#G4double" title='G4double' data-type='double' data-ref="G4double">G4double</a> <dfn class="virtual decl" id="_ZN26G4IonParametrisedLossModel12MinEnergyCutEPK20G4ParticleDefinitionPK20G4MaterialCutsCouple" title='G4IonParametrisedLossModel::MinEnergyCut' data-ref="_ZN26G4IonParametrisedLossModel12MinEnergyCutEPK20G4ParticleDefinitionPK20G4MaterialCutsCouple">MinEnergyCut</dfn>(</td></tr>
+<tr><th id="105">105</th><td>                                 <em>const</em> <a class="type" href="../../../../particles/management/include/G4ParticleDefinition.hh.html#G4ParticleDefinition" title='G4ParticleDefinition' data-ref="G4ParticleDefinition">G4ParticleDefinition</a>*,  <i>// Projectile</i></td></tr>
+<tr><th id="106">106</th><td>		        	 <em>const</em> <a class="type" href="../../../cuts/include/G4MaterialCutsCouple.hh.html#G4MaterialCutsCouple" title='G4MaterialCutsCouple' data-ref="G4MaterialCutsCouple">G4MaterialCutsCouple</a>*);</td></tr>
+<tr><th id="107">107</th><td></td></tr>
+<tr><th id="108">108</th><td>   <b>virtual</b> <a class="typedef" href="../../../../global/management/include/G4Types.hh.html#G4double" title='G4double' data-type='double' data-ref="G4double">G4double</a> <dfn class="virtual decl" id="_ZN26G4IonParametrisedLossModel26ComputeCrossSectionPerAtomEPK20G4ParticleDefinitionddddd" title='G4IonParametrisedLossModel::ComputeCrossSectionPerAtom' data-ref="_ZN26G4IonParametrisedLossModel26ComputeCrossSectionPerAtomEPK20G4ParticleDefinitionddddd">ComputeCrossSectionPerAtom</dfn>(</td></tr>
+<tr><th id="109">109</th><td>                                 <em>const</em> <a class="type" href="../../../../particles/management/include/G4ParticleDefinition.hh.html#G4ParticleDefinition" title='G4ParticleDefinition' data-ref="G4ParticleDefinition">G4ParticleDefinition</a>*, <i>// Projectile</i></td></tr>
+<tr><th id="110">110</th><td>				 <a class="typedef" href="../../../../global/management/include/G4Types.hh.html#G4double" title='G4double' data-type='double' data-ref="G4double">G4double</a>,  <i>// Kinetic energy of projectile</i></td></tr>
+<tr><th id="111">111</th><td>				 <a class="typedef" href="../../../../global/management/include/G4Types.hh.html#G4double" title='G4double' data-type='double' data-ref="G4double">G4double</a>,  <i>// Atomic number</i></td></tr>
+<tr><th id="112">112</th><td>                                 <a class="typedef" href="../../../../global/management/include/G4Types.hh.html#G4double" title='G4double' data-type='double' data-ref="G4double">G4double</a>,  <i>// Mass number</i></td></tr>
+<tr><th id="113">113</th><td>				 <a class="typedef" href="../../../../global/management/include/G4Types.hh.html#G4double" title='G4double' data-type='double' data-ref="G4double">G4double</a>,  <i>// Energy cut for secondary prod.</i></td></tr>
+<tr><th id="114">114</th><td>				 <a class="typedef" href="../../../../global/management/include/G4Types.hh.html#G4double" title='G4double' data-type='double' data-ref="G4double">G4double</a>); <i>// Maximum energy of secondaries</i></td></tr>
+<tr><th id="115">115</th><td>				 				 </td></tr>
+<tr><th id="116">116</th><td>   <b>virtual</b> <a class="typedef" href="../../../../global/management/include/G4Types.hh.html#G4double" title='G4double' data-type='double' data-ref="G4double">G4double</a> <dfn class="virtual decl" id="_ZN26G4IonParametrisedLossModel21CrossSectionPerVolumeEPK10G4MaterialPK20G4ParticleDefinitionddd" title='G4IonParametrisedLossModel::CrossSectionPerVolume' data-ref="_ZN26G4IonParametrisedLossModel21CrossSectionPerVolumeEPK10G4MaterialPK20G4ParticleDefinitionddd">CrossSectionPerVolume</dfn>(</td></tr>
+<tr><th id="117">117</th><td>                                 <em>const</em> <a class="type" href="../../../../materials/include/G4Material.hh.html#G4Material" title='G4Material' data-ref="G4Material">G4Material</a>*,  <i>// Target material</i></td></tr>
+<tr><th id="118">118</th><td>				 <em>const</em> <a class="type" href="../../../../particles/management/include/G4ParticleDefinition.hh.html#G4ParticleDefinition" title='G4ParticleDefinition' data-ref="G4ParticleDefinition">G4ParticleDefinition</a>*, <i>// Projectile</i></td></tr>
+<tr><th id="119">119</th><td>				 <a class="typedef" href="../../../../global/management/include/G4Types.hh.html#G4double" title='G4double' data-type='double' data-ref="G4double">G4double</a>,  <i>// Kinetic energy</i></td></tr>
+<tr><th id="120">120</th><td>				 <a class="typedef" href="../../../../global/management/include/G4Types.hh.html#G4double" title='G4double' data-type='double' data-ref="G4double">G4double</a>,  <i>// Energy cut for secondary prod.</i></td></tr>
+<tr><th id="121">121</th><td>				 <a class="typedef" href="../../../../global/management/include/G4Types.hh.html#G4double" title='G4double' data-type='double' data-ref="G4double">G4double</a>); <i>// Maximum energy of secondaries</i></td></tr>
+<tr><th id="122">122</th><td>				 </td></tr>
+<tr><th id="123">123</th><td>   <b>virtual</b> <a class="typedef" href="../../../../global/management/include/G4Types.hh.html#G4double" title='G4double' data-type='double' data-ref="G4double">G4double</a> <dfn class="virtual decl" id="_ZN26G4IonParametrisedLossModel20ComputeDEDXPerVolumeEPK10G4MaterialPK20G4ParticleDefinitiondd" title='G4IonParametrisedLossModel::ComputeDEDXPerVolume' data-ref="_ZN26G4IonParametrisedLossModel20ComputeDEDXPerVolumeEPK10G4MaterialPK20G4ParticleDefinitiondd">ComputeDEDXPerVolume</dfn>(</td></tr>
+<tr><th id="124">124</th><td>                                 <em>const</em> <a class="type" href="../../../../materials/include/G4Material.hh.html#G4Material" title='G4Material' data-ref="G4Material">G4Material</a>*, <i>// Target material</i></td></tr>
+<tr><th id="125">125</th><td>				 <em>const</em> <a class="type" href="../../../../particles/management/include/G4ParticleDefinition.hh.html#G4ParticleDefinition" title='G4ParticleDefinition' data-ref="G4ParticleDefinition">G4ParticleDefinition</a>*, <i>// Projectile</i></td></tr>
+<tr><th id="126">126</th><td>				 <a class="typedef" href="../../../../global/management/include/G4Types.hh.html#G4double" title='G4double' data-type='double' data-ref="G4double">G4double</a>,  <i>// Kinetic energy of projectile</i></td></tr>
+<tr><th id="127">127</th><td>				 <a class="typedef" href="../../../../global/management/include/G4Types.hh.html#G4double" title='G4double' data-type='double' data-ref="G4double">G4double</a>); <i>// Energy cut for secondary prod.</i></td></tr>
+<tr><th id="128">128</th><td></td></tr>
+<tr><th id="129">129</th><td>   <i>// Function, which computes the continuous energy loss (due to electronic</i></td></tr>
+<tr><th id="130">130</th><td><i>   // stopping) for a given pre-step energy and step length by using</i></td></tr>
+<tr><th id="131">131</th><td><i>   // range vs energy (and energy vs range) tables  </i></td></tr>
+<tr><th id="132">132</th><td>   <a class="typedef" href="../../../../global/management/include/G4Types.hh.html#G4double" title='G4double' data-type='double' data-ref="G4double">G4double</a> <dfn class="decl" id="_ZN26G4IonParametrisedLossModel18ComputeLossForStepEPK20G4MaterialCutsCouplePK20G4ParticleDefinitiondd" title='G4IonParametrisedLossModel::ComputeLossForStep' data-ref="_ZN26G4IonParametrisedLossModel18ComputeLossForStepEPK20G4MaterialCutsCouplePK20G4ParticleDefinitiondd">ComputeLossForStep</dfn>(</td></tr>
+<tr><th id="133">133</th><td>                                 <em>const</em> <a class="type" href="../../../cuts/include/G4MaterialCutsCouple.hh.html#G4MaterialCutsCouple" title='G4MaterialCutsCouple' data-ref="G4MaterialCutsCouple">G4MaterialCutsCouple</a>*, <i>// Mat-cuts couple</i></td></tr>
+<tr><th id="134">134</th><td>				 <em>const</em> <a class="type" href="../../../../particles/management/include/G4ParticleDefinition.hh.html#G4ParticleDefinition" title='G4ParticleDefinition' data-ref="G4ParticleDefinition">G4ParticleDefinition</a>*, <i>// Projectile</i></td></tr>
+<tr><th id="135">135</th><td>				 <a class="typedef" href="../../../../global/management/include/G4Types.hh.html#G4double" title='G4double' data-type='double' data-ref="G4double">G4double</a>,  <i>// Kinetic energy of projectile</i></td></tr>
+<tr><th id="136">136</th><td>				 <a class="typedef" href="../../../../global/management/include/G4Types.hh.html#G4double" title='G4double' data-type='double' data-ref="G4double">G4double</a>); <i>// Length of current step</i></td></tr>
+<tr><th id="137">137</th><td></td></tr>
+<tr><th id="138">138</th><td>   <i>// Function, which computes the mean energy transfer rate to delta rays </i></td></tr>
+<tr><th id="139">139</th><td>   <b>inline</b> <a class="typedef" href="../../../../global/management/include/G4Types.hh.html#G4double" title='G4double' data-type='double' data-ref="G4double">G4double</a> <a class="decl" href="G4IonParametrisedLossModel.icc.html#_ZN26G4IonParametrisedLossModel30DeltaRayMeanEnergyTransferRateEPK10G4MaterialPK20G4ParticleDefinitiondd" title='G4IonParametrisedLossModel::DeltaRayMeanEnergyTransferRate' data-ref="_ZN26G4IonParametrisedLossModel30DeltaRayMeanEnergyTransferRateEPK10G4MaterialPK20G4ParticleDefinitiondd" id="_ZN26G4IonParametrisedLossModel30DeltaRayMeanEnergyTransferRateEPK10G4MaterialPK20G4ParticleDefinitiondd">DeltaRayMeanEnergyTransferRate</a>(</td></tr>
+<tr><th id="140">140</th><td>                                 <em>const</em> <a class="type" href="../../../../materials/include/G4Material.hh.html#G4Material" title='G4Material' data-ref="G4Material">G4Material</a>*, <i>// Target Material</i></td></tr>
+<tr><th id="141">141</th><td>			         <em>const</em> <a class="type" href="../../../../particles/management/include/G4ParticleDefinition.hh.html#G4ParticleDefinition" title='G4ParticleDefinition' data-ref="G4ParticleDefinition">G4ParticleDefinition</a>*, <i>// Projectile</i></td></tr>
+<tr><th id="142">142</th><td>				 <a class="typedef" href="../../../../global/management/include/G4Types.hh.html#G4double" title='G4double' data-type='double' data-ref="G4double">G4double</a>,  <i>// Kinetic energy of projectile</i></td></tr>
+<tr><th id="143">143</th><td>				 <a class="typedef" href="../../../../global/management/include/G4Types.hh.html#G4double" title='G4double' data-type='double' data-ref="G4double">G4double</a>); <i>// Energy cut for secondary prod.</i></td></tr>
+<tr><th id="144">144</th><td></td></tr>
+<tr><th id="145">145</th><td></td></tr>
+<tr><th id="146">146</th><td>   <b>virtual</b> <em>void</em> <dfn class="virtual decl" id="_ZN26G4IonParametrisedLossModel17SampleSecondariesEi" title='G4IonParametrisedLossModel::SampleSecondaries' data-ref="_ZN26G4IonParametrisedLossModel17SampleSecondariesEi">SampleSecondaries</dfn>(<span class='error' title="use of undeclared identifier &apos;std&apos;">std</span>::vector<span class='error' title="expected &apos;)&apos;">&lt;</span>G4DynamicParticle*&gt;*,</td></tr>
+<tr><th id="147">147</th><td>				 <em>const</em> G4MaterialCutsCouple*,</td></tr>
+<tr><th id="148">148</th><td>				 <em>const</em> G4DynamicParticle*,</td></tr>
+<tr><th id="149">149</th><td>				 G4double,  <i>// Energy cut for secondary prod.</i></td></tr>
+<tr><th id="150">150</th><td>                                 G4double); <i>// Maximum energy of secondaries</i></td></tr>
+<tr><th id="151">151</th><td></td></tr>
+<tr><th id="152">152</th><td>   <b>virtual</b> <a class="typedef" href="../../../../global/management/include/G4Types.hh.html#G4double" title='G4double' data-type='double' data-ref="G4double">G4double</a> <dfn class="virtual decl" id="_ZN26G4IonParametrisedLossModel20GetChargeSquareRatioEPK20G4ParticleDefinitionPK10G4Materiald" title='G4IonParametrisedLossModel::GetChargeSquareRatio' data-ref="_ZN26G4IonParametrisedLossModel20GetChargeSquareRatioEPK20G4ParticleDefinitionPK10G4Materiald">GetChargeSquareRatio</dfn>(</td></tr>
+<tr><th id="153">153</th><td>                                 <em>const</em> <a class="type" href="../../../../particles/management/include/G4ParticleDefinition.hh.html#G4ParticleDefinition" title='G4ParticleDefinition' data-ref="G4ParticleDefinition">G4ParticleDefinition</a>*, <i>// Projectile</i></td></tr>
+<tr><th id="154">154</th><td>		 	 	 <em>const</em> <a class="type" href="../../../../materials/include/G4Material.hh.html#G4Material" title='G4Material' data-ref="G4Material">G4Material</a>*,  <i>// Target Material</i></td></tr>
+<tr><th id="155">155</th><td>				 <a class="typedef" href="../../../../global/management/include/G4Types.hh.html#G4double" title='G4double' data-type='double' data-ref="G4double">G4double</a>); <i>// Kinetic energy of projectile</i></td></tr>
+<tr><th id="156">156</th><td></td></tr>
+<tr><th id="157">157</th><td>   <b>virtual</b> <a class="typedef" href="../../../../global/management/include/G4Types.hh.html#G4double" title='G4double' data-type='double' data-ref="G4double">G4double</a> <dfn class="virtual decl" id="_ZN26G4IonParametrisedLossModel17GetParticleChargeEPK20G4ParticleDefinitionPK10G4Materiald" title='G4IonParametrisedLossModel::GetParticleCharge' data-ref="_ZN26G4IonParametrisedLossModel17GetParticleChargeEPK20G4ParticleDefinitionPK10G4Materiald">GetParticleCharge</dfn>(</td></tr>
+<tr><th id="158">158</th><td>                                 <em>const</em> <a class="type" href="../../../../particles/management/include/G4ParticleDefinition.hh.html#G4ParticleDefinition" title='G4ParticleDefinition' data-ref="G4ParticleDefinition">G4ParticleDefinition</a>*, <i>// Projectile</i></td></tr>
+<tr><th id="159">159</th><td>				 <em>const</em> <a class="type" href="../../../../materials/include/G4Material.hh.html#G4Material" title='G4Material' data-ref="G4Material">G4Material</a>*,  <i>// Target Material</i></td></tr>
+<tr><th id="160">160</th><td>				 <a class="typedef" href="../../../../global/management/include/G4Types.hh.html#G4double" title='G4double' data-type='double' data-ref="G4double">G4double</a>); <i>// Kinetic energy of projectile </i></td></tr>
+<tr><th id="161">161</th><td></td></tr>
+<tr><th id="162">162</th><td>   <b>virtual</b> <em>void</em> <dfn class="virtual decl" id="_ZN26G4IonParametrisedLossModel20CorrectionsAlongStepEPK20G4MaterialCutsCouplePK17G4DynamicParticleRdS6_d" title='G4IonParametrisedLossModel::CorrectionsAlongStep' data-ref="_ZN26G4IonParametrisedLossModel20CorrectionsAlongStepEPK20G4MaterialCutsCouplePK17G4DynamicParticleRdS6_d">CorrectionsAlongStep</dfn>(</td></tr>
+<tr><th id="163">163</th><td>                                 <em>const</em> <a class="type" href="../../../cuts/include/G4MaterialCutsCouple.hh.html#G4MaterialCutsCouple" title='G4MaterialCutsCouple' data-ref="G4MaterialCutsCouple">G4MaterialCutsCouple</a>*,<i>// Mat.-Cut couple</i></td></tr>
+<tr><th id="164">164</th><td>				 <em>const</em> <a class="type" href="../../../../particles/management/include/G4DynamicParticle.hh.html#G4DynamicParticle" title='G4DynamicParticle' data-ref="G4DynamicParticle">G4DynamicParticle</a>*,  <i>// Dyn. particle</i></td></tr>
+<tr><th id="165">165</th><td>				 <a class="typedef" href="../../../../global/management/include/G4Types.hh.html#G4double" title='G4double' data-type='double' data-ref="G4double">G4double</a>&amp;, <i>// Energy loss in current step</i></td></tr>
+<tr><th id="166">166</th><td>				 <a class="typedef" href="../../../../global/management/include/G4Types.hh.html#G4double" title='G4double' data-type='double' data-ref="G4double">G4double</a>&amp;, </td></tr>
+<tr><th id="167">167</th><td>				 <a class="typedef" href="../../../../global/management/include/G4Types.hh.html#G4double" title='G4double' data-type='double' data-ref="G4double">G4double</a>); <i>// Length of current step</i></td></tr>
+<tr><th id="168">168</th><td></td></tr>
+<tr><th id="169">169</th><td>   <i>// Function which allows to add additional stopping power tables</i></td></tr>
+<tr><th id="170">170</th><td><i>   // in combination with a scaling algorithm, which may depend on dynamic</i></td></tr>
+<tr><th id="171">171</th><td><i>   // information like the current particle energy (the table and scaling </i></td></tr>
+<tr><th id="172">172</th><td><i>   // algorithm are used via a handler class, which performs e.g.caching or</i></td></tr>
+<tr><th id="173">173</th><td><i>   // which applies the scaling of energy and dE/dx values)</i></td></tr>
+<tr><th id="174">174</th><td>   <a class="typedef" href="../../../../global/management/include/G4Types.hh.html#G4bool" title='G4bool' data-type='bool' data-ref="G4bool">G4bool</a> <dfn class="decl" id="_ZN26G4IonParametrisedLossModel12AddDEDXTableERK8G4StringP15G4VIonDEDXTableP26G4VIonDEDXScalingAlgorithm" title='G4IonParametrisedLossModel::AddDEDXTable' data-ref="_ZN26G4IonParametrisedLossModel12AddDEDXTableERK8G4StringP15G4VIonDEDXTableP26G4VIonDEDXScalingAlgorithm">AddDEDXTable</dfn>(<em>const</em> <a class="type" href="../../../../global/management/include/G4String.hh.html#G4String" title='G4String' data-ref="G4String">G4String</a>&amp; <dfn class="local col2 decl" id="252name" title='name' data-type='const G4String &amp;' data-ref="252name">name</dfn>,</td></tr>
+<tr><th id="175">175</th><td>                     <a class="type" href="G4IonDEDXHandler.hh.html#G4VIonDEDXTable" title='G4VIonDEDXTable' data-ref="G4VIonDEDXTable">G4VIonDEDXTable</a>* <dfn class="local col3 decl" id="253table" title='table' data-type='G4VIonDEDXTable *' data-ref="253table">table</dfn>, </td></tr>
+<tr><th id="176">176</th><td>                     <a class="type" href="G4IonDEDXHandler.hh.html#G4VIonDEDXScalingAlgorithm" title='G4VIonDEDXScalingAlgorithm' data-ref="G4VIonDEDXScalingAlgorithm">G4VIonDEDXScalingAlgorithm</a>* <dfn class="local col4 decl" id="254algorithm" title='algorithm' data-type='G4VIonDEDXScalingAlgorithm *' data-ref="254algorithm">algorithm</dfn> = <var>0</var>); </td></tr>
+<tr><th id="177">177</th><td></td></tr>
+<tr><th id="178">178</th><td>   <a class="typedef" href="../../../../global/management/include/G4Types.hh.html#G4bool" title='G4bool' data-type='bool' data-ref="G4bool">G4bool</a> <dfn class="decl" id="_ZN26G4IonParametrisedLossModel15RemoveDEDXTableERK8G4String" title='G4IonParametrisedLossModel::RemoveDEDXTable' data-ref="_ZN26G4IonParametrisedLossModel15RemoveDEDXTableERK8G4String">RemoveDEDXTable</dfn>(<em>const</em> <a class="type" href="../../../../global/management/include/G4String.hh.html#G4String" title='G4String' data-ref="G4String">G4String</a>&amp; <dfn class="local col5 decl" id="255name" title='name' data-type='const G4String &amp;' data-ref="255name">name</dfn>); </td></tr>
+<tr><th id="179">179</th><td></td></tr>
+<tr><th id="180">180</th><td>   <i>// Function which allows to switch off scaling of stopping powers of heavy</i></td></tr>
+<tr><th id="181">181</th><td><i>   // ions from existing ICRU 73 data</i></td></tr>
+<tr><th id="182">182</th><td>   <em>void</em> <dfn class="decl" id="_ZN26G4IonParametrisedLossModel23DeactivateICRU73ScalingEv" title='G4IonParametrisedLossModel::DeactivateICRU73Scaling' data-ref="_ZN26G4IonParametrisedLossModel23DeactivateICRU73ScalingEv">DeactivateICRU73Scaling</dfn>();</td></tr>
+<tr><th id="183">183</th><td></td></tr>
+<tr><th id="184">184</th><td>   <i>// Function checking the applicability of physics tables to ion-material</i></td></tr>
+<tr><th id="185">185</th><td><i>   // combinations (Note: the energy range of tables is not checked)</i></td></tr>
+<tr><th id="186">186</th><td>   <b>inline</b> <span class='error' title="use of undeclared identifier &apos;LossTableList&apos;">LossTableList</span>::iterator <dfn class="decl" id="_ZN26G4IonParametrisedLossModel12IsApplicableEPK20G4ParticleDefinitionPK10G4Material" title='G4IonParametrisedLossModel::IsApplicable' data-ref="_ZN26G4IonParametrisedLossModel12IsApplicableEPK20G4ParticleDefinitionPK10G4Material">IsApplicable</dfn>(</td></tr>
+<tr><th id="187">187</th><td>                      <em>const</em> G4ParticleDefinition*,  <i>// Projectile (ion) </i></td></tr>
+<tr><th id="188">188</th><td>                      <em>const</em> G4Material*);           <i>// Target material</i></td></tr>
+<tr><th id="189">189</th><td></td></tr>
+<tr><th id="190">190</th><td>   <i>// Function printing a dE/dx table for a given ion-material combination</i></td></tr>
+<tr><th id="191">191</th><td><i>   // and a specified energy grid </i></td></tr>
+<tr><th id="192">192</th><td>   <em>void</em> <dfn class="decl" id="_ZN26G4IonParametrisedLossModel14PrintDEDXTableEPK20G4ParticleDefinitionPK10G4Materialddib" title='G4IonParametrisedLossModel::PrintDEDXTable' data-ref="_ZN26G4IonParametrisedLossModel14PrintDEDXTableEPK20G4ParticleDefinitionPK10G4Materialddib">PrintDEDXTable</dfn>(</td></tr>
+<tr><th id="193">193</th><td>                      <em>const</em> <a class="type" href="../../../../particles/management/include/G4ParticleDefinition.hh.html#G4ParticleDefinition" title='G4ParticleDefinition' data-ref="G4ParticleDefinition">G4ParticleDefinition</a>*,  <i>// Projectile (ion) </i></td></tr>
+<tr><th id="194">194</th><td>                      <em>const</em> <a class="type" href="../../../../materials/include/G4Material.hh.html#G4Material" title='G4Material' data-ref="G4Material">G4Material</a>*, <i>// Absorber material</i></td></tr>
+<tr><th id="195">195</th><td>                      <a class="typedef" href="../../../../global/management/include/G4Types.hh.html#G4double" title='G4double' data-type='double' data-ref="G4double">G4double</a>,          <i>// Minimum energy per nucleon</i></td></tr>
+<tr><th id="196">196</th><td>                      <a class="typedef" href="../../../../global/management/include/G4Types.hh.html#G4double" title='G4double' data-type='double' data-ref="G4double">G4double</a>,          <i>// Maximum energy per nucleon</i></td></tr>
+<tr><th id="197">197</th><td>                      <a class="typedef" href="../../../../global/management/include/G4Types.hh.html#G4int" title='G4int' data-type='int' data-ref="G4int">G4int</a>,             <i>// Number of bins</i></td></tr>
+<tr><th id="198">198</th><td>                      <a class="typedef" href="../../../../global/management/include/G4Types.hh.html#G4bool" title='G4bool' data-type='bool' data-ref="G4bool">G4bool</a>);           <i>// Logarithmic scaling of energy</i></td></tr>
+<tr><th id="199">199</th><td></td></tr>
+<tr><th id="200">200</th><td>   <i>// Function printing a dE/dx table for a given ion-material combination</i></td></tr>
+<tr><th id="201">201</th><td><i>   // and a specified energy grid </i></td></tr>
+<tr><th id="202">202</th><td>   <em>void</em> <dfn class="decl" id="_ZN26G4IonParametrisedLossModel22PrintDEDXTableHandlersEPK20G4ParticleDefinitionPK10G4Materialddib" title='G4IonParametrisedLossModel::PrintDEDXTableHandlers' data-ref="_ZN26G4IonParametrisedLossModel22PrintDEDXTableHandlersEPK20G4ParticleDefinitionPK10G4Materialddib">PrintDEDXTableHandlers</dfn>(</td></tr>
+<tr><th id="203">203</th><td>                      <em>const</em> <a class="type" href="../../../../particles/management/include/G4ParticleDefinition.hh.html#G4ParticleDefinition" title='G4ParticleDefinition' data-ref="G4ParticleDefinition">G4ParticleDefinition</a>*,  <i>// Projectile (ion) </i></td></tr>
+<tr><th id="204">204</th><td>                      <em>const</em> <a class="type" href="../../../../materials/include/G4Material.hh.html#G4Material" title='G4Material' data-ref="G4Material">G4Material</a>*, <i>// Absorber material</i></td></tr>
+<tr><th id="205">205</th><td>                      <a class="typedef" href="../../../../global/management/include/G4Types.hh.html#G4double" title='G4double' data-type='double' data-ref="G4double">G4double</a>,          <i>// Minimum energy per nucleon</i></td></tr>
+<tr><th id="206">206</th><td>                      <a class="typedef" href="../../../../global/management/include/G4Types.hh.html#G4double" title='G4double' data-type='double' data-ref="G4double">G4double</a>,          <i>// Maximum energy per nucleon</i></td></tr>
+<tr><th id="207">207</th><td>                      <a class="typedef" href="../../../../global/management/include/G4Types.hh.html#G4int" title='G4int' data-type='int' data-ref="G4int">G4int</a>,             <i>// Number of bins</i></td></tr>
+<tr><th id="208">208</th><td>                      <a class="typedef" href="../../../../global/management/include/G4Types.hh.html#G4bool" title='G4bool' data-type='bool' data-ref="G4bool">G4bool</a>);           <i>// Logarithmic scaling of energy</i></td></tr>
+<tr><th id="209">209</th><td>   </td></tr>
+<tr><th id="210">210</th><td>   <i>// Function for setting energy loss limit for stopping power integration</i></td></tr>
+<tr><th id="211">211</th><td>   <b>inline</b> <em>void</em> <a class="decl" href="G4IonParametrisedLossModel.icc.html#_ZN26G4IonParametrisedLossModel18SetEnergyLossLimitEd" title='G4IonParametrisedLossModel::SetEnergyLossLimit' data-ref="_ZN26G4IonParametrisedLossModel18SetEnergyLossLimitEd" id="_ZN26G4IonParametrisedLossModel18SetEnergyLossLimitEd">SetEnergyLossLimit</a>(<a class="typedef" href="../../../../global/management/include/G4Types.hh.html#G4double" title='G4double' data-type='double' data-ref="G4double">G4double</a> <dfn class="local col6 decl" id="256ionEnergyLossLimit" title='ionEnergyLossLimit' data-type='G4double' data-ref="256ionEnergyLossLimit">ionEnergyLossLimit</dfn>); </td></tr>
+<tr><th id="212">212</th><td></td></tr>
+<tr><th id="213">213</th><td> <b>protected</b>:</td></tr>
+<tr><th id="214">214</th><td></td></tr>
+<tr><th id="215">215</th><td>   <b>virtual</b> </td></tr>
+<tr><th id="216">216</th><td>   <a class="typedef" href="../../../../global/management/include/G4Types.hh.html#G4double" title='G4double' data-type='double' data-ref="G4double">G4double</a> <dfn class="virtual decl" id="_ZN26G4IonParametrisedLossModel18MaxSecondaryEnergyEPK20G4ParticleDefinitiond" title='G4IonParametrisedLossModel::MaxSecondaryEnergy' data-ref="_ZN26G4IonParametrisedLossModel18MaxSecondaryEnergyEPK20G4ParticleDefinitiond">MaxSecondaryEnergy</dfn>(<em>const</em> <a class="type" href="../../../../particles/management/include/G4ParticleDefinition.hh.html#G4ParticleDefinition" title='G4ParticleDefinition' data-ref="G4ParticleDefinition">G4ParticleDefinition</a>*,</td></tr>
+<tr><th id="217">217</th><td>			       <a class="typedef" href="../../../../global/management/include/G4Types.hh.html#G4double" title='G4double' data-type='double' data-ref="G4double">G4double</a>);   <i>// Kinetic energy of projectile</i></td></tr>
+<tr><th id="218">218</th><td></td></tr>
+<tr><th id="219">219</th><td> <b>private</b>:</td></tr>
+<tr><th id="220">220</th><td>   <i>// Function which updates parameters concerning the dE/dx calculation</i></td></tr>
+<tr><th id="221">221</th><td><i>   // (the parameters are only updated if the particle, the material or </i></td></tr>
+<tr><th id="222">222</th><td><i>   // the associated energy cut has changed)</i></td></tr>
+<tr><th id="223">223</th><td>   <em>void</em> <dfn class="decl" id="_ZN26G4IonParametrisedLossModel15UpdateDEDXCacheEPK20G4ParticleDefinitionPK10G4Materiald" title='G4IonParametrisedLossModel::UpdateDEDXCache' data-ref="_ZN26G4IonParametrisedLossModel15UpdateDEDXCacheEPK20G4ParticleDefinitionPK10G4Materiald">UpdateDEDXCache</dfn>(</td></tr>
+<tr><th id="224">224</th><td>                  <em>const</em> <a class="type" href="../../../../particles/management/include/G4ParticleDefinition.hh.html#G4ParticleDefinition" title='G4ParticleDefinition' data-ref="G4ParticleDefinition">G4ParticleDefinition</a>*,   <i>// Projectile (ion) </i></td></tr>
+<tr><th id="225">225</th><td>                  <em>const</em> <a class="type" href="../../../../materials/include/G4Material.hh.html#G4Material" title='G4Material' data-ref="G4Material">G4Material</a>*,             <i>// Target material</i></td></tr>
+<tr><th id="226">226</th><td>                  <a class="typedef" href="../../../../global/management/include/G4Types.hh.html#G4double" title='G4double' data-type='double' data-ref="G4double">G4double</a> <dfn class="local col7 decl" id="257cutEnergy" title='cutEnergy' data-type='G4double' data-ref="257cutEnergy">cutEnergy</dfn>);           <i>// Energy cut</i></td></tr>
+<tr><th id="227">227</th><td></td></tr>
+<tr><th id="228">228</th><td>   <i>// Function which updates parameters concerning the range calculation</i></td></tr>
+<tr><th id="229">229</th><td><i>   // (the parameters are only updated if the particle, the material or </i></td></tr>
+<tr><th id="230">230</th><td><i>   // the associated energy cut has changed)</i></td></tr>
+<tr><th id="231">231</th><td>   <em>void</em> <dfn class="decl" id="_ZN26G4IonParametrisedLossModel16UpdateRangeCacheEPK20G4ParticleDefinitionPK20G4MaterialCutsCouple" title='G4IonParametrisedLossModel::UpdateRangeCache' data-ref="_ZN26G4IonParametrisedLossModel16UpdateRangeCacheEPK20G4ParticleDefinitionPK20G4MaterialCutsCouple">UpdateRangeCache</dfn>(</td></tr>
+<tr><th id="232">232</th><td>                  <em>const</em> <a class="type" href="../../../../particles/management/include/G4ParticleDefinition.hh.html#G4ParticleDefinition" title='G4ParticleDefinition' data-ref="G4ParticleDefinition">G4ParticleDefinition</a>*,   <i>// Projectile (ion) </i></td></tr>
+<tr><th id="233">233</th><td>                  <em>const</em> <a class="type" href="../../../cuts/include/G4MaterialCutsCouple.hh.html#G4MaterialCutsCouple" title='G4MaterialCutsCouple' data-ref="G4MaterialCutsCouple">G4MaterialCutsCouple</a>*);  <i>// Target material</i></td></tr>
+<tr><th id="234">234</th><td></td></tr>
+<tr><th id="235">235</th><td>   <i>// Function, which updates parameters concering particle properties</i></td></tr>
+<tr><th id="236">236</th><td>   <b>inline</b> <em>void</em> <a class="decl" href="G4IonParametrisedLossModel.icc.html#_ZN26G4IonParametrisedLossModel11UpdateCacheEPK20G4ParticleDefinition" title='G4IonParametrisedLossModel::UpdateCache' data-ref="_ZN26G4IonParametrisedLossModel11UpdateCacheEPK20G4ParticleDefinition" id="_ZN26G4IonParametrisedLossModel11UpdateCacheEPK20G4ParticleDefinition">UpdateCache</a>(</td></tr>
+<tr><th id="237">237</th><td>                  <em>const</em> <a class="type" href="../../../../particles/management/include/G4ParticleDefinition.hh.html#G4ParticleDefinition" title='G4ParticleDefinition' data-ref="G4ParticleDefinition">G4ParticleDefinition</a>*);  <i>// Projectile (ion) </i></td></tr>
+<tr><th id="238">238</th><td> </td></tr>
+<tr><th id="239">239</th><td>   <i>// Function, which builds range vs energy (and energy vs range) vectors</i></td></tr>
+<tr><th id="240">240</th><td><i>   // for a given particle, material and energy cut   </i></td></tr>
+<tr><th id="241">241</th><td>   <em>void</em> <dfn class="decl" id="_ZN26G4IonParametrisedLossModel16BuildRangeVectorEPK20G4ParticleDefinitionPK20G4MaterialCutsCouple" title='G4IonParametrisedLossModel::BuildRangeVector' data-ref="_ZN26G4IonParametrisedLossModel16BuildRangeVectorEPK20G4ParticleDefinitionPK20G4MaterialCutsCouple">BuildRangeVector</dfn>(</td></tr>
+<tr><th id="242">242</th><td>                  <em>const</em> <a class="type" href="../../../../particles/management/include/G4ParticleDefinition.hh.html#G4ParticleDefinition" title='G4ParticleDefinition' data-ref="G4ParticleDefinition">G4ParticleDefinition</a>*,   <i>// Projectile (ion) </i></td></tr>
+<tr><th id="243">243</th><td>                  <em>const</em> <a class="type" href="../../../cuts/include/G4MaterialCutsCouple.hh.html#G4MaterialCutsCouple" title='G4MaterialCutsCouple' data-ref="G4MaterialCutsCouple">G4MaterialCutsCouple</a>*);  <i>// Material cuts couple</i></td></tr>
+<tr><th id="244">244</th><td></td></tr>
+<tr><th id="245">245</th><td>   <i>// Assignment operator and copy constructor are hidden:</i></td></tr>
+<tr><th id="246">246</th><td>   <a class="type" href="#G4IonParametrisedLossModel" title='G4IonParametrisedLossModel' data-ref="G4IonParametrisedLossModel">G4IonParametrisedLossModel</a> &amp; <dfn class="decl" id="_ZN26G4IonParametrisedLossModelaSERKS_" title='G4IonParametrisedLossModel::operator=' data-ref="_ZN26G4IonParametrisedLossModelaSERKS_"><b>operator</b>=</dfn>(</td></tr>
+<tr><th id="247">247</th><td>                              <em>const</em> <a class="type" href="#G4IonParametrisedLossModel" title='G4IonParametrisedLossModel' data-ref="G4IonParametrisedLossModel">G4IonParametrisedLossModel</a> &amp;<dfn class="local col8 decl" id="258right" title='right' data-type='const G4IonParametrisedLossModel &amp;' data-ref="258right">right</dfn>);</td></tr>
+<tr><th id="248">248</th><td>   <dfn class="decl" id="_ZN26G4IonParametrisedLossModelC1ERKS_" title='G4IonParametrisedLossModel::G4IonParametrisedLossModel' data-ref="_ZN26G4IonParametrisedLossModelC1ERKS_">G4IonParametrisedLossModel</dfn>(<em>const</em> <a class="type" href="#G4IonParametrisedLossModel" title='G4IonParametrisedLossModel' data-ref="G4IonParametrisedLossModel">G4IonParametrisedLossModel</a> &amp;);</td></tr>
+<tr><th id="249">249</th><td>   </td></tr>
+<tr><th id="250">250</th><td>   <i>// ######################################################################</i></td></tr>
+<tr><th id="251">251</th><td><i>   // # Models and dE/dx tables for computing the energy loss </i></td></tr>
+<tr><th id="252">252</th><td><i>   // # </i></td></tr>
+<tr><th id="253">253</th><td><i>   // ######################################################################</i></td></tr>
+<tr><th id="254">254</th><td><i></i></td></tr>
+<tr><th id="255">255</th><td><i>   // G4BraggIonModel and G4BetheBlochModel are used for ion-target</i></td></tr>
+<tr><th id="256">256</th><td><i>   // combinations and/or projectile energies not covered by parametrisations</i></td></tr>
+<tr><th id="257">257</th><td><i>   // adopted by this model:</i></td></tr>
+<tr><th id="258">258</th><td>   <a class="type" href="#G4BraggIonModel" title='G4BraggIonModel' data-ref="G4BraggIonModel">G4BraggIonModel</a>* <dfn class="decl" id="G4IonParametrisedLossModel::braggIonModel" title='G4IonParametrisedLossModel::braggIonModel' data-ref="G4IonParametrisedLossModel::braggIonModel">braggIonModel</dfn>;</td></tr>
+<tr><th id="259">259</th><td>   <a class="type" href="#G4BetheBlochModel" title='G4BetheBlochModel' data-ref="G4BetheBlochModel">G4BetheBlochModel</a>* <dfn class="decl" id="G4IonParametrisedLossModel::betheBlochModel" title='G4IonParametrisedLossModel::betheBlochModel' data-ref="G4IonParametrisedLossModel::betheBlochModel">betheBlochModel</dfn>;</td></tr>
+<tr><th id="260">260</th><td></td></tr>
+<tr><th id="261">261</th><td>   <i>// List of dE/dx tables plugged into the model</i></td></tr>
+<tr><th id="262">262</th><td>   <span class='error' title="unknown type name &apos;LossTableList&apos;">LossTableList</span> <dfn class="decl" id="G4IonParametrisedLossModel::lossTableList" title='G4IonParametrisedLossModel::lossTableList' data-ref="G4IonParametrisedLossModel::lossTableList">lossTableList</dfn>;</td></tr>
+<tr><th id="263">263</th><td></td></tr>
+<tr><th id="264">264</th><td>   <i>// ######################################################################</i></td></tr>
+<tr><th id="265">265</th><td><i>   // # Maps of Range vs Energy and Energy vs Range vectors</i></td></tr>
+<tr><th id="266">266</th><td><i>   // # </i></td></tr>
+<tr><th id="267">267</th><td><i>   // ######################################################################</i></td></tr>
+<tr><th id="268">268</th><td></td></tr>
+<tr><th id="269">269</th><td>   <b>typedef</b> <span class='error' title="use of undeclared identifier &apos;std&apos;">std</span>::map<span class='error' title="expected member name or &apos;;&apos; after declaration specifiers">&lt;</span>IonMatCouple, G4LPhysicsFreeVector*&gt; RangeEnergyTable; </td></tr>
+<tr><th id="270">270</th><td>   <span class='error' title="unknown type name &apos;RangeEnergyTable&apos;">RangeEnergyTable</span> <dfn class="decl" id="G4IonParametrisedLossModel::r" title='G4IonParametrisedLossModel::r' data-ref="G4IonParametrisedLossModel::r">r</dfn>;</td></tr>
+<tr><th id="271">271</th><td></td></tr>
+<tr><th id="272">272</th><td>   <b>typedef</b> <span class='error' title="use of undeclared identifier &apos;std&apos;">std</span>::map<span class='error' title="expected member name or &apos;;&apos; after declaration specifiers">&lt;</span>IonMatCouple, G4LPhysicsFreeVector*&gt; EnergyRangeTable; </td></tr>
+<tr><th id="273">273</th><td>   <span class='error' title="unknown type name &apos;EnergyRangeTable&apos;">EnergyRangeTable</span> <dfn class="decl" id="G4IonParametrisedLossModel::E" title='G4IonParametrisedLossModel::E' data-ref="G4IonParametrisedLossModel::E">E</dfn>;</td></tr>
+<tr><th id="274">274</th><td></td></tr>
+<tr><th id="275">275</th><td>   <i>// ######################################################################</i></td></tr>
+<tr><th id="276">276</th><td><i>   // # Energy grid definitions (e.g. used for computing range-energy </i></td></tr>
+<tr><th id="277">277</th><td><i>   // # tables)</i></td></tr>
+<tr><th id="278">278</th><td><i>   // ######################################################################</i></td></tr>
+<tr><th id="279">279</th><td></td></tr>
+<tr><th id="280">280</th><td>   <a class="typedef" href="../../../../global/management/include/G4Types.hh.html#G4double" title='G4double' data-type='double' data-ref="G4double">G4double</a> <dfn class="decl" id="G4IonParametrisedLossModel::lowerEnergyEdgeIntegr" title='G4IonParametrisedLossModel::lowerEnergyEdgeIntegr' data-ref="G4IonParametrisedLossModel::lowerEnergyEdgeIntegr">lowerEnergyEdgeIntegr</dfn>;</td></tr>
+<tr><th id="281">281</th><td>   <a class="typedef" href="../../../../global/management/include/G4Types.hh.html#G4double" title='G4double' data-type='double' data-ref="G4double">G4double</a> <dfn class="decl" id="G4IonParametrisedLossModel::upperEnergyEdgeIntegr" title='G4IonParametrisedLossModel::upperEnergyEdgeIntegr' data-ref="G4IonParametrisedLossModel::upperEnergyEdgeIntegr">upperEnergyEdgeIntegr</dfn>;</td></tr>
+<tr><th id="282">282</th><td></td></tr>
+<tr><th id="283">283</th><td>   <span class='error' title="unknown type name &apos;size_t&apos;">size_t</span> <dfn class="decl" id="G4IonParametrisedLossModel::nmbBins" title='G4IonParametrisedLossModel::nmbBins' data-ref="G4IonParametrisedLossModel::nmbBins">nmbBins</dfn>;</td></tr>
+<tr><th id="284">284</th><td>   <span class='error' title="unknown type name &apos;size_t&apos;">size_t</span> <dfn class="decl" id="G4IonParametrisedLossModel::nmbSubBins" title='G4IonParametrisedLossModel::nmbSubBins' data-ref="G4IonParametrisedLossModel::nmbSubBins">nmbSubBins</dfn>;</td></tr>
+<tr><th id="285">285</th><td></td></tr>
+<tr><th id="286">286</th><td>   <i>// ######################################################################</i></td></tr>
+<tr><th id="287">287</th><td><i>   // # Particle change for loss</i></td></tr>
+<tr><th id="288">288</th><td><i>   // # </i></td></tr>
+<tr><th id="289">289</th><td><i>   // ######################################################################</i></td></tr>
+<tr><th id="290">290</th><td><i></i></td></tr>
+<tr><th id="291">291</th><td><i>   // Pointer to particle change object, which is used to set e.g. the</i></td></tr>
+<tr><th id="292">292</th><td><i>   // energy loss and secondary delta-electron</i></td></tr>
+<tr><th id="293">293</th><td><i>   // used indicating if model is initialized  </i></td></tr>
+<tr><th id="294">294</th><td>   <a class="type" href="../../../../track/include/G4ParticleChangeForLoss.hh.html#G4ParticleChangeForLoss" title='G4ParticleChangeForLoss' data-ref="G4ParticleChangeForLoss">G4ParticleChangeForLoss</a>* <dfn class="decl" id="G4IonParametrisedLossModel::particleChangeLoss" title='G4IonParametrisedLossModel::particleChangeLoss' data-ref="G4IonParametrisedLossModel::particleChangeLoss">particleChangeLoss</dfn>;</td></tr>
+<tr><th id="295">295</th><td></td></tr>
+<tr><th id="296">296</th><td>   <i>// ######################################################################</i></td></tr>
+<tr><th id="297">297</th><td><i>   // # Corrections and energy loss limit</i></td></tr>
+<tr><th id="298">298</th><td><i>   // # </i></td></tr>
+<tr><th id="299">299</th><td><i>   // ######################################################################</i></td></tr>
+<tr><th id="300">300</th><td><i>   </i></td></tr>
+<tr><th id="301">301</th><td><i>   // Pointer to an G4EmCorrections object, which is used to compute the</i></td></tr>
+<tr><th id="302">302</th><td><i>   // effective ion charge, and other corrections (like high order corrections</i></td></tr>
+<tr><th id="303">303</th><td><i>   // to stopping powers) </i></td></tr>
+<tr><th id="304">304</th><td>   <a class="type" href="../../utils/include/G4EmCorrections.hh.html#G4EmCorrections" title='G4EmCorrections' data-ref="G4EmCorrections">G4EmCorrections</a>* <dfn class="decl" id="G4IonParametrisedLossModel::corrections" title='G4IonParametrisedLossModel::corrections' data-ref="G4IonParametrisedLossModel::corrections">corrections</dfn>;</td></tr>
+<tr><th id="305">305</th><td></td></tr>
+<tr><th id="306">306</th><td>   <i>// Corrections factor for effective charge, computed for each particle</i></td></tr>
+<tr><th id="307">307</th><td><i>   // step</i></td></tr>
+<tr><th id="308">308</th><td>   <a class="typedef" href="../../../../global/management/include/G4Types.hh.html#G4double" title='G4double' data-type='double' data-ref="G4double">G4double</a> <dfn class="decl" id="G4IonParametrisedLossModel::corrFactor" title='G4IonParametrisedLossModel::corrFactor' data-ref="G4IonParametrisedLossModel::corrFactor">corrFactor</dfn>;</td></tr>
+<tr><th id="309">309</th><td></td></tr>
+<tr><th id="310">310</th><td>   <i>// Parameter indicating the maximal fraction of kinetic energy, which</i></td></tr>
+<tr><th id="311">311</th><td><i>   // a particle may loose along a step, in order that the simple relation</i></td></tr>
+<tr><th id="312">312</th><td><i>   // (dE/dx)*l can still be applied to compute the energy loss (l = step </i></td></tr>
+<tr><th id="313">313</th><td><i>   // length)</i></td></tr>
+<tr><th id="314">314</th><td>   <a class="typedef" href="../../../../global/management/include/G4Types.hh.html#G4double" title='G4double' data-type='double' data-ref="G4double">G4double</a> <dfn class="decl" id="G4IonParametrisedLossModel::energyLossLimit" title='G4IonParametrisedLossModel::energyLossLimit' data-ref="G4IonParametrisedLossModel::energyLossLimit">energyLossLimit</dfn>;</td></tr>
+<tr><th id="315">315</th><td></td></tr>
+<tr><th id="316">316</th><td>   <i>// ######################################################################</i></td></tr>
+<tr><th id="317">317</th><td><i>   // # Cut energies and properties of generic ion</i></td></tr>
+<tr><th id="318">318</th><td><i>   // # </i></td></tr>
+<tr><th id="319">319</th><td><i>   // ######################################################################</i></td></tr>
+<tr><th id="320">320</th><td><i></i></td></tr>
+<tr><th id="321">321</th><td><i>   // Vector containing the current cut energies (the vector index matches</i></td></tr>
+<tr><th id="322">322</th><td><i>   // the material-cuts couple index):</i></td></tr>
+<tr><th id="323">323</th><td>   <a class="type" href="../../../../global/management/include/G4DataVector.hh.html#G4DataVector" title='G4DataVector' data-ref="G4DataVector">G4DataVector</a> <dfn class="decl" id="G4IonParametrisedLossModel::cutEnergies" title='G4IonParametrisedLossModel::cutEnergies' data-ref="G4IonParametrisedLossModel::cutEnergies">cutEnergies</dfn>;</td></tr>
+<tr><th id="324">324</th><td></td></tr>
+<tr><th id="325">325</th><td>   <i>// Pointer to generic ion and mass of generic ion</i></td></tr>
+<tr><th id="326">326</th><td>   <a class="type" href="../../../../particles/management/include/G4ParticleDefinition.hh.html#G4ParticleDefinition" title='G4ParticleDefinition' data-ref="G4ParticleDefinition">G4ParticleDefinition</a>* <dfn class="decl" id="G4IonParametrisedLossModel::genericIon" title='G4IonParametrisedLossModel::genericIon' data-ref="G4IonParametrisedLossModel::genericIon">genericIon</dfn>;</td></tr>
+<tr><th id="327">327</th><td>   <a class="typedef" href="../../../../global/management/include/G4Types.hh.html#G4double" title='G4double' data-type='double' data-ref="G4double">G4double</a> <dfn class="decl" id="G4IonParametrisedLossModel::genericIonPDGMass" title='G4IonParametrisedLossModel::genericIonPDGMass' data-ref="G4IonParametrisedLossModel::genericIonPDGMass">genericIonPDGMass</dfn>;</td></tr>
+<tr><th id="328">328</th><td></td></tr>
+<tr><th id="329">329</th><td>   <i>// ######################################################################</i></td></tr>
+<tr><th id="330">330</th><td><i>   // # "Most-recently-used" cache parameters</i></td></tr>
+<tr><th id="331">331</th><td><i>   // #</i></td></tr>
+<tr><th id="332">332</th><td><i>   // ######################################################################</i></td></tr>
+<tr><th id="333">333</th><td><i></i></td></tr>
+<tr><th id="334">334</th><td><i>   // Cached key (particle) and value information for a faster </i></td></tr>
+<tr><th id="335">335</th><td><i>   // access of particle-related information</i></td></tr>
+<tr><th id="336">336</th><td>   <em>const</em> <a class="type" href="../../../../particles/management/include/G4ParticleDefinition.hh.html#G4ParticleDefinition" title='G4ParticleDefinition' data-ref="G4ParticleDefinition">G4ParticleDefinition</a>* <dfn class="decl" id="G4IonParametrisedLossModel::cacheParticle" title='G4IonParametrisedLossModel::cacheParticle' data-ref="G4IonParametrisedLossModel::cacheParticle">cacheParticle</dfn>; <i>// Key: Current projectile</i></td></tr>
+<tr><th id="337">337</th><td>   <a class="typedef" href="../../../../global/management/include/G4Types.hh.html#G4double" title='G4double' data-type='double' data-ref="G4double">G4double</a> <dfn class="decl" id="G4IonParametrisedLossModel::cacheMass" title='G4IonParametrisedLossModel::cacheMass' data-ref="G4IonParametrisedLossModel::cacheMass">cacheMass</dfn>;                        <i>// Projectile mass</i></td></tr>
+<tr><th id="338">338</th><td>   <a class="typedef" href="../../../../global/management/include/G4Types.hh.html#G4double" title='G4double' data-type='double' data-ref="G4double">G4double</a> <dfn class="decl" id="G4IonParametrisedLossModel::cacheElecMassRatio" title='G4IonParametrisedLossModel::cacheElecMassRatio' data-ref="G4IonParametrisedLossModel::cacheElecMassRatio">cacheElecMassRatio</dfn>;               <i>// Electron-mass ratio</i></td></tr>
+<tr><th id="339">339</th><td>   <a class="typedef" href="../../../../global/management/include/G4Types.hh.html#G4double" title='G4double' data-type='double' data-ref="G4double">G4double</a> <dfn class="decl" id="G4IonParametrisedLossModel::cacheChargeSquare" title='G4IonParametrisedLossModel::cacheChargeSquare' data-ref="G4IonParametrisedLossModel::cacheChargeSquare">cacheChargeSquare</dfn>;                <i>// Charge squared</i></td></tr>
+<tr><th id="340">340</th><td></td></tr>
+<tr><th id="341">341</th><td>   <i>// Cached parameters needed during range computations:</i></td></tr>
+<tr><th id="342">342</th><td>   <em>const</em> <a class="type" href="../../../../particles/management/include/G4ParticleDefinition.hh.html#G4ParticleDefinition" title='G4ParticleDefinition' data-ref="G4ParticleDefinition">G4ParticleDefinition</a>* <dfn class="decl" id="G4IonParametrisedLossModel::rangeCacheParticle" title='G4IonParametrisedLossModel::rangeCacheParticle' data-ref="G4IonParametrisedLossModel::rangeCacheParticle">rangeCacheParticle</dfn>; <i>// Key: 1) Current ion,</i></td></tr>
+<tr><th id="343">343</th><td>   <em>const</em> <a class="type" href="../../../cuts/include/G4MaterialCutsCouple.hh.html#G4MaterialCutsCouple" title='G4MaterialCutsCouple' data-ref="G4MaterialCutsCouple">G4MaterialCutsCouple</a>* <dfn class="decl" id="G4IonParametrisedLossModel::rangeCacheMatCutsCouple" title='G4IonParametrisedLossModel::rangeCacheMatCutsCouple' data-ref="G4IonParametrisedLossModel::rangeCacheMatCutsCouple">rangeCacheMatCutsCouple</dfn>; <i>// 2) Mat-cuts-couple</i></td></tr>
+<tr><th id="344">344</th><td>   <a class="type" href="../../../../global/management/include/G4PhysicsVector.hh.html#G4PhysicsVector" title='G4PhysicsVector' data-ref="G4PhysicsVector">G4PhysicsVector</a>* <dfn class="decl" id="G4IonParametrisedLossModel::rangeCacheEnergyRange" title='G4IonParametrisedLossModel::rangeCacheEnergyRange' data-ref="G4IonParametrisedLossModel::rangeCacheEnergyRange">rangeCacheEnergyRange</dfn>;         <i>// Energy vs range vector</i></td></tr>
+<tr><th id="345">345</th><td>   <a class="type" href="../../../../global/management/include/G4PhysicsVector.hh.html#G4PhysicsVector" title='G4PhysicsVector' data-ref="G4PhysicsVector">G4PhysicsVector</a>* <dfn class="decl" id="G4IonParametrisedLossModel::rangeCacheRangeEnergy" title='G4IonParametrisedLossModel::rangeCacheRangeEnergy' data-ref="G4IonParametrisedLossModel::rangeCacheRangeEnergy">rangeCacheRangeEnergy</dfn>;         <i>// Range vs energy vector</i></td></tr>
+<tr><th id="346">346</th><td></td></tr>
+<tr><th id="347">347</th><td>   <i>// Cached parameters needed during dE/dx computations:</i></td></tr>
+<tr><th id="348">348</th><td>   <em>const</em> <a class="type" href="../../../../particles/management/include/G4ParticleDefinition.hh.html#G4ParticleDefinition" title='G4ParticleDefinition' data-ref="G4ParticleDefinition">G4ParticleDefinition</a>* <dfn class="decl" id="G4IonParametrisedLossModel::dedxCacheParticle" title='G4IonParametrisedLossModel::dedxCacheParticle' data-ref="G4IonParametrisedLossModel::dedxCacheParticle">dedxCacheParticle</dfn>; <i>// Key: 1) Current ion,</i></td></tr>
+<tr><th id="349">349</th><td>   <em>const</em> <a class="type" href="../../../../materials/include/G4Material.hh.html#G4Material" title='G4Material' data-ref="G4Material">G4Material</a>* <dfn class="decl" id="G4IonParametrisedLossModel::dedxCacheMaterial" title='G4IonParametrisedLossModel::dedxCacheMaterial' data-ref="G4IonParametrisedLossModel::dedxCacheMaterial">dedxCacheMaterial</dfn>;           <i>//      2) material and</i></td></tr>
+<tr><th id="350">350</th><td>   <a class="typedef" href="../../../../global/management/include/G4Types.hh.html#G4double" title='G4double' data-type='double' data-ref="G4double">G4double</a> <dfn class="decl" id="G4IonParametrisedLossModel::dedxCacheEnergyCut" title='G4IonParametrisedLossModel::dedxCacheEnergyCut' data-ref="G4IonParametrisedLossModel::dedxCacheEnergyCut">dedxCacheEnergyCut</dfn>;                   <i>//      3) cut energy </i></td></tr>
+<tr><th id="351">351</th><td>   <span class='error' title="use of undeclared identifier &apos;LossTableList&apos;">LossTableList</span>::iterator <dfn class="decl" id="G4IonParametrisedLossModel::dedxCacheIter" title='G4IonParametrisedLossModel::dedxCacheIter' data-ref="G4IonParametrisedLossModel::dedxCacheIter">dedxCacheIter</dfn>;         <i>// Responsible dE/dx table</i></td></tr>
+<tr><th id="352">352</th><td>   <a class="typedef" href="../../../../global/management/include/G4Types.hh.html#G4double" title='G4double' data-type='double' data-ref="G4double">G4double</a> <dfn class="decl" id="G4IonParametrisedLossModel::dedxCacheTransitionEnergy" title='G4IonParametrisedLossModel::dedxCacheTransitionEnergy' data-ref="G4IonParametrisedLossModel::dedxCacheTransitionEnergy">dedxCacheTransitionEnergy</dfn>;      <i>// Transition energy between</i></td></tr>
+<tr><th id="353">353</th><td>                                            <i>// parameterization and </i></td></tr>
+<tr><th id="354">354</th><td><i>                                            // Bethe-Bloch model</i></td></tr>
+<tr><th id="355">355</th><td>   <a class="typedef" href="../../../../global/management/include/G4Types.hh.html#G4double" title='G4double' data-type='double' data-ref="G4double">G4double</a> <dfn class="decl" id="G4IonParametrisedLossModel::dedxCacheTransitionFactor" title='G4IonParametrisedLossModel::dedxCacheTransitionFactor' data-ref="G4IonParametrisedLossModel::dedxCacheTransitionFactor">dedxCacheTransitionFactor</dfn>;      <i>// Factor for smoothing the dE/dx</i></td></tr>
+<tr><th id="356">356</th><td>                                            <i>// values in the transition region</i></td></tr>
+<tr><th id="357">357</th><td>   <a class="typedef" href="../../../../global/management/include/G4Types.hh.html#G4double" title='G4double' data-type='double' data-ref="G4double">G4double</a> <dfn class="decl" id="G4IonParametrisedLossModel::dedxCacheGenIonMassRatio" title='G4IonParametrisedLossModel::dedxCacheGenIonMassRatio' data-ref="G4IonParametrisedLossModel::dedxCacheGenIonMassRatio">dedxCacheGenIonMassRatio</dfn>;       <i>// Ratio of generic ion mass       </i></td></tr>
+<tr><th id="358">358</th><td>                                            <i>// and current particle mass</i></td></tr>
+<tr><th id="359">359</th><td>};</td></tr>
+<tr><th id="360">360</th><td></td></tr>
+<tr><th id="361">361</th><td></td></tr>
+<tr><th id="362">362</th><td><u>#include <a href="G4IonParametrisedLossModel.icc.html">"G4IonParametrisedLossModel.icc"</a></u></td></tr>
+<tr><th id="363">363</th><td></td></tr>
+<tr><th id="364">364</th><td><u>#<span data-ppcond="66">endif</span></u></td></tr>
+<tr><th id="365">365</th><td></td></tr>
+</table><hr/><p id='footer'>
+Generated while processing <a href='../../../../physics_lists/constructors/electromagnetic/src/G4EmLivermorePhysics.cc.html'>codebrowser/source/physics_lists/constructors/electromagnetic/src/G4EmLivermorePhysics.cc</a><br/>Generated on <em>2019-Aug-28</em> from project codebrowser<br />Powered by <a href='https://woboq.com'><img alt='Woboq' src='https://code.woboq.org/woboq-16.png' width='41' height='16' /></a> <a href='https://code.woboq.org'>Code Browser</a> 2.1
+<br/>Generator usage only permitted with license.</p>
+</div></body></html>

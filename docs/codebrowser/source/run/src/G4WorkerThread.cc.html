@@ -1,0 +1,260 @@
+<!doctype html>
+<html>
+<head>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"><title>G4WorkerThread.cc source code [codebrowser/source/run/src/G4WorkerThread.cc] - Woboq Code Browser</title>
+<link rel="stylesheet" href="../../../../../data/qtcreator.css" title="QtCreator"/>
+<link rel="alternate stylesheet" href="../../../../../data/kdevelop.css" title="KDevelop"/>
+<script type="text/javascript" src="../../../../../data/jquery/jquery.min.js"></script>
+<script type="text/javascript" src="../../../../../data/jquery/jquery-ui.min.js"></script>
+<script>var file = 'codebrowser/source/run/src/G4WorkerThread.cc'; var root_path = '../../../..'; var data_path = '../../../../../data';</script>
+<script src='../../../../../data/codebrowser.js'></script>
+</head>
+<body><div id='header'><h1 id='breadcrumb'><span>Browse the source code of </span><a href='../../..'>codebrowser</a>/<a href='../..'>source</a>/<a href='..'>run</a>/<a href='./'>src</a>/<a href='G4WorkerThread.cc.html'>G4WorkerThread.cc</a></h1></div>
+<hr/><div id='content'><table class="code">
+<tr><th id="1">1</th><td><i>//</i></td></tr>
+<tr><th id="2">2</th><td><i>// ********************************************************************</i></td></tr>
+<tr><th id="3">3</th><td><i>// * License and Disclaimer                                           *</i></td></tr>
+<tr><th id="4">4</th><td><i>// *                                                                  *</i></td></tr>
+<tr><th id="5">5</th><td><i>// * The  Geant4 software  is  copyright of the Copyright Holders  of *</i></td></tr>
+<tr><th id="6">6</th><td><i>// * the Geant4 Collaboration.  It is provided  under  the terms  and *</i></td></tr>
+<tr><th id="7">7</th><td><i>// * conditions of the Geant4 Software License,  included in the file *</i></td></tr>
+<tr><th id="8">8</th><td><i>// * LICENSE and available at  <a href="http://cern.ch/geant4/license">http://cern.ch/geant4/license</a> .  These *</i></td></tr>
+<tr><th id="9">9</th><td><i>// * include a list of copyright holders.                             *</i></td></tr>
+<tr><th id="10">10</th><td><i>// *                                                                  *</i></td></tr>
+<tr><th id="11">11</th><td><i>// * Neither the authors of this software system, nor their employing *</i></td></tr>
+<tr><th id="12">12</th><td><i>// * institutes,nor the agencies providing financial support for this *</i></td></tr>
+<tr><th id="13">13</th><td><i>// * work  make  any representation or  warranty, express or implied, *</i></td></tr>
+<tr><th id="14">14</th><td><i>// * regarding  this  software system or assume any liability for its *</i></td></tr>
+<tr><th id="15">15</th><td><i>// * use.  Please see the license in the file  LICENSE  and URL above *</i></td></tr>
+<tr><th id="16">16</th><td><i>// * for the full disclaimer and the limitation of liability.         *</i></td></tr>
+<tr><th id="17">17</th><td><i>// *                                                                  *</i></td></tr>
+<tr><th id="18">18</th><td><i>// * This  code  implementation is the result of  the  scientific and *</i></td></tr>
+<tr><th id="19">19</th><td><i>// * technical work of the GEANT4 collaboration.                      *</i></td></tr>
+<tr><th id="20">20</th><td><i>// * By using,  copying,  modifying or  distributing the software (or *</i></td></tr>
+<tr><th id="21">21</th><td><i>// * any work based  on the software)  you  agree  to acknowledge its *</i></td></tr>
+<tr><th id="22">22</th><td><i>// * use  in  resulting  scientific  publications,  and indicate your *</i></td></tr>
+<tr><th id="23">23</th><td><i>// * acceptance of all terms of the Geant4 Software license.          *</i></td></tr>
+<tr><th id="24">24</th><td><i>// ********************************************************************</i></td></tr>
+<tr><th id="25">25</th><td><i>//</i></td></tr>
+<tr><th id="26">26</th><td><u>#include <a href="../include/G4WorkerThread.hh.html">"G4WorkerThread.hh"</a></u></td></tr>
+<tr><th id="27">27</th><td><u>#include <a href="../include/G4WorkerRunManager.hh.html">"G4WorkerRunManager.hh"</a></u></td></tr>
+<tr><th id="28">28</th><td><u>#include <a href="../include/G4MTRunManager.hh.html">"G4MTRunManager.hh"</a></u></td></tr>
+<tr><th id="29">29</th><td></td></tr>
+<tr><th id="30">30</th><td><u>#include <a href="../../geometry/volumes/include/G4GeometryWorkspace.hh.html">"G4GeometryWorkspace.hh"</a></u></td></tr>
+<tr><th id="31">31</th><td><u>#include <a href="../../geometry/solids/specific/include/G4SolidsWorkspace.hh.html">"G4SolidsWorkspace.hh"</a></u></td></tr>
+<tr><th id="32">32</th><td><u>#include <a href="../../particles/management/include/G4ParticlesWorkspace.hh.html">"G4ParticlesWorkspace.hh"</a></u></td></tr>
+<tr><th id="33">33</th><td><u>#include <a href="../include/G4PhysicsListWorkspace.hh.html">"G4PhysicsListWorkspace.hh"</a></u></td></tr>
+<tr><th id="34">34</th><td></td></tr>
+<tr><th id="35">35</th><td><u>#include <a href="../../geometry/management/include/G4Region.hh.html">"G4Region.hh"</a></u></td></tr>
+<tr><th id="36">36</th><td><u>#include <a href="../../geometry/management/include/G4RegionStore.hh.html">"G4RegionStore.hh"</a></u></td></tr>
+<tr><th id="37">37</th><td><u>#include <a href="../../geometry/management/include/G4LogicalVolume.hh.html">"G4LogicalVolume.hh"</a></u></td></tr>
+<tr><th id="38">38</th><td><u>#include <a href="../../geometry/management/include/G4Region.hh.html">"G4Region.hh"</a></u></td></tr>
+<tr><th id="39">39</th><td><u>#include <a href="../../geometry/management/include/G4PhysicalVolumeStore.hh.html">"G4PhysicalVolumeStore.hh"</a></u></td></tr>
+<tr><th id="40">40</th><td><u>#include <a href="../../geometry/management/include/G4LogicalVolumeStore.hh.html">"G4LogicalVolumeStore.hh"</a></u></td></tr>
+<tr><th id="41">41</th><td></td></tr>
+<tr><th id="42">42</th><td><em>void</em> <a class="type" href="../include/G4WorkerThread.hh.html#G4WorkerThread" title='G4WorkerThread' data-ref="G4WorkerThread">G4WorkerThread</a>::<dfn class="decl def" id="_ZN14G4WorkerThread11SetThreadIdEi" title='G4WorkerThread::SetThreadId' data-ref="_ZN14G4WorkerThread11SetThreadIdEi">SetThreadId</dfn>(<a class="typedef" href="../../global/management/include/G4Types.hh.html#G4int" title='G4int' data-type='int' data-ref="G4int">G4int</a> <dfn class="local col1 decl" id="1tid" title='tid' data-type='G4int' data-ref="1tid">tid</dfn>)</td></tr>
+<tr><th id="43">43</th><td>{</td></tr>
+<tr><th id="44">44</th><td>    <a class="member" href="../include/G4WorkerThread.hh.html#G4WorkerThread::threadId" title='G4WorkerThread::threadId' data-ref="G4WorkerThread::threadId">threadId</a> = <a class="local col1 ref" href="#1tid" title='tid' data-ref="1tid">tid</a>;</td></tr>
+<tr><th id="45">45</th><td>}</td></tr>
+<tr><th id="46">46</th><td></td></tr>
+<tr><th id="47">47</th><td><a class="typedef" href="../../global/management/include/G4Types.hh.html#G4int" title='G4int' data-type='int' data-ref="G4int">G4int</a> <a class="type" href="../include/G4WorkerThread.hh.html#G4WorkerThread" title='G4WorkerThread' data-ref="G4WorkerThread">G4WorkerThread</a>::<dfn class="decl def" id="_ZNK14G4WorkerThread11GetThreadIdEv" title='G4WorkerThread::GetThreadId' data-ref="_ZNK14G4WorkerThread11GetThreadIdEv">GetThreadId</dfn>() <em>const</em></td></tr>
+<tr><th id="48">48</th><td>{</td></tr>
+<tr><th id="49">49</th><td>    <b>return</b> <a class="member" href="../include/G4WorkerThread.hh.html#G4WorkerThread::threadId" title='G4WorkerThread::threadId' data-ref="G4WorkerThread::threadId">threadId</a>;</td></tr>
+<tr><th id="50">50</th><td>}</td></tr>
+<tr><th id="51">51</th><td></td></tr>
+<tr><th id="52">52</th><td><em>void</em> <a class="type" href="../include/G4WorkerThread.hh.html#G4WorkerThread" title='G4WorkerThread' data-ref="G4WorkerThread">G4WorkerThread</a>::<dfn class="decl def" id="_ZN14G4WorkerThread16SetNumberThreadsEi" title='G4WorkerThread::SetNumberThreads' data-ref="_ZN14G4WorkerThread16SetNumberThreadsEi">SetNumberThreads</dfn>(<a class="typedef" href="../../global/management/include/G4Types.hh.html#G4int" title='G4int' data-type='int' data-ref="G4int">G4int</a> <dfn class="local col2 decl" id="2nw" title='nw' data-type='G4int' data-ref="2nw">nw</dfn>)</td></tr>
+<tr><th id="53">53</th><td>{</td></tr>
+<tr><th id="54">54</th><td>    <a class="member" href="../include/G4WorkerThread.hh.html#G4WorkerThread::numThreads" title='G4WorkerThread::numThreads' data-ref="G4WorkerThread::numThreads">numThreads</a> = <a class="local col2 ref" href="#2nw" title='nw' data-ref="2nw">nw</a>;</td></tr>
+<tr><th id="55">55</th><td>}</td></tr>
+<tr><th id="56">56</th><td></td></tr>
+<tr><th id="57">57</th><td><a class="typedef" href="../../global/management/include/G4Types.hh.html#G4int" title='G4int' data-type='int' data-ref="G4int">G4int</a> <a class="type" href="../include/G4WorkerThread.hh.html#G4WorkerThread" title='G4WorkerThread' data-ref="G4WorkerThread">G4WorkerThread</a>::<dfn class="decl def" id="_ZNK14G4WorkerThread16GetNumberThreadsEv" title='G4WorkerThread::GetNumberThreads' data-ref="_ZNK14G4WorkerThread16GetNumberThreadsEv">GetNumberThreads</dfn>() <em>const</em></td></tr>
+<tr><th id="58">58</th><td>{</td></tr>
+<tr><th id="59">59</th><td>    <b>return</b> <a class="member" href="../include/G4WorkerThread.hh.html#G4WorkerThread::numThreads" title='G4WorkerThread::numThreads' data-ref="G4WorkerThread::numThreads">numThreads</a>;</td></tr>
+<tr><th id="60">60</th><td>}</td></tr>
+<tr><th id="61">61</th><td></td></tr>
+<tr><th id="62">62</th><td><em>void</em> <a class="type" href="../include/G4WorkerThread.hh.html#G4WorkerThread" title='G4WorkerThread' data-ref="G4WorkerThread">G4WorkerThread</a>::<dfn class="decl def" id="_ZN14G4WorkerThread29BuildGeometryAndPhysicsVectorEv" title='G4WorkerThread::BuildGeometryAndPhysicsVector' data-ref="_ZN14G4WorkerThread29BuildGeometryAndPhysicsVectorEv">BuildGeometryAndPhysicsVector</dfn>()</td></tr>
+<tr><th id="63">63</th><td>{</td></tr>
+<tr><th id="64">64</th><td>    <i>// Initialise all split classes</i></td></tr>
+<tr><th id="65">65</th><td><i>    // with copy of data from master thread</i></td></tr>
+<tr><th id="66">66</th><td></td></tr>
+<tr><th id="67">67</th><td>    <a class="type" href="../../geometry/volumes/include/G4GeometryWorkspace.hh.html#G4GeometryWorkspace" title='G4GeometryWorkspace' data-ref="G4GeometryWorkspace">G4GeometryWorkspace</a>::<a class="ref" href="../../geometry/volumes/include/G4GeometryWorkspace.hh.html#_ZN19G4GeometryWorkspace7GetPoolEv" title='G4GeometryWorkspace::GetPool' data-ref="_ZN19G4GeometryWorkspace7GetPoolEv">GetPool</a>()-&gt;<a class="ref" href="../../global/management/include/G4TWorkspacePool.hh.html#_ZN16G4TWorkspacePool21CreateAndUseWorkspaceEv" title='G4TWorkspacePool::CreateAndUseWorkspace' data-ref="_ZN16G4TWorkspacePool21CreateAndUseWorkspaceEv">CreateAndUseWorkspace</a>();</td></tr>
+<tr><th id="68">68</th><td>    <a class="type" href="../../geometry/solids/specific/include/G4SolidsWorkspace.hh.html#G4SolidsWorkspace" title='G4SolidsWorkspace' data-ref="G4SolidsWorkspace">G4SolidsWorkspace</a>::<a class="ref" href="../../geometry/solids/specific/include/G4SolidsWorkspace.hh.html#_ZN17G4SolidsWorkspace7GetPoolEv" title='G4SolidsWorkspace::GetPool' data-ref="_ZN17G4SolidsWorkspace7GetPoolEv">GetPool</a>()-&gt;<a class="ref" href="../../global/management/include/G4TWorkspacePool.hh.html#_ZN16G4TWorkspacePool21CreateAndUseWorkspaceEv" title='G4TWorkspacePool::CreateAndUseWorkspace' data-ref="_ZN16G4TWorkspacePool21CreateAndUseWorkspaceEv">CreateAndUseWorkspace</a>();</td></tr>
+<tr><th id="69">69</th><td>    <a class="type" href="../../particles/management/include/G4ParticlesWorkspace.hh.html#G4ParticlesWorkspace" title='G4ParticlesWorkspace' data-ref="G4ParticlesWorkspace">G4ParticlesWorkspace</a>::<a class="ref" href="../../particles/management/include/G4ParticlesWorkspace.hh.html#_ZN20G4ParticlesWorkspace7GetPoolEv" title='G4ParticlesWorkspace::GetPool' data-ref="_ZN20G4ParticlesWorkspace7GetPoolEv">GetPool</a>()-&gt;<a class="ref" href="../../global/management/include/G4TWorkspacePool.hh.html#_ZN16G4TWorkspacePool21CreateAndUseWorkspaceEv" title='G4TWorkspacePool::CreateAndUseWorkspace' data-ref="_ZN16G4TWorkspacePool21CreateAndUseWorkspaceEv">CreateAndUseWorkspace</a>();</td></tr>
+<tr><th id="70">70</th><td>    <a class="type" href="../include/G4PhysicsListWorkspace.hh.html#G4PhysicsListWorkspace" title='G4PhysicsListWorkspace' data-ref="G4PhysicsListWorkspace">G4PhysicsListWorkspace</a>::<a class="ref" href="../include/G4PhysicsListWorkspace.hh.html#_ZN22G4PhysicsListWorkspace7GetPoolEv" title='G4PhysicsListWorkspace::GetPool' data-ref="_ZN22G4PhysicsListWorkspace7GetPoolEv">GetPool</a>()-&gt;<a class="ref" href="../../global/management/include/G4TWorkspacePool.hh.html#_ZN16G4TWorkspacePool21CreateAndUseWorkspaceEv" title='G4TWorkspacePool::CreateAndUseWorkspace' data-ref="_ZN16G4TWorkspacePool21CreateAndUseWorkspaceEv">CreateAndUseWorkspace</a>();</td></tr>
+<tr><th id="71">71</th><td>}</td></tr>
+<tr><th id="72">72</th><td></td></tr>
+<tr><th id="73">73</th><td><em>void</em> <a class="type" href="../include/G4WorkerThread.hh.html#G4WorkerThread" title='G4WorkerThread' data-ref="G4WorkerThread">G4WorkerThread</a>::<dfn class="decl def" id="_ZN14G4WorkerThread31DestroyGeometryAndPhysicsVectorEv" title='G4WorkerThread::DestroyGeometryAndPhysicsVector' data-ref="_ZN14G4WorkerThread31DestroyGeometryAndPhysicsVectorEv">DestroyGeometryAndPhysicsVector</dfn>()</td></tr>
+<tr><th id="74">74</th><td>{</td></tr>
+<tr><th id="75">75</th><td>    <i>// Clear all split classes</i></td></tr>
+<tr><th id="76">76</th><td></td></tr>
+<tr><th id="77">77</th><td>    <a class="type" href="../../geometry/volumes/include/G4GeometryWorkspace.hh.html#G4GeometryWorkspace" title='G4GeometryWorkspace' data-ref="G4GeometryWorkspace">G4GeometryWorkspace</a>::<a class="ref" href="../../geometry/volumes/include/G4GeometryWorkspace.hh.html#_ZN19G4GeometryWorkspace7GetPoolEv" title='G4GeometryWorkspace::GetPool' data-ref="_ZN19G4GeometryWorkspace7GetPoolEv">GetPool</a>()-&gt;<a class="ref" href="../../global/management/include/G4TWorkspacePool.hh.html#_ZN16G4TWorkspacePool30CleanUpAndDestroyAllWorkspacesEv" title='G4TWorkspacePool::CleanUpAndDestroyAllWorkspaces' data-ref="_ZN16G4TWorkspacePool30CleanUpAndDestroyAllWorkspacesEv">CleanUpAndDestroyAllWorkspaces</a>();</td></tr>
+<tr><th id="78">78</th><td>    <a class="type" href="../../geometry/solids/specific/include/G4SolidsWorkspace.hh.html#G4SolidsWorkspace" title='G4SolidsWorkspace' data-ref="G4SolidsWorkspace">G4SolidsWorkspace</a>::<a class="ref" href="../../geometry/solids/specific/include/G4SolidsWorkspace.hh.html#_ZN17G4SolidsWorkspace7GetPoolEv" title='G4SolidsWorkspace::GetPool' data-ref="_ZN17G4SolidsWorkspace7GetPoolEv">GetPool</a>()-&gt;<a class="ref" href="../../global/management/include/G4TWorkspacePool.hh.html#_ZN16G4TWorkspacePool30CleanUpAndDestroyAllWorkspacesEv" title='G4TWorkspacePool::CleanUpAndDestroyAllWorkspaces' data-ref="_ZN16G4TWorkspacePool30CleanUpAndDestroyAllWorkspacesEv">CleanUpAndDestroyAllWorkspaces</a>();</td></tr>
+<tr><th id="79">79</th><td>    <a class="type" href="../../particles/management/include/G4ParticlesWorkspace.hh.html#G4ParticlesWorkspace" title='G4ParticlesWorkspace' data-ref="G4ParticlesWorkspace">G4ParticlesWorkspace</a>::<a class="ref" href="../../particles/management/include/G4ParticlesWorkspace.hh.html#_ZN20G4ParticlesWorkspace7GetPoolEv" title='G4ParticlesWorkspace::GetPool' data-ref="_ZN20G4ParticlesWorkspace7GetPoolEv">GetPool</a>()-&gt;<a class="ref" href="../../global/management/include/G4TWorkspacePool.hh.html#_ZN16G4TWorkspacePool30CleanUpAndDestroyAllWorkspacesEv" title='G4TWorkspacePool::CleanUpAndDestroyAllWorkspaces' data-ref="_ZN16G4TWorkspacePool30CleanUpAndDestroyAllWorkspacesEv">CleanUpAndDestroyAllWorkspaces</a>();    </td></tr>
+<tr><th id="80">80</th><td>    <a class="type" href="../include/G4PhysicsListWorkspace.hh.html#G4PhysicsListWorkspace" title='G4PhysicsListWorkspace' data-ref="G4PhysicsListWorkspace">G4PhysicsListWorkspace</a>::<a class="ref" href="../include/G4PhysicsListWorkspace.hh.html#_ZN22G4PhysicsListWorkspace7GetPoolEv" title='G4PhysicsListWorkspace::GetPool' data-ref="_ZN22G4PhysicsListWorkspace7GetPoolEv">GetPool</a>()-&gt;<a class="ref" href="../../global/management/include/G4TWorkspacePool.hh.html#_ZN16G4TWorkspacePool30CleanUpAndDestroyAllWorkspacesEv" title='G4TWorkspacePool::CleanUpAndDestroyAllWorkspaces' data-ref="_ZN16G4TWorkspacePool30CleanUpAndDestroyAllWorkspacesEv">CleanUpAndDestroyAllWorkspaces</a>();</td></tr>
+<tr><th id="81">81</th><td>}</td></tr>
+<tr><th id="82">82</th><td></td></tr>
+<tr><th id="83">83</th><td><em>void</em> <a class="type" href="../include/G4WorkerThread.hh.html#G4WorkerThread" title='G4WorkerThread' data-ref="G4WorkerThread">G4WorkerThread</a>::<dfn class="decl def" id="_ZN14G4WorkerThread40UpdateGeometryAndPhysicsVectorFromMasterEv" title='G4WorkerThread::UpdateGeometryAndPhysicsVectorFromMaster' data-ref="_ZN14G4WorkerThread40UpdateGeometryAndPhysicsVectorFromMasterEv">UpdateGeometryAndPhysicsVectorFromMaster</dfn>()</td></tr>
+<tr><th id="84">84</th><td>{</td></tr>
+<tr><th id="85">85</th><td>    <i>// =================================================</i></td></tr>
+<tr><th id="86">86</th><td><i>    // Step-0: keep sensitive detector and field manager</i></td></tr>
+<tr><th id="87">87</th><td><i>    // =================================================</i></td></tr>
+<tr><th id="88">88</th><td><i>    // First remember SD and Filed Associated with worker</i></td></tr>
+<tr><th id="89">89</th><td><i>    // in order to re-use it</i></td></tr>
+<tr><th id="90">90</th><td><i>    // (note that all the stuff after this will reset SD and Field)</i></td></tr>
+<tr><th id="91">91</th><td>    <b>typedef</b> <span class='error' title="use of undeclared identifier &apos;std&apos;">std</span>::map<span class='error' title="expected unqualified-id">&lt;</span>G4LogicalVolume*,</td></tr>
+<tr><th id="92">92</th><td>            std::pair&lt;G4VSensitiveDetector*,G4FieldManager*&gt; &gt; LV2SDFM;</td></tr>
+<tr><th id="93">93</th><td>    <span class='error' title="unknown type name &apos;LV2SDFM&apos;">LV2SDFM</span> <dfn class="local col3 decl" id="3lvmap" title='lvmap' data-type='int' data-ref="3lvmap">lvmap</dfn>;</td></tr>
+<tr><th id="94">94</th><td></td></tr>
+<tr><th id="95">95</th><td>    <b>typedef</b> <span class='error' title="use of undeclared identifier &apos;std&apos;">std</span>::map<span class='error' title="expected unqualified-id">&lt;</span>G4Region*,</td></tr>
+<tr><th id="96">96</th><td>            std::pair&lt;G4FastSimulationManager*,G4UserSteppingAction*&gt; &gt; R2FSM;</td></tr>
+<tr><th id="97">97</th><td>    <span class='error' title="unknown type name &apos;R2FSM&apos;">R2FSM</span> <dfn class="local col4 decl" id="4rgnmap" title='rgnmap' data-type='int' data-ref="4rgnmap">rgnmap</dfn>;</td></tr>
+<tr><th id="98">98</th><td></td></tr>
+<tr><th id="99">99</th><td>    <a class="type" href="../../geometry/management/include/G4LogicalVolumeStore.hh.html#G4LogicalVolumeStore" title='G4LogicalVolumeStore' data-ref="G4LogicalVolumeStore">G4LogicalVolumeStore</a>* <dfn class="local col5 decl" id="5mLogVolStore" title='mLogVolStore' data-type='G4LogicalVolumeStore *' data-ref="5mLogVolStore">mLogVolStore</dfn> = <a class="type" href="../../geometry/management/include/G4LogicalVolumeStore.hh.html#G4LogicalVolumeStore" title='G4LogicalVolumeStore' data-ref="G4LogicalVolumeStore">G4LogicalVolumeStore</a>::<a class="ref" href="../../geometry/management/include/G4LogicalVolumeStore.hh.html#_ZN20G4LogicalVolumeStore11GetInstanceEv" title='G4LogicalVolumeStore::GetInstance' data-ref="_ZN20G4LogicalVolumeStore11GetInstanceEv">GetInstance</a>();</td></tr>
+<tr><th id="100">100</th><td>    <b>for</b>(<span class='error' title="unknown type name &apos;size_t&apos;">size_t</span> <dfn class="local col6 decl" id="6ip" title='ip' data-type='int' data-ref="6ip">ip</dfn>=<var>0</var>; ip&lt;mLogVolStore-&gt;<span class='error' title="no member named &apos;size&apos; in &apos;G4LogicalVolumeStore&apos;">size</span>(); ip++)</td></tr>
+<tr><th id="101">101</th><td>    {</td></tr>
+<tr><th id="102">102</th><td>        <a class="type" href="../../geometry/management/include/G4LogicalVolume.hh.html#G4LogicalVolume" title='G4LogicalVolume' data-ref="G4LogicalVolume">G4LogicalVolume</a> *<dfn class="local col7 decl" id="7lv" title='lv' data-type='G4LogicalVolume *' data-ref="7lv">lv</dfn> = (*mLogVolStore)[ip];</td></tr>
+<tr><th id="103">103</th><td></td></tr>
+<tr><th id="104">104</th><td>        <i>// The following needs an explanation.</i></td></tr>
+<tr><th id="105">105</th><td><i>        // Consider the case in which the user adds one LogVolume between</i></td></tr>
+<tr><th id="106">106</th><td><i>        // the runs. The problem is that the thread-local part (split class)</i></td></tr>
+<tr><th id="107">107</th><td><i>        // of the G4LogicalVolume object is not initialized for workers</i></td></tr>
+<tr><th id="108">108</th><td><i>        // because the initialization is done once when the thread starts</i></td></tr>
+<tr><th id="109">109</th><td><i>        // (see G4MTRunManagerKernel::StartThread Step-2 that calls</i></td></tr>
+<tr><th id="110">110</th><td><i>        // G4WorkerThread::BuildGeometryAndPhysicsVector in this class).</i></td></tr>
+<tr><th id="111">111</th><td><i>        // The problem is that pointers of SD and FM for these newly added LV</i></td></tr>
+<tr><th id="112">112</th><td><i>        // may be invalid pointers (because never initialized, we have seen</i></td></tr>
+<tr><th id="113">113</th><td><i>        // this behavior in our testing). If now we remember them and re-use</i></td></tr>
+<tr><th id="114">114</th><td><i>        // them in Step-4 below we set invalid pointers to LV for this thread.</i></td></tr>
+<tr><th id="115">115</th><td><i>        // Thus we need a way to know if for a given LV we need to remember</i></td></tr>
+<tr><th id="116">116</th><td><i>        // or not the SD and FM pointers.</i></td></tr>
+<tr><th id="117">117</th><td><i>        // To solve this problem: We assume that the ConstructSDandField() is</i></td></tr>
+<tr><th id="118">118</th><td><i>        // called also by Master thread, thus for newly added LV the shadow</i></td></tr>
+<tr><th id="119">119</th><td><i>        // pointers of SD and Fields are correct.</i></td></tr>
+<tr><th id="120">120</th><td><i>        // (LIMITATION: this assumption may be too stringent, a user to save</i></td></tr>
+<tr><th id="121">121</th><td><i>        // memory could instantiate SD only for workers, but we require this</i></td></tr>
+<tr><th id="122">122</th><td><i>        // not to happen!).</i></td></tr>
+<tr><th id="123">123</th><td><i>        // Thus if a SD and FieldMgr are needed for this particular LV, and</i></td></tr>
+<tr><th id="124">124</th><td><i>        // shadow are !=0 it means that user wants an SD and FM to be</i></td></tr>
+<tr><th id="125">125</th><td><i>        // associated with LV, we get the values and we remember them.</i></td></tr>
+<tr><th id="126">126</th><td><i>        //</i></td></tr>
+<tr><th id="127">127</th><td>        <a class="type" href="../../geometry/management/include/G4LogicalVolume.hh.html#G4VSensitiveDetector" title='G4VSensitiveDetector' data-ref="G4VSensitiveDetector">G4VSensitiveDetector</a>* <dfn class="local col8 decl" id="8sd" title='sd' data-type='G4VSensitiveDetector *' data-ref="8sd">sd</dfn> = <var>0</var>;</td></tr>
+<tr><th id="128">128</th><td>        <a class="type" href="../../geometry/management/include/G4Region.hh.html#G4FieldManager" title='G4FieldManager' data-ref="G4FieldManager">G4FieldManager</a>* <dfn class="local col9 decl" id="9fmgr" title='fmgr' data-type='G4FieldManager *' data-ref="9fmgr">fmgr</dfn> = <var>0</var>;</td></tr>
+<tr><th id="129">129</th><td>        <b>if</b> ( <a class="local col7 ref" href="#7lv" title='lv' data-ref="7lv">lv</a>-&gt;<a class="ref" href="../../geometry/management/include/G4LogicalVolume.hh.html#_ZNK15G4LogicalVolume26GetMasterSensitiveDetectorEv" title='G4LogicalVolume::GetMasterSensitiveDetector' data-ref="_ZNK15G4LogicalVolume26GetMasterSensitiveDetectorEv">GetMasterSensitiveDetector</a>() != <var>0</var> )</td></tr>
+<tr><th id="130">130</th><td>        {</td></tr>
+<tr><th id="131">131</th><td>           <a class="local col8 ref" href="#8sd" title='sd' data-ref="8sd">sd</a> = <a class="local col7 ref" href="#7lv" title='lv' data-ref="7lv">lv</a>-&gt;<a class="ref" href="../../geometry/management/include/G4LogicalVolume.hh.html#_ZNK15G4LogicalVolume20GetSensitiveDetectorEv" title='G4LogicalVolume::GetSensitiveDetector' data-ref="_ZNK15G4LogicalVolume20GetSensitiveDetectorEv">GetSensitiveDetector</a>();</td></tr>
+<tr><th id="132">132</th><td>        }</td></tr>
+<tr><th id="133">133</th><td>        <b>if</b> ( <a class="local col7 ref" href="#7lv" title='lv' data-ref="7lv">lv</a>-&gt;<a class="ref" href="../../geometry/management/include/G4LogicalVolume.hh.html#_ZNK15G4LogicalVolume21GetMasterFieldManagerEv" title='G4LogicalVolume::GetMasterFieldManager' data-ref="_ZNK15G4LogicalVolume21GetMasterFieldManagerEv">GetMasterFieldManager</a>() != <var>0</var> )</td></tr>
+<tr><th id="134">134</th><td>        {</td></tr>
+<tr><th id="135">135</th><td>           <a class="local col9 ref" href="#9fmgr" title='fmgr' data-ref="9fmgr">fmgr</a> = <a class="local col7 ref" href="#7lv" title='lv' data-ref="7lv">lv</a>-&gt;<a class="ref" href="../../geometry/management/include/G4LogicalVolume.hh.html#_ZNK15G4LogicalVolume15GetFieldManagerEv" title='G4LogicalVolume::GetFieldManager' data-ref="_ZNK15G4LogicalVolume15GetFieldManagerEv">GetFieldManager</a>();</td></tr>
+<tr><th id="136">136</th><td>        }</td></tr>
+<tr><th id="137">137</th><td>        <b>if</b> ( <a class="local col8 ref" href="#8sd" title='sd' data-ref="8sd">sd</a> || <a class="local col9 ref" href="#9fmgr" title='fmgr' data-ref="9fmgr">fmgr</a> )</td></tr>
+<tr><th id="138">138</th><td>        {</td></tr>
+<tr><th id="139">139</th><td>           lvmap[lv] = <span class='error' title="use of undeclared identifier &apos;std&apos;">std</span>::make_pair(sd,fmgr);</td></tr>
+<tr><th id="140">140</th><td>        }</td></tr>
+<tr><th id="141">141</th><td>    }</td></tr>
+<tr><th id="142">142</th><td>    <a class="type" href="../../geometry/management/include/G4RegionStore.hh.html#G4RegionStore" title='G4RegionStore' data-ref="G4RegionStore">G4RegionStore</a>* <dfn class="local col0 decl" id="10mRegStore" title='mRegStore' data-type='G4RegionStore *' data-ref="10mRegStore">mRegStore</dfn> = <a class="type" href="../../geometry/management/include/G4RegionStore.hh.html#G4RegionStore" title='G4RegionStore' data-ref="G4RegionStore">G4RegionStore</a>::<a class="ref" href="../../geometry/management/include/G4RegionStore.hh.html#_ZN13G4RegionStore11GetInstanceEv" title='G4RegionStore::GetInstance' data-ref="_ZN13G4RegionStore11GetInstanceEv">GetInstance</a>();</td></tr>
+<tr><th id="143">143</th><td>    <b>for</b>(<span class='error' title="unknown type name &apos;size_t&apos;">size_t</span> <dfn class="local col1 decl" id="11ir" title='ir' data-type='int' data-ref="11ir">ir</dfn>=<var>0</var>; ir&lt;mRegStore-&gt;<span class='error' title="no member named &apos;size&apos; in &apos;G4RegionStore&apos;">size</span>(); ir++)</td></tr>
+<tr><th id="144">144</th><td>    {</td></tr>
+<tr><th id="145">145</th><td>        <a class="type" href="../../geometry/management/include/G4Region.hh.html#G4Region" title='G4Region' data-ref="G4Region">G4Region</a>* <dfn class="local col2 decl" id="12reg" title='reg' data-type='G4Region *' data-ref="12reg">reg</dfn> = (*mRegStore)[ir];</td></tr>
+<tr><th id="146">146</th><td>        <a class="type" href="../../geometry/management/include/G4Region.hh.html#G4FastSimulationManager" title='G4FastSimulationManager' data-ref="G4FastSimulationManager">G4FastSimulationManager</a>* <dfn class="local col3 decl" id="13fsm" title='fsm' data-type='G4FastSimulationManager *' data-ref="13fsm">fsm</dfn> = <a class="local col2 ref" href="#12reg" title='reg' data-ref="12reg">reg</a>-&gt;<a class="ref" href="../../geometry/management/include/G4Region.hh.html#_ZNK8G4Region24GetFastSimulationManagerEv" title='G4Region::GetFastSimulationManager' data-ref="_ZNK8G4Region24GetFastSimulationManagerEv">GetFastSimulationManager</a>();</td></tr>
+<tr><th id="147">147</th><td>        <a class="type" href="../../tracking/include/G4UserSteppingAction.hh.html#G4UserSteppingAction" title='G4UserSteppingAction' data-ref="G4UserSteppingAction">G4UserSteppingAction</a>* <dfn class="local col4 decl" id="14usa" title='usa' data-type='G4UserSteppingAction *' data-ref="14usa">usa</dfn> = <a class="local col2 ref" href="#12reg" title='reg' data-ref="12reg">reg</a>-&gt;<a class="ref" href="../../geometry/management/include/G4Region.hh.html#_ZNK8G4Region25GetRegionalSteppingActionEv" title='G4Region::GetRegionalSteppingAction' data-ref="_ZNK8G4Region25GetRegionalSteppingActionEv">GetRegionalSteppingAction</a>();</td></tr>
+<tr><th id="148">148</th><td>        <b>if</b> ( <a class="local col2 ref" href="#12reg" title='reg' data-ref="12reg">reg</a> || <a class="local col4 ref" href="#14usa" title='usa' data-ref="14usa">usa</a> )</td></tr>
+<tr><th id="149">149</th><td>        {</td></tr>
+<tr><th id="150">150</th><td>           rgnmap[reg] = <span class='error' title="use of undeclared identifier &apos;std&apos;">std</span>::make_pair(fsm,usa);</td></tr>
+<tr><th id="151">151</th><td>        }</td></tr>
+<tr><th id="152">152</th><td>    }</td></tr>
+<tr><th id="153">153</th><td></td></tr>
+<tr><th id="154">154</th><td>    <i>//===========================</i></td></tr>
+<tr><th id="155">155</th><td><i>    // Step-1: Clean the workspace</i></td></tr>
+<tr><th id="156">156</th><td><i>    //===========================</i></td></tr>
+<tr><th id="157">157</th><td>    <a class="type" href="../../geometry/volumes/include/G4GeometryWorkspace.hh.html#G4GeometryWorkspace" title='G4GeometryWorkspace' data-ref="G4GeometryWorkspace">G4GeometryWorkspace</a>* <dfn class="local col5 decl" id="15geomWorkspace" title='geomWorkspace' data-type='G4GeometryWorkspace *' data-ref="15geomWorkspace">geomWorkspace</dfn> =</td></tr>
+<tr><th id="158">158</th><td>      <a class="type" href="../../geometry/volumes/include/G4GeometryWorkspace.hh.html#G4GeometryWorkspace" title='G4GeometryWorkspace' data-ref="G4GeometryWorkspace">G4GeometryWorkspace</a>::<a class="ref" href="../../geometry/volumes/include/G4GeometryWorkspace.hh.html#_ZN19G4GeometryWorkspace7GetPoolEv" title='G4GeometryWorkspace::GetPool' data-ref="_ZN19G4GeometryWorkspace7GetPoolEv">GetPool</a>()-&gt;<a class="ref" href="../../global/management/include/G4TWorkspacePool.hh.html#_ZN16G4TWorkspacePool12GetWorkspaceEv" title='G4TWorkspacePool::GetWorkspace' data-ref="_ZN16G4TWorkspacePool12GetWorkspaceEv">GetWorkspace</a>();</td></tr>
+<tr><th id="159">159</th><td>    <a class="local col5 ref" href="#15geomWorkspace" title='geomWorkspace' data-ref="15geomWorkspace">geomWorkspace</a>-&gt;<a class="ref" href="../../geometry/volumes/include/G4GeometryWorkspace.hh.html#_ZN19G4GeometryWorkspace16DestroyWorkspaceEv" title='G4GeometryWorkspace::DestroyWorkspace' data-ref="_ZN19G4GeometryWorkspace16DestroyWorkspaceEv">DestroyWorkspace</a>();</td></tr>
+<tr><th id="160">160</th><td>    <a class="type" href="../../geometry/solids/specific/include/G4SolidsWorkspace.hh.html#G4SolidsWorkspace" title='G4SolidsWorkspace' data-ref="G4SolidsWorkspace">G4SolidsWorkspace</a>* <dfn class="local col6 decl" id="16solidWorkspace" title='solidWorkspace' data-type='G4SolidsWorkspace *' data-ref="16solidWorkspace">solidWorkspace</dfn> =</td></tr>
+<tr><th id="161">161</th><td>      <a class="type" href="../../geometry/solids/specific/include/G4SolidsWorkspace.hh.html#G4SolidsWorkspace" title='G4SolidsWorkspace' data-ref="G4SolidsWorkspace">G4SolidsWorkspace</a>::<a class="ref" href="../../geometry/solids/specific/include/G4SolidsWorkspace.hh.html#_ZN17G4SolidsWorkspace7GetPoolEv" title='G4SolidsWorkspace::GetPool' data-ref="_ZN17G4SolidsWorkspace7GetPoolEv">GetPool</a>()-&gt;<a class="ref" href="../../global/management/include/G4TWorkspacePool.hh.html#_ZN16G4TWorkspacePool12GetWorkspaceEv" title='G4TWorkspacePool::GetWorkspace' data-ref="_ZN16G4TWorkspacePool12GetWorkspaceEv">GetWorkspace</a>();</td></tr>
+<tr><th id="162">162</th><td>    <a class="local col6 ref" href="#16solidWorkspace" title='solidWorkspace' data-ref="16solidWorkspace">solidWorkspace</a>-&gt;<a class="ref" href="../../geometry/solids/specific/include/G4SolidsWorkspace.hh.html#_ZN17G4SolidsWorkspace16DestroyWorkspaceEv" title='G4SolidsWorkspace::DestroyWorkspace' data-ref="_ZN17G4SolidsWorkspace16DestroyWorkspaceEv">DestroyWorkspace</a>();</td></tr>
+<tr><th id="163">163</th><td>    </td></tr>
+<tr><th id="164">164</th><td>    <i>//===========================</i></td></tr>
+<tr><th id="165">165</th><td><i>    // Step-2: Re-create and initialize workspace</i></td></tr>
+<tr><th id="166">166</th><td><i>    //===========================</i></td></tr>
+<tr><th id="167">167</th><td>    <a class="local col5 ref" href="#15geomWorkspace" title='geomWorkspace' data-ref="15geomWorkspace">geomWorkspace</a>-&gt;<a class="ref" href="../../geometry/volumes/include/G4GeometryWorkspace.hh.html#_ZN19G4GeometryWorkspace19InitialiseWorkspaceEv" title='G4GeometryWorkspace::InitialiseWorkspace' data-ref="_ZN19G4GeometryWorkspace19InitialiseWorkspaceEv">InitialiseWorkspace</a>();</td></tr>
+<tr><th id="168">168</th><td>    <a class="local col6 ref" href="#16solidWorkspace" title='solidWorkspace' data-ref="16solidWorkspace">solidWorkspace</a>-&gt;<a class="ref" href="../../geometry/solids/specific/include/G4SolidsWorkspace.hh.html#_ZN17G4SolidsWorkspace19InitialiseWorkspaceEv" title='G4SolidsWorkspace::InitialiseWorkspace' data-ref="_ZN17G4SolidsWorkspace19InitialiseWorkspaceEv">InitialiseWorkspace</a>();</td></tr>
+<tr><th id="169">169</th><td>    </td></tr>
+<tr><th id="170">170</th><td>    <i>//===================================================</i></td></tr>
+<tr><th id="171">171</th><td><i>    // Step-4: Restore sensitive detector and field manaer</i></td></tr>
+<tr><th id="172">172</th><td><i>    //===================================================</i></td></tr>
+<tr><th id="173">173</th><td>    <b>for</b> ( <span class='error' title="use of undeclared identifier &apos;LV2SDFM&apos;">LV2SDFM</span>::const_iterator <dfn class="local col7 decl" id="17it" title='it' data-type='int' data-ref="17it">it</dfn> = lvmap.begin() ;</td></tr>
+<tr><th id="174">174</th><td>          it != lvmap.end() ; ++it )</td></tr>
+<tr><th id="175">175</th><td>    {</td></tr>
+<tr><th id="176">176</th><td>        <a class="type" href="../../geometry/management/include/G4LogicalVolume.hh.html#G4LogicalVolume" title='G4LogicalVolume' data-ref="G4LogicalVolume">G4LogicalVolume</a>* <dfn class="local col8 decl" id="18lv" title='lv' data-type='G4LogicalVolume *' data-ref="18lv">lv</dfn>      = it-&gt;first;</td></tr>
+<tr><th id="177">177</th><td>        <a class="type" href="../../geometry/management/include/G4LogicalVolume.hh.html#G4VSensitiveDetector" title='G4VSensitiveDetector' data-ref="G4VSensitiveDetector">G4VSensitiveDetector</a>* <dfn class="local col9 decl" id="19sd" title='sd' data-type='G4VSensitiveDetector *' data-ref="19sd">sd</dfn> = (it-&gt;second).first;</td></tr>
+<tr><th id="178">178</th><td>        <a class="type" href="../../geometry/management/include/G4Region.hh.html#G4FieldManager" title='G4FieldManager' data-ref="G4FieldManager">G4FieldManager</a>* <dfn class="local col0 decl" id="20fmgr" title='fmgr' data-type='G4FieldManager *' data-ref="20fmgr">fmgr</dfn>       = (it-&gt;second).second;</td></tr>
+<tr><th id="179">179</th><td>        <b>if</b> (<a class="local col0 ref" href="#20fmgr" title='fmgr' data-ref="20fmgr">fmgr</a>) <i>// What should be the second parameter?</i></td></tr>
+<tr><th id="180">180</th><td>        {         <i>// We use always false for MT mode</i></td></tr>
+<tr><th id="181">181</th><td>           <a class="local col8 ref" href="#18lv" title='lv' data-ref="18lv">lv</a>-&gt;<a class="ref" href="../../geometry/management/include/G4LogicalVolume.hh.html#_ZN15G4LogicalVolume15SetFieldManagerEP14G4FieldManagerb" title='G4LogicalVolume::SetFieldManager' data-ref="_ZN15G4LogicalVolume15SetFieldManagerEP14G4FieldManagerb">SetFieldManager</a>(<a class="local col0 ref" href="#20fmgr" title='fmgr' data-ref="20fmgr">fmgr</a>, <b>false</b>);</td></tr>
+<tr><th id="182">182</th><td>        }   </td></tr>
+<tr><th id="183">183</th><td>        <b>if</b> (<a class="local col9 ref" href="#19sd" title='sd' data-ref="19sd">sd</a>)</td></tr>
+<tr><th id="184">184</th><td>        {</td></tr>
+<tr><th id="185">185</th><td>           <a class="local col8 ref" href="#18lv" title='lv' data-ref="18lv">lv</a>-&gt;<a class="ref" href="../../geometry/management/include/G4LogicalVolume.hh.html#_ZN15G4LogicalVolume20SetSensitiveDetectorEP20G4VSensitiveDetector" title='G4LogicalVolume::SetSensitiveDetector' data-ref="_ZN15G4LogicalVolume20SetSensitiveDetectorEP20G4VSensitiveDetector">SetSensitiveDetector</a>(<a class="local col9 ref" href="#19sd" title='sd' data-ref="19sd">sd</a>);</td></tr>
+<tr><th id="186">186</th><td>        }</td></tr>
+<tr><th id="187">187</th><td>    }</td></tr>
+<tr><th id="188">188</th><td>    <b>for</b> ( <span class='error' title="use of undeclared identifier &apos;R2FSM&apos;">R2FSM</span>::const_iterator <dfn class="local col1 decl" id="21it3" title='it3' data-type='int' data-ref="21it3">it3</dfn> = rgnmap.begin() ;</td></tr>
+<tr><th id="189">189</th><td>          it3 != rgnmap.end() ; it3++ )</td></tr>
+<tr><th id="190">190</th><td>    {</td></tr>
+<tr><th id="191">191</th><td>        <a class="type" href="../../geometry/management/include/G4Region.hh.html#G4Region" title='G4Region' data-ref="G4Region">G4Region</a>* <dfn class="local col2 decl" id="22reg" title='reg' data-type='G4Region *' data-ref="22reg">reg</dfn> = it3-&gt;first;</td></tr>
+<tr><th id="192">192</th><td>        <a class="type" href="../../geometry/management/include/G4Region.hh.html#G4FastSimulationManager" title='G4FastSimulationManager' data-ref="G4FastSimulationManager">G4FastSimulationManager</a>* <dfn class="local col3 decl" id="23fsm" title='fsm' data-type='G4FastSimulationManager *' data-ref="23fsm">fsm</dfn> = (it3-&gt;second).first;</td></tr>
+<tr><th id="193">193</th><td>        <b>if</b>(<a class="local col3 ref" href="#23fsm" title='fsm' data-ref="23fsm">fsm</a>) <a class="local col2 ref" href="#22reg" title='reg' data-ref="22reg">reg</a>-&gt;<a class="ref" href="../../geometry/management/include/G4Region.hh.html#_ZN8G4Region24SetFastSimulationManagerEP23G4FastSimulationManager" title='G4Region::SetFastSimulationManager' data-ref="_ZN8G4Region24SetFastSimulationManagerEP23G4FastSimulationManager">SetFastSimulationManager</a>(<a class="local col3 ref" href="#23fsm" title='fsm' data-ref="23fsm">fsm</a>);</td></tr>
+<tr><th id="194">194</th><td>        <a class="type" href="../../tracking/include/G4UserSteppingAction.hh.html#G4UserSteppingAction" title='G4UserSteppingAction' data-ref="G4UserSteppingAction">G4UserSteppingAction</a>* <dfn class="local col4 decl" id="24usa" title='usa' data-type='G4UserSteppingAction *' data-ref="24usa">usa</dfn> = (it3-&gt;second).second;</td></tr>
+<tr><th id="195">195</th><td>        <b>if</b>(<a class="local col4 ref" href="#24usa" title='usa' data-ref="24usa">usa</a>) <a class="local col2 ref" href="#22reg" title='reg' data-ref="22reg">reg</a>-&gt;<a class="ref" href="../../geometry/management/include/G4Region.hh.html#_ZN8G4Region25SetRegionalSteppingActionEP20G4UserSteppingAction" title='G4Region::SetRegionalSteppingAction' data-ref="_ZN8G4Region25SetRegionalSteppingActionEP20G4UserSteppingAction">SetRegionalSteppingAction</a>(<a class="local col4 ref" href="#24usa" title='usa' data-ref="24usa">usa</a>);</td></tr>
+<tr><th id="196">196</th><td>    }</td></tr>
+<tr><th id="197">197</th><td>}</td></tr>
+<tr><th id="198">198</th><td></td></tr>
+<tr><th id="199">199</th><td><em>void</em> <a class="type" href="../include/G4WorkerThread.hh.html#G4WorkerThread" title='G4WorkerThread' data-ref="G4WorkerThread">G4WorkerThread</a>::<dfn class="decl def" id="_ZNK14G4WorkerThread14SetPinAffinityEi" title='G4WorkerThread::SetPinAffinity' data-ref="_ZNK14G4WorkerThread14SetPinAffinityEi">SetPinAffinity</dfn>(<a class="typedef" href="../../global/management/include/G4Types.hh.html#G4int" title='G4int' data-type='int' data-ref="G4int">G4int</a> <dfn class="local col5 decl" id="25affinity" title='affinity' data-type='G4int' data-ref="25affinity">affinity</dfn>) <em>const</em></td></tr>
+<tr><th id="200">200</th><td>{</td></tr>
+<tr><th id="201">201</th><td>  <b>if</b> ( <a class="local col5 ref" href="#25affinity" title='affinity' data-ref="25affinity">affinity</a> == <var>0</var> ) <b>return</b>;</td></tr>
+<tr><th id="202">202</th><td></td></tr>
+<tr><th id="203">203</th><td><u>#<span data-ppcond="203">if</span> !defined(<span class="macro" data-ref="_M/WIN32">WIN32</span>)</u></td></tr>
+<tr><th id="204">204</th><td>  <a class="macro" href="../../global/management/include/G4ios.hh.html#46" title="(*_G4cout_p())" data-ref="_M/G4cout">G4cout</a> <span class='error' title="invalid operands to binary expression (&apos;int&apos; and &apos;const char *&apos;)">&lt;&lt;</span> <q>"AFFINITY SET"</q> &lt;&lt; <a class="macro" href="../../global/management/include/G4ios.hh.html#60" title="std::endl" data-ref="_M/G4endl">G4endl</a>;</td></tr>
+<tr><th id="205">205</th><td>  <i>// Assign this thread to cpus in a round robin way</i></td></tr>
+<tr><th id="206">206</th><td>  <a class="typedef" href="../../global/management/include/G4Types.hh.html#G4int" title='G4int' data-type='int' data-ref="G4int">G4int</a> <dfn class="local col6 decl" id="26offset" title='offset' data-type='G4int' data-ref="26offset">offset</dfn> = <a class="local col5 ref" href="#25affinity" title='affinity' data-ref="25affinity">affinity</a>;</td></tr>
+<tr><th id="207">207</th><td>  <a class="typedef" href="../../global/management/include/G4Types.hh.html#G4int" title='G4int' data-type='int' data-ref="G4int">G4int</a> <dfn class="local col7 decl" id="27cpuindex" title='cpuindex' data-type='G4int' data-ref="27cpuindex">cpuindex</dfn> = <var>0</var>;</td></tr>
+<tr><th id="208">208</th><td>  <b>if</b> ( <span class='error' title="use of undeclared identifier &apos;std&apos;">std</span>::abs(offset)&gt;G4Threading::G4GetNumberOfCores() )</td></tr>
+<tr><th id="209">209</th><td>  {</td></tr>
+<tr><th id="210">210</th><td>      <a class="ref" href="../../global/management/include/G4Exception.hh.html#_Z11G4ExceptionPKcS0_19G4ExceptionSeverityS0_" title='G4Exception' data-ref="_Z11G4ExceptionPKcS0_19G4ExceptionSeverityS0_">G4Exception</a>(<q>"G4WorkerThread::SetPinAffinity()"</q>,<q>"Run0100"</q>, <a class="enum" href="../../global/management/include/G4ExceptionSeverity.hh.html#G4ExceptionSeverity::JustWarning" title='G4ExceptionSeverity::JustWarning' data-ref="G4ExceptionSeverity::JustWarning">JustWarning</a>,</td></tr>
+<tr><th id="211">211</th><td>      <q>"Cannot set thread affinity, affinity parameter larger than number of cores"</q>);</td></tr>
+<tr><th id="212">212</th><td>      <b>return</b>;</td></tr>
+<tr><th id="213">213</th><td>  }</td></tr>
+<tr><th id="214">214</th><td>  <b>if</b> (<a class="local col6 ref" href="#26offset" title='offset' data-ref="26offset">offset</a>&gt;<var>0</var>)  <i>// Start assigning affinity to given CPU</i></td></tr>
+<tr><th id="215">215</th><td>  {</td></tr>
+<tr><th id="216">216</th><td>      --<a class="local col6 ref" href="#26offset" title='offset' data-ref="26offset">offset</a>;</td></tr>
+<tr><th id="217">217</th><td>      <a class="local col7 ref" href="#27cpuindex" title='cpuindex' data-ref="27cpuindex">cpuindex</a> = (<a class="member" href="#_ZNK14G4WorkerThread11GetThreadIdEv" title='G4WorkerThread::GetThreadId' data-ref="_ZNK14G4WorkerThread11GetThreadIdEv">GetThreadId</a>()+<a class="local col6 ref" href="#26offset" title='offset' data-ref="26offset">offset</a>) % <span class="namespace">G4Threading::</span><a class="ref" href="../../global/management/include/G4Threading.hh.html#_ZN11G4Threading18G4GetNumberOfCoresEv" title='G4Threading::G4GetNumberOfCores' data-ref="_ZN11G4Threading18G4GetNumberOfCoresEv">G4GetNumberOfCores</a>();</td></tr>
+<tr><th id="218">218</th><td>      <i>// Round robin</i></td></tr>
+<tr><th id="219">219</th><td>  }</td></tr>
+<tr><th id="220">220</th><td>  <b>else</b>  <i>// Exclude the given CPU</i></td></tr>
+<tr><th id="221">221</th><td>  {</td></tr>
+<tr><th id="222">222</th><td>      <a class="local col6 ref" href="#26offset" title='offset' data-ref="26offset">offset</a> *= -<var>1</var>;</td></tr>
+<tr><th id="223">223</th><td>      --<a class="local col6 ref" href="#26offset" title='offset' data-ref="26offset">offset</a>;</td></tr>
+<tr><th id="224">224</th><td>      <a class="typedef" href="../../global/management/include/G4Types.hh.html#G4int" title='G4int' data-type='int' data-ref="G4int">G4int</a> <dfn class="local col8 decl" id="28myidx" title='myidx' data-type='G4int' data-ref="28myidx">myidx</dfn> = <a class="member" href="#_ZNK14G4WorkerThread11GetThreadIdEv" title='G4WorkerThread::GetThreadId' data-ref="_ZNK14G4WorkerThread11GetThreadIdEv">GetThreadId</a>()%(<span class="namespace">G4Threading::</span><a class="ref" href="../../global/management/include/G4Threading.hh.html#_ZN11G4Threading18G4GetNumberOfCoresEv" title='G4Threading::G4GetNumberOfCores' data-ref="_ZN11G4Threading18G4GetNumberOfCoresEv">G4GetNumberOfCores</a>()-<var>1</var>);</td></tr>
+<tr><th id="225">225</th><td>      <a class="local col7 ref" href="#27cpuindex" title='cpuindex' data-ref="27cpuindex">cpuindex</a> = <a class="local col8 ref" href="#28myidx" title='myidx' data-ref="28myidx">myidx</a> + (<a class="local col8 ref" href="#28myidx" title='myidx' data-ref="28myidx">myidx</a>&gt;=<a class="local col6 ref" href="#26offset" title='offset' data-ref="26offset">offset</a>);</td></tr>
+<tr><th id="226">226</th><td>  }</td></tr>
+<tr><th id="227">227</th><td>  <a class="macro" href="../../global/management/include/G4ios.hh.html#46" title="(*_G4cout_p())" data-ref="_M/G4cout">G4cout</a> <span class='error' title="invalid operands to binary expression (&apos;int&apos; and &apos;const char *&apos;)">&lt;&lt;</span> <q>"Setting affinity to:"</q> &lt;&lt; cpuindex &lt;&lt; <a class="macro" href="../../global/management/include/G4ios.hh.html#60" title="std::endl" data-ref="_M/G4endl">G4endl</a>;</td></tr>
+<tr><th id="228">228</th><td></td></tr>
+<tr><th id="229">229</th><td><u>#<span data-ppcond="229">if</span> defined(<span class="macro" data-ref="_M/G4MULTITHREADED">G4MULTITHREADED</span>)</u></td></tr>
+<tr><th id="230">230</th><td>    <i>// Avoid compilation warning in C90 standard w/o MT</i></td></tr>
+<tr><th id="231">231</th><td>    <span class='error' title="unknown type name &apos;G4NativeThread&apos;">G4NativeThread</span> <dfn class="local col9 decl" id="29t" title='t' data-type='int' data-ref="29t">t</dfn> = <span class='error' title="use of undeclared identifier &apos;pthread_self&apos;">pthread_self</span>();</td></tr>
+<tr><th id="232">232</th><td><u>#<span data-ppcond="229">else</span></u></td></tr>
+<tr><th id="233">233</th><td>    G4NativeThread t;</td></tr>
+<tr><th id="234">234</th><td><u>#<span data-ppcond="229">endif</span></u></td></tr>
+<tr><th id="235">235</th><td>  <a class="typedef" href="../../global/management/include/G4Types.hh.html#G4bool" title='G4bool' data-type='bool' data-ref="G4bool">G4bool</a> <dfn class="local col0 decl" id="30success" title='success' data-type='G4bool' data-ref="30success">success</dfn> = G4Threading::G4SetPinAffinity(cpuindex,t);</td></tr>
+<tr><th id="236">236</th><td>  <b>if</b> ( ! <a class="local col0 ref" href="#30success" title='success' data-ref="30success">success</a> )</td></tr>
+<tr><th id="237">237</th><td>  {</td></tr>
+<tr><th id="238">238</th><td>      <a class="ref" href="../../global/management/include/G4Exception.hh.html#_Z11G4ExceptionPKcS0_19G4ExceptionSeverityS0_" title='G4Exception' data-ref="_Z11G4ExceptionPKcS0_19G4ExceptionSeverityS0_">G4Exception</a>(<q>"G4MTRunManagerKernel::StarThread()"</q>, <q>"Run0101"</q>,</td></tr>
+<tr><th id="239">239</th><td>                  <a class="enum" href="../../global/management/include/G4ExceptionSeverity.hh.html#G4ExceptionSeverity::JustWarning" title='G4ExceptionSeverity::JustWarning' data-ref="G4ExceptionSeverity::JustWarning">JustWarning</a>, <q>"Cannot set thread affinity."</q>);</td></tr>
+<tr><th id="240">240</th><td>  }</td></tr>
+<tr><th id="241">241</th><td><u>#<span data-ppcond="203">endif</span></u></td></tr>
+<tr><th id="242">242</th><td>}</td></tr>
+<tr><th id="243">243</th><td></td></tr>
+</table><hr/><p id='footer'>
+Generated on <em>2019-Aug-28</em> from project codebrowser<br />Powered by <a href='https://woboq.com'><img alt='Woboq' src='https://code.woboq.org/woboq-16.png' width='41' height='16' /></a> <a href='https://code.woboq.org'>Code Browser</a> 2.1
+<br/>Generator usage only permitted with license.</p>
+</div></body></html>

@@ -1,0 +1,753 @@
+<!doctype html>
+<html>
+<head>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"><title>G4VEmAdjointModel.cc source code [codebrowser/source/processes/electromagnetic/adjoint/src/G4VEmAdjointModel.cc] - Woboq Code Browser</title>
+<link rel="stylesheet" href="../../../../../../../data/qtcreator.css" title="QtCreator"/>
+<link rel="alternate stylesheet" href="../../../../../../../data/kdevelop.css" title="KDevelop"/>
+<script type="text/javascript" src="../../../../../../../data/jquery/jquery.min.js"></script>
+<script type="text/javascript" src="../../../../../../../data/jquery/jquery-ui.min.js"></script>
+<script>var file = 'codebrowser/source/processes/electromagnetic/adjoint/src/G4VEmAdjointModel.cc'; var root_path = '../../../../../..'; var data_path = '../../../../../../../data';</script>
+<script src='../../../../../../../data/codebrowser.js'></script>
+</head>
+<body><div id='header'><h1 id='breadcrumb'><span>Browse the source code of </span><a href='../../../../..'>codebrowser</a>/<a href='../../../..'>source</a>/<a href='../../..'>processes</a>/<a href='../..'>electromagnetic</a>/<a href='..'>adjoint</a>/<a href='./'>src</a>/<a href='G4VEmAdjointModel.cc.html'>G4VEmAdjointModel.cc</a></h1></div>
+<hr/><div id='content'><table class="code">
+<tr><th id="1">1</th><td><i>//</i></td></tr>
+<tr><th id="2">2</th><td><i>// ********************************************************************</i></td></tr>
+<tr><th id="3">3</th><td><i>// * License and Disclaimer                                           *</i></td></tr>
+<tr><th id="4">4</th><td><i>// *                                                                  *</i></td></tr>
+<tr><th id="5">5</th><td><i>// * The  Geant4 software  is  copyright of the Copyright Holders  of *</i></td></tr>
+<tr><th id="6">6</th><td><i>// * the Geant4 Collaboration.  It is provided  under  the terms  and *</i></td></tr>
+<tr><th id="7">7</th><td><i>// * conditions of the Geant4 Software License,  included in the file *</i></td></tr>
+<tr><th id="8">8</th><td><i>// * LICENSE and available at  <a href="http://cern.ch/geant4/license">http://cern.ch/geant4/license</a> .  These *</i></td></tr>
+<tr><th id="9">9</th><td><i>// * include a list of copyright holders.                             *</i></td></tr>
+<tr><th id="10">10</th><td><i>// *                                                                  *</i></td></tr>
+<tr><th id="11">11</th><td><i>// * Neither the authors of this software system, nor their employing *</i></td></tr>
+<tr><th id="12">12</th><td><i>// * institutes,nor the agencies providing financial support for this *</i></td></tr>
+<tr><th id="13">13</th><td><i>// * work  make  any representation or  warranty, express or implied, *</i></td></tr>
+<tr><th id="14">14</th><td><i>// * regarding  this  software system or assume any liability for its *</i></td></tr>
+<tr><th id="15">15</th><td><i>// * use.  Please see the license in the file  LICENSE  and URL above *</i></td></tr>
+<tr><th id="16">16</th><td><i>// * for the full disclaimer and the limitation of liability.         *</i></td></tr>
+<tr><th id="17">17</th><td><i>// *                                                                  *</i></td></tr>
+<tr><th id="18">18</th><td><i>// * This  code  implementation is the result of  the  scientific and *</i></td></tr>
+<tr><th id="19">19</th><td><i>// * technical work of the GEANT4 collaboration.                      *</i></td></tr>
+<tr><th id="20">20</th><td><i>// * By using,  copying,  modifying or  distributing the software (or *</i></td></tr>
+<tr><th id="21">21</th><td><i>// * any work based  on the software)  you  agree  to acknowledge its *</i></td></tr>
+<tr><th id="22">22</th><td><i>// * use  in  resulting  scientific  publications,  and indicate your *</i></td></tr>
+<tr><th id="23">23</th><td><i>// * acceptance of all terms of the Geant4 Software license.          *</i></td></tr>
+<tr><th id="24">24</th><td><i>// ********************************************************************</i></td></tr>
+<tr><th id="25">25</th><td><i>//</i></td></tr>
+<tr><th id="26">26</th><td><i>//</i></td></tr>
+<tr><th id="27">27</th><td><u>#include <a href="../include/G4VEmAdjointModel.hh.html">"G4VEmAdjointModel.hh"</a></u></td></tr>
+<tr><th id="28">28</th><td><u>#include <a href="../include/G4AdjointCSManager.hh.html">"G4AdjointCSManager.hh"</a></u></td></tr>
+<tr><th id="29">29</th><td><u>#include <a href="../../../../global/HEPNumerics/include/G4Integrator.hh.html">"G4Integrator.hh"</a></u></td></tr>
+<tr><th id="30">30</th><td><u>#include <a href="../../../../track/include/G4TrackStatus.hh.html">"G4TrackStatus.hh"</a></u></td></tr>
+<tr><th id="31">31</th><td><u>#include <a href="../../../../track/include/G4ParticleChange.hh.html">"G4ParticleChange.hh"</a></u></td></tr>
+<tr><th id="32">32</th><td><u>#include <a href="../../../../particles/adjoint/include/G4AdjointElectron.hh.html">"G4AdjointElectron.hh"</a></u></td></tr>
+<tr><th id="33">33</th><td><u>#include <a href="../../../../particles/adjoint/include/G4AdjointGamma.hh.html">"G4AdjointGamma.hh"</a></u></td></tr>
+<tr><th id="34">34</th><td><u>#include <a href="../../../../particles/adjoint/include/G4AdjointPositron.hh.html">"G4AdjointPositron.hh"</a></u></td></tr>
+<tr><th id="35">35</th><td><u>#include <a href="../include/G4AdjointInterpolator.hh.html">"G4AdjointInterpolator.hh"</a></u></td></tr>
+<tr><th id="36">36</th><td><u>#include <a href="../../../../global/management/include/G4PhysicsTable.hh.html">"G4PhysicsTable.hh"</a></u></td></tr>
+<tr><th id="37">37</th><td></td></tr>
+<tr><th id="38">38</th><td><i>////////////////////////////////////////////////////////////////////////////////</i></td></tr>
+<tr><th id="39">39</th><td><i>//</i></td></tr>
+<tr><th id="40">40</th><td><a class="type" href="../include/G4VEmAdjointModel.hh.html#G4VEmAdjointModel" title='G4VEmAdjointModel' data-ref="G4VEmAdjointModel">G4VEmAdjointModel</a>::<dfn class="decl def" id="_ZN17G4VEmAdjointModelC1ERK8G4String" title='G4VEmAdjointModel::G4VEmAdjointModel' data-ref="_ZN17G4VEmAdjointModelC1ERK8G4String">G4VEmAdjointModel</dfn>(<em>const</em> <a class="type" href="../../../../global/management/include/G4String.hh.html#G4String" title='G4String' data-ref="G4String">G4String</a>&amp; <dfn class="local col1 decl" id="1nam" title='nam' data-type='const G4String &amp;' data-ref="1nam">nam</dfn>):</td></tr>
+<tr><th id="41">41</th><td><a class="member" href="../include/G4VEmAdjointModel.hh.html#G4VEmAdjointModel::name" title='G4VEmAdjointModel::name' data-ref="G4VEmAdjointModel::name">name</a><a class="ref" href="../../../../global/management/include/G4String.hh.html#_ZN8G4StringC1ERKS_" title='G4String::G4String' data-ref="_ZN8G4StringC1ERKS_">(</a><a class="local col1 ref" href="#1nam" title='nam' data-ref="1nam">nam</a>)</td></tr>
+<tr><th id="42">42</th><td><i>// lowLimit(0.1*keV), highLimit(100.0*TeV), fluc(0), name(nam), pParticleChange(0)</i></td></tr>
+<tr><th id="43">43</th><td>{ </td></tr>
+<tr><th id="44">44</th><td>  model_index = G4AdjointCSManager::GetAdjointCSManager()-&gt;RegisterEmAdjointModel(<b>this</b>);</td></tr>
+<tr><th id="45">45</th><td>  <a class="member" href="../include/G4VEmAdjointModel.hh.html#G4VEmAdjointModel::second_part_of_same_type" title='G4VEmAdjointModel::second_part_of_same_type' data-ref="G4VEmAdjointModel::second_part_of_same_type">second_part_of_same_type</a> =<b>false</b>;</td></tr>
+<tr><th id="46">46</th><td>  <a class="member" href="../include/G4VEmAdjointModel.hh.html#G4VEmAdjointModel::theDirectEMModel" title='G4VEmAdjointModel::theDirectEMModel' data-ref="G4VEmAdjointModel::theDirectEMModel">theDirectEMModel</a>=<var>0</var>;</td></tr>
+<tr><th id="47">47</th><td>  <a class="member" href="../include/G4VEmAdjointModel.hh.html#G4VEmAdjointModel::mass_ratio_product" title='G4VEmAdjointModel::mass_ratio_product' data-ref="G4VEmAdjointModel::mass_ratio_product">mass_ratio_product</a>=<var>1.</var>;</td></tr>
+<tr><th id="48">48</th><td>  <a class="member" href="../include/G4VEmAdjointModel.hh.html#G4VEmAdjointModel::mass_ratio_projectile" title='G4VEmAdjointModel::mass_ratio_projectile' data-ref="G4VEmAdjointModel::mass_ratio_projectile">mass_ratio_projectile</a>=<var>1.</var>;</td></tr>
+<tr><th id="49">49</th><td>  <a class="member" href="../include/G4VEmAdjointModel.hh.html#G4VEmAdjointModel::currentCouple" title='G4VEmAdjointModel::currentCouple' data-ref="G4VEmAdjointModel::currentCouple">currentCouple</a>=<var>0</var>;</td></tr>
+<tr><th id="50">50</th><td>  <a class="member" href="../include/G4VEmAdjointModel.hh.html#G4VEmAdjointModel::additional_weight_correction_factor_for_post_step_outside_model" title='G4VEmAdjointModel::additional_weight_correction_factor_for_post_step_outside_model' data-ref="G4VEmAdjointModel::additional_weight_correction_factor_for_post_step_outside_model">additional_weight_correction_factor_for_post_step_outside_model</a>=<var>1.</var>;</td></tr>
+<tr><th id="51">51</th><td>}</td></tr>
+<tr><th id="52">52</th><td><i>////////////////////////////////////////////////////////////////////////////////</i></td></tr>
+<tr><th id="53">53</th><td><i>//</i></td></tr>
+<tr><th id="54">54</th><td>G4VEmAdjointModel::<span class='error' title="exception specification in declaration does not match previous declaration">~</span>G4VEmAdjointModel()</td></tr>
+<tr><th id="55">55</th><td>{;}</td></tr>
+<tr><th id="56">56</th><td><i>////////////////////////////////////////////////////////////////////////////////</i></td></tr>
+<tr><th id="57">57</th><td><i>//				</i></td></tr>
+<tr><th id="58">58</th><td><a class="typedef" href="../../../../global/management/include/G4Types.hh.html#G4double" title='G4double' data-type='double' data-ref="G4double">G4double</a> <a class="type" href="../include/G4VEmAdjointModel.hh.html#G4VEmAdjointModel" title='G4VEmAdjointModel' data-ref="G4VEmAdjointModel">G4VEmAdjointModel</a>::<dfn class="virtual decl def" id="_ZN17G4VEmAdjointModel19AdjointCrossSectionEPK20G4MaterialCutsCoupledb" title='G4VEmAdjointModel::AdjointCrossSection' data-ref="_ZN17G4VEmAdjointModel19AdjointCrossSectionEPK20G4MaterialCutsCoupledb">AdjointCrossSection</dfn>(<em>const</em> <a class="type" href="../../../cuts/include/G4MaterialCutsCouple.hh.html#G4MaterialCutsCouple" title='G4MaterialCutsCouple' data-ref="G4MaterialCutsCouple">G4MaterialCutsCouple</a>* <dfn class="local col2 decl" id="2aCouple" title='aCouple' data-type='const G4MaterialCutsCouple *' data-ref="2aCouple">aCouple</dfn>,</td></tr>
+<tr><th id="59">59</th><td>				<a class="typedef" href="../../../../global/management/include/G4Types.hh.html#G4double" title='G4double' data-type='double' data-ref="G4double">G4double</a> <dfn class="local col3 decl" id="3primEnergy" title='primEnergy' data-type='G4double' data-ref="3primEnergy">primEnergy</dfn>,</td></tr>
+<tr><th id="60">60</th><td>				<a class="typedef" href="../../../../global/management/include/G4Types.hh.html#G4bool" title='G4bool' data-type='bool' data-ref="G4bool">G4bool</a> <dfn class="local col4 decl" id="4IsScatProjToProjCase" title='IsScatProjToProjCase' data-type='G4bool' data-ref="4IsScatProjToProjCase">IsScatProjToProjCase</dfn>)</td></tr>
+<tr><th id="61">61</th><td>{ </td></tr>
+<tr><th id="62">62</th><td>  <a class="member" href="#_ZN17G4VEmAdjointModel21DefineCurrentMaterialEPK20G4MaterialCutsCouple" title='G4VEmAdjointModel::DefineCurrentMaterial' data-ref="_ZN17G4VEmAdjointModel21DefineCurrentMaterialEPK20G4MaterialCutsCouple">DefineCurrentMaterial</a>(<a class="local col2 ref" href="#2aCouple" title='aCouple' data-ref="2aCouple">aCouple</a>);</td></tr>
+<tr><th id="63">63</th><td>  <a class="member" href="../include/G4VEmAdjointModel.hh.html#G4VEmAdjointModel::preStepEnergy" title='G4VEmAdjointModel::preStepEnergy' data-ref="G4VEmAdjointModel::preStepEnergy">preStepEnergy</a>=<a class="local col3 ref" href="#3primEnergy" title='primEnergy' data-ref="3primEnergy">primEnergy</a>;</td></tr>
+<tr><th id="64">64</th><td>  </td></tr>
+<tr><th id="65">65</th><td>  <span class='error' title="use of undeclared identifier &apos;std&apos;">std</span>::vector&lt;<span class='error' title="unexpected type name &apos;G4double&apos;: expected expression">G4double</span>&gt;* <span class='error' title="use of undeclared identifier &apos;CS_Vs_Element&apos;">CS_Vs_Element</span> = &amp;<span class='error' title="use of undeclared identifier &apos;CS_Vs_ElementForProdToProjCase&apos;">CS_Vs_ElementForProdToProjCase</span>;</td></tr>
+<tr><th id="66">66</th><td>  <b>if</b> (IsScatProjToProjCase)   <span class='error' title="use of undeclared identifier &apos;CS_Vs_Element&apos;">CS_Vs_Element</span> = &amp;<span class='error' title="use of undeclared identifier &apos;CS_Vs_ElementForScatProjToProjCase&apos;">CS_Vs_ElementForScatProjToProjCase</span>;</td></tr>
+<tr><th id="67">67</th><td>  lastCS = G4AdjointCSManager::GetAdjointCSManager()-&gt;<span class='error' title="&apos;ComputeAdjointCS&apos; is a private member of &apos;G4AdjointCSManager&apos;">ComputeAdjointCS</span>(currentMaterial,</td></tr>
+<tr><th id="68">68</th><td>					    		 		<b>this</b>, </td></tr>
+<tr><th id="69">69</th><td>					    		 		primEnergy,</td></tr>
+<tr><th id="70">70</th><td>					    		 		currentTcutForDirectSecond,</td></tr>
+<tr><th id="71">71</th><td>					    		 		IsScatProjToProjCase,</td></tr>
+<tr><th id="72">72</th><td>							 		*<span class='error' title="use of undeclared identifier &apos;CS_Vs_Element&apos;">CS_Vs_Element</span>);</td></tr>
+<tr><th id="73">73</th><td>  <b>if</b> (<a class="local col4 ref" href="#4IsScatProjToProjCase" title='IsScatProjToProjCase' data-ref="4IsScatProjToProjCase">IsScatProjToProjCase</a>) <a class="member" href="../include/G4VEmAdjointModel.hh.html#G4VEmAdjointModel::lastAdjointCSForScatProjToProjCase" title='G4VEmAdjointModel::lastAdjointCSForScatProjToProjCase' data-ref="G4VEmAdjointModel::lastAdjointCSForScatProjToProjCase">lastAdjointCSForScatProjToProjCase</a> = <a class="member" href="../include/G4VEmAdjointModel.hh.html#G4VEmAdjointModel::lastCS" title='G4VEmAdjointModel::lastCS' data-ref="G4VEmAdjointModel::lastCS">lastCS</a>;</td></tr>
+<tr><th id="74">74</th><td>  <b>else</b> <a class="member" href="../include/G4VEmAdjointModel.hh.html#G4VEmAdjointModel::lastAdjointCSForProdToProjCase" title='G4VEmAdjointModel::lastAdjointCSForProdToProjCase' data-ref="G4VEmAdjointModel::lastAdjointCSForProdToProjCase">lastAdjointCSForProdToProjCase</a> =<a class="member" href="../include/G4VEmAdjointModel.hh.html#G4VEmAdjointModel::lastCS" title='G4VEmAdjointModel::lastCS' data-ref="G4VEmAdjointModel::lastCS">lastCS</a>;								</td></tr>
+<tr><th id="75">75</th><td>	</td></tr>
+<tr><th id="76">76</th><td> </td></tr>
+<tr><th id="77">77</th><td> </td></tr>
+<tr><th id="78">78</th><td>  <b>return</b> <a class="member" href="../include/G4VEmAdjointModel.hh.html#G4VEmAdjointModel::lastCS" title='G4VEmAdjointModel::lastCS' data-ref="G4VEmAdjointModel::lastCS">lastCS</a>;</td></tr>
+<tr><th id="79">79</th><td>  									</td></tr>
+<tr><th id="80">80</th><td>}</td></tr>
+<tr><th id="81">81</th><td><i>////////////////////////////////////////////////////////////////////////////////</i></td></tr>
+<tr><th id="82">82</th><td><i>//</i></td></tr>
+<tr><th id="83">83</th><td><a class="typedef" href="../../../../global/management/include/G4Types.hh.html#G4double" title='G4double' data-type='double' data-ref="G4double">G4double</a> <a class="type" href="../include/G4VEmAdjointModel.hh.html#G4VEmAdjointModel" title='G4VEmAdjointModel' data-ref="G4VEmAdjointModel">G4VEmAdjointModel</a>::<dfn class="virtual decl def" id="_ZN17G4VEmAdjointModel22GetAdjointCrossSectionEPK20G4MaterialCutsCoupledb" title='G4VEmAdjointModel::GetAdjointCrossSection' data-ref="_ZN17G4VEmAdjointModel22GetAdjointCrossSectionEPK20G4MaterialCutsCoupledb">GetAdjointCrossSection</dfn>(<em>const</em> <a class="type" href="../../../cuts/include/G4MaterialCutsCouple.hh.html#G4MaterialCutsCouple" title='G4MaterialCutsCouple' data-ref="G4MaterialCutsCouple">G4MaterialCutsCouple</a>* <dfn class="local col5 decl" id="5aCouple" title='aCouple' data-type='const G4MaterialCutsCouple *' data-ref="5aCouple">aCouple</dfn>,</td></tr>
+<tr><th id="84">84</th><td>				             <a class="typedef" href="../../../../global/management/include/G4Types.hh.html#G4double" title='G4double' data-type='double' data-ref="G4double">G4double</a> <dfn class="local col6 decl" id="6primEnergy" title='primEnergy' data-type='G4double' data-ref="6primEnergy">primEnergy</dfn>,</td></tr>
+<tr><th id="85">85</th><td>				             <a class="typedef" href="../../../../global/management/include/G4Types.hh.html#G4bool" title='G4bool' data-type='bool' data-ref="G4bool">G4bool</a> <dfn class="local col7 decl" id="7IsScatProjToProjCase" title='IsScatProjToProjCase' data-type='G4bool' data-ref="7IsScatProjToProjCase">IsScatProjToProjCase</dfn>)</td></tr>
+<tr><th id="86">86</th><td>{</td></tr>
+<tr><th id="87">87</th><td>  <b>return</b> <a class="virtual member" href="#_ZN17G4VEmAdjointModel19AdjointCrossSectionEPK20G4MaterialCutsCoupledb" title='G4VEmAdjointModel::AdjointCrossSection' data-ref="_ZN17G4VEmAdjointModel19AdjointCrossSectionEPK20G4MaterialCutsCoupledb">AdjointCrossSection</a>(<a class="local col5 ref" href="#5aCouple" title='aCouple' data-ref="5aCouple">aCouple</a>, <a class="local col6 ref" href="#6primEnergy" title='primEnergy' data-ref="6primEnergy">primEnergy</a>,</td></tr>
+<tr><th id="88">88</th><td>				<a class="local col7 ref" href="#7IsScatProjToProjCase" title='IsScatProjToProjCase' data-ref="7IsScatProjToProjCase">IsScatProjToProjCase</a>);</td></tr>
+<tr><th id="89">89</th><td>  </td></tr>
+<tr><th id="90">90</th><td>  <i>/*</i></td></tr>
+<tr><th id="91">91</th><td><i>  //To continue</i></td></tr>
+<tr><th id="92">92</th><td><i>  DefineCurrentMaterial(aCouple);</i></td></tr>
+<tr><th id="93">93</th><td><i>  preStepEnergy=primEnergy;</i></td></tr>
+<tr><th id="94">94</th><td><i>  if (IsScatProjToProjCase){</i></td></tr>
+<tr><th id="95">95</th><td><i>  	G4double ekin=primEnergy*mass_ratio_projectile;</i></td></tr>
+<tr><th id="96">96</th><td><i>  	lastCS = G4AdjointCSManager::GetAdjointCSManager()-&gt;GetAdjointSigma(ekin, model_index,true, aCouple);</i></td></tr>
+<tr><th id="97">97</th><td><i>	lastAdjointCSForScatProjToProjCase = lastCS;</i></td></tr>
+<tr><th id="98">98</th><td><i>	//G4cout&lt;&lt;ekin&lt;&lt;std::endl;</i></td></tr>
+<tr><th id="99">99</th><td><i>  }</i></td></tr>
+<tr><th id="100">100</th><td><i>  else {</i></td></tr>
+<tr><th id="101">101</th><td><i>  	G4double ekin=primEnergy*mass_ratio_product;</i></td></tr>
+<tr><th id="102">102</th><td><i>	lastCS = G4AdjointCSManager::GetAdjointCSManager()-&gt;GetAdjointSigma(ekin, model_index,false, aCouple);</i></td></tr>
+<tr><th id="103">103</th><td><i>	lastAdjointCSForProdToProjCase = lastCS;</i></td></tr>
+<tr><th id="104">104</th><td><i>	//G4cout&lt;&lt;ekin&lt;&lt;std::endl;</i></td></tr>
+<tr><th id="105">105</th><td><i>  }</i></td></tr>
+<tr><th id="106">106</th><td><i>  return lastCS;</i></td></tr>
+<tr><th id="107">107</th><td><i>  */</i></td></tr>
+<tr><th id="108">108</th><td>}					     				</td></tr>
+<tr><th id="109">109</th><td><i>////////////////////////////////////////////////////////////////////////////////</i></td></tr>
+<tr><th id="110">110</th><td><i>//</i></td></tr>
+<tr><th id="111">111</th><td><i>//General implementation correct for energy loss process, for the photoelectric and compton scattering the method should be redefine  </i></td></tr>
+<tr><th id="112">112</th><td><a class="typedef" href="../../../../global/management/include/G4Types.hh.html#G4double" title='G4double' data-type='double' data-ref="G4double">G4double</a> <a class="type" href="../include/G4VEmAdjointModel.hh.html#G4VEmAdjointModel" title='G4VEmAdjointModel' data-ref="G4VEmAdjointModel">G4VEmAdjointModel</a>::<dfn class="virtual decl def" id="_ZN17G4VEmAdjointModel35DiffCrossSectionPerAtomPrimToSecondEdddd" title='G4VEmAdjointModel::DiffCrossSectionPerAtomPrimToSecond' data-ref="_ZN17G4VEmAdjointModel35DiffCrossSectionPerAtomPrimToSecondEdddd">DiffCrossSectionPerAtomPrimToSecond</dfn>(</td></tr>
+<tr><th id="113">113</th><td>                                      <a class="typedef" href="../../../../global/management/include/G4Types.hh.html#G4double" title='G4double' data-type='double' data-ref="G4double">G4double</a> <dfn class="local col8 decl" id="8kinEnergyProj" title='kinEnergyProj' data-type='G4double' data-ref="8kinEnergyProj">kinEnergyProj</dfn>, </td></tr>
+<tr><th id="114">114</th><td>                                      <a class="typedef" href="../../../../global/management/include/G4Types.hh.html#G4double" title='G4double' data-type='double' data-ref="G4double">G4double</a> <dfn class="local col9 decl" id="9kinEnergyProd" title='kinEnergyProd' data-type='G4double' data-ref="9kinEnergyProd">kinEnergyProd</dfn>,</td></tr>
+<tr><th id="115">115</th><td>				      <a class="typedef" href="../../../../global/management/include/G4Types.hh.html#G4double" title='G4double' data-type='double' data-ref="G4double">G4double</a> <dfn class="local col0 decl" id="10Z" title='Z' data-type='G4double' data-ref="10Z">Z</dfn>, </td></tr>
+<tr><th id="116">116</th><td>                                      <a class="typedef" href="../../../../global/management/include/G4Types.hh.html#G4double" title='G4double' data-type='double' data-ref="G4double">G4double</a> <dfn class="local col1 decl" id="11A" title='A' data-type='G4double' data-ref="11A">A</dfn>)</td></tr>
+<tr><th id="117">117</th><td>{</td></tr>
+<tr><th id="118">118</th><td> <a class="typedef" href="../../../../global/management/include/G4Types.hh.html#G4double" title='G4double' data-type='double' data-ref="G4double">G4double</a> <dfn class="local col2 decl" id="12dSigmadEprod" title='dSigmadEprod' data-type='G4double' data-ref="12dSigmadEprod">dSigmadEprod</dfn>=<var>0</var>;</td></tr>
+<tr><th id="119">119</th><td> <a class="typedef" href="../../../../global/management/include/G4Types.hh.html#G4double" title='G4double' data-type='double' data-ref="G4double">G4double</a> <dfn class="local col3 decl" id="13Emax_proj" title='Emax_proj' data-type='G4double' data-ref="13Emax_proj">Emax_proj</dfn> = <a class="virtual member" href="#_ZN17G4VEmAdjointModel38GetSecondAdjEnergyMaxForProdToProjCaseEd" title='G4VEmAdjointModel::GetSecondAdjEnergyMaxForProdToProjCase' data-ref="_ZN17G4VEmAdjointModel38GetSecondAdjEnergyMaxForProdToProjCaseEd">GetSecondAdjEnergyMaxForProdToProjCase</a>(<a class="local col9 ref" href="#9kinEnergyProd" title='kinEnergyProd' data-ref="9kinEnergyProd">kinEnergyProd</a>);</td></tr>
+<tr><th id="120">120</th><td> <a class="typedef" href="../../../../global/management/include/G4Types.hh.html#G4double" title='G4double' data-type='double' data-ref="G4double">G4double</a> <dfn class="local col4 decl" id="14Emin_proj" title='Emin_proj' data-type='G4double' data-ref="14Emin_proj">Emin_proj</dfn> = <a class="virtual member" href="#_ZN17G4VEmAdjointModel38GetSecondAdjEnergyMinForProdToProjCaseEd" title='G4VEmAdjointModel::GetSecondAdjEnergyMinForProdToProjCase' data-ref="_ZN17G4VEmAdjointModel38GetSecondAdjEnergyMinForProdToProjCaseEd">GetSecondAdjEnergyMinForProdToProjCase</a>(<a class="local col9 ref" href="#9kinEnergyProd" title='kinEnergyProd' data-ref="9kinEnergyProd">kinEnergyProd</a>);</td></tr>
+<tr><th id="121">121</th><td> </td></tr>
+<tr><th id="122">122</th><td> </td></tr>
+<tr><th id="123">123</th><td> <b>if</b> (<a class="local col8 ref" href="#8kinEnergyProj" title='kinEnergyProj' data-ref="8kinEnergyProj">kinEnergyProj</a>&gt;<a class="local col4 ref" href="#14Emin_proj" title='Emin_proj' data-ref="14Emin_proj">Emin_proj</a> &amp;&amp; <a class="local col8 ref" href="#8kinEnergyProj" title='kinEnergyProj' data-ref="8kinEnergyProj">kinEnergyProj</a>&lt;=<a class="local col3 ref" href="#13Emax_proj" title='Emax_proj' data-ref="13Emax_proj">Emax_proj</a>){ <i>//the produced particle should have a kinetic energy smaller than the projectile </i></td></tr>
+<tr><th id="124">124</th><td>	</td></tr>
+<tr><th id="125">125</th><td>	<i>/*G4double Tmax=kinEnergyProj;</i></td></tr>
+<tr><th id="126">126</th><td><i>	if (second_part_of_same_type) Tmax = kinEnergyProj/2.;*/</i></td></tr>
+<tr><th id="127">127</th><td></td></tr>
+<tr><th id="128">128</th><td>	<a class="typedef" href="../../../../global/management/include/G4Types.hh.html#G4double" title='G4double' data-type='double' data-ref="G4double">G4double</a> <dfn class="local col5 decl" id="15E1" title='E1' data-type='G4double' data-ref="15E1">E1</dfn>=<a class="local col9 ref" href="#9kinEnergyProd" title='kinEnergyProd' data-ref="9kinEnergyProd">kinEnergyProd</a>;</td></tr>
+<tr><th id="129">129</th><td> 	<a class="typedef" href="../../../../global/management/include/G4Types.hh.html#G4double" title='G4double' data-type='double' data-ref="G4double">G4double</a> <dfn class="local col6 decl" id="16E2" title='E2' data-type='G4double' data-ref="16E2">E2</dfn>=<a class="local col9 ref" href="#9kinEnergyProd" title='kinEnergyProd' data-ref="9kinEnergyProd">kinEnergyProd</a>*<var>1.000001</var>;</td></tr>
+<tr><th id="130">130</th><td> 	<a class="typedef" href="../../../../global/management/include/G4Types.hh.html#G4double" title='G4double' data-type='double' data-ref="G4double">G4double</a> <dfn class="local col7 decl" id="17dE" title='dE' data-type='G4double' data-ref="17dE">dE</dfn>=(<a class="local col6 ref" href="#16E2" title='E2' data-ref="16E2">E2</a>-<a class="local col5 ref" href="#15E1" title='E1' data-ref="15E1">E1</a>);</td></tr>
+<tr><th id="131">131</th><td> 	<a class="typedef" href="../../../../global/management/include/G4Types.hh.html#G4double" title='G4double' data-type='double' data-ref="G4double">G4double</a> <dfn class="local col8 decl" id="18sigma1" title='sigma1' data-type='G4double' data-ref="18sigma1">sigma1</dfn>=<a class="member" href="../include/G4VEmAdjointModel.hh.html#G4VEmAdjointModel::theDirectEMModel" title='G4VEmAdjointModel::theDirectEMModel' data-ref="G4VEmAdjointModel::theDirectEMModel">theDirectEMModel</a>-&gt;<a class="virtual ref" href="../../utils/include/G4VEmModel.hh.html#_ZN10G4VEmModel26ComputeCrossSectionPerAtomEPK20G4ParticleDefinitionddddd" title='G4VEmModel::ComputeCrossSectionPerAtom' data-ref="_ZN10G4VEmModel26ComputeCrossSectionPerAtomEPK20G4ParticleDefinitionddddd">ComputeCrossSectionPerAtom</a>(<a class="member" href="../include/G4VEmAdjointModel.hh.html#G4VEmAdjointModel::theDirectPrimaryPartDef" title='G4VEmAdjointModel::theDirectPrimaryPartDef' data-ref="G4VEmAdjointModel::theDirectPrimaryPartDef">theDirectPrimaryPartDef</a>,<a class="local col8 ref" href="#8kinEnergyProj" title='kinEnergyProj' data-ref="8kinEnergyProj">kinEnergyProj</a>,<a class="local col0 ref" href="#10Z" title='Z' data-ref="10Z">Z</a>,<a class="local col1 ref" href="#11A" title='A' data-ref="11A">A</a> ,<a class="local col5 ref" href="#15E1" title='E1' data-ref="15E1">E1</a>,<var>1.e20</var>);</td></tr>
+<tr><th id="132">132</th><td> 	<a class="typedef" href="../../../../global/management/include/G4Types.hh.html#G4double" title='G4double' data-type='double' data-ref="G4double">G4double</a> <dfn class="local col9 decl" id="19sigma2" title='sigma2' data-type='G4double' data-ref="19sigma2">sigma2</dfn>=<a class="member" href="../include/G4VEmAdjointModel.hh.html#G4VEmAdjointModel::theDirectEMModel" title='G4VEmAdjointModel::theDirectEMModel' data-ref="G4VEmAdjointModel::theDirectEMModel">theDirectEMModel</a>-&gt;<a class="virtual ref" href="../../utils/include/G4VEmModel.hh.html#_ZN10G4VEmModel26ComputeCrossSectionPerAtomEPK20G4ParticleDefinitionddddd" title='G4VEmModel::ComputeCrossSectionPerAtom' data-ref="_ZN10G4VEmModel26ComputeCrossSectionPerAtomEPK20G4ParticleDefinitionddddd">ComputeCrossSectionPerAtom</a>(<a class="member" href="../include/G4VEmAdjointModel.hh.html#G4VEmAdjointModel::theDirectPrimaryPartDef" title='G4VEmAdjointModel::theDirectPrimaryPartDef' data-ref="G4VEmAdjointModel::theDirectPrimaryPartDef">theDirectPrimaryPartDef</a>,<a class="local col8 ref" href="#8kinEnergyProj" title='kinEnergyProj' data-ref="8kinEnergyProj">kinEnergyProj</a>,<a class="local col0 ref" href="#10Z" title='Z' data-ref="10Z">Z</a>,<a class="local col1 ref" href="#11A" title='A' data-ref="11A">A</a> ,<a class="local col6 ref" href="#16E2" title='E2' data-ref="16E2">E2</a>,<var>1.e20</var>);</td></tr>
+<tr><th id="133">133</th><td> 	</td></tr>
+<tr><th id="134">134</th><td>	<a class="local col2 ref" href="#12dSigmadEprod" title='dSigmadEprod' data-ref="12dSigmadEprod">dSigmadEprod</a>=(<a class="local col8 ref" href="#18sigma1" title='sigma1' data-ref="18sigma1">sigma1</a>-<a class="local col9 ref" href="#19sigma2" title='sigma2' data-ref="19sigma2">sigma2</a>)/<a class="local col7 ref" href="#17dE" title='dE' data-ref="17dE">dE</a>;</td></tr>
+<tr><th id="135">135</th><td> }</td></tr>
+<tr><th id="136">136</th><td> <b>return</b> <a class="local col2 ref" href="#12dSigmadEprod" title='dSigmadEprod' data-ref="12dSigmadEprod">dSigmadEprod</a>;	</td></tr>
+<tr><th id="137">137</th><td> </td></tr>
+<tr><th id="138">138</th><td> </td></tr>
+<tr><th id="139">139</th><td> </td></tr>
+<tr><th id="140">140</th><td>}</td></tr>
+<tr><th id="141">141</th><td><i>//The implementation here is correct for energy loss process, for the photoelectric and compton scattering the method should be redefine </i></td></tr>
+<tr><th id="142">142</th><td><i>////////////////////////////////////////////////////////////////////////////////</i></td></tr>
+<tr><th id="143">143</th><td><i>//</i></td></tr>
+<tr><th id="144">144</th><td><a class="typedef" href="../../../../global/management/include/G4Types.hh.html#G4double" title='G4double' data-type='double' data-ref="G4double">G4double</a> <a class="type" href="../include/G4VEmAdjointModel.hh.html#G4VEmAdjointModel" title='G4VEmAdjointModel' data-ref="G4VEmAdjointModel">G4VEmAdjointModel</a>::<dfn class="virtual decl def" id="_ZN17G4VEmAdjointModel37DiffCrossSectionPerAtomPrimToScatPrimEdddd" title='G4VEmAdjointModel::DiffCrossSectionPerAtomPrimToScatPrim' data-ref="_ZN17G4VEmAdjointModel37DiffCrossSectionPerAtomPrimToScatPrimEdddd">DiffCrossSectionPerAtomPrimToScatPrim</dfn>(</td></tr>
+<tr><th id="145">145</th><td>                                      <a class="typedef" href="../../../../global/management/include/G4Types.hh.html#G4double" title='G4double' data-type='double' data-ref="G4double">G4double</a> <dfn class="local col0 decl" id="20kinEnergyProj" title='kinEnergyProj' data-type='G4double' data-ref="20kinEnergyProj">kinEnergyProj</dfn>, </td></tr>
+<tr><th id="146">146</th><td>                                      <a class="typedef" href="../../../../global/management/include/G4Types.hh.html#G4double" title='G4double' data-type='double' data-ref="G4double">G4double</a> <dfn class="local col1 decl" id="21kinEnergyScatProj" title='kinEnergyScatProj' data-type='G4double' data-ref="21kinEnergyScatProj">kinEnergyScatProj</dfn>,</td></tr>
+<tr><th id="147">147</th><td>				      <a class="typedef" href="../../../../global/management/include/G4Types.hh.html#G4double" title='G4double' data-type='double' data-ref="G4double">G4double</a> <dfn class="local col2 decl" id="22Z" title='Z' data-type='G4double' data-ref="22Z">Z</dfn>, </td></tr>
+<tr><th id="148">148</th><td>                                      <a class="typedef" href="../../../../global/management/include/G4Types.hh.html#G4double" title='G4double' data-type='double' data-ref="G4double">G4double</a> <dfn class="local col3 decl" id="23A" title='A' data-type='G4double' data-ref="23A">A</dfn>)</td></tr>
+<tr><th id="149">149</th><td>{ <a class="typedef" href="../../../../global/management/include/G4Types.hh.html#G4double" title='G4double' data-type='double' data-ref="G4double">G4double</a> <dfn class="local col4 decl" id="24kinEnergyProd" title='kinEnergyProd' data-type='G4double' data-ref="24kinEnergyProd">kinEnergyProd</dfn> = <a class="local col0 ref" href="#20kinEnergyProj" title='kinEnergyProj' data-ref="20kinEnergyProj">kinEnergyProj</a> - <a class="local col1 ref" href="#21kinEnergyScatProj" title='kinEnergyScatProj' data-ref="21kinEnergyScatProj">kinEnergyScatProj</a>;</td></tr>
+<tr><th id="150">150</th><td>  <a class="typedef" href="../../../../global/management/include/G4Types.hh.html#G4double" title='G4double' data-type='double' data-ref="G4double">G4double</a> <dfn class="local col5 decl" id="25dSigmadEprod" title='dSigmadEprod' data-type='G4double' data-ref="25dSigmadEprod">dSigmadEprod</dfn>;</td></tr>
+<tr><th id="151">151</th><td>  <b>if</b> (<a class="local col4 ref" href="#24kinEnergyProd" title='kinEnergyProd' data-ref="24kinEnergyProd">kinEnergyProd</a> &lt;=<var>0</var>) <a class="local col5 ref" href="#25dSigmadEprod" title='dSigmadEprod' data-ref="25dSigmadEprod">dSigmadEprod</a>=<var>0</var>;</td></tr>
+<tr><th id="152">152</th><td>  <b>else</b> <a class="local col5 ref" href="#25dSigmadEprod" title='dSigmadEprod' data-ref="25dSigmadEprod">dSigmadEprod</a>=<a class="virtual member" href="#_ZN17G4VEmAdjointModel35DiffCrossSectionPerAtomPrimToSecondEdddd" title='G4VEmAdjointModel::DiffCrossSectionPerAtomPrimToSecond' data-ref="_ZN17G4VEmAdjointModel35DiffCrossSectionPerAtomPrimToSecondEdddd">DiffCrossSectionPerAtomPrimToSecond</a>(<a class="local col0 ref" href="#20kinEnergyProj" title='kinEnergyProj' data-ref="20kinEnergyProj">kinEnergyProj</a>,<a class="local col4 ref" href="#24kinEnergyProd" title='kinEnergyProd' data-ref="24kinEnergyProd">kinEnergyProd</a>,<a class="local col2 ref" href="#22Z" title='Z' data-ref="22Z">Z</a>,<a class="local col3 ref" href="#23A" title='A' data-ref="23A">A</a>);</td></tr>
+<tr><th id="153">153</th><td>  <b>return</b> <a class="local col5 ref" href="#25dSigmadEprod" title='dSigmadEprod' data-ref="25dSigmadEprod">dSigmadEprod</a>;	</td></tr>
+<tr><th id="154">154</th><td></td></tr>
+<tr><th id="155">155</th><td>}</td></tr>
+<tr><th id="156">156</th><td></td></tr>
+<tr><th id="157">157</th><td><i>////////////////////////////////////////////////////////////////////////////////</i></td></tr>
+<tr><th id="158">158</th><td><i>//</i></td></tr>
+<tr><th id="159">159</th><td><i>//The implementation here is correct for energy loss process, for the photoelectric and compton scattering the method should be redefine  </i></td></tr>
+<tr><th id="160">160</th><td><a class="typedef" href="../../../../global/management/include/G4Types.hh.html#G4double" title='G4double' data-type='double' data-ref="G4double">G4double</a> <a class="type" href="../include/G4VEmAdjointModel.hh.html#G4VEmAdjointModel" title='G4VEmAdjointModel' data-ref="G4VEmAdjointModel">G4VEmAdjointModel</a>::<dfn class="virtual decl def" id="_ZN17G4VEmAdjointModel37DiffCrossSectionPerVolumePrimToSecondEPK10G4Materialdd" title='G4VEmAdjointModel::DiffCrossSectionPerVolumePrimToSecond' data-ref="_ZN17G4VEmAdjointModel37DiffCrossSectionPerVolumePrimToSecondEPK10G4Materialdd">DiffCrossSectionPerVolumePrimToSecond</dfn>(</td></tr>
+<tr><th id="161">161</th><td>				      <em>const</em> <a class="type" href="../../../../materials/include/G4Material.hh.html#G4Material" title='G4Material' data-ref="G4Material">G4Material</a>* <dfn class="local col6 decl" id="26aMaterial" title='aMaterial' data-type='const G4Material *' data-ref="26aMaterial">aMaterial</dfn>,</td></tr>
+<tr><th id="162">162</th><td>                                      <a class="typedef" href="../../../../global/management/include/G4Types.hh.html#G4double" title='G4double' data-type='double' data-ref="G4double">G4double</a> <dfn class="local col7 decl" id="27kinEnergyProj" title='kinEnergyProj' data-type='G4double' data-ref="27kinEnergyProj">kinEnergyProj</dfn>, </td></tr>
+<tr><th id="163">163</th><td>                                      <a class="typedef" href="../../../../global/management/include/G4Types.hh.html#G4double" title='G4double' data-type='double' data-ref="G4double">G4double</a> <dfn class="local col8 decl" id="28kinEnergyProd" title='kinEnergyProd' data-type='G4double' data-ref="28kinEnergyProd">kinEnergyProd</dfn>)</td></tr>
+<tr><th id="164">164</th><td>{</td></tr>
+<tr><th id="165">165</th><td> <a class="typedef" href="../../../../global/management/include/G4Types.hh.html#G4double" title='G4double' data-type='double' data-ref="G4double">G4double</a> <dfn class="local col9 decl" id="29dSigmadEprod" title='dSigmadEprod' data-type='G4double' data-ref="29dSigmadEprod">dSigmadEprod</dfn>=<var>0</var>;</td></tr>
+<tr><th id="166">166</th><td> <a class="typedef" href="../../../../global/management/include/G4Types.hh.html#G4double" title='G4double' data-type='double' data-ref="G4double">G4double</a> <dfn class="local col0 decl" id="30Emax_proj" title='Emax_proj' data-type='G4double' data-ref="30Emax_proj">Emax_proj</dfn> = <a class="virtual member" href="#_ZN17G4VEmAdjointModel38GetSecondAdjEnergyMaxForProdToProjCaseEd" title='G4VEmAdjointModel::GetSecondAdjEnergyMaxForProdToProjCase' data-ref="_ZN17G4VEmAdjointModel38GetSecondAdjEnergyMaxForProdToProjCaseEd">GetSecondAdjEnergyMaxForProdToProjCase</a>(<a class="local col8 ref" href="#28kinEnergyProd" title='kinEnergyProd' data-ref="28kinEnergyProd">kinEnergyProd</a>);</td></tr>
+<tr><th id="167">167</th><td> <a class="typedef" href="../../../../global/management/include/G4Types.hh.html#G4double" title='G4double' data-type='double' data-ref="G4double">G4double</a> <dfn class="local col1 decl" id="31Emin_proj" title='Emin_proj' data-type='G4double' data-ref="31Emin_proj">Emin_proj</dfn> = <a class="virtual member" href="#_ZN17G4VEmAdjointModel38GetSecondAdjEnergyMinForProdToProjCaseEd" title='G4VEmAdjointModel::GetSecondAdjEnergyMinForProdToProjCase' data-ref="_ZN17G4VEmAdjointModel38GetSecondAdjEnergyMinForProdToProjCaseEd">GetSecondAdjEnergyMinForProdToProjCase</a>(<a class="local col8 ref" href="#28kinEnergyProd" title='kinEnergyProd' data-ref="28kinEnergyProd">kinEnergyProd</a>);</td></tr>
+<tr><th id="168">168</th><td> </td></tr>
+<tr><th id="169">169</th><td> </td></tr>
+<tr><th id="170">170</th><td> <b>if</b> (<a class="local col7 ref" href="#27kinEnergyProj" title='kinEnergyProj' data-ref="27kinEnergyProj">kinEnergyProj</a>&gt;<a class="local col1 ref" href="#31Emin_proj" title='Emin_proj' data-ref="31Emin_proj">Emin_proj</a> &amp;&amp; <a class="local col7 ref" href="#27kinEnergyProj" title='kinEnergyProj' data-ref="27kinEnergyProj">kinEnergyProj</a>&lt;=<a class="local col0 ref" href="#30Emax_proj" title='Emax_proj' data-ref="30Emax_proj">Emax_proj</a>){ </td></tr>
+<tr><th id="171">171</th><td>	<i>/*G4double Tmax=kinEnergyProj;</i></td></tr>
+<tr><th id="172">172</th><td><i>	if (second_part_of_same_type) Tmax = kinEnergyProj/2.;*/</i></td></tr>
+<tr><th id="173">173</th><td>	<a class="typedef" href="../../../../global/management/include/G4Types.hh.html#G4double" title='G4double' data-type='double' data-ref="G4double">G4double</a> <dfn class="local col2 decl" id="32E1" title='E1' data-type='G4double' data-ref="32E1">E1</dfn>=<a class="local col8 ref" href="#28kinEnergyProd" title='kinEnergyProd' data-ref="28kinEnergyProd">kinEnergyProd</a>;</td></tr>
+<tr><th id="174">174</th><td>	<a class="typedef" href="../../../../global/management/include/G4Types.hh.html#G4double" title='G4double' data-type='double' data-ref="G4double">G4double</a> <dfn class="local col3 decl" id="33E2" title='E2' data-type='G4double' data-ref="33E2">E2</dfn>=<a class="local col8 ref" href="#28kinEnergyProd" title='kinEnergyProd' data-ref="28kinEnergyProd">kinEnergyProd</a>*<var>1.0001</var>;</td></tr>
+<tr><th id="175">175</th><td> 	<a class="typedef" href="../../../../global/management/include/G4Types.hh.html#G4double" title='G4double' data-type='double' data-ref="G4double">G4double</a> <dfn class="local col4 decl" id="34dE" title='dE' data-type='G4double' data-ref="34dE">dE</dfn>=(<a class="local col3 ref" href="#33E2" title='E2' data-ref="33E2">E2</a>-<a class="local col2 ref" href="#32E1" title='E1' data-ref="32E1">E1</a>);</td></tr>
+<tr><th id="176">176</th><td> 	<a class="typedef" href="../../../../global/management/include/G4Types.hh.html#G4double" title='G4double' data-type='double' data-ref="G4double">G4double</a> <dfn class="local col5 decl" id="35sigma1" title='sigma1' data-type='G4double' data-ref="35sigma1">sigma1</dfn>=<a class="member" href="../include/G4VEmAdjointModel.hh.html#G4VEmAdjointModel::theDirectEMModel" title='G4VEmAdjointModel::theDirectEMModel' data-ref="G4VEmAdjointModel::theDirectEMModel">theDirectEMModel</a>-&gt;<a class="virtual ref" href="../../utils/include/G4VEmModel.hh.html#_ZN10G4VEmModel21CrossSectionPerVolumeEPK10G4MaterialPK20G4ParticleDefinitionddd" title='G4VEmModel::CrossSectionPerVolume' data-ref="_ZN10G4VEmModel21CrossSectionPerVolumeEPK10G4MaterialPK20G4ParticleDefinitionddd">CrossSectionPerVolume</a>(<a class="local col6 ref" href="#26aMaterial" title='aMaterial' data-ref="26aMaterial">aMaterial</a>,<a class="member" href="../include/G4VEmAdjointModel.hh.html#G4VEmAdjointModel::theDirectPrimaryPartDef" title='G4VEmAdjointModel::theDirectPrimaryPartDef' data-ref="G4VEmAdjointModel::theDirectPrimaryPartDef">theDirectPrimaryPartDef</a>,<a class="local col7 ref" href="#27kinEnergyProj" title='kinEnergyProj' data-ref="27kinEnergyProj">kinEnergyProj</a>,<a class="local col2 ref" href="#32E1" title='E1' data-ref="32E1">E1</a>,<var>1.e20</var>);</td></tr>
+<tr><th id="177">177</th><td>    <a class="typedef" href="../../../../global/management/include/G4Types.hh.html#G4double" title='G4double' data-type='double' data-ref="G4double">G4double</a> <dfn class="local col6 decl" id="36sigma2" title='sigma2' data-type='G4double' data-ref="36sigma2">sigma2</dfn>=<a class="member" href="../include/G4VEmAdjointModel.hh.html#G4VEmAdjointModel::theDirectEMModel" title='G4VEmAdjointModel::theDirectEMModel' data-ref="G4VEmAdjointModel::theDirectEMModel">theDirectEMModel</a>-&gt;<a class="virtual ref" href="../../utils/include/G4VEmModel.hh.html#_ZN10G4VEmModel21CrossSectionPerVolumeEPK10G4MaterialPK20G4ParticleDefinitionddd" title='G4VEmModel::CrossSectionPerVolume' data-ref="_ZN10G4VEmModel21CrossSectionPerVolumeEPK10G4MaterialPK20G4ParticleDefinitionddd">CrossSectionPerVolume</a>(<a class="local col6 ref" href="#26aMaterial" title='aMaterial' data-ref="26aMaterial">aMaterial</a>,<a class="member" href="../include/G4VEmAdjointModel.hh.html#G4VEmAdjointModel::theDirectPrimaryPartDef" title='G4VEmAdjointModel::theDirectPrimaryPartDef' data-ref="G4VEmAdjointModel::theDirectPrimaryPartDef">theDirectPrimaryPartDef</a>,<a class="local col7 ref" href="#27kinEnergyProj" title='kinEnergyProj' data-ref="27kinEnergyProj">kinEnergyProj</a>,<a class="local col3 ref" href="#33E2" title='E2' data-ref="33E2">E2</a>,<var>1.e20</var>);</td></tr>
+<tr><th id="178">178</th><td> 	<a class="local col9 ref" href="#29dSigmadEprod" title='dSigmadEprod' data-ref="29dSigmadEprod">dSigmadEprod</a>=(<a class="local col5 ref" href="#35sigma1" title='sigma1' data-ref="35sigma1">sigma1</a>-<a class="local col6 ref" href="#36sigma2" title='sigma2' data-ref="36sigma2">sigma2</a>)/<a class="local col4 ref" href="#34dE" title='dE' data-ref="34dE">dE</a>;</td></tr>
+<tr><th id="179">179</th><td> }</td></tr>
+<tr><th id="180">180</th><td> <b>return</b> <a class="local col9 ref" href="#29dSigmadEprod" title='dSigmadEprod' data-ref="29dSigmadEprod">dSigmadEprod</a>;	</td></tr>
+<tr><th id="181">181</th><td> </td></tr>
+<tr><th id="182">182</th><td> </td></tr>
+<tr><th id="183">183</th><td> </td></tr>
+<tr><th id="184">184</th><td>}</td></tr>
+<tr><th id="185">185</th><td><i>//The implementation here is correct for energy loss process, for the photoelectric and compton scattering the method should be redefine </i></td></tr>
+<tr><th id="186">186</th><td><i>////////////////////////////////////////////////////////////////////////////////</i></td></tr>
+<tr><th id="187">187</th><td><i>//</i></td></tr>
+<tr><th id="188">188</th><td><a class="typedef" href="../../../../global/management/include/G4Types.hh.html#G4double" title='G4double' data-type='double' data-ref="G4double">G4double</a> <a class="type" href="../include/G4VEmAdjointModel.hh.html#G4VEmAdjointModel" title='G4VEmAdjointModel' data-ref="G4VEmAdjointModel">G4VEmAdjointModel</a>::<dfn class="virtual decl def" id="_ZN17G4VEmAdjointModel39DiffCrossSectionPerVolumePrimToScatPrimEPK10G4Materialdd" title='G4VEmAdjointModel::DiffCrossSectionPerVolumePrimToScatPrim' data-ref="_ZN17G4VEmAdjointModel39DiffCrossSectionPerVolumePrimToScatPrimEPK10G4Materialdd">DiffCrossSectionPerVolumePrimToScatPrim</dfn>(</td></tr>
+<tr><th id="189">189</th><td>                                      <em>const</em> <a class="type" href="../../../../materials/include/G4Material.hh.html#G4Material" title='G4Material' data-ref="G4Material">G4Material</a>* <dfn class="local col7 decl" id="37aMaterial" title='aMaterial' data-type='const G4Material *' data-ref="37aMaterial">aMaterial</dfn>,</td></tr>
+<tr><th id="190">190</th><td>				      <a class="typedef" href="../../../../global/management/include/G4Types.hh.html#G4double" title='G4double' data-type='double' data-ref="G4double">G4double</a> <dfn class="local col8 decl" id="38kinEnergyProj" title='kinEnergyProj' data-type='G4double' data-ref="38kinEnergyProj">kinEnergyProj</dfn>, </td></tr>
+<tr><th id="191">191</th><td>                                      <a class="typedef" href="../../../../global/management/include/G4Types.hh.html#G4double" title='G4double' data-type='double' data-ref="G4double">G4double</a> <dfn class="local col9 decl" id="39kinEnergyScatProj" title='kinEnergyScatProj' data-type='G4double' data-ref="39kinEnergyScatProj">kinEnergyScatProj</dfn>)</td></tr>
+<tr><th id="192">192</th><td>{ <a class="typedef" href="../../../../global/management/include/G4Types.hh.html#G4double" title='G4double' data-type='double' data-ref="G4double">G4double</a> <dfn class="local col0 decl" id="40kinEnergyProd" title='kinEnergyProd' data-type='G4double' data-ref="40kinEnergyProd">kinEnergyProd</dfn> = <a class="local col8 ref" href="#38kinEnergyProj" title='kinEnergyProj' data-ref="38kinEnergyProj">kinEnergyProj</a> - <a class="local col9 ref" href="#39kinEnergyScatProj" title='kinEnergyScatProj' data-ref="39kinEnergyScatProj">kinEnergyScatProj</a>;</td></tr>
+<tr><th id="193">193</th><td>  <a class="typedef" href="../../../../global/management/include/G4Types.hh.html#G4double" title='G4double' data-type='double' data-ref="G4double">G4double</a> <dfn class="local col1 decl" id="41dSigmadEprod" title='dSigmadEprod' data-type='G4double' data-ref="41dSigmadEprod">dSigmadEprod</dfn>;</td></tr>
+<tr><th id="194">194</th><td>  <b>if</b> (<a class="local col0 ref" href="#40kinEnergyProd" title='kinEnergyProd' data-ref="40kinEnergyProd">kinEnergyProd</a> &lt;=<var>0</var>) <a class="local col1 ref" href="#41dSigmadEprod" title='dSigmadEprod' data-ref="41dSigmadEprod">dSigmadEprod</a>=<var>0</var>;</td></tr>
+<tr><th id="195">195</th><td>  <b>else</b> <a class="local col1 ref" href="#41dSigmadEprod" title='dSigmadEprod' data-ref="41dSigmadEprod">dSigmadEprod</a>=<a class="virtual member" href="#_ZN17G4VEmAdjointModel37DiffCrossSectionPerVolumePrimToSecondEPK10G4Materialdd" title='G4VEmAdjointModel::DiffCrossSectionPerVolumePrimToSecond' data-ref="_ZN17G4VEmAdjointModel37DiffCrossSectionPerVolumePrimToSecondEPK10G4Materialdd">DiffCrossSectionPerVolumePrimToSecond</a>(<a class="local col7 ref" href="#37aMaterial" title='aMaterial' data-ref="37aMaterial">aMaterial</a>,<a class="local col8 ref" href="#38kinEnergyProj" title='kinEnergyProj' data-ref="38kinEnergyProj">kinEnergyProj</a>,<a class="local col0 ref" href="#40kinEnergyProd" title='kinEnergyProd' data-ref="40kinEnergyProd">kinEnergyProd</a>);</td></tr>
+<tr><th id="196">196</th><td>  <b>return</b> <a class="local col1 ref" href="#41dSigmadEprod" title='dSigmadEprod' data-ref="41dSigmadEprod">dSigmadEprod</a>;	</td></tr>
+<tr><th id="197">197</th><td></td></tr>
+<tr><th id="198">198</th><td>}</td></tr>
+<tr><th id="199">199</th><td><i>///////////////////////////////////////////////////////////////////////////////////////////////////////////</i></td></tr>
+<tr><th id="200">200</th><td><i>//</i></td></tr>
+<tr><th id="201">201</th><td><a class="typedef" href="../../../../global/management/include/G4Types.hh.html#G4double" title='G4double' data-type='double' data-ref="G4double">G4double</a> <a class="type" href="../include/G4VEmAdjointModel.hh.html#G4VEmAdjointModel" title='G4VEmAdjointModel' data-ref="G4VEmAdjointModel">G4VEmAdjointModel</a>::<dfn class="decl def" id="_ZN17G4VEmAdjointModel25DiffCrossSectionFunction1Ed" title='G4VEmAdjointModel::DiffCrossSectionFunction1' data-ref="_ZN17G4VEmAdjointModel25DiffCrossSectionFunction1Ed">DiffCrossSectionFunction1</dfn>(<a class="typedef" href="../../../../global/management/include/G4Types.hh.html#G4double" title='G4double' data-type='double' data-ref="G4double">G4double</a> <dfn class="local col2 decl" id="42kinEnergyProj" title='kinEnergyProj' data-type='G4double' data-ref="42kinEnergyProj">kinEnergyProj</dfn>){</td></tr>
+<tr><th id="202">202</th><td>  </td></tr>
+<tr><th id="203">203</th><td>  </td></tr>
+<tr><th id="204">204</th><td>  <a class="typedef" href="../../../../global/management/include/G4Types.hh.html#G4double" title='G4double' data-type='double' data-ref="G4double">G4double</a> <dfn class="local col3 decl" id="43bias_factor" title='bias_factor' data-type='G4double' data-ref="43bias_factor">bias_factor</dfn> = <a class="member" href="../include/G4VEmAdjointModel.hh.html#G4VEmAdjointModel::CS_biasing_factor" title='G4VEmAdjointModel::CS_biasing_factor' data-ref="G4VEmAdjointModel::CS_biasing_factor">CS_biasing_factor</a>*<a class="member" href="../include/G4VEmAdjointModel.hh.html#G4VEmAdjointModel::kinEnergyProdForIntegration" title='G4VEmAdjointModel::kinEnergyProdForIntegration' data-ref="G4VEmAdjointModel::kinEnergyProdForIntegration">kinEnergyProdForIntegration</a>/<a class="local col2 ref" href="#42kinEnergyProj" title='kinEnergyProj' data-ref="42kinEnergyProj">kinEnergyProj</a>;	</td></tr>
+<tr><th id="205">205</th><td></td></tr>
+<tr><th id="206">206</th><td></td></tr>
+<tr><th id="207">207</th><td>  <b>if</b> (<a class="member" href="../include/G4VEmAdjointModel.hh.html#G4VEmAdjointModel::UseMatrixPerElement" title='G4VEmAdjointModel::UseMatrixPerElement' data-ref="G4VEmAdjointModel::UseMatrixPerElement">UseMatrixPerElement</a> ) {</td></tr>
+<tr><th id="208">208</th><td>  	<b>return</b> <a class="virtual member" href="#_ZN17G4VEmAdjointModel35DiffCrossSectionPerAtomPrimToSecondEdddd" title='G4VEmAdjointModel::DiffCrossSectionPerAtomPrimToSecond' data-ref="_ZN17G4VEmAdjointModel35DiffCrossSectionPerAtomPrimToSecondEdddd">DiffCrossSectionPerAtomPrimToSecond</a>(<a class="local col2 ref" href="#42kinEnergyProj" title='kinEnergyProj' data-ref="42kinEnergyProj">kinEnergyProj</a>,<a class="member" href="../include/G4VEmAdjointModel.hh.html#G4VEmAdjointModel::kinEnergyProdForIntegration" title='G4VEmAdjointModel::kinEnergyProdForIntegration' data-ref="G4VEmAdjointModel::kinEnergyProdForIntegration">kinEnergyProdForIntegration</a>,<a class="member" href="../include/G4VEmAdjointModel.hh.html#G4VEmAdjointModel::ZSelectedNucleus" title='G4VEmAdjointModel::ZSelectedNucleus' data-ref="G4VEmAdjointModel::ZSelectedNucleus">ZSelectedNucleus</a>,<a class="member" href="../include/G4VEmAdjointModel.hh.html#G4VEmAdjointModel::ASelectedNucleus" title='G4VEmAdjointModel::ASelectedNucleus' data-ref="G4VEmAdjointModel::ASelectedNucleus">ASelectedNucleus</a>)*<a class="local col3 ref" href="#43bias_factor" title='bias_factor' data-ref="43bias_factor">bias_factor</a>;</td></tr>
+<tr><th id="209">209</th><td>  }</td></tr>
+<tr><th id="210">210</th><td>  <b>else</b>  {</td></tr>
+<tr><th id="211">211</th><td>  	<b>return</b> <a class="virtual member" href="#_ZN17G4VEmAdjointModel37DiffCrossSectionPerVolumePrimToSecondEPK10G4Materialdd" title='G4VEmAdjointModel::DiffCrossSectionPerVolumePrimToSecond' data-ref="_ZN17G4VEmAdjointModel37DiffCrossSectionPerVolumePrimToSecondEPK10G4Materialdd">DiffCrossSectionPerVolumePrimToSecond</a>(<a class="member" href="../include/G4VEmAdjointModel.hh.html#G4VEmAdjointModel::SelectedMaterial" title='G4VEmAdjointModel::SelectedMaterial' data-ref="G4VEmAdjointModel::SelectedMaterial">SelectedMaterial</a>,<a class="local col2 ref" href="#42kinEnergyProj" title='kinEnergyProj' data-ref="42kinEnergyProj">kinEnergyProj</a>,<a class="member" href="../include/G4VEmAdjointModel.hh.html#G4VEmAdjointModel::kinEnergyProdForIntegration" title='G4VEmAdjointModel::kinEnergyProdForIntegration' data-ref="G4VEmAdjointModel::kinEnergyProdForIntegration">kinEnergyProdForIntegration</a>)*<a class="local col3 ref" href="#43bias_factor" title='bias_factor' data-ref="43bias_factor">bias_factor</a>;</td></tr>
+<tr><th id="212">212</th><td>  }	</td></tr>
+<tr><th id="213">213</th><td>}</td></tr>
+<tr><th id="214">214</th><td></td></tr>
+<tr><th id="215">215</th><td><i>////////////////////////////////////////////////////////////////////////////////</i></td></tr>
+<tr><th id="216">216</th><td><i>//</i></td></tr>
+<tr><th id="217">217</th><td><a class="typedef" href="../../../../global/management/include/G4Types.hh.html#G4double" title='G4double' data-type='double' data-ref="G4double">G4double</a> <a class="type" href="../include/G4VEmAdjointModel.hh.html#G4VEmAdjointModel" title='G4VEmAdjointModel' data-ref="G4VEmAdjointModel">G4VEmAdjointModel</a>::<dfn class="decl def" id="_ZN17G4VEmAdjointModel25DiffCrossSectionFunction2Ed" title='G4VEmAdjointModel::DiffCrossSectionFunction2' data-ref="_ZN17G4VEmAdjointModel25DiffCrossSectionFunction2Ed">DiffCrossSectionFunction2</dfn>(<a class="typedef" href="../../../../global/management/include/G4Types.hh.html#G4double" title='G4double' data-type='double' data-ref="G4double">G4double</a> <dfn class="local col4 decl" id="44kinEnergyProj" title='kinEnergyProj' data-type='G4double' data-ref="44kinEnergyProj">kinEnergyProj</dfn>){</td></tr>
+<tr><th id="218">218</th><td>  </td></tr>
+<tr><th id="219">219</th><td> <a class="typedef" href="../../../../global/management/include/G4Types.hh.html#G4double" title='G4double' data-type='double' data-ref="G4double">G4double</a> <dfn class="local col5 decl" id="45bias_factor" title='bias_factor' data-type='G4double' data-ref="45bias_factor">bias_factor</dfn> =  <a class="member" href="../include/G4VEmAdjointModel.hh.html#G4VEmAdjointModel::CS_biasing_factor" title='G4VEmAdjointModel::CS_biasing_factor' data-ref="G4VEmAdjointModel::CS_biasing_factor">CS_biasing_factor</a>*<a class="member" href="../include/G4VEmAdjointModel.hh.html#G4VEmAdjointModel::kinEnergyScatProjForIntegration" title='G4VEmAdjointModel::kinEnergyScatProjForIntegration' data-ref="G4VEmAdjointModel::kinEnergyScatProjForIntegration">kinEnergyScatProjForIntegration</a>/<a class="local col4 ref" href="#44kinEnergyProj" title='kinEnergyProj' data-ref="44kinEnergyProj">kinEnergyProj</a>;</td></tr>
+<tr><th id="220">220</th><td> <b>if</b> (<a class="member" href="../include/G4VEmAdjointModel.hh.html#G4VEmAdjointModel::UseMatrixPerElement" title='G4VEmAdjointModel::UseMatrixPerElement' data-ref="G4VEmAdjointModel::UseMatrixPerElement">UseMatrixPerElement</a> ) {</td></tr>
+<tr><th id="221">221</th><td>  	<b>return</b> <a class="virtual member" href="#_ZN17G4VEmAdjointModel37DiffCrossSectionPerAtomPrimToScatPrimEdddd" title='G4VEmAdjointModel::DiffCrossSectionPerAtomPrimToScatPrim' data-ref="_ZN17G4VEmAdjointModel37DiffCrossSectionPerAtomPrimToScatPrimEdddd">DiffCrossSectionPerAtomPrimToScatPrim</a>(<a class="local col4 ref" href="#44kinEnergyProj" title='kinEnergyProj' data-ref="44kinEnergyProj">kinEnergyProj</a>,<a class="member" href="../include/G4VEmAdjointModel.hh.html#G4VEmAdjointModel::kinEnergyScatProjForIntegration" title='G4VEmAdjointModel::kinEnergyScatProjForIntegration' data-ref="G4VEmAdjointModel::kinEnergyScatProjForIntegration">kinEnergyScatProjForIntegration</a>,<a class="member" href="../include/G4VEmAdjointModel.hh.html#G4VEmAdjointModel::ZSelectedNucleus" title='G4VEmAdjointModel::ZSelectedNucleus' data-ref="G4VEmAdjointModel::ZSelectedNucleus">ZSelectedNucleus</a>,<a class="member" href="../include/G4VEmAdjointModel.hh.html#G4VEmAdjointModel::ASelectedNucleus" title='G4VEmAdjointModel::ASelectedNucleus' data-ref="G4VEmAdjointModel::ASelectedNucleus">ASelectedNucleus</a>)*<a class="local col5 ref" href="#45bias_factor" title='bias_factor' data-ref="45bias_factor">bias_factor</a>;</td></tr>
+<tr><th id="222">222</th><td> }	</td></tr>
+<tr><th id="223">223</th><td> <b>else</b> {  </td></tr>
+<tr><th id="224">224</th><td> 	<b>return</b> <a class="virtual member" href="#_ZN17G4VEmAdjointModel39DiffCrossSectionPerVolumePrimToScatPrimEPK10G4Materialdd" title='G4VEmAdjointModel::DiffCrossSectionPerVolumePrimToScatPrim' data-ref="_ZN17G4VEmAdjointModel39DiffCrossSectionPerVolumePrimToScatPrimEPK10G4Materialdd">DiffCrossSectionPerVolumePrimToScatPrim</a>(<a class="member" href="../include/G4VEmAdjointModel.hh.html#G4VEmAdjointModel::SelectedMaterial" title='G4VEmAdjointModel::SelectedMaterial' data-ref="G4VEmAdjointModel::SelectedMaterial">SelectedMaterial</a>,<a class="local col4 ref" href="#44kinEnergyProj" title='kinEnergyProj' data-ref="44kinEnergyProj">kinEnergyProj</a>,<a class="member" href="../include/G4VEmAdjointModel.hh.html#G4VEmAdjointModel::kinEnergyScatProjForIntegration" title='G4VEmAdjointModel::kinEnergyScatProjForIntegration' data-ref="G4VEmAdjointModel::kinEnergyScatProjForIntegration">kinEnergyScatProjForIntegration</a>)*<a class="local col5 ref" href="#45bias_factor" title='bias_factor' data-ref="45bias_factor">bias_factor</a>;</td></tr>
+<tr><th id="225">225</th><td> </td></tr>
+<tr><th id="226">226</th><td> }	</td></tr>
+<tr><th id="227">227</th><td> 		</td></tr>
+<tr><th id="228">228</th><td>}</td></tr>
+<tr><th id="229">229</th><td><i>////////////////////////////////////////////////////////////////////////////////</i></td></tr>
+<tr><th id="230">230</th><td><i>//</i></td></tr>
+<tr><th id="231">231</th><td></td></tr>
+<tr><th id="232">232</th><td><a class="typedef" href="../../../../global/management/include/G4Types.hh.html#G4double" title='G4double' data-type='double' data-ref="G4double">G4double</a> <a class="type" href="../include/G4VEmAdjointModel.hh.html#G4VEmAdjointModel" title='G4VEmAdjointModel' data-ref="G4VEmAdjointModel">G4VEmAdjointModel</a>::<dfn class="decl def" id="_ZN17G4VEmAdjointModel59DiffCrossSectionPerVolumeFunctionForIntegrationOverEkinProjEd" title='G4VEmAdjointModel::DiffCrossSectionPerVolumeFunctionForIntegrationOverEkinProj' data-ref="_ZN17G4VEmAdjointModel59DiffCrossSectionPerVolumeFunctionForIntegrationOverEkinProjEd">DiffCrossSectionPerVolumeFunctionForIntegrationOverEkinProj</dfn>(<a class="typedef" href="../../../../global/management/include/G4Types.hh.html#G4double" title='G4double' data-type='double' data-ref="G4double">G4double</a> <dfn class="local col6 decl" id="46kinEnergyProd" title='kinEnergyProd' data-type='G4double' data-ref="46kinEnergyProd">kinEnergyProd</dfn>)</td></tr>
+<tr><th id="233">233</th><td>{</td></tr>
+<tr><th id="234">234</th><td>  <b>return</b> <a class="virtual member" href="#_ZN17G4VEmAdjointModel37DiffCrossSectionPerVolumePrimToSecondEPK10G4Materialdd" title='G4VEmAdjointModel::DiffCrossSectionPerVolumePrimToSecond' data-ref="_ZN17G4VEmAdjointModel37DiffCrossSectionPerVolumePrimToSecondEPK10G4Materialdd">DiffCrossSectionPerVolumePrimToSecond</a>(<a class="member" href="../include/G4VEmAdjointModel.hh.html#G4VEmAdjointModel::SelectedMaterial" title='G4VEmAdjointModel::SelectedMaterial' data-ref="G4VEmAdjointModel::SelectedMaterial">SelectedMaterial</a>,<a class="member" href="../include/G4VEmAdjointModel.hh.html#G4VEmAdjointModel::kinEnergyProjForIntegration" title='G4VEmAdjointModel::kinEnergyProjForIntegration' data-ref="G4VEmAdjointModel::kinEnergyProjForIntegration">kinEnergyProjForIntegration</a>,<a class="local col6 ref" href="#46kinEnergyProd" title='kinEnergyProd' data-ref="46kinEnergyProd">kinEnergyProd</a>);</td></tr>
+<tr><th id="235">235</th><td>}</td></tr>
+<tr><th id="236">236</th><td><i>////////////////////////////////////////////////////////////////////////////////</i></td></tr>
+<tr><th id="237">237</th><td><i>//</i></td></tr>
+<tr><th id="238">238</th><td><span class='error' title="use of undeclared identifier &apos;std&apos;">std</span>::vector<span class='error' title="expected unqualified-id">&lt;</span> std::vector&lt;G4double&gt;* &gt; G4VEmAdjointModel::ComputeAdjointCrossSectionVectorPerAtomForSecond(      </td></tr>
+<tr><th id="239">239</th><td>				G4double kinEnergyProd,</td></tr>
+<tr><th id="240">240</th><td>				G4double Z, </td></tr>
+<tr><th id="241">241</th><td>                                G4double A ,</td></tr>
+<tr><th id="242">242</th><td>				G4int nbin_pro_decade) <i>//nb bins pro order of magnitude of energy</i></td></tr>
+<tr><th id="243">243</th><td>{ </td></tr>
+<tr><th id="244">244</th><td>  G4Integrator&lt;G4VEmAdjointModel, <em>double</em>(G4VEmAdjointModel::*)(<em>double</em>)&gt; integral;</td></tr>
+<tr><th id="245">245</th><td>  ASelectedNucleus= <em>int</em>(A);</td></tr>
+<tr><th id="246">246</th><td>  ZSelectedNucleus=<em>int</em>(Z);</td></tr>
+<tr><th id="247">247</th><td>  kinEnergyProdForIntegration = kinEnergyProd;</td></tr>
+<tr><th id="248">248</th><td>  </td></tr>
+<tr><th id="249">249</th><td>  <i>//compute the vector of integrated cross sections</i></td></tr>
+<tr><th id="250">250</th><td><i>  //-------------------</i></td></tr>
+<tr><th id="251">251</th><td>  </td></tr>
+<tr><th id="252">252</th><td>  G4double minEProj= GetSecondAdjEnergyMinForProdToProjCase(kinEnergyProd);</td></tr>
+<tr><th id="253">253</th><td>  G4double maxEProj= GetSecondAdjEnergyMaxForProdToProjCase(kinEnergyProd);</td></tr>
+<tr><th id="254">254</th><td>  G4double E1=minEProj;</td></tr>
+<tr><th id="255">255</th><td>  std::vector&lt; <em>double</em>&gt;*  log_ESec_vector = <b>new</b>  std::vector&lt; <em>double</em>&gt;();</td></tr>
+<tr><th id="256">256</th><td>  std::vector&lt; <em>double</em>&gt;*  log_Prob_vector = <b>new</b>  std::vector&lt; <em>double</em>&gt;();</td></tr>
+<tr><th id="257">257</th><td>  log_ESec_vector-&gt;clear();</td></tr>
+<tr><th id="258">258</th><td>  log_Prob_vector-&gt;clear();</td></tr>
+<tr><th id="259">259</th><td>  log_ESec_vector-&gt;push_back(std::log(E1));</td></tr>
+<tr><th id="260">260</th><td>  log_Prob_vector-&gt;push_back(-<var>50.</var>);</td></tr>
+<tr><th id="261">261</th><td>  </td></tr>
+<tr><th id="262">262</th><td>  G4double E2=std::pow(<var>10.</var>,<em>double</em>( <em>int</em>(std::log10(minEProj)*nbin_pro_decade)+<var>1</var>)/nbin_pro_decade);</td></tr>
+<tr><th id="263">263</th><td>  G4double fE=std::pow(<var>10.</var>,<var>1.</var>/nbin_pro_decade);</td></tr>
+<tr><th id="264">264</th><td>  G4double int_cross_section=<var>0.</var>;</td></tr>
+<tr><th id="265">265</th><td>  </td></tr>
+<tr><th id="266">266</th><td>  <b>if</b> (std::pow(fE,<var>5.</var>)&gt;(maxEProj/minEProj)) fE = std::pow(maxEProj/minEProj,<var>0.2</var>);</td></tr>
+<tr><th id="267">267</th><td>  </td></tr>
+<tr><th id="268">268</th><td>  <i>// Loop checking, 07-Aug-2015, Vladimir Ivanchenko</i></td></tr>
+<tr><th id="269">269</th><td>  <b>while</b> (E1 &lt;maxEProj*<var>0.9999999</var>){</td></tr>
+<tr><th id="270">270</th><td>  	<i>//G4cout&lt;&lt;E1&lt;&lt;'\t'&lt;&lt;E2&lt;&lt;G4endl;</i></td></tr>
+<tr><th id="271">271</th><td>	</td></tr>
+<tr><th id="272">272</th><td>  	int_cross_section +=integral.Simpson(<b>this</b>,</td></tr>
+<tr><th id="273">273</th><td>	&amp;G4VEmAdjointModel::DiffCrossSectionFunction1,E1,std::min(E2,maxEProj*<var>0.99999999</var>), <var>5</var>);</td></tr>
+<tr><th id="274">274</th><td>	log_ESec_vector-&gt;push_back(std::log(std::min(E2,maxEProj)));</td></tr>
+<tr><th id="275">275</th><td>	log_Prob_vector-&gt;push_back(std::log(int_cross_section));	</td></tr>
+<tr><th id="276">276</th><td>	E1=E2;</td></tr>
+<tr><th id="277">277</th><td>	E2*=fE;</td></tr>
+<tr><th id="278">278</th><td>  </td></tr>
+<tr><th id="279">279</th><td>  }</td></tr>
+<tr><th id="280">280</th><td>  std::vector&lt; std::vector&lt;G4double&gt;* &gt; res_mat;</td></tr>
+<tr><th id="281">281</th><td>  res_mat.clear();</td></tr>
+<tr><th id="282">282</th><td>  <b>if</b> (int_cross_section &gt;<var>0.</var>) {</td></tr>
+<tr><th id="283">283</th><td>  	res_mat.push_back(log_ESec_vector);</td></tr>
+<tr><th id="284">284</th><td>  	res_mat.push_back(log_Prob_vector);</td></tr>
+<tr><th id="285">285</th><td>  }	</td></tr>
+<tr><th id="286">286</th><td>  </td></tr>
+<tr><th id="287">287</th><td>  <b>return</b> res_mat;</td></tr>
+<tr><th id="288">288</th><td>}</td></tr>
+<tr><th id="289">289</th><td></td></tr>
+<tr><th id="290">290</th><td><i>/////////////////////////////////////////////////////////////////////////////////////</i></td></tr>
+<tr><th id="291">291</th><td><i>//</i></td></tr>
+<tr><th id="292">292</th><td><span class='error' title="use of undeclared identifier &apos;std&apos;">std</span>::vector<span class='error' title="expected unqualified-id">&lt;</span> std::vector&lt;G4double&gt;* &gt; G4VEmAdjointModel::ComputeAdjointCrossSectionVectorPerAtomForScatProj(</td></tr>
+<tr><th id="293">293</th><td>      				G4double kinEnergyScatProj,</td></tr>
+<tr><th id="294">294</th><td>				G4double Z, </td></tr>
+<tr><th id="295">295</th><td>                                G4double A ,</td></tr>
+<tr><th id="296">296</th><td>				G4int nbin_pro_decade) <i>//nb bins pro order of magnitude of energy</i></td></tr>
+<tr><th id="297">297</th><td>{ G4Integrator&lt;G4VEmAdjointModel, <em>double</em>(G4VEmAdjointModel::*)(<em>double</em>)&gt; integral;</td></tr>
+<tr><th id="298">298</th><td>  ASelectedNucleus=<em>int</em>(A);</td></tr>
+<tr><th id="299">299</th><td>  ZSelectedNucleus=<em>int</em>(Z);</td></tr>
+<tr><th id="300">300</th><td>  kinEnergyScatProjForIntegration = kinEnergyScatProj;</td></tr>
+<tr><th id="301">301</th><td>  </td></tr>
+<tr><th id="302">302</th><td>  <i>//compute the vector of integrated cross sections</i></td></tr>
+<tr><th id="303">303</th><td><i>  //-------------------</i></td></tr>
+<tr><th id="304">304</th><td>  </td></tr>
+<tr><th id="305">305</th><td>  G4double minEProj= GetSecondAdjEnergyMinForScatProjToProjCase(kinEnergyScatProj); </td></tr>
+<tr><th id="306">306</th><td>  G4double maxEProj= GetSecondAdjEnergyMaxForScatProjToProjCase(kinEnergyScatProj);</td></tr>
+<tr><th id="307">307</th><td>  G4double dEmax=maxEProj-kinEnergyScatProj;</td></tr>
+<tr><th id="308">308</th><td>  G4double dEmin=GetLowEnergyLimit();</td></tr>
+<tr><th id="309">309</th><td>  G4double dE1=dEmin;</td></tr>
+<tr><th id="310">310</th><td>  G4double dE2=dEmin;</td></tr>
+<tr><th id="311">311</th><td>  </td></tr>
+<tr><th id="312">312</th><td>  </td></tr>
+<tr><th id="313">313</th><td>  std::vector&lt; <em>double</em>&gt;*  log_ESec_vector = <b>new</b> std::vector&lt; <em>double</em>&gt;();</td></tr>
+<tr><th id="314">314</th><td>  std::vector&lt; <em>double</em>&gt;*  log_Prob_vector = <b>new</b> std::vector&lt; <em>double</em>&gt;();</td></tr>
+<tr><th id="315">315</th><td>  log_ESec_vector-&gt;push_back(std::log(dEmin));</td></tr>
+<tr><th id="316">316</th><td>  log_Prob_vector-&gt;push_back(-<var>50.</var>);</td></tr>
+<tr><th id="317">317</th><td>  G4int nbins=std::max( <em>int</em>(std::log10(dEmax/dEmin))*nbin_pro_decade,<var>5</var>);</td></tr>
+<tr><th id="318">318</th><td>  G4double fE=std::pow(dEmax/dEmin,<var>1.</var>/nbins);</td></tr>
+<tr><th id="319">319</th><td>  </td></tr>
+<tr><th id="320">320</th><td>  </td></tr>
+<tr><th id="321">321</th><td>  </td></tr>
+<tr><th id="322">322</th><td>  </td></tr>
+<tr><th id="323">323</th><td>  </td></tr>
+<tr><th id="324">324</th><td>  G4double int_cross_section=<var>0.</var>;</td></tr>
+<tr><th id="325">325</th><td>  </td></tr>
+<tr><th id="326">326</th><td>  <i>// Loop checking, 07-Aug-2015, Vladimir Ivanchenko</i></td></tr>
+<tr><th id="327">327</th><td>  <b>while</b> (dE1 &lt;dEmax*<var>0.9999999999999</var>){</td></tr>
+<tr><th id="328">328</th><td>  	dE2=dE1*fE;</td></tr>
+<tr><th id="329">329</th><td>  	int_cross_section +=integral.Simpson(<b>this</b>,</td></tr>
+<tr><th id="330">330</th><td>	&amp;G4VEmAdjointModel::DiffCrossSectionFunction2,minEProj+dE1,std::min(minEProj+dE2,maxEProj), <var>5</var>);</td></tr>
+<tr><th id="331">331</th><td>	<i>//G4cout&lt;&lt;"int_cross_section "&lt;&lt;minEProj+dE1&lt;&lt;'\t'&lt;&lt;int_cross_section&lt;&lt;G4endl;</i></td></tr>
+<tr><th id="332">332</th><td>	log_ESec_vector-&gt;push_back(std::log(std::min(dE2,maxEProj-minEProj)));</td></tr>
+<tr><th id="333">333</th><td>	log_Prob_vector-&gt;push_back(std::log(int_cross_section));	</td></tr>
+<tr><th id="334">334</th><td>	dE1=dE2;</td></tr>
+<tr><th id="335">335</th><td></td></tr>
+<tr><th id="336">336</th><td>  }</td></tr>
+<tr><th id="337">337</th><td>  </td></tr>
+<tr><th id="338">338</th><td>  </td></tr>
+<tr><th id="339">339</th><td>  std::vector&lt; std::vector&lt;G4double&gt; *&gt; res_mat; </td></tr>
+<tr><th id="340">340</th><td>  res_mat.clear();</td></tr>
+<tr><th id="341">341</th><td>  <b>if</b> (int_cross_section &gt;<var>0.</var>) {</td></tr>
+<tr><th id="342">342</th><td>  	res_mat.push_back(log_ESec_vector);</td></tr>
+<tr><th id="343">343</th><td>  	res_mat.push_back(log_Prob_vector);</td></tr>
+<tr><th id="344">344</th><td>  }	</td></tr>
+<tr><th id="345">345</th><td>  </td></tr>
+<tr><th id="346">346</th><td>  <b>return</b> res_mat;</td></tr>
+<tr><th id="347">347</th><td>}</td></tr>
+<tr><th id="348">348</th><td><i>////////////////////////////////////////////////////////////////////////////////</i></td></tr>
+<tr><th id="349">349</th><td><i>//</i></td></tr>
+<tr><th id="350">350</th><td><span class='error' title="use of undeclared identifier &apos;std&apos;">std</span>::vector<span class='error' title="expected unqualified-id">&lt;</span> std::vector&lt;G4double&gt;* &gt; G4VEmAdjointModel::ComputeAdjointCrossSectionVectorPerVolumeForSecond(      </td></tr>
+<tr><th id="351">351</th><td>				G4Material* aMaterial,</td></tr>
+<tr><th id="352">352</th><td>				G4double kinEnergyProd,</td></tr>
+<tr><th id="353">353</th><td>				G4int nbin_pro_decade) <i>//nb bins pro order of magnitude of energy</i></td></tr>
+<tr><th id="354">354</th><td>{ G4Integrator&lt;G4VEmAdjointModel, <em>double</em>(G4VEmAdjointModel::*)(<em>double</em>)&gt; integral;</td></tr>
+<tr><th id="355">355</th><td>  SelectedMaterial= aMaterial;</td></tr>
+<tr><th id="356">356</th><td>  kinEnergyProdForIntegration = kinEnergyProd;</td></tr>
+<tr><th id="357">357</th><td>   <i>//compute the vector of integrated cross sections</i></td></tr>
+<tr><th id="358">358</th><td><i>  //-------------------</i></td></tr>
+<tr><th id="359">359</th><td>  </td></tr>
+<tr><th id="360">360</th><td>  G4double minEProj= GetSecondAdjEnergyMinForProdToProjCase(kinEnergyProd);</td></tr>
+<tr><th id="361">361</th><td>  G4double maxEProj= GetSecondAdjEnergyMaxForProdToProjCase(kinEnergyProd);</td></tr>
+<tr><th id="362">362</th><td>  G4double E1=minEProj;</td></tr>
+<tr><th id="363">363</th><td>  std::vector&lt; <em>double</em>&gt;*  log_ESec_vector = <b>new</b>  std::vector&lt; <em>double</em>&gt;();</td></tr>
+<tr><th id="364">364</th><td>  std::vector&lt; <em>double</em>&gt;*  log_Prob_vector = <b>new</b>  std::vector&lt; <em>double</em>&gt;();</td></tr>
+<tr><th id="365">365</th><td>  log_ESec_vector-&gt;clear();</td></tr>
+<tr><th id="366">366</th><td>  log_Prob_vector-&gt;clear();</td></tr>
+<tr><th id="367">367</th><td>  log_ESec_vector-&gt;push_back(std::log(E1));</td></tr>
+<tr><th id="368">368</th><td>  log_Prob_vector-&gt;push_back(-<var>50.</var>);</td></tr>
+<tr><th id="369">369</th><td>  </td></tr>
+<tr><th id="370">370</th><td>  G4double E2=std::pow(<var>10.</var>,<em>double</em>( <em>int</em>(std::log10(minEProj)*nbin_pro_decade)+<var>1</var>)/nbin_pro_decade);</td></tr>
+<tr><th id="371">371</th><td>  G4double fE=std::pow(<var>10.</var>,<var>1.</var>/nbin_pro_decade);</td></tr>
+<tr><th id="372">372</th><td>  G4double int_cross_section=<var>0.</var>;</td></tr>
+<tr><th id="373">373</th><td>  </td></tr>
+<tr><th id="374">374</th><td>  <b>if</b> (std::pow(fE,<var>5.</var>)&gt;(maxEProj/minEProj)) fE = std::pow(maxEProj/minEProj,<var>0.2</var>);</td></tr>
+<tr><th id="375">375</th><td>  </td></tr>
+<tr><th id="376">376</th><td>  <i>// Loop checking, 07-Aug-2015, Vladimir Ivanchenko</i></td></tr>
+<tr><th id="377">377</th><td>  <b>while</b> (E1 &lt;maxEProj*<var>0.9999999</var>){</td></tr>
+<tr><th id="378">378</th><td>  	</td></tr>
+<tr><th id="379">379</th><td>  	int_cross_section +=integral.Simpson(<b>this</b>,</td></tr>
+<tr><th id="380">380</th><td>	&amp;G4VEmAdjointModel::DiffCrossSectionFunction1,E1,std::min(E2,maxEProj*<var>0.99999999</var>), <var>5</var>);</td></tr>
+<tr><th id="381">381</th><td>	log_ESec_vector-&gt;push_back(std::log(std::min(E2,maxEProj)));</td></tr>
+<tr><th id="382">382</th><td>	log_Prob_vector-&gt;push_back(std::log(int_cross_section));</td></tr>
+<tr><th id="383">383</th><td>	E1=E2;</td></tr>
+<tr><th id="384">384</th><td>	E2*=fE;</td></tr>
+<tr><th id="385">385</th><td>  </td></tr>
+<tr><th id="386">386</th><td>  }</td></tr>
+<tr><th id="387">387</th><td>  std::vector&lt; std::vector&lt;G4double&gt;* &gt; res_mat;</td></tr>
+<tr><th id="388">388</th><td>  res_mat.clear();</td></tr>
+<tr><th id="389">389</th><td>  </td></tr>
+<tr><th id="390">390</th><td>  <b>if</b> (int_cross_section &gt;<var>0.</var>) {</td></tr>
+<tr><th id="391">391</th><td>  	res_mat.push_back(log_ESec_vector);</td></tr>
+<tr><th id="392">392</th><td>  	res_mat.push_back(log_Prob_vector);</td></tr>
+<tr><th id="393">393</th><td>  }</td></tr>
+<tr><th id="394">394</th><td>  </td></tr>
+<tr><th id="395">395</th><td> </td></tr>
+<tr><th id="396">396</th><td>  </td></tr>
+<tr><th id="397">397</th><td>  <b>return</b> res_mat;</td></tr>
+<tr><th id="398">398</th><td>}</td></tr>
+<tr><th id="399">399</th><td></td></tr>
+<tr><th id="400">400</th><td><i>/////////////////////////////////////////////////////////////////////////////////////</i></td></tr>
+<tr><th id="401">401</th><td><i>//</i></td></tr>
+<tr><th id="402">402</th><td><span class='error' title="use of undeclared identifier &apos;std&apos;">std</span>::vector<span class='error' title="expected unqualified-id">&lt;</span> std::vector&lt;G4double&gt;* &gt; G4VEmAdjointModel::ComputeAdjointCrossSectionVectorPerVolumeForScatProj(</td></tr>
+<tr><th id="403">403</th><td>      				G4Material* aMaterial,</td></tr>
+<tr><th id="404">404</th><td>				G4double kinEnergyScatProj,</td></tr>
+<tr><th id="405">405</th><td>				G4int nbin_pro_decade) <i>//nb bins pro order of magnitude of energy</i></td></tr>
+<tr><th id="406">406</th><td>{ G4Integrator&lt;G4VEmAdjointModel, <em>double</em>(G4VEmAdjointModel::*)(<em>double</em>)&gt; integral;</td></tr>
+<tr><th id="407">407</th><td>  SelectedMaterial= aMaterial;</td></tr>
+<tr><th id="408">408</th><td>  kinEnergyScatProjForIntegration = kinEnergyScatProj;</td></tr>
+<tr><th id="409">409</th><td> </td></tr>
+<tr><th id="410">410</th><td>  <i>//compute the vector of integrated cross sections</i></td></tr>
+<tr><th id="411">411</th><td><i>  //-------------------</i></td></tr>
+<tr><th id="412">412</th><td>  </td></tr>
+<tr><th id="413">413</th><td>  G4double minEProj= GetSecondAdjEnergyMinForScatProjToProjCase(kinEnergyScatProj);</td></tr>
+<tr><th id="414">414</th><td>  G4double maxEProj= GetSecondAdjEnergyMaxForScatProjToProjCase(kinEnergyScatProj);</td></tr>
+<tr><th id="415">415</th><td> </td></tr>
+<tr><th id="416">416</th><td>  </td></tr>
+<tr><th id="417">417</th><td>  G4double dEmax=maxEProj-kinEnergyScatProj;</td></tr>
+<tr><th id="418">418</th><td>  G4double dEmin=GetLowEnergyLimit();</td></tr>
+<tr><th id="419">419</th><td>  G4double dE1=dEmin;</td></tr>
+<tr><th id="420">420</th><td>  G4double dE2=dEmin;</td></tr>
+<tr><th id="421">421</th><td>  </td></tr>
+<tr><th id="422">422</th><td>  </td></tr>
+<tr><th id="423">423</th><td>  std::vector&lt; <em>double</em>&gt;*  log_ESec_vector = <b>new</b> std::vector&lt; <em>double</em>&gt;();</td></tr>
+<tr><th id="424">424</th><td>  std::vector&lt; <em>double</em>&gt;*  log_Prob_vector = <b>new</b> std::vector&lt; <em>double</em>&gt;();</td></tr>
+<tr><th id="425">425</th><td>  log_ESec_vector-&gt;push_back(std::log(dEmin));</td></tr>
+<tr><th id="426">426</th><td>  log_Prob_vector-&gt;push_back(-<var>50.</var>);</td></tr>
+<tr><th id="427">427</th><td>  G4int nbins=std::max( <em>int</em>(std::log10(dEmax/dEmin))*nbin_pro_decade,<var>5</var>);</td></tr>
+<tr><th id="428">428</th><td>  G4double fE=std::pow(dEmax/dEmin,<var>1.</var>/nbins);</td></tr>
+<tr><th id="429">429</th><td>  </td></tr>
+<tr><th id="430">430</th><td>  G4double int_cross_section=<var>0.</var>;</td></tr>
+<tr><th id="431">431</th><td>  </td></tr>
+<tr><th id="432">432</th><td>  <i>// Loop checking, 07-Aug-2015, Vladimir Ivanchenko</i></td></tr>
+<tr><th id="433">433</th><td>  <b>while</b> (dE1 &lt;dEmax*<var>0.9999999999999</var>){</td></tr>
+<tr><th id="434">434</th><td>  	dE2=dE1*fE;</td></tr>
+<tr><th id="435">435</th><td>  	int_cross_section +=integral.Simpson(<b>this</b>,</td></tr>
+<tr><th id="436">436</th><td>	&amp;G4VEmAdjointModel::DiffCrossSectionFunction2,minEProj+dE1,std::min(minEProj+dE2,maxEProj), <var>5</var>);</td></tr>
+<tr><th id="437">437</th><td>	log_ESec_vector-&gt;push_back(std::log(std::min(dE2,maxEProj-minEProj)));</td></tr>
+<tr><th id="438">438</th><td>	log_Prob_vector-&gt;push_back(std::log(int_cross_section));</td></tr>
+<tr><th id="439">439</th><td>	dE1=dE2;</td></tr>
+<tr><th id="440">440</th><td></td></tr>
+<tr><th id="441">441</th><td>  }</td></tr>
+<tr><th id="442">442</th><td>  </td></tr>
+<tr><th id="443">443</th><td>  </td></tr>
+<tr><th id="444">444</th><td>  </td></tr>
+<tr><th id="445">445</th><td>  </td></tr>
+<tr><th id="446">446</th><td>  </td></tr>
+<tr><th id="447">447</th><td>  std::vector&lt; std::vector&lt;G4double&gt; *&gt; res_mat;</td></tr>
+<tr><th id="448">448</th><td>  res_mat.clear();</td></tr>
+<tr><th id="449">449</th><td>  <b>if</b> (int_cross_section &gt;<var>0.</var>) {</td></tr>
+<tr><th id="450">450</th><td>  	res_mat.push_back(log_ESec_vector);</td></tr>
+<tr><th id="451">451</th><td>  	res_mat.push_back(log_Prob_vector);</td></tr>
+<tr><th id="452">452</th><td>  }	</td></tr>
+<tr><th id="453">453</th><td>  </td></tr>
+<tr><th id="454">454</th><td>  <b>return</b> res_mat;</td></tr>
+<tr><th id="455">455</th><td>}</td></tr>
+<tr><th id="456">456</th><td><i>//////////////////////////////////////////////////////////////////////////////</i></td></tr>
+<tr><th id="457">457</th><td><i>//				</i></td></tr>
+<tr><th id="458">458</th><td>G4double G4VEmAdjointModel::SampleAdjSecEnergyFromCSMatrix(<span class='error' title="unknown type name &apos;size_t&apos;">size_t</span> MatrixIndex,G4double aPrimEnergy,G4bool IsScatProjToProjCase)</td></tr>
+<tr><th id="459">459</th><td>{ </td></tr>
+<tr><th id="460">460</th><td>  </td></tr>
+<tr><th id="461">461</th><td>  </td></tr>
+<tr><th id="462">462</th><td>  G4AdjointCSMatrix* theMatrix= (*<span class='error' title="use of undeclared identifier &apos;pOnCSMatrixForProdToProjBackwardScattering&apos;">pOnCSMatrixForProdToProjBackwardScattering</span>)[MatrixIndex];</td></tr>
+<tr><th id="463">463</th><td>  <b>if</b> (IsScatProjToProjCase) theMatrix= (*<span class='error' title="use of undeclared identifier &apos;pOnCSMatrixForScatProjToProjBackwardScattering&apos;">pOnCSMatrixForScatProjToProjBackwardScattering</span>)[MatrixIndex];</td></tr>
+<tr><th id="464">464</th><td>  <span class='error' title="use of undeclared identifier &apos;std&apos;">std</span>::vector&lt; <em>double</em><span class='error' title="expected &apos;(&apos; for function-style cast or type construction">&gt;</span>* <span class='error' title="use of undeclared identifier &apos;theLogPrimEnergyVector&apos;">theLogPrimEnergyVector</span> = theMatrix-&gt;<span class='error' title="no member named &apos;GetLogPrimEnergyVector&apos; in &apos;G4AdjointCSMatrix&apos;">GetLogPrimEnergyVector</span>();</td></tr>
+<tr><th id="465">465</th><td>  </td></tr>
+<tr><th id="466">466</th><td>  <b>if</b> (<span class='error' title="use of undeclared identifier &apos;theLogPrimEnergyVector&apos;">theLogPrimEnergyVector</span>-&gt;size() ==<var>0</var>){</td></tr>
+<tr><th id="467">467</th><td> 	<a class="macro" href="../../../../global/management/include/G4ios.hh.html#46" title="(*_G4cout_p())" data-ref="_M/G4cout">G4cout</a><span class='error' title="invalid operands to binary expression (&apos;int&apos; and &apos;const char *&apos;)">&lt;&lt;</span><q>"No data are contained in the given AdjointCSMatrix!"</q>&lt;&lt;<a class="macro" href="../../../../global/management/include/G4ios.hh.html#60" title="std::endl" data-ref="_M/G4endl">G4endl</a>;</td></tr>
+<tr><th id="468">468</th><td>	<a class="macro" href="../../../../global/management/include/G4ios.hh.html#46" title="(*_G4cout_p())" data-ref="_M/G4cout">G4cout</a><span class='error' title="invalid operands to binary expression (&apos;int&apos; and &apos;const char *&apos;)">&lt;&lt;</span><q>"The sampling procedure will be stopped."</q>&lt;&lt;<a class="macro" href="../../../../global/management/include/G4ios.hh.html#60" title="std::endl" data-ref="_M/G4endl">G4endl</a>;</td></tr>
+<tr><th id="469">469</th><td>	<b>return</b> <var>0.</var>;</td></tr>
+<tr><th id="470">470</th><td>	</td></tr>
+<tr><th id="471">471</th><td>  }</td></tr>
+<tr><th id="472">472</th><td>  </td></tr>
+<tr><th id="473">473</th><td>  G4AdjointInterpolator* theInterpolator=G4AdjointInterpolator::GetInstance();</td></tr>
+<tr><th id="474">474</th><td>  G4double aLogPrimEnergy = <span class='error' title="use of undeclared identifier &apos;std&apos;">std</span>::log(aPrimEnergy);</td></tr>
+<tr><th id="475">475</th><td>  <span class='error' title="unknown type name &apos;size_t&apos;">size_t</span> ind =theInterpolator-&gt;FindPositionForLogVector(aLogPrimEnergy,*<span class='error' title="use of undeclared identifier &apos;theLogPrimEnergyVector&apos;">theLogPrimEnergyVector</span>);</td></tr>
+<tr><th id="476">476</th><td>  </td></tr>
+<tr><th id="477">477</th><td>  </td></tr>
+<tr><th id="478">478</th><td>  G4double aLogPrimEnergy1,aLogPrimEnergy2;</td></tr>
+<tr><th id="479">479</th><td>  G4double aLogCS1,aLogCS2;</td></tr>
+<tr><th id="480">480</th><td>  G4double log01,log02;</td></tr>
+<tr><th id="481">481</th><td>  <span class='error' title="use of undeclared identifier &apos;std&apos;">std</span>::vector&lt; <em>double</em><span class='error' title="expected &apos;(&apos; for function-style cast or type construction">&gt;</span>* <span class='error' title="use of undeclared identifier &apos;aLogSecondEnergyVector1&apos;">aLogSecondEnergyVector1</span> =<var>0</var>;</td></tr>
+<tr><th id="482">482</th><td>  <span class='error' title="use of undeclared identifier &apos;std&apos;">std</span>::vector&lt; <em>double</em><span class='error' title="expected &apos;(&apos; for function-style cast or type construction">&gt;</span>* <span class='error' title="use of undeclared identifier &apos;aLogSecondEnergyVector2&apos;">aLogSecondEnergyVector2</span>  =<var>0</var>;</td></tr>
+<tr><th id="483">483</th><td>  <span class='error' title="use of undeclared identifier &apos;std&apos;">std</span>::vector&lt; <em>double</em><span class='error' title="expected &apos;(&apos; for function-style cast or type construction">&gt;</span>* <span class='error' title="use of undeclared identifier &apos;aLogProbVector1&apos;">aLogProbVector1</span>=<var>0</var>;</td></tr>
+<tr><th id="484">484</th><td>  <span class='error' title="use of undeclared identifier &apos;std&apos;">std</span>::vector&lt; <em>double</em><span class='error' title="expected &apos;(&apos; for function-style cast or type construction">&gt;</span>* <span class='error' title="use of undeclared identifier &apos;aLogProbVector2&apos;">aLogProbVector2</span>=<var>0</var>; </td></tr>
+<tr><th id="485">485</th><td>  <span class='error' title="use of undeclared identifier &apos;std&apos;">std</span>::vector&lt; <span class='error' title="use of undeclared identifier &apos;size_t&apos;">size_t</span>&gt;* <span class='error' title="use of undeclared identifier &apos;aLogProbVectorIndex1&apos;">aLogProbVectorIndex1</span>=<var>0</var>;</td></tr>
+<tr><th id="486">486</th><td>  <span class='error' title="use of undeclared identifier &apos;std&apos;">std</span>::vector&lt; <span class='error' title="use of undeclared identifier &apos;size_t&apos;">size_t</span>&gt;* <span class='error' title="use of undeclared identifier &apos;aLogProbVectorIndex2&apos;">aLogProbVectorIndex2</span>=<var>0</var>;</td></tr>
+<tr><th id="487">487</th><td>	 							     </td></tr>
+<tr><th id="488">488</th><td>  theMatrix-&gt;GetData(ind, aLogPrimEnergy1,aLogCS1,log01, <span class='error' title="use of undeclared identifier &apos;aLogSecondEnergyVector1&apos;">aLogSecondEnergyVector1</span>,<span class='error' title="use of undeclared identifier &apos;aLogProbVector1&apos;">aLogProbVector1</span>,<span class='error' title="use of undeclared identifier &apos;aLogProbVectorIndex1&apos;">aLogProbVectorIndex1</span>);</td></tr>
+<tr><th id="489">489</th><td>  theMatrix-&gt;GetData(ind+<var>1</var>, aLogPrimEnergy2,aLogCS2,log02, <span class='error' title="use of undeclared identifier &apos;aLogSecondEnergyVector2&apos;">aLogSecondEnergyVector2</span>,<span class='error' title="use of undeclared identifier &apos;aLogProbVector2&apos;">aLogProbVector2</span>,<span class='error' title="use of undeclared identifier &apos;aLogProbVectorIndex2&apos;">aLogProbVectorIndex2</span>);</td></tr>
+<tr><th id="490">490</th><td>  </td></tr>
+<tr><th id="491">491</th><td>  G4double rand_var = <a class="macro" href="../../../../global/HEPRandom/include/Randomize.hh.html#52" title="CLHEP::HepRandom::getTheEngine()-&gt;flat()" data-ref="_M/G4UniformRand">G4UniformRand</a>();</td></tr>
+<tr><th id="492">492</th><td>  G4double log_rand_var= <span class='error' title="use of undeclared identifier &apos;std&apos;">std</span>::log(rand_var);</td></tr>
+<tr><th id="493">493</th><td>  G4double log_Tcut =<span class='error' title="use of undeclared identifier &apos;std&apos;">std</span>::log(currentTcutForDirectSecond);</td></tr>
+<tr><th id="494">494</th><td>  G4double Esec=<var>0</var>;</td></tr>
+<tr><th id="495">495</th><td>  G4double log_dE1,log_dE2;</td></tr>
+<tr><th id="496">496</th><td>  G4double log_rand_var1,log_rand_var2;</td></tr>
+<tr><th id="497">497</th><td>  G4double log_E1,log_E2;</td></tr>
+<tr><th id="498">498</th><td>  log_rand_var1=log_rand_var;</td></tr>
+<tr><th id="499">499</th><td>  log_rand_var2=log_rand_var;</td></tr>
+<tr><th id="500">500</th><td>  </td></tr>
+<tr><th id="501">501</th><td>  G4double Emin=<var>0.</var>;</td></tr>
+<tr><th id="502">502</th><td>  G4double Emax=<var>0.</var>;</td></tr>
+<tr><th id="503">503</th><td>  <b>if</b> (theMatrix-&gt;<span class='error' title="no member named &apos;IsScatProjToProjCase&apos; in &apos;G4AdjointCSMatrix&apos;">IsScatProjToProjCase</span>()){ <i>//case where Tcut plays a role</i></td></tr>
+<tr><th id="504">504</th><td> 	Emin=GetSecondAdjEnergyMinForScatProjToProjCase(aPrimEnergy,currentTcutForDirectSecond);</td></tr>
+<tr><th id="505">505</th><td>	Emax=GetSecondAdjEnergyMaxForScatProjToProjCase(aPrimEnergy);</td></tr>
+<tr><th id="506">506</th><td>	G4double dE=<var>0</var>;</td></tr>
+<tr><th id="507">507</th><td>	<b>if</b> (Emin &lt; Emax ){</td></tr>
+<tr><th id="508">508</th><td>	    <b>if</b> (ApplyCutInRange) {</td></tr>
+<tr><th id="509">509</th><td>		<b>if</b> (second_part_of_same_type &amp;&amp; currentTcutForDirectSecond&gt;aPrimEnergy) <b>return</b> aPrimEnergy;</td></tr>
+<tr><th id="510">510</th><td>		</td></tr>
+<tr><th id="511">511</th><td>		log_rand_var1=log_rand_var+theInterpolator-&gt;InterpolateForLogVector(log_Tcut,*<span class='error' title="use of undeclared identifier &apos;aLogSecondEnergyVector1&apos;">aLogSecondEnergyVector1</span>,*<span class='error' title="use of undeclared identifier &apos;aLogProbVector1&apos;">aLogProbVector1</span>);</td></tr>
+<tr><th id="512">512</th><td>		log_rand_var2=log_rand_var+theInterpolator-&gt;InterpolateForLogVector(log_Tcut,*<span class='error' title="use of undeclared identifier &apos;aLogSecondEnergyVector2&apos;">aLogSecondEnergyVector2</span>,*<span class='error' title="use of undeclared identifier &apos;aLogProbVector2&apos;">aLogProbVector2</span>);</td></tr>
+<tr><th id="513">513</th><td>		</td></tr>
+<tr><th id="514">514</th><td>	    }	</td></tr>
+<tr><th id="515">515</th><td>	    log_dE1 = theInterpolator-&gt;Interpolate(log_rand_var1,*<span class='error' title="use of undeclared identifier &apos;aLogProbVector1&apos;">aLogProbVector1</span>,*<span class='error' title="use of undeclared identifier &apos;aLogSecondEnergyVector1&apos;">aLogSecondEnergyVector1</span>,<q>"Lin"</q>);</td></tr>
+<tr><th id="516">516</th><td>	    log_dE2 = theInterpolator-&gt;Interpolate(log_rand_var2,*<span class='error' title="use of undeclared identifier &apos;aLogProbVector2&apos;">aLogProbVector2</span>,*<span class='error' title="use of undeclared identifier &apos;aLogSecondEnergyVector2&apos;">aLogSecondEnergyVector2</span>,<q>"Lin"</q>);</td></tr>
+<tr><th id="517">517</th><td>	     dE=<span class='error' title="use of undeclared identifier &apos;std&apos;">std</span>::exp(theInterpolator-&gt;LinearInterpolation(aLogPrimEnergy,aLogPrimEnergy1,aLogPrimEnergy2,log_dE1,log_dE2));</td></tr>
+<tr><th id="518">518</th><td>	}</td></tr>
+<tr><th id="519">519</th><td>	</td></tr>
+<tr><th id="520">520</th><td>	Esec = aPrimEnergy +dE;</td></tr>
+<tr><th id="521">521</th><td>	Esec=<span class='error' title="use of undeclared identifier &apos;std&apos;">std</span>::max(Esec,Emin);</td></tr>
+<tr><th id="522">522</th><td>	Esec=<span class='error' title="use of undeclared identifier &apos;std&apos;">std</span>::min(Esec,Emax);</td></tr>
+<tr><th id="523">523</th><td>	</td></tr>
+<tr><th id="524">524</th><td>  }</td></tr>
+<tr><th id="525">525</th><td>  <b>else</b> { <i>//Tcut condition is already full-filled</i></td></tr>
+<tr><th id="526">526</th><td>        </td></tr>
+<tr><th id="527">527</th><td> 	log_E1 = theInterpolator-&gt;Interpolate(log_rand_var,*<span class='error' title="use of undeclared identifier &apos;aLogProbVector1&apos;">aLogProbVector1</span>,*<span class='error' title="use of undeclared identifier &apos;aLogSecondEnergyVector1&apos;">aLogSecondEnergyVector1</span>,<q>"Lin"</q>);</td></tr>
+<tr><th id="528">528</th><td> 	log_E2 = theInterpolator-&gt;Interpolate(log_rand_var,*<span class='error' title="use of undeclared identifier &apos;aLogProbVector2&apos;">aLogProbVector2</span>,*<span class='error' title="use of undeclared identifier &apos;aLogSecondEnergyVector2&apos;">aLogSecondEnergyVector2</span>,<q>"Lin"</q>);</td></tr>
+<tr><th id="529">529</th><td>	</td></tr>
+<tr><th id="530">530</th><td>	Esec = <span class='error' title="use of undeclared identifier &apos;std&apos;">std</span>::exp(theInterpolator-&gt;LinearInterpolation(aLogPrimEnergy,aLogPrimEnergy1,aLogPrimEnergy2,log_E1,log_E2));</td></tr>
+<tr><th id="531">531</th><td>	Emin=GetSecondAdjEnergyMinForProdToProjCase(aPrimEnergy);</td></tr>
+<tr><th id="532">532</th><td>	Emax=GetSecondAdjEnergyMaxForProdToProjCase(aPrimEnergy);</td></tr>
+<tr><th id="533">533</th><td>	Esec=<span class='error' title="use of undeclared identifier &apos;std&apos;">std</span>::max(Esec,Emin);</td></tr>
+<tr><th id="534">534</th><td>	Esec=<span class='error' title="use of undeclared identifier &apos;std&apos;">std</span>::min(Esec,Emax);</td></tr>
+<tr><th id="535">535</th><td>	</td></tr>
+<tr><th id="536">536</th><td>  }</td></tr>
+<tr><th id="537">537</th><td>  	</td></tr>
+<tr><th id="538">538</th><td>  <b>return</b> Esec;</td></tr>
+<tr><th id="539">539</th><td>  </td></tr>
+<tr><th id="540">540</th><td>  </td></tr>
+<tr><th id="541">541</th><td>  </td></tr>
+<tr><th id="542">542</th><td> </td></tr>
+<tr><th id="543">543</th><td>										   </td></tr>
+<tr><th id="544">544</th><td>}</td></tr>
+<tr><th id="545">545</th><td></td></tr>
+<tr><th id="546">546</th><td><i>//////////////////////////////////////////////////////////////////////////////</i></td></tr>
+<tr><th id="547">547</th><td><i>//				</i></td></tr>
+<tr><th id="548">548</th><td><a class="typedef" href="../../../../global/management/include/G4Types.hh.html#G4double" title='G4double' data-type='double' data-ref="G4double">G4double</a> <a class="type" href="../include/G4VEmAdjointModel.hh.html#G4VEmAdjointModel" title='G4VEmAdjointModel' data-ref="G4VEmAdjointModel">G4VEmAdjointModel</a>::<dfn class="decl def" id="_ZN17G4VEmAdjointModel30SampleAdjSecEnergyFromCSMatrixEdb" title='G4VEmAdjointModel::SampleAdjSecEnergyFromCSMatrix' data-ref="_ZN17G4VEmAdjointModel30SampleAdjSecEnergyFromCSMatrixEdb">SampleAdjSecEnergyFromCSMatrix</dfn>(<a class="typedef" href="../../../../global/management/include/G4Types.hh.html#G4double" title='G4double' data-type='double' data-ref="G4double">G4double</a> <dfn class="local col7 decl" id="47aPrimEnergy" title='aPrimEnergy' data-type='G4double' data-ref="47aPrimEnergy">aPrimEnergy</dfn>,<a class="typedef" href="../../../../global/management/include/G4Types.hh.html#G4bool" title='G4bool' data-type='bool' data-ref="G4bool">G4bool</a> <dfn class="local col8 decl" id="48IsScatProjToProjCase" title='IsScatProjToProjCase' data-type='G4bool' data-ref="48IsScatProjToProjCase">IsScatProjToProjCase</dfn>)</td></tr>
+<tr><th id="549">549</th><td>{ <a class="member" href="#_ZN17G4VEmAdjointModel14SelectCSMatrixEb" title='G4VEmAdjointModel::SelectCSMatrix' data-ref="_ZN17G4VEmAdjointModel14SelectCSMatrixEb">SelectCSMatrix</a>(<a class="local col8 ref" href="#48IsScatProjToProjCase" title='IsScatProjToProjCase' data-ref="48IsScatProjToProjCase">IsScatProjToProjCase</a>);</td></tr>
+<tr><th id="550">550</th><td>  <b>return</b> SampleAdjSecEnergyFromCSMatrix(indexOfUsedCrossSectionMatrix, aPrimEnergy, IsScatProjToProjCase);</td></tr>
+<tr><th id="551">551</th><td>}</td></tr>
+<tr><th id="552">552</th><td><i>//////////////////////////////////////////////////////////////////////////////</i></td></tr>
+<tr><th id="553">553</th><td><i>//</i></td></tr>
+<tr><th id="554">554</th><td><em>void</em> <a class="type" href="../include/G4VEmAdjointModel.hh.html#G4VEmAdjointModel" title='G4VEmAdjointModel' data-ref="G4VEmAdjointModel">G4VEmAdjointModel</a>::<dfn class="decl def" id="_ZN17G4VEmAdjointModel14SelectCSMatrixEb" title='G4VEmAdjointModel::SelectCSMatrix' data-ref="_ZN17G4VEmAdjointModel14SelectCSMatrixEb">SelectCSMatrix</dfn>(<a class="typedef" href="../../../../global/management/include/G4Types.hh.html#G4bool" title='G4bool' data-type='bool' data-ref="G4bool">G4bool</a> <dfn class="local col9 decl" id="49IsScatProjToProjCase" title='IsScatProjToProjCase' data-type='G4bool' data-ref="49IsScatProjToProjCase">IsScatProjToProjCase</dfn>)</td></tr>
+<tr><th id="555">555</th><td>{ </td></tr>
+<tr><th id="556">556</th><td>  indexOfUsedCrossSectionMatrix=<var>0</var>;</td></tr>
+<tr><th id="557">557</th><td>  <b>if</b> (!<a class="member" href="../include/G4VEmAdjointModel.hh.html#G4VEmAdjointModel::UseMatrixPerElement" title='G4VEmAdjointModel::UseMatrixPerElement' data-ref="G4VEmAdjointModel::UseMatrixPerElement">UseMatrixPerElement</a>) indexOfUsedCrossSectionMatrix = currentMaterialIndex;</td></tr>
+<tr><th id="558">558</th><td>  <b>else</b> <b>if</b> (!<a class="member" href="../include/G4VEmAdjointModel.hh.html#G4VEmAdjointModel::UseOnlyOneMatrixForAllElements" title='G4VEmAdjointModel::UseOnlyOneMatrixForAllElements' data-ref="G4VEmAdjointModel::UseOnlyOneMatrixForAllElements">UseOnlyOneMatrixForAllElements</a>) { <i>//Select Material</i></td></tr>
+<tr><th id="559">559</th><td>   	<span class='error' title="use of undeclared identifier &apos;std&apos;">std</span>::vector&lt;<span class='error' title="unexpected type name &apos;G4double&apos;: expected expression">G4double</span>&gt;* <span class='error' title="use of undeclared identifier &apos;CS_Vs_Element&apos;">CS_Vs_Element</span> = &amp;<span class='error' title="use of undeclared identifier &apos;CS_Vs_ElementForScatProjToProjCase&apos;">CS_Vs_ElementForScatProjToProjCase</span>;</td></tr>
+<tr><th id="560">560</th><td>	<a class="member" href="../include/G4VEmAdjointModel.hh.html#G4VEmAdjointModel::lastCS" title='G4VEmAdjointModel::lastCS' data-ref="G4VEmAdjointModel::lastCS">lastCS</a>=<a class="member" href="../include/G4VEmAdjointModel.hh.html#G4VEmAdjointModel::lastAdjointCSForScatProjToProjCase" title='G4VEmAdjointModel::lastAdjointCSForScatProjToProjCase' data-ref="G4VEmAdjointModel::lastAdjointCSForScatProjToProjCase">lastAdjointCSForScatProjToProjCase</a>;</td></tr>
+<tr><th id="561">561</th><td>  	<b>if</b> ( !<a class="local col9 ref" href="#49IsScatProjToProjCase" title='IsScatProjToProjCase' data-ref="49IsScatProjToProjCase">IsScatProjToProjCase</a>) {</td></tr>
+<tr><th id="562">562</th><td>		<span class='error' title="use of undeclared identifier &apos;CS_Vs_Element&apos;">CS_Vs_Element</span> = &amp;<span class='error' title="use of undeclared identifier &apos;CS_Vs_ElementForProdToProjCase&apos;">CS_Vs_ElementForProdToProjCase</span>;</td></tr>
+<tr><th id="563">563</th><td>		<a class="member" href="../include/G4VEmAdjointModel.hh.html#G4VEmAdjointModel::lastCS" title='G4VEmAdjointModel::lastCS' data-ref="G4VEmAdjointModel::lastCS">lastCS</a>=<a class="member" href="../include/G4VEmAdjointModel.hh.html#G4VEmAdjointModel::lastAdjointCSForProdToProjCase" title='G4VEmAdjointModel::lastAdjointCSForProdToProjCase' data-ref="G4VEmAdjointModel::lastAdjointCSForProdToProjCase">lastAdjointCSForProdToProjCase</a>;</td></tr>
+<tr><th id="564">564</th><td>	}	</td></tr>
+<tr><th id="565">565</th><td>  	<a class="typedef" href="../../../../global/management/include/G4Types.hh.html#G4double" title='G4double' data-type='double' data-ref="G4double">G4double</a> <dfn class="local col0 decl" id="50rand_var" title='rand_var' data-type='G4double' data-ref="50rand_var">rand_var</dfn>= <a class="macro" href="../../../../global/HEPRandom/include/Randomize.hh.html#52" title="CLHEP::HepRandom::getTheEngine()-&gt;flat()" data-ref="_M/G4UniformRand">G4UniformRand</a>();</td></tr>
+<tr><th id="566">566</th><td>  	<a class="typedef" href="../../../../global/management/include/G4Types.hh.html#G4double" title='G4double' data-type='double' data-ref="G4double">G4double</a> <dfn class="local col1 decl" id="51SumCS" title='SumCS' data-type='G4double' data-ref="51SumCS">SumCS</dfn>=<var>0.</var>;</td></tr>
+<tr><th id="567">567</th><td>	<span class='error' title="unknown type name &apos;size_t&apos;">size_t</span> <dfn class="local col2 decl" id="52ind" title='ind' data-type='int' data-ref="52ind">ind</dfn>=<var>0</var>;</td></tr>
+<tr><th id="568">568</th><td>  	<b>for</b> (<span class='error' title="unknown type name &apos;size_t&apos;">size_t</span> <dfn class="local col3 decl" id="53i" title='i' data-type='int' data-ref="53i">i</dfn>=<var>0</var>;i&lt;<span class='error' title="use of undeclared identifier &apos;CS_Vs_Element&apos;">CS_Vs_Element</span>-&gt;size();i++){</td></tr>
+<tr><th id="569">569</th><td> 		SumCS+=(*<span class='error' title="use of undeclared identifier &apos;CS_Vs_Element&apos;">CS_Vs_Element</span>)[i];</td></tr>
+<tr><th id="570">570</th><td>		<b>if</b> (<a class="local col0 ref" href="#50rand_var" title='rand_var' data-ref="50rand_var">rand_var</a>&lt;=<a class="local col1 ref" href="#51SumCS" title='SumCS' data-ref="51SumCS">SumCS</a>/<a class="member" href="../include/G4VEmAdjointModel.hh.html#G4VEmAdjointModel::lastCS" title='G4VEmAdjointModel::lastCS' data-ref="G4VEmAdjointModel::lastCS">lastCS</a>){</td></tr>
+<tr><th id="571">571</th><td>			ind=i;</td></tr>
+<tr><th id="572">572</th><td>			<b>break</b>;</td></tr>
+<tr><th id="573">573</th><td>		}</td></tr>
+<tr><th id="574">574</th><td>  	}</td></tr>
+<tr><th id="575">575</th><td>	indexOfUsedCrossSectionMatrix = currentMaterial-&gt;GetElement(ind)-&gt;GetIndex();</td></tr>
+<tr><th id="576">576</th><td>  }</td></tr>
+<tr><th id="577">577</th><td>}</td></tr>
+<tr><th id="578">578</th><td><i>//////////////////////////////////////////////////////////////////////////////</i></td></tr>
+<tr><th id="579">579</th><td><i>//				</i></td></tr>
+<tr><th id="580">580</th><td><a class="typedef" href="../../../../global/management/include/G4Types.hh.html#G4double" title='G4double' data-type='double' data-ref="G4double">G4double</a> <a class="type" href="../include/G4VEmAdjointModel.hh.html#G4VEmAdjointModel" title='G4VEmAdjointModel' data-ref="G4VEmAdjointModel">G4VEmAdjointModel</a>::<dfn class="virtual decl def" id="_ZN17G4VEmAdjointModel45SampleAdjSecEnergyFromDiffCrossSectionPerAtomEdb" title='G4VEmAdjointModel::SampleAdjSecEnergyFromDiffCrossSectionPerAtom' data-ref="_ZN17G4VEmAdjointModel45SampleAdjSecEnergyFromDiffCrossSectionPerAtomEdb">SampleAdjSecEnergyFromDiffCrossSectionPerAtom</dfn>(<a class="typedef" href="../../../../global/management/include/G4Types.hh.html#G4double" title='G4double' data-type='double' data-ref="G4double">G4double</a> <dfn class="local col4 decl" id="54prim_energy" title='prim_energy' data-type='G4double' data-ref="54prim_energy">prim_energy</dfn>,<a class="typedef" href="../../../../global/management/include/G4Types.hh.html#G4bool" title='G4bool' data-type='bool' data-ref="G4bool">G4bool</a> <dfn class="local col5 decl" id="55IsScatProjToProjCase" title='IsScatProjToProjCase' data-type='G4bool' data-ref="55IsScatProjToProjCase">IsScatProjToProjCase</dfn>)</td></tr>
+<tr><th id="581">581</th><td>{  </td></tr>
+<tr><th id="582">582</th><td>  <i>// here we try to use the rejection method </i></td></tr>
+<tr><th id="583">583</th><td><i>  //-----------------------------------------</i></td></tr>
+<tr><th id="584">584</th><td>  </td></tr>
+<tr><th id="585">585</th><td>  <em>const</em> <a class="typedef" href="../../../../global/management/include/G4Types.hh.html#G4int" title='G4int' data-type='int' data-ref="G4int">G4int</a> <dfn class="local col6 decl" id="56iimax" title='iimax' data-type='const G4int' data-ref="56iimax">iimax</dfn> = <var>1000</var>;</td></tr>
+<tr><th id="586">586</th><td>  <a class="typedef" href="../../../../global/management/include/G4Types.hh.html#G4double" title='G4double' data-type='double' data-ref="G4double">G4double</a> <dfn class="local col7 decl" id="57E" title='E' data-type='G4double' data-ref="57E">E</dfn>=<var>0</var>;</td></tr>
+<tr><th id="587">587</th><td>  <a class="typedef" href="../../../../global/management/include/G4Types.hh.html#G4double" title='G4double' data-type='double' data-ref="G4double">G4double</a> <dfn class="local col8 decl" id="58x" title='x' data-type='G4double' data-ref="58x">x</dfn>,<dfn class="local col9 decl" id="59xmin" title='xmin' data-type='G4double' data-ref="59xmin">xmin</dfn>,<dfn class="local col0 decl" id="60greject" title='greject' data-type='G4double' data-ref="60greject">greject</dfn>,<dfn class="local col1 decl" id="61q" title='q' data-type='G4double' data-ref="61q">q</dfn>;</td></tr>
+<tr><th id="588">588</th><td>  <b>if</b> ( <a class="local col5 ref" href="#55IsScatProjToProjCase" title='IsScatProjToProjCase' data-ref="55IsScatProjToProjCase">IsScatProjToProjCase</a>){</td></tr>
+<tr><th id="589">589</th><td>  	<a class="typedef" href="../../../../global/management/include/G4Types.hh.html#G4double" title='G4double' data-type='double' data-ref="G4double">G4double</a> <dfn class="local col2 decl" id="62Emax" title='Emax' data-type='G4double' data-ref="62Emax">Emax</dfn> = <a class="virtual member" href="#_ZN17G4VEmAdjointModel42GetSecondAdjEnergyMaxForScatProjToProjCaseEd" title='G4VEmAdjointModel::GetSecondAdjEnergyMaxForScatProjToProjCase' data-ref="_ZN17G4VEmAdjointModel42GetSecondAdjEnergyMaxForScatProjToProjCaseEd">GetSecondAdjEnergyMaxForScatProjToProjCase</a>(<a class="local col4 ref" href="#54prim_energy" title='prim_energy' data-ref="54prim_energy">prim_energy</a>);</td></tr>
+<tr><th id="590">590</th><td>        <a class="typedef" href="../../../../global/management/include/G4Types.hh.html#G4double" title='G4double' data-type='double' data-ref="G4double">G4double</a> <dfn class="local col3 decl" id="63Emin" title='Emin' data-type='G4double' data-ref="63Emin">Emin</dfn>= <a class="local col4 ref" href="#54prim_energy" title='prim_energy' data-ref="54prim_energy">prim_energy</a>+<a class="member" href="../include/G4VEmAdjointModel.hh.html#G4VEmAdjointModel::currentTcutForDirectSecond" title='G4VEmAdjointModel::currentTcutForDirectSecond' data-ref="G4VEmAdjointModel::currentTcutForDirectSecond">currentTcutForDirectSecond</a>;</td></tr>
+<tr><th id="591">591</th><td>	<a class="local col9 ref" href="#59xmin" title='xmin' data-ref="59xmin">xmin</a>=<a class="local col3 ref" href="#63Emin" title='Emin' data-ref="63Emin">Emin</a>/<a class="local col2 ref" href="#62Emax" title='Emax' data-ref="62Emax">Emax</a>;</td></tr>
+<tr><th id="592">592</th><td>	<a class="typedef" href="../../../../global/management/include/G4Types.hh.html#G4double" title='G4double' data-type='double' data-ref="G4double">G4double</a> <dfn class="local col4 decl" id="64grejmax" title='grejmax' data-type='G4double' data-ref="64grejmax">grejmax</dfn> = <a class="virtual member" href="#_ZN17G4VEmAdjointModel37DiffCrossSectionPerAtomPrimToScatPrimEdddd" title='G4VEmAdjointModel::DiffCrossSectionPerAtomPrimToScatPrim' data-ref="_ZN17G4VEmAdjointModel37DiffCrossSectionPerAtomPrimToScatPrimEdddd">DiffCrossSectionPerAtomPrimToScatPrim</a>(<a class="local col3 ref" href="#63Emin" title='Emin' data-ref="63Emin">Emin</a>,<a class="local col4 ref" href="#54prim_energy" title='prim_energy' data-ref="54prim_energy">prim_energy</a>,<var>1</var>)*<a class="local col4 ref" href="#54prim_energy" title='prim_energy' data-ref="54prim_energy">prim_energy</a>; </td></tr>
+<tr><th id="593">593</th><td></td></tr>
+<tr><th id="594">594</th><td>        <a class="typedef" href="../../../../global/management/include/G4Types.hh.html#G4int" title='G4int' data-type='int' data-ref="G4int">G4int</a> <dfn class="local col5 decl" id="65ii" title='ii' data-type='G4int' data-ref="65ii">ii</dfn> =<var>0</var>;</td></tr>
+<tr><th id="595">595</th><td>	<b>do</b> {</td></tr>
+<tr><th id="596">596</th><td>        	<a class="local col1 ref" href="#61q" title='q' data-ref="61q">q</a> = <a class="macro" href="../../../../global/HEPRandom/include/Randomize.hh.html#52" title="CLHEP::HepRandom::getTheEngine()-&gt;flat()" data-ref="_M/G4UniformRand">G4UniformRand</a>();</td></tr>
+<tr><th id="597">597</th><td>        	<a class="local col8 ref" href="#58x" title='x' data-ref="58x">x</a> = <var>1.</var>/(<a class="local col1 ref" href="#61q" title='q' data-ref="61q">q</a>*(<var>1.</var>/<a class="local col9 ref" href="#59xmin" title='xmin' data-ref="59xmin">xmin</a> -<var>1.</var>) +<var>1.</var>);</td></tr>
+<tr><th id="598">598</th><td>		<a class="local col7 ref" href="#57E" title='E' data-ref="57E">E</a>=<a class="local col8 ref" href="#58x" title='x' data-ref="58x">x</a>*<a class="local col2 ref" href="#62Emax" title='Emax' data-ref="62Emax">Emax</a>;</td></tr>
+<tr><th id="599">599</th><td>		<a class="local col0 ref" href="#60greject" title='greject' data-ref="60greject">greject</a> = <a class="virtual member" href="#_ZN17G4VEmAdjointModel37DiffCrossSectionPerAtomPrimToScatPrimEdddd" title='G4VEmAdjointModel::DiffCrossSectionPerAtomPrimToScatPrim' data-ref="_ZN17G4VEmAdjointModel37DiffCrossSectionPerAtomPrimToScatPrimEdddd">DiffCrossSectionPerAtomPrimToScatPrim</a>( <a class="local col7 ref" href="#57E" title='E' data-ref="57E">E</a>,<a class="local col4 ref" href="#54prim_energy" title='prim_energy' data-ref="54prim_energy">prim_energy</a> ,<var>1</var>)*<a class="local col4 ref" href="#54prim_energy" title='prim_energy' data-ref="54prim_energy">prim_energy</a>; </td></tr>
+<tr><th id="600">600</th><td>		++<a class="local col5 ref" href="#65ii" title='ii' data-ref="65ii">ii</a>;</td></tr>
+<tr><th id="601">601</th><td>                <b>if</b>(<a class="local col5 ref" href="#65ii" title='ii' data-ref="65ii">ii</a> &gt;= <a class="local col6 ref" href="#56iimax" title='iimax' data-ref="56iimax">iimax</a>) { <b>break</b>; }</td></tr>
+<tr><th id="602">602</th><td>	}	</td></tr>
+<tr><th id="603">603</th><td>	<i>// Loop checking, 07-Aug-2015, Vladimir Ivanchenko</i></td></tr>
+<tr><th id="604">604</th><td>	<b>while</b>( <a class="local col0 ref" href="#60greject" title='greject' data-ref="60greject">greject</a> &lt; <a class="macro" href="../../../../global/HEPRandom/include/Randomize.hh.html#52" title="CLHEP::HepRandom::getTheEngine()-&gt;flat()" data-ref="_M/G4UniformRand">G4UniformRand</a>()*<a class="local col4 ref" href="#64grejmax" title='grejmax' data-ref="64grejmax">grejmax</a> );	</td></tr>
+<tr><th id="605">605</th><td>	</td></tr>
+<tr><th id="606">606</th><td>  }</td></tr>
+<tr><th id="607">607</th><td>  <b>else</b> {</td></tr>
+<tr><th id="608">608</th><td>  	<a class="typedef" href="../../../../global/management/include/G4Types.hh.html#G4double" title='G4double' data-type='double' data-ref="G4double">G4double</a> <dfn class="local col6 decl" id="66Emax" title='Emax' data-type='G4double' data-ref="66Emax">Emax</dfn> = <a class="virtual member" href="#_ZN17G4VEmAdjointModel38GetSecondAdjEnergyMaxForProdToProjCaseEd" title='G4VEmAdjointModel::GetSecondAdjEnergyMaxForProdToProjCase' data-ref="_ZN17G4VEmAdjointModel38GetSecondAdjEnergyMaxForProdToProjCaseEd">GetSecondAdjEnergyMaxForProdToProjCase</a>(<a class="local col4 ref" href="#54prim_energy" title='prim_energy' data-ref="54prim_energy">prim_energy</a>);</td></tr>
+<tr><th id="609">609</th><td>        <a class="typedef" href="../../../../global/management/include/G4Types.hh.html#G4double" title='G4double' data-type='double' data-ref="G4double">G4double</a> <dfn class="local col7 decl" id="67Emin" title='Emin' data-type='G4double' data-ref="67Emin">Emin</dfn>=  <a class="virtual member" href="#_ZN17G4VEmAdjointModel38GetSecondAdjEnergyMinForProdToProjCaseEd" title='G4VEmAdjointModel::GetSecondAdjEnergyMinForProdToProjCase' data-ref="_ZN17G4VEmAdjointModel38GetSecondAdjEnergyMinForProdToProjCaseEd">GetSecondAdjEnergyMinForProdToProjCase</a>(<a class="local col4 ref" href="#54prim_energy" title='prim_energy' data-ref="54prim_energy">prim_energy</a>);;</td></tr>
+<tr><th id="610">610</th><td>	<a class="local col9 ref" href="#59xmin" title='xmin' data-ref="59xmin">xmin</a>=<a class="local col7 ref" href="#67Emin" title='Emin' data-ref="67Emin">Emin</a>/<a class="local col6 ref" href="#66Emax" title='Emax' data-ref="66Emax">Emax</a>;</td></tr>
+<tr><th id="611">611</th><td>	<a class="typedef" href="../../../../global/management/include/G4Types.hh.html#G4double" title='G4double' data-type='double' data-ref="G4double">G4double</a> <dfn class="local col8 decl" id="68grejmax" title='grejmax' data-type='G4double' data-ref="68grejmax">grejmax</dfn> = <a class="virtual member" href="#_ZN17G4VEmAdjointModel35DiffCrossSectionPerAtomPrimToSecondEdddd" title='G4VEmAdjointModel::DiffCrossSectionPerAtomPrimToSecond' data-ref="_ZN17G4VEmAdjointModel35DiffCrossSectionPerAtomPrimToSecondEdddd">DiffCrossSectionPerAtomPrimToSecond</a>(<a class="local col7 ref" href="#67Emin" title='Emin' data-ref="67Emin">Emin</a>,<a class="local col4 ref" href="#54prim_energy" title='prim_energy' data-ref="54prim_energy">prim_energy</a>,<var>1</var>); </td></tr>
+<tr><th id="612">612</th><td>        <a class="typedef" href="../../../../global/management/include/G4Types.hh.html#G4int" title='G4int' data-type='int' data-ref="G4int">G4int</a> <dfn class="local col9 decl" id="69ii" title='ii' data-type='G4int' data-ref="69ii">ii</dfn> =<var>0</var>;</td></tr>
+<tr><th id="613">613</th><td>	<b>do</b> {</td></tr>
+<tr><th id="614">614</th><td>        	<a class="local col1 ref" href="#61q" title='q' data-ref="61q">q</a> = <a class="macro" href="../../../../global/HEPRandom/include/Randomize.hh.html#52" title="CLHEP::HepRandom::getTheEngine()-&gt;flat()" data-ref="_M/G4UniformRand">G4UniformRand</a>();</td></tr>
+<tr><th id="615">615</th><td>        	x = <span class='error' title="use of undeclared identifier &apos;std&apos;">std</span>::pow(xmin, q);</td></tr>
+<tr><th id="616">616</th><td>		<a class="local col7 ref" href="#57E" title='E' data-ref="57E">E</a>=<a class="local col8 ref" href="#58x" title='x' data-ref="58x">x</a>*<a class="local col6 ref" href="#66Emax" title='Emax' data-ref="66Emax">Emax</a>;</td></tr>
+<tr><th id="617">617</th><td>		<a class="local col0 ref" href="#60greject" title='greject' data-ref="60greject">greject</a> = <a class="virtual member" href="#_ZN17G4VEmAdjointModel35DiffCrossSectionPerAtomPrimToSecondEdddd" title='G4VEmAdjointModel::DiffCrossSectionPerAtomPrimToSecond' data-ref="_ZN17G4VEmAdjointModel35DiffCrossSectionPerAtomPrimToSecondEdddd">DiffCrossSectionPerAtomPrimToSecond</a>( <a class="local col7 ref" href="#57E" title='E' data-ref="57E">E</a>,<a class="local col4 ref" href="#54prim_energy" title='prim_energy' data-ref="54prim_energy">prim_energy</a> ,<var>1</var>); </td></tr>
+<tr><th id="618">618</th><td>		++<a class="local col9 ref" href="#69ii" title='ii' data-ref="69ii">ii</a>;</td></tr>
+<tr><th id="619">619</th><td>                <b>if</b>(<a class="local col9 ref" href="#69ii" title='ii' data-ref="69ii">ii</a> &gt;= <a class="local col6 ref" href="#56iimax" title='iimax' data-ref="56iimax">iimax</a>) { <b>break</b>; }		</td></tr>
+<tr><th id="620">620</th><td>	}	</td></tr>
+<tr><th id="621">621</th><td>	<i>// Loop checking, 07-Aug-2015, Vladimir Ivanchenko</i></td></tr>
+<tr><th id="622">622</th><td>	<b>while</b>( <a class="local col0 ref" href="#60greject" title='greject' data-ref="60greject">greject</a> &lt; <a class="macro" href="../../../../global/HEPRandom/include/Randomize.hh.html#52" title="CLHEP::HepRandom::getTheEngine()-&gt;flat()" data-ref="_M/G4UniformRand">G4UniformRand</a>()*<a class="local col8 ref" href="#68grejmax" title='grejmax' data-ref="68grejmax">grejmax</a> );</td></tr>
+<tr><th id="623">623</th><td>  </td></tr>
+<tr><th id="624">624</th><td>  </td></tr>
+<tr><th id="625">625</th><td>  </td></tr>
+<tr><th id="626">626</th><td>  }</td></tr>
+<tr><th id="627">627</th><td>  </td></tr>
+<tr><th id="628">628</th><td>  <b>return</b> <a class="local col7 ref" href="#57E" title='E' data-ref="57E">E</a>;</td></tr>
+<tr><th id="629">629</th><td>}</td></tr>
+<tr><th id="630">630</th><td></td></tr>
+<tr><th id="631">631</th><td><i>////////////////////////////////////////////////////////////////////////////////</i></td></tr>
+<tr><th id="632">632</th><td><i>//</i></td></tr>
+<tr><th id="633">633</th><td><em>void</em> <a class="type" href="../include/G4VEmAdjointModel.hh.html#G4VEmAdjointModel" title='G4VEmAdjointModel' data-ref="G4VEmAdjointModel">G4VEmAdjointModel</a>::<dfn class="virtual decl def" id="_ZN17G4VEmAdjointModel21CorrectPostStepWeightEP16G4ParticleChangedddb" title='G4VEmAdjointModel::CorrectPostStepWeight' data-ref="_ZN17G4VEmAdjointModel21CorrectPostStepWeightEP16G4ParticleChangedddb">CorrectPostStepWeight</dfn>(<a class="type" href="../../../../track/include/G4ParticleChange.hh.html#G4ParticleChange" title='G4ParticleChange' data-ref="G4ParticleChange">G4ParticleChange</a>* <dfn class="local col0 decl" id="70fParticleChange" title='fParticleChange' data-type='G4ParticleChange *' data-ref="70fParticleChange">fParticleChange</dfn>, </td></tr>
+<tr><th id="634">634</th><td>						  <a class="typedef" href="../../../../global/management/include/G4Types.hh.html#G4double" title='G4double' data-type='double' data-ref="G4double">G4double</a> <dfn class="local col1 decl" id="71old_weight" title='old_weight' data-type='G4double' data-ref="71old_weight">old_weight</dfn>,  </td></tr>
+<tr><th id="635">635</th><td>						  <a class="typedef" href="../../../../global/management/include/G4Types.hh.html#G4double" title='G4double' data-type='double' data-ref="G4double">G4double</a> <dfn class="local col2 decl" id="72adjointPrimKinEnergy" title='adjointPrimKinEnergy' data-type='G4double' data-ref="72adjointPrimKinEnergy">adjointPrimKinEnergy</dfn>, </td></tr>
+<tr><th id="636">636</th><td>						  <a class="typedef" href="../../../../global/management/include/G4Types.hh.html#G4double" title='G4double' data-type='double' data-ref="G4double">G4double</a> <dfn class="local col3 decl" id="73projectileKinEnergy" title='projectileKinEnergy' data-type='G4double' data-ref="73projectileKinEnergy">projectileKinEnergy</dfn>,</td></tr>
+<tr><th id="637">637</th><td>						  <a class="typedef" href="../../../../global/management/include/G4Types.hh.html#G4bool" title='G4bool' data-type='bool' data-ref="G4bool">G4bool</a> <dfn class="local col4 decl" id="74IsScatProjToProjCase" title='IsScatProjToProjCase' data-type='G4bool' data-ref="74IsScatProjToProjCase">IsScatProjToProjCase</dfn>) </td></tr>
+<tr><th id="638">638</th><td>{</td></tr>
+<tr><th id="639">639</th><td> <a class="typedef" href="../../../../global/management/include/G4Types.hh.html#G4double" title='G4double' data-type='double' data-ref="G4double">G4double</a> <dfn class="local col5 decl" id="75new_weight" title='new_weight' data-type='G4double' data-ref="75new_weight">new_weight</dfn>=<a class="local col1 ref" href="#71old_weight" title='old_weight' data-ref="71old_weight">old_weight</a>;</td></tr>
+<tr><th id="640">640</th><td> <a class="typedef" href="../../../../global/management/include/G4Types.hh.html#G4double" title='G4double' data-type='double' data-ref="G4double">G4double</a> <dfn class="local col6 decl" id="76w_corr" title='w_corr' data-type='G4double' data-ref="76w_corr">w_corr</dfn> =<var>1.</var>/<a class="member" href="../include/G4VEmAdjointModel.hh.html#G4VEmAdjointModel::CS_biasing_factor" title='G4VEmAdjointModel::CS_biasing_factor' data-ref="G4VEmAdjointModel::CS_biasing_factor">CS_biasing_factor</a>;</td></tr>
+<tr><th id="641">641</th><td> <a class="local col6 ref" href="#76w_corr" title='w_corr' data-ref="76w_corr">w_corr</a>*=<a class="type" href="../include/G4AdjointCSManager.hh.html#G4AdjointCSManager" title='G4AdjointCSManager' data-ref="G4AdjointCSManager">G4AdjointCSManager</a>::<a class="ref" href="../include/G4AdjointCSManager.hh.html#_ZN18G4AdjointCSManager19GetAdjointCSManagerEv" title='G4AdjointCSManager::GetAdjointCSManager' data-ref="_ZN18G4AdjointCSManager19GetAdjointCSManagerEv">GetAdjointCSManager</a>()-&gt;<a class="ref" href="../include/G4AdjointCSManager.hh.html#_ZN18G4AdjointCSManager27GetPostStepWeightCorrectionEv" title='G4AdjointCSManager::GetPostStepWeightCorrection' data-ref="_ZN18G4AdjointCSManager27GetPostStepWeightCorrectionEv">GetPostStepWeightCorrection</a>();</td></tr>
+<tr><th id="642">642</th><td> </td></tr>
+<tr><th id="643">643</th><td> </td></tr>
+<tr><th id="644">644</th><td> <a class="member" href="../include/G4VEmAdjointModel.hh.html#G4VEmAdjointModel::lastCS" title='G4VEmAdjointModel::lastCS' data-ref="G4VEmAdjointModel::lastCS">lastCS</a>=<a class="member" href="../include/G4VEmAdjointModel.hh.html#G4VEmAdjointModel::lastAdjointCSForScatProjToProjCase" title='G4VEmAdjointModel::lastAdjointCSForScatProjToProjCase' data-ref="G4VEmAdjointModel::lastAdjointCSForScatProjToProjCase">lastAdjointCSForScatProjToProjCase</a>;</td></tr>
+<tr><th id="645">645</th><td> <b>if</b> ( !<a class="local col4 ref" href="#74IsScatProjToProjCase" title='IsScatProjToProjCase' data-ref="74IsScatProjToProjCase">IsScatProjToProjCase</a>) <a class="member" href="../include/G4VEmAdjointModel.hh.html#G4VEmAdjointModel::lastCS" title='G4VEmAdjointModel::lastCS' data-ref="G4VEmAdjointModel::lastCS">lastCS</a>=<a class="member" href="../include/G4VEmAdjointModel.hh.html#G4VEmAdjointModel::lastAdjointCSForProdToProjCase" title='G4VEmAdjointModel::lastAdjointCSForProdToProjCase' data-ref="G4VEmAdjointModel::lastAdjointCSForProdToProjCase">lastAdjointCSForProdToProjCase</a>;</td></tr>
+<tr><th id="646">646</th><td> <b>if</b> ((<a class="local col2 ref" href="#72adjointPrimKinEnergy" title='adjointPrimKinEnergy' data-ref="72adjointPrimKinEnergy">adjointPrimKinEnergy</a>-<a class="member" href="../include/G4VEmAdjointModel.hh.html#G4VEmAdjointModel::preStepEnergy" title='G4VEmAdjointModel::preStepEnergy' data-ref="G4VEmAdjointModel::preStepEnergy">preStepEnergy</a>)/<a class="member" href="../include/G4VEmAdjointModel.hh.html#G4VEmAdjointModel::preStepEnergy" title='G4VEmAdjointModel::preStepEnergy' data-ref="G4VEmAdjointModel::preStepEnergy">preStepEnergy</a>&gt;<var>0.001</var>){ <i>//Is that in all cases needed???</i></td></tr>
+<tr><th id="647">647</th><td> 	<a class="typedef" href="../../../../global/management/include/G4Types.hh.html#G4double" title='G4double' data-type='double' data-ref="G4double">G4double</a> <dfn class="local col7 decl" id="77post_stepCS" title='post_stepCS' data-type='G4double' data-ref="77post_stepCS">post_stepCS</dfn>=<a class="virtual member" href="#_ZN17G4VEmAdjointModel19AdjointCrossSectionEPK20G4MaterialCutsCoupledb" title='G4VEmAdjointModel::AdjointCrossSection' data-ref="_ZN17G4VEmAdjointModel19AdjointCrossSectionEPK20G4MaterialCutsCoupledb">AdjointCrossSection</a>(<a class="member" href="../include/G4VEmAdjointModel.hh.html#G4VEmAdjointModel::currentCouple" title='G4VEmAdjointModel::currentCouple' data-ref="G4VEmAdjointModel::currentCouple">currentCouple</a>, <a class="local col2 ref" href="#72adjointPrimKinEnergy" title='adjointPrimKinEnergy' data-ref="72adjointPrimKinEnergy">adjointPrimKinEnergy</a></td></tr>
+<tr><th id="648">648</th><td>						 ,<a class="local col4 ref" href="#74IsScatProjToProjCase" title='IsScatProjToProjCase' data-ref="74IsScatProjToProjCase">IsScatProjToProjCase</a> );</td></tr>
+<tr><th id="649">649</th><td>	<b>if</b> (<a class="local col7 ref" href="#77post_stepCS" title='post_stepCS' data-ref="77post_stepCS">post_stepCS</a>&gt;<var>0</var> &amp;&amp; <a class="member" href="../include/G4VEmAdjointModel.hh.html#G4VEmAdjointModel::lastCS" title='G4VEmAdjointModel::lastCS' data-ref="G4VEmAdjointModel::lastCS">lastCS</a>&gt;<var>0</var>) <a class="local col6 ref" href="#76w_corr" title='w_corr' data-ref="76w_corr">w_corr</a>*=<a class="local col7 ref" href="#77post_stepCS" title='post_stepCS' data-ref="77post_stepCS">post_stepCS</a>/<a class="member" href="../include/G4VEmAdjointModel.hh.html#G4VEmAdjointModel::lastCS" title='G4VEmAdjointModel::lastCS' data-ref="G4VEmAdjointModel::lastCS">lastCS</a>;</td></tr>
+<tr><th id="650">650</th><td> }</td></tr>
+<tr><th id="651">651</th><td>	</td></tr>
+<tr><th id="652">652</th><td> <a class="local col5 ref" href="#75new_weight" title='new_weight' data-ref="75new_weight">new_weight</a>*=<a class="local col6 ref" href="#76w_corr" title='w_corr' data-ref="76w_corr">w_corr</a>;</td></tr>
+<tr><th id="653">653</th><td></td></tr>
+<tr><th id="654">654</th><td> <i>//G4cout&lt;&lt;"Post step "&lt;&lt;new_weight&lt;&lt;'\t'&lt;&lt;w_corr&lt;&lt;'\t'&lt;&lt;old_weight&lt;&lt;G4endl;</i></td></tr>
+<tr><th id="655">655</th><td> <a class="local col5 ref" href="#75new_weight" title='new_weight' data-ref="75new_weight">new_weight</a>*=<a class="local col3 ref" href="#73projectileKinEnergy" title='projectileKinEnergy' data-ref="73projectileKinEnergy">projectileKinEnergy</a>/<a class="local col2 ref" href="#72adjointPrimKinEnergy" title='adjointPrimKinEnergy' data-ref="72adjointPrimKinEnergy">adjointPrimKinEnergy</a>;<i>//This is needed due to the biasing of diff CS</i></td></tr>
+<tr><th id="656">656</th><td> 							<i>//by the factor adjointPrimKinEnergy/projectileKinEnergy</i></td></tr>
+<tr><th id="657">657</th><td>   </td></tr>
+<tr><th id="658">658</th><td></td></tr>
+<tr><th id="659">659</th><td></td></tr>
+<tr><th id="660">660</th><td> <a class="local col0 ref" href="#70fParticleChange" title='fParticleChange' data-ref="70fParticleChange">fParticleChange</a>-&gt;<a class="ref" href="../../../../track/include/G4VParticleChange.hh.html#_ZN17G4VParticleChange24SetParentWeightByProcessEb" title='G4VParticleChange::SetParentWeightByProcess' data-ref="_ZN17G4VParticleChange24SetParentWeightByProcessEb">SetParentWeightByProcess</a>(<b>false</b>);</td></tr>
+<tr><th id="661">661</th><td> <a class="local col0 ref" href="#70fParticleChange" title='fParticleChange' data-ref="70fParticleChange">fParticleChange</a>-&gt;<a class="ref" href="../../../../track/include/G4VParticleChange.hh.html#_ZN17G4VParticleChange27SetSecondaryWeightByProcessEb" title='G4VParticleChange::SetSecondaryWeightByProcess' data-ref="_ZN17G4VParticleChange27SetSecondaryWeightByProcessEb">SetSecondaryWeightByProcess</a>(<b>false</b>);</td></tr>
+<tr><th id="662">662</th><td> <a class="local col0 ref" href="#70fParticleChange" title='fParticleChange' data-ref="70fParticleChange">fParticleChange</a>-&gt;<a class="ref" href="../../../../track/include/G4VParticleChange.hh.html#_ZN17G4VParticleChange19ProposeParentWeightEd" title='G4VParticleChange::ProposeParentWeight' data-ref="_ZN17G4VParticleChange19ProposeParentWeightEd">ProposeParentWeight</a>(<a class="local col5 ref" href="#75new_weight" title='new_weight' data-ref="75new_weight">new_weight</a>);	</td></tr>
+<tr><th id="663">663</th><td>}</td></tr>
+<tr><th id="664">664</th><td><i>//////////////////////////////////////////////////////////////////////////////</i></td></tr>
+<tr><th id="665">665</th><td><i>//				</i></td></tr>
+<tr><th id="666">666</th><td><a class="typedef" href="../../../../global/management/include/G4Types.hh.html#G4double" title='G4double' data-type='double' data-ref="G4double">G4double</a> <a class="type" href="../include/G4VEmAdjointModel.hh.html#G4VEmAdjointModel" title='G4VEmAdjointModel' data-ref="G4VEmAdjointModel">G4VEmAdjointModel</a>::<dfn class="virtual decl def" id="_ZN17G4VEmAdjointModel42GetSecondAdjEnergyMaxForScatProjToProjCaseEd" title='G4VEmAdjointModel::GetSecondAdjEnergyMaxForScatProjToProjCase' data-ref="_ZN17G4VEmAdjointModel42GetSecondAdjEnergyMaxForScatProjToProjCaseEd">GetSecondAdjEnergyMaxForScatProjToProjCase</dfn>(<a class="typedef" href="../../../../global/management/include/G4Types.hh.html#G4double" title='G4double' data-type='double' data-ref="G4double">G4double</a> <dfn class="local col8 decl" id="78kinEnergyScatProj" title='kinEnergyScatProj' data-type='G4double' data-ref="78kinEnergyScatProj">kinEnergyScatProj</dfn>)</td></tr>
+<tr><th id="667">667</th><td>{ <a class="typedef" href="../../../../global/management/include/G4Types.hh.html#G4double" title='G4double' data-type='double' data-ref="G4double">G4double</a> <dfn class="local col9 decl" id="79maxEProj" title='maxEProj' data-type='G4double' data-ref="79maxEProj">maxEProj</dfn>= <a class="member" href="../include/G4VEmAdjointModel.hh.html#G4VEmAdjointModel::HighEnergyLimit" title='G4VEmAdjointModel::HighEnergyLimit' data-ref="G4VEmAdjointModel::HighEnergyLimit">HighEnergyLimit</a>;</td></tr>
+<tr><th id="668">668</th><td>  <b>if</b> (second_part_of_same_type)  maxEProj=<span class='error' title="use of undeclared identifier &apos;std&apos;">std</span>::min(kinEnergyScatProj*<var>2.</var>,HighEnergyLimit);</td></tr>
+<tr><th id="669">669</th><td>  <b>return</b> <a class="local col9 ref" href="#79maxEProj" title='maxEProj' data-ref="79maxEProj">maxEProj</a>;</td></tr>
+<tr><th id="670">670</th><td>}</td></tr>
+<tr><th id="671">671</th><td><i>//////////////////////////////////////////////////////////////////////////////</i></td></tr>
+<tr><th id="672">672</th><td><i>//</i></td></tr>
+<tr><th id="673">673</th><td><a class="typedef" href="../../../../global/management/include/G4Types.hh.html#G4double" title='G4double' data-type='double' data-ref="G4double">G4double</a> <a class="type" href="../include/G4VEmAdjointModel.hh.html#G4VEmAdjointModel" title='G4VEmAdjointModel' data-ref="G4VEmAdjointModel">G4VEmAdjointModel</a>::<dfn class="virtual decl def" id="_ZN17G4VEmAdjointModel42GetSecondAdjEnergyMinForScatProjToProjCaseEdd" title='G4VEmAdjointModel::GetSecondAdjEnergyMinForScatProjToProjCase' data-ref="_ZN17G4VEmAdjointModel42GetSecondAdjEnergyMinForScatProjToProjCaseEdd">GetSecondAdjEnergyMinForScatProjToProjCase</dfn>(<a class="typedef" href="../../../../global/management/include/G4Types.hh.html#G4double" title='G4double' data-type='double' data-ref="G4double">G4double</a> <dfn class="local col0 decl" id="80PrimAdjEnergy" title='PrimAdjEnergy' data-type='G4double' data-ref="80PrimAdjEnergy">PrimAdjEnergy</dfn>,<a class="typedef" href="../../../../global/management/include/G4Types.hh.html#G4double" title='G4double' data-type='double' data-ref="G4double">G4double</a> <dfn class="local col1 decl" id="81Tcut" title='Tcut' data-type='G4double' data-ref="81Tcut">Tcut</dfn>)</td></tr>
+<tr><th id="674">674</th><td>{ <a class="typedef" href="../../../../global/management/include/G4Types.hh.html#G4double" title='G4double' data-type='double' data-ref="G4double">G4double</a> <dfn class="local col2 decl" id="82Emin" title='Emin' data-type='G4double' data-ref="82Emin">Emin</dfn>=<a class="local col0 ref" href="#80PrimAdjEnergy" title='PrimAdjEnergy' data-ref="80PrimAdjEnergy">PrimAdjEnergy</a>;</td></tr>
+<tr><th id="675">675</th><td>  <b>if</b> (<a class="member" href="../include/G4VEmAdjointModel.hh.html#G4VEmAdjointModel::ApplyCutInRange" title='G4VEmAdjointModel::ApplyCutInRange' data-ref="G4VEmAdjointModel::ApplyCutInRange">ApplyCutInRange</a>) <a class="local col2 ref" href="#82Emin" title='Emin' data-ref="82Emin">Emin</a>=<a class="local col0 ref" href="#80PrimAdjEnergy" title='PrimAdjEnergy' data-ref="80PrimAdjEnergy">PrimAdjEnergy</a>+<a class="local col1 ref" href="#81Tcut" title='Tcut' data-ref="81Tcut">Tcut</a>;</td></tr>
+<tr><th id="676">676</th><td>  <b>return</b> <a class="local col2 ref" href="#82Emin" title='Emin' data-ref="82Emin">Emin</a>;</td></tr>
+<tr><th id="677">677</th><td>}</td></tr>
+<tr><th id="678">678</th><td><i>//////////////////////////////////////////////////////////////////////////////</i></td></tr>
+<tr><th id="679">679</th><td><i>//				</i></td></tr>
+<tr><th id="680">680</th><td><a class="typedef" href="../../../../global/management/include/G4Types.hh.html#G4double" title='G4double' data-type='double' data-ref="G4double">G4double</a> <a class="type" href="../include/G4VEmAdjointModel.hh.html#G4VEmAdjointModel" title='G4VEmAdjointModel' data-ref="G4VEmAdjointModel">G4VEmAdjointModel</a>::<dfn class="virtual decl def" id="_ZN17G4VEmAdjointModel38GetSecondAdjEnergyMaxForProdToProjCaseEd" title='G4VEmAdjointModel::GetSecondAdjEnergyMaxForProdToProjCase' data-ref="_ZN17G4VEmAdjointModel38GetSecondAdjEnergyMaxForProdToProjCaseEd">GetSecondAdjEnergyMaxForProdToProjCase</dfn>(<a class="typedef" href="../../../../global/management/include/G4Types.hh.html#G4double" title='G4double' data-type='double' data-ref="G4double">G4double</a> )</td></tr>
+<tr><th id="681">681</th><td>{ <b>return</b> <a class="member" href="../include/G4VEmAdjointModel.hh.html#G4VEmAdjointModel::HighEnergyLimit" title='G4VEmAdjointModel::HighEnergyLimit' data-ref="G4VEmAdjointModel::HighEnergyLimit">HighEnergyLimit</a>;</td></tr>
+<tr><th id="682">682</th><td>}</td></tr>
+<tr><th id="683">683</th><td><i>//////////////////////////////////////////////////////////////////////////////</i></td></tr>
+<tr><th id="684">684</th><td><i>//</i></td></tr>
+<tr><th id="685">685</th><td><a class="typedef" href="../../../../global/management/include/G4Types.hh.html#G4double" title='G4double' data-type='double' data-ref="G4double">G4double</a> <a class="type" href="../include/G4VEmAdjointModel.hh.html#G4VEmAdjointModel" title='G4VEmAdjointModel' data-ref="G4VEmAdjointModel">G4VEmAdjointModel</a>::<dfn class="virtual decl def" id="_ZN17G4VEmAdjointModel38GetSecondAdjEnergyMinForProdToProjCaseEd" title='G4VEmAdjointModel::GetSecondAdjEnergyMinForProdToProjCase' data-ref="_ZN17G4VEmAdjointModel38GetSecondAdjEnergyMinForProdToProjCaseEd">GetSecondAdjEnergyMinForProdToProjCase</dfn>(<a class="typedef" href="../../../../global/management/include/G4Types.hh.html#G4double" title='G4double' data-type='double' data-ref="G4double">G4double</a> <dfn class="local col3 decl" id="83PrimAdjEnergy" title='PrimAdjEnergy' data-type='G4double' data-ref="83PrimAdjEnergy">PrimAdjEnergy</dfn>)</td></tr>
+<tr><th id="686">686</th><td>{ <a class="typedef" href="../../../../global/management/include/G4Types.hh.html#G4double" title='G4double' data-type='double' data-ref="G4double">G4double</a> <dfn class="local col4 decl" id="84minEProj" title='minEProj' data-type='G4double' data-ref="84minEProj">minEProj</dfn>=<a class="local col3 ref" href="#83PrimAdjEnergy" title='PrimAdjEnergy' data-ref="83PrimAdjEnergy">PrimAdjEnergy</a>;</td></tr>
+<tr><th id="687">687</th><td>  <b>if</b> (<a class="member" href="../include/G4VEmAdjointModel.hh.html#G4VEmAdjointModel::second_part_of_same_type" title='G4VEmAdjointModel::second_part_of_same_type' data-ref="G4VEmAdjointModel::second_part_of_same_type">second_part_of_same_type</a>)  <a class="local col4 ref" href="#84minEProj" title='minEProj' data-ref="84minEProj">minEProj</a>=<a class="local col3 ref" href="#83PrimAdjEnergy" title='PrimAdjEnergy' data-ref="83PrimAdjEnergy">PrimAdjEnergy</a>*<var>2.</var>;</td></tr>
+<tr><th id="688">688</th><td>  <b>return</b> <a class="local col4 ref" href="#84minEProj" title='minEProj' data-ref="84minEProj">minEProj</a>;</td></tr>
+<tr><th id="689">689</th><td>}</td></tr>
+<tr><th id="690">690</th><td><i>////////////////////////////////////////////////////////////////////////////////////////////</i></td></tr>
+<tr><th id="691">691</th><td><i>//</i></td></tr>
+<tr><th id="692">692</th><td><em>void</em>  <a class="type" href="../include/G4VEmAdjointModel.hh.html#G4VEmAdjointModel" title='G4VEmAdjointModel' data-ref="G4VEmAdjointModel">G4VEmAdjointModel</a>::<dfn class="decl def" id="_ZN17G4VEmAdjointModel21DefineCurrentMaterialEPK20G4MaterialCutsCouple" title='G4VEmAdjointModel::DefineCurrentMaterial' data-ref="_ZN17G4VEmAdjointModel21DefineCurrentMaterialEPK20G4MaterialCutsCouple">DefineCurrentMaterial</dfn>(<em>const</em> <a class="type" href="../../../cuts/include/G4MaterialCutsCouple.hh.html#G4MaterialCutsCouple" title='G4MaterialCutsCouple' data-ref="G4MaterialCutsCouple">G4MaterialCutsCouple</a>* <dfn class="local col5 decl" id="85couple" title='couple' data-type='const G4MaterialCutsCouple *' data-ref="85couple">couple</dfn>)</td></tr>
+<tr><th id="693">693</th><td>{ <b>if</b>(<a class="local col5 ref" href="#85couple" title='couple' data-ref="85couple">couple</a> != <a class="member" href="../include/G4VEmAdjointModel.hh.html#G4VEmAdjointModel::currentCouple" title='G4VEmAdjointModel::currentCouple' data-ref="G4VEmAdjointModel::currentCouple">currentCouple</a>) {</td></tr>
+<tr><th id="694">694</th><td>    	<a class="member" href="../include/G4VEmAdjointModel.hh.html#G4VEmAdjointModel::currentCouple" title='G4VEmAdjointModel::currentCouple' data-ref="G4VEmAdjointModel::currentCouple">currentCouple</a>   = <b>const_cast</b>&lt;<a class="type" href="../../../cuts/include/G4MaterialCutsCouple.hh.html#G4MaterialCutsCouple" title='G4MaterialCutsCouple' data-ref="G4MaterialCutsCouple">G4MaterialCutsCouple</a>*&gt; (<a class="local col5 ref" href="#85couple" title='couple' data-ref="85couple">couple</a>);</td></tr>
+<tr><th id="695">695</th><td>    	<a class="member" href="../include/G4VEmAdjointModel.hh.html#G4VEmAdjointModel::currentMaterial" title='G4VEmAdjointModel::currentMaterial' data-ref="G4VEmAdjointModel::currentMaterial">currentMaterial</a> = <b>const_cast</b>&lt;<a class="type" href="../../../../materials/include/G4Material.hh.html#G4Material" title='G4Material' data-ref="G4Material">G4Material</a>*&gt; (<a class="local col5 ref" href="#85couple" title='couple' data-ref="85couple">couple</a>-&gt;<a class="ref" href="../../../cuts/include/G4MaterialCutsCouple.hh.html#_ZNK20G4MaterialCutsCouple11GetMaterialEv" title='G4MaterialCutsCouple::GetMaterial' data-ref="_ZNK20G4MaterialCutsCouple11GetMaterialEv">GetMaterial</a>());</td></tr>
+<tr><th id="696">696</th><td>    	currentCoupleIndex = couple-&gt;GetIndex();</td></tr>
+<tr><th id="697">697</th><td>    	currentMaterialIndex = currentMaterial-&gt;GetIndex();</td></tr>
+<tr><th id="698">698</th><td>   	<span class='error' title="unknown type name &apos;size_t&apos;">size_t</span> <dfn class="local col6 decl" id="86idx" title='idx' data-type='int' data-ref="86idx">idx</dfn>=<var>56</var>;</td></tr>
+<tr><th id="699">699</th><td>    	<a class="member" href="../include/G4VEmAdjointModel.hh.html#G4VEmAdjointModel::currentTcutForDirectSecond" title='G4VEmAdjointModel::currentTcutForDirectSecond' data-ref="G4VEmAdjointModel::currentTcutForDirectSecond">currentTcutForDirectSecond</a> =<var>0.00000000001</var>;</td></tr>
+<tr><th id="700">700</th><td>   	<b>if</b> (<a class="member" href="../include/G4VEmAdjointModel.hh.html#G4VEmAdjointModel::theAdjEquivOfDirectSecondPartDef" title='G4VEmAdjointModel::theAdjEquivOfDirectSecondPartDef' data-ref="G4VEmAdjointModel::theAdjEquivOfDirectSecondPartDef">theAdjEquivOfDirectSecondPartDef</a>) {</td></tr>
+<tr><th id="701">701</th><td>    		<b>if</b> (theAdjEquivOfDirectSecondPartDef == G4AdjointGamma::AdjointGamma()) idx = <var>0</var>;</td></tr>
+<tr><th id="702">702</th><td>   		<b>else</b> <b>if</b> (theAdjEquivOfDirectSecondPartDef == G4AdjointElectron::AdjointElectron()) idx = <var>1</var>;</td></tr>
+<tr><th id="703">703</th><td>    		<b>else</b> <b>if</b> (theAdjEquivOfDirectSecondPartDef == G4AdjointPositron::AdjointPositron()) idx = <var>2</var>;</td></tr>
+<tr><th id="704">704</th><td>    		<b>if</b> (idx &lt;<var>56</var>){</td></tr>
+<tr><th id="705">705</th><td>			<em>const</em> <span class='error' title="use of undeclared identifier &apos;std&apos;">std</span>::vector<span class='error' title="expected unqualified-id">&lt;</span>G4double&gt;* aVec = G4ProductionCutsTable::GetProductionCutsTable()-&gt;GetEnergyCutsVector(idx);</td></tr>
+<tr><th id="706">706</th><td>    			currentTcutForDirectSecond=(*<span class='error' title="use of undeclared identifier &apos;aVec&apos;">aVec</span>)[currentCoupleIndex];</td></tr>
+<tr><th id="707">707</th><td>		}	</td></tr>
+<tr><th id="708">708</th><td>    	}	</td></tr>
+<tr><th id="709">709</th><td>    </td></tr>
+<tr><th id="710">710</th><td>    	</td></tr>
+<tr><th id="711">711</th><td>  }</td></tr>
+<tr><th id="712">712</th><td>}</td></tr>
+<tr><th id="713">713</th><td><i>////////////////////////////////////////////////////////////////////////////////////////////</i></td></tr>
+<tr><th id="714">714</th><td><i>//</i></td></tr>
+<tr><th id="715">715</th><td><em>void</em> <a class="type" href="../include/G4VEmAdjointModel.hh.html#G4VEmAdjointModel" title='G4VEmAdjointModel' data-ref="G4VEmAdjointModel">G4VEmAdjointModel</a>::<dfn class="decl def" id="_ZN17G4VEmAdjointModel18SetHighEnergyLimitEd" title='G4VEmAdjointModel::SetHighEnergyLimit' data-ref="_ZN17G4VEmAdjointModel18SetHighEnergyLimitEd">SetHighEnergyLimit</dfn>(<a class="typedef" href="../../../../global/management/include/G4Types.hh.html#G4double" title='G4double' data-type='double' data-ref="G4double">G4double</a> <dfn class="local col7 decl" id="87aVal" title='aVal' data-type='G4double' data-ref="87aVal">aVal</dfn>)</td></tr>
+<tr><th id="716">716</th><td>{ <a class="member" href="../include/G4VEmAdjointModel.hh.html#G4VEmAdjointModel::HighEnergyLimit" title='G4VEmAdjointModel::HighEnergyLimit' data-ref="G4VEmAdjointModel::HighEnergyLimit">HighEnergyLimit</a>=<a class="local col7 ref" href="#87aVal" title='aVal' data-ref="87aVal">aVal</a>;</td></tr>
+<tr><th id="717">717</th><td>  <b>if</b> (<a class="member" href="../include/G4VEmAdjointModel.hh.html#G4VEmAdjointModel::theDirectEMModel" title='G4VEmAdjointModel::theDirectEMModel' data-ref="G4VEmAdjointModel::theDirectEMModel">theDirectEMModel</a>) <a class="member" href="../include/G4VEmAdjointModel.hh.html#G4VEmAdjointModel::theDirectEMModel" title='G4VEmAdjointModel::theDirectEMModel' data-ref="G4VEmAdjointModel::theDirectEMModel">theDirectEMModel</a>-&gt;<a class="ref" href="../../utils/include/G4VEmModel.hh.html#_ZN10G4VEmModel18SetHighEnergyLimitEd" title='G4VEmModel::SetHighEnergyLimit' data-ref="_ZN10G4VEmModel18SetHighEnergyLimitEd">SetHighEnergyLimit</a>( <a class="local col7 ref" href="#87aVal" title='aVal' data-ref="87aVal">aVal</a>);</td></tr>
+<tr><th id="718">718</th><td>}</td></tr>
+<tr><th id="719">719</th><td><i>////////////////////////////////////////////////////////////////////////////////////////////</i></td></tr>
+<tr><th id="720">720</th><td><i>//</i></td></tr>
+<tr><th id="721">721</th><td><em>void</em> <a class="type" href="../include/G4VEmAdjointModel.hh.html#G4VEmAdjointModel" title='G4VEmAdjointModel' data-ref="G4VEmAdjointModel">G4VEmAdjointModel</a>::<dfn class="decl def" id="_ZN17G4VEmAdjointModel17SetLowEnergyLimitEd" title='G4VEmAdjointModel::SetLowEnergyLimit' data-ref="_ZN17G4VEmAdjointModel17SetLowEnergyLimitEd">SetLowEnergyLimit</dfn>(<a class="typedef" href="../../../../global/management/include/G4Types.hh.html#G4double" title='G4double' data-type='double' data-ref="G4double">G4double</a> <dfn class="local col8 decl" id="88aVal" title='aVal' data-type='G4double' data-ref="88aVal">aVal</dfn>)</td></tr>
+<tr><th id="722">722</th><td>{</td></tr>
+<tr><th id="723">723</th><td>  <a class="member" href="../include/G4VEmAdjointModel.hh.html#G4VEmAdjointModel::LowEnergyLimit" title='G4VEmAdjointModel::LowEnergyLimit' data-ref="G4VEmAdjointModel::LowEnergyLimit">LowEnergyLimit</a>=<a class="local col8 ref" href="#88aVal" title='aVal' data-ref="88aVal">aVal</a>;</td></tr>
+<tr><th id="724">724</th><td>  <b>if</b> (<a class="member" href="../include/G4VEmAdjointModel.hh.html#G4VEmAdjointModel::theDirectEMModel" title='G4VEmAdjointModel::theDirectEMModel' data-ref="G4VEmAdjointModel::theDirectEMModel">theDirectEMModel</a>) <a class="member" href="../include/G4VEmAdjointModel.hh.html#G4VEmAdjointModel::theDirectEMModel" title='G4VEmAdjointModel::theDirectEMModel' data-ref="G4VEmAdjointModel::theDirectEMModel">theDirectEMModel</a>-&gt;<a class="ref" href="../../utils/include/G4VEmModel.hh.html#_ZN10G4VEmModel17SetLowEnergyLimitEd" title='G4VEmModel::SetLowEnergyLimit' data-ref="_ZN10G4VEmModel17SetLowEnergyLimitEd">SetLowEnergyLimit</a>( <a class="local col8 ref" href="#88aVal" title='aVal' data-ref="88aVal">aVal</a>);</td></tr>
+<tr><th id="725">725</th><td>}</td></tr>
+<tr><th id="726">726</th><td><i>////////////////////////////////////////////////////////////////////////////////////////////</i></td></tr>
+<tr><th id="727">727</th><td><i>//</i></td></tr>
+<tr><th id="728">728</th><td><em>void</em> <a class="type" href="../include/G4VEmAdjointModel.hh.html#G4VEmAdjointModel" title='G4VEmAdjointModel' data-ref="G4VEmAdjointModel">G4VEmAdjointModel</a>::<dfn class="decl def" id="_ZN17G4VEmAdjointModel53SetAdjointEquivalentOfDirectPrimaryParticleDefinitionEP20G4ParticleDefinition" title='G4VEmAdjointModel::SetAdjointEquivalentOfDirectPrimaryParticleDefinition' data-ref="_ZN17G4VEmAdjointModel53SetAdjointEquivalentOfDirectPrimaryParticleDefinitionEP20G4ParticleDefinition">SetAdjointEquivalentOfDirectPrimaryParticleDefinition</dfn>(<a class="type" href="../../../../particles/management/include/G4ParticleDefinition.hh.html#G4ParticleDefinition" title='G4ParticleDefinition' data-ref="G4ParticleDefinition">G4ParticleDefinition</a>* <dfn class="local col9 decl" id="89aPart" title='aPart' data-type='G4ParticleDefinition *' data-ref="89aPart">aPart</dfn>)</td></tr>
+<tr><th id="729">729</th><td>{</td></tr>
+<tr><th id="730">730</th><td>  <a class="member" href="../include/G4VEmAdjointModel.hh.html#G4VEmAdjointModel::theAdjEquivOfDirectPrimPartDef" title='G4VEmAdjointModel::theAdjEquivOfDirectPrimPartDef' data-ref="G4VEmAdjointModel::theAdjEquivOfDirectPrimPartDef">theAdjEquivOfDirectPrimPartDef</a>=<a class="local col9 ref" href="#89aPart" title='aPart' data-ref="89aPart">aPart</a>;</td></tr>
+<tr><th id="731">731</th><td>  <b>if</b> (theAdjEquivOfDirectPrimPartDef-&gt;GetParticleName() ==<q>"adj_e-"</q>)</td></tr>
+<tr><th id="732">732</th><td>					theDirectPrimaryPartDef=<span class='error' title="use of undeclared identifier &apos;G4Electron&apos;">G4Electron</span>::Electron();</td></tr>
+<tr><th id="733">733</th><td>  <b>if</b> (<a class="member" href="../include/G4VEmAdjointModel.hh.html#G4VEmAdjointModel::theAdjEquivOfDirectPrimPartDef" title='G4VEmAdjointModel::theAdjEquivOfDirectPrimPartDef' data-ref="G4VEmAdjointModel::theAdjEquivOfDirectPrimPartDef">theAdjEquivOfDirectPrimPartDef</a>-&gt;<a class="ref" href="../../../../particles/management/include/G4ParticleDefinition.hh.html#_ZNK20G4ParticleDefinition15GetParticleNameEv" title='G4ParticleDefinition::GetParticleName' data-ref="_ZNK20G4ParticleDefinition15GetParticleNameEv">GetParticleName</a>() <a class="ref" href="../../../../global/management/include/G4String.hh.html#_ZNK8G4StringeqEPKc" title='G4String::operator==' data-ref="_ZNK8G4StringeqEPKc">==</a><q>"adj_gamma"</q>)</td></tr>
+<tr><th id="734">734</th><td>					<a class="member" href="../include/G4VEmAdjointModel.hh.html#G4VEmAdjointModel::theDirectPrimaryPartDef" title='G4VEmAdjointModel::theDirectPrimaryPartDef' data-ref="G4VEmAdjointModel::theDirectPrimaryPartDef">theDirectPrimaryPartDef</a>=<a class="type" href="../../../../particles/bosons/include/G4Gamma.hh.html#G4Gamma" title='G4Gamma' data-ref="G4Gamma">G4Gamma</a>::<a class="ref" href="../../../../particles/bosons/include/G4Gamma.hh.html#_ZN7G4Gamma5GammaEv" title='G4Gamma::Gamma' data-ref="_ZN7G4Gamma5GammaEv">Gamma</a>();</td></tr>
+<tr><th id="735">735</th><td>}</td></tr>
+<tr><th id="736">736</th><td></td></tr>
+</table><hr/><p id='footer'>
+Generated on <em>2019-Aug-28</em> from project codebrowser<br />Powered by <a href='https://woboq.com'><img alt='Woboq' src='https://code.woboq.org/woboq-16.png' width='41' height='16' /></a> <a href='https://code.woboq.org'>Code Browser</a> 2.1
+<br/>Generator usage only permitted with license.</p>
+</div></body></html>

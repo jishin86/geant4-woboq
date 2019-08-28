@@ -1,0 +1,390 @@
+<!doctype html>
+<html>
+<head>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"><title>G4ProcessManager.hh source code [codebrowser/source/processes/management/include/G4ProcessManager.hh] - Woboq Code Browser</title>
+<meta name="woboq:interestingDefinitions" content="G4ProcessManager,G4ProcessVectorDoItIndex,G4ProcessVectorOrdering,G4ProcessVectorTypeIndex "/>
+<link rel="stylesheet" href="../../../../../../data/qtcreator.css" title="QtCreator"/>
+<link rel="alternate stylesheet" href="../../../../../../data/kdevelop.css" title="KDevelop"/>
+<script type="text/javascript" src="../../../../../../data/jquery/jquery.min.js"></script>
+<script type="text/javascript" src="../../../../../../data/jquery/jquery-ui.min.js"></script>
+<script>var file = 'codebrowser/source/processes/management/include/G4ProcessManager.hh'; var root_path = '../../../../..'; var data_path = '../../../../../../data';</script>
+<script src='../../../../../../data/codebrowser.js'></script>
+</head>
+<body><div id='header'><h1 id='breadcrumb'><span>Browse the source code of </span><a href='../../../..'>codebrowser</a>/<a href='../../..'>source</a>/<a href='../..'>processes</a>/<a href='..'>management</a>/<a href='./'>include</a>/<a href='G4ProcessManager.hh.html'>G4ProcessManager.hh</a></h1></div>
+<hr/><div id='content'><table class="code">
+<tr><th id="1">1</th><td><i>//</i></td></tr>
+<tr><th id="2">2</th><td><i>// ********************************************************************</i></td></tr>
+<tr><th id="3">3</th><td><i>// * License and Disclaimer                                           *</i></td></tr>
+<tr><th id="4">4</th><td><i>// *                                                                  *</i></td></tr>
+<tr><th id="5">5</th><td><i>// * The  Geant4 software  is  copyright of the Copyright Holders  of *</i></td></tr>
+<tr><th id="6">6</th><td><i>// * the Geant4 Collaboration.  It is provided  under  the terms  and *</i></td></tr>
+<tr><th id="7">7</th><td><i>// * conditions of the Geant4 Software License,  included in the file *</i></td></tr>
+<tr><th id="8">8</th><td><i>// * LICENSE and available at  <a href="http://cern.ch/geant4/license">http://cern.ch/geant4/license</a> .  These *</i></td></tr>
+<tr><th id="9">9</th><td><i>// * include a list of copyright holders.                             *</i></td></tr>
+<tr><th id="10">10</th><td><i>// *                                                                  *</i></td></tr>
+<tr><th id="11">11</th><td><i>// * Neither the authors of this software system, nor their employing *</i></td></tr>
+<tr><th id="12">12</th><td><i>// * institutes,nor the agencies providing financial support for this *</i></td></tr>
+<tr><th id="13">13</th><td><i>// * work  make  any representation or  warranty, express or implied, *</i></td></tr>
+<tr><th id="14">14</th><td><i>// * regarding  this  software system or assume any liability for its *</i></td></tr>
+<tr><th id="15">15</th><td><i>// * use.  Please see the license in the file  LICENSE  and URL above *</i></td></tr>
+<tr><th id="16">16</th><td><i>// * for the full disclaimer and the limitation of liability.         *</i></td></tr>
+<tr><th id="17">17</th><td><i>// *                                                                  *</i></td></tr>
+<tr><th id="18">18</th><td><i>// * This  code  implementation is the result of  the  scientific and *</i></td></tr>
+<tr><th id="19">19</th><td><i>// * technical work of the GEANT4 collaboration.                      *</i></td></tr>
+<tr><th id="20">20</th><td><i>// * By using,  copying,  modifying or  distributing the software (or *</i></td></tr>
+<tr><th id="21">21</th><td><i>// * any work based  on the software)  you  agree  to acknowledge its *</i></td></tr>
+<tr><th id="22">22</th><td><i>// * use  in  resulting  scientific  publications,  and indicate your *</i></td></tr>
+<tr><th id="23">23</th><td><i>// * acceptance of all terms of the Geant4 Software license.          *</i></td></tr>
+<tr><th id="24">24</th><td><i>// ********************************************************************</i></td></tr>
+<tr><th id="25">25</th><td><i>//</i></td></tr>
+<tr><th id="26">26</th><td><i>//</i></td></tr>
+<tr><th id="27">27</th><td><i>//</i></td></tr>
+<tr><th id="28">28</th><td><i>// </i></td></tr>
+<tr><th id="29">29</th><td><i>// ------------------------------------------------------------</i></td></tr>
+<tr><th id="30">30</th><td><i>//	GEANT 4 class header file </i></td></tr>
+<tr><th id="31">31</th><td><i>//</i></td></tr>
+<tr><th id="32">32</th><td><i>//	History: first implementation, based on object model of</i></td></tr>
+<tr><th id="33">33</th><td><i>//	2nd December 1995, G.Cosmo</i></td></tr>
+<tr><th id="34">34</th><td><i>//   ----------------  G4ProcessManager  -----------------</i></td></tr>
+<tr><th id="35">35</th><td><i>// Class Description </i></td></tr>
+<tr><th id="36">36</th><td><i>//  It collects all physics a particle can undertake as seven vectors.</i></td></tr>
+<tr><th id="37">37</th><td><i>//  These vectors are </i></td></tr>
+<tr><th id="38">38</th><td><i>//   one vector for all processes (called as "process List")</i></td></tr>
+<tr><th id="39">39</th><td><i>//   two vectors for processes with AtRestGetPhysicalInteractionLength</i></td></tr>
+<tr><th id="40">40</th><td><i>//                                    and AtRestDoIt</i></td></tr>
+<tr><th id="41">41</th><td><i>//   two vectors for processes with AlongStepGetPhysicalInteractionLength</i></td></tr>
+<tr><th id="42">42</th><td><i>//                                    and AlongStepDoIt</i></td></tr>
+<tr><th id="43">43</th><td><i>//   two vectors for processes with PostStepGetPhysicalInteractionLength</i></td></tr>
+<tr><th id="44">44</th><td><i>//                                    and PostStepDoIt</i></td></tr>
+<tr><th id="45">45</th><td><i>//  The tracking will message three types of GetPhysicalInteractionLength</i></td></tr>
+<tr><th id="46">46</th><td><i>//  in order to limit the Step and select the occurrence of processes. </i></td></tr>
+<tr><th id="47">47</th><td><i>//  It will message the corresponding DoIt() to apply the selected </i></td></tr>
+<tr><th id="48">48</th><td><i>//  processes. In addition, the Tracking will limit the Step</i></td></tr>
+<tr><th id="49">49</th><td><i>//  and select the occurrence of the processes according to</i></td></tr>
+<tr><th id="50">50</th><td><i>//  the shortest physical interaction length computed (except for</i></td></tr>
+<tr><th id="51">51</th><td><i>//  processes at rest, for which the Tracking will select the</i></td></tr>
+<tr><th id="52">52</th><td><i>//  occurrence of the process which returns the shortest mean</i></td></tr>
+<tr><th id="53">53</th><td><i>//  life-time from the GetPhysicalInteractionLength()).</i></td></tr>
+<tr><th id="54">54</th><td><i>//</i></td></tr>
+<tr><th id="55">55</th><td><i>// History:</i></td></tr>
+<tr><th id="56">56</th><td><i>// revised by G.Cosmo, 06 May 1996</i></td></tr>
+<tr><th id="57">57</th><td><i>//    Added vector of processes at rest, 06 May 1996</i></td></tr>
+<tr><th id="58">58</th><td><i>// ------------------------------------------------------------</i></td></tr>
+<tr><th id="59">59</th><td><i>//   New Physics scheme           8 Jan. 1997  H.Kurahige</i></td></tr>
+<tr><th id="60">60</th><td><i>//   Add SetProcessOrdering methods     27 Mar 1998  H.Kurahige</i></td></tr>
+<tr><th id="61">61</th><td><i>//   Add copy constructor (deep copy)   28 June 1998 H.Kurashige</i></td></tr>
+<tr><th id="62">62</th><td><i>//   Add GetProcessActivation     3 May. 1999 H.Kurashige</i></td></tr>
+<tr><th id="63">63</th><td><i>//   Use STL vector instead of RW vector    1. Mar 00 H.Kurashige</i></td></tr>
+<tr><th id="64">64</th><td><i>//   Modify G4ProcessVectorOrdering to fix FindInsedrtPosition 15 Feb. 2005</i></td></tr>
+<tr><th id="65">65</th><td><i>//   Add  </i></td></tr>
+<tr><th id="66">66</th><td><i>// ------------------------------------------------------------</i></td></tr>
+<tr><th id="67">67</th><td></td></tr>
+<tr><th id="68">68</th><td><u>#<span data-ppcond="68">ifndef</span> <span class="macro" data-ref="_M/G4ProcessManager_h">G4ProcessManager_h</span></u></td></tr>
+<tr><th id="69">69</th><td><u>#define <dfn class="macro" id="_M/G4ProcessManager_h" data-ref="_M/G4ProcessManager_h">G4ProcessManager_h</dfn> 1</u></td></tr>
+<tr><th id="70">70</th><td></td></tr>
+<tr><th id="71">71</th><td><u>#include <a href="../../../global/management/include/globals.hh.html">"globals.hh"</a></u></td></tr>
+<tr><th id="72">72</th><td><u>#include <a href="../../../global/management/include/G4ios.hh.html">"G4ios.hh"</a></u></td></tr>
+<tr><th id="73">73</th><td><u>#include <span class='error' title="&apos;vector&apos; file not found">&lt;</span>vector&gt;</u></td></tr>
+<tr><th id="74">74</th><td></td></tr>
+<tr><th id="75">75</th><td><u>#include <a href="G4VProcess.hh.html">"G4VProcess.hh"</a></u></td></tr>
+<tr><th id="76">76</th><td><u>#include <a href="G4ProcessVector.hh.html">"G4ProcessVector.hh"</a></u></td></tr>
+<tr><th id="77">77</th><td><u>#include <a href="../../../particles/management/include/G4ParticleDefinition.hh.html">"G4ParticleDefinition.hh"</a></u></td></tr>
+<tr><th id="78">78</th><td></td></tr>
+<tr><th id="79">79</th><td><b>class</b> <dfn class="type" id="G4ProcessManagerMessenger" title='G4ProcessManagerMessenger' data-ref="G4ProcessManagerMessenger">G4ProcessManagerMessenger</dfn>;</td></tr>
+<tr><th id="80">80</th><td><b>class</b> <dfn class="type" id="G4ProcessAttribute" title='G4ProcessAttribute' data-ref="G4ProcessAttribute">G4ProcessAttribute</dfn>;</td></tr>
+<tr><th id="81">81</th><td></td></tr>
+<tr><th id="82">82</th><td><i>//  Indexes for ProcessVector</i></td></tr>
+<tr><th id="83">83</th><td><b>enum</b> <dfn class="type def" id="G4ProcessVectorTypeIndex" title='G4ProcessVectorTypeIndex' data-ref="G4ProcessVectorTypeIndex">G4ProcessVectorTypeIndex</dfn></td></tr>
+<tr><th id="84">84</th><td>{ </td></tr>
+<tr><th id="85">85</th><td>  	<dfn class="enum" id="G4ProcessVectorTypeIndex::typeGPIL" title='G4ProcessVectorTypeIndex::typeGPIL' data-ref="G4ProcessVectorTypeIndex::typeGPIL">typeGPIL</dfn> = <var>0</var>,	<i>// for GetPhysicalInteractionLength </i></td></tr>
+<tr><th id="86">86</th><td>	<dfn class="enum" id="G4ProcessVectorTypeIndex::typeDoIt" title='G4ProcessVectorTypeIndex::typeDoIt' data-ref="G4ProcessVectorTypeIndex::typeDoIt">typeDoIt</dfn> =<var>1</var>		<i>// for DoIt</i></td></tr>
+<tr><th id="87">87</th><td>};</td></tr>
+<tr><th id="88">88</th><td><b>enum</b> <dfn class="type def" id="G4ProcessVectorDoItIndex" title='G4ProcessVectorDoItIndex' data-ref="G4ProcessVectorDoItIndex">G4ProcessVectorDoItIndex</dfn></td></tr>
+<tr><th id="89">89</th><td>{</td></tr>
+<tr><th id="90">90</th><td>  	<dfn class="enum" id="G4ProcessVectorDoItIndex::idxAll" title='G4ProcessVectorDoItIndex::idxAll' data-ref="G4ProcessVectorDoItIndex::idxAll">idxAll</dfn> = -<var>1</var>,		<i>// for all DoIt/GPIL </i></td></tr>
+<tr><th id="91">91</th><td>  	<dfn class="enum" id="G4ProcessVectorDoItIndex::idxAtRest" title='G4ProcessVectorDoItIndex::idxAtRest' data-ref="G4ProcessVectorDoItIndex::idxAtRest">idxAtRest</dfn> = <var>0</var>, 		<i>// for AtRestDoIt/GPIL</i></td></tr>
+<tr><th id="92">92</th><td>	<dfn class="enum" id="G4ProcessVectorDoItIndex::idxAlongStep" title='G4ProcessVectorDoItIndex::idxAlongStep' data-ref="G4ProcessVectorDoItIndex::idxAlongStep">idxAlongStep</dfn> = <var>1</var>, 	<i>// for AlongStepDoIt/GPIL</i></td></tr>
+<tr><th id="93">93</th><td>	<dfn class="enum" id="G4ProcessVectorDoItIndex::idxPostStep" title='G4ProcessVectorDoItIndex::idxPostStep' data-ref="G4ProcessVectorDoItIndex::idxPostStep">idxPostStep</dfn> =<var>2</var>,		<i>// for AlongSTepDoIt/GPIL</i></td></tr>
+<tr><th id="94">94</th><td>	<dfn class="enum" id="G4ProcessVectorDoItIndex::NDoit" title='G4ProcessVectorDoItIndex::NDoit' data-ref="G4ProcessVectorDoItIndex::NDoit">NDoit</dfn> =<var>3</var></td></tr>
+<tr><th id="95">95</th><td>};</td></tr>
+<tr><th id="96">96</th><td></td></tr>
+<tr><th id="97">97</th><td><i>//  enumeration for Ordering Parameter      </i></td></tr>
+<tr><th id="98">98</th><td><b>enum</b> <dfn class="type def" id="G4ProcessVectorOrdering" title='G4ProcessVectorOrdering' data-ref="G4ProcessVectorOrdering">G4ProcessVectorOrdering</dfn></td></tr>
+<tr><th id="99">99</th><td>{ </td></tr>
+<tr><th id="100">100</th><td>   	<dfn class="enum" id="G4ProcessVectorOrdering::ordInActive" title='G4ProcessVectorOrdering::ordInActive' data-ref="G4ProcessVectorOrdering::ordInActive">ordInActive</dfn> = -<var>1</var>,	<i>// ordering parameter to indicate InActive DoIt</i></td></tr>
+<tr><th id="101">101</th><td>   	<dfn class="enum" id="G4ProcessVectorOrdering::ordDefault" title='G4ProcessVectorOrdering::ordDefault' data-ref="G4ProcessVectorOrdering::ordDefault">ordDefault</dfn> = <var>1000</var>,	<i>// default ordering parameter</i></td></tr>
+<tr><th id="102">102</th><td>   	<dfn class="enum" id="G4ProcessVectorOrdering::ordLast" title='G4ProcessVectorOrdering::ordLast' data-ref="G4ProcessVectorOrdering::ordLast">ordLast</dfn>    = <var>9999</var> 	<i>// ordering parameter to indicate the last DoIt</i></td></tr>
+<tr><th id="103">103</th><td>};</td></tr>
+<tr><th id="104">104</th><td></td></tr>
+<tr><th id="105">105</th><td><b>class</b> <dfn class="type def" id="G4ProcessManager" title='G4ProcessManager' data-ref="G4ProcessManager">G4ProcessManager</dfn> </td></tr>
+<tr><th id="106">106</th><td>{</td></tr>
+<tr><th id="107">107</th><td> </td></tr>
+<tr><th id="108">108</th><td>  <b>public</b>: </td></tr>
+<tr><th id="109">109</th><td>      <i>// copy constructor</i></td></tr>
+<tr><th id="110">110</th><td>      <dfn class="decl" id="_ZN16G4ProcessManagerC1ERS_" title='G4ProcessManager::G4ProcessManager' data-ref="_ZN16G4ProcessManagerC1ERS_">G4ProcessManager</dfn>(<a class="type" href="#G4ProcessManager" title='G4ProcessManager' data-ref="G4ProcessManager">G4ProcessManager</a> &amp;<dfn class="local col9 decl" id="819right" title='right' data-type='G4ProcessManager &amp;' data-ref="819right">right</dfn>);</td></tr>
+<tr><th id="111">111</th><td></td></tr>
+<tr><th id="112">112</th><td>  <b>private</b>:</td></tr>
+<tr><th id="113">113</th><td>      <i>// hide default constructor and assignment operator</i></td></tr>
+<tr><th id="114">114</th><td>      <a class="type" href="#G4ProcessManager" title='G4ProcessManager' data-ref="G4ProcessManager">G4ProcessManager</a> &amp; <dfn class="decl" id="_ZN16G4ProcessManageraSERKS_" title='G4ProcessManager::operator=' data-ref="_ZN16G4ProcessManageraSERKS_"><b>operator</b>=</dfn>(<em>const</em> <a class="type" href="#G4ProcessManager" title='G4ProcessManager' data-ref="G4ProcessManager">G4ProcessManager</a> &amp;<dfn class="local col0 decl" id="820right" title='right' data-type='const G4ProcessManager &amp;' data-ref="820right">right</dfn>);</td></tr>
+<tr><th id="115">115</th><td>      <dfn class="decl" id="_ZN16G4ProcessManagerC1Ev" title='G4ProcessManager::G4ProcessManager' data-ref="_ZN16G4ProcessManagerC1Ev">G4ProcessManager</dfn>();</td></tr>
+<tr><th id="116">116</th><td></td></tr>
+<tr><th id="117">117</th><td>  <b>public</b>:</td></tr>
+<tr><th id="118">118</th><td> </td></tr>
+<tr><th id="119">119</th><td>      <dfn class="decl" id="_ZN16G4ProcessManagerC1EPK20G4ParticleDefinition" title='G4ProcessManager::G4ProcessManager' data-ref="_ZN16G4ProcessManagerC1EPK20G4ParticleDefinition">G4ProcessManager</dfn>(<em>const</em> <a class="type" href="../../../particles/management/include/G4ParticleDefinition.hh.html#G4ParticleDefinition" title='G4ParticleDefinition' data-ref="G4ParticleDefinition">G4ParticleDefinition</a>* <dfn class="local col1 decl" id="821aParticleType" title='aParticleType' data-type='const G4ParticleDefinition *' data-ref="821aParticleType">aParticleType</dfn>);</td></tr>
+<tr><th id="120">120</th><td>      <i>//  Constructor</i></td></tr>
+<tr><th id="121">121</th><td></td></tr>
+<tr><th id="122">122</th><td>      <dfn class="decl" id="_ZN16G4ProcessManagerD1Ev" title='G4ProcessManager::~G4ProcessManager' data-ref="_ZN16G4ProcessManagerD1Ev">~G4ProcessManager</dfn>();</td></tr>
+<tr><th id="123">123</th><td>      <i>//  Destructor</i></td></tr>
+<tr><th id="124">124</th><td></td></tr>
+<tr><th id="125">125</th><td>      <a class="typedef" href="../../../global/management/include/G4Types.hh.html#G4bool" title='G4bool' data-type='bool' data-ref="G4bool">G4bool</a> <dfn class="decl" id="_ZNK16G4ProcessManagereqERKS_" title='G4ProcessManager::operator==' data-ref="_ZNK16G4ProcessManagereqERKS_"><b>operator</b>==</dfn>(<em>const</em> <a class="type" href="#G4ProcessManager" title='G4ProcessManager' data-ref="G4ProcessManager">G4ProcessManager</a> &amp;<dfn class="local col2 decl" id="822right" title='right' data-type='const G4ProcessManager &amp;' data-ref="822right">right</dfn>) <em>const</em>;</td></tr>
+<tr><th id="126">126</th><td>      <a class="typedef" href="../../../global/management/include/G4Types.hh.html#G4bool" title='G4bool' data-type='bool' data-ref="G4bool">G4bool</a> <dfn class="decl" id="_ZNK16G4ProcessManagerneERKS_" title='G4ProcessManager::operator!=' data-ref="_ZNK16G4ProcessManagerneERKS_"><b>operator</b>!=</dfn>(<em>const</em> <a class="type" href="#G4ProcessManager" title='G4ProcessManager' data-ref="G4ProcessManager">G4ProcessManager</a> &amp;<dfn class="local col3 decl" id="823right" title='right' data-type='const G4ProcessManager &amp;' data-ref="823right">right</dfn>) <em>const</em>;</td></tr>
+<tr><th id="127">127</th><td></td></tr>
+<tr><th id="128">128</th><td> <b>public</b>: <i>//  with description</i></td></tr>
+<tr><th id="129">129</th><td>      <a class="type" href="G4ProcessVector.hh.html#G4ProcessVector" title='G4ProcessVector' data-ref="G4ProcessVector">G4ProcessVector</a>* <a class="decl" href="G4ProcessManager.icc.html#_ZNK16G4ProcessManager14GetProcessListEv" title='G4ProcessManager::GetProcessList' data-ref="_ZNK16G4ProcessManager14GetProcessListEv" id="_ZNK16G4ProcessManager14GetProcessListEv">GetProcessList</a>() <em>const</em>;</td></tr>
+<tr><th id="130">130</th><td>      <i>//  Returns the address of the vector of all processes </i></td></tr>
+<tr><th id="131">131</th><td></td></tr>
+<tr><th id="132">132</th><td>      <a class="typedef" href="../../../global/management/include/G4Types.hh.html#G4int" title='G4int' data-type='int' data-ref="G4int">G4int</a>  <a class="decl" href="G4ProcessManager.icc.html#_ZNK16G4ProcessManager20GetProcessListLengthEv" title='G4ProcessManager::GetProcessListLength' data-ref="_ZNK16G4ProcessManager20GetProcessListLengthEv" id="_ZNK16G4ProcessManager20GetProcessListLengthEv">GetProcessListLength</a>() <em>const</em>;</td></tr>
+<tr><th id="133">133</th><td>      <i>//  Returns the number of process in the ProcessVector </i></td></tr>
+<tr><th id="134">134</th><td></td></tr>
+<tr><th id="135">135</th><td>      <a class="typedef" href="../../../global/management/include/G4Types.hh.html#G4int" title='G4int' data-type='int' data-ref="G4int">G4int</a> <a class="decl" href="G4ProcessManager.icc.html#_ZNK16G4ProcessManager15GetProcessIndexEP10G4VProcess" title='G4ProcessManager::GetProcessIndex' data-ref="_ZNK16G4ProcessManager15GetProcessIndexEP10G4VProcess" id="_ZNK16G4ProcessManager15GetProcessIndexEP10G4VProcess">GetProcessIndex</a>(<a class="type" href="G4VProcess.hh.html#G4VProcess" title='G4VProcess' data-ref="G4VProcess">G4VProcess</a> *) <em>const</em>;</td></tr>
+<tr><th id="136">136</th><td>      <i>//  Returns the index of the process in the process List</i></td></tr>
+<tr><th id="137">137</th><td><i></i></td></tr>
+<tr><th id="138">138</th><td><i>      // --------------------------------------</i></td></tr>
+<tr><th id="139">139</th><td></td></tr>
+<tr><th id="140">140</th><td>      <a class="type" href="G4ProcessVector.hh.html#G4ProcessVector" title='G4ProcessVector' data-ref="G4ProcessVector">G4ProcessVector</a>* <a class="decl" href="G4ProcessManager.icc.html#_ZNK16G4ProcessManager16GetProcessVectorE24G4ProcessVectorDoItIndex24G4ProcessVectorTypeIndex" title='G4ProcessManager::GetProcessVector' data-ref="_ZNK16G4ProcessManager16GetProcessVectorE24G4ProcessVectorDoItIndex24G4ProcessVectorTypeIndex" id="_ZNK16G4ProcessManager16GetProcessVectorE24G4ProcessVectorDoItIndex24G4ProcessVectorTypeIndex">GetProcessVector</a>( </td></tr>
+<tr><th id="141">141</th><td>			       <a class="type" href="#G4ProcessVectorDoItIndex" title='G4ProcessVectorDoItIndex' data-ref="G4ProcessVectorDoItIndex">G4ProcessVectorDoItIndex</a> <dfn class="local col4 decl" id="824idx" title='idx' data-type='G4ProcessVectorDoItIndex' data-ref="824idx">idx</dfn>,</td></tr>
+<tr><th id="142">142</th><td>			       <a class="type" href="#G4ProcessVectorTypeIndex" title='G4ProcessVectorTypeIndex' data-ref="G4ProcessVectorTypeIndex">G4ProcessVectorTypeIndex</a> <dfn class="local col5 decl" id="825typ" title='typ' data-type='G4ProcessVectorTypeIndex' data-ref="825typ">typ</dfn> = <a class="enum" href="#G4ProcessVectorTypeIndex::typeGPIL" title='G4ProcessVectorTypeIndex::typeGPIL' data-ref="G4ProcessVectorTypeIndex::typeGPIL">typeGPIL</a></td></tr>
+<tr><th id="143">143</th><td>			      ) <em>const</em>;</td></tr>
+<tr><th id="144">144</th><td>      <i>//  Returns the address of the vector of processes </i></td></tr>
+<tr><th id="145">145</th><td></td></tr>
+<tr><th id="146">146</th><td>      <a class="type" href="G4ProcessVector.hh.html#G4ProcessVector" title='G4ProcessVector' data-ref="G4ProcessVector">G4ProcessVector</a>* <a class="decl" href="G4ProcessManager.icc.html#_ZNK16G4ProcessManager22GetAtRestProcessVectorE24G4ProcessVectorTypeIndex" title='G4ProcessManager::GetAtRestProcessVector' data-ref="_ZNK16G4ProcessManager22GetAtRestProcessVectorE24G4ProcessVectorTypeIndex" id="_ZNK16G4ProcessManager22GetAtRestProcessVectorE24G4ProcessVectorTypeIndex">GetAtRestProcessVector</a>(</td></tr>
+<tr><th id="147">147</th><td>			       <a class="type" href="#G4ProcessVectorTypeIndex" title='G4ProcessVectorTypeIndex' data-ref="G4ProcessVectorTypeIndex">G4ProcessVectorTypeIndex</a> <dfn class="local col6 decl" id="826typ" title='typ' data-type='G4ProcessVectorTypeIndex' data-ref="826typ">typ</dfn> = <a class="enum" href="#G4ProcessVectorTypeIndex::typeGPIL" title='G4ProcessVectorTypeIndex::typeGPIL' data-ref="G4ProcessVectorTypeIndex::typeGPIL">typeGPIL</a></td></tr>
+<tr><th id="148">148</th><td>                              ) <em>const</em>; </td></tr>
+<tr><th id="149">149</th><td>      <i>//  Returns the address of the vector of processes for</i></td></tr>
+<tr><th id="150">150</th><td><i>      //    AtRestGetPhysicalInteractionLength      idx =0</i></td></tr>
+<tr><th id="151">151</th><td><i>      //    AtRestGetPhysicalDoIt                   idx =1</i></td></tr>
+<tr><th id="152">152</th><td>      <a class="type" href="G4ProcessVector.hh.html#G4ProcessVector" title='G4ProcessVector' data-ref="G4ProcessVector">G4ProcessVector</a>* <a class="decl" href="G4ProcessManager.icc.html#_ZNK16G4ProcessManager25GetAlongStepProcessVectorE24G4ProcessVectorTypeIndex" title='G4ProcessManager::GetAlongStepProcessVector' data-ref="_ZNK16G4ProcessManager25GetAlongStepProcessVectorE24G4ProcessVectorTypeIndex" id="_ZNK16G4ProcessManager25GetAlongStepProcessVectorE24G4ProcessVectorTypeIndex">GetAlongStepProcessVector</a>(</td></tr>
+<tr><th id="153">153</th><td>			       <a class="type" href="#G4ProcessVectorTypeIndex" title='G4ProcessVectorTypeIndex' data-ref="G4ProcessVectorTypeIndex">G4ProcessVectorTypeIndex</a> <dfn class="local col7 decl" id="827typ" title='typ' data-type='G4ProcessVectorTypeIndex' data-ref="827typ">typ</dfn> = <a class="enum" href="#G4ProcessVectorTypeIndex::typeGPIL" title='G4ProcessVectorTypeIndex::typeGPIL' data-ref="G4ProcessVectorTypeIndex::typeGPIL">typeGPIL</a></td></tr>
+<tr><th id="154">154</th><td>                              ) <em>const</em>;</td></tr>
+<tr><th id="155">155</th><td>      <i>//  Returns the address of the vector of processes for</i></td></tr>
+<tr><th id="156">156</th><td><i>      //    AlongStepGetPhysicalInteractionLength      idx =0</i></td></tr>
+<tr><th id="157">157</th><td><i>      //    AlongStepGetPhysicalDoIt                   idx =1</i></td></tr>
+<tr><th id="158">158</th><td></td></tr>
+<tr><th id="159">159</th><td>      <a class="type" href="G4ProcessVector.hh.html#G4ProcessVector" title='G4ProcessVector' data-ref="G4ProcessVector">G4ProcessVector</a>* <a class="decl" href="G4ProcessManager.icc.html#_ZNK16G4ProcessManager24GetPostStepProcessVectorE24G4ProcessVectorTypeIndex" title='G4ProcessManager::GetPostStepProcessVector' data-ref="_ZNK16G4ProcessManager24GetPostStepProcessVectorE24G4ProcessVectorTypeIndex" id="_ZNK16G4ProcessManager24GetPostStepProcessVectorE24G4ProcessVectorTypeIndex">GetPostStepProcessVector</a>(</td></tr>
+<tr><th id="160">160</th><td>			       <a class="type" href="#G4ProcessVectorTypeIndex" title='G4ProcessVectorTypeIndex' data-ref="G4ProcessVectorTypeIndex">G4ProcessVectorTypeIndex</a> <dfn class="local col8 decl" id="828typ" title='typ' data-type='G4ProcessVectorTypeIndex' data-ref="828typ">typ</dfn> = <a class="enum" href="#G4ProcessVectorTypeIndex::typeGPIL" title='G4ProcessVectorTypeIndex::typeGPIL' data-ref="G4ProcessVectorTypeIndex::typeGPIL">typeGPIL</a></td></tr>
+<tr><th id="161">161</th><td>                              ) <em>const</em>;</td></tr>
+<tr><th id="162">162</th><td>      <i>//  Returns the address of the vector of processes for</i></td></tr>
+<tr><th id="163">163</th><td><i>      //    PostStepGetPhysicalInteractionLength      idx =0</i></td></tr>
+<tr><th id="164">164</th><td><i>      //    PostStepGetPhysicalDoIt                   idx =1</i></td></tr>
+<tr><th id="165">165</th><td></td></tr>
+<tr><th id="166">166</th><td>      <a class="typedef" href="../../../global/management/include/G4Types.hh.html#G4int" title='G4int' data-type='int' data-ref="G4int">G4int</a> <dfn class="decl" id="_ZNK16G4ProcessManager21GetProcessVectorIndexEP10G4VProcess24G4ProcessVectorDoItIndex24G4ProcessVectorTypeIndex" title='G4ProcessManager::GetProcessVectorIndex' data-ref="_ZNK16G4ProcessManager21GetProcessVectorIndexEP10G4VProcess24G4ProcessVectorDoItIndex24G4ProcessVectorTypeIndex">GetProcessVectorIndex</dfn>(</td></tr>
+<tr><th id="167">167</th><td>                           <a class="type" href="G4VProcess.hh.html#G4VProcess" title='G4VProcess' data-ref="G4VProcess">G4VProcess</a>* <dfn class="local col9 decl" id="829aProcess" title='aProcess' data-type='G4VProcess *' data-ref="829aProcess">aProcess</dfn>,</td></tr>
+<tr><th id="168">168</th><td>			   <a class="type" href="#G4ProcessVectorDoItIndex" title='G4ProcessVectorDoItIndex' data-ref="G4ProcessVectorDoItIndex">G4ProcessVectorDoItIndex</a> <dfn class="local col0 decl" id="830idx" title='idx' data-type='G4ProcessVectorDoItIndex' data-ref="830idx">idx</dfn>,</td></tr>
+<tr><th id="169">169</th><td>			   <a class="type" href="#G4ProcessVectorTypeIndex" title='G4ProcessVectorTypeIndex' data-ref="G4ProcessVectorTypeIndex">G4ProcessVectorTypeIndex</a> <dfn class="local col1 decl" id="831typ" title='typ' data-type='G4ProcessVectorTypeIndex' data-ref="831typ">typ</dfn>  = <a class="enum" href="#G4ProcessVectorTypeIndex::typeGPIL" title='G4ProcessVectorTypeIndex::typeGPIL' data-ref="G4ProcessVectorTypeIndex::typeGPIL">typeGPIL</a></td></tr>
+<tr><th id="170">170</th><td>			   ) <em>const</em>;</td></tr>
+<tr><th id="171">171</th><td>      <a class="typedef" href="../../../global/management/include/G4Types.hh.html#G4int" title='G4int' data-type='int' data-ref="G4int">G4int</a> <a class="decl" href="G4ProcessManager.icc.html#_ZNK16G4ProcessManager14GetAtRestIndexEP10G4VProcess24G4ProcessVectorTypeIndex" title='G4ProcessManager::GetAtRestIndex' data-ref="_ZNK16G4ProcessManager14GetAtRestIndexEP10G4VProcess24G4ProcessVectorTypeIndex" id="_ZNK16G4ProcessManager14GetAtRestIndexEP10G4VProcess24G4ProcessVectorTypeIndex">GetAtRestIndex</a>(</td></tr>
+<tr><th id="172">172</th><td>                           <a class="type" href="G4VProcess.hh.html#G4VProcess" title='G4VProcess' data-ref="G4VProcess">G4VProcess</a>* <dfn class="local col2 decl" id="832aProcess" title='aProcess' data-type='G4VProcess *' data-ref="832aProcess">aProcess</dfn>,</td></tr>
+<tr><th id="173">173</th><td>			   <a class="type" href="#G4ProcessVectorTypeIndex" title='G4ProcessVectorTypeIndex' data-ref="G4ProcessVectorTypeIndex">G4ProcessVectorTypeIndex</a> <dfn class="local col3 decl" id="833typ" title='typ' data-type='G4ProcessVectorTypeIndex' data-ref="833typ">typ</dfn>  = <a class="enum" href="#G4ProcessVectorTypeIndex::typeGPIL" title='G4ProcessVectorTypeIndex::typeGPIL' data-ref="G4ProcessVectorTypeIndex::typeGPIL">typeGPIL</a></td></tr>
+<tr><th id="174">174</th><td>			   ) <em>const</em>;</td></tr>
+<tr><th id="175">175</th><td>      <a class="typedef" href="../../../global/management/include/G4Types.hh.html#G4int" title='G4int' data-type='int' data-ref="G4int">G4int</a> <a class="decl" href="G4ProcessManager.icc.html#_ZNK16G4ProcessManager17GetAlongStepIndexEP10G4VProcess24G4ProcessVectorTypeIndex" title='G4ProcessManager::GetAlongStepIndex' data-ref="_ZNK16G4ProcessManager17GetAlongStepIndexEP10G4VProcess24G4ProcessVectorTypeIndex" id="_ZNK16G4ProcessManager17GetAlongStepIndexEP10G4VProcess24G4ProcessVectorTypeIndex">GetAlongStepIndex</a>(</td></tr>
+<tr><th id="176">176</th><td>                           <a class="type" href="G4VProcess.hh.html#G4VProcess" title='G4VProcess' data-ref="G4VProcess">G4VProcess</a>* <dfn class="local col4 decl" id="834aProcess" title='aProcess' data-type='G4VProcess *' data-ref="834aProcess">aProcess</dfn>,</td></tr>
+<tr><th id="177">177</th><td>			   <a class="type" href="#G4ProcessVectorTypeIndex" title='G4ProcessVectorTypeIndex' data-ref="G4ProcessVectorTypeIndex">G4ProcessVectorTypeIndex</a> <dfn class="local col5 decl" id="835typ" title='typ' data-type='G4ProcessVectorTypeIndex' data-ref="835typ">typ</dfn>  = <a class="enum" href="#G4ProcessVectorTypeIndex::typeGPIL" title='G4ProcessVectorTypeIndex::typeGPIL' data-ref="G4ProcessVectorTypeIndex::typeGPIL">typeGPIL</a></td></tr>
+<tr><th id="178">178</th><td>			   ) <em>const</em>;</td></tr>
+<tr><th id="179">179</th><td>      <a class="typedef" href="../../../global/management/include/G4Types.hh.html#G4int" title='G4int' data-type='int' data-ref="G4int">G4int</a> <a class="decl" href="G4ProcessManager.icc.html#_ZNK16G4ProcessManager16GetPostStepIndexEP10G4VProcess24G4ProcessVectorTypeIndex" title='G4ProcessManager::GetPostStepIndex' data-ref="_ZNK16G4ProcessManager16GetPostStepIndexEP10G4VProcess24G4ProcessVectorTypeIndex" id="_ZNK16G4ProcessManager16GetPostStepIndexEP10G4VProcess24G4ProcessVectorTypeIndex">GetPostStepIndex</a>(</td></tr>
+<tr><th id="180">180</th><td>			   <a class="type" href="G4VProcess.hh.html#G4VProcess" title='G4VProcess' data-ref="G4VProcess">G4VProcess</a>* <dfn class="local col6 decl" id="836aProcess" title='aProcess' data-type='G4VProcess *' data-ref="836aProcess">aProcess</dfn>,</td></tr>
+<tr><th id="181">181</th><td>			   <a class="type" href="#G4ProcessVectorTypeIndex" title='G4ProcessVectorTypeIndex' data-ref="G4ProcessVectorTypeIndex">G4ProcessVectorTypeIndex</a> <dfn class="local col7 decl" id="837typ" title='typ' data-type='G4ProcessVectorTypeIndex' data-ref="837typ">typ</dfn> = <a class="enum" href="#G4ProcessVectorTypeIndex::typeGPIL" title='G4ProcessVectorTypeIndex::typeGPIL' data-ref="G4ProcessVectorTypeIndex::typeGPIL">typeGPIL</a></td></tr>
+<tr><th id="182">182</th><td>			   ) <em>const</em>;</td></tr>
+<tr><th id="183">183</th><td>      <i>//  Returns the index for GPIL/DoIt process vector of the process  </i></td></tr>
+<tr><th id="184">184</th><td></td></tr>
+<tr><th id="185">185</th><td>      <a class="typedef" href="../../../global/management/include/G4Types.hh.html#G4int" title='G4int' data-type='int' data-ref="G4int">G4int</a> <dfn class="decl" id="_ZN16G4ProcessManager10AddProcessEP10G4VProcessiii" title='G4ProcessManager::AddProcess' data-ref="_ZN16G4ProcessManager10AddProcessEP10G4VProcessiii">AddProcess</dfn>(</td></tr>
+<tr><th id="186">186</th><td>             <a class="type" href="G4VProcess.hh.html#G4VProcess" title='G4VProcess' data-ref="G4VProcess">G4VProcess</a> *<dfn class="local col8 decl" id="838aProcess" title='aProcess' data-type='G4VProcess *' data-ref="838aProcess">aProcess</dfn>,</td></tr>
+<tr><th id="187">187</th><td>             <a class="typedef" href="../../../global/management/include/G4Types.hh.html#G4int" title='G4int' data-type='int' data-ref="G4int">G4int</a>      <dfn class="local col9 decl" id="839ordAtRestDoIt" title='ordAtRestDoIt' data-type='G4int' data-ref="839ordAtRestDoIt">ordAtRestDoIt</dfn> = <a class="enum" href="#G4ProcessVectorOrdering::ordInActive" title='G4ProcessVectorOrdering::ordInActive' data-ref="G4ProcessVectorOrdering::ordInActive">ordInActive</a>,</td></tr>
+<tr><th id="188">188</th><td>             <a class="typedef" href="../../../global/management/include/G4Types.hh.html#G4int" title='G4int' data-type='int' data-ref="G4int">G4int</a>      <dfn class="local col0 decl" id="840ordAlongSteptDoIt" title='ordAlongSteptDoIt' data-type='G4int' data-ref="840ordAlongSteptDoIt">ordAlongSteptDoIt</dfn> = <a class="enum" href="#G4ProcessVectorOrdering::ordInActive" title='G4ProcessVectorOrdering::ordInActive' data-ref="G4ProcessVectorOrdering::ordInActive">ordInActive</a>,</td></tr>
+<tr><th id="189">189</th><td>             <a class="typedef" href="../../../global/management/include/G4Types.hh.html#G4int" title='G4int' data-type='int' data-ref="G4int">G4int</a>      <dfn class="local col1 decl" id="841ordPostStepDoIt" title='ordPostStepDoIt' data-type='G4int' data-ref="841ordPostStepDoIt">ordPostStepDoIt</dfn> = <a class="enum" href="#G4ProcessVectorOrdering::ordInActive" title='G4ProcessVectorOrdering::ordInActive' data-ref="G4ProcessVectorOrdering::ordInActive">ordInActive</a></td></tr>
+<tr><th id="190">190</th><td>            );</td></tr>
+<tr><th id="191">191</th><td>      <i>//  Add a process to the process List</i></td></tr>
+<tr><th id="192">192</th><td><i>      //  return values are index to the List. Negative return value </i></td></tr>
+<tr><th id="193">193</th><td><i>      //  indicates that the process has not be added due to some errors</i></td></tr>
+<tr><th id="194">194</th><td><i>      //  The first argument is a pointer to process.</i></td></tr>
+<tr><th id="195">195</th><td><i>      //  Following arguments are ordering parameters of the process in </i></td></tr>
+<tr><th id="196">196</th><td><i>      //  process vectors. If value is negative, the process is</i></td></tr>
+<tr><th id="197">197</th><td><i>      //  not added to the corresponding process vector. </i></td></tr>
+<tr><th id="198">198</th><td><i>   </i></td></tr>
+<tr><th id="199">199</th><td><i>      //  following methods are provided for simple processes  </i></td></tr>
+<tr><th id="200">200</th><td><i>      //   AtRestProcess has only AtRestDoIt</i></td></tr>
+<tr><th id="201">201</th><td><i>      //   ContinuousProcess has only AlongStepDoIt</i></td></tr>
+<tr><th id="202">202</th><td><i>      //   DiscreteProcess has only PostStepDoIt</i></td></tr>
+<tr><th id="203">203</th><td><i>      //  If the ording parameter is not specified, the process is</i></td></tr>
+<tr><th id="204">204</th><td><i>      //  added at the end of List of process vectors </i></td></tr>
+<tr><th id="205">205</th><td><i>      //  If a process with same ordering parameter exists, </i></td></tr>
+<tr><th id="206">206</th><td><i>      //   this new process will be added just after processes </i></td></tr>
+<tr><th id="207">207</th><td><i>      //   with same ordering parameter  </i></td></tr>
+<tr><th id="208">208</th><td><i>      //  (except for processes assigned to LAST explicitly )</i></td></tr>
+<tr><th id="209">209</th><td><i>      //  for both DoIt and GetPhysicalInteractionLength</i></td></tr>
+<tr><th id="210">210</th><td><i>      //  </i></td></tr>
+<tr><th id="211">211</th><td></td></tr>
+<tr><th id="212">212</th><td>      <a class="typedef" href="../../../global/management/include/G4Types.hh.html#G4int" title='G4int' data-type='int' data-ref="G4int">G4int</a> <a class="decl" href="G4ProcessManager.icc.html#_ZN16G4ProcessManager14AddRestProcessEP10G4VProcessi" title='G4ProcessManager::AddRestProcess' data-ref="_ZN16G4ProcessManager14AddRestProcessEP10G4VProcessi" id="_ZN16G4ProcessManager14AddRestProcessEP10G4VProcessi">AddRestProcess</a>(<a class="type" href="G4VProcess.hh.html#G4VProcess" title='G4VProcess' data-ref="G4VProcess">G4VProcess</a> *<dfn class="local col2 decl" id="842aProcess" title='aProcess' data-type='G4VProcess *' data-ref="842aProcess">aProcess</dfn>, <a class="typedef" href="../../../global/management/include/G4Types.hh.html#G4int" title='G4int' data-type='int' data-ref="G4int">G4int</a> <dfn class="local col3 decl" id="843ord" title='ord' data-type='G4int' data-ref="843ord">ord</dfn> = <a class="enum" href="#G4ProcessVectorOrdering::ordDefault" title='G4ProcessVectorOrdering::ordDefault' data-ref="G4ProcessVectorOrdering::ordDefault">ordDefault</a>);</td></tr>
+<tr><th id="213">213</th><td>      <a class="typedef" href="../../../global/management/include/G4Types.hh.html#G4int" title='G4int' data-type='int' data-ref="G4int">G4int</a> <a class="decl" href="G4ProcessManager.icc.html#_ZN16G4ProcessManager18AddDiscreteProcessEP10G4VProcessi" title='G4ProcessManager::AddDiscreteProcess' data-ref="_ZN16G4ProcessManager18AddDiscreteProcessEP10G4VProcessi" id="_ZN16G4ProcessManager18AddDiscreteProcessEP10G4VProcessi">AddDiscreteProcess</a>(<a class="type" href="G4VProcess.hh.html#G4VProcess" title='G4VProcess' data-ref="G4VProcess">G4VProcess</a> *<dfn class="local col4 decl" id="844aProcess" title='aProcess' data-type='G4VProcess *' data-ref="844aProcess">aProcess</dfn>, <a class="typedef" href="../../../global/management/include/G4Types.hh.html#G4int" title='G4int' data-type='int' data-ref="G4int">G4int</a> <dfn class="local col5 decl" id="845ord" title='ord' data-type='G4int' data-ref="845ord">ord</dfn> = <a class="enum" href="#G4ProcessVectorOrdering::ordDefault" title='G4ProcessVectorOrdering::ordDefault' data-ref="G4ProcessVectorOrdering::ordDefault">ordDefault</a>);</td></tr>
+<tr><th id="214">214</th><td>      <a class="typedef" href="../../../global/management/include/G4Types.hh.html#G4int" title='G4int' data-type='int' data-ref="G4int">G4int</a> <a class="decl" href="G4ProcessManager.icc.html#_ZN16G4ProcessManager20AddContinuousProcessEP10G4VProcessi" title='G4ProcessManager::AddContinuousProcess' data-ref="_ZN16G4ProcessManager20AddContinuousProcessEP10G4VProcessi" id="_ZN16G4ProcessManager20AddContinuousProcessEP10G4VProcessi">AddContinuousProcess</a>(<a class="type" href="G4VProcess.hh.html#G4VProcess" title='G4VProcess' data-ref="G4VProcess">G4VProcess</a> *<dfn class="local col6 decl" id="846aProcess" title='aProcess' data-type='G4VProcess *' data-ref="846aProcess">aProcess</dfn>, <a class="typedef" href="../../../global/management/include/G4Types.hh.html#G4int" title='G4int' data-type='int' data-ref="G4int">G4int</a> <dfn class="local col7 decl" id="847ord" title='ord' data-type='G4int' data-ref="847ord">ord</dfn> = <a class="enum" href="#G4ProcessVectorOrdering::ordDefault" title='G4ProcessVectorOrdering::ordDefault' data-ref="G4ProcessVectorOrdering::ordDefault">ordDefault</a>);</td></tr>
+<tr><th id="215">215</th><td></td></tr>
+<tr><th id="216">216</th><td></td></tr>
+<tr><th id="217">217</th><td>       <i>/////////////////////////////////////////////// </i></td></tr>
+<tr><th id="218">218</th><td><i>      // Methods for setting ordering parameters</i></td></tr>
+<tr><th id="219">219</th><td><i>      // Altanative methods for setting ordering parameters </i></td></tr>
+<tr><th id="220">220</th><td><i>      //   Note: AddProcess method should precede these methods</i></td></tr>
+<tr><th id="221">221</th><td></td></tr>
+<tr><th id="222">222</th><td>      <a class="typedef" href="../../../global/management/include/G4Types.hh.html#G4int" title='G4int' data-type='int' data-ref="G4int">G4int</a> <dfn class="decl" id="_ZN16G4ProcessManager18GetProcessOrderingEP10G4VProcess24G4ProcessVectorDoItIndex" title='G4ProcessManager::GetProcessOrdering' data-ref="_ZN16G4ProcessManager18GetProcessOrderingEP10G4VProcess24G4ProcessVectorDoItIndex">GetProcessOrdering</dfn>(</td></tr>
+<tr><th id="223">223</th><td>			       <a class="type" href="G4VProcess.hh.html#G4VProcess" title='G4VProcess' data-ref="G4VProcess">G4VProcess</a> *<dfn class="local col8 decl" id="848aProcess" title='aProcess' data-type='G4VProcess *' data-ref="848aProcess">aProcess</dfn>,</td></tr>
+<tr><th id="224">224</th><td>			       <a class="type" href="#G4ProcessVectorDoItIndex" title='G4ProcessVectorDoItIndex' data-ref="G4ProcessVectorDoItIndex">G4ProcessVectorDoItIndex</a> <dfn class="local col9 decl" id="849idDoIt" title='idDoIt' data-type='G4ProcessVectorDoItIndex' data-ref="849idDoIt">idDoIt</dfn></td></tr>
+<tr><th id="225">225</th><td>                               );</td></tr>
+<tr><th id="226">226</th><td></td></tr>
+<tr><th id="227">227</th><td>      <em>void</em> <dfn class="decl" id="_ZN16G4ProcessManager18SetProcessOrderingEP10G4VProcess24G4ProcessVectorDoItIndexi" title='G4ProcessManager::SetProcessOrdering' data-ref="_ZN16G4ProcessManager18SetProcessOrderingEP10G4VProcess24G4ProcessVectorDoItIndexi">SetProcessOrdering</dfn>(</td></tr>
+<tr><th id="228">228</th><td>			       <a class="type" href="G4VProcess.hh.html#G4VProcess" title='G4VProcess' data-ref="G4VProcess">G4VProcess</a> *<dfn class="local col0 decl" id="850aProcess" title='aProcess' data-type='G4VProcess *' data-ref="850aProcess">aProcess</dfn>,</td></tr>
+<tr><th id="229">229</th><td>			       <a class="type" href="#G4ProcessVectorDoItIndex" title='G4ProcessVectorDoItIndex' data-ref="G4ProcessVectorDoItIndex">G4ProcessVectorDoItIndex</a> <dfn class="local col1 decl" id="851idDoIt" title='idDoIt' data-type='G4ProcessVectorDoItIndex' data-ref="851idDoIt">idDoIt</dfn>,</td></tr>
+<tr><th id="230">230</th><td>			       <a class="typedef" href="../../../global/management/include/G4Types.hh.html#G4int" title='G4int' data-type='int' data-ref="G4int">G4int</a>      <dfn class="local col2 decl" id="852ordDoIt" title='ordDoIt' data-type='G4int' data-ref="852ordDoIt">ordDoIt</dfn> = <a class="enum" href="#G4ProcessVectorOrdering::ordDefault" title='G4ProcessVectorOrdering::ordDefault' data-ref="G4ProcessVectorOrdering::ordDefault">ordDefault</a></td></tr>
+<tr><th id="231">231</th><td>                               );</td></tr>
+<tr><th id="232">232</th><td>      <i>// Set ordering parameter for DoIt specified by typeDoIt.</i></td></tr>
+<tr><th id="233">233</th><td><i>      // If a process with same ordering parameter exists, </i></td></tr>
+<tr><th id="234">234</th><td><i>      // this new process will be added just after processes </i></td></tr>
+<tr><th id="235">235</th><td><i>      // with same ordering parameter  </i></td></tr>
+<tr><th id="236">236</th><td><i>      // Note: Ordering parameter will bet set to non-zero </i></td></tr>
+<tr><th id="237">237</th><td><i>      //       even if you set  ordDoIt = 0</i></td></tr>
+<tr><th id="238">238</th><td>            </td></tr>
+<tr><th id="239">239</th><td>     <em>void</em> <dfn class="decl" id="_ZN16G4ProcessManager25SetProcessOrderingToFirstEP10G4VProcess24G4ProcessVectorDoItIndex" title='G4ProcessManager::SetProcessOrderingToFirst' data-ref="_ZN16G4ProcessManager25SetProcessOrderingToFirstEP10G4VProcess24G4ProcessVectorDoItIndex">SetProcessOrderingToFirst</dfn>(</td></tr>
+<tr><th id="240">240</th><td>			       <a class="type" href="G4VProcess.hh.html#G4VProcess" title='G4VProcess' data-ref="G4VProcess">G4VProcess</a> *<dfn class="local col3 decl" id="853aProcess" title='aProcess' data-type='G4VProcess *' data-ref="853aProcess">aProcess</dfn>,</td></tr>
+<tr><th id="241">241</th><td>			       <a class="type" href="#G4ProcessVectorDoItIndex" title='G4ProcessVectorDoItIndex' data-ref="G4ProcessVectorDoItIndex">G4ProcessVectorDoItIndex</a> <dfn class="local col4 decl" id="854idDoIt" title='idDoIt' data-type='G4ProcessVectorDoItIndex' data-ref="854idDoIt">idDoIt</dfn></td></tr>
+<tr><th id="242">242</th><td>			       );</td></tr>
+<tr><th id="243">243</th><td>      <i>// Set ordering parameter to the first of all processes </i></td></tr>
+<tr><th id="244">244</th><td><i>      // for DoIt specified by idDoIt.</i></td></tr>
+<tr><th id="245">245</th><td><i>      //  Note: If you use this method for two processes,</i></td></tr>
+<tr><th id="246">246</th><td><i>      //        a process called later will be first.</i></td></tr>
+<tr><th id="247">247</th><td></td></tr>
+<tr><th id="248">248</th><td>      <em>void</em> <dfn class="decl" id="_ZN16G4ProcessManager26SetProcessOrderingToSecondEP10G4VProcess24G4ProcessVectorDoItIndex" title='G4ProcessManager::SetProcessOrderingToSecond' data-ref="_ZN16G4ProcessManager26SetProcessOrderingToSecondEP10G4VProcess24G4ProcessVectorDoItIndex">SetProcessOrderingToSecond</dfn>(</td></tr>
+<tr><th id="249">249</th><td>			       <a class="type" href="G4VProcess.hh.html#G4VProcess" title='G4VProcess' data-ref="G4VProcess">G4VProcess</a> *<dfn class="local col5 decl" id="855aProcess" title='aProcess' data-type='G4VProcess *' data-ref="855aProcess">aProcess</dfn>,</td></tr>
+<tr><th id="250">250</th><td>			       <a class="type" href="#G4ProcessVectorDoItIndex" title='G4ProcessVectorDoItIndex' data-ref="G4ProcessVectorDoItIndex">G4ProcessVectorDoItIndex</a> <dfn class="local col6 decl" id="856idDoIt" title='idDoIt' data-type='G4ProcessVectorDoItIndex' data-ref="856idDoIt">idDoIt</dfn></td></tr>
+<tr><th id="251">251</th><td>			       );</td></tr>
+<tr><th id="252">252</th><td>      <i>// Set ordering parameter to 1 for DoIt specified by idDoIt</i></td></tr>
+<tr><th id="253">253</th><td><i>      // and the rpocess will be added just after </i></td></tr>
+<tr><th id="254">254</th><td><i>      // the processes with ordering parameter equal to zero</i></td></tr>
+<tr><th id="255">255</th><td><i>      //  Note: If you use this method for two processes,</i></td></tr>
+<tr><th id="256">256</th><td><i>      //        a process called later will be .</i></td></tr>
+<tr><th id="257">257</th><td></td></tr>
+<tr><th id="258">258</th><td>        <em>void</em> <dfn class="decl" id="_ZN16G4ProcessManager24SetProcessOrderingToLastEP10G4VProcess24G4ProcessVectorDoItIndex" title='G4ProcessManager::SetProcessOrderingToLast' data-ref="_ZN16G4ProcessManager24SetProcessOrderingToLastEP10G4VProcess24G4ProcessVectorDoItIndex">SetProcessOrderingToLast</dfn>(</td></tr>
+<tr><th id="259">259</th><td>			       <a class="type" href="G4VProcess.hh.html#G4VProcess" title='G4VProcess' data-ref="G4VProcess">G4VProcess</a> *<dfn class="local col7 decl" id="857aProcess" title='aProcess' data-type='G4VProcess *' data-ref="857aProcess">aProcess</dfn>,</td></tr>
+<tr><th id="260">260</th><td>			       <a class="type" href="#G4ProcessVectorDoItIndex" title='G4ProcessVectorDoItIndex' data-ref="G4ProcessVectorDoItIndex">G4ProcessVectorDoItIndex</a> <dfn class="local col8 decl" id="858idDoIt" title='idDoIt' data-type='G4ProcessVectorDoItIndex' data-ref="858idDoIt">idDoIt</dfn></td></tr>
+<tr><th id="261">261</th><td>			       );</td></tr>
+<tr><th id="262">262</th><td>      <i>// Set ordering parameter to the last of all processes </i></td></tr>
+<tr><th id="263">263</th><td><i>      // for DoIt specified by idDoIt.</i></td></tr>
+<tr><th id="264">264</th><td><i>      //  Note: If you use this method for two processes,</i></td></tr>
+<tr><th id="265">265</th><td><i>      //        a process called later will precede.</i></td></tr>
+<tr><th id="266">266</th><td></td></tr>
+<tr><th id="267">267</th><td>      <a class="type" href="G4VProcess.hh.html#G4VProcess" title='G4VProcess' data-ref="G4VProcess">G4VProcess</a>*  <dfn class="decl" id="_ZN16G4ProcessManager13RemoveProcessEP10G4VProcess" title='G4ProcessManager::RemoveProcess' data-ref="_ZN16G4ProcessManager13RemoveProcessEP10G4VProcess">RemoveProcess</dfn>(<a class="type" href="G4VProcess.hh.html#G4VProcess" title='G4VProcess' data-ref="G4VProcess">G4VProcess</a> *<dfn class="local col9 decl" id="859aProcess" title='aProcess' data-type='G4VProcess *' data-ref="859aProcess">aProcess</dfn>);</td></tr>
+<tr><th id="268">268</th><td>      <a class="type" href="G4VProcess.hh.html#G4VProcess" title='G4VProcess' data-ref="G4VProcess">G4VProcess</a>*  <dfn class="decl" id="_ZN16G4ProcessManager13RemoveProcessEi" title='G4ProcessManager::RemoveProcess' data-ref="_ZN16G4ProcessManager13RemoveProcessEi">RemoveProcess</dfn>(<a class="typedef" href="../../../global/management/include/G4Types.hh.html#G4int" title='G4int' data-type='int' data-ref="G4int">G4int</a>      <dfn class="local col0 decl" id="860index" title='index' data-type='G4int' data-ref="860index">index</dfn>);</td></tr>
+<tr><th id="269">269</th><td>      <i>//  Removes a process from the process List.</i></td></tr>
+<tr><th id="270">270</th><td><i>      //  return value is pointer to the removed process.</i></td></tr>
+<tr><th id="271">271</th><td><i>      //  (0 value will be returned in case of errors)</i></td></tr>
+<tr><th id="272">272</th><td></td></tr>
+<tr><th id="273">273</th><td>      <a class="type" href="G4VProcess.hh.html#G4VProcess" title='G4VProcess' data-ref="G4VProcess">G4VProcess</a>* <dfn class="decl" id="_ZN16G4ProcessManager20SetProcessActivationEP10G4VProcessb" title='G4ProcessManager::SetProcessActivation' data-ref="_ZN16G4ProcessManager20SetProcessActivationEP10G4VProcessb">SetProcessActivation</dfn>(<a class="type" href="G4VProcess.hh.html#G4VProcess" title='G4VProcess' data-ref="G4VProcess">G4VProcess</a> *<dfn class="local col1 decl" id="861aProcess" title='aProcess' data-type='G4VProcess *' data-ref="861aProcess">aProcess</dfn>, <a class="typedef" href="../../../global/management/include/G4Types.hh.html#G4bool" title='G4bool' data-type='bool' data-ref="G4bool">G4bool</a> <dfn class="local col2 decl" id="862fActive" title='fActive' data-type='G4bool' data-ref="862fActive">fActive</dfn>);</td></tr>
+<tr><th id="274">274</th><td>      <a class="type" href="G4VProcess.hh.html#G4VProcess" title='G4VProcess' data-ref="G4VProcess">G4VProcess</a>* <dfn class="decl" id="_ZN16G4ProcessManager20SetProcessActivationEib" title='G4ProcessManager::SetProcessActivation' data-ref="_ZN16G4ProcessManager20SetProcessActivationEib">SetProcessActivation</dfn>(<a class="typedef" href="../../../global/management/include/G4Types.hh.html#G4int" title='G4int' data-type='int' data-ref="G4int">G4int</a>      <dfn class="local col3 decl" id="863index" title='index' data-type='G4int' data-ref="863index">index</dfn>, <a class="typedef" href="../../../global/management/include/G4Types.hh.html#G4bool" title='G4bool' data-type='bool' data-ref="G4bool">G4bool</a> <dfn class="local col4 decl" id="864fActive" title='fActive' data-type='G4bool' data-ref="864fActive">fActive</dfn>);</td></tr>
+<tr><th id="275">275</th><td>      <i>//  Set activation flag. </i></td></tr>
+<tr><th id="276">276</th><td><i>      //  return value is pointer to the applied process.</i></td></tr>
+<tr><th id="277">277</th><td><i>      //  (0 value will be returned in case of errors)</i></td></tr>
+<tr><th id="278">278</th><td></td></tr>
+<tr><th id="279">279</th><td>      <a class="typedef" href="../../../global/management/include/G4Types.hh.html#G4bool" title='G4bool' data-type='bool' data-ref="G4bool">G4bool</a> <dfn class="decl" id="_ZNK16G4ProcessManager20GetProcessActivationEP10G4VProcess" title='G4ProcessManager::GetProcessActivation' data-ref="_ZNK16G4ProcessManager20GetProcessActivationEP10G4VProcess">GetProcessActivation</dfn>(<a class="type" href="G4VProcess.hh.html#G4VProcess" title='G4VProcess' data-ref="G4VProcess">G4VProcess</a> *<dfn class="local col5 decl" id="865aProcess" title='aProcess' data-type='G4VProcess *' data-ref="865aProcess">aProcess</dfn>) <em>const</em>;</td></tr>
+<tr><th id="280">280</th><td>      <a class="typedef" href="../../../global/management/include/G4Types.hh.html#G4bool" title='G4bool' data-type='bool' data-ref="G4bool">G4bool</a> <dfn class="decl" id="_ZNK16G4ProcessManager20GetProcessActivationEi" title='G4ProcessManager::GetProcessActivation' data-ref="_ZNK16G4ProcessManager20GetProcessActivationEi">GetProcessActivation</dfn>(<a class="typedef" href="../../../global/management/include/G4Types.hh.html#G4int" title='G4int' data-type='int' data-ref="G4int">G4int</a>      <dfn class="local col6 decl" id="866index" title='index' data-type='G4int' data-ref="866index">index</dfn>) <em>const</em>;</td></tr>
+<tr><th id="281">281</th><td>      <i>//  Get activation flag. </i></td></tr>
+<tr><th id="282">282</th><td></td></tr>
+<tr><th id="283">283</th><td>      <a class="type" href="../../../particles/management/include/G4ParticleDefinition.hh.html#G4ParticleDefinition" title='G4ParticleDefinition' data-ref="G4ParticleDefinition">G4ParticleDefinition</a>*  <a class="decl" href="G4ProcessManager.icc.html#_ZNK16G4ProcessManager15GetParticleTypeEv" title='G4ProcessManager::GetParticleType' data-ref="_ZNK16G4ProcessManager15GetParticleTypeEv" id="_ZNK16G4ProcessManager15GetParticleTypeEv">GetParticleType</a>() <em>const</em>;</td></tr>
+<tr><th id="284">284</th><td>      <i>// get the particle type </i></td></tr>
+<tr><th id="285">285</th><td>      <em>void</em> <a class="decl" href="G4ProcessManager.icc.html#_ZN16G4ProcessManager15SetParticleTypeEPK20G4ParticleDefinition" title='G4ProcessManager::SetParticleType' data-ref="_ZN16G4ProcessManager15SetParticleTypeEPK20G4ParticleDefinition" id="_ZN16G4ProcessManager15SetParticleTypeEPK20G4ParticleDefinition">SetParticleType</a>(<em>const</em> <a class="type" href="../../../particles/management/include/G4ParticleDefinition.hh.html#G4ParticleDefinition" title='G4ParticleDefinition' data-ref="G4ParticleDefinition">G4ParticleDefinition</a>*);</td></tr>
+<tr><th id="286">286</th><td>      <i>// set the particle type</i></td></tr>
+<tr><th id="287">287</th><td></td></tr>
+<tr><th id="288">288</th><td>      <a class="type" href="G4VProcess.hh.html#G4VProcess" title='G4VProcess' data-ref="G4VProcess">G4VProcess</a>* <dfn class="decl" id="_ZNK16G4ProcessManager10GetProcessERK8G4String" title='G4ProcessManager::GetProcess' data-ref="_ZNK16G4ProcessManager10GetProcessERK8G4String">GetProcess</dfn> (<em>const</em> <a class="type" href="../../../global/management/include/G4String.hh.html#G4String" title='G4String' data-ref="G4String">G4String</a>&amp;) <em>const</em>;</td></tr>
+<tr><th id="289">289</th><td>      <i>// get process by process name</i></td></tr>
+<tr><th id="290">290</th><td></td></tr>
+<tr><th id="291">291</th><td>      <em>void</em> <dfn class="decl" id="_ZN16G4ProcessManager13StartTrackingEP7G4Track" title='G4ProcessManager::StartTracking' data-ref="_ZN16G4ProcessManager13StartTrackingEP7G4Track">StartTracking</dfn>(<a class="type" href="../../../track/include/G4Track.hh.html#G4Track" title='G4Track' data-ref="G4Track">G4Track</a>* <dfn class="local col7 decl" id="867aTrack" title='aTrack' data-type='G4Track *' data-ref="867aTrack">aTrack</dfn>=<var>0</var>);</td></tr>
+<tr><th id="292">292</th><td>      <em>void</em> <dfn class="decl" id="_ZN16G4ProcessManager11EndTrackingEv" title='G4ProcessManager::EndTracking' data-ref="_ZN16G4ProcessManager11EndTrackingEv">EndTracking</dfn>();</td></tr>
+<tr><th id="293">293</th><td>      <i>// these two methods are used by G4TrackingManager </i></td></tr>
+<tr><th id="294">294</th><td><i>      // in order to inform Start/End of tracking for each track</i></td></tr>
+<tr><th id="295">295</th><td><i>      // to the process manager and all physics processes </i></td></tr>
+<tr><th id="296">296</th><td></td></tr>
+<tr><th id="297">297</th><td></td></tr>
+<tr><th id="298">298</th><td>  <b>public</b>:</td></tr>
+<tr><th id="299">299</th><td>      <b>enum</b> {<dfn class="enum" id="G4ProcessManager::SizeOfProcVectorArray" title='G4ProcessManager::SizeOfProcVectorArray' data-ref="G4ProcessManager::SizeOfProcVectorArray">SizeOfProcVectorArray</dfn> = <var>6</var>};</td></tr>
+<tr><th id="300">300</th><td>  <b>private</b>:</td></tr>
+<tr><th id="301">301</th><td>      <a class="type" href="G4ProcessVector.hh.html#G4ProcessVector" title='G4ProcessVector' data-ref="G4ProcessVector">G4ProcessVector</a>* <dfn class="decl" id="G4ProcessManager::theProcVector" title='G4ProcessManager::theProcVector' data-ref="G4ProcessManager::theProcVector">theProcVector</dfn>[<a class="enum" href="#G4ProcessManager::SizeOfProcVectorArray" title='G4ProcessManager::SizeOfProcVectorArray' data-ref="G4ProcessManager::SizeOfProcVectorArray">SizeOfProcVectorArray</a>];</td></tr>
+<tr><th id="302">302</th><td>      <i>// vector for processes with GetPhysicalInteractionLength/DoIt</i></td></tr>
+<tr><th id="303">303</th><td></td></tr>
+<tr><th id="304">304</th><td>      <b>typedef</b> <span class='error' title="use of undeclared identifier &apos;std&apos;">std</span>::vector<span class='error' title="expected member name or &apos;;&apos; after declaration specifiers">&lt;</span>G4ProcessAttribute*&gt; G4ProcessAttrVector; </td></tr>
+<tr><th id="305">305</th><td>      <span class='error' title="unknown type name &apos;G4ProcessAttrVector&apos;">G4ProcessAttrVector</span>*  <dfn class="decl" id="G4ProcessManager::theAttrVector" title='G4ProcessManager::theAttrVector' data-ref="G4ProcessManager::theAttrVector">theAttrVector</dfn>;</td></tr>
+<tr><th id="306">306</th><td>      <i>// vector for process attribute  </i></td></tr>
+<tr><th id="307">307</th><td></td></tr>
+<tr><th id="308">308</th><td>  <b>protected</b>: <i>// with description</i></td></tr>
+<tr><th id="309">309</th><td>      <a class="typedef" href="../../../global/management/include/G4Types.hh.html#G4int" title='G4int' data-type='int' data-ref="G4int">G4int</a> <dfn class="decl" id="_ZN16G4ProcessManager8InsertAtEiP10G4VProcessi" title='G4ProcessManager::InsertAt' data-ref="_ZN16G4ProcessManager8InsertAtEiP10G4VProcessi">InsertAt</dfn>(<a class="typedef" href="../../../global/management/include/G4Types.hh.html#G4int" title='G4int' data-type='int' data-ref="G4int">G4int</a> <dfn class="local col8 decl" id="868position" title='position' data-type='G4int' data-ref="868position">position</dfn>, <a class="type" href="G4VProcess.hh.html#G4VProcess" title='G4VProcess' data-ref="G4VProcess">G4VProcess</a>* <dfn class="local col9 decl" id="869process" title='process' data-type='G4VProcess *' data-ref="869process">process</dfn>, <a class="typedef" href="../../../global/management/include/G4Types.hh.html#G4int" title='G4int' data-type='int' data-ref="G4int">G4int</a> <dfn class="local col0 decl" id="870ivec" title='ivec' data-type='G4int' data-ref="870ivec">ivec</dfn>);</td></tr>
+<tr><th id="310">310</th><td>      <i>// insert process at position in theProcVector[ivec]</i></td></tr>
+<tr><th id="311">311</th><td></td></tr>
+<tr><th id="312">312</th><td>      <a class="typedef" href="../../../global/management/include/G4Types.hh.html#G4int" title='G4int' data-type='int' data-ref="G4int">G4int</a> <dfn class="decl" id="_ZN16G4ProcessManager8RemoveAtEiP10G4VProcessi" title='G4ProcessManager::RemoveAt' data-ref="_ZN16G4ProcessManager8RemoveAtEiP10G4VProcessi">RemoveAt</dfn>(<a class="typedef" href="../../../global/management/include/G4Types.hh.html#G4int" title='G4int' data-type='int' data-ref="G4int">G4int</a> <dfn class="local col1 decl" id="871position" title='position' data-type='G4int' data-ref="871position">position</dfn>, <a class="type" href="G4VProcess.hh.html#G4VProcess" title='G4VProcess' data-ref="G4VProcess">G4VProcess</a>* <dfn class="local col2 decl" id="872process" title='process' data-type='G4VProcess *' data-ref="872process">process</dfn>, <a class="typedef" href="../../../global/management/include/G4Types.hh.html#G4int" title='G4int' data-type='int' data-ref="G4int">G4int</a> <dfn class="local col3 decl" id="873ivec" title='ivec' data-type='G4int' data-ref="873ivec">ivec</dfn>);</td></tr>
+<tr><th id="313">313</th><td>      <i>// remove process at position in theProcVector[ivec]</i></td></tr>
+<tr><th id="314">314</th><td></td></tr>
+<tr><th id="315">315</th><td>      <a class="typedef" href="../../../global/management/include/G4Types.hh.html#G4int" title='G4int' data-type='int' data-ref="G4int">G4int</a> <dfn class="decl" id="_ZN16G4ProcessManager18FindInsertPositionEii" title='G4ProcessManager::FindInsertPosition' data-ref="_ZN16G4ProcessManager18FindInsertPositionEii">FindInsertPosition</dfn>(<a class="typedef" href="../../../global/management/include/G4Types.hh.html#G4int" title='G4int' data-type='int' data-ref="G4int">G4int</a> <dfn class="local col4 decl" id="874ord" title='ord' data-type='G4int' data-ref="874ord">ord</dfn>, <a class="typedef" href="../../../global/management/include/G4Types.hh.html#G4int" title='G4int' data-type='int' data-ref="G4int">G4int</a> <dfn class="local col5 decl" id="875ivec" title='ivec' data-type='G4int' data-ref="875ivec">ivec</dfn>);</td></tr>
+<tr><th id="316">316</th><td>      <i>// find insert position according to ordering parameter </i></td></tr>
+<tr><th id="317">317</th><td><i>      // in theProcVector[ivec]</i></td></tr>
+<tr><th id="318">318</th><td></td></tr>
+<tr><th id="319">319</th><td>      <a class="typedef" href="../../../global/management/include/G4Types.hh.html#G4int" title='G4int' data-type='int' data-ref="G4int">G4int</a> <a class="decl" href="G4ProcessManager.icc.html#_ZNK16G4ProcessManager18GetProcessVectorIdE24G4ProcessVectorDoItIndex24G4ProcessVectorTypeIndex" title='G4ProcessManager::GetProcessVectorId' data-ref="_ZNK16G4ProcessManager18GetProcessVectorIdE24G4ProcessVectorDoItIndex24G4ProcessVectorTypeIndex" id="_ZNK16G4ProcessManager18GetProcessVectorIdE24G4ProcessVectorDoItIndex24G4ProcessVectorTypeIndex">GetProcessVectorId</a>(<a class="type" href="#G4ProcessVectorDoItIndex" title='G4ProcessVectorDoItIndex' data-ref="G4ProcessVectorDoItIndex">G4ProcessVectorDoItIndex</a> <dfn class="local col6 decl" id="876idx" title='idx' data-type='G4ProcessVectorDoItIndex' data-ref="876idx">idx</dfn>,</td></tr>
+<tr><th id="320">320</th><td>			       <a class="type" href="#G4ProcessVectorTypeIndex" title='G4ProcessVectorTypeIndex' data-ref="G4ProcessVectorTypeIndex">G4ProcessVectorTypeIndex</a> <dfn class="local col7 decl" id="877typ" title='typ' data-type='G4ProcessVectorTypeIndex' data-ref="877typ">typ</dfn>  = <a class="enum" href="#G4ProcessVectorTypeIndex::typeGPIL" title='G4ProcessVectorTypeIndex::typeGPIL' data-ref="G4ProcessVectorTypeIndex::typeGPIL">typeGPIL</a>) <em>const</em>;</td></tr>
+<tr><th id="321">321</th><td></td></tr>
+<tr><th id="322">322</th><td>  <em>void</em> <dfn class="decl" id="_ZNK16G4ProcessManager23CheckOrderingParametersEP10G4VProcess" title='G4ProcessManager::CheckOrderingParameters' data-ref="_ZNK16G4ProcessManager23CheckOrderingParametersEP10G4VProcess">CheckOrderingParameters</dfn>(<a class="type" href="G4VProcess.hh.html#G4VProcess" title='G4VProcess' data-ref="G4VProcess">G4VProcess</a>*) <em>const</em>;</td></tr>
+<tr><th id="323">323</th><td>       <i>// check consistencies between ordering parameters and </i></td></tr>
+<tr><th id="324">324</th><td><i>       // validity of DoIt of the Process </i></td></tr>
+<tr><th id="325">325</th><td></td></tr>
+<tr><th id="326">326</th><td>  <b>private</b>:     </td></tr>
+<tr><th id="327">327</th><td>      <a class="type" href="#G4ProcessAttribute" title='G4ProcessAttribute' data-ref="G4ProcessAttribute">G4ProcessAttribute</a>* <dfn class="decl" id="_ZNK16G4ProcessManager12GetAttributeEi" title='G4ProcessManager::GetAttribute' data-ref="_ZNK16G4ProcessManager12GetAttributeEi">GetAttribute</dfn>(<a class="typedef" href="../../../global/management/include/G4Types.hh.html#G4int" title='G4int' data-type='int' data-ref="G4int">G4int</a>      <dfn class="local col8 decl" id="878index" title='index' data-type='G4int' data-ref="878index">index</dfn>) <em>const</em>;</td></tr>
+<tr><th id="328">328</th><td>      <a class="type" href="#G4ProcessAttribute" title='G4ProcessAttribute' data-ref="G4ProcessAttribute">G4ProcessAttribute</a>* <dfn class="decl" id="_ZNK16G4ProcessManager12GetAttributeEP10G4VProcess" title='G4ProcessManager::GetAttribute' data-ref="_ZNK16G4ProcessManager12GetAttributeEP10G4VProcess">GetAttribute</dfn>(<a class="type" href="G4VProcess.hh.html#G4VProcess" title='G4VProcess' data-ref="G4VProcess">G4VProcess</a> *<dfn class="local col9 decl" id="879aProcess" title='aProcess' data-type='G4VProcess *' data-ref="879aProcess">aProcess</dfn>) <em>const</em>;</td></tr>
+<tr><th id="329">329</th><td>      <i>// get Pointer to ProcessAttribute</i></td></tr>
+<tr><th id="330">330</th><td></td></tr>
+<tr><th id="331">331</th><td>      <a class="type" href="G4VProcess.hh.html#G4VProcess" title='G4VProcess' data-ref="G4VProcess">G4VProcess</a>* <dfn class="decl" id="_ZN16G4ProcessManager15ActivateProcessEi" title='G4ProcessManager::ActivateProcess' data-ref="_ZN16G4ProcessManager15ActivateProcessEi">ActivateProcess</dfn>(<a class="typedef" href="../../../global/management/include/G4Types.hh.html#G4int" title='G4int' data-type='int' data-ref="G4int">G4int</a>   <dfn class="local col0 decl" id="880index" title='index' data-type='G4int' data-ref="880index">index</dfn>);</td></tr>
+<tr><th id="332">332</th><td>      <a class="type" href="G4VProcess.hh.html#G4VProcess" title='G4VProcess' data-ref="G4VProcess">G4VProcess</a>* <dfn class="decl" id="_ZN16G4ProcessManager17InActivateProcessEi" title='G4ProcessManager::InActivateProcess' data-ref="_ZN16G4ProcessManager17InActivateProcessEi">InActivateProcess</dfn>(<a class="typedef" href="../../../global/management/include/G4Types.hh.html#G4int" title='G4int' data-type='int' data-ref="G4int">G4int</a>  <dfn class="local col1 decl" id="881index" title='index' data-type='G4int' data-ref="881index">index</dfn>);</td></tr>
+<tr><th id="333">333</th><td>      <i>// Activate/InActivateProcess   Process</i></td></tr>
+<tr><th id="334">334</th><td>      </td></tr>
+<tr><th id="335">335</th><td>  <b>private</b>:     </td></tr>
+<tr><th id="336">336</th><td>      <em>const</em> <a class="type" href="../../../particles/management/include/G4ParticleDefinition.hh.html#G4ParticleDefinition" title='G4ParticleDefinition' data-ref="G4ParticleDefinition">G4ParticleDefinition</a>*   <dfn class="decl" id="G4ProcessManager::theParticleType" title='G4ProcessManager::theParticleType' data-ref="G4ProcessManager::theParticleType">theParticleType</dfn>;</td></tr>
+<tr><th id="337">337</th><td>      <i>//  particle which has this process manager object     </i></td></tr>
+<tr><th id="338">338</th><td></td></tr>
+<tr><th id="339">339</th><td>      <a class="typedef" href="../../../global/management/include/G4Types.hh.html#G4int" title='G4int' data-type='int' data-ref="G4int">G4int</a>             <dfn class="decl" id="G4ProcessManager::numberOfProcesses" title='G4ProcessManager::numberOfProcesses' data-ref="G4ProcessManager::numberOfProcesses">numberOfProcesses</dfn>;</td></tr>
+<tr><th id="340">340</th><td>      <a class="type" href="G4ProcessVector.hh.html#G4ProcessVector" title='G4ProcessVector' data-ref="G4ProcessVector">G4ProcessVector</a>*  <dfn class="decl" id="G4ProcessManager::theProcessList" title='G4ProcessManager::theProcessList' data-ref="G4ProcessManager::theProcessList">theProcessList</dfn>;</td></tr>
+<tr><th id="341">341</th><td>      <i>// vector for all processes (called as "process List")</i></td></tr>
+<tr><th id="342">342</th><td></td></tr>
+<tr><th id="343">343</th><td> <b>private</b>:</td></tr>
+<tr><th id="344">344</th><td>      <a class="typedef" href="../../../global/management/include/G4Types.hh.html#G4bool" title='G4bool' data-type='bool' data-ref="G4bool">G4bool</a>  <dfn class="decl" id="G4ProcessManager::duringTracking" title='G4ProcessManager::duringTracking' data-ref="G4ProcessManager::duringTracking">duringTracking</dfn>;</td></tr>
+<tr><th id="345">345</th><td>      <em>void</em>    <dfn class="decl" id="_ZN16G4ProcessManager17CreateGPILvectorsEv" title='G4ProcessManager::CreateGPILvectors' data-ref="_ZN16G4ProcessManager17CreateGPILvectorsEv">CreateGPILvectors</dfn>();</td></tr>
+<tr><th id="346">346</th><td>      <em>void</em>    <dfn class="decl" id="_ZN16G4ProcessManager23SetIndexToProcessVectorEi" title='G4ProcessManager::SetIndexToProcessVector' data-ref="_ZN16G4ProcessManager23SetIndexToProcessVectorEi">SetIndexToProcessVector</dfn>(<a class="typedef" href="../../../global/management/include/G4Types.hh.html#G4int" title='G4int' data-type='int' data-ref="G4int">G4int</a> <dfn class="local col2 decl" id="882ivec" title='ivec' data-type='G4int' data-ref="882ivec">ivec</dfn>);</td></tr>
+<tr><th id="347">347</th><td></td></tr>
+<tr><th id="348">348</th><td>      <a class="typedef" href="../../../global/management/include/G4Types.hh.html#G4bool" title='G4bool' data-type='bool' data-ref="G4bool">G4bool</a>  <dfn class="decl" id="G4ProcessManager::isSetOrderingFirstInvoked" title='G4ProcessManager::isSetOrderingFirstInvoked' data-ref="G4ProcessManager::isSetOrderingFirstInvoked">isSetOrderingFirstInvoked</dfn>[<a class="enum" href="#G4ProcessVectorDoItIndex::NDoit" title='G4ProcessVectorDoItIndex::NDoit' data-ref="G4ProcessVectorDoItIndex::NDoit">NDoit</a>];</td></tr>
+<tr><th id="349">349</th><td>      <a class="typedef" href="../../../global/management/include/G4Types.hh.html#G4bool" title='G4bool' data-type='bool' data-ref="G4bool">G4bool</a>  <dfn class="decl" id="G4ProcessManager::isSetOrderingLastInvoked" title='G4ProcessManager::isSetOrderingLastInvoked' data-ref="G4ProcessManager::isSetOrderingLastInvoked">isSetOrderingLastInvoked</dfn>[<a class="enum" href="#G4ProcessVectorDoItIndex::NDoit" title='G4ProcessVectorDoItIndex::NDoit' data-ref="G4ProcessVectorDoItIndex::NDoit">NDoit</a>];</td></tr>
+<tr><th id="350">350</th><td></td></tr>
+<tr><th id="351">351</th><td> <b>public</b>: <i>// with description</i></td></tr>
+<tr><th id="352">352</th><td>   <em>void</em>  <dfn class="decl" id="_ZN16G4ProcessManager8DumpInfoEv" title='G4ProcessManager::DumpInfo' data-ref="_ZN16G4ProcessManager8DumpInfoEv">DumpInfo</dfn>();</td></tr>
+<tr><th id="353">353</th><td></td></tr>
+<tr><th id="354">354</th><td>   <em>void</em>  <a class="decl" href="G4ProcessManager.icc.html#_ZN16G4ProcessManager15SetVerboseLevelEi" title='G4ProcessManager::SetVerboseLevel' data-ref="_ZN16G4ProcessManager15SetVerboseLevelEi" id="_ZN16G4ProcessManager15SetVerboseLevelEi">SetVerboseLevel</a>(<a class="typedef" href="../../../global/management/include/G4Types.hh.html#G4int" title='G4int' data-type='int' data-ref="G4int">G4int</a> <dfn class="local col3 decl" id="883value" title='value' data-type='G4int' data-ref="883value">value</dfn>);</td></tr>
+<tr><th id="355">355</th><td>   <a class="typedef" href="../../../global/management/include/G4Types.hh.html#G4int" title='G4int' data-type='int' data-ref="G4int">G4int</a> <a class="decl" href="G4ProcessManager.icc.html#_ZNK16G4ProcessManager15GetVerboseLevelEv" title='G4ProcessManager::GetVerboseLevel' data-ref="_ZNK16G4ProcessManager15GetVerboseLevelEv" id="_ZNK16G4ProcessManager15GetVerboseLevelEv">GetVerboseLevel</a>() <em>const</em>;</td></tr>
+<tr><th id="356">356</th><td>   <i>// controle flag for output message</i></td></tr>
+<tr><th id="357">357</th><td><i>   //  0: Silent</i></td></tr>
+<tr><th id="358">358</th><td><i>   //  1: Warning message</i></td></tr>
+<tr><th id="359">359</th><td><i>   //  2: More</i></td></tr>
+<tr><th id="360">360</th><td></td></tr>
+<tr><th id="361">361</th><td> <b>protected</b>:</td></tr>
+<tr><th id="362">362</th><td>   <a class="typedef" href="../../../global/management/include/G4Types.hh.html#G4int" title='G4int' data-type='int' data-ref="G4int">G4int</a> <dfn class="decl" id="G4ProcessManager::verboseLevel" title='G4ProcessManager::verboseLevel' data-ref="G4ProcessManager::verboseLevel">verboseLevel</dfn>;</td></tr>
+<tr><th id="363">363</th><td>  </td></tr>
+<tr><th id="364">364</th><td> <b>private</b>:</td></tr>
+<tr><th id="365">365</th><td>   <em>static</em> <a class="macro" href="../../../global/management/include/tls.hh.html#39" title="thread_local" data-ref="_M/G4ThreadLocal">G4ThreadLocal</a> <a class="type" href="#G4ProcessManagerMessenger" title='G4ProcessManagerMessenger' data-ref="G4ProcessManagerMessenger">G4ProcessManagerMessenger</a>* <dfn class="decl" id="G4ProcessManager::fProcessManagerMessenger" title='G4ProcessManager::fProcessManagerMessenger' data-ref="G4ProcessManager::fProcessManagerMessenger">fProcessManagerMessenger</dfn>;</td></tr>
+<tr><th id="366">366</th><td>   <em>static</em> <a class="macro" href="../../../global/management/include/tls.hh.html#39" title="thread_local" data-ref="_M/G4ThreadLocal">G4ThreadLocal</a> <a class="typedef" href="../../../global/management/include/G4Types.hh.html#G4int" title='G4int' data-type='int' data-ref="G4int">G4int</a>                      <dfn class="decl" id="G4ProcessManager::counterOfObjects" title='G4ProcessManager::counterOfObjects' data-ref="G4ProcessManager::counterOfObjects">counterOfObjects</dfn>;</td></tr>
+<tr><th id="367">367</th><td>};</td></tr>
+<tr><th id="368">368</th><td><u>#include <a href="G4ProcessManager.icc.html">"G4ProcessManager.icc"</a></u></td></tr>
+<tr><th id="369">369</th><td></td></tr>
+<tr><th id="370">370</th><td><u>#<span data-ppcond="68">endif</span></u></td></tr>
+<tr><th id="371">371</th><td></td></tr>
+<tr><th id="372">372</th><td></td></tr>
+</table><hr/><p id='footer'>
+Generated while processing <a href='../../../error_propagation/src/G4ErrorPhysicsList.cc.html'>codebrowser/source/error_propagation/src/G4ErrorPhysicsList.cc</a><br/>Generated on <em>2019-Aug-28</em> from project codebrowser<br />Powered by <a href='https://woboq.com'><img alt='Woboq' src='https://code.woboq.org/woboq-16.png' width='41' height='16' /></a> <a href='https://code.woboq.org'>Code Browser</a> 2.1
+<br/>Generator usage only permitted with license.</p>
+</div></body></html>

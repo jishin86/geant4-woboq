@@ -1,0 +1,219 @@
+<!doctype html>
+<html>
+<head>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"><title>G4CascadeParameters.cc source code [codebrowser/source/processes/hadronic/models/cascade/cascade/src/G4CascadeParameters.cc] - Woboq Code Browser</title>
+<link rel="stylesheet" href="../../../../../../../../../data/qtcreator.css" title="QtCreator"/>
+<link rel="alternate stylesheet" href="../../../../../../../../../data/kdevelop.css" title="KDevelop"/>
+<script type="text/javascript" src="../../../../../../../../../data/jquery/jquery.min.js"></script>
+<script type="text/javascript" src="../../../../../../../../../data/jquery/jquery-ui.min.js"></script>
+<script>var file = 'codebrowser/source/processes/hadronic/models/cascade/cascade/src/G4CascadeParameters.cc'; var root_path = '../../../../../../../..'; var data_path = '../../../../../../../../../data';</script>
+<script src='../../../../../../../../../data/codebrowser.js'></script>
+</head>
+<body><div id='header'><h1 id='breadcrumb'><span>Browse the source code of </span><a href='../../../../../../..'>codebrowser</a>/<a href='../../../../../..'>source</a>/<a href='../../../../..'>processes</a>/<a href='../../../..'>hadronic</a>/<a href='../../..'>models</a>/<a href='../..'>cascade</a>/<a href='..'>cascade</a>/<a href='./'>src</a>/<a href='G4CascadeParameters.cc.html'>G4CascadeParameters.cc</a></h1></div>
+<hr/><div id='content'><table class="code">
+<tr><th id="1">1</th><td><i>//</i></td></tr>
+<tr><th id="2">2</th><td><i>// ********************************************************************</i></td></tr>
+<tr><th id="3">3</th><td><i>// * License and Disclaimer                                           *</i></td></tr>
+<tr><th id="4">4</th><td><i>// *                                                                  *</i></td></tr>
+<tr><th id="5">5</th><td><i>// * The  Geant4 software  is  copyright of the Copyright Holders  of *</i></td></tr>
+<tr><th id="6">6</th><td><i>// * the Geant4 Collaboration.  It is provided  under  the terms  and *</i></td></tr>
+<tr><th id="7">7</th><td><i>// * conditions of the Geant4 Software License,  included in the file *</i></td></tr>
+<tr><th id="8">8</th><td><i>// * LICENSE and available at  <a href="http://cern.ch/geant4/license">http://cern.ch/geant4/license</a> .  These *</i></td></tr>
+<tr><th id="9">9</th><td><i>// * include a list of copyright holders.                             *</i></td></tr>
+<tr><th id="10">10</th><td><i>// *                                                                  *</i></td></tr>
+<tr><th id="11">11</th><td><i>// * Neither the authors of this software system, nor their employing *</i></td></tr>
+<tr><th id="12">12</th><td><i>// * institutes,nor the agencies providing financial support for this *</i></td></tr>
+<tr><th id="13">13</th><td><i>// * work  make  any representation or  warranty, express or implied, *</i></td></tr>
+<tr><th id="14">14</th><td><i>// * regarding  this  software system or assume any liability for its *</i></td></tr>
+<tr><th id="15">15</th><td><i>// * use.  Please see the license in the file  LICENSE  and URL above *</i></td></tr>
+<tr><th id="16">16</th><td><i>// * for the full disclaimer and the limitation of liability.         *</i></td></tr>
+<tr><th id="17">17</th><td><i>// *                                                                  *</i></td></tr>
+<tr><th id="18">18</th><td><i>// * This  code  implementation is the result of  the  scientific and *</i></td></tr>
+<tr><th id="19">19</th><td><i>// * technical work of the GEANT4 collaboration.                      *</i></td></tr>
+<tr><th id="20">20</th><td><i>// * By using,  copying,  modifying or  distributing the software (or *</i></td></tr>
+<tr><th id="21">21</th><td><i>// * any work based  on the software)  you  agree  to acknowledge its *</i></td></tr>
+<tr><th id="22">22</th><td><i>// * use  in  resulting  scientific  publications,  and indicate your *</i></td></tr>
+<tr><th id="23">23</th><td><i>// * acceptance of all terms of the Geant4 Software license.          *</i></td></tr>
+<tr><th id="24">24</th><td><i>// ********************************************************************</i></td></tr>
+<tr><th id="25">25</th><td><i>//</i></td></tr>
+<tr><th id="26">26</th><td><i>// Encapsulate all user-configurable parameters with associated envvars</i></td></tr>
+<tr><th id="27">27</th><td><i>//</i></td></tr>
+<tr><th id="28">28</th><td><i>// 20120912  M. Kelsey -- Add interface to support UI commands</i></td></tr>
+<tr><th id="29">29</th><td><i>// 20130304  M. Kelsey -- Add flag to collect and display cascade structure</i></td></tr>
+<tr><th id="30">30</th><td><i>// 20130308  M. Kelsey -- Add flag to use separate 3-body momentum generators</i></td></tr>
+<tr><th id="31">31</th><td><i>// 20130421  M. Kelsey -- Add flag for CHECK_ECONS, replacing #ifdef's</i></td></tr>
+<tr><th id="32">32</th><td><i>// 20130702  M. Kelsey -- Add flag to use N-body phase-space generator</i></td></tr>
+<tr><th id="33">33</th><td><i>// 20140311  G. Cosmo -- Implement standard (non-const) singleton pattern</i></td></tr>
+<tr><th id="34">34</th><td><i>// 20140929  M. Kelsey -- Enable some parameters as default true (must be set</i></td></tr>
+<tr><th id="35">35</th><td><i>//		'0' for false): PreCompound, phase-space, clustering,</i></td></tr>
+<tr><th id="36">36</th><td><i>//		trailing effect</i></td></tr>
+<tr><th id="37">37</th><td><i>// 20141111  M. Kelsey -- Revert defaults for PreCompound, phase-space,</i></td></tr>
+<tr><th id="38">38</th><td><i>//		and trailing effect.</i></td></tr>
+<tr><th id="39">39</th><td><i>// 20141121  Use G4AutoDelete to avoid end-of-thread memory leaks</i></td></tr>
+<tr><th id="40">40</th><td><i>// 20141211  M. Kelsey -- Change PIN_ABSORPTION flag to double, for energy cut</i></td></tr>
+<tr><th id="41">41</th><td></td></tr>
+<tr><th id="42">42</th><td><u>#include <a href="../include/G4CascadeParameters.hh.html">"G4CascadeParameters.hh"</a></u></td></tr>
+<tr><th id="43">43</th><td><u>#include <a href="../include/G4CascadeParamMessenger.hh.html">"G4CascadeParamMessenger.hh"</a></u></td></tr>
+<tr><th id="44">44</th><td><u>#include <a href="../../../../../../global/management/include/G4AutoDelete.hh.html">"G4AutoDelete.hh"</a></u></td></tr>
+<tr><th id="45">45</th><td><u>#include &lt;stdlib.h&gt;</u></td></tr>
+<tr><th id="46">46</th><td><u>#include &lt;iostream&gt;</u></td></tr>
+<tr><th id="47">47</th><td><b>using</b> std::endl;</td></tr>
+<tr><th id="48">48</th><td></td></tr>
+<tr><th id="49">49</th><td><u>#define <dfn class="macro" id="_M/OLD_RADIUS_UNITS" data-ref="_M/OLD_RADIUS_UNITS">OLD_RADIUS_UNITS</dfn> (3.3836/1.2)		// Used with NucModel params</u></td></tr>
+<tr><th id="50">50</th><td></td></tr>
+<tr><th id="51">51</th><td><u>#include <a href="../../../../util/include/G4HadronicDeveloperParameters.hh.html">"G4HadronicDeveloperParameters.hh"</a></u></td></tr>
+<tr><th id="52">52</th><td><b>namespace</b> { </td></tr>
+<tr><th id="53">53</th><td>   <a class="type" href="../../../../util/include/G4HadronicDeveloperParameters.hh.html#G4HadronicDeveloperParameters" title='G4HadronicDeveloperParameters' data-ref="G4HadronicDeveloperParameters">G4HadronicDeveloperParameters</a>&amp; <dfn class="tu decl def" id="(anonymousnamespace)::HDP" title='(anonymous namespace)::HDP' data-type='G4HadronicDeveloperParameters &amp;' data-ref="(anonymousnamespace)::HDP">HDP</dfn> = <a class="type" href="../../../../util/include/G4HadronicDeveloperParameters.hh.html#G4HadronicDeveloperParameters" title='G4HadronicDeveloperParameters' data-ref="G4HadronicDeveloperParameters">G4HadronicDeveloperParameters</a>::<a class="ref" href="../../../../util/include/G4HadronicDeveloperParameters.hh.html#_ZN29G4HadronicDeveloperParameters11GetInstanceEv" title='G4HadronicDeveloperParameters::GetInstance' data-ref="_ZN29G4HadronicDeveloperParameters11GetInstanceEv">GetInstance</a>();</td></tr>
+<tr><th id="54">54</th><td>   <b>class</b> <dfn class="tu type def" id="(anonymousnamespace)::BERTParameters" title='(anonymous namespace)::BERTParameters' data-ref="(anonymousnamespace)::BERTParameters">BERTParameters</dfn> {</td></tr>
+<tr><th id="55">55</th><td>      <b>public</b>: </td></tr>
+<tr><th id="56">56</th><td>         <dfn class="tu decl def" id="_ZN12_GLOBAL__N_114BERTParametersC1Ev" title='(anonymous namespace)::BERTParameters::BERTParameters' data-type='void (anonymous namespace)::BERTParameters::BERTParameters()' data-ref="_ZN12_GLOBAL__N_114BERTParametersC1Ev">BERTParameters</dfn>(){</td></tr>
+<tr><th id="57">57</th><td>            <i>//HDP.SetDefault("NAME",VALUE,LOWER_LIMIT(default=-DBL_MAX),UPPER_LIMIT(default=DBL_MAX));</i></td></tr>
+<tr><th id="58">58</th><td>            HDP.SetDefault( <q>"BERT_FERMI_SCALE"</q> , <var>1.932</var>/<a class="macro" href="#49" title="(3.3836/1.2)" data-ref="_M/OLD_RADIUS_UNITS">OLD_RADIUS_UNITS</a> , <var>1.932</var>/<a class="macro" href="#49" title="(3.3836/1.2)" data-ref="_M/OLD_RADIUS_UNITS">OLD_RADIUS_UNITS</a>/<var>2</var> , <var>1.932</var>/<a class="macro" href="#49" title="(3.3836/1.2)" data-ref="_M/OLD_RADIUS_UNITS">OLD_RADIUS_UNITS</a>*<var>2</var> );</td></tr>
+<tr><th id="59">59</th><td>            HDP.SetDefault( <q>"BERT_RADIUS_SCALE"</q> , <a class="macro" href="#49" title="(3.3836/1.2)" data-ref="_M/OLD_RADIUS_UNITS">OLD_RADIUS_UNITS</a> , <a class="macro" href="#49" title="(3.3836/1.2)" data-ref="_M/OLD_RADIUS_UNITS">OLD_RADIUS_UNITS</a>/<var>2</var> , <a class="macro" href="#49" title="(3.3836/1.2)" data-ref="_M/OLD_RADIUS_UNITS">OLD_RADIUS_UNITS</a>*<var>2</var> );</td></tr>
+<tr><th id="60">60</th><td>            HDP.SetDefault( <q>"BERT_RAD_TRAILING"</q> , <var>0.</var> , <var>0.</var> , <var>2.</var> );</td></tr>
+<tr><th id="61">61</th><td>            HDP.SetDefault( <q>"BERT_XSEC_SCALE"</q> , <var>1.0</var> , <var>0.5</var> , <var>2.</var> );</td></tr>
+<tr><th id="62">62</th><td>         }</td></tr>
+<tr><th id="63">63</th><td>   };</td></tr>
+<tr><th id="64">64</th><td>   <a class="tu type" href="#(anonymousnamespace)::BERTParameters" title='(anonymous namespace)::BERTParameters' data-ref="(anonymousnamespace)::BERTParameters">BERTParameters</a> <a class="tu ref fake" href="#_ZN12_GLOBAL__N_114BERTParametersC1Ev" title='(anonymous namespace)::BERTParameters::BERTParameters' data-use='c' data-ref="_ZN12_GLOBAL__N_114BERTParametersC1Ev"></a><dfn class="tu decl def" id="(anonymousnamespace)::BP" title='(anonymous namespace)::BP' data-type='(anonymous namespace)::BERTParameters' data-ref="(anonymousnamespace)::BP">BP</dfn>;</td></tr>
+<tr><th id="65">65</th><td>}</td></tr>
+<tr><th id="66">66</th><td></td></tr>
+<tr><th id="67">67</th><td></td></tr>
+<tr><th id="68">68</th><td><i>// Singleton accessor</i></td></tr>
+<tr><th id="69">69</th><td></td></tr>
+<tr><th id="70">70</th><td><a class="type" href="../include/G4CascadeParameters.hh.html#G4CascadeParameters" title='G4CascadeParameters' data-ref="G4CascadeParameters">G4CascadeParameters</a>* <a class="type" href="../include/G4CascadeParameters.hh.html#G4CascadeParameters" title='G4CascadeParameters' data-ref="G4CascadeParameters">G4CascadeParameters</a>::<dfn class="decl def" id="G4CascadeParameters::fpInstance" title='G4CascadeParameters::fpInstance' data-ref="G4CascadeParameters::fpInstance">fpInstance</dfn> = <var>0</var>;</td></tr>
+<tr><th id="71">71</th><td></td></tr>
+<tr><th id="72">72</th><td><em>const</em> <a class="type" href="../include/G4CascadeParameters.hh.html#G4CascadeParameters" title='G4CascadeParameters' data-ref="G4CascadeParameters">G4CascadeParameters</a>* <a class="type" href="../include/G4CascadeParameters.hh.html#G4CascadeParameters" title='G4CascadeParameters' data-ref="G4CascadeParameters">G4CascadeParameters</a>::<dfn class="decl def" id="_ZN19G4CascadeParameters8InstanceEv" title='G4CascadeParameters::Instance' data-ref="_ZN19G4CascadeParameters8InstanceEv">Instance</dfn>() {</td></tr>
+<tr><th id="73">73</th><td>  <b>if</b> (!<a class="member" href="../include/G4CascadeParameters.hh.html#G4CascadeParameters::fpInstance" title='G4CascadeParameters::fpInstance' data-ref="G4CascadeParameters::fpInstance">fpInstance</a>) {</td></tr>
+<tr><th id="74">74</th><td>    <a class="member" href="../include/G4CascadeParameters.hh.html#G4CascadeParameters::fpInstance" title='G4CascadeParameters::fpInstance' data-ref="G4CascadeParameters::fpInstance">fpInstance</a> = <b>new</b> <a class="ref fake" href="#_ZN19G4CascadeParametersC1Ev" title='G4CascadeParameters::G4CascadeParameters' data-ref="_ZN19G4CascadeParametersC1Ev"></a><a class="type" href="../include/G4CascadeParameters.hh.html#G4CascadeParameters" title='G4CascadeParameters' data-ref="G4CascadeParameters">G4CascadeParameters</a>;</td></tr>
+<tr><th id="75">75</th><td>    <span class='error' title="use of undeclared identifier &apos;G4AutoDelete&apos;">G4AutoDelete</span>::Register(<dfn class="local col9 decl" id="19fpInstance" title='fpInstance' data-type='int' data-ref="19fpInstance">fpInstance</dfn>);</td></tr>
+<tr><th id="76">76</th><td>  }</td></tr>
+<tr><th id="77">77</th><td></td></tr>
+<tr><th id="78">78</th><td>  <b>return</b> <a class="member" href="../include/G4CascadeParameters.hh.html#G4CascadeParameters::fpInstance" title='G4CascadeParameters::fpInstance' data-ref="G4CascadeParameters::fpInstance">fpInstance</a>;</td></tr>
+<tr><th id="79">79</th><td>}</td></tr>
+<tr><th id="80">80</th><td></td></tr>
+<tr><th id="81">81</th><td></td></tr>
+<tr><th id="82">82</th><td><i>// Constructor initializes everything once</i></td></tr>
+<tr><th id="83">83</th><td><i></i></td></tr>
+<tr><th id="84">84</th><td><i>//#define OLD_RADIUS_UNITS (3.3836/1.2)		// Used with NucModel params</i></td></tr>
+<tr><th id="85">85</th><td></td></tr>
+<tr><th id="86">86</th><td><a class="type" href="../include/G4CascadeParameters.hh.html#G4CascadeParameters" title='G4CascadeParameters' data-ref="G4CascadeParameters">G4CascadeParameters</a>::<dfn class="decl def" id="_ZN19G4CascadeParametersC1Ev" title='G4CascadeParameters::G4CascadeParameters' data-ref="_ZN19G4CascadeParametersC1Ev">G4CascadeParameters</dfn>()</td></tr>
+<tr><th id="87">87</th><td>  : G4CASCADE_VERBOSE(<span class='error' title="use of undeclared identifier &apos;getenv&apos;">getenv</span>(<q>"G4CASCADE_VERBOSE"</q>)),</td></tr>
+<tr><th id="88">88</th><td>    G4CASCADE_CHECK_ECONS(<span class='error' title="use of undeclared identifier &apos;getenv&apos;">getenv</span>(<q>"G4CASCADE_CHECK_ECONS"</q>)),</td></tr>
+<tr><th id="89">89</th><td>    G4CASCADE_USE_PRECOMPOUND(<span class='error' title="use of undeclared identifier &apos;getenv&apos;">getenv</span>(<q>"G4CASCADE_USE_PRECOMPOUND"</q>)),</td></tr>
+<tr><th id="90">90</th><td>    G4CASCADE_DO_COALESCENCE(<span class='error' title="use of undeclared identifier &apos;getenv&apos;">getenv</span>(<q>"G4CASCADE_DO_COALESCENCE"</q>)),</td></tr>
+<tr><th id="91">91</th><td>    G4CASCADE_SHOW_HISTORY(<span class='error' title="use of undeclared identifier &apos;getenv&apos;">getenv</span>(<q>"G4CASCADE_SHOW_HISTORY"</q>)),</td></tr>
+<tr><th id="92">92</th><td>    G4CASCADE_USE_3BODYMOM(<span class='error' title="use of undeclared identifier &apos;getenv&apos;">getenv</span>(<q>"G4CASCADE_USE_3BODYMOM"</q>)),</td></tr>
+<tr><th id="93">93</th><td>    G4CASCADE_USE_PHASESPACE(<span class='error' title="use of undeclared identifier &apos;getenv&apos;">getenv</span>(<q>"G4CASCADE_USE_PHASESPACE"</q>)),</td></tr>
+<tr><th id="94">94</th><td>    G4CASCADE_PIN_ABSORPTION(<span class='error' title="use of undeclared identifier &apos;getenv&apos;">getenv</span>(<q>"G4CASCADE_PIN_ABSORPTION"</q>)),</td></tr>
+<tr><th id="95">95</th><td>    G4CASCADE_RANDOM_FILE(<span class='error' title="use of undeclared identifier &apos;getenv&apos;">getenv</span>(<q>"G4CASCADE_RANDOM_FILE"</q>)),</td></tr>
+<tr><th id="96">96</th><td>    G4NUCMODEL_USE_BEST(<span class='error' title="use of undeclared identifier &apos;getenv&apos;">getenv</span>(<q>"G4NUCMODEL_USE_BEST"</q>)),</td></tr>
+<tr><th id="97">97</th><td>    G4NUCMODEL_RAD_2PAR(<span class='error' title="use of undeclared identifier &apos;getenv&apos;">getenv</span>(<q>"G4NUCMODEL_RAD_2PAR"</q>)),</td></tr>
+<tr><th id="98">98</th><td>    G4NUCMODEL_RAD_SCALE(<span class='error' title="use of undeclared identifier &apos;getenv&apos;">getenv</span>(<q>"G4NUCMODEL_RAD_SCALE"</q>)),</td></tr>
+<tr><th id="99">99</th><td>    G4NUCMODEL_RAD_SMALL(<span class='error' title="use of undeclared identifier &apos;getenv&apos;">getenv</span>(<q>"G4NUCMODEL_RAD_SMALL"</q>)),</td></tr>
+<tr><th id="100">100</th><td>    G4NUCMODEL_RAD_ALPHA(<span class='error' title="use of undeclared identifier &apos;getenv&apos;">getenv</span>(<q>"G4NUCMODEL_RAD_ALPHA"</q>)),</td></tr>
+<tr><th id="101">101</th><td>    G4NUCMODEL_RAD_TRAILING(<span class='error' title="use of undeclared identifier &apos;getenv&apos;">getenv</span>(<q>"G4NUCMODEL_RAD_TRAILING"</q>)),</td></tr>
+<tr><th id="102">102</th><td>    G4NUCMODEL_FERMI_SCALE(<span class='error' title="use of undeclared identifier &apos;getenv&apos;">getenv</span>(<q>"G4NUCMODEL_FERMI_SCALE"</q>)),</td></tr>
+<tr><th id="103">103</th><td>    G4NUCMODEL_XSEC_SCALE(<span class='error' title="use of undeclared identifier &apos;getenv&apos;">getenv</span>(<q>"G4NUCMODEL_XSEC_SCALE"</q>)),</td></tr>
+<tr><th id="104">104</th><td>    G4NUCMODEL_GAMMAQD(<span class='error' title="use of undeclared identifier &apos;getenv&apos;">getenv</span>(<q>"G4NUCMODEL_GAMMAQD"</q>)),</td></tr>
+<tr><th id="105">105</th><td>    DPMAX_2CLUSTER(<span class='error' title="use of undeclared identifier &apos;getenv&apos;">getenv</span>(<q>"DPMAX_2CLUSTER"</q>)),</td></tr>
+<tr><th id="106">106</th><td>    DPMAX_3CLUSTER(<span class='error' title="use of undeclared identifier &apos;getenv&apos;">getenv</span>(<q>"DPMAX_3CLUSTER"</q>)),</td></tr>
+<tr><th id="107">107</th><td>    DPMAX_4CLUSTER(<span class='error' title="use of undeclared identifier &apos;getenv&apos;">getenv</span>(<q>"DPMAX_4CLUSTER"</q>)),</td></tr>
+<tr><th id="108">108</th><td>    <a class="member" href="../include/G4CascadeParameters.hh.html#G4CascadeParameters::messenger" title='G4CascadeParameters::messenger' data-ref="G4CascadeParameters::messenger">messenger</a>(<var>0</var>) {</td></tr>
+<tr><th id="109">109</th><td>  <a class="member" href="../include/G4CascadeParameters.hh.html#G4CascadeParameters::messenger" title='G4CascadeParameters::messenger' data-ref="G4CascadeParameters::messenger">messenger</a> = <b>new</b> <a class="type" href="../include/G4CascadeParamMessenger.hh.html#G4CascadeParamMessenger" title='G4CascadeParamMessenger' data-ref="G4CascadeParamMessenger">G4CascadeParamMessenger</a><a class="ref" href="../include/G4CascadeParamMessenger.hh.html#_ZN23G4CascadeParamMessengerC1EP19G4CascadeParameters" title='G4CascadeParamMessenger::G4CascadeParamMessenger' data-ref="_ZN23G4CascadeParamMessengerC1EP19G4CascadeParameters">(</a><b>this</b>);</td></tr>
+<tr><th id="110">110</th><td>  <a class="member" href="#_ZN19G4CascadeParameters10InitializeEv" title='G4CascadeParameters::Initialize' data-ref="_ZN19G4CascadeParameters10InitializeEv">Initialize</a>();</td></tr>
+<tr><th id="111">111</th><td>}</td></tr>
+<tr><th id="112">112</th><td></td></tr>
+<tr><th id="113">113</th><td><em>void</em> <a class="type" href="../include/G4CascadeParameters.hh.html#G4CascadeParameters" title='G4CascadeParameters' data-ref="G4CascadeParameters">G4CascadeParameters</a>::<dfn class="decl def" id="_ZN19G4CascadeParameters10InitializeEv" title='G4CascadeParameters::Initialize' data-ref="_ZN19G4CascadeParameters10InitializeEv">Initialize</dfn>() {</td></tr>
+<tr><th id="114">114</th><td>  VERBOSE_LEVEL = (G4CASCADE_VERBOSE ? <span class='error' title="use of undeclared identifier &apos;atoi&apos;">atoi</span>(G4CASCADE_VERBOSE) : <var>0</var>);</td></tr>
+<tr><th id="115">115</th><td>  <a class="member" href="../include/G4CascadeParameters.hh.html#G4CascadeParameters::CHECK_ECONS" title='G4CascadeParameters::CHECK_ECONS' data-ref="G4CascadeParameters::CHECK_ECONS">CHECK_ECONS</a> = (<var>0</var>!=<a class="member" href="../include/G4CascadeParameters.hh.html#G4CascadeParameters::G4CASCADE_CHECK_ECONS" title='G4CascadeParameters::G4CASCADE_CHECK_ECONS' data-ref="G4CascadeParameters::G4CASCADE_CHECK_ECONS">G4CASCADE_CHECK_ECONS</a>);</td></tr>
+<tr><th id="116">116</th><td>  <a class="member" href="../include/G4CascadeParameters.hh.html#G4CascadeParameters::USE_PRECOMPOUND" title='G4CascadeParameters::USE_PRECOMPOUND' data-ref="G4CascadeParameters::USE_PRECOMPOUND">USE_PRECOMPOUND</a> = (<var>0</var>!=<a class="member" href="../include/G4CascadeParameters.hh.html#G4CascadeParameters::G4CASCADE_USE_PRECOMPOUND" title='G4CascadeParameters::G4CASCADE_USE_PRECOMPOUND' data-ref="G4CascadeParameters::G4CASCADE_USE_PRECOMPOUND">G4CASCADE_USE_PRECOMPOUND</a> &amp;&amp;</td></tr>
+<tr><th id="117">117</th><td>		     <a class="member" href="../include/G4CascadeParameters.hh.html#G4CascadeParameters::G4CASCADE_USE_PRECOMPOUND" title='G4CascadeParameters::G4CASCADE_USE_PRECOMPOUND' data-ref="G4CascadeParameters::G4CASCADE_USE_PRECOMPOUND">G4CASCADE_USE_PRECOMPOUND</a>[<var>0</var>]!=<kbd>'0'</kbd>);</td></tr>
+<tr><th id="118">118</th><td>  <a class="member" href="../include/G4CascadeParameters.hh.html#G4CascadeParameters::DO_COALESCENCE" title='G4CascadeParameters::DO_COALESCENCE' data-ref="G4CascadeParameters::DO_COALESCENCE">DO_COALESCENCE</a> = (<var>0</var>==<a class="member" href="../include/G4CascadeParameters.hh.html#G4CascadeParameters::G4CASCADE_DO_COALESCENCE" title='G4CascadeParameters::G4CASCADE_DO_COALESCENCE' data-ref="G4CascadeParameters::G4CASCADE_DO_COALESCENCE">G4CASCADE_DO_COALESCENCE</a> ||</td></tr>
+<tr><th id="119">119</th><td>		    <a class="member" href="../include/G4CascadeParameters.hh.html#G4CascadeParameters::G4CASCADE_DO_COALESCENCE" title='G4CascadeParameters::G4CASCADE_DO_COALESCENCE' data-ref="G4CascadeParameters::G4CASCADE_DO_COALESCENCE">G4CASCADE_DO_COALESCENCE</a>[<var>0</var>]!=<kbd>'0'</kbd>);</td></tr>
+<tr><th id="120">120</th><td>  <a class="member" href="../include/G4CascadeParameters.hh.html#G4CascadeParameters::SHOW_HISTORY" title='G4CascadeParameters::SHOW_HISTORY' data-ref="G4CascadeParameters::SHOW_HISTORY">SHOW_HISTORY</a> = (<var>0</var>!=<a class="member" href="../include/G4CascadeParameters.hh.html#G4CascadeParameters::G4CASCADE_SHOW_HISTORY" title='G4CascadeParameters::G4CASCADE_SHOW_HISTORY' data-ref="G4CascadeParameters::G4CASCADE_SHOW_HISTORY">G4CASCADE_SHOW_HISTORY</a>);</td></tr>
+<tr><th id="121">121</th><td>  <a class="member" href="../include/G4CascadeParameters.hh.html#G4CascadeParameters::USE_3BODYMOM" title='G4CascadeParameters::USE_3BODYMOM' data-ref="G4CascadeParameters::USE_3BODYMOM">USE_3BODYMOM</a> = (<var>0</var>!=<a class="member" href="../include/G4CascadeParameters.hh.html#G4CascadeParameters::G4CASCADE_USE_3BODYMOM" title='G4CascadeParameters::G4CASCADE_USE_3BODYMOM' data-ref="G4CascadeParameters::G4CASCADE_USE_3BODYMOM">G4CASCADE_USE_3BODYMOM</a>);</td></tr>
+<tr><th id="122">122</th><td>  <a class="member" href="../include/G4CascadeParameters.hh.html#G4CascadeParameters::USE_PHASESPACE" title='G4CascadeParameters::USE_PHASESPACE' data-ref="G4CascadeParameters::USE_PHASESPACE">USE_PHASESPACE</a> = (<var>0</var>!=<a class="member" href="../include/G4CascadeParameters.hh.html#G4CascadeParameters::G4CASCADE_USE_PHASESPACE" title='G4CascadeParameters::G4CASCADE_USE_PHASESPACE' data-ref="G4CascadeParameters::G4CASCADE_USE_PHASESPACE">G4CASCADE_USE_PHASESPACE</a> &amp;&amp;</td></tr>
+<tr><th id="123">123</th><td>		    <a class="member" href="../include/G4CascadeParameters.hh.html#G4CascadeParameters::G4CASCADE_USE_PHASESPACE" title='G4CascadeParameters::G4CASCADE_USE_PHASESPACE' data-ref="G4CascadeParameters::G4CASCADE_USE_PHASESPACE">G4CASCADE_USE_PHASESPACE</a>[<var>0</var>]!=<kbd>'0'</kbd>);</td></tr>
+<tr><th id="124">124</th><td>  PIN_ABSORPTION = (G4CASCADE_PIN_ABSORPTION ? <span class='error' title="use of undeclared identifier &apos;strtod&apos;">strtod</span>(G4CASCADE_PIN_ABSORPTION,<var>0</var>)</td></tr>
+<tr><th id="125">125</th><td>		    : <var>0.</var>);</td></tr>
+<tr><th id="126">126</th><td>  <a class="member" href="../include/G4CascadeParameters.hh.html#G4CascadeParameters::RANDOM_FILE" title='G4CascadeParameters::RANDOM_FILE' data-ref="G4CascadeParameters::RANDOM_FILE">RANDOM_FILE</a> <a class="ref" href="../../../../../../global/management/include/G4String.hh.html#_ZN8G4StringaSEPKc" title='G4String::operator=' data-ref="_ZN8G4StringaSEPKc">=</a> (<a class="member" href="../include/G4CascadeParameters.hh.html#G4CascadeParameters::G4CASCADE_RANDOM_FILE" title='G4CascadeParameters::G4CASCADE_RANDOM_FILE' data-ref="G4CascadeParameters::G4CASCADE_RANDOM_FILE">G4CASCADE_RANDOM_FILE</a> ? <a class="member" href="../include/G4CascadeParameters.hh.html#G4CascadeParameters::G4CASCADE_RANDOM_FILE" title='G4CascadeParameters::G4CASCADE_RANDOM_FILE' data-ref="G4CascadeParameters::G4CASCADE_RANDOM_FILE">G4CASCADE_RANDOM_FILE</a> : <q>""</q>);</td></tr>
+<tr><th id="127">127</th><td>  <a class="member" href="../include/G4CascadeParameters.hh.html#G4CascadeParameters::BEST_PAR" title='G4CascadeParameters::BEST_PAR' data-ref="G4CascadeParameters::BEST_PAR">BEST_PAR</a> = (<var>0</var>!=<a class="member" href="../include/G4CascadeParameters.hh.html#G4CascadeParameters::G4NUCMODEL_USE_BEST" title='G4CascadeParameters::G4NUCMODEL_USE_BEST' data-ref="G4CascadeParameters::G4NUCMODEL_USE_BEST">G4NUCMODEL_USE_BEST</a>);</td></tr>
+<tr><th id="128">128</th><td>  <a class="member" href="../include/G4CascadeParameters.hh.html#G4CascadeParameters::TWOPARAM_RADIUS" title='G4CascadeParameters::TWOPARAM_RADIUS' data-ref="G4CascadeParameters::TWOPARAM_RADIUS">TWOPARAM_RADIUS</a> = (<var>0</var>!=<a class="member" href="../include/G4CascadeParameters.hh.html#G4CascadeParameters::G4NUCMODEL_RAD_2PAR" title='G4CascadeParameters::G4NUCMODEL_RAD_2PAR' data-ref="G4CascadeParameters::G4NUCMODEL_RAD_2PAR">G4NUCMODEL_RAD_2PAR</a>); <i>// &amp;&amp; G4NUCMODEL_RAD_2PAR[0]!='0');</i></td></tr>
+<tr><th id="129">129</th><td>  RADIUS_SCALE = (G4NUCMODEL_RAD_SCALE ? <span class='error' title="use of undeclared identifier &apos;strtod&apos;">strtod</span>(G4NUCMODEL_RAD_SCALE,<var>0</var>)</td></tr>
+<tr><th id="130">130</th><td>  		  : (BEST_PAR?<var>1.0</var>:<a class="macro" href="#49" title="(3.3836/1.2)" data-ref="_M/OLD_RADIUS_UNITS">OLD_RADIUS_UNITS</a>));</td></tr>
+<tr><th id="131">131</th><td>  <b>if</b> ( G4NUCMODEL_RAD_SCALE == <var>0</var> &amp;&amp; BEST_PAR == <var>0</var> ) HDP.DeveloperGet(<q>"BERT_RADIUS_SCALE"</q>,RADIUS_SCALE);</td></tr>
+<tr><th id="132">132</th><td>  RADIUS_SMALL = ((G4NUCMODEL_RAD_SMALL ? <span class='error' title="use of undeclared identifier &apos;strtod&apos;">strtod</span>(G4NUCMODEL_RAD_SMALL,<var>0</var>)</td></tr>
+<tr><th id="133">133</th><td>		   : (BEST_PAR?<var>1.992</var>:(<var>8.0</var>/<a class="macro" href="#49" title="(3.3836/1.2)" data-ref="_M/OLD_RADIUS_UNITS">OLD_RADIUS_UNITS</a>))) * RADIUS_SCALE);</td></tr>
+<tr><th id="134">134</th><td>  RADIUS_ALPHA = (G4NUCMODEL_RAD_ALPHA ? <span class='error' title="use of undeclared identifier &apos;strtod&apos;">strtod</span>(G4NUCMODEL_RAD_ALPHA,<var>0</var>)</td></tr>
+<tr><th id="135">135</th><td>		  : (BEST_PAR?<var>0.84</var>:<var>0.70</var>));</td></tr>
+<tr><th id="136">136</th><td>  RADIUS_TRAILING = ((G4NUCMODEL_RAD_TRAILING ? <span class='error' title="use of undeclared identifier &apos;strtod&apos;">strtod</span>(G4NUCMODEL_RAD_TRAILING,<var>0</var>)</td></tr>
+<tr><th id="137">137</th><td>		      : <var>0.</var>) * RADIUS_SCALE);</td></tr>
+<tr><th id="138">138</th><td>  <b>if</b> ( G4NUCMODEL_RAD_TRAILING == <var>0</var> ) HDP.DeveloperGet(<q>"BERT_RAD_TRAILING"</q>,RADIUS_TRAILING),RADIUS_TRAILING*=RADIUS_SCALE;</td></tr>
+<tr><th id="139">139</th><td>  FERMI_SCALE = ((G4NUCMODEL_FERMI_SCALE ? <span class='error' title="use of undeclared identifier &apos;strtod&apos;">strtod</span>(G4NUCMODEL_FERMI_SCALE,<var>0</var>)</td></tr>
+<tr><th id="140">140</th><td>		  : (BEST_PAR?<var>0.685</var>:(<var>1.932</var>/<a class="macro" href="#49" title="(3.3836/1.2)" data-ref="_M/OLD_RADIUS_UNITS">OLD_RADIUS_UNITS</a>))) * RADIUS_SCALE);</td></tr>
+<tr><th id="141">141</th><td>  <b>if</b> ( G4NUCMODEL_FERMI_SCALE == <var>0</var> &amp;&amp; BEST_PAR == <var>0</var> ) HDP.DeveloperGet(<q>"BERT_FERMI_SCALE"</q>,FERMI_SCALE),FERMI_SCALE*=RADIUS_SCALE;</td></tr>
+<tr><th id="142">142</th><td>  XSEC_SCALE = (G4NUCMODEL_XSEC_SCALE ? <span class='error' title="use of undeclared identifier &apos;strtod&apos;">strtod</span>(G4NUCMODEL_XSEC_SCALE,<var>0</var>)</td></tr>
+<tr><th id="143">143</th><td>  		: (BEST_PAR?<var>0.1</var>:<var>1.0</var>) );</td></tr>
+<tr><th id="144">144</th><td>  <b>if</b> ( G4NUCMODEL_XSEC_SCALE == <var>0</var> &amp;&amp; BEST_PAR == <var>0</var> ) HDP.DeveloperGet(<q>"BERT_XSEC_SCALE"</q>,XSEC_SCALE);</td></tr>
+<tr><th id="145">145</th><td>  GAMMAQD_SCALE = (G4NUCMODEL_GAMMAQD?<span class='error' title="use of undeclared identifier &apos;strtod&apos;">strtod</span>(G4NUCMODEL_GAMMAQD,<var>0</var>):<var>1.</var>);</td></tr>
+<tr><th id="146">146</th><td>  DPMAX_DOUBLET = (DPMAX_2CLUSTER ? <span class='error' title="use of undeclared identifier &apos;strtod&apos;">strtod</span>(DPMAX_2CLUSTER,<var>0</var>) : <var>0.090</var>);</td></tr>
+<tr><th id="147">147</th><td>  DPMAX_TRIPLET = (DPMAX_3CLUSTER ? <span class='error' title="use of undeclared identifier &apos;strtod&apos;">strtod</span>(DPMAX_3CLUSTER,<var>0</var>) : <var>0.108</var>);</td></tr>
+<tr><th id="148">148</th><td>  DPMAX_ALPHA = (DPMAX_4CLUSTER ? <span class='error' title="use of undeclared identifier &apos;strtod&apos;">strtod</span>(DPMAX_4CLUSTER,<var>0</var>) : <var>0.115</var>);</td></tr>
+<tr><th id="149">149</th><td>}</td></tr>
+<tr><th id="150">150</th><td></td></tr>
+<tr><th id="151">151</th><td><a class="type" href="../include/G4CascadeParameters.hh.html#G4CascadeParameters" title='G4CascadeParameters' data-ref="G4CascadeParameters">G4CascadeParameters</a>::<dfn class="decl def" id="_ZN19G4CascadeParametersD1Ev" title='G4CascadeParameters::~G4CascadeParameters' data-ref="_ZN19G4CascadeParametersD1Ev">~G4CascadeParameters</dfn>() {</td></tr>
+<tr><th id="152">152</th><td>  <b>delete</b> <a class="member" href="../include/G4CascadeParameters.hh.html#G4CascadeParameters::messenger" title='G4CascadeParameters::messenger' data-ref="G4CascadeParameters::messenger">messenger</a>;</td></tr>
+<tr><th id="153">153</th><td>}</td></tr>
+<tr><th id="154">154</th><td></td></tr>
+<tr><th id="155">155</th><td></td></tr>
+<tr><th id="156">156</th><td><i>// Report any non-default parameters (used by G4CascadeInterface)</i></td></tr>
+<tr><th id="157">157</th><td></td></tr>
+<tr><th id="158">158</th><td><em>void</em> G4CascadeParameters::DumpConfig(<span class='error' title="use of undeclared identifier &apos;std&apos;">std</span>::ostream&amp; os) <em>const</em> {</td></tr>
+<tr><th id="159">159</th><td>  <b>if</b> (G4CASCADE_VERBOSE)</td></tr>
+<tr><th id="160">160</th><td>    os &lt;&lt; <q>"G4CASCADE_VERBOSE = "</q> &lt;&lt; G4CASCADE_VERBOSE &lt;&lt; <span class='error' title="use of undeclared identifier &apos;endl&apos;">endl</span>;</td></tr>
+<tr><th id="161">161</th><td>  <b>if</b> (G4CASCADE_CHECK_ECONS)</td></tr>
+<tr><th id="162">162</th><td>    os &lt;&lt; <q>"G4CASCADE_CHECK_ECONS = "</q> &lt;&lt; G4CASCADE_CHECK_ECONS &lt;&lt; <span class='error' title="use of undeclared identifier &apos;endl&apos;">endl</span>;</td></tr>
+<tr><th id="163">163</th><td>  <b>if</b> (G4CASCADE_USE_PRECOMPOUND)</td></tr>
+<tr><th id="164">164</th><td>    os &lt;&lt; <q>"G4CASCADE_USE_PRECOMPOUND = "</q> &lt;&lt; G4CASCADE_USE_PRECOMPOUND &lt;&lt; <span class='error' title="use of undeclared identifier &apos;endl&apos;">endl</span>;</td></tr>
+<tr><th id="165">165</th><td>  <b>if</b> (G4CASCADE_DO_COALESCENCE)</td></tr>
+<tr><th id="166">166</th><td>    os &lt;&lt; <q>"G4CASCADE_DO_COALESCENCE = "</q> &lt;&lt; G4CASCADE_DO_COALESCENCE &lt;&lt; <span class='error' title="use of undeclared identifier &apos;endl&apos;">endl</span>;</td></tr>
+<tr><th id="167">167</th><td>  <b>if</b> (G4CASCADE_PIN_ABSORPTION)</td></tr>
+<tr><th id="168">168</th><td>    os &lt;&lt; <q>"G4CASCADE_PIN_ABSORPTION = "</q> &lt;&lt; G4CASCADE_PIN_ABSORPTION &lt;&lt; <span class='error' title="use of undeclared identifier &apos;endl&apos;">endl</span>;</td></tr>
+<tr><th id="169">169</th><td>  <b>if</b> (G4CASCADE_SHOW_HISTORY)</td></tr>
+<tr><th id="170">170</th><td>    os &lt;&lt; <q>"G4CASCADE_SHOW_HISTORY = "</q> &lt;&lt; G4CASCADE_SHOW_HISTORY &lt;&lt; <span class='error' title="use of undeclared identifier &apos;endl&apos;">endl</span>;</td></tr>
+<tr><th id="171">171</th><td>  <b>if</b> (G4CASCADE_USE_3BODYMOM)</td></tr>
+<tr><th id="172">172</th><td>    os &lt;&lt; <q>"G4CASCADE_USE_3BODYMOM = "</q> &lt;&lt; G4CASCADE_USE_3BODYMOM &lt;&lt; <span class='error' title="use of undeclared identifier &apos;endl&apos;">endl</span>;</td></tr>
+<tr><th id="173">173</th><td>  <b>if</b> (G4CASCADE_USE_PHASESPACE)</td></tr>
+<tr><th id="174">174</th><td>    os &lt;&lt; <q>"G4CASCADE_USE_PHASESPACE = "</q> &lt;&lt; G4CASCADE_USE_PHASESPACE &lt;&lt; <span class='error' title="use of undeclared identifier &apos;endl&apos;">endl</span>;</td></tr>
+<tr><th id="175">175</th><td>  <b>if</b> (G4CASCADE_RANDOM_FILE)</td></tr>
+<tr><th id="176">176</th><td>    os &lt;&lt; <q>"G4CASCADE_RANDOM_FILE = "</q> &lt;&lt; G4CASCADE_RANDOM_FILE &lt;&lt; <span class='error' title="use of undeclared identifier &apos;endl&apos;">endl</span>;</td></tr>
+<tr><th id="177">177</th><td>  <b>if</b> (G4NUCMODEL_USE_BEST)</td></tr>
+<tr><th id="178">178</th><td>    os &lt;&lt; <q>"G4NUCMODEL_USE_BEST = "</q> &lt;&lt; G4NUCMODEL_USE_BEST &lt;&lt; <span class='error' title="use of undeclared identifier &apos;endl&apos;">endl</span>;</td></tr>
+<tr><th id="179">179</th><td>  <b>if</b> (G4NUCMODEL_RAD_2PAR)</td></tr>
+<tr><th id="180">180</th><td>    os &lt;&lt; <q>"G4NUCMODEL_RAD_2PAR = "</q> &lt;&lt; G4NUCMODEL_RAD_2PAR &lt;&lt; <span class='error' title="use of undeclared identifier &apos;endl&apos;">endl</span>;</td></tr>
+<tr><th id="181">181</th><td>  <b>if</b> (G4NUCMODEL_RAD_SCALE)</td></tr>
+<tr><th id="182">182</th><td>    os &lt;&lt; <q>"G4NUCMODEL_RAD_SCALE = "</q> &lt;&lt; G4NUCMODEL_RAD_SCALE &lt;&lt; <span class='error' title="use of undeclared identifier &apos;endl&apos;">endl</span>;</td></tr>
+<tr><th id="183">183</th><td>  <b>if</b> (G4NUCMODEL_RAD_SMALL)</td></tr>
+<tr><th id="184">184</th><td>    os &lt;&lt; <q>"G4NUCMODEL_RAD_SMALL = "</q> &lt;&lt; G4NUCMODEL_RAD_SMALL &lt;&lt; <span class='error' title="use of undeclared identifier &apos;endl&apos;">endl</span>;</td></tr>
+<tr><th id="185">185</th><td>  <b>if</b> (G4NUCMODEL_RAD_ALPHA)</td></tr>
+<tr><th id="186">186</th><td>    os &lt;&lt; <q>"G4NUCMODEL_RAD_ALPHA = "</q> &lt;&lt; G4NUCMODEL_RAD_ALPHA &lt;&lt; <span class='error' title="use of undeclared identifier &apos;endl&apos;">endl</span>;</td></tr>
+<tr><th id="187">187</th><td>  <b>if</b> (G4NUCMODEL_RAD_TRAILING)</td></tr>
+<tr><th id="188">188</th><td>    os &lt;&lt; <q>"G4NUCMODEL_RAD_TRAILING = "</q> &lt;&lt; G4NUCMODEL_RAD_TRAILING &lt;&lt; <span class='error' title="use of undeclared identifier &apos;endl&apos;">endl</span>;</td></tr>
+<tr><th id="189">189</th><td>  <b>if</b> (G4NUCMODEL_FERMI_SCALE)</td></tr>
+<tr><th id="190">190</th><td>    os &lt;&lt; <q>"G4NUCMODEL_FERMI_SCALE = "</q> &lt;&lt; G4NUCMODEL_FERMI_SCALE &lt;&lt; <span class='error' title="use of undeclared identifier &apos;endl&apos;">endl</span>;</td></tr>
+<tr><th id="191">191</th><td>  <b>if</b> (G4NUCMODEL_XSEC_SCALE)</td></tr>
+<tr><th id="192">192</th><td>    os &lt;&lt; <q>"G4NUCMODEL_XSEC_SCALE = "</q> &lt;&lt; G4NUCMODEL_XSEC_SCALE &lt;&lt; <span class='error' title="use of undeclared identifier &apos;endl&apos;">endl</span>;</td></tr>
+<tr><th id="193">193</th><td>  <b>if</b> (G4NUCMODEL_GAMMAQD)</td></tr>
+<tr><th id="194">194</th><td>    os &lt;&lt; <q>"G4NUCMODEL_GAMMAQD = "</q> &lt;&lt; G4NUCMODEL_GAMMAQD &lt;&lt; <span class='error' title="use of undeclared identifier &apos;endl&apos;">endl</span>;</td></tr>
+<tr><th id="195">195</th><td>  <b>if</b> (DPMAX_2CLUSTER)</td></tr>
+<tr><th id="196">196</th><td>    os &lt;&lt; <q>"DPMAX_2CLUSTER = "</q> &lt;&lt; DPMAX_2CLUSTER &lt;&lt; <span class='error' title="use of undeclared identifier &apos;endl&apos;">endl</span>;</td></tr>
+<tr><th id="197">197</th><td>  <b>if</b> (DPMAX_3CLUSTER)</td></tr>
+<tr><th id="198">198</th><td>    os &lt;&lt; <q>"DPMAX_3CLUSTER = "</q> &lt;&lt; DPMAX_3CLUSTER &lt;&lt; <span class='error' title="use of undeclared identifier &apos;endl&apos;">endl</span>;</td></tr>
+<tr><th id="199">199</th><td>  <b>if</b> (DPMAX_4CLUSTER)</td></tr>
+<tr><th id="200">200</th><td>    os &lt;&lt; <q>"DPMAX_4CLUSTER = "</q> &lt;&lt; DPMAX_4CLUSTER &lt;&lt; <span class='error' title="use of undeclared identifier &apos;endl&apos;">endl</span>;</td></tr>
+<tr><th id="201">201</th><td>}</td></tr>
+<tr><th id="202">202</th><td></td></tr>
+</table><hr/><p id='footer'>
+Generated on <em>2019-Aug-28</em> from project codebrowser<br />Powered by <a href='https://woboq.com'><img alt='Woboq' src='https://code.woboq.org/woboq-16.png' width='41' height='16' /></a> <a href='https://code.woboq.org'>Code Browser</a> 2.1
+<br/>Generator usage only permitted with license.</p>
+</div></body></html>

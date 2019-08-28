@@ -1,0 +1,578 @@
+<!doctype html>
+<html>
+<head>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"><title>G4ENDFTapeRead.cc source code [codebrowser/source/processes/hadronic/models/particle_hp/src/G4ENDFTapeRead.cc] - Woboq Code Browser</title>
+<link rel="stylesheet" href="../../../../../../../../data/qtcreator.css" title="QtCreator"/>
+<link rel="alternate stylesheet" href="../../../../../../../../data/kdevelop.css" title="KDevelop"/>
+<script type="text/javascript" src="../../../../../../../../data/jquery/jquery.min.js"></script>
+<script type="text/javascript" src="../../../../../../../../data/jquery/jquery-ui.min.js"></script>
+<script>var file = 'codebrowser/source/processes/hadronic/models/particle_hp/src/G4ENDFTapeRead.cc'; var root_path = '../../../../../../..'; var data_path = '../../../../../../../../data';</script>
+<script src='../../../../../../../../data/codebrowser.js'></script>
+</head>
+<body><div id='header'><h1 id='breadcrumb'><span>Browse the source code of </span><a href='../../../../../..'>codebrowser</a>/<a href='../../../../..'>source</a>/<a href='../../../..'>processes</a>/<a href='../../..'>hadronic</a>/<a href='../..'>models</a>/<a href='..'>particle_hp</a>/<a href='./'>src</a>/<a href='G4ENDFTapeRead.cc.html'>G4ENDFTapeRead.cc</a></h1></div>
+<hr/><div id='content'><table class="code">
+<tr><th id="1">1</th><td><i>//</i></td></tr>
+<tr><th id="2">2</th><td><i>// ********************************************************************</i></td></tr>
+<tr><th id="3">3</th><td><i>// * License and Disclaimer                                           *</i></td></tr>
+<tr><th id="4">4</th><td><i>// *                                                                  *</i></td></tr>
+<tr><th id="5">5</th><td><i>// * The  Geant4 software  is  copyright of the Copyright Holders  of *</i></td></tr>
+<tr><th id="6">6</th><td><i>// * the Geant4 Collaboration.  It is provided  under  the terms  and *</i></td></tr>
+<tr><th id="7">7</th><td><i>// * conditions of the Geant4 Software License,  included in the file *</i></td></tr>
+<tr><th id="8">8</th><td><i>// * LICENSE and available at  <a href="http://cern.ch/geant4/license">http://cern.ch/geant4/license</a> .  These *</i></td></tr>
+<tr><th id="9">9</th><td><i>// * include a list of copyright holders.                             *</i></td></tr>
+<tr><th id="10">10</th><td><i>// *                                                                  *</i></td></tr>
+<tr><th id="11">11</th><td><i>// * Neither the authors of this software system, nor their employing *</i></td></tr>
+<tr><th id="12">12</th><td><i>// * institutes,nor the agencies providing financial support for this *</i></td></tr>
+<tr><th id="13">13</th><td><i>// * work  make  any representation or  warranty, express or implied, *</i></td></tr>
+<tr><th id="14">14</th><td><i>// * regarding  this  software system or assume any liability for its *</i></td></tr>
+<tr><th id="15">15</th><td><i>// * use.  Please see the license in the file  LICENSE  and URL above *</i></td></tr>
+<tr><th id="16">16</th><td><i>// * for the full disclaimer and the limitation of liability.         *</i></td></tr>
+<tr><th id="17">17</th><td><i>// *                                                                  *</i></td></tr>
+<tr><th id="18">18</th><td><i>// * This  code  implementation is the result of  the  scientific and *</i></td></tr>
+<tr><th id="19">19</th><td><i>// * technical work of the GEANT4 collaboration.                      *</i></td></tr>
+<tr><th id="20">20</th><td><i>// * By using,  copying,  modifying or  distributing the software (or *</i></td></tr>
+<tr><th id="21">21</th><td><i>// * any work based  on the software)  you  agree  to acknowledge its *</i></td></tr>
+<tr><th id="22">22</th><td><i>// * use  in  resulting  scientific  publications,  and indicate your *</i></td></tr>
+<tr><th id="23">23</th><td><i>// * acceptance of all terms of the Geant4 Software license.          *</i></td></tr>
+<tr><th id="24">24</th><td><i>// ********************************************************************</i></td></tr>
+<tr><th id="25">25</th><td><i>//</i></td></tr>
+<tr><th id="26">26</th><td><i>/*</i></td></tr>
+<tr><th id="27">27</th><td><i> * File:   G4ENDFTapeRead.cc</i></td></tr>
+<tr><th id="28">28</th><td><i> * Author: B. Wendt (wendbryc@isu.edu)</i></td></tr>
+<tr><th id="29">29</th><td><i> *</i></td></tr>
+<tr><th id="30">30</th><td><i> * Created on September 6, 2011, 10:01 AM</i></td></tr>
+<tr><th id="31">31</th><td><i> */</i></td></tr>
+<tr><th id="32">32</th><td></td></tr>
+<tr><th id="33">33</th><td><u>#include <span class='error' title="&apos;fstream&apos; file not found">&lt;</span>fstream&gt;</u></td></tr>
+<tr><th id="34">34</th><td><u>#include &lt;map&gt;</u></td></tr>
+<tr><th id="35">35</th><td><u>#include &lt;vector&gt;</u></td></tr>
+<tr><th id="36">36</th><td></td></tr>
+<tr><th id="37">37</th><td><u>#include <a href="../../../../../global/management/include/globals.hh.html">"globals.hh"</a></u></td></tr>
+<tr><th id="38">38</th><td><u>#include <a href="../include/G4ParticleHPManager.hh.html">"G4ParticleHPManager.hh"</a></u></td></tr>
+<tr><th id="39">39</th><td></td></tr>
+<tr><th id="40">40</th><td><u>#include <a href="../include/G4ENDFTapeRead.hh.html">"G4ENDFTapeRead.hh"</a></u></td></tr>
+<tr><th id="41">41</th><td><u>#include <a href="../include/G4ENDFYieldDataContainer.hh.html">"G4ENDFYieldDataContainer.hh"</a></u></td></tr>
+<tr><th id="42">42</th><td><u>#include <a href="../include/G4FFGDebuggingMacros.hh.html">"G4FFGDebuggingMacros.hh"</a></u></td></tr>
+<tr><th id="43">43</th><td><u>#include <a href="../include/G4FFGDefaultValues.hh.html">"G4FFGDefaultValues.hh"</a></u></td></tr>
+<tr><th id="44">44</th><td><u>#include <a href="../include/G4FFGEnumerations.hh.html">"G4FFGEnumerations.hh"</a></u></td></tr>
+<tr><th id="45">45</th><td><u>#include <a href="../include/G4TableTemplate.hh.html">"G4TableTemplate.hh"</a></u></td></tr>
+<tr><th id="46">46</th><td></td></tr>
+<tr><th id="47">47</th><td><a class="type" href="../include/G4ENDFTapeRead.hh.html#G4ENDFTapeRead" title='G4ENDFTapeRead' data-ref="G4ENDFTapeRead">G4ENDFTapeRead</a>::</td></tr>
+<tr><th id="48">48</th><td><dfn class="decl def" id="_ZN14G4ENDFTapeReadC1E8G4StringS0_N17G4FFGEnumerations9YieldTypeENS1_12FissionCauseE" title='G4ENDFTapeRead::G4ENDFTapeRead' data-ref="_ZN14G4ENDFTapeReadC1E8G4StringS0_N17G4FFGEnumerations9YieldTypeENS1_12FissionCauseE">G4ENDFTapeRead</dfn>( <a class="type" href="../../../../../global/management/include/G4String.hh.html#G4String" title='G4String' data-ref="G4String">G4String</a> <dfn class="local col1 decl" id="1FileLocation" title='FileLocation' data-type='G4String' data-ref="1FileLocation">FileLocation</dfn>,</td></tr>
+<tr><th id="49">49</th><td>                <a class="type" href="../../../../../global/management/include/G4String.hh.html#G4String" title='G4String' data-ref="G4String">G4String</a> <dfn class="local col2 decl" id="2FileName" title='FileName' data-type='G4String' data-ref="2FileName">FileName</dfn>,</td></tr>
+<tr><th id="50">50</th><td>                <span class="namespace">G4FFGEnumerations::</span><a class="type" href="../include/G4FFGEnumerations.hh.html#G4FFGEnumerations::YieldType" title='G4FFGEnumerations::YieldType' data-ref="G4FFGEnumerations::YieldType">YieldType</a> <dfn class="local col3 decl" id="3WhichYield" title='WhichYield' data-type='G4FFGEnumerations::YieldType' data-ref="3WhichYield">WhichYield</dfn>,</td></tr>
+<tr><th id="51">51</th><td>                <span class="namespace">G4FFGEnumerations::</span><a class="type" href="../include/G4FFGEnumerations.hh.html#G4FFGEnumerations::FissionCause" title='G4FFGEnumerations::FissionCause' data-ref="G4FFGEnumerations::FissionCause">FissionCause</a> <i>/*WhichCause*/</i> )</td></tr>
+<tr><th id="52">52</th><td>:   <i>/* Cause_(WhichCause),*/</i></td></tr>
+<tr><th id="53">53</th><td>    <a class="member" href="../include/G4ENDFTapeRead.hh.html#G4ENDFTapeRead::Verbosity_" title='G4ENDFTapeRead::Verbosity_' data-ref="G4ENDFTapeRead::Verbosity_">Verbosity_</a>(<span class="namespace">G4FFGDefaultValues::</span><a class="ref" href="../include/G4FFGDefaultValues.hh.html#G4FFGDefaultValues::Verbosity" title='G4FFGDefaultValues::Verbosity' data-ref="G4FFGDefaultValues::Verbosity">Verbosity</a>),</td></tr>
+<tr><th id="54">54</th><td>    <a class="member" href="../include/G4ENDFTapeRead.hh.html#G4ENDFTapeRead::YieldType_" title='G4ENDFTapeRead::YieldType_' data-ref="G4ENDFTapeRead::YieldType_">YieldType_</a>(<a class="local col3 ref" href="#3WhichYield" title='WhichYield' data-ref="3WhichYield">WhichYield</a>)</td></tr>
+<tr><th id="55">55</th><td>{</td></tr>
+<tr><th id="56">56</th><td>    <i>// Initialize the class</i></td></tr>
+<tr><th id="57">57</th><td>    Initialize(FileLocation <span class='error' title="invalid operands to binary expression (&apos;G4String&apos; and &apos;G4String&apos;)">+</span> FileName);</td></tr>
+<tr><th id="58">58</th><td>}</td></tr>
+<tr><th id="59">59</th><td></td></tr>
+<tr><th id="60">60</th><td><a class="type" href="../include/G4ENDFTapeRead.hh.html#G4ENDFTapeRead" title='G4ENDFTapeRead' data-ref="G4ENDFTapeRead">G4ENDFTapeRead</a>::</td></tr>
+<tr><th id="61">61</th><td><dfn class="decl def" id="_ZN14G4ENDFTapeReadC1E8G4StringS0_N17G4FFGEnumerations9YieldTypeENS1_12FissionCauseEi" title='G4ENDFTapeRead::G4ENDFTapeRead' data-ref="_ZN14G4ENDFTapeReadC1E8G4StringS0_N17G4FFGEnumerations9YieldTypeENS1_12FissionCauseEi">G4ENDFTapeRead</dfn>( <a class="type" href="../../../../../global/management/include/G4String.hh.html#G4String" title='G4String' data-ref="G4String">G4String</a> <dfn class="local col4 decl" id="4FileLocation" title='FileLocation' data-type='G4String' data-ref="4FileLocation">FileLocation</dfn>,</td></tr>
+<tr><th id="62">62</th><td>                <a class="type" href="../../../../../global/management/include/G4String.hh.html#G4String" title='G4String' data-ref="G4String">G4String</a> <dfn class="local col5 decl" id="5FileName" title='FileName' data-type='G4String' data-ref="5FileName">FileName</dfn>,</td></tr>
+<tr><th id="63">63</th><td>                <span class="namespace">G4FFGEnumerations::</span><a class="type" href="../include/G4FFGEnumerations.hh.html#G4FFGEnumerations::YieldType" title='G4FFGEnumerations::YieldType' data-ref="G4FFGEnumerations::YieldType">YieldType</a> <dfn class="local col6 decl" id="6WhichYield" title='WhichYield' data-type='G4FFGEnumerations::YieldType' data-ref="6WhichYield">WhichYield</dfn>,</td></tr>
+<tr><th id="64">64</th><td>                <span class="namespace">G4FFGEnumerations::</span><a class="type" href="../include/G4FFGEnumerations.hh.html#G4FFGEnumerations::FissionCause" title='G4FFGEnumerations::FissionCause' data-ref="G4FFGEnumerations::FissionCause">FissionCause</a> <i>/*WhichCause*/</i>,</td></tr>
+<tr><th id="65">65</th><td>                <a class="typedef" href="../../../../../global/management/include/G4Types.hh.html#G4int" title='G4int' data-type='int' data-ref="G4int">G4int</a> <dfn class="local col7 decl" id="7Verbosity" title='Verbosity' data-type='G4int' data-ref="7Verbosity">Verbosity</dfn> )</td></tr>
+<tr><th id="66">66</th><td>:   <i>/*Cause_(WhichCause),*/</i></td></tr>
+<tr><th id="67">67</th><td>    <a class="member" href="../include/G4ENDFTapeRead.hh.html#G4ENDFTapeRead::Verbosity_" title='G4ENDFTapeRead::Verbosity_' data-ref="G4ENDFTapeRead::Verbosity_">Verbosity_</a>(<a class="local col7 ref" href="#7Verbosity" title='Verbosity' data-ref="7Verbosity">Verbosity</a>),</td></tr>
+<tr><th id="68">68</th><td>    <a class="member" href="../include/G4ENDFTapeRead.hh.html#G4ENDFTapeRead::YieldType_" title='G4ENDFTapeRead::YieldType_' data-ref="G4ENDFTapeRead::YieldType_">YieldType_</a>(<a class="local col6 ref" href="#6WhichYield" title='WhichYield' data-ref="6WhichYield">WhichYield</a>)</td></tr>
+<tr><th id="69">69</th><td>{</td></tr>
+<tr><th id="70">70</th><td>    <i>// Initialize the class</i></td></tr>
+<tr><th id="71">71</th><td>    Initialize(FileLocation <span class='error' title="invalid operands to binary expression (&apos;G4String&apos; and &apos;G4String&apos;)">+</span> FileName);</td></tr>
+<tr><th id="72">72</th><td>}</td></tr>
+<tr><th id="73">73</th><td></td></tr>
+<tr><th id="74">74</th><td>G4ENDFTapeRead::</td></tr>
+<tr><th id="75">75</th><td>G4ENDFTapeRead( <span class='error' title="use of undeclared identifier &apos;std&apos;">std</span>::istringstream&amp; dataStream,</td></tr>
+<tr><th id="76">76</th><td>                G4FFGEnumerations::YieldType WhichYield,</td></tr>
+<tr><th id="77">77</th><td>                G4FFGEnumerations::FissionCause <i>/*WhichCause*/</i>,</td></tr>
+<tr><th id="78">78</th><td>                G4int Verbosity )</td></tr>
+<tr><th id="79">79</th><td>:   <i>/*Cause_(WhichCause),*/</i></td></tr>
+<tr><th id="80">80</th><td>    Verbosity_(Verbosity),</td></tr>
+<tr><th id="81">81</th><td>    YieldType_(WhichYield)</td></tr>
+<tr><th id="82">82</th><td>{</td></tr>
+<tr><th id="83">83</th><td>    <i>// Initialize the class</i></td></tr>
+<tr><th id="84">84</th><td>    Initialize(dataStream);</td></tr>
+<tr><th id="85">85</th><td>}</td></tr>
+<tr><th id="86">86</th><td></td></tr>
+<tr><th id="87">87</th><td><em>void</em> <a class="type" href="../include/G4ENDFTapeRead.hh.html#G4ENDFTapeRead" title='G4ENDFTapeRead' data-ref="G4ENDFTapeRead">G4ENDFTapeRead</a>::</td></tr>
+<tr><th id="88">88</th><td><dfn class="decl def" id="_ZN14G4ENDFTapeRead10InitializeE8G4String" title='G4ENDFTapeRead::Initialize' data-ref="_ZN14G4ENDFTapeRead10InitializeE8G4String">Initialize</dfn>( <a class="type" href="../../../../../global/management/include/G4String.hh.html#G4String" title='G4String' data-ref="G4String">G4String</a> <dfn class="local col8 decl" id="8dataFile" title='dataFile' data-type='G4String' data-ref="8dataFile">dataFile</dfn> )</td></tr>
+<tr><th id="89">89</th><td>{</td></tr>
+<tr><th id="90">90</th><td>    <span class='error' title="use of undeclared identifier &apos;std&apos;">std</span>::istringstream dataStream(std::ios::in);</td></tr>
+<tr><th id="91">91</th><td>    G4ParticleHPManager::GetInstance()-&gt;GetDataStream(dataFile, <span class='error' title="use of undeclared identifier &apos;dataStream&apos;">dataStream</span>);</td></tr>
+<tr><th id="92">92</th><td></td></tr>
+<tr><th id="93">93</th><td>    Initialize(<span class='error' title="use of undeclared identifier &apos;dataStream&apos;">dataStream</span>);</td></tr>
+<tr><th id="94">94</th><td>}</td></tr>
+<tr><th id="95">95</th><td></td></tr>
+<tr><th id="96">96</th><td><em>void</em> G4ENDFTapeRead::</td></tr>
+<tr><th id="97">97</th><td>Initialize( <span class='error' title="use of undeclared identifier &apos;std&apos;">std</span>::istringstream&amp; dataStream )</td></tr>
+<tr><th id="98">98</th><td>{    </td></tr>
+<tr><th id="99">99</th><td><a class="macro" href="../include/G4FFGDebuggingMacros.hh.html#215" title="G4FFG_DEPTH++;" data-ref="_M/G4FFG_FUNCTIONENTER__">G4FFG_FUNCTIONENTER__</a></td></tr>
+<tr><th id="100">100</th><td></td></tr>
+<tr><th id="101">101</th><td>    EnergyGroups_ = <var>0</var>;</td></tr>
+<tr><th id="102">102</th><td>    EnergyGroupValues_ = <span class='error' title="use of undeclared identifier &apos;NULL&apos;">NULL</span>;</td></tr>
+<tr><th id="103">103</th><td></td></tr>
+<tr><th id="104">104</th><td>    YieldContainerTable_ = <b>new</b> G4TableTemplate&lt; G4ENDFYieldDataContainer &gt;;</td></tr>
+<tr><th id="105">105</th><td></td></tr>
+<tr><th id="106">106</th><td>    <b>try</b></td></tr>
+<tr><th id="107">107</th><td>    {</td></tr>
+<tr><th id="108">108</th><td>        ReadInData(dataStream);</td></tr>
+<tr><th id="109">109</th><td>    } <b>catch</b> (<span class='error' title="use of undeclared identifier &apos;std&apos;">std</span>::exception &amp; e)</td></tr>
+<tr><th id="110">110</th><td>    {</td></tr>
+<tr><th id="111">111</th><td>        <b>delete</b> YieldContainerTable_;</td></tr>
+<tr><th id="112">112</th><td></td></tr>
+<tr><th id="113">113</th><td>        <a class="macro" href="../include/G4FFGDebuggingMacros.hh.html#219" title="G4FFG_DEPTH--;" data-ref="_M/G4FFG_FUNCTIONLEAVE__">G4FFG_FUNCTIONLEAVE__</a></td></tr>
+<tr><th id="114">114</th><td>        <b>throw</b> e;</td></tr>
+<tr><th id="115">115</th><td>    }</td></tr>
+<tr><th id="116">116</th><td></td></tr>
+<tr><th id="117">117</th><td><a class="macro" href="../include/G4FFGDebuggingMacros.hh.html#219" title="G4FFG_DEPTH--;" data-ref="_M/G4FFG_FUNCTIONLEAVE__">G4FFG_FUNCTIONLEAVE__</a></td></tr>
+<tr><th id="118">118</th><td>}</td></tr>
+<tr><th id="119">119</th><td></td></tr>
+<tr><th id="120">120</th><td><a class="typedef" href="../../../../../global/management/include/G4Types.hh.html#G4double" title='G4double' data-type='double' data-ref="G4double">G4double</a>* <a class="type" href="../include/G4ENDFTapeRead.hh.html#G4ENDFTapeRead" title='G4ENDFTapeRead' data-ref="G4ENDFTapeRead">G4ENDFTapeRead</a>::</td></tr>
+<tr><th id="121">121</th><td><dfn class="decl def" id="_ZN14G4ENDFTapeRead22G4GetEnergyGroupValuesEv" title='G4ENDFTapeRead::G4GetEnergyGroupValues' data-ref="_ZN14G4ENDFTapeRead22G4GetEnergyGroupValuesEv">G4GetEnergyGroupValues</dfn>( <em>void</em> )</td></tr>
+<tr><th id="122">122</th><td>{</td></tr>
+<tr><th id="123">123</th><td><a class="macro" href="../include/G4FFGDebuggingMacros.hh.html#215" title="G4FFG_DEPTH++;" data-ref="_M/G4FFG_FUNCTIONENTER__">G4FFG_FUNCTIONENTER__</a></td></tr>
+<tr><th id="124">124</th><td></td></tr>
+<tr><th id="125">125</th><td><a class="macro" href="../include/G4FFGDebuggingMacros.hh.html#219" title="G4FFG_DEPTH--;" data-ref="_M/G4FFG_FUNCTIONLEAVE__">G4FFG_FUNCTIONLEAVE__</a></td></tr>
+<tr><th id="126">126</th><td>    <b>return</b> <a class="member" href="../include/G4ENDFTapeRead.hh.html#G4ENDFTapeRead::EnergyGroupValues_" title='G4ENDFTapeRead::EnergyGroupValues_' data-ref="G4ENDFTapeRead::EnergyGroupValues_">EnergyGroupValues_</a>;</td></tr>
+<tr><th id="127">127</th><td>}</td></tr>
+<tr><th id="128">128</th><td></td></tr>
+<tr><th id="129">129</th><td><a class="typedef" href="../../../../../global/management/include/G4Types.hh.html#G4int" title='G4int' data-type='int' data-ref="G4int">G4int</a> <a class="type" href="../include/G4ENDFTapeRead.hh.html#G4ENDFTapeRead" title='G4ENDFTapeRead' data-ref="G4ENDFTapeRead">G4ENDFTapeRead</a>::</td></tr>
+<tr><th id="130">130</th><td><dfn class="decl def" id="_ZN14G4ENDFTapeRead25G4GetNumberOfEnergyGroupsEv" title='G4ENDFTapeRead::G4GetNumberOfEnergyGroups' data-ref="_ZN14G4ENDFTapeRead25G4GetNumberOfEnergyGroupsEv">G4GetNumberOfEnergyGroups</dfn>( <em>void</em> )</td></tr>
+<tr><th id="131">131</th><td>{</td></tr>
+<tr><th id="132">132</th><td><a class="macro" href="../include/G4FFGDebuggingMacros.hh.html#215" title="G4FFG_DEPTH++;" data-ref="_M/G4FFG_FUNCTIONENTER__">G4FFG_FUNCTIONENTER__</a></td></tr>
+<tr><th id="133">133</th><td></td></tr>
+<tr><th id="134">134</th><td><a class="macro" href="../include/G4FFGDebuggingMacros.hh.html#219" title="G4FFG_DEPTH--;" data-ref="_M/G4FFG_FUNCTIONLEAVE__">G4FFG_FUNCTIONLEAVE__</a></td></tr>
+<tr><th id="135">135</th><td>    <b>return</b> <a class="member" href="../include/G4ENDFTapeRead.hh.html#G4ENDFTapeRead::EnergyGroups_" title='G4ENDFTapeRead::EnergyGroups_' data-ref="G4ENDFTapeRead::EnergyGroups_">EnergyGroups_</a>;</td></tr>
+<tr><th id="136">136</th><td>}</td></tr>
+<tr><th id="137">137</th><td></td></tr>
+<tr><th id="138">138</th><td><a class="typedef" href="../../../../../global/management/include/G4Types.hh.html#G4int" title='G4int' data-type='int' data-ref="G4int">G4int</a> <a class="type" href="../include/G4ENDFTapeRead.hh.html#G4ENDFTapeRead" title='G4ENDFTapeRead' data-ref="G4ENDFTapeRead">G4ENDFTapeRead</a>::</td></tr>
+<tr><th id="139">139</th><td><dfn class="decl def" id="_ZN14G4ENDFTapeRead28G4GetNumberOfFissionProductsEv" title='G4ENDFTapeRead::G4GetNumberOfFissionProducts' data-ref="_ZN14G4ENDFTapeRead28G4GetNumberOfFissionProductsEv">G4GetNumberOfFissionProducts</dfn>( <em>void</em> )</td></tr>
+<tr><th id="140">140</th><td>{</td></tr>
+<tr><th id="141">141</th><td><a class="macro" href="../include/G4FFGDebuggingMacros.hh.html#215" title="G4FFG_DEPTH++;" data-ref="_M/G4FFG_FUNCTIONENTER__">G4FFG_FUNCTIONENTER__</a></td></tr>
+<tr><th id="142">142</th><td></td></tr>
+<tr><th id="143">143</th><td>    <a class="typedef" href="../../../../../global/management/include/G4Types.hh.html#G4int" title='G4int' data-type='int' data-ref="G4int">G4int</a> <dfn class="local col9 decl" id="9NumberOfElements" title='NumberOfElements' data-type='G4int' data-ref="9NumberOfElements">NumberOfElements</dfn> = <a class="member" href="../include/G4ENDFTapeRead.hh.html#G4ENDFTapeRead::YieldContainerTable_" title='G4ENDFTapeRead::YieldContainerTable_' data-ref="G4ENDFTapeRead::YieldContainerTable_">YieldContainerTable_</a>-&gt;<a class="ref" href="../include/G4TableTemplate.hh.html#_ZN15G4TableTemplate21G4GetNumberOfElementsEv" title='G4TableTemplate::G4GetNumberOfElements' data-ref="_ZN15G4TableTemplate21G4GetNumberOfElementsEv">G4GetNumberOfElements</a>();</td></tr>
+<tr><th id="144">144</th><td></td></tr>
+<tr><th id="145">145</th><td><a class="macro" href="../include/G4FFGDebuggingMacros.hh.html#219" title="G4FFG_DEPTH--;" data-ref="_M/G4FFG_FUNCTIONLEAVE__">G4FFG_FUNCTIONLEAVE__</a></td></tr>
+<tr><th id="146">146</th><td>    <b>return</b> <a class="local col9 ref" href="#9NumberOfElements" title='NumberOfElements' data-ref="9NumberOfElements">NumberOfElements</a>;</td></tr>
+<tr><th id="147">147</th><td>}</td></tr>
+<tr><th id="148">148</th><td></td></tr>
+<tr><th id="149">149</th><td><a class="type" href="../include/G4ENDFYieldDataContainer.hh.html#G4ENDFYieldDataContainer" title='G4ENDFYieldDataContainer' data-ref="G4ENDFYieldDataContainer">G4ENDFYieldDataContainer</a>* <a class="type" href="../include/G4ENDFTapeRead.hh.html#G4ENDFTapeRead" title='G4ENDFTapeRead' data-ref="G4ENDFTapeRead">G4ENDFTapeRead</a>::</td></tr>
+<tr><th id="150">150</th><td><dfn class="decl def" id="_ZN14G4ENDFTapeRead10G4GetYieldEi" title='G4ENDFTapeRead::G4GetYield' data-ref="_ZN14G4ENDFTapeRead10G4GetYieldEi">G4GetYield</dfn>( <a class="typedef" href="../../../../../global/management/include/G4Types.hh.html#G4int" title='G4int' data-type='int' data-ref="G4int">G4int</a> <dfn class="local col0 decl" id="10WhichYield" title='WhichYield' data-type='G4int' data-ref="10WhichYield">WhichYield</dfn> )</td></tr>
+<tr><th id="151">151</th><td>{</td></tr>
+<tr><th id="152">152</th><td><a class="macro" href="../include/G4FFGDebuggingMacros.hh.html#218" title="" data-ref="_M/G4FFG_DATA_FUNCTIONENTER__">G4FFG_DATA_FUNCTIONENTER__</a></td></tr>
+<tr><th id="153">153</th><td></td></tr>
+<tr><th id="154">154</th><td>    <a class="type" href="../include/G4ENDFYieldDataContainer.hh.html#G4ENDFYieldDataContainer" title='G4ENDFYieldDataContainer' data-ref="G4ENDFYieldDataContainer">G4ENDFYieldDataContainer</a>* <dfn class="local col1 decl" id="11Container" title='Container' data-type='G4ENDFYieldDataContainer *' data-ref="11Container">Container</dfn> = <span class='error' title="use of undeclared identifier &apos;NULL&apos;">NULL</span>;</td></tr>
+<tr><th id="155">155</th><td>    <b>if</b>(<a class="local col0 ref" href="#10WhichYield" title='WhichYield' data-ref="10WhichYield">WhichYield</a> &gt;= <var>0</var> &amp;&amp; <a class="local col0 ref" href="#10WhichYield" title='WhichYield' data-ref="10WhichYield">WhichYield</a> &lt; <a class="member" href="../include/G4ENDFTapeRead.hh.html#G4ENDFTapeRead::YieldContainerTable_" title='G4ENDFTapeRead::YieldContainerTable_' data-ref="G4ENDFTapeRead::YieldContainerTable_">YieldContainerTable_</a>-&gt;<a class="ref" href="../include/G4TableTemplate.hh.html#_ZN15G4TableTemplate21G4GetNumberOfElementsEv" title='G4TableTemplate::G4GetNumberOfElements' data-ref="_ZN15G4TableTemplate21G4GetNumberOfElementsEv">G4GetNumberOfElements</a>())</td></tr>
+<tr><th id="156">156</th><td>    {</td></tr>
+<tr><th id="157">157</th><td>        <a class="local col1 ref" href="#11Container" title='Container' data-ref="11Container">Container</a> = <a class="member" href="../include/G4ENDFTapeRead.hh.html#G4ENDFTapeRead::YieldContainerTable_" title='G4ENDFTapeRead::YieldContainerTable_' data-ref="G4ENDFTapeRead::YieldContainerTable_">YieldContainerTable_</a>-&gt;<a class="ref" href="../include/G4TableTemplate.hh.html#_ZN15G4TableTemplate14G4GetContainerEj" title='G4TableTemplate::G4GetContainer' data-ref="_ZN15G4TableTemplate14G4GetContainerEj">G4GetContainer</a>(<a class="local col0 ref" href="#10WhichYield" title='WhichYield' data-ref="10WhichYield">WhichYield</a>);</td></tr>
+<tr><th id="158">158</th><td>    }</td></tr>
+<tr><th id="159">159</th><td></td></tr>
+<tr><th id="160">160</th><td><a class="macro" href="../include/G4FFGDebuggingMacros.hh.html#222" title="" data-ref="_M/G4FFG_DATA_FUNCTIONLEAVE__">G4FFG_DATA_FUNCTIONLEAVE__</a></td></tr>
+<tr><th id="161">161</th><td>    <b>return</b> <a class="local col1 ref" href="#11Container" title='Container' data-ref="11Container">Container</a>;</td></tr>
+<tr><th id="162">162</th><td>}</td></tr>
+<tr><th id="163">163</th><td></td></tr>
+<tr><th id="164">164</th><td><em>void</em> <a class="type" href="../include/G4ENDFTapeRead.hh.html#G4ENDFTapeRead" title='G4ENDFTapeRead' data-ref="G4ENDFTapeRead">G4ENDFTapeRead</a>::</td></tr>
+<tr><th id="165">165</th><td><dfn class="decl def" id="_ZN14G4ENDFTapeRead14G4SetVerbosityEi" title='G4ENDFTapeRead::G4SetVerbosity' data-ref="_ZN14G4ENDFTapeRead14G4SetVerbosityEi">G4SetVerbosity</dfn>(<a class="typedef" href="../../../../../global/management/include/G4Types.hh.html#G4int" title='G4int' data-type='int' data-ref="G4int">G4int</a> <dfn class="local col2 decl" id="12WhatVerbosity" title='WhatVerbosity' data-type='G4int' data-ref="12WhatVerbosity">WhatVerbosity</dfn>)</td></tr>
+<tr><th id="166">166</th><td>{</td></tr>
+<tr><th id="167">167</th><td><a class="macro" href="../include/G4FFGDebuggingMacros.hh.html#215" title="G4FFG_DEPTH++;" data-ref="_M/G4FFG_FUNCTIONENTER__">G4FFG_FUNCTIONENTER__</a></td></tr>
+<tr><th id="168">168</th><td></td></tr>
+<tr><th id="169">169</th><td>    <b>this</b>-&gt;<a class="member" href="../include/G4ENDFTapeRead.hh.html#G4ENDFTapeRead::Verbosity_" title='G4ENDFTapeRead::Verbosity_' data-ref="G4ENDFTapeRead::Verbosity_">Verbosity_</a> = <a class="local col2 ref" href="#12WhatVerbosity" title='WhatVerbosity' data-ref="12WhatVerbosity">WhatVerbosity</a>;</td></tr>
+<tr><th id="170">170</th><td></td></tr>
+<tr><th id="171">171</th><td><a class="macro" href="../include/G4FFGDebuggingMacros.hh.html#219" title="G4FFG_DEPTH--;" data-ref="_M/G4FFG_FUNCTIONLEAVE__">G4FFG_FUNCTIONLEAVE__</a></td></tr>
+<tr><th id="172">172</th><td>}</td></tr>
+<tr><th id="173">173</th><td></td></tr>
+<tr><th id="174">174</th><td><em>void</em> G4ENDFTapeRead::</td></tr>
+<tr><th id="175">175</th><td>ReadInData( <span class='error' title="use of undeclared identifier &apos;std&apos;">std</span>::istringstream&amp; dataStream )</td></tr>
+<tr><th id="176">176</th><td>{</td></tr>
+<tr><th id="177">177</th><td><a class="macro" href="../include/G4FFGDebuggingMacros.hh.html#215" title="G4FFG_DEPTH++;" data-ref="_M/G4FFG_FUNCTIONENTER__">G4FFG_FUNCTIONENTER__</a></td></tr>
+<tr><th id="178">178</th><td></td></tr>
+<tr><th id="179">179</th><td>    <i>// Check if the file exists</i></td></tr>
+<tr><th id="180">180</th><td>    <b>if</b>(!dataStream.good())</td></tr>
+<tr><th id="181">181</th><td>    {</td></tr>
+<tr><th id="182">182</th><td>        G4Exception(<q>"G4ENDFTapeRead::ReadInData()"</q>,</td></tr>
+<tr><th id="183">183</th><td>                    <q>"Illegal file name"</q>,</td></tr>
+<tr><th id="184">184</th><td>                    JustWarning,</td></tr>
+<tr><th id="185">185</th><td>                    <q>"Fission product data not available"</q>);</td></tr>
+<tr><th id="186">186</th><td></td></tr>
+<tr><th id="187">187</th><td>        <i>// TODO create/use a specialized exception</i></td></tr>
+<tr><th id="188">188</th><td>        <a class="macro" href="../include/G4FFGDebuggingMacros.hh.html#219" title="G4FFG_DEPTH--;" data-ref="_M/G4FFG_FUNCTIONLEAVE__">G4FFG_FUNCTIONLEAVE__</a></td></tr>
+<tr><th id="189">189</th><td>        <b>throw</b> <span class='error' title="use of undeclared identifier &apos;std&apos;">std</span>::exception();</td></tr>
+<tr><th id="190">190</th><td>    }</td></tr>
+<tr><th id="191">191</th><td></td></tr>
+<tr><th id="192">192</th><td>    <i>// Code to read in from a pure ENDF data tape.</i></td></tr>
+<tr><th id="193">193</th><td><i>    // Commented out while pre-formatted Geant4 ENDF data is being used</i></td></tr>
+<tr><th id="194">194</th><td><i>//    G4int CurrentEnergyGroup = -1;</i></td></tr>
+<tr><th id="195">195</th><td><i>//    std::vector&lt; G4double &gt; NewDoubleVector;</i></td></tr>
+<tr><th id="196">196</th><td><i>//    std::vector&lt; G4double &gt; EnergyPoints;</i></td></tr>
+<tr><th id="197">197</th><td><i>//    std::vector&lt; G4int &gt; Product;</i></td></tr>
+<tr><th id="198">198</th><td><i>//    std::vector&lt; G4FFGEnumerations::MetaState &gt; MetaState;</i></td></tr>
+<tr><th id="199">199</th><td><i>//    std::vector&lt; std::vector&lt; G4double &gt; &gt; Yield;</i></td></tr>
+<tr><th id="200">200</th><td><i>//    std::vector&lt; std::vector&lt; G4double &gt; &gt; Error;</i></td></tr>
+<tr><th id="201">201</th><td><i>//    G4String DataBlock;</i></td></tr>
+<tr><th id="202">202</th><td><i>//    size_t InsertExponent;</i></td></tr>
+<tr><th id="203">203</th><td><i>//    G4double Parts[6];</i></td></tr>
+<tr><th id="204">204</th><td><i>//    G4double dummy;</i></td></tr>
+<tr><th id="205">205</th><td><i>//    G4int MAT;</i></td></tr>
+<tr><th id="206">206</th><td><i>//    G4int MF;</i></td></tr>
+<tr><th id="207">207</th><td><i>//    G4int MT;</i></td></tr>
+<tr><th id="208">208</th><td><i>//    G4int LN;</i></td></tr>
+<tr><th id="209">209</th><td><i>//    G4int Block;</i></td></tr>
+<tr><th id="210">210</th><td><i>//    G4int EmptyProduct;</i></td></tr>
+<tr><th id="211">211</th><td><i>//    G4int Location;</i></td></tr>
+<tr><th id="212">212</th><td><i>//    G4int ItemCounter = 0;</i></td></tr>
+<tr><th id="213">213</th><td><i>//    G4int FirstLineInEnergyGroup = 0;</i></td></tr>
+<tr><th id="214">214</th><td><i>//    G4int LastLineInEnergyGroup = 0;</i></td></tr>
+<tr><th id="215">215</th><td><i>//    G4bool FoundEnergyGroup = false;</i></td></tr>
+<tr><th id="216">216</th><td><i>//    G4bool FoundPID = false;</i></td></tr>
+<tr><th id="217">217</th><td><i>//</i></td></tr>
+<tr><th id="218">218</th><td><i>//    while(getline(DataFile, Temp))</i></td></tr>
+<tr><th id="219">219</th><td><i>//    {</i></td></tr>
+<tr><th id="220">220</th><td><i>//        // Format the string so that it can be interpreted correctly</i></td></tr>
+<tr><th id="221">221</th><td><i>//        DataBlock = Temp.substr(0, 66);</i></td></tr>
+<tr><th id="222">222</th><td><i>//        Temp = Temp.substr(66);</i></td></tr>
+<tr><th id="223">223</th><td><i>//        InsertExponent = 0;</i></td></tr>
+<tr><th id="224">224</th><td><i>//        while((InsertExponent = DataBlock.find_first_of("-+", InsertExponent)) != G4String::npos)</i></td></tr>
+<tr><th id="225">225</th><td><i>//        {</i></td></tr>
+<tr><th id="226">226</th><td><i>//            DataBlock.insert(InsertExponent, 1, 'e');</i></td></tr>
+<tr><th id="227">227</th><td><i>//            InsertExponent += 2;</i></td></tr>
+<tr><th id="228">228</th><td><i>//        }</i></td></tr>
+<tr><th id="229">229</th><td><i>//        sscanf(DataBlock.c_str(), "%11le %11le %11le %11le %11le %11le",</i></td></tr>
+<tr><th id="230">230</th><td><i>//            &amp;Parts[0], &amp;Parts[1], &amp;Parts[2], &amp;Parts[3], &amp;Parts[4], &amp;Parts[5]);</i></td></tr>
+<tr><th id="231">231</th><td><i>//        sscanf(Temp.substr(0, 4).c_str(), "%i", &amp;MAT);</i></td></tr>
+<tr><th id="232">232</th><td><i>//        sscanf(Temp.substr(4, 2).c_str(), "%i", &amp;MF);</i></td></tr>
+<tr><th id="233">233</th><td><i>//        sscanf(Temp.substr(6, 3).c_str(), "%i", &amp;MT);</i></td></tr>
+<tr><th id="234">234</th><td><i>//        sscanf(Temp.substr(9).c_str(), "%i", &amp;LN);</i></td></tr>
+<tr><th id="235">235</th><td><i>//</i></td></tr>
+<tr><th id="236">236</th><td><i>//        if(MT == YieldType_)</i></td></tr>
+<tr><th id="237">237</th><td><i>//        {</i></td></tr>
+<tr><th id="238">238</th><td><i>//            if(LN == 1)</i></td></tr>
+<tr><th id="239">239</th><td><i>//            {</i></td></tr>
+<tr><th id="240">240</th><td><i>//                if(FoundPID != true)</i></td></tr>
+<tr><th id="241">241</th><td><i>//                {</i></td></tr>
+<tr><th id="242">242</th><td><i>//                    // The first line of an ENDF section for MT = 454 or 459</i></td></tr>
+<tr><th id="243">243</th><td><i>//                    // always contains the parent PID</i></td></tr>
+<tr><th id="244">244</th><td><i>//                    // This section can potentially be expanded to check and</i></td></tr>
+<tr><th id="245">245</th><td><i>//                    // verify that it is the correct nucleus</i></td></tr>
+<tr><th id="246">246</th><td><i>//                    FoundPID = true;</i></td></tr>
+<tr><th id="247">247</th><td><i>//</i></td></tr>
+<tr><th id="248">248</th><td><i>//                    continue;</i></td></tr>
+<tr><th id="249">249</th><td><i>//                }</i></td></tr>
+<tr><th id="250">250</th><td><i>//            } else if(FoundPID == true &amp;&amp; FoundEnergyGroup == false)</i></td></tr>
+<tr><th id="251">251</th><td><i>//            {</i></td></tr>
+<tr><th id="252">252</th><td><i>//                // Skip this line if it is not the energy definition line</i></td></tr>
+<tr><th id="253">253</th><td><i>//                if(Parts[1] != 0 || Parts[3] != 0)</i></td></tr>
+<tr><th id="254">254</th><td><i>//                {</i></td></tr>
+<tr><th id="255">255</th><td><i>//                    continue;</i></td></tr>
+<tr><th id="256">256</th><td><i>//                }</i></td></tr>
+<tr><th id="257">257</th><td><i>//</i></td></tr>
+<tr><th id="258">258</th><td><i>//                // The first block is the incident neutron energy</i></td></tr>
+<tr><th id="259">259</th><td><i>//                // information.</i></td></tr>
+<tr><th id="260">260</th><td><i>//                // Check to make sure that it is spontaneous or neutron</i></td></tr>
+<tr><th id="261">261</th><td><i>//                // induced.</i></td></tr>
+<tr><th id="262">262</th><td><i>//                if(Cause_ == G4FFGEnumerations::NEUTRON_INDUCED)</i></td></tr>
+<tr><th id="263">263</th><td><i>//                {</i></td></tr>
+<tr><th id="264">264</th><td><i>//                    if(Parts[0] != 0)</i></td></tr>
+<tr><th id="265">265</th><td><i>//                    {</i></td></tr>
+<tr><th id="266">266</th><td><i>//                        FoundEnergyGroup = true;</i></td></tr>
+<tr><th id="267">267</th><td><i>//                    }</i></td></tr>
+<tr><th id="268">268</th><td><i>//                } else if(Cause_ == G4FFGEnumerations::SPONTANEOUS)</i></td></tr>
+<tr><th id="269">269</th><td><i>//                {</i></td></tr>
+<tr><th id="270">270</th><td><i>//                    if(Parts[0] == 0)</i></td></tr>
+<tr><th id="271">271</th><td><i>//                    {</i></td></tr>
+<tr><th id="272">272</th><td><i>//                        FoundEnergyGroup = true;</i></td></tr>
+<tr><th id="273">273</th><td><i>//                    }</i></td></tr>
+<tr><th id="274">274</th><td><i>//                } else</i></td></tr>
+<tr><th id="275">275</th><td><i>//                { // Maybe more fission causes here if added later</i></td></tr>
+<tr><th id="276">276</th><td><i>//                    FoundEnergyGroup = false;</i></td></tr>
+<tr><th id="277">277</th><td><i>//                }</i></td></tr>
+<tr><th id="278">278</th><td><i>//</i></td></tr>
+<tr><th id="279">279</th><td><i>//                if(FoundEnergyGroup == true)</i></td></tr>
+<tr><th id="280">280</th><td><i>//                {</i></td></tr>
+<tr><th id="281">281</th><td><i>//                    // Convert to eV</i></td></tr>
+<tr><th id="282">282</th><td><i>//                    Parts[0] *= eV;</i></td></tr>
+<tr><th id="283">283</th><td><i>//</i></td></tr>
+<tr><th id="284">284</th><td><i>//                    // Calculate the parameters</i></td></tr>
+<tr><th id="285">285</th><td><i>//                    FirstLineInEnergyGroup = LN;</i></td></tr>
+<tr><th id="286">286</th><td><i>//                    LastLineInEnergyGroup = FirstLineInEnergyGroup +</i></td></tr>
+<tr><th id="287">287</th><td><i>//                        ceil(Parts[4] / 6.0);</i></td></tr>
+<tr><th id="288">288</th><td><i>//                    ItemCounter = 0;</i></td></tr>
+<tr><th id="289">289</th><td><i>//                    EmptyProduct = 0;</i></td></tr>
+<tr><th id="290">290</th><td><i>//</i></td></tr>
+<tr><th id="291">291</th><td><i>//                    // Initialize the data storage</i></td></tr>
+<tr><th id="292">292</th><td><i>//                    CurrentEnergyGroup++;</i></td></tr>
+<tr><th id="293">293</th><td><i>//                    EnergyPoints.push_back(Parts[0]);</i></td></tr>
+<tr><th id="294">294</th><td><i>//                    Yield.push_back(NewDoubleVector);</i></td></tr>
+<tr><th id="295">295</th><td><i>//                    Yield.back().resize(Product.size(), 0);</i></td></tr>
+<tr><th id="296">296</th><td><i>//                    Error.push_back(NewDoubleVector);</i></td></tr>
+<tr><th id="297">297</th><td><i>//                    Error.back().resize(Product.size(), 0);</i></td></tr>
+<tr><th id="298">298</th><td><i>//</i></td></tr>
+<tr><th id="299">299</th><td><i>//                    continue;</i></td></tr>
+<tr><th id="300">300</th><td><i>//                }</i></td></tr>
+<tr><th id="301">301</th><td><i>//            }</i></td></tr>
+<tr><th id="302">302</th><td><i>//</i></td></tr>
+<tr><th id="303">303</th><td><i>//            if(LN &gt; FirstLineInEnergyGroup &amp;&amp; LN &lt;= LastLineInEnergyGroup)</i></td></tr>
+<tr><th id="304">304</th><td><i>//            {</i></td></tr>
+<tr><th id="305">305</th><td><i>//                for(Block = 0; Block &lt; 6; Block++)</i></td></tr>
+<tr><th id="306">306</th><td><i>//                {</i></td></tr>
+<tr><th id="307">307</th><td><i>//                    if(EmptyProduct &gt; 0)</i></td></tr>
+<tr><th id="308">308</th><td><i>//                    {</i></td></tr>
+<tr><th id="309">309</th><td><i>//                        EmptyProduct--;</i></td></tr>
+<tr><th id="310">310</th><td><i>//</i></td></tr>
+<tr><th id="311">311</th><td><i>//                        continue;</i></td></tr>
+<tr><th id="312">312</th><td><i>//                    }</i></td></tr>
+<tr><th id="313">313</th><td><i>//                    switch(ItemCounter % 4)</i></td></tr>
+<tr><th id="314">314</th><td><i>//                    {</i></td></tr>
+<tr><th id="315">315</th><td><i>//                        case 0:</i></td></tr>
+<tr><th id="316">316</th><td><i>//                            // Determine if the block is empty</i></td></tr>
+<tr><th id="317">317</th><td><i>//                            if(Parts[Block] == 0)</i></td></tr>
+<tr><th id="318">318</th><td><i>//                            {</i></td></tr>
+<tr><th id="319">319</th><td><i>//                                EmptyProduct = 3;</i></td></tr>
+<tr><th id="320">320</th><td><i>//</i></td></tr>
+<tr><th id="321">321</th><td><i>//                                continue;</i></td></tr>
+<tr><th id="322">322</th><td><i>//                            }</i></td></tr>
+<tr><th id="323">323</th><td><i>//</i></td></tr>
+<tr><th id="324">324</th><td><i>//                            // Determine if this product is already loaded</i></td></tr>
+<tr><th id="325">325</th><td><i>//                            for(Location = 0; Location &lt; (signed)Product.size(); Location++)</i></td></tr>
+<tr><th id="326">326</th><td><i>//                            {</i></td></tr>
+<tr><th id="327">327</th><td><i>//                                if(Parts[Block] == Product.at(Location) &amp;&amp;</i></td></tr>
+<tr><th id="328">328</th><td><i>//                                   Parts[Block + 1] == MetaState.at(Location))</i></td></tr>
+<tr><th id="329">329</th><td><i>//                                {</i></td></tr>
+<tr><th id="330">330</th><td><i>//                                    break;</i></td></tr>
+<tr><th id="331">331</th><td><i>//                                }</i></td></tr>
+<tr><th id="332">332</th><td><i>//                            }</i></td></tr>
+<tr><th id="333">333</th><td><i>//</i></td></tr>
+<tr><th id="334">334</th><td><i>//                            // The product hasn't been created yet</i></td></tr>
+<tr><th id="335">335</th><td><i>//                            // Add it and initialize the other vectors</i></td></tr>
+<tr><th id="336">336</th><td><i>//                            if(Location == (signed)Product.size())</i></td></tr>
+<tr><th id="337">337</th><td><i>//                            {</i></td></tr>
+<tr><th id="338">338</th><td><i>//                                Product.push_back(Parts[Block]);</i></td></tr>
+<tr><th id="339">339</th><td><i>//                                MetaState.push_back((G4FFGEnumerations::MetaState)Parts[Block + 1]);</i></td></tr>
+<tr><th id="340">340</th><td><i>//                                Yield.at(CurrentEnergyGroup).push_back(0.0);</i></td></tr>
+<tr><th id="341">341</th><td><i>//                                Error.at(CurrentEnergyGroup).push_back(0.0);</i></td></tr>
+<tr><th id="342">342</th><td><i>//                            }</i></td></tr>
+<tr><th id="343">343</th><td><i>//                            break;</i></td></tr>
+<tr><th id="344">344</th><td><i>//</i></td></tr>
+<tr><th id="345">345</th><td><i>//                        case 2:</i></td></tr>
+<tr><th id="346">346</th><td><i>//                            Yield.at(CurrentEnergyGroup).at(Location) = Parts[Block];</i></td></tr>
+<tr><th id="347">347</th><td><i>//                            break;</i></td></tr>
+<tr><th id="348">348</th><td><i>//</i></td></tr>
+<tr><th id="349">349</th><td><i>//                        case 3:</i></td></tr>
+<tr><th id="350">350</th><td><i>//                            Error.at(CurrentEnergyGroup).at(Location) = Parts[Block];</i></td></tr>
+<tr><th id="351">351</th><td><i>//                            break;</i></td></tr>
+<tr><th id="352">352</th><td><i>//                    }</i></td></tr>
+<tr><th id="353">353</th><td><i>//</i></td></tr>
+<tr><th id="354">354</th><td><i>//                    ItemCounter++;</i></td></tr>
+<tr><th id="355">355</th><td><i>//                }</i></td></tr>
+<tr><th id="356">356</th><td><i>//            }</i></td></tr>
+<tr><th id="357">357</th><td><i>//</i></td></tr>
+<tr><th id="358">358</th><td><i>//            if (LN == LastLineInEnergyGroup)</i></td></tr>
+<tr><th id="359">359</th><td><i>//            {</i></td></tr>
+<tr><th id="360">360</th><td><i>//                FoundEnergyGroup = false;</i></td></tr>
+<tr><th id="361">361</th><td><i>//            }</i></td></tr>
+<tr><th id="362">362</th><td><i>//        }</i></td></tr>
+<tr><th id="363">363</th><td><i>//    }</i></td></tr>
+<tr><th id="364">364</th><td><i>//</i></td></tr>
+<tr><th id="365">365</th><td><i>//    G4ENDFYieldDataContainer* NewDataContainer;</i></td></tr>
+<tr><th id="366">366</th><td><i>//    EnergyGroups_ = EnergyPoints.size();</i></td></tr>
+<tr><th id="367">367</th><td><i>//    EnergyGroupValues_ = new G4double[EnergyGroups_];</i></td></tr>
+<tr><th id="368">368</th><td><i>//    G4int NewProduct;</i></td></tr>
+<tr><th id="369">369</th><td><i>//    G4FFGEnumerations::MetaState NewMetaState;</i></td></tr>
+<tr><th id="370">370</th><td><i>//    G4double* NewYield = new G4double[EnergyGroups_];</i></td></tr>
+<tr><th id="371">371</th><td><i>//    G4double* NewError = new G4double[EnergyGroups_];</i></td></tr>
+<tr><th id="372">372</th><td><i>//</i></td></tr>
+<tr><th id="373">373</th><td><i>//    for(G4int i = 0; i &lt; EnergyGroups_; i++)</i></td></tr>
+<tr><th id="374">374</th><td><i>//    {</i></td></tr>
+<tr><th id="375">375</th><td><i>//        // Load the energy values</i></td></tr>
+<tr><th id="376">376</th><td><i>//        EnergyGroupValues_[i] = EnergyPoints.at(i);</i></td></tr>
+<tr><th id="377">377</th><td><i>//</i></td></tr>
+<tr><th id="378">378</th><td><i>//        // Make all the vectors the same size</i></td></tr>
+<tr><th id="379">379</th><td><i>//        Yield[i].resize(maxSize, 0.0);</i></td></tr>
+<tr><th id="380">380</th><td><i>//        Error[i].resize(maxSize, 0.0);</i></td></tr>
+<tr><th id="381">381</th><td><i>//    }</i></td></tr>
+<tr><th id="382">382</th><td><i>//</i></td></tr>
+<tr><th id="383">383</th><td><i>//    // Load the data into the yield table</i></td></tr>
+<tr><th id="384">384</th><td><i>//    for(ItemCounter = 0; ItemCounter &lt; (signed)Product.size(); ItemCounter++)</i></td></tr>
+<tr><th id="385">385</th><td><i>//    {</i></td></tr>
+<tr><th id="386">386</th><td><i>//        NewProduct = Product.at(ItemCounter);</i></td></tr>
+<tr><th id="387">387</th><td><i>//        NewMetaState = MetaState.at(ItemCounter);</i></td></tr>
+<tr><th id="388">388</th><td><i>//</i></td></tr>
+<tr><th id="389">389</th><td><i>//        for(CurrentEnergyGroup = 0; CurrentEnergyGroup &lt; EnergyGroups_; CurrentEnergyGroup++)</i></td></tr>
+<tr><th id="390">390</th><td><i>//        {</i></td></tr>
+<tr><th id="391">391</th><td><i>//            NewYield[CurrentEnergyGroup] = Yield.at(CurrentEnergyGroup).at(ItemCounter);</i></td></tr>
+<tr><th id="392">392</th><td><i>//            NewYield[CurrentEnergyGroup] = Error.at(CurrentEnergyGroup).at(ItemCounter);</i></td></tr>
+<tr><th id="393">393</th><td><i>//        }</i></td></tr>
+<tr><th id="394">394</th><td><i>//</i></td></tr>
+<tr><th id="395">395</th><td><i>//        NewDataContainer = YieldContainerTable_-&gt;G4GetNewContainer(EnergyGroups_ + 1);</i></td></tr>
+<tr><th id="396">396</th><td><i>//        NewDataContainer-&gt;SetProduct(NewProduct);</i></td></tr>
+<tr><th id="397">397</th><td><i>//        NewDataContainer-&gt;SetMetaState(NewMetaState);</i></td></tr>
+<tr><th id="398">398</th><td><i>//        NewDataContainer-&gt;SetYieldProbability(NewYield);</i></td></tr>
+<tr><th id="399">399</th><td><i>//        NewDataContainer-&gt;SetYieldError(NewError);</i></td></tr>
+<tr><th id="400">400</th><td><i>//    }</i></td></tr>
+<tr><th id="401">401</th><td><i>//</i></td></tr>
+<tr><th id="402">402</th><td><i>//    delete[] NewYield;</i></td></tr>
+<tr><th id="403">403</th><td><i>//    delete[] NewError;</i></td></tr>
+<tr><th id="404">404</th><td></td></tr>
+<tr><th id="405">405</th><td>    G4int MT;</td></tr>
+<tr><th id="406">406</th><td>    G4bool correctMT;</td></tr>
+<tr><th id="407">407</th><td>    G4int MF;</td></tr>
+<tr><th id="408">408</th><td>    G4double dummy;</td></tr>
+<tr><th id="409">409</th><td>    G4int blockCount;</td></tr>
+<tr><th id="410">410</th><td>    G4int currentEnergy = <var>0</var>;</td></tr>
+<tr><th id="411">411</th><td>    G4double incidentEnergy;</td></tr>
+<tr><th id="412">412</th><td>    G4int itemCount;</td></tr>
+<tr><th id="413">413</th><td>    <i>// TODO correctly implement the interpolation in the fission product yield</i></td></tr>
+<tr><th id="414">414</th><td>    G4int interpolation;</td></tr>
+<tr><th id="415">415</th><td>    G4int isotope;</td></tr>
+<tr><th id="416">416</th><td>    G4int metastate;</td></tr>
+<tr><th id="417">417</th><td>    G4int identifier;</td></tr>
+<tr><th id="418">418</th><td>    G4double yield;</td></tr>
+<tr><th id="419">419</th><td>    <i>// "error" is included here in the event that errors are included in the future</i></td></tr>
+<tr><th id="420">420</th><td>    G4double error = <var>0.0</var>;</td></tr>
+<tr><th id="421">421</th><td>    G4int maxSize = <var>0</var>;</td></tr>
+<tr><th id="422">422</th><td></td></tr>
+<tr><th id="423">423</th><td>    <span class='error' title="use of undeclared identifier &apos;std&apos;">std</span>::vector&lt; <span class='error' title="unexpected type name &apos;G4double&apos;: expected expression">G4double</span> &gt; <span class='error' title="use of undeclared identifier &apos;projectileEnergies&apos;">projectileEnergies</span>;</td></tr>
+<tr><th id="424">424</th><td>    <span class='error' title="use of undeclared identifier &apos;std&apos;">std</span>::map&lt; <span class='error' title="expected expression"><em>const</em></span> G4int, std::pair&lt; std::vector&lt; G4double &gt;, std::vector&lt; G4double &gt; &gt; &gt; intermediateData;</td></tr>
+<tr><th id="425">425</th><td>    <span class='error' title="use of undeclared identifier &apos;std&apos;">std</span>::map&lt; <span class='error' title="expected expression"><em>const</em></span> G4int, std::pair&lt; std::vector&lt; G4double &gt;, std::vector&lt; G4double &gt; &gt; &gt;::iterator dataIterator;</td></tr>
+<tr><th id="426">426</th><td></td></tr>
+<tr><th id="427">427</th><td>    <b>while</b>(dataStream.good()) <i>// Loop checking, 11.05.2015, T. Koi</i></td></tr>
+<tr><th id="428">428</th><td>    {</td></tr>
+<tr><th id="429">429</th><td>        dataStream &gt;&gt; MT &gt;&gt; MF &gt;&gt; dummy &gt;&gt; blockCount;</td></tr>
+<tr><th id="430">430</th><td></td></tr>
+<tr><th id="431">431</th><td>        correctMT = MT == YieldType_;</td></tr>
+<tr><th id="432">432</th><td></td></tr>
+<tr><th id="433">433</th><td>        <b>for</b>(G4int b = <var>0</var>; b &lt; blockCount; ++b)</td></tr>
+<tr><th id="434">434</th><td>        {</td></tr>
+<tr><th id="435">435</th><td>            dataStream &gt;&gt; incidentEnergy &gt;&gt; itemCount &gt;&gt; interpolation;</td></tr>
+<tr><th id="436">436</th><td>            maxSize = maxSize &gt;= itemCount ? maxSize : itemCount;</td></tr>
+<tr><th id="437">437</th><td></td></tr>
+<tr><th id="438">438</th><td>            <b>if</b>(correctMT)</td></tr>
+<tr><th id="439">439</th><td>            {</td></tr>
+<tr><th id="440">440</th><td>                <i>// Load in the energy of the projectile</i></td></tr>
+<tr><th id="441">441</th><td>                <span class='error' title="use of undeclared identifier &apos;projectileEnergies&apos;">projectileEnergies</span>.push_back(incidentEnergy);</td></tr>
+<tr><th id="442">442</th><td>                currentEnergy = <span class='error' title="use of undeclared identifier &apos;projectileEnergies&apos;">projectileEnergies</span>.size() - <var>1</var>;</td></tr>
+<tr><th id="443">443</th><td>            } <b>else</b></td></tr>
+<tr><th id="444">444</th><td>            {</td></tr>
+<tr><th id="445">445</th><td>                <i>// !!! Do not break since we need to parse through the !!!</i></td></tr>
+<tr><th id="446">446</th><td><i>                // !!! entire data file for all possible energies      !!!</i></td></tr>
+<tr><th id="447">447</th><td>            }</td></tr>
+<tr><th id="448">448</th><td></td></tr>
+<tr><th id="449">449</th><td>            <b>for</b>(G4int i = <var>0</var>; i &lt; itemCount; ++i)</td></tr>
+<tr><th id="450">450</th><td>            {</td></tr>
+<tr><th id="451">451</th><td>                dataStream &gt;&gt; isotope &gt;&gt; metastate &gt;&gt; yield;</td></tr>
+<tr><th id="452">452</th><td></td></tr>
+<tr><th id="453">453</th><td>                <b>if</b>(correctMT)</td></tr>
+<tr><th id="454">454</th><td>                {</td></tr>
+<tr><th id="455">455</th><td>                    identifier = isotope * <var>10</var> + metastate;</td></tr>
+<tr><th id="456">456</th><td></td></tr>
+<tr><th id="457">457</th><td>                    <span class='error' title="use of undeclared identifier &apos;dataIterator&apos;">dataIterator</span> = <span class='error' title="use of undeclared identifier &apos;intermediateData&apos;">intermediateData</span>.insert(<span class='error' title="use of undeclared identifier &apos;std&apos;">std</span>::make_pair(</td></tr>
+<tr><th id="458">458</th><td>                            identifier,</td></tr>
+<tr><th id="459">459</th><td>                            <span class='error' title="use of undeclared identifier &apos;std&apos;">std</span>::make_pair(</td></tr>
+<tr><th id="460">460</th><td>                                    <span class='error' title="use of undeclared identifier &apos;std&apos;">std</span>::vector&lt; <span class='error' title="unexpected type name &apos;G4double&apos;: expected expression">G4double</span> &gt;(<span class='error' title="use of undeclared identifier &apos;projectileEnergies&apos;">projectileEnergies</span>.size(), <var>0.0</var>),</td></tr>
+<tr><th id="461">461</th><td>                                    <span class='error' title="use of undeclared identifier &apos;std&apos;">std</span>::vector&lt; <span class='error' title="unexpected type name &apos;G4double&apos;: expected expression">G4double</span> &gt;(<span class='error' title="use of undeclared identifier &apos;projectileEnergies&apos;">projectileEnergies</span>.size(), <var>0.0</var>)))).first;</td></tr>
+<tr><th id="462">462</th><td></td></tr>
+<tr><th id="463">463</th><td>                    <b>if</b>(<span class='error' title="use of undeclared identifier &apos;dataIterator&apos;">dataIterator</span>-&gt;second.first.size() &lt; <span class='error' title="use of undeclared identifier &apos;projectileEnergies&apos;">projectileEnergies</span>.size())</td></tr>
+<tr><th id="464">464</th><td>                    {</td></tr>
+<tr><th id="465">465</th><td>                        <span class='error' title="use of undeclared identifier &apos;dataIterator&apos;">dataIterator</span>-&gt;second.first.resize(<span class='error' title="use of undeclared identifier &apos;projectileEnergies&apos;">projectileEnergies</span>.size());</td></tr>
+<tr><th id="466">466</th><td>                        <span class='error' title="use of undeclared identifier &apos;dataIterator&apos;">dataIterator</span>-&gt;second.second.resize(<span class='error' title="use of undeclared identifier &apos;projectileEnergies&apos;">projectileEnergies</span>.size());</td></tr>
+<tr><th id="467">467</th><td>                    }</td></tr>
+<tr><th id="468">468</th><td></td></tr>
+<tr><th id="469">469</th><td>                    <span class='error' title="use of undeclared identifier &apos;dataIterator&apos;">dataIterator</span>-&gt;second.first[currentEnergy] = yield;</td></tr>
+<tr><th id="470">470</th><td>                    <span class='error' title="use of undeclared identifier &apos;dataIterator&apos;">dataIterator</span>-&gt;second.second[currentEnergy] = error;</td></tr>
+<tr><th id="471">471</th><td>                } <b>else</b></td></tr>
+<tr><th id="472">472</th><td>                {</td></tr>
+<tr><th id="473">473</th><td>                    <i>// !!! Do not break since we need to parse through the !!!</i></td></tr>
+<tr><th id="474">474</th><td><i>                    // !!! entire data file for all possible energies      !!!</i></td></tr>
+<tr><th id="475">475</th><td>                }</td></tr>
+<tr><th id="476">476</th><td>            }</td></tr>
+<tr><th id="477">477</th><td>        }</td></tr>
+<tr><th id="478">478</th><td>    }</td></tr>
+<tr><th id="479">479</th><td></td></tr>
+<tr><th id="480">480</th><td>    G4ENDFYieldDataContainer* NewDataContainer;</td></tr>
+<tr><th id="481">481</th><td>    EnergyGroups_ = <span class='error' title="use of undeclared identifier &apos;projectileEnergies&apos;">projectileEnergies</span>.size();</td></tr>
+<tr><th id="482">482</th><td>    EnergyGroupValues_ = <b>new</b> G4double[EnergyGroups_];</td></tr>
+<tr><th id="483">483</th><td>    G4int NewProduct;</td></tr>
+<tr><th id="484">484</th><td>    G4FFGEnumerations::MetaState NewMetaState;</td></tr>
+<tr><th id="485">485</th><td>    G4double* NewYield = <b>new</b> G4double[EnergyGroups_];</td></tr>
+<tr><th id="486">486</th><td>    G4double* NewError = <b>new</b> G4double[EnergyGroups_];</td></tr>
+<tr><th id="487">487</th><td></td></tr>
+<tr><th id="488">488</th><td>    <b>for</b>(G4int energyGroup = <var>0</var>; energyGroup &lt; EnergyGroups_; energyGroup++)</td></tr>
+<tr><th id="489">489</th><td>    {</td></tr>
+<tr><th id="490">490</th><td>        <i>// Load the energy values</i></td></tr>
+<tr><th id="491">491</th><td>        EnergyGroupValues_[energyGroup] = <span class='error' title="use of undeclared identifier &apos;projectileEnergies&apos;">projectileEnergies</span>[energyGroup];</td></tr>
+<tr><th id="492">492</th><td>    }</td></tr>
+<tr><th id="493">493</th><td></td></tr>
+<tr><th id="494">494</th><td>    <i>// Load the data into the yield table</i></td></tr>
+<tr><th id="495">495</th><td>    <b>for</b>(<span class='error' title="use of undeclared identifier &apos;dataIterator&apos;">dataIterator</span> = <span class='error' title="use of undeclared identifier &apos;intermediateData&apos;">intermediateData</span>.begin(); <span class='error' title="use of undeclared identifier &apos;dataIterator&apos;">dataIterator</span> != <span class='error' title="use of undeclared identifier &apos;intermediateData&apos;">intermediateData</span>.end(); ++<span class='error' title="use of undeclared identifier &apos;dataIterator&apos;">dataIterator</span>)</td></tr>
+<tr><th id="496">496</th><td>    {</td></tr>
+<tr><th id="497">497</th><td>        identifier = <span class='error' title="use of undeclared identifier &apos;dataIterator&apos;">dataIterator</span>-&gt;first;</td></tr>
+<tr><th id="498">498</th><td>        metastate = identifier % <var>10</var>;</td></tr>
+<tr><th id="499">499</th><td>        <b>switch</b>(metastate)</td></tr>
+<tr><th id="500">500</th><td>        {</td></tr>
+<tr><th id="501">501</th><td>        <b>case</b> <var>1</var>:</td></tr>
+<tr><th id="502">502</th><td>            NewMetaState = G4FFGEnumerations::META_1;</td></tr>
+<tr><th id="503">503</th><td>            <b>break</b>;</td></tr>
+<tr><th id="504">504</th><td></td></tr>
+<tr><th id="505">505</th><td>        <b>case</b> <var>2</var>:</td></tr>
+<tr><th id="506">506</th><td>            NewMetaState = G4FFGEnumerations::META_2;</td></tr>
+<tr><th id="507">507</th><td>            <b>break</b>;</td></tr>
+<tr><th id="508">508</th><td></td></tr>
+<tr><th id="509">509</th><td>        <b>default</b>:</td></tr>
+<tr><th id="510">510</th><td>            G4Exception(<q>"G4ENDFTapeRead::ReadInData()"</q>,</td></tr>
+<tr><th id="511">511</th><td>                        <q>"Unsupported state"</q>,</td></tr>
+<tr><th id="512">512</th><td>                        JustWarning,</td></tr>
+<tr><th id="513">513</th><td>                        <q>"Unsupported metastable state supplied in fission yield data. Defaulting to the ground state"</q>);</td></tr>
+<tr><th id="514">514</th><td>            <i>// Fall through</i></td></tr>
+<tr><th id="515">515</th><td>        <b>case</b> <var>0</var>:</td></tr>
+<tr><th id="516">516</th><td>            NewMetaState = G4FFGEnumerations::GROUND_STATE;</td></tr>
+<tr><th id="517">517</th><td>            <b>break</b>;</td></tr>
+<tr><th id="518">518</th><td>        }</td></tr>
+<tr><th id="519">519</th><td>        NewProduct = (identifier - metastate) / <var>10</var>;</td></tr>
+<tr><th id="520">520</th><td></td></tr>
+<tr><th id="521">521</th><td>        <b>for</b>(G4int energyGroup = <var>0</var>; energyGroup &lt; EnergyGroups_; energyGroup++)</td></tr>
+<tr><th id="522">522</th><td>        {</td></tr>
+<tr><th id="523">523</th><td>            <b>if</b>(energyGroup &lt; (<em>signed</em>)<span class='error' title="use of undeclared identifier &apos;dataIterator&apos;">dataIterator</span>-&gt;second.first.size())</td></tr>
+<tr><th id="524">524</th><td>            {</td></tr>
+<tr><th id="525">525</th><td>                yield = <span class='error' title="use of undeclared identifier &apos;dataIterator&apos;">dataIterator</span>-&gt;second.first[energyGroup];</td></tr>
+<tr><th id="526">526</th><td>                error = <span class='error' title="use of undeclared identifier &apos;dataIterator&apos;">dataIterator</span>-&gt;second.second[energyGroup];</td></tr>
+<tr><th id="527">527</th><td>            } <b>else</b></td></tr>
+<tr><th id="528">528</th><td>            {</td></tr>
+<tr><th id="529">529</th><td>                yield = <var>0.0</var>;</td></tr>
+<tr><th id="530">530</th><td>                error = <var>0.0</var>;</td></tr>
+<tr><th id="531">531</th><td>            }</td></tr>
+<tr><th id="532">532</th><td></td></tr>
+<tr><th id="533">533</th><td>            NewYield[energyGroup] = yield;</td></tr>
+<tr><th id="534">534</th><td>            NewError[energyGroup] = error;</td></tr>
+<tr><th id="535">535</th><td>        }</td></tr>
+<tr><th id="536">536</th><td></td></tr>
+<tr><th id="537">537</th><td>        NewDataContainer = YieldContainerTable_-&gt;G4GetNewContainer(EnergyGroups_);</td></tr>
+<tr><th id="538">538</th><td>        NewDataContainer-&gt;SetProduct(NewProduct);</td></tr>
+<tr><th id="539">539</th><td>        NewDataContainer-&gt;SetMetaState(NewMetaState);</td></tr>
+<tr><th id="540">540</th><td>        NewDataContainer-&gt;SetYieldProbability(NewYield);</td></tr>
+<tr><th id="541">541</th><td>        NewDataContainer-&gt;SetYieldError(NewError);</td></tr>
+<tr><th id="542">542</th><td>    }</td></tr>
+<tr><th id="543">543</th><td></td></tr>
+<tr><th id="544">544</th><td>    <b>delete</b>[] NewYield;</td></tr>
+<tr><th id="545">545</th><td>    <b>delete</b>[] NewError;</td></tr>
+<tr><th id="546">546</th><td></td></tr>
+<tr><th id="547">547</th><td><a class="macro" href="../include/G4FFGDebuggingMacros.hh.html#219" title="G4FFG_DEPTH--;" data-ref="_M/G4FFG_FUNCTIONLEAVE__">G4FFG_FUNCTIONLEAVE__</a></td></tr>
+<tr><th id="548">548</th><td>}</td></tr>
+<tr><th id="549">549</th><td></td></tr>
+<tr><th id="550">550</th><td><a class="type" href="../include/G4ENDFTapeRead.hh.html#G4ENDFTapeRead" title='G4ENDFTapeRead' data-ref="G4ENDFTapeRead">G4ENDFTapeRead</a>::</td></tr>
+<tr><th id="551">551</th><td><dfn class="decl def" id="_ZN14G4ENDFTapeReadD1Ev" title='G4ENDFTapeRead::~G4ENDFTapeRead' data-ref="_ZN14G4ENDFTapeReadD1Ev">~G4ENDFTapeRead</dfn>( <em>void</em> )</td></tr>
+<tr><th id="552">552</th><td>{</td></tr>
+<tr><th id="553">553</th><td><a class="macro" href="../include/G4FFGDebuggingMacros.hh.html#215" title="G4FFG_DEPTH++;" data-ref="_M/G4FFG_FUNCTIONENTER__">G4FFG_FUNCTIONENTER__</a></td></tr>
+<tr><th id="554">554</th><td></td></tr>
+<tr><th id="555">555</th><td>    <b>delete</b>[] <a class="member" href="../include/G4ENDFTapeRead.hh.html#G4ENDFTapeRead::EnergyGroupValues_" title='G4ENDFTapeRead::EnergyGroupValues_' data-ref="G4ENDFTapeRead::EnergyGroupValues_">EnergyGroupValues_</a>;</td></tr>
+<tr><th id="556">556</th><td>    <b>delete</b> <a class="member" href="../include/G4ENDFTapeRead.hh.html#G4ENDFTapeRead::YieldContainerTable_" title='G4ENDFTapeRead::YieldContainerTable_' data-ref="G4ENDFTapeRead::YieldContainerTable_">YieldContainerTable_</a>;</td></tr>
+<tr><th id="557">557</th><td></td></tr>
+<tr><th id="558">558</th><td><a class="macro" href="../include/G4FFGDebuggingMacros.hh.html#219" title="G4FFG_DEPTH--;" data-ref="_M/G4FFG_FUNCTIONLEAVE__">G4FFG_FUNCTIONLEAVE__</a></td></tr>
+<tr><th id="559">559</th><td>}</td></tr>
+<tr><th id="560">560</th><td></td></tr>
+<tr><th id="561">561</th><td></td></tr>
+</table><hr/><p id='footer'>
+Generated on <em>2019-Aug-28</em> from project codebrowser<br />Powered by <a href='https://woboq.com'><img alt='Woboq' src='https://code.woboq.org/woboq-16.png' width='41' height='16' /></a> <a href='https://code.woboq.org'>Code Browser</a> 2.1
+<br/>Generator usage only permitted with license.</p>
+</div></body></html>

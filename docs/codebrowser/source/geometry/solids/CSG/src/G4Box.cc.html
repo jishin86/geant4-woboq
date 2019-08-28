@@ -1,0 +1,578 @@
+<!doctype html>
+<html>
+<head>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"><title>G4Box.cc source code [codebrowser/source/geometry/solids/CSG/src/G4Box.cc] - Woboq Code Browser</title>
+<link rel="stylesheet" href="../../../../../../../data/qtcreator.css" title="QtCreator"/>
+<link rel="alternate stylesheet" href="../../../../../../../data/kdevelop.css" title="KDevelop"/>
+<script type="text/javascript" src="../../../../../../../data/jquery/jquery.min.js"></script>
+<script type="text/javascript" src="../../../../../../../data/jquery/jquery-ui.min.js"></script>
+<script>var file = 'codebrowser/source/geometry/solids/CSG/src/G4Box.cc'; var root_path = '../../../../../..'; var data_path = '../../../../../../../data';</script>
+<script src='../../../../../../../data/codebrowser.js'></script>
+</head>
+<body><div id='header'><h1 id='breadcrumb'><span>Browse the source code of </span><a href='../../../../..'>codebrowser</a>/<a href='../../../..'>source</a>/<a href='../../..'>geometry</a>/<a href='../..'>solids</a>/<a href='..'>CSG</a>/<a href='./'>src</a>/<a href='G4Box.cc.html'>G4Box.cc</a></h1></div>
+<hr/><div id='content'><table class="code">
+<tr><th id="1">1</th><td><i>//</i></td></tr>
+<tr><th id="2">2</th><td><i>// ********************************************************************</i></td></tr>
+<tr><th id="3">3</th><td><i>// * License and Disclaimer                                           *</i></td></tr>
+<tr><th id="4">4</th><td><i>// *                                                                  *</i></td></tr>
+<tr><th id="5">5</th><td><i>// * The  Geant4 software  is  copyright of the Copyright Holders  of *</i></td></tr>
+<tr><th id="6">6</th><td><i>// * the Geant4 Collaboration.  It is provided  under  the terms  and *</i></td></tr>
+<tr><th id="7">7</th><td><i>// * conditions of the Geant4 Software License,  included in the file *</i></td></tr>
+<tr><th id="8">8</th><td><i>// * LICENSE and available at  <a href="http://cern.ch/geant4/license">http://cern.ch/geant4/license</a> .  These *</i></td></tr>
+<tr><th id="9">9</th><td><i>// * include a list of copyright holders.                             *</i></td></tr>
+<tr><th id="10">10</th><td><i>// *                                                                  *</i></td></tr>
+<tr><th id="11">11</th><td><i>// * Neither the authors of this software system, nor their employing *</i></td></tr>
+<tr><th id="12">12</th><td><i>// * institutes,nor the agencies providing financial support for this *</i></td></tr>
+<tr><th id="13">13</th><td><i>// * work  make  any representation or  warranty, express or implied, *</i></td></tr>
+<tr><th id="14">14</th><td><i>// * regarding  this  software system or assume any liability for its *</i></td></tr>
+<tr><th id="15">15</th><td><i>// * use.  Please see the license in the file  LICENSE  and URL above *</i></td></tr>
+<tr><th id="16">16</th><td><i>// * for the full disclaimer and the limitation of liability.         *</i></td></tr>
+<tr><th id="17">17</th><td><i>// *                                                                  *</i></td></tr>
+<tr><th id="18">18</th><td><i>// * This  code  implementation is the result of  the  scientific and *</i></td></tr>
+<tr><th id="19">19</th><td><i>// * technical work of the GEANT4 collaboration.                      *</i></td></tr>
+<tr><th id="20">20</th><td><i>// * By using,  copying,  modifying or  distributing the software (or *</i></td></tr>
+<tr><th id="21">21</th><td><i>// * any work based  on the software)  you  agree  to acknowledge its *</i></td></tr>
+<tr><th id="22">22</th><td><i>// * use  in  resulting  scientific  publications,  and indicate your *</i></td></tr>
+<tr><th id="23">23</th><td><i>// * acceptance of all terms of the Geant4 Software license.          *</i></td></tr>
+<tr><th id="24">24</th><td><i>// ********************************************************************</i></td></tr>
+<tr><th id="25">25</th><td><i>//</i></td></tr>
+<tr><th id="26">26</th><td><i>//</i></td></tr>
+<tr><th id="27">27</th><td><i>//</i></td></tr>
+<tr><th id="28">28</th><td><i>// </i></td></tr>
+<tr><th id="29">29</th><td><i>//</i></td></tr>
+<tr><th id="30">30</th><td><i>// Implementation for G4Box class</i></td></tr>
+<tr><th id="31">31</th><td><i>//</i></td></tr>
+<tr><th id="32">32</th><td><i>//  24.06.98 - V.Grichine: insideEdge in DistanceToIn(p,v)</i></td></tr>
+<tr><th id="33">33</th><td><i>//  20.09.98 - V.Grichine: new algorithm of DistanceToIn(p,v)</i></td></tr>
+<tr><th id="34">34</th><td><i>//  07.05.00 - V.Grichine: d= DistanceToIn(p,v), if d&lt;e/2, d=0</i></td></tr>
+<tr><th id="35">35</th><td><i>//  09.06.00 - V.Grichine: safety in DistanceToIn(p) against Inside(p)=kOutside</i></td></tr>
+<tr><th id="36">36</th><td><i>//             and information before exception in DistanceToOut(p,v,...)</i></td></tr>
+<tr><th id="37">37</th><td><i>//  15.11.00 - D.Williams, V.Grichine: bug fixed in CalculateExtent - change</i></td></tr>
+<tr><th id="38">38</th><td><i>//                                     algorithm for rotated vertices</i></td></tr>
+<tr><th id="39">39</th><td><i>//  23.08.16 - E.Tcherniaev: use G4BoundingEnvelope for CalculateExtent()</i></td></tr>
+<tr><th id="40">40</th><td><i>//  18.04.17 - E.Tcherniaev: complete revision, speed-up</i></td></tr>
+<tr><th id="41">41</th><td><i>// --------------------------------------------------------------------</i></td></tr>
+<tr><th id="42">42</th><td></td></tr>
+<tr><th id="43">43</th><td><u>#include <a href="../include/G4Box.hh.html">"G4Box.hh"</a></u></td></tr>
+<tr><th id="44">44</th><td></td></tr>
+<tr><th id="45">45</th><td><u>#<span data-ppcond="45">if</span> !defined(<span class="macro" data-ref="_M/G4GEOM_USE_UBOX">G4GEOM_USE_UBOX</span>)</u></td></tr>
+<tr><th id="46">46</th><td></td></tr>
+<tr><th id="47">47</th><td><u>#include <a href="../../../../global/management/include/G4SystemOfUnits.hh.html">"G4SystemOfUnits.hh"</a></u></td></tr>
+<tr><th id="48">48</th><td><u>#include <a href="../../../management/include/G4VoxelLimits.hh.html">"G4VoxelLimits.hh"</a></u></td></tr>
+<tr><th id="49">49</th><td><u>#include <a href="../../../management/include/G4AffineTransform.hh.html">"G4AffineTransform.hh"</a></u></td></tr>
+<tr><th id="50">50</th><td><u>#include <a href="../../../management/include/G4BoundingEnvelope.hh.html">"G4BoundingEnvelope.hh"</a></u></td></tr>
+<tr><th id="51">51</th><td><u>#include <a href="../../../../global/HEPRandom/include/Randomize.hh.html">"Randomize.hh"</a></u></td></tr>
+<tr><th id="52">52</th><td></td></tr>
+<tr><th id="53">53</th><td><u>#include <a href="../../../management/include/G4VPVParameterisation.hh.html">"G4VPVParameterisation.hh"</a></u></td></tr>
+<tr><th id="54">54</th><td></td></tr>
+<tr><th id="55">55</th><td><u>#include <a href="../../../../graphics_reps/include/G4VGraphicsScene.hh.html">"G4VGraphicsScene.hh"</a></u></td></tr>
+<tr><th id="56">56</th><td><u>#include <a href="../../../../graphics_reps/include/G4VisExtent.hh.html">"G4VisExtent.hh"</a></u></td></tr>
+<tr><th id="57">57</th><td></td></tr>
+<tr><th id="58">58</th><td><i>////////////////////////////////////////////////////////////////////////</i></td></tr>
+<tr><th id="59">59</th><td><i>//</i></td></tr>
+<tr><th id="60">60</th><td><i>// Constructor - check &amp; set half widths</i></td></tr>
+<tr><th id="61">61</th><td></td></tr>
+<tr><th id="62">62</th><td><a class="type" href="../include/G4Box.hh.html#G4Box" title='G4Box' data-ref="G4Box">G4Box</a>::<dfn class="decl def" id="_ZN5G4BoxC1ERK8G4Stringddd" title='G4Box::G4Box' data-ref="_ZN5G4BoxC1ERK8G4Stringddd">G4Box</dfn>(<em>const</em> <a class="type" href="../../../../global/management/include/G4String.hh.html#G4String" title='G4String' data-ref="G4String">G4String</a>&amp; <dfn class="local col1 decl" id="1pName" title='pName' data-type='const G4String &amp;' data-ref="1pName">pName</dfn>,</td></tr>
+<tr><th id="63">63</th><td>                   <a class="typedef" href="../../../../global/management/include/G4Types.hh.html#G4double" title='G4double' data-type='double' data-ref="G4double">G4double</a> <dfn class="local col2 decl" id="2pX" title='pX' data-type='G4double' data-ref="2pX">pX</dfn>,</td></tr>
+<tr><th id="64">64</th><td>                   <a class="typedef" href="../../../../global/management/include/G4Types.hh.html#G4double" title='G4double' data-type='double' data-ref="G4double">G4double</a> <dfn class="local col3 decl" id="3pY" title='pY' data-type='G4double' data-ref="3pY">pY</dfn>,</td></tr>
+<tr><th id="65">65</th><td>                   <a class="typedef" href="../../../../global/management/include/G4Types.hh.html#G4double" title='G4double' data-type='double' data-ref="G4double">G4double</a> <dfn class="local col4 decl" id="4pZ" title='pZ' data-type='G4double' data-ref="4pZ">pZ</dfn>)</td></tr>
+<tr><th id="66">66</th><td>  : <a class="type" href="../include/G4CSGSolid.hh.html#G4CSGSolid" title='G4CSGSolid' data-ref="G4CSGSolid">G4CSGSolid</a><a class="ref" href="../include/G4CSGSolid.hh.html#_ZN10G4CSGSolidC1ERK8G4String" title='G4CSGSolid::G4CSGSolid' data-ref="_ZN10G4CSGSolidC1ERK8G4String">(</a><a class="local col1 ref" href="#1pName" title='pName' data-ref="1pName">pName</a>), <a class="member" href="../include/G4Box.hh.html#G4Box::fDx" title='G4Box::fDx' data-ref="G4Box::fDx">fDx</a>(<a class="local col2 ref" href="#2pX" title='pX' data-ref="2pX">pX</a>), <a class="member" href="../include/G4Box.hh.html#G4Box::fDy" title='G4Box::fDy' data-ref="G4Box::fDy">fDy</a>(<a class="local col3 ref" href="#3pY" title='pY' data-ref="3pY">pY</a>), <a class="member" href="../include/G4Box.hh.html#G4Box::fDz" title='G4Box::fDz' data-ref="G4Box::fDz">fDz</a>(<a class="local col4 ref" href="#4pZ" title='pZ' data-ref="4pZ">pZ</a>)</td></tr>
+<tr><th id="67">67</th><td>{</td></tr>
+<tr><th id="68">68</th><td>  <a class="member" href="../include/G4Box.hh.html#G4Box::delta" title='G4Box::delta' data-ref="G4Box::delta">delta</a> = <var>0.5</var>*<a class="member" href="../../../management/include/G4VSolid.hh.html#G4VSolid::kCarTolerance" title='G4VSolid::kCarTolerance' data-ref="G4VSolid::kCarTolerance">kCarTolerance</a>;</td></tr>
+<tr><th id="69">69</th><td>  <b>if</b> (<a class="local col2 ref" href="#2pX" title='pX' data-ref="2pX">pX</a> &lt; <var>2</var>*<a class="member" href="../../../management/include/G4VSolid.hh.html#G4VSolid::kCarTolerance" title='G4VSolid::kCarTolerance' data-ref="G4VSolid::kCarTolerance">kCarTolerance</a> ||</td></tr>
+<tr><th id="70">70</th><td>      <a class="local col3 ref" href="#3pY" title='pY' data-ref="3pY">pY</a> &lt; <var>2</var>*<a class="member" href="../../../management/include/G4VSolid.hh.html#G4VSolid::kCarTolerance" title='G4VSolid::kCarTolerance' data-ref="G4VSolid::kCarTolerance">kCarTolerance</a> ||</td></tr>
+<tr><th id="71">71</th><td>      <a class="local col4 ref" href="#4pZ" title='pZ' data-ref="4pZ">pZ</a> &lt; <var>2</var>*<a class="member" href="../../../management/include/G4VSolid.hh.html#G4VSolid::kCarTolerance" title='G4VSolid::kCarTolerance' data-ref="G4VSolid::kCarTolerance">kCarTolerance</a>)  <i>// limit to thickness of surfaces</i></td></tr>
+<tr><th id="72">72</th><td>  {</td></tr>
+<tr><th id="73">73</th><td>    <span class='error' title="use of undeclared identifier &apos;std&apos;">std</span>::ostringstream <dfn class="local col5 decl" id="5message" title='message' data-type='int' data-ref="5message">message</dfn>;</td></tr>
+<tr><th id="74">74</th><td>    message &lt;&lt; <q>"Dimensions too small for Solid: "</q> &lt;&lt; GetName() &lt;&lt; <q>"!"</q> &lt;&lt; <a class="macro" href="../../../../global/management/include/G4ios.hh.html#60" title="std::endl" data-ref="_M/G4endl">G4endl</a></td></tr>
+<tr><th id="75">75</th><td>            &lt;&lt; <q>"     hX, hY, hZ = "</q> &lt;&lt; pX &lt;&lt; <q>", "</q> &lt;&lt; pY &lt;&lt; <q>", "</q> &lt;&lt; pZ;</td></tr>
+<tr><th id="76">76</th><td>    G4Exception(<q>"G4Box::G4Box()"</q>, <q>"GeomSolids0002"</q>, FatalException, message);</td></tr>
+<tr><th id="77">77</th><td>  }</td></tr>
+<tr><th id="78">78</th><td>}</td></tr>
+<tr><th id="79">79</th><td></td></tr>
+<tr><th id="80">80</th><td><i>//////////////////////////////////////////////////////////////////////////</i></td></tr>
+<tr><th id="81">81</th><td><i>//</i></td></tr>
+<tr><th id="82">82</th><td><i>// Fake default constructor - sets only member data and allocates memory</i></td></tr>
+<tr><th id="83">83</th><td><i>//                            for usage restricted to object persistency</i></td></tr>
+<tr><th id="84">84</th><td></td></tr>
+<tr><th id="85">85</th><td><a class="type" href="../include/G4Box.hh.html#G4Box" title='G4Box' data-ref="G4Box">G4Box</a>::<dfn class="decl def" id="_ZN5G4BoxC1ER8__void__" title='G4Box::G4Box' data-ref="_ZN5G4BoxC1ER8__void__">G4Box</dfn>( <a class="type" href="../../../../global/management/include/G4Types.hh.html#__void__" title='__void__' data-ref="__void__">__void__</a>&amp; <dfn class="local col6 decl" id="6a" title='a' data-type='__void__ &amp;' data-ref="6a">a</dfn> )</td></tr>
+<tr><th id="86">86</th><td>  : <a class="type" href="../include/G4CSGSolid.hh.html#G4CSGSolid" title='G4CSGSolid' data-ref="G4CSGSolid">G4CSGSolid</a><a class="ref" href="../include/G4CSGSolid.hh.html#_ZN10G4CSGSolidC1ER8__void__" title='G4CSGSolid::G4CSGSolid' data-ref="_ZN10G4CSGSolidC1ER8__void__">(</a><a class="local col6 ref" href="#6a" title='a' data-ref="6a">a</a>), <a class="member" href="../include/G4Box.hh.html#G4Box::fDx" title='G4Box::fDx' data-ref="G4Box::fDx">fDx</a>(<var>0.</var>), <a class="member" href="../include/G4Box.hh.html#G4Box::fDy" title='G4Box::fDy' data-ref="G4Box::fDy">fDy</a>(<var>0.</var>), <a class="member" href="../include/G4Box.hh.html#G4Box::fDz" title='G4Box::fDz' data-ref="G4Box::fDz">fDz</a>(<var>0.</var>), <a class="member" href="../include/G4Box.hh.html#G4Box::delta" title='G4Box::delta' data-ref="G4Box::delta">delta</a>(<var>0.</var>)</td></tr>
+<tr><th id="87">87</th><td>{</td></tr>
+<tr><th id="88">88</th><td>}</td></tr>
+<tr><th id="89">89</th><td></td></tr>
+<tr><th id="90">90</th><td><i>//////////////////////////////////////////////////////////////////////////</i></td></tr>
+<tr><th id="91">91</th><td><i>//</i></td></tr>
+<tr><th id="92">92</th><td><i>// Destructor</i></td></tr>
+<tr><th id="93">93</th><td></td></tr>
+<tr><th id="94">94</th><td><a class="type" href="../include/G4Box.hh.html#G4Box" title='G4Box' data-ref="G4Box">G4Box</a>::<dfn class="virtual decl def" id="_ZN5G4BoxD1Ev" title='G4Box::~G4Box' data-ref="_ZN5G4BoxD1Ev">~G4Box</dfn>()</td></tr>
+<tr><th id="95">95</th><td>{</td></tr>
+<tr><th id="96">96</th><td>}</td></tr>
+<tr><th id="97">97</th><td></td></tr>
+<tr><th id="98">98</th><td><i>//////////////////////////////////////////////////////////////////////////</i></td></tr>
+<tr><th id="99">99</th><td><i>//</i></td></tr>
+<tr><th id="100">100</th><td><i>// Copy constructor</i></td></tr>
+<tr><th id="101">101</th><td></td></tr>
+<tr><th id="102">102</th><td><a class="type" href="../include/G4Box.hh.html#G4Box" title='G4Box' data-ref="G4Box">G4Box</a>::<dfn class="decl def" id="_ZN5G4BoxC1ERKS_" title='G4Box::G4Box' data-ref="_ZN5G4BoxC1ERKS_">G4Box</dfn>(<em>const</em> <a class="type" href="../include/G4Box.hh.html#G4Box" title='G4Box' data-ref="G4Box">G4Box</a>&amp; <dfn class="local col7 decl" id="7rhs" title='rhs' data-type='const G4Box &amp;' data-ref="7rhs">rhs</dfn>)</td></tr>
+<tr><th id="103">103</th><td>  : <a class="type" href="../include/G4CSGSolid.hh.html#G4CSGSolid" title='G4CSGSolid' data-ref="G4CSGSolid">G4CSGSolid</a><a class="ref" href="../include/G4CSGSolid.hh.html#_ZN10G4CSGSolidC1ERKS_" title='G4CSGSolid::G4CSGSolid' data-ref="_ZN10G4CSGSolidC1ERKS_">(</a><a class="local col7 ref" href="#7rhs" title='rhs' data-ref="7rhs">rhs</a>), <a class="member" href="../include/G4Box.hh.html#G4Box::fDx" title='G4Box::fDx' data-ref="G4Box::fDx">fDx</a>(<a class="local col7 ref" href="#7rhs" title='rhs' data-ref="7rhs">rhs</a>.<a class="member" href="../include/G4Box.hh.html#G4Box::fDx" title='G4Box::fDx' data-ref="G4Box::fDx">fDx</a>), <a class="member" href="../include/G4Box.hh.html#G4Box::fDy" title='G4Box::fDy' data-ref="G4Box::fDy">fDy</a>(<a class="local col7 ref" href="#7rhs" title='rhs' data-ref="7rhs">rhs</a>.<a class="member" href="../include/G4Box.hh.html#G4Box::fDy" title='G4Box::fDy' data-ref="G4Box::fDy">fDy</a>), <a class="member" href="../include/G4Box.hh.html#G4Box::fDz" title='G4Box::fDz' data-ref="G4Box::fDz">fDz</a>(<a class="local col7 ref" href="#7rhs" title='rhs' data-ref="7rhs">rhs</a>.<a class="member" href="../include/G4Box.hh.html#G4Box::fDz" title='G4Box::fDz' data-ref="G4Box::fDz">fDz</a>), <a class="member" href="../include/G4Box.hh.html#G4Box::delta" title='G4Box::delta' data-ref="G4Box::delta">delta</a>(<a class="local col7 ref" href="#7rhs" title='rhs' data-ref="7rhs">rhs</a>.<a class="member" href="../include/G4Box.hh.html#G4Box::delta" title='G4Box::delta' data-ref="G4Box::delta">delta</a>)</td></tr>
+<tr><th id="104">104</th><td>{</td></tr>
+<tr><th id="105">105</th><td>}</td></tr>
+<tr><th id="106">106</th><td></td></tr>
+<tr><th id="107">107</th><td><i>//////////////////////////////////////////////////////////////////////////</i></td></tr>
+<tr><th id="108">108</th><td><i>//</i></td></tr>
+<tr><th id="109">109</th><td><i>// Assignment operator</i></td></tr>
+<tr><th id="110">110</th><td></td></tr>
+<tr><th id="111">111</th><td><a class="type" href="../include/G4Box.hh.html#G4Box" title='G4Box' data-ref="G4Box">G4Box</a>&amp; <a class="type" href="../include/G4Box.hh.html#G4Box" title='G4Box' data-ref="G4Box">G4Box</a>::<dfn class="decl def" id="_ZN5G4BoxaSERKS_" title='G4Box::operator=' data-ref="_ZN5G4BoxaSERKS_"><b>operator</b> =</dfn> (<em>const</em> <a class="type" href="../include/G4Box.hh.html#G4Box" title='G4Box' data-ref="G4Box">G4Box</a>&amp; <dfn class="local col8 decl" id="8rhs" title='rhs' data-type='const G4Box &amp;' data-ref="8rhs">rhs</dfn>)</td></tr>
+<tr><th id="112">112</th><td>{</td></tr>
+<tr><th id="113">113</th><td>   <i>// Check assignment to self</i></td></tr>
+<tr><th id="114">114</th><td><i>   //</i></td></tr>
+<tr><th id="115">115</th><td>   <b>if</b> (<b>this</b> == &amp;<a class="local col8 ref" href="#8rhs" title='rhs' data-ref="8rhs">rhs</a>)  { <b>return</b> *<b>this</b>; }</td></tr>
+<tr><th id="116">116</th><td></td></tr>
+<tr><th id="117">117</th><td>   <i>// Copy base class data</i></td></tr>
+<tr><th id="118">118</th><td><i>   //</i></td></tr>
+<tr><th id="119">119</th><td>   <a class="type" href="../include/G4CSGSolid.hh.html#G4CSGSolid" title='G4CSGSolid' data-ref="G4CSGSolid">G4CSGSolid</a>::<a class="member" href="../include/G4CSGSolid.hh.html#_ZN10G4CSGSolidaSERKS_" title='G4CSGSolid::operator=' data-ref="_ZN10G4CSGSolidaSERKS_"><b>operator</b>=</a>(<a class="local col8 ref" href="#8rhs" title='rhs' data-ref="8rhs">rhs</a>);</td></tr>
+<tr><th id="120">120</th><td></td></tr>
+<tr><th id="121">121</th><td>   <i>// Copy data</i></td></tr>
+<tr><th id="122">122</th><td><i>   //</i></td></tr>
+<tr><th id="123">123</th><td>   <a class="member" href="../include/G4Box.hh.html#G4Box::fDx" title='G4Box::fDx' data-ref="G4Box::fDx">fDx</a> = <a class="local col8 ref" href="#8rhs" title='rhs' data-ref="8rhs">rhs</a>.<a class="member" href="../include/G4Box.hh.html#G4Box::fDx" title='G4Box::fDx' data-ref="G4Box::fDx">fDx</a>;</td></tr>
+<tr><th id="124">124</th><td>   <a class="member" href="../include/G4Box.hh.html#G4Box::fDy" title='G4Box::fDy' data-ref="G4Box::fDy">fDy</a> = <a class="local col8 ref" href="#8rhs" title='rhs' data-ref="8rhs">rhs</a>.<a class="member" href="../include/G4Box.hh.html#G4Box::fDy" title='G4Box::fDy' data-ref="G4Box::fDy">fDy</a>;</td></tr>
+<tr><th id="125">125</th><td>   <a class="member" href="../include/G4Box.hh.html#G4Box::fDz" title='G4Box::fDz' data-ref="G4Box::fDz">fDz</a> = <a class="local col8 ref" href="#8rhs" title='rhs' data-ref="8rhs">rhs</a>.<a class="member" href="../include/G4Box.hh.html#G4Box::fDz" title='G4Box::fDz' data-ref="G4Box::fDz">fDz</a>;</td></tr>
+<tr><th id="126">126</th><td>   <a class="member" href="../include/G4Box.hh.html#G4Box::delta" title='G4Box::delta' data-ref="G4Box::delta">delta</a> = <a class="local col8 ref" href="#8rhs" title='rhs' data-ref="8rhs">rhs</a>.<a class="member" href="../include/G4Box.hh.html#G4Box::delta" title='G4Box::delta' data-ref="G4Box::delta">delta</a>;</td></tr>
+<tr><th id="127">127</th><td></td></tr>
+<tr><th id="128">128</th><td>   <b>return</b> *<b>this</b>;</td></tr>
+<tr><th id="129">129</th><td>}</td></tr>
+<tr><th id="130">130</th><td></td></tr>
+<tr><th id="131">131</th><td><i>//////////////////////////////////////////////////////////////////////////</i></td></tr>
+<tr><th id="132">132</th><td><i>//</i></td></tr>
+<tr><th id="133">133</th><td><i>//  Set X dimension</i></td></tr>
+<tr><th id="134">134</th><td></td></tr>
+<tr><th id="135">135</th><td><em>void</em> <a class="type" href="../include/G4Box.hh.html#G4Box" title='G4Box' data-ref="G4Box">G4Box</a>::<dfn class="decl def" id="_ZN5G4Box14SetXHalfLengthEd" title='G4Box::SetXHalfLength' data-ref="_ZN5G4Box14SetXHalfLengthEd">SetXHalfLength</dfn>(<a class="typedef" href="../../../../global/management/include/G4Types.hh.html#G4double" title='G4double' data-type='double' data-ref="G4double">G4double</a> <dfn class="local col9 decl" id="9dx" title='dx' data-type='G4double' data-ref="9dx">dx</dfn>)</td></tr>
+<tr><th id="136">136</th><td>{</td></tr>
+<tr><th id="137">137</th><td>  <b>if</b>(<a class="local col9 ref" href="#9dx" title='dx' data-ref="9dx">dx</a> &gt; <var>2</var>*<a class="member" href="../../../management/include/G4VSolid.hh.html#G4VSolid::kCarTolerance" title='G4VSolid::kCarTolerance' data-ref="G4VSolid::kCarTolerance">kCarTolerance</a>)  <i>// limit to thickness of surfaces</i></td></tr>
+<tr><th id="138">138</th><td>  {</td></tr>
+<tr><th id="139">139</th><td>    <a class="member" href="../include/G4Box.hh.html#G4Box::fDx" title='G4Box::fDx' data-ref="G4Box::fDx">fDx</a> = <a class="local col9 ref" href="#9dx" title='dx' data-ref="9dx">dx</a>;</td></tr>
+<tr><th id="140">140</th><td>  }</td></tr>
+<tr><th id="141">141</th><td>  <b>else</b></td></tr>
+<tr><th id="142">142</th><td>  {</td></tr>
+<tr><th id="143">143</th><td>    <span class='error' title="use of undeclared identifier &apos;std&apos;">std</span>::ostringstream <dfn class="local col0 decl" id="10message" title='message' data-type='int' data-ref="10message">message</dfn>;</td></tr>
+<tr><th id="144">144</th><td>    message &lt;&lt; <q>"Dimension X too small for solid: "</q> &lt;&lt; GetName() &lt;&lt; <q>"!"</q></td></tr>
+<tr><th id="145">145</th><td>            &lt;&lt; <a class="macro" href="../../../../global/management/include/G4ios.hh.html#60" title="std::endl" data-ref="_M/G4endl">G4endl</a></td></tr>
+<tr><th id="146">146</th><td>            &lt;&lt; <q>"       hX = "</q> &lt;&lt; dx;</td></tr>
+<tr><th id="147">147</th><td>    G4Exception(<q>"G4Box::SetXHalfLength()"</q>, <q>"GeomSolids0002"</q>,</td></tr>
+<tr><th id="148">148</th><td>                FatalException, message);</td></tr>
+<tr><th id="149">149</th><td>  }</td></tr>
+<tr><th id="150">150</th><td>  <a class="member" href="../include/G4CSGSolid.hh.html#G4CSGSolid::fCubicVolume" title='G4CSGSolid::fCubicVolume' data-ref="G4CSGSolid::fCubicVolume">fCubicVolume</a> = <var>0.</var>;</td></tr>
+<tr><th id="151">151</th><td>  <a class="member" href="../include/G4CSGSolid.hh.html#G4CSGSolid::fSurfaceArea" title='G4CSGSolid::fSurfaceArea' data-ref="G4CSGSolid::fSurfaceArea">fSurfaceArea</a> = <var>0.</var>;</td></tr>
+<tr><th id="152">152</th><td>  <a class="member" href="../include/G4CSGSolid.hh.html#G4CSGSolid::fRebuildPolyhedron" title='G4CSGSolid::fRebuildPolyhedron' data-ref="G4CSGSolid::fRebuildPolyhedron">fRebuildPolyhedron</a> = <b>true</b>;</td></tr>
+<tr><th id="153">153</th><td>} </td></tr>
+<tr><th id="154">154</th><td></td></tr>
+<tr><th id="155">155</th><td><i>//////////////////////////////////////////////////////////////////////////</i></td></tr>
+<tr><th id="156">156</th><td><i>//</i></td></tr>
+<tr><th id="157">157</th><td><i>//  Set Y dimension</i></td></tr>
+<tr><th id="158">158</th><td></td></tr>
+<tr><th id="159">159</th><td><em>void</em> <a class="type" href="../include/G4Box.hh.html#G4Box" title='G4Box' data-ref="G4Box">G4Box</a>::<dfn class="decl def" id="_ZN5G4Box14SetYHalfLengthEd" title='G4Box::SetYHalfLength' data-ref="_ZN5G4Box14SetYHalfLengthEd">SetYHalfLength</dfn>(<a class="typedef" href="../../../../global/management/include/G4Types.hh.html#G4double" title='G4double' data-type='double' data-ref="G4double">G4double</a> <dfn class="local col1 decl" id="11dy" title='dy' data-type='G4double' data-ref="11dy">dy</dfn>) </td></tr>
+<tr><th id="160">160</th><td>{</td></tr>
+<tr><th id="161">161</th><td>  <b>if</b>(<a class="local col1 ref" href="#11dy" title='dy' data-ref="11dy">dy</a> &gt; <var>2</var>*<a class="member" href="../../../management/include/G4VSolid.hh.html#G4VSolid::kCarTolerance" title='G4VSolid::kCarTolerance' data-ref="G4VSolid::kCarTolerance">kCarTolerance</a>)  <i>// limit to thickness of surfaces</i></td></tr>
+<tr><th id="162">162</th><td>  {</td></tr>
+<tr><th id="163">163</th><td>    <a class="member" href="../include/G4Box.hh.html#G4Box::fDy" title='G4Box::fDy' data-ref="G4Box::fDy">fDy</a> = <a class="local col1 ref" href="#11dy" title='dy' data-ref="11dy">dy</a>;</td></tr>
+<tr><th id="164">164</th><td>  }</td></tr>
+<tr><th id="165">165</th><td>  <b>else</b></td></tr>
+<tr><th id="166">166</th><td>  {</td></tr>
+<tr><th id="167">167</th><td>    <span class='error' title="use of undeclared identifier &apos;std&apos;">std</span>::ostringstream <dfn class="local col2 decl" id="12message" title='message' data-type='int' data-ref="12message">message</dfn>;</td></tr>
+<tr><th id="168">168</th><td>    message &lt;&lt; <q>"Dimension Y too small for solid: "</q> &lt;&lt; GetName() &lt;&lt; <q>"!\n"</q></td></tr>
+<tr><th id="169">169</th><td>            &lt;&lt; <q>"       hY = "</q> &lt;&lt; dy;</td></tr>
+<tr><th id="170">170</th><td>    G4Exception(<q>"G4Box::SetYHalfLength()"</q>, <q>"GeomSolids0002"</q>,</td></tr>
+<tr><th id="171">171</th><td>                FatalException, message);</td></tr>
+<tr><th id="172">172</th><td>  }</td></tr>
+<tr><th id="173">173</th><td>  <a class="member" href="../include/G4CSGSolid.hh.html#G4CSGSolid::fCubicVolume" title='G4CSGSolid::fCubicVolume' data-ref="G4CSGSolid::fCubicVolume">fCubicVolume</a> = <var>0.</var>;</td></tr>
+<tr><th id="174">174</th><td>  <a class="member" href="../include/G4CSGSolid.hh.html#G4CSGSolid::fSurfaceArea" title='G4CSGSolid::fSurfaceArea' data-ref="G4CSGSolid::fSurfaceArea">fSurfaceArea</a> = <var>0.</var>;</td></tr>
+<tr><th id="175">175</th><td>  <a class="member" href="../include/G4CSGSolid.hh.html#G4CSGSolid::fRebuildPolyhedron" title='G4CSGSolid::fRebuildPolyhedron' data-ref="G4CSGSolid::fRebuildPolyhedron">fRebuildPolyhedron</a> = <b>true</b>;</td></tr>
+<tr><th id="176">176</th><td>} </td></tr>
+<tr><th id="177">177</th><td></td></tr>
+<tr><th id="178">178</th><td><i>//////////////////////////////////////////////////////////////////////////</i></td></tr>
+<tr><th id="179">179</th><td><i>//</i></td></tr>
+<tr><th id="180">180</th><td><i>//  Set Z dimension</i></td></tr>
+<tr><th id="181">181</th><td></td></tr>
+<tr><th id="182">182</th><td><em>void</em> <a class="type" href="../include/G4Box.hh.html#G4Box" title='G4Box' data-ref="G4Box">G4Box</a>::<dfn class="decl def" id="_ZN5G4Box14SetZHalfLengthEd" title='G4Box::SetZHalfLength' data-ref="_ZN5G4Box14SetZHalfLengthEd">SetZHalfLength</dfn>(<a class="typedef" href="../../../../global/management/include/G4Types.hh.html#G4double" title='G4double' data-type='double' data-ref="G4double">G4double</a> <dfn class="local col3 decl" id="13dz" title='dz' data-type='G4double' data-ref="13dz">dz</dfn>)</td></tr>
+<tr><th id="183">183</th><td>{</td></tr>
+<tr><th id="184">184</th><td>  <b>if</b>(<a class="local col3 ref" href="#13dz" title='dz' data-ref="13dz">dz</a> &gt; <var>2</var>*<a class="member" href="../../../management/include/G4VSolid.hh.html#G4VSolid::kCarTolerance" title='G4VSolid::kCarTolerance' data-ref="G4VSolid::kCarTolerance">kCarTolerance</a>)  <i>// limit to thickness of surfaces</i></td></tr>
+<tr><th id="185">185</th><td>  {</td></tr>
+<tr><th id="186">186</th><td>    <a class="member" href="../include/G4Box.hh.html#G4Box::fDz" title='G4Box::fDz' data-ref="G4Box::fDz">fDz</a> = <a class="local col3 ref" href="#13dz" title='dz' data-ref="13dz">dz</a>;</td></tr>
+<tr><th id="187">187</th><td>  }</td></tr>
+<tr><th id="188">188</th><td>  <b>else</b></td></tr>
+<tr><th id="189">189</th><td>  {</td></tr>
+<tr><th id="190">190</th><td>    <span class='error' title="use of undeclared identifier &apos;std&apos;">std</span>::ostringstream <dfn class="local col4 decl" id="14message" title='message' data-type='int' data-ref="14message">message</dfn>;</td></tr>
+<tr><th id="191">191</th><td>    message &lt;&lt; <q>"Dimension Z too small for solid: "</q> &lt;&lt; GetName() &lt;&lt; <q>"!\n"</q></td></tr>
+<tr><th id="192">192</th><td>            &lt;&lt; <q>"       hZ = "</q> &lt;&lt; dz;</td></tr>
+<tr><th id="193">193</th><td>    G4Exception(<q>"G4Box::SetZHalfLength()"</q>, <q>"GeomSolids0002"</q>,</td></tr>
+<tr><th id="194">194</th><td>                FatalException, message);</td></tr>
+<tr><th id="195">195</th><td>  }</td></tr>
+<tr><th id="196">196</th><td>  <a class="member" href="../include/G4CSGSolid.hh.html#G4CSGSolid::fCubicVolume" title='G4CSGSolid::fCubicVolume' data-ref="G4CSGSolid::fCubicVolume">fCubicVolume</a> = <var>0.</var>;</td></tr>
+<tr><th id="197">197</th><td>  <a class="member" href="../include/G4CSGSolid.hh.html#G4CSGSolid::fSurfaceArea" title='G4CSGSolid::fSurfaceArea' data-ref="G4CSGSolid::fSurfaceArea">fSurfaceArea</a> = <var>0.</var>;</td></tr>
+<tr><th id="198">198</th><td>  <a class="member" href="../include/G4CSGSolid.hh.html#G4CSGSolid::fRebuildPolyhedron" title='G4CSGSolid::fRebuildPolyhedron' data-ref="G4CSGSolid::fRebuildPolyhedron">fRebuildPolyhedron</a> = <b>true</b>;</td></tr>
+<tr><th id="199">199</th><td>} </td></tr>
+<tr><th id="200">200</th><td></td></tr>
+<tr><th id="201">201</th><td><i>//////////////////////////////////////////////////////////////////////////</i></td></tr>
+<tr><th id="202">202</th><td><i>//</i></td></tr>
+<tr><th id="203">203</th><td><i>// Dispatch to parameterisation for replication mechanism dimension</i></td></tr>
+<tr><th id="204">204</th><td><i>// computation &amp; modification.</i></td></tr>
+<tr><th id="205">205</th><td></td></tr>
+<tr><th id="206">206</th><td><em>void</em> <a class="type" href="../include/G4Box.hh.html#G4Box" title='G4Box' data-ref="G4Box">G4Box</a>::<dfn class="virtual decl def" id="_ZN5G4Box17ComputeDimensionsEP21G4VPVParameterisationiPK17G4VPhysicalVolume" title='G4Box::ComputeDimensions' data-ref="_ZN5G4Box17ComputeDimensionsEP21G4VPVParameterisationiPK17G4VPhysicalVolume">ComputeDimensions</dfn>(<a class="type" href="../../../management/include/G4VPVParameterisation.hh.html#G4VPVParameterisation" title='G4VPVParameterisation' data-ref="G4VPVParameterisation">G4VPVParameterisation</a>* <dfn class="local col5 decl" id="15p" title='p' data-type='G4VPVParameterisation *' data-ref="15p">p</dfn>,</td></tr>
+<tr><th id="207">207</th><td>                              <em>const</em> <a class="typedef" href="../../../../global/management/include/G4Types.hh.html#G4int" title='G4int' data-type='int' data-ref="G4int">G4int</a> <dfn class="local col6 decl" id="16n" title='n' data-type='const G4int' data-ref="16n">n</dfn>,</td></tr>
+<tr><th id="208">208</th><td>                              <em>const</em> <a class="type" href="../../../management/include/G4VSolid.hh.html#G4VPhysicalVolume" title='G4VPhysicalVolume' data-ref="G4VPhysicalVolume">G4VPhysicalVolume</a>* <dfn class="local col7 decl" id="17pRep" title='pRep' data-type='const G4VPhysicalVolume *' data-ref="17pRep">pRep</dfn>)</td></tr>
+<tr><th id="209">209</th><td>{</td></tr>
+<tr><th id="210">210</th><td>  <a class="local col5 ref" href="#15p" title='p' data-ref="15p">p</a>-&gt;<a class="virtual ref" href="../../../management/include/G4VPVParameterisation.hh.html#_ZNK21G4VPVParameterisation17ComputeDimensionsER5G4BoxiPK17G4VPhysicalVolume" title='G4VPVParameterisation::ComputeDimensions' data-ref="_ZNK21G4VPVParameterisation17ComputeDimensionsER5G4BoxiPK17G4VPhysicalVolume">ComputeDimensions</a>(<span class='refarg'>*<b>this</b></span>,<a class="local col6 ref" href="#16n" title='n' data-ref="16n">n</a>,<a class="local col7 ref" href="#17pRep" title='pRep' data-ref="17pRep">pRep</a>);</td></tr>
+<tr><th id="211">211</th><td>}</td></tr>
+<tr><th id="212">212</th><td></td></tr>
+<tr><th id="213">213</th><td><i>//////////////////////////////////////////////////////////////////////////</i></td></tr>
+<tr><th id="214">214</th><td><i>//</i></td></tr>
+<tr><th id="215">215</th><td><i>// Get bounding box</i></td></tr>
+<tr><th id="216">216</th><td></td></tr>
+<tr><th id="217">217</th><td><em>void</em> <a class="type" href="../include/G4Box.hh.html#G4Box" title='G4Box' data-ref="G4Box">G4Box</a>::<dfn class="virtual decl def" id="_ZNK5G4Box14BoundingLimitsERN5CLHEP10Hep3VectorES2_" title='G4Box::BoundingLimits' data-ref="_ZNK5G4Box14BoundingLimitsERN5CLHEP10Hep3VectorES2_">BoundingLimits</dfn>(<a class="typedef" href="../../../../global/management/include/G4ThreeVector.hh.html#G4ThreeVector" title='G4ThreeVector' data-type='CLHEP::Hep3Vector' data-ref="G4ThreeVector">G4ThreeVector</a>&amp; <dfn class="local col8 decl" id="18pMin" title='pMin' data-type='G4ThreeVector &amp;' data-ref="18pMin">pMin</dfn>, <a class="typedef" href="../../../../global/management/include/G4ThreeVector.hh.html#G4ThreeVector" title='G4ThreeVector' data-type='CLHEP::Hep3Vector' data-ref="G4ThreeVector">G4ThreeVector</a>&amp; <dfn class="local col9 decl" id="19pMax" title='pMax' data-type='G4ThreeVector &amp;' data-ref="19pMax">pMax</dfn>) <em>const</em></td></tr>
+<tr><th id="218">218</th><td>{</td></tr>
+<tr><th id="219">219</th><td>  <a class="local col8 ref" href="#18pMin" title='pMin' data-ref="18pMin">pMin</a>.<a class="ref" href="../../../../externals/clhep/include/CLHEP/Vector/ThreeVector.h.html#_ZN5CLHEP10Hep3Vector3setEddd" title='CLHEP::Hep3Vector::set' data-ref="_ZN5CLHEP10Hep3Vector3setEddd">set</a>(-<a class="member" href="../include/G4Box.hh.html#G4Box::fDx" title='G4Box::fDx' data-ref="G4Box::fDx">fDx</a>,-<a class="member" href="../include/G4Box.hh.html#G4Box::fDy" title='G4Box::fDy' data-ref="G4Box::fDy">fDy</a>,-<a class="member" href="../include/G4Box.hh.html#G4Box::fDz" title='G4Box::fDz' data-ref="G4Box::fDz">fDz</a>);</td></tr>
+<tr><th id="220">220</th><td>  <a class="local col9 ref" href="#19pMax" title='pMax' data-ref="19pMax">pMax</a>.<a class="ref" href="../../../../externals/clhep/include/CLHEP/Vector/ThreeVector.h.html#_ZN5CLHEP10Hep3Vector3setEddd" title='CLHEP::Hep3Vector::set' data-ref="_ZN5CLHEP10Hep3Vector3setEddd">set</a>( <a class="member" href="../include/G4Box.hh.html#G4Box::fDx" title='G4Box::fDx' data-ref="G4Box::fDx">fDx</a>, <a class="member" href="../include/G4Box.hh.html#G4Box::fDy" title='G4Box::fDy' data-ref="G4Box::fDy">fDy</a>, <a class="member" href="../include/G4Box.hh.html#G4Box::fDz" title='G4Box::fDz' data-ref="G4Box::fDz">fDz</a>);</td></tr>
+<tr><th id="221">221</th><td></td></tr>
+<tr><th id="222">222</th><td>  <i>// Check correctness of the bounding box</i></td></tr>
+<tr><th id="223">223</th><td><i>  //</i></td></tr>
+<tr><th id="224">224</th><td>  <b>if</b> (<a class="local col8 ref" href="#18pMin" title='pMin' data-ref="18pMin">pMin</a>.<a class="ref" href="../../../../externals/clhep/include/CLHEP/Vector/ThreeVector.h.html#_ZNK5CLHEP10Hep3Vector1xEv" title='CLHEP::Hep3Vector::x' data-ref="_ZNK5CLHEP10Hep3Vector1xEv">x</a>() &gt;= <a class="local col9 ref" href="#19pMax" title='pMax' data-ref="19pMax">pMax</a>.<a class="ref" href="../../../../externals/clhep/include/CLHEP/Vector/ThreeVector.h.html#_ZNK5CLHEP10Hep3Vector1xEv" title='CLHEP::Hep3Vector::x' data-ref="_ZNK5CLHEP10Hep3Vector1xEv">x</a>() || <a class="local col8 ref" href="#18pMin" title='pMin' data-ref="18pMin">pMin</a>.<a class="ref" href="../../../../externals/clhep/include/CLHEP/Vector/ThreeVector.h.html#_ZNK5CLHEP10Hep3Vector1yEv" title='CLHEP::Hep3Vector::y' data-ref="_ZNK5CLHEP10Hep3Vector1yEv">y</a>() &gt;= <a class="local col9 ref" href="#19pMax" title='pMax' data-ref="19pMax">pMax</a>.<a class="ref" href="../../../../externals/clhep/include/CLHEP/Vector/ThreeVector.h.html#_ZNK5CLHEP10Hep3Vector1yEv" title='CLHEP::Hep3Vector::y' data-ref="_ZNK5CLHEP10Hep3Vector1yEv">y</a>() || <a class="local col8 ref" href="#18pMin" title='pMin' data-ref="18pMin">pMin</a>.<a class="ref" href="../../../../externals/clhep/include/CLHEP/Vector/ThreeVector.h.html#_ZNK5CLHEP10Hep3Vector1zEv" title='CLHEP::Hep3Vector::z' data-ref="_ZNK5CLHEP10Hep3Vector1zEv">z</a>() &gt;= <a class="local col9 ref" href="#19pMax" title='pMax' data-ref="19pMax">pMax</a>.<a class="ref" href="../../../../externals/clhep/include/CLHEP/Vector/ThreeVector.h.html#_ZNK5CLHEP10Hep3Vector1zEv" title='CLHEP::Hep3Vector::z' data-ref="_ZNK5CLHEP10Hep3Vector1zEv">z</a>())</td></tr>
+<tr><th id="225">225</th><td>  {</td></tr>
+<tr><th id="226">226</th><td>    <span class='error' title="use of undeclared identifier &apos;std&apos;">std</span>::ostringstream <dfn class="local col0 decl" id="20message" title='message' data-type='int' data-ref="20message">message</dfn>;</td></tr>
+<tr><th id="227">227</th><td>    message &lt;&lt; <q>"Bad bounding box (min &gt;= max) for solid: "</q></td></tr>
+<tr><th id="228">228</th><td>            &lt;&lt; GetName() &lt;&lt; <q>" !"</q></td></tr>
+<tr><th id="229">229</th><td>            &lt;&lt; <q>"\npMin = "</q> &lt;&lt; pMin</td></tr>
+<tr><th id="230">230</th><td>            &lt;&lt; <q>"\npMax = "</q> &lt;&lt; pMax;</td></tr>
+<tr><th id="231">231</th><td>    G4Exception(<q>"G4Box::BoundingLimits()"</q>, <q>"GeomMgt0001"</q>, JustWarning, message);</td></tr>
+<tr><th id="232">232</th><td>    <a class="member" href="../../../management/include/G4VSolid.hh.html#_ZNK8G4VSolid8DumpInfoEv" title='G4VSolid::DumpInfo' data-ref="_ZNK8G4VSolid8DumpInfoEv">DumpInfo</a>();</td></tr>
+<tr><th id="233">233</th><td>  }</td></tr>
+<tr><th id="234">234</th><td>}</td></tr>
+<tr><th id="235">235</th><td></td></tr>
+<tr><th id="236">236</th><td><i>//////////////////////////////////////////////////////////////////////////</i></td></tr>
+<tr><th id="237">237</th><td><i>//</i></td></tr>
+<tr><th id="238">238</th><td><i>// Calculate extent under transform and specified limit</i></td></tr>
+<tr><th id="239">239</th><td></td></tr>
+<tr><th id="240">240</th><td><a class="typedef" href="../../../../global/management/include/G4Types.hh.html#G4bool" title='G4bool' data-type='bool' data-ref="G4bool">G4bool</a> <a class="type" href="../include/G4Box.hh.html#G4Box" title='G4Box' data-ref="G4Box">G4Box</a>::<dfn class="virtual decl def" id="_ZNK5G4Box15CalculateExtentE5EAxisRK13G4VoxelLimitsRK17G4AffineTransformRdS7_" title='G4Box::CalculateExtent' data-ref="_ZNK5G4Box15CalculateExtentE5EAxisRK13G4VoxelLimitsRK17G4AffineTransformRdS7_">CalculateExtent</dfn>(<em>const</em> <a class="type" href="../../../../global/HEPGeometry/include/geomdefs.hh.html#EAxis" title='EAxis' data-ref="EAxis">EAxis</a> <dfn class="local col1 decl" id="21pAxis" title='pAxis' data-type='const EAxis' data-ref="21pAxis">pAxis</dfn>,</td></tr>
+<tr><th id="241">241</th><td>                              <em>const</em> <a class="type" href="../../../management/include/G4VoxelLimits.hh.html#G4VoxelLimits" title='G4VoxelLimits' data-ref="G4VoxelLimits">G4VoxelLimits</a>&amp; <dfn class="local col2 decl" id="22pVoxelLimit" title='pVoxelLimit' data-type='const G4VoxelLimits &amp;' data-ref="22pVoxelLimit">pVoxelLimit</dfn>,</td></tr>
+<tr><th id="242">242</th><td>                              <em>const</em> <a class="type" href="../../../management/include/G4AffineTransform.hh.html#G4AffineTransform" title='G4AffineTransform' data-ref="G4AffineTransform">G4AffineTransform</a>&amp; <dfn class="local col3 decl" id="23pTransform" title='pTransform' data-type='const G4AffineTransform &amp;' data-ref="23pTransform">pTransform</dfn>,</td></tr>
+<tr><th id="243">243</th><td>                                    <a class="typedef" href="../../../../global/management/include/G4Types.hh.html#G4double" title='G4double' data-type='double' data-ref="G4double">G4double</a>&amp; <dfn class="local col4 decl" id="24pMin" title='pMin' data-type='G4double &amp;' data-ref="24pMin">pMin</dfn>, <a class="typedef" href="../../../../global/management/include/G4Types.hh.html#G4double" title='G4double' data-type='double' data-ref="G4double">G4double</a>&amp; <dfn class="local col5 decl" id="25pMax" title='pMax' data-type='G4double &amp;' data-ref="25pMax">pMax</dfn>) <em>const</em></td></tr>
+<tr><th id="244">244</th><td>{</td></tr>
+<tr><th id="245">245</th><td>  <a class="typedef" href="../../../../global/management/include/G4ThreeVector.hh.html#G4ThreeVector" title='G4ThreeVector' data-type='CLHEP::Hep3Vector' data-ref="G4ThreeVector">G4ThreeVector</a> <a class="ref fake" href="../../../../externals/clhep/include/CLHEP/Vector/ThreeVector.h.html#_ZN5CLHEP10Hep3VectorC1Ev" title='CLHEP::Hep3Vector::Hep3Vector' data-ref="_ZN5CLHEP10Hep3VectorC1Ev"></a><dfn class="local col6 decl" id="26bmin" title='bmin' data-type='G4ThreeVector' data-ref="26bmin">bmin</dfn>, <a class="ref fake" href="../../../../externals/clhep/include/CLHEP/Vector/ThreeVector.h.html#_ZN5CLHEP10Hep3VectorC1Ev" title='CLHEP::Hep3Vector::Hep3Vector' data-ref="_ZN5CLHEP10Hep3VectorC1Ev"></a><dfn class="local col7 decl" id="27bmax" title='bmax' data-type='G4ThreeVector' data-ref="27bmax">bmax</dfn>;</td></tr>
+<tr><th id="246">246</th><td></td></tr>
+<tr><th id="247">247</th><td>  <i>// Get bounding box</i></td></tr>
+<tr><th id="248">248</th><td>  <a class="virtual member" href="#_ZNK5G4Box14BoundingLimitsERN5CLHEP10Hep3VectorES2_" title='G4Box::BoundingLimits' data-ref="_ZNK5G4Box14BoundingLimitsERN5CLHEP10Hep3VectorES2_">BoundingLimits</a>(<span class='refarg'><a class="local col6 ref" href="#26bmin" title='bmin' data-ref="26bmin">bmin</a></span>,<span class='refarg'><a class="local col7 ref" href="#27bmax" title='bmax' data-ref="27bmax">bmax</a></span>);</td></tr>
+<tr><th id="249">249</th><td></td></tr>
+<tr><th id="250">250</th><td>  <i>// Find extent</i></td></tr>
+<tr><th id="251">251</th><td>  <a class="type" href="../../../management/include/G4BoundingEnvelope.hh.html#G4BoundingEnvelope" title='G4BoundingEnvelope' data-ref="G4BoundingEnvelope">G4BoundingEnvelope</a> <dfn class="local col8 decl" id="28bbox" title='bbox' data-type='G4BoundingEnvelope' data-ref="28bbox">bbox</dfn><a class="ref" href="../../../management/include/G4BoundingEnvelope.hh.html#_ZN18G4BoundingEnvelopeC1ERKN5CLHEP10Hep3VectorES3_" title='G4BoundingEnvelope::G4BoundingEnvelope' data-ref="_ZN18G4BoundingEnvelopeC1ERKN5CLHEP10Hep3VectorES3_">(</a><a class="local col6 ref" href="#26bmin" title='bmin' data-ref="26bmin">bmin</a>,<a class="local col7 ref" href="#27bmax" title='bmax' data-ref="27bmax">bmax</a>);</td></tr>
+<tr><th id="252">252</th><td>  <b>return</b> <a class="local col8 ref" href="#28bbox" title='bbox' data-ref="28bbox">bbox</a>.<a class="ref" href="../../../management/include/G4BoundingEnvelope.hh.html#_ZNK18G4BoundingEnvelope15CalculateExtentE5EAxisRK13G4VoxelLimitsRKN7HepGeom11Transform3DERdS8_" title='G4BoundingEnvelope::CalculateExtent' data-ref="_ZNK18G4BoundingEnvelope15CalculateExtentE5EAxisRK13G4VoxelLimitsRKN7HepGeom11Transform3DERdS8_">CalculateExtent</a>(<a class="local col1 ref" href="#21pAxis" title='pAxis' data-ref="21pAxis">pAxis</a>,<a class="local col2 ref" href="#22pVoxelLimit" title='pVoxelLimit' data-ref="22pVoxelLimit">pVoxelLimit</a>,<a class="ref fake" href="../../../management/include/G4AffineTransform.hh.html#_ZNK17G4AffineTransformcvN7HepGeom11Transform3DEEv" title='G4AffineTransform::operator Transform3D' data-ref="_ZNK17G4AffineTransformcvN7HepGeom11Transform3DEEv"></a><a class="local col3 ref" href="#23pTransform" title='pTransform' data-ref="23pTransform">pTransform</a>,<span class='refarg'><a class="local col4 ref" href="#24pMin" title='pMin' data-ref="24pMin">pMin</a></span>,<span class='refarg'><a class="local col5 ref" href="#25pMax" title='pMax' data-ref="25pMax">pMax</a></span>);</td></tr>
+<tr><th id="253">253</th><td>}</td></tr>
+<tr><th id="254">254</th><td></td></tr>
+<tr><th id="255">255</th><td><i>//////////////////////////////////////////////////////////////////////////</i></td></tr>
+<tr><th id="256">256</th><td><i>//</i></td></tr>
+<tr><th id="257">257</th><td><i>// Return whether point inside/outside/on surface, using tolerance</i></td></tr>
+<tr><th id="258">258</th><td></td></tr>
+<tr><th id="259">259</th><td><a class="type" href="../../../../global/HEPGeometry/include/geomdefs.hh.html#EInside" title='EInside' data-ref="EInside">EInside</a> <a class="type" href="../include/G4Box.hh.html#G4Box" title='G4Box' data-ref="G4Box">G4Box</a>::<dfn class="virtual decl def" id="_ZNK5G4Box6InsideERKN5CLHEP10Hep3VectorE" title='G4Box::Inside' data-ref="_ZNK5G4Box6InsideERKN5CLHEP10Hep3VectorE">Inside</dfn>(<em>const</em> <a class="typedef" href="../../../../global/management/include/G4ThreeVector.hh.html#G4ThreeVector" title='G4ThreeVector' data-type='CLHEP::Hep3Vector' data-ref="G4ThreeVector">G4ThreeVector</a>&amp; <dfn class="local col9 decl" id="29p" title='p' data-type='const G4ThreeVector &amp;' data-ref="29p">p</dfn>) <em>const</em></td></tr>
+<tr><th id="260">260</th><td>{</td></tr>
+<tr><th id="261">261</th><td>  <a class="typedef" href="../../../../global/management/include/G4Types.hh.html#G4double" title='G4double' data-type='double' data-ref="G4double">G4double</a> <dfn class="local col0 decl" id="30dist" title='dist' data-type='G4double' data-ref="30dist">dist</dfn> = <span class='error' title="use of undeclared identifier &apos;std&apos;">std</span>::max(<span class='error' title="use of undeclared identifier &apos;std&apos;">std</span>::max(</td></tr>
+<tr><th id="262">262</th><td>                  <span class='error' title="use of undeclared identifier &apos;std&apos;">std</span>::abs(p.x())-fDx,</td></tr>
+<tr><th id="263">263</th><td>                  <span class='error' title="use of undeclared identifier &apos;std&apos;">std</span>::abs(p.y())-fDy),</td></tr>
+<tr><th id="264">264</th><td>                  <span class='error' title="use of undeclared identifier &apos;std&apos;">std</span>::abs(p.z())-fDz);</td></tr>
+<tr><th id="265">265</th><td>  <b>if</b> (<a class="local col0 ref" href="#30dist" title='dist' data-ref="30dist">dist</a> &gt; <a class="member" href="../include/G4Box.hh.html#G4Box::delta" title='G4Box::delta' data-ref="G4Box::delta">delta</a>) <b>return</b> <a class="enum" href="../../../../global/HEPGeometry/include/geomdefs.hh.html#EInside::kOutside" title='EInside::kOutside' data-ref="EInside::kOutside">kOutside</a>;</td></tr>
+<tr><th id="266">266</th><td>  <b>return</b> (<a class="local col0 ref" href="#30dist" title='dist' data-ref="30dist">dist</a> &gt; -<a class="member" href="../include/G4Box.hh.html#G4Box::delta" title='G4Box::delta' data-ref="G4Box::delta">delta</a>) ? <a class="enum" href="../../../../global/HEPGeometry/include/geomdefs.hh.html#EInside::kSurface" title='EInside::kSurface' data-ref="EInside::kSurface">kSurface</a> : <a class="enum" href="../../../../global/HEPGeometry/include/geomdefs.hh.html#EInside::kInside" title='EInside::kInside' data-ref="EInside::kInside">kInside</a>;</td></tr>
+<tr><th id="267">267</th><td>}</td></tr>
+<tr><th id="268">268</th><td></td></tr>
+<tr><th id="269">269</th><td><i>//////////////////////////////////////////////////////////////////////////</i></td></tr>
+<tr><th id="270">270</th><td><i>//</i></td></tr>
+<tr><th id="271">271</th><td><i>// Detect the side(s) and return corresponding normal</i></td></tr>
+<tr><th id="272">272</th><td></td></tr>
+<tr><th id="273">273</th><td><a class="typedef" href="../../../../global/management/include/G4ThreeVector.hh.html#G4ThreeVector" title='G4ThreeVector' data-type='CLHEP::Hep3Vector' data-ref="G4ThreeVector">G4ThreeVector</a> <a class="type" href="../include/G4Box.hh.html#G4Box" title='G4Box' data-ref="G4Box">G4Box</a>::<dfn class="virtual decl def" id="_ZNK5G4Box13SurfaceNormalERKN5CLHEP10Hep3VectorE" title='G4Box::SurfaceNormal' data-ref="_ZNK5G4Box13SurfaceNormalERKN5CLHEP10Hep3VectorE">SurfaceNormal</dfn>( <em>const</em> <a class="typedef" href="../../../../global/management/include/G4ThreeVector.hh.html#G4ThreeVector" title='G4ThreeVector' data-type='CLHEP::Hep3Vector' data-ref="G4ThreeVector">G4ThreeVector</a>&amp; <dfn class="local col1 decl" id="31p" title='p' data-type='const G4ThreeVector &amp;' data-ref="31p">p</dfn>) <em>const</em></td></tr>
+<tr><th id="274">274</th><td>{</td></tr>
+<tr><th id="275">275</th><td>  <a class="typedef" href="../../../../global/management/include/G4ThreeVector.hh.html#G4ThreeVector" title='G4ThreeVector' data-type='CLHEP::Hep3Vector' data-ref="G4ThreeVector">G4ThreeVector</a> <dfn class="local col2 decl" id="32norm" title='norm' data-type='G4ThreeVector' data-ref="32norm">norm</dfn><a class="ref" href="../../../../externals/clhep/include/CLHEP/Vector/ThreeVector.h.html#_ZN5CLHEP10Hep3VectorC1Eddd" title='CLHEP::Hep3Vector::Hep3Vector' data-ref="_ZN5CLHEP10Hep3VectorC1Eddd">(</a><var>0</var>,<var>0</var>,<var>0</var>);</td></tr>
+<tr><th id="276">276</th><td>  <a class="typedef" href="../../../../global/management/include/G4Types.hh.html#G4double" title='G4double' data-type='double' data-ref="G4double">G4double</a> <dfn class="local col3 decl" id="33px" title='px' data-type='G4double' data-ref="33px">px</dfn> = <a class="local col1 ref" href="#31p" title='p' data-ref="31p">p</a>.<a class="ref" href="../../../../externals/clhep/include/CLHEP/Vector/ThreeVector.h.html#_ZNK5CLHEP10Hep3Vector1xEv" title='CLHEP::Hep3Vector::x' data-ref="_ZNK5CLHEP10Hep3Vector1xEv">x</a>();</td></tr>
+<tr><th id="277">277</th><td>  <b>if</b> (<span class='error' title="use of undeclared identifier &apos;std&apos;">std</span>::abs(<span class='error' title="use of undeclared identifier &apos;std&apos;">std</span>::abs(px) - fDx) &lt;= delta) <a class="local col2 ref" href="#32norm" title='norm' data-ref="32norm">norm</a>.<a class="ref" href="../../../../externals/clhep/include/CLHEP/Vector/ThreeVector.h.html#_ZN5CLHEP10Hep3Vector4setXEd" title='CLHEP::Hep3Vector::setX' data-ref="_ZN5CLHEP10Hep3Vector4setXEd">setX</a>(<a class="local col3 ref" href="#33px" title='px' data-ref="33px">px</a> &lt; <var>0</var> ? -<var>1.</var> : <var>1.</var>);</td></tr>
+<tr><th id="278">278</th><td>  <a class="typedef" href="../../../../global/management/include/G4Types.hh.html#G4double" title='G4double' data-type='double' data-ref="G4double">G4double</a> <dfn class="local col4 decl" id="34py" title='py' data-type='G4double' data-ref="34py">py</dfn> = <a class="local col1 ref" href="#31p" title='p' data-ref="31p">p</a>.<a class="ref" href="../../../../externals/clhep/include/CLHEP/Vector/ThreeVector.h.html#_ZNK5CLHEP10Hep3Vector1yEv" title='CLHEP::Hep3Vector::y' data-ref="_ZNK5CLHEP10Hep3Vector1yEv">y</a>();</td></tr>
+<tr><th id="279">279</th><td>  <b>if</b> (<span class='error' title="use of undeclared identifier &apos;std&apos;">std</span>::abs(<span class='error' title="use of undeclared identifier &apos;std&apos;">std</span>::abs(py) - fDy) &lt;= delta) <a class="local col2 ref" href="#32norm" title='norm' data-ref="32norm">norm</a>.<a class="ref" href="../../../../externals/clhep/include/CLHEP/Vector/ThreeVector.h.html#_ZN5CLHEP10Hep3Vector4setYEd" title='CLHEP::Hep3Vector::setY' data-ref="_ZN5CLHEP10Hep3Vector4setYEd">setY</a>(<a class="local col4 ref" href="#34py" title='py' data-ref="34py">py</a> &lt; <var>0</var> ? -<var>1.</var> : <var>1.</var>);</td></tr>
+<tr><th id="280">280</th><td>  <a class="typedef" href="../../../../global/management/include/G4Types.hh.html#G4double" title='G4double' data-type='double' data-ref="G4double">G4double</a> <dfn class="local col5 decl" id="35pz" title='pz' data-type='G4double' data-ref="35pz">pz</dfn> = <a class="local col1 ref" href="#31p" title='p' data-ref="31p">p</a>.<a class="ref" href="../../../../externals/clhep/include/CLHEP/Vector/ThreeVector.h.html#_ZNK5CLHEP10Hep3Vector1zEv" title='CLHEP::Hep3Vector::z' data-ref="_ZNK5CLHEP10Hep3Vector1zEv">z</a>();</td></tr>
+<tr><th id="281">281</th><td>  <b>if</b> (<span class='error' title="use of undeclared identifier &apos;std&apos;">std</span>::abs(<span class='error' title="use of undeclared identifier &apos;std&apos;">std</span>::abs(pz) - fDz) &lt;= delta) <a class="local col2 ref" href="#32norm" title='norm' data-ref="32norm">norm</a>.<a class="ref" href="../../../../externals/clhep/include/CLHEP/Vector/ThreeVector.h.html#_ZN5CLHEP10Hep3Vector4setZEd" title='CLHEP::Hep3Vector::setZ' data-ref="_ZN5CLHEP10Hep3Vector4setZEd">setZ</a>(<a class="local col5 ref" href="#35pz" title='pz' data-ref="35pz">pz</a> &lt; <var>0</var> ? -<var>1.</var> : <var>1.</var>);</td></tr>
+<tr><th id="282">282</th><td></td></tr>
+<tr><th id="283">283</th><td>  <a class="typedef" href="../../../../global/management/include/G4Types.hh.html#G4double" title='G4double' data-type='double' data-ref="G4double">G4double</a> <dfn class="local col6 decl" id="36nside" title='nside' data-type='G4double' data-ref="36nside">nside</dfn> = <a class="local col2 ref" href="#32norm" title='norm' data-ref="32norm">norm</a>.<a class="ref" href="../../../../externals/clhep/include/CLHEP/Vector/ThreeVector.h.html#_ZNK5CLHEP10Hep3Vector4mag2Ev" title='CLHEP::Hep3Vector::mag2' data-ref="_ZNK5CLHEP10Hep3Vector4mag2Ev">mag2</a>(); <i>// number of sides = magnitude squared</i></td></tr>
+<tr><th id="284">284</th><td>  <b>if</b> (<a class="local col6 ref" href="#36nside" title='nside' data-ref="36nside">nside</a> == <var>1</var>)</td></tr>
+<tr><th id="285">285</th><td>    <b>return</b> <a class="local col2 ref" href="#32norm" title='norm' data-ref="32norm">norm</a>;</td></tr>
+<tr><th id="286">286</th><td>  <b>else</b> <b>if</b> (<a class="local col6 ref" href="#36nside" title='nside' data-ref="36nside">nside</a> &gt; <var>1</var>)</td></tr>
+<tr><th id="287">287</th><td>    <b>return</b> <a class="local col2 ref" href="#32norm" title='norm' data-ref="32norm">norm</a>.<a class="ref" href="../../../../externals/clhep/include/CLHEP/Vector/ThreeVector.h.html#_ZNK5CLHEP10Hep3Vector4unitEv" title='CLHEP::Hep3Vector::unit' data-ref="_ZNK5CLHEP10Hep3Vector4unitEv">unit</a>(); <i>// edge or corner</i></td></tr>
+<tr><th id="288">288</th><td>  <b>else</b></td></tr>
+<tr><th id="289">289</th><td>  {</td></tr>
+<tr><th id="290">290</th><td>    <i>// Point is not on the surface</i></td></tr>
+<tr><th id="291">291</th><td><i>    // </i></td></tr>
+<tr><th id="292">292</th><td><u>#<span data-ppcond="292">ifdef</span> <span class="macro" data-ref="_M/G4CSGDEBUG">G4CSGDEBUG</span></u></td></tr>
+<tr><th id="293">293</th><td>    std::ostringstream message;</td></tr>
+<tr><th id="294">294</th><td>    G4int oldprc = message.precision(<var>16</var>);</td></tr>
+<tr><th id="295">295</th><td>    message &lt;&lt; <q>"Point p is not on surface (!?) of solid: "</q></td></tr>
+<tr><th id="296">296</th><td>            &lt;&lt; GetName() &lt;&lt; G4endl;</td></tr>
+<tr><th id="297">297</th><td>    message &lt;&lt; <q>"Position:\n"</q>;</td></tr>
+<tr><th id="298">298</th><td>    message &lt;&lt; <q>"   p.x() = "</q> &lt;&lt; p.x()/mm &lt;&lt; <q>" mm\n"</q>;</td></tr>
+<tr><th id="299">299</th><td>    message &lt;&lt; <q>"   p.y() = "</q> &lt;&lt; p.y()/mm &lt;&lt; <q>" mm\n"</q>;</td></tr>
+<tr><th id="300">300</th><td>    message &lt;&lt; <q>"   p.z() = "</q> &lt;&lt; p.z()/mm &lt;&lt; <q>" mm"</q>;</td></tr>
+<tr><th id="301">301</th><td>    G4cout.precision(oldprc);</td></tr>
+<tr><th id="302">302</th><td>    G4Exception(<q>"G4Box::SurfaceNormal(p)"</q>, <q>"GeomSolids1002"</q>,</td></tr>
+<tr><th id="303">303</th><td>                JustWarning, message );</td></tr>
+<tr><th id="304">304</th><td>    DumpInfo();</td></tr>
+<tr><th id="305">305</th><td><u>#<span data-ppcond="292">endif</span></u></td></tr>
+<tr><th id="306">306</th><td>    <b>return</b> <a class="member" href="#_ZNK5G4Box19ApproxSurfaceNormalERKN5CLHEP10Hep3VectorE" title='G4Box::ApproxSurfaceNormal' data-ref="_ZNK5G4Box19ApproxSurfaceNormalERKN5CLHEP10Hep3VectorE">ApproxSurfaceNormal</a>(<a class="local col1 ref" href="#31p" title='p' data-ref="31p">p</a>);</td></tr>
+<tr><th id="307">307</th><td>  }</td></tr>
+<tr><th id="308">308</th><td>}</td></tr>
+<tr><th id="309">309</th><td></td></tr>
+<tr><th id="310">310</th><td><i>//////////////////////////////////////////////////////////////////////////</i></td></tr>
+<tr><th id="311">311</th><td><i>//</i></td></tr>
+<tr><th id="312">312</th><td><i>// Algorithm for SurfaceNormal() following the original specification</i></td></tr>
+<tr><th id="313">313</th><td><i>// for points not on the surface</i></td></tr>
+<tr><th id="314">314</th><td></td></tr>
+<tr><th id="315">315</th><td><a class="typedef" href="../../../../global/management/include/G4ThreeVector.hh.html#G4ThreeVector" title='G4ThreeVector' data-type='CLHEP::Hep3Vector' data-ref="G4ThreeVector">G4ThreeVector</a> <a class="type" href="../include/G4Box.hh.html#G4Box" title='G4Box' data-ref="G4Box">G4Box</a>::<dfn class="decl def" id="_ZNK5G4Box19ApproxSurfaceNormalERKN5CLHEP10Hep3VectorE" title='G4Box::ApproxSurfaceNormal' data-ref="_ZNK5G4Box19ApproxSurfaceNormalERKN5CLHEP10Hep3VectorE">ApproxSurfaceNormal</dfn>(<em>const</em> <a class="typedef" href="../../../../global/management/include/G4ThreeVector.hh.html#G4ThreeVector" title='G4ThreeVector' data-type='CLHEP::Hep3Vector' data-ref="G4ThreeVector">G4ThreeVector</a>&amp; <dfn class="local col7 decl" id="37p" title='p' data-type='const G4ThreeVector &amp;' data-ref="37p">p</dfn>) <em>const</em></td></tr>
+<tr><th id="316">316</th><td>{</td></tr>
+<tr><th id="317">317</th><td>  <a class="typedef" href="../../../../global/management/include/G4Types.hh.html#G4double" title='G4double' data-type='double' data-ref="G4double">G4double</a> <dfn class="local col8 decl" id="38distx" title='distx' data-type='G4double' data-ref="38distx">distx</dfn> = <span class='error' title="use of undeclared identifier &apos;std&apos;">std</span>::abs(p.x()) - fDx;</td></tr>
+<tr><th id="318">318</th><td>  <a class="typedef" href="../../../../global/management/include/G4Types.hh.html#G4double" title='G4double' data-type='double' data-ref="G4double">G4double</a> <dfn class="local col9 decl" id="39disty" title='disty' data-type='G4double' data-ref="39disty">disty</dfn> = <span class='error' title="use of undeclared identifier &apos;std&apos;">std</span>::abs(p.y()) - fDy;</td></tr>
+<tr><th id="319">319</th><td>  <a class="typedef" href="../../../../global/management/include/G4Types.hh.html#G4double" title='G4double' data-type='double' data-ref="G4double">G4double</a> <dfn class="local col0 decl" id="40distz" title='distz' data-type='G4double' data-ref="40distz">distz</dfn> = <span class='error' title="use of undeclared identifier &apos;std&apos;">std</span>::abs(p.z()) - fDz;</td></tr>
+<tr><th id="320">320</th><td></td></tr>
+<tr><th id="321">321</th><td>  <b>if</b> (distx &gt;= disty &amp;&amp; distx &gt;= distz)</td></tr>
+<tr><th id="322">322</th><td>    <b>return</b> G4ThreeVector(<span class='error' title="use of undeclared identifier &apos;std&apos;">std</span>::copysign(<var>1.</var>,p.x()), <var>0.</var>, <var>0.</var>);</td></tr>
+<tr><th id="323">323</th><td>  <b>if</b> (disty &gt;= distx &amp;&amp; disty &gt;= distz)</td></tr>
+<tr><th id="324">324</th><td>    <b>return</b> G4ThreeVector(<var>0.</var>, <span class='error' title="use of undeclared identifier &apos;std&apos;">std</span>::copysign(<var>1.</var>,p.y()), <var>0.</var>);</td></tr>
+<tr><th id="325">325</th><td>  <b>else</b></td></tr>
+<tr><th id="326">326</th><td>    <b>return</b> G4ThreeVector(<var>0.</var>, <var>0.</var>, <span class='error' title="use of undeclared identifier &apos;std&apos;">std</span>::copysign(<var>1.</var>,p.z()));</td></tr>
+<tr><th id="327">327</th><td>}</td></tr>
+<tr><th id="328">328</th><td></td></tr>
+<tr><th id="329">329</th><td><i>//////////////////////////////////////////////////////////////////////////</i></td></tr>
+<tr><th id="330">330</th><td><i>//</i></td></tr>
+<tr><th id="331">331</th><td><i>// Calculate distance to box from an outside point</i></td></tr>
+<tr><th id="332">332</th><td><i>// - return kInfinity if no intersection</i></td></tr>
+<tr><th id="333">333</th><td><i>//</i></td></tr>
+<tr><th id="334">334</th><td></td></tr>
+<tr><th id="335">335</th><td><a class="typedef" href="../../../../global/management/include/G4Types.hh.html#G4double" title='G4double' data-type='double' data-ref="G4double">G4double</a> <a class="type" href="../include/G4Box.hh.html#G4Box" title='G4Box' data-ref="G4Box">G4Box</a>::<dfn class="virtual decl def" id="_ZNK5G4Box12DistanceToInERKN5CLHEP10Hep3VectorES3_" title='G4Box::DistanceToIn' data-ref="_ZNK5G4Box12DistanceToInERKN5CLHEP10Hep3VectorES3_">DistanceToIn</dfn>(<em>const</em> <a class="typedef" href="../../../../global/management/include/G4ThreeVector.hh.html#G4ThreeVector" title='G4ThreeVector' data-type='CLHEP::Hep3Vector' data-ref="G4ThreeVector">G4ThreeVector</a>&amp; <dfn class="local col1 decl" id="41p" title='p' data-type='const G4ThreeVector &amp;' data-ref="41p">p</dfn>,</td></tr>
+<tr><th id="336">336</th><td>                             <em>const</em> <a class="typedef" href="../../../../global/management/include/G4ThreeVector.hh.html#G4ThreeVector" title='G4ThreeVector' data-type='CLHEP::Hep3Vector' data-ref="G4ThreeVector">G4ThreeVector</a>&amp; <dfn class="local col2 decl" id="42v" title='v' data-type='const G4ThreeVector &amp;' data-ref="42v">v</dfn>) <em>const</em></td></tr>
+<tr><th id="337">337</th><td>{</td></tr>
+<tr><th id="338">338</th><td>  <i>// Check if point is on the surface and traveling away</i></td></tr>
+<tr><th id="339">339</th><td><i>  //</i></td></tr>
+<tr><th id="340">340</th><td>  <b>if</b> ((<span class='error' title="use of undeclared identifier &apos;std&apos;">std</span>::abs(p.x()) - fDx) &gt;= -delta &amp;&amp; p.x()*v.x() &gt;= <var>0</var>) <b>return</b> <a class="ref" href="../../../../global/HEPGeometry/include/geomdefs.hh.html#kInfinity" title='kInfinity' data-ref="kInfinity">kInfinity</a>;</td></tr>
+<tr><th id="341">341</th><td>  <b>if</b> ((<span class='error' title="use of undeclared identifier &apos;std&apos;">std</span>::abs(p.y()) - fDy) &gt;= -delta &amp;&amp; p.y()*v.y() &gt;= <var>0</var>) <b>return</b> <a class="ref" href="../../../../global/HEPGeometry/include/geomdefs.hh.html#kInfinity" title='kInfinity' data-ref="kInfinity">kInfinity</a>;</td></tr>
+<tr><th id="342">342</th><td>  <b>if</b> ((<span class='error' title="use of undeclared identifier &apos;std&apos;">std</span>::abs(p.z()) - fDz) &gt;= -delta &amp;&amp; p.z()*v.z() &gt;= <var>0</var>) <b>return</b> <a class="ref" href="../../../../global/HEPGeometry/include/geomdefs.hh.html#kInfinity" title='kInfinity' data-ref="kInfinity">kInfinity</a>;</td></tr>
+<tr><th id="343">343</th><td></td></tr>
+<tr><th id="344">344</th><td>  <i>// Find intersection</i></td></tr>
+<tr><th id="345">345</th><td><i>  //</i></td></tr>
+<tr><th id="346">346</th><td>  <a class="typedef" href="../../../../global/management/include/G4Types.hh.html#G4double" title='G4double' data-type='double' data-ref="G4double">G4double</a> <dfn class="local col3 decl" id="43invx" title='invx' data-type='G4double' data-ref="43invx">invx</dfn> = (v.x() == <var>0</var>) ? <a class="macro" href="../../../../global/management/include/templates.hh.html#82" title="std::numeric_limits&lt;double&gt;::max()" data-ref="_M/DBL_MAX">DBL_MAX</a> : -<var>1.</var>/v.x();</td></tr>
+<tr><th id="347">347</th><td>  <a class="typedef" href="../../../../global/management/include/G4Types.hh.html#G4double" title='G4double' data-type='double' data-ref="G4double">G4double</a> <dfn class="local col4 decl" id="44dx" title='dx' data-type='G4double' data-ref="44dx">dx</dfn> = <span class='error' title="use of undeclared identifier &apos;std&apos;">std</span>::copysign(fDx,invx);</td></tr>
+<tr><th id="348">348</th><td>  <a class="typedef" href="../../../../global/management/include/G4Types.hh.html#G4double" title='G4double' data-type='double' data-ref="G4double">G4double</a> <dfn class="local col5 decl" id="45txmin" title='txmin' data-type='G4double' data-ref="45txmin">txmin</dfn> = (<a class="local col1 ref" href="#41p" title='p' data-ref="41p">p</a>.<a class="ref" href="../../../../externals/clhep/include/CLHEP/Vector/ThreeVector.h.html#_ZNK5CLHEP10Hep3Vector1xEv" title='CLHEP::Hep3Vector::x' data-ref="_ZNK5CLHEP10Hep3Vector1xEv">x</a>() - <a class="local col4 ref" href="#44dx" title='dx' data-ref="44dx">dx</a>)*<a class="local col3 ref" href="#43invx" title='invx' data-ref="43invx">invx</a>;</td></tr>
+<tr><th id="349">349</th><td>  <a class="typedef" href="../../../../global/management/include/G4Types.hh.html#G4double" title='G4double' data-type='double' data-ref="G4double">G4double</a> <dfn class="local col6 decl" id="46txmax" title='txmax' data-type='G4double' data-ref="46txmax">txmax</dfn> = (<a class="local col1 ref" href="#41p" title='p' data-ref="41p">p</a>.<a class="ref" href="../../../../externals/clhep/include/CLHEP/Vector/ThreeVector.h.html#_ZNK5CLHEP10Hep3Vector1xEv" title='CLHEP::Hep3Vector::x' data-ref="_ZNK5CLHEP10Hep3Vector1xEv">x</a>() + <a class="local col4 ref" href="#44dx" title='dx' data-ref="44dx">dx</a>)*<a class="local col3 ref" href="#43invx" title='invx' data-ref="43invx">invx</a>;</td></tr>
+<tr><th id="350">350</th><td></td></tr>
+<tr><th id="351">351</th><td>  <a class="typedef" href="../../../../global/management/include/G4Types.hh.html#G4double" title='G4double' data-type='double' data-ref="G4double">G4double</a> <dfn class="local col7 decl" id="47invy" title='invy' data-type='G4double' data-ref="47invy">invy</dfn> = (v.y() == <var>0</var>) ? <a class="macro" href="../../../../global/management/include/templates.hh.html#82" title="std::numeric_limits&lt;double&gt;::max()" data-ref="_M/DBL_MAX">DBL_MAX</a> : -<var>1.</var>/v.y();</td></tr>
+<tr><th id="352">352</th><td>  <a class="typedef" href="../../../../global/management/include/G4Types.hh.html#G4double" title='G4double' data-type='double' data-ref="G4double">G4double</a> <dfn class="local col8 decl" id="48dy" title='dy' data-type='G4double' data-ref="48dy">dy</dfn> = <span class='error' title="use of undeclared identifier &apos;std&apos;">std</span>::copysign(fDy,invy);</td></tr>
+<tr><th id="353">353</th><td>  <a class="typedef" href="../../../../global/management/include/G4Types.hh.html#G4double" title='G4double' data-type='double' data-ref="G4double">G4double</a> <dfn class="local col9 decl" id="49tymin" title='tymin' data-type='G4double' data-ref="49tymin">tymin</dfn> = <span class='error' title="use of undeclared identifier &apos;std&apos;">std</span>::max(txmin,(p.y() - dy)*invy);</td></tr>
+<tr><th id="354">354</th><td>  <a class="typedef" href="../../../../global/management/include/G4Types.hh.html#G4double" title='G4double' data-type='double' data-ref="G4double">G4double</a> <dfn class="local col0 decl" id="50tymax" title='tymax' data-type='G4double' data-ref="50tymax">tymax</dfn> = <span class='error' title="use of undeclared identifier &apos;std&apos;">std</span>::min(txmax,(p.y() + dy)*invy);</td></tr>
+<tr><th id="355">355</th><td></td></tr>
+<tr><th id="356">356</th><td>  <a class="typedef" href="../../../../global/management/include/G4Types.hh.html#G4double" title='G4double' data-type='double' data-ref="G4double">G4double</a> <dfn class="local col1 decl" id="51invz" title='invz' data-type='G4double' data-ref="51invz">invz</dfn> = (v.z() == <var>0</var>) ? <a class="macro" href="../../../../global/management/include/templates.hh.html#82" title="std::numeric_limits&lt;double&gt;::max()" data-ref="_M/DBL_MAX">DBL_MAX</a> : -<var>1.</var>/v.z();</td></tr>
+<tr><th id="357">357</th><td>  <a class="typedef" href="../../../../global/management/include/G4Types.hh.html#G4double" title='G4double' data-type='double' data-ref="G4double">G4double</a> <dfn class="local col2 decl" id="52dz" title='dz' data-type='G4double' data-ref="52dz">dz</dfn> = <span class='error' title="use of undeclared identifier &apos;std&apos;">std</span>::copysign(fDz,invz);</td></tr>
+<tr><th id="358">358</th><td>  <a class="typedef" href="../../../../global/management/include/G4Types.hh.html#G4double" title='G4double' data-type='double' data-ref="G4double">G4double</a> <dfn class="local col3 decl" id="53tmin" title='tmin' data-type='G4double' data-ref="53tmin">tmin</dfn> = <span class='error' title="use of undeclared identifier &apos;std&apos;">std</span>::max(tymin,(p.z() - dz)*invz);</td></tr>
+<tr><th id="359">359</th><td>  <a class="typedef" href="../../../../global/management/include/G4Types.hh.html#G4double" title='G4double' data-type='double' data-ref="G4double">G4double</a> <dfn class="local col4 decl" id="54tmax" title='tmax' data-type='G4double' data-ref="54tmax">tmax</dfn> = <span class='error' title="use of undeclared identifier &apos;std&apos;">std</span>::min(tymax,(p.z() + dz)*invz);</td></tr>
+<tr><th id="360">360</th><td></td></tr>
+<tr><th id="361">361</th><td>  <b>if</b> (<a class="local col4 ref" href="#54tmax" title='tmax' data-ref="54tmax">tmax</a> &lt;= <a class="local col3 ref" href="#53tmin" title='tmin' data-ref="53tmin">tmin</a> + <a class="member" href="../include/G4Box.hh.html#G4Box::delta" title='G4Box::delta' data-ref="G4Box::delta">delta</a>) <b>return</b> <a class="ref" href="../../../../global/HEPGeometry/include/geomdefs.hh.html#kInfinity" title='kInfinity' data-ref="kInfinity">kInfinity</a>; <i>// touch or no hit</i></td></tr>
+<tr><th id="362">362</th><td>  <b>return</b> (<a class="local col3 ref" href="#53tmin" title='tmin' data-ref="53tmin">tmin</a> &lt; <a class="member" href="../include/G4Box.hh.html#G4Box::delta" title='G4Box::delta' data-ref="G4Box::delta">delta</a>) ? <var>0.</var> : <a class="local col3 ref" href="#53tmin" title='tmin' data-ref="53tmin">tmin</a>;</td></tr>
+<tr><th id="363">363</th><td>}</td></tr>
+<tr><th id="364">364</th><td></td></tr>
+<tr><th id="365">365</th><td><i>//////////////////////////////////////////////////////////////////////////</i></td></tr>
+<tr><th id="366">366</th><td><i>// </i></td></tr>
+<tr><th id="367">367</th><td><i>// Appoximate distance to box.</i></td></tr>
+<tr><th id="368">368</th><td><i>// Returns largest perpendicular distance to the closest x/y/z sides of</i></td></tr>
+<tr><th id="369">369</th><td><i>// the box, which is the most fast estimation of the shortest distance to box</i></td></tr>
+<tr><th id="370">370</th><td><i>// - If inside return 0</i></td></tr>
+<tr><th id="371">371</th><td></td></tr>
+<tr><th id="372">372</th><td><a class="typedef" href="../../../../global/management/include/G4Types.hh.html#G4double" title='G4double' data-type='double' data-ref="G4double">G4double</a> <a class="type" href="../include/G4Box.hh.html#G4Box" title='G4Box' data-ref="G4Box">G4Box</a>::<dfn class="virtual decl def" id="_ZNK5G4Box12DistanceToInERKN5CLHEP10Hep3VectorE" title='G4Box::DistanceToIn' data-ref="_ZNK5G4Box12DistanceToInERKN5CLHEP10Hep3VectorE">DistanceToIn</dfn>(<em>const</em> <a class="typedef" href="../../../../global/management/include/G4ThreeVector.hh.html#G4ThreeVector" title='G4ThreeVector' data-type='CLHEP::Hep3Vector' data-ref="G4ThreeVector">G4ThreeVector</a>&amp; <dfn class="local col5 decl" id="55p" title='p' data-type='const G4ThreeVector &amp;' data-ref="55p">p</dfn>) <em>const</em></td></tr>
+<tr><th id="373">373</th><td>{</td></tr>
+<tr><th id="374">374</th><td>  <a class="typedef" href="../../../../global/management/include/G4Types.hh.html#G4double" title='G4double' data-type='double' data-ref="G4double">G4double</a> <dfn class="local col6 decl" id="56dist" title='dist' data-type='G4double' data-ref="56dist">dist</dfn> = <span class='error' title="use of undeclared identifier &apos;std&apos;">std</span>::max(<span class='error' title="use of undeclared identifier &apos;std&apos;">std</span>::max(</td></tr>
+<tr><th id="375">375</th><td>                  <span class='error' title="use of undeclared identifier &apos;std&apos;">std</span>::abs(p.x())-fDx,</td></tr>
+<tr><th id="376">376</th><td>                  <span class='error' title="use of undeclared identifier &apos;std&apos;">std</span>::abs(p.y())-fDy),</td></tr>
+<tr><th id="377">377</th><td>                  <span class='error' title="use of undeclared identifier &apos;std&apos;">std</span>::abs(p.z())-fDz);</td></tr>
+<tr><th id="378">378</th><td>  <b>return</b> (<a class="local col6 ref" href="#56dist" title='dist' data-ref="56dist">dist</a> &gt; <var>0</var>) ? <a class="local col6 ref" href="#56dist" title='dist' data-ref="56dist">dist</a> : <var>0.</var>;</td></tr>
+<tr><th id="379">379</th><td>}</td></tr>
+<tr><th id="380">380</th><td></td></tr>
+<tr><th id="381">381</th><td><i>//////////////////////////////////////////////////////////////////////////</i></td></tr>
+<tr><th id="382">382</th><td><i>//</i></td></tr>
+<tr><th id="383">383</th><td><i>// Calculate distance to surface of the box from inside and</i></td></tr>
+<tr><th id="384">384</th><td><i>// find normal at exit point, if required</i></td></tr>
+<tr><th id="385">385</th><td><i>// - when leaving the surface, return 0</i></td></tr>
+<tr><th id="386">386</th><td></td></tr>
+<tr><th id="387">387</th><td><a class="typedef" href="../../../../global/management/include/G4Types.hh.html#G4double" title='G4double' data-type='double' data-ref="G4double">G4double</a> <a class="type" href="../include/G4Box.hh.html#G4Box" title='G4Box' data-ref="G4Box">G4Box</a>::<dfn class="virtual decl def" id="_ZNK5G4Box13DistanceToOutERKN5CLHEP10Hep3VectorES3_bPbPS1_" title='G4Box::DistanceToOut' data-ref="_ZNK5G4Box13DistanceToOutERKN5CLHEP10Hep3VectorES3_bPbPS1_">DistanceToOut</dfn>( <em>const</em> <a class="typedef" href="../../../../global/management/include/G4ThreeVector.hh.html#G4ThreeVector" title='G4ThreeVector' data-type='CLHEP::Hep3Vector' data-ref="G4ThreeVector">G4ThreeVector</a>&amp; <dfn class="local col7 decl" id="57p" title='p' data-type='const G4ThreeVector &amp;' data-ref="57p">p</dfn>,</td></tr>
+<tr><th id="388">388</th><td>                               <em>const</em> <a class="typedef" href="../../../../global/management/include/G4ThreeVector.hh.html#G4ThreeVector" title='G4ThreeVector' data-type='CLHEP::Hep3Vector' data-ref="G4ThreeVector">G4ThreeVector</a>&amp; <dfn class="local col8 decl" id="58v" title='v' data-type='const G4ThreeVector &amp;' data-ref="58v">v</dfn>,</td></tr>
+<tr><th id="389">389</th><td>                               <em>const</em> <a class="typedef" href="../../../../global/management/include/G4Types.hh.html#G4bool" title='G4bool' data-type='bool' data-ref="G4bool">G4bool</a> <dfn class="local col9 decl" id="59calcNorm" title='calcNorm' data-type='const G4bool' data-ref="59calcNorm">calcNorm</dfn>,</td></tr>
+<tr><th id="390">390</th><td>                               <a class="typedef" href="../../../../global/management/include/G4Types.hh.html#G4bool" title='G4bool' data-type='bool' data-ref="G4bool">G4bool</a> *<dfn class="local col0 decl" id="60validNorm" title='validNorm' data-type='G4bool *' data-ref="60validNorm">validNorm</dfn>, <a class="typedef" href="../../../../global/management/include/G4ThreeVector.hh.html#G4ThreeVector" title='G4ThreeVector' data-type='CLHEP::Hep3Vector' data-ref="G4ThreeVector">G4ThreeVector</a> *<dfn class="local col1 decl" id="61n" title='n' data-type='G4ThreeVector *' data-ref="61n">n</dfn>) <em>const</em></td></tr>
+<tr><th id="391">391</th><td>{</td></tr>
+<tr><th id="392">392</th><td>  <i>// Check if point is on the surface and traveling away</i></td></tr>
+<tr><th id="393">393</th><td><i>  //</i></td></tr>
+<tr><th id="394">394</th><td>  <b>if</b> ((<span class='error' title="use of undeclared identifier &apos;std&apos;">std</span>::abs(p.x()) - fDx) &gt;= -delta &amp;&amp; p.x()*v.x() &gt; <var>0</var>)</td></tr>
+<tr><th id="395">395</th><td>  {</td></tr>
+<tr><th id="396">396</th><td>    <b>if</b> (<a class="local col9 ref" href="#59calcNorm" title='calcNorm' data-ref="59calcNorm">calcNorm</a>)</td></tr>
+<tr><th id="397">397</th><td>    {</td></tr>
+<tr><th id="398">398</th><td>      *<a class="local col0 ref" href="#60validNorm" title='validNorm' data-ref="60validNorm">validNorm</a> = <b>true</b>;</td></tr>
+<tr><th id="399">399</th><td>      <a class="local col1 ref" href="#61n" title='n' data-ref="61n">n</a>-&gt;<a class="ref" href="../../../../externals/clhep/include/CLHEP/Vector/ThreeVector.h.html#_ZN5CLHEP10Hep3Vector3setEddd" title='CLHEP::Hep3Vector::set' data-ref="_ZN5CLHEP10Hep3Vector3setEddd">set</a>((<a class="local col7 ref" href="#57p" title='p' data-ref="57p">p</a>.<a class="ref" href="../../../../externals/clhep/include/CLHEP/Vector/ThreeVector.h.html#_ZNK5CLHEP10Hep3Vector1xEv" title='CLHEP::Hep3Vector::x' data-ref="_ZNK5CLHEP10Hep3Vector1xEv">x</a>() &lt; <var>0</var>) ? -<var>1.</var> : <var>1.</var>, <var>0.</var>, <var>0.</var>);</td></tr>
+<tr><th id="400">400</th><td>    }</td></tr>
+<tr><th id="401">401</th><td>    <b>return</b> <var>0.</var>;</td></tr>
+<tr><th id="402">402</th><td>  }</td></tr>
+<tr><th id="403">403</th><td>  <b>if</b> ((<span class='error' title="use of undeclared identifier &apos;std&apos;">std</span>::abs(p.y()) - fDy) &gt;= -delta &amp;&amp; p.y()*v.y() &gt; <var>0</var>)</td></tr>
+<tr><th id="404">404</th><td>  {</td></tr>
+<tr><th id="405">405</th><td>    <b>if</b> (<a class="local col9 ref" href="#59calcNorm" title='calcNorm' data-ref="59calcNorm">calcNorm</a>)</td></tr>
+<tr><th id="406">406</th><td>    {</td></tr>
+<tr><th id="407">407</th><td>      *<a class="local col0 ref" href="#60validNorm" title='validNorm' data-ref="60validNorm">validNorm</a> = <b>true</b>;</td></tr>
+<tr><th id="408">408</th><td>      <a class="local col1 ref" href="#61n" title='n' data-ref="61n">n</a>-&gt;<a class="ref" href="../../../../externals/clhep/include/CLHEP/Vector/ThreeVector.h.html#_ZN5CLHEP10Hep3Vector3setEddd" title='CLHEP::Hep3Vector::set' data-ref="_ZN5CLHEP10Hep3Vector3setEddd">set</a>(<var>0.</var>, (<a class="local col7 ref" href="#57p" title='p' data-ref="57p">p</a>.<a class="ref" href="../../../../externals/clhep/include/CLHEP/Vector/ThreeVector.h.html#_ZNK5CLHEP10Hep3Vector1yEv" title='CLHEP::Hep3Vector::y' data-ref="_ZNK5CLHEP10Hep3Vector1yEv">y</a>() &lt; <var>0</var>) ? -<var>1.</var> : <var>1.</var>, <var>0.</var>);</td></tr>
+<tr><th id="409">409</th><td>    }</td></tr>
+<tr><th id="410">410</th><td>    <b>return</b> <var>0.</var>;</td></tr>
+<tr><th id="411">411</th><td>  }</td></tr>
+<tr><th id="412">412</th><td>  <b>if</b> ((<span class='error' title="use of undeclared identifier &apos;std&apos;">std</span>::abs(p.z()) - fDz) &gt;= -delta &amp;&amp; p.z()*v.z() &gt; <var>0</var>)</td></tr>
+<tr><th id="413">413</th><td>  {</td></tr>
+<tr><th id="414">414</th><td>    <b>if</b> (<a class="local col9 ref" href="#59calcNorm" title='calcNorm' data-ref="59calcNorm">calcNorm</a>)</td></tr>
+<tr><th id="415">415</th><td>    {</td></tr>
+<tr><th id="416">416</th><td>      *<a class="local col0 ref" href="#60validNorm" title='validNorm' data-ref="60validNorm">validNorm</a> = <b>true</b>;</td></tr>
+<tr><th id="417">417</th><td>      <a class="local col1 ref" href="#61n" title='n' data-ref="61n">n</a>-&gt;<a class="ref" href="../../../../externals/clhep/include/CLHEP/Vector/ThreeVector.h.html#_ZN5CLHEP10Hep3Vector3setEddd" title='CLHEP::Hep3Vector::set' data-ref="_ZN5CLHEP10Hep3Vector3setEddd">set</a>(<var>0.</var>, <var>0.</var>, (<a class="local col7 ref" href="#57p" title='p' data-ref="57p">p</a>.<a class="ref" href="../../../../externals/clhep/include/CLHEP/Vector/ThreeVector.h.html#_ZNK5CLHEP10Hep3Vector1zEv" title='CLHEP::Hep3Vector::z' data-ref="_ZNK5CLHEP10Hep3Vector1zEv">z</a>() &lt; <var>0</var>) ? -<var>1.</var> : <var>1.</var>);</td></tr>
+<tr><th id="418">418</th><td>    }</td></tr>
+<tr><th id="419">419</th><td>    <b>return</b> <var>0.</var>;</td></tr>
+<tr><th id="420">420</th><td>  }</td></tr>
+<tr><th id="421">421</th><td></td></tr>
+<tr><th id="422">422</th><td>  <i>// Find intersection</i></td></tr>
+<tr><th id="423">423</th><td><i>  //</i></td></tr>
+<tr><th id="424">424</th><td>  <a class="typedef" href="../../../../global/management/include/G4Types.hh.html#G4double" title='G4double' data-type='double' data-ref="G4double">G4double</a> <dfn class="local col2 decl" id="62vx" title='vx' data-type='G4double' data-ref="62vx">vx</dfn> = <a class="local col8 ref" href="#58v" title='v' data-ref="58v">v</a>.<a class="ref" href="../../../../externals/clhep/include/CLHEP/Vector/ThreeVector.h.html#_ZNK5CLHEP10Hep3Vector1xEv" title='CLHEP::Hep3Vector::x' data-ref="_ZNK5CLHEP10Hep3Vector1xEv">x</a>();</td></tr>
+<tr><th id="425">425</th><td>  <a class="typedef" href="../../../../global/management/include/G4Types.hh.html#G4double" title='G4double' data-type='double' data-ref="G4double">G4double</a> <dfn class="local col3 decl" id="63tx" title='tx' data-type='G4double' data-ref="63tx">tx</dfn> = (vx == <var>0</var>) ? <a class="macro" href="../../../../global/management/include/templates.hh.html#82" title="std::numeric_limits&lt;double&gt;::max()" data-ref="_M/DBL_MAX">DBL_MAX</a> : (<span class='error' title="use of undeclared identifier &apos;std&apos;">std</span>::copysign(fDx,vx) - p.x())/vx;</td></tr>
+<tr><th id="426">426</th><td></td></tr>
+<tr><th id="427">427</th><td>  <a class="typedef" href="../../../../global/management/include/G4Types.hh.html#G4double" title='G4double' data-type='double' data-ref="G4double">G4double</a> <dfn class="local col4 decl" id="64vy" title='vy' data-type='G4double' data-ref="64vy">vy</dfn> = <a class="local col8 ref" href="#58v" title='v' data-ref="58v">v</a>.<a class="ref" href="../../../../externals/clhep/include/CLHEP/Vector/ThreeVector.h.html#_ZNK5CLHEP10Hep3Vector1yEv" title='CLHEP::Hep3Vector::y' data-ref="_ZNK5CLHEP10Hep3Vector1yEv">y</a>();</td></tr>
+<tr><th id="428">428</th><td>  <a class="typedef" href="../../../../global/management/include/G4Types.hh.html#G4double" title='G4double' data-type='double' data-ref="G4double">G4double</a> <dfn class="local col5 decl" id="65ty" title='ty' data-type='G4double' data-ref="65ty">ty</dfn> = (vy == <var>0</var>) ? tx : (<span class='error' title="use of undeclared identifier &apos;std&apos;">std</span>::copysign(fDy,vy) - p.y())/vy;</td></tr>
+<tr><th id="429">429</th><td>  <a class="typedef" href="../../../../global/management/include/G4Types.hh.html#G4double" title='G4double' data-type='double' data-ref="G4double">G4double</a> <dfn class="local col6 decl" id="66txy" title='txy' data-type='G4double' data-ref="66txy">txy</dfn> = <span class='error' title="use of undeclared identifier &apos;std&apos;">std</span>::min(tx,ty);</td></tr>
+<tr><th id="430">430</th><td></td></tr>
+<tr><th id="431">431</th><td>  <a class="typedef" href="../../../../global/management/include/G4Types.hh.html#G4double" title='G4double' data-type='double' data-ref="G4double">G4double</a> <dfn class="local col7 decl" id="67vz" title='vz' data-type='G4double' data-ref="67vz">vz</dfn> = <a class="local col8 ref" href="#58v" title='v' data-ref="58v">v</a>.<a class="ref" href="../../../../externals/clhep/include/CLHEP/Vector/ThreeVector.h.html#_ZNK5CLHEP10Hep3Vector1zEv" title='CLHEP::Hep3Vector::z' data-ref="_ZNK5CLHEP10Hep3Vector1zEv">z</a>();</td></tr>
+<tr><th id="432">432</th><td>  <a class="typedef" href="../../../../global/management/include/G4Types.hh.html#G4double" title='G4double' data-type='double' data-ref="G4double">G4double</a> <dfn class="local col8 decl" id="68tz" title='tz' data-type='G4double' data-ref="68tz">tz</dfn> = (vz == <var>0</var>) ? txy : (<span class='error' title="use of undeclared identifier &apos;std&apos;">std</span>::copysign(fDz,vz) - p.z())/vz;</td></tr>
+<tr><th id="433">433</th><td>  <a class="typedef" href="../../../../global/management/include/G4Types.hh.html#G4double" title='G4double' data-type='double' data-ref="G4double">G4double</a> <dfn class="local col9 decl" id="69tmax" title='tmax' data-type='G4double' data-ref="69tmax">tmax</dfn> = <span class='error' title="use of undeclared identifier &apos;std&apos;">std</span>::min(txy,tz);</td></tr>
+<tr><th id="434">434</th><td></td></tr>
+<tr><th id="435">435</th><td>  <i>// Set normal, if required, and return distance</i></td></tr>
+<tr><th id="436">436</th><td><i>  //</i></td></tr>
+<tr><th id="437">437</th><td>  <b>if</b> (<a class="local col9 ref" href="#59calcNorm" title='calcNorm' data-ref="59calcNorm">calcNorm</a>)</td></tr>
+<tr><th id="438">438</th><td>  {</td></tr>
+<tr><th id="439">439</th><td>    *<a class="local col0 ref" href="#60validNorm" title='validNorm' data-ref="60validNorm">validNorm</a> = <b>true</b>;</td></tr>
+<tr><th id="440">440</th><td>    <b>if</b> (<a class="local col9 ref" href="#69tmax" title='tmax' data-ref="69tmax">tmax</a> == <a class="local col3 ref" href="#63tx" title='tx' data-ref="63tx">tx</a>)      <a class="local col1 ref" href="#61n" title='n' data-ref="61n">n</a>-&gt;<a class="ref" href="../../../../externals/clhep/include/CLHEP/Vector/ThreeVector.h.html#_ZN5CLHEP10Hep3Vector3setEddd" title='CLHEP::Hep3Vector::set' data-ref="_ZN5CLHEP10Hep3Vector3setEddd">set</a>((<a class="local col8 ref" href="#58v" title='v' data-ref="58v">v</a>.<a class="ref" href="../../../../externals/clhep/include/CLHEP/Vector/ThreeVector.h.html#_ZNK5CLHEP10Hep3Vector1xEv" title='CLHEP::Hep3Vector::x' data-ref="_ZNK5CLHEP10Hep3Vector1xEv">x</a>() &lt; <var>0</var>) ? -<var>1.</var> : <var>1.</var>, <var>0.</var>, <var>0.</var>);</td></tr>
+<tr><th id="441">441</th><td>    <b>else</b> <b>if</b> (<a class="local col9 ref" href="#69tmax" title='tmax' data-ref="69tmax">tmax</a> == <a class="local col5 ref" href="#65ty" title='ty' data-ref="65ty">ty</a>) <a class="local col1 ref" href="#61n" title='n' data-ref="61n">n</a>-&gt;<a class="ref" href="../../../../externals/clhep/include/CLHEP/Vector/ThreeVector.h.html#_ZN5CLHEP10Hep3Vector3setEddd" title='CLHEP::Hep3Vector::set' data-ref="_ZN5CLHEP10Hep3Vector3setEddd">set</a>(<var>0.</var>, (<a class="local col8 ref" href="#58v" title='v' data-ref="58v">v</a>.<a class="ref" href="../../../../externals/clhep/include/CLHEP/Vector/ThreeVector.h.html#_ZNK5CLHEP10Hep3Vector1yEv" title='CLHEP::Hep3Vector::y' data-ref="_ZNK5CLHEP10Hep3Vector1yEv">y</a>() &lt; <var>0</var>) ? -<var>1.</var> : <var>1.</var>, <var>0.</var>);</td></tr>
+<tr><th id="442">442</th><td>    <b>else</b>                 <a class="local col1 ref" href="#61n" title='n' data-ref="61n">n</a>-&gt;<a class="ref" href="../../../../externals/clhep/include/CLHEP/Vector/ThreeVector.h.html#_ZN5CLHEP10Hep3Vector3setEddd" title='CLHEP::Hep3Vector::set' data-ref="_ZN5CLHEP10Hep3Vector3setEddd">set</a>(<var>0.</var>, <var>0.</var>, (<a class="local col8 ref" href="#58v" title='v' data-ref="58v">v</a>.<a class="ref" href="../../../../externals/clhep/include/CLHEP/Vector/ThreeVector.h.html#_ZNK5CLHEP10Hep3Vector1zEv" title='CLHEP::Hep3Vector::z' data-ref="_ZNK5CLHEP10Hep3Vector1zEv">z</a>() &lt; <var>0</var>) ? -<var>1.</var> : <var>1.</var>);</td></tr>
+<tr><th id="443">443</th><td>  }</td></tr>
+<tr><th id="444">444</th><td>  <b>return</b> <a class="local col9 ref" href="#69tmax" title='tmax' data-ref="69tmax">tmax</a>;</td></tr>
+<tr><th id="445">445</th><td>}</td></tr>
+<tr><th id="446">446</th><td></td></tr>
+<tr><th id="447">447</th><td><i>////////////////////////////////////////////////////////////////////////////</i></td></tr>
+<tr><th id="448">448</th><td><i>//</i></td></tr>
+<tr><th id="449">449</th><td><i>// Calculate exact shortest distance to any boundary from inside</i></td></tr>
+<tr><th id="450">450</th><td><i>// - if outside return 0</i></td></tr>
+<tr><th id="451">451</th><td></td></tr>
+<tr><th id="452">452</th><td><a class="typedef" href="../../../../global/management/include/G4Types.hh.html#G4double" title='G4double' data-type='double' data-ref="G4double">G4double</a> <a class="type" href="../include/G4Box.hh.html#G4Box" title='G4Box' data-ref="G4Box">G4Box</a>::<dfn class="virtual decl def" id="_ZNK5G4Box13DistanceToOutERKN5CLHEP10Hep3VectorE" title='G4Box::DistanceToOut' data-ref="_ZNK5G4Box13DistanceToOutERKN5CLHEP10Hep3VectorE">DistanceToOut</dfn>(<em>const</em> <a class="typedef" href="../../../../global/management/include/G4ThreeVector.hh.html#G4ThreeVector" title='G4ThreeVector' data-type='CLHEP::Hep3Vector' data-ref="G4ThreeVector">G4ThreeVector</a>&amp; <dfn class="local col0 decl" id="70p" title='p' data-type='const G4ThreeVector &amp;' data-ref="70p">p</dfn>) <em>const</em></td></tr>
+<tr><th id="453">453</th><td>{</td></tr>
+<tr><th id="454">454</th><td><u>#<span data-ppcond="454">ifdef</span> <span class="macro" data-ref="_M/G4CSGDEBUG">G4CSGDEBUG</span></u></td></tr>
+<tr><th id="455">455</th><td>  <b>if</b>( Inside(p) == kOutside )</td></tr>
+<tr><th id="456">456</th><td>  {</td></tr>
+<tr><th id="457">457</th><td>    std::ostringstream message;</td></tr>
+<tr><th id="458">458</th><td>    G4int oldprc = message.precision(<var>16</var>);</td></tr>
+<tr><th id="459">459</th><td>    message &lt;&lt; <q>"Point p is outside (!?) of solid: "</q> &lt;&lt; GetName() &lt;&lt; G4endl;</td></tr>
+<tr><th id="460">460</th><td>    message &lt;&lt; <q>"Position:\n"</q>;</td></tr>
+<tr><th id="461">461</th><td>    message &lt;&lt; <q>"   p.x() = "</q> &lt;&lt; p.x()/mm &lt;&lt; <q>" mm\n"</q>;</td></tr>
+<tr><th id="462">462</th><td>    message &lt;&lt; <q>"   p.y() = "</q> &lt;&lt; p.y()/mm &lt;&lt; <q>" mm\n"</q>;</td></tr>
+<tr><th id="463">463</th><td>    message &lt;&lt; <q>"   p.z() = "</q> &lt;&lt; p.z()/mm &lt;&lt; <q>" mm"</q>;</td></tr>
+<tr><th id="464">464</th><td>    G4cout.precision(oldprc);</td></tr>
+<tr><th id="465">465</th><td>    G4Exception(<q>"G4Box::DistanceToOut(p)"</q>, <q>"GeomSolids1002"</q>,</td></tr>
+<tr><th id="466">466</th><td>                JustWarning, message );</td></tr>
+<tr><th id="467">467</th><td>    DumpInfo();</td></tr>
+<tr><th id="468">468</th><td>  }</td></tr>
+<tr><th id="469">469</th><td><u>#<span data-ppcond="454">endif</span></u></td></tr>
+<tr><th id="470">470</th><td>  <a class="typedef" href="../../../../global/management/include/G4Types.hh.html#G4double" title='G4double' data-type='double' data-ref="G4double">G4double</a> <dfn class="local col1 decl" id="71dist" title='dist' data-type='G4double' data-ref="71dist">dist</dfn> = <span class='error' title="use of undeclared identifier &apos;std&apos;">std</span>::min(<span class='error' title="use of undeclared identifier &apos;std&apos;">std</span>::min(</td></tr>
+<tr><th id="471">471</th><td>                  fDx-<span class='error' title="use of undeclared identifier &apos;std&apos;">std</span>::abs(p.x()),</td></tr>
+<tr><th id="472">472</th><td>                  fDy-<span class='error' title="use of undeclared identifier &apos;std&apos;">std</span>::abs(p.y())),</td></tr>
+<tr><th id="473">473</th><td>                  fDz-<span class='error' title="use of undeclared identifier &apos;std&apos;">std</span>::abs(p.z()));</td></tr>
+<tr><th id="474">474</th><td>  <b>return</b> (<a class="local col1 ref" href="#71dist" title='dist' data-ref="71dist">dist</a> &gt; <var>0</var>) ? <a class="local col1 ref" href="#71dist" title='dist' data-ref="71dist">dist</a> : <var>0.</var>;</td></tr>
+<tr><th id="475">475</th><td>}</td></tr>
+<tr><th id="476">476</th><td></td></tr>
+<tr><th id="477">477</th><td><i>//////////////////////////////////////////////////////////////////////////</i></td></tr>
+<tr><th id="478">478</th><td><i>//</i></td></tr>
+<tr><th id="479">479</th><td><i>// GetEntityType</i></td></tr>
+<tr><th id="480">480</th><td></td></tr>
+<tr><th id="481">481</th><td><a class="typedef" href="../../../management/include/G4VSolid.hh.html#G4GeometryType" title='G4GeometryType' data-type='G4String' data-ref="G4GeometryType">G4GeometryType</a> <a class="type" href="../include/G4Box.hh.html#G4Box" title='G4Box' data-ref="G4Box">G4Box</a>::<dfn class="virtual decl def" id="_ZNK5G4Box13GetEntityTypeEv" title='G4Box::GetEntityType' data-ref="_ZNK5G4Box13GetEntityTypeEv">GetEntityType</dfn>() <em>const</em></td></tr>
+<tr><th id="482">482</th><td>{</td></tr>
+<tr><th id="483">483</th><td>  <b>return</b> <a class="type" href="../../../../global/management/include/G4String.hh.html#G4String" title='G4String' data-ref="G4String">G4String</a><a class="ref" href="../../../../global/management/include/G4String.hh.html#_ZN8G4StringC1EPKc" title='G4String::G4String' data-ref="_ZN8G4StringC1EPKc">(</a><q>"G4Box"</q>);</td></tr>
+<tr><th id="484">484</th><td>}</td></tr>
+<tr><th id="485">485</th><td></td></tr>
+<tr><th id="486">486</th><td><i>//////////////////////////////////////////////////////////////////////////</i></td></tr>
+<tr><th id="487">487</th><td><i>//</i></td></tr>
+<tr><th id="488">488</th><td><i>// Stream object contents to an output stream</i></td></tr>
+<tr><th id="489">489</th><td></td></tr>
+<tr><th id="490">490</th><td><span class='error' title="use of undeclared identifier &apos;std&apos;">std</span>::ostream&amp; G4Box::StreamInfo(<span class='error' title="use of undeclared identifier &apos;std&apos;">std</span>::ostream&amp; os) <em>const</em></td></tr>
+<tr><th id="491">491</th><td>{</td></tr>
+<tr><th id="492">492</th><td>  G4int oldprc = os.precision(<var>16</var>);</td></tr>
+<tr><th id="493">493</th><td>  os &lt;&lt; <q>"-----------------------------------------------------------\n"</q></td></tr>
+<tr><th id="494">494</th><td>     &lt;&lt; <q>"    *** Dump for solid - "</q> &lt;&lt; GetName() &lt;&lt; <q>" ***\n"</q></td></tr>
+<tr><th id="495">495</th><td>     &lt;&lt; <q>"    ===================================================\n"</q></td></tr>
+<tr><th id="496">496</th><td>     &lt;&lt; <q>"Solid type: G4Box\n"</q></td></tr>
+<tr><th id="497">497</th><td>     &lt;&lt; <q>"Parameters: \n"</q></td></tr>
+<tr><th id="498">498</th><td>     &lt;&lt; <q>"   half length X: "</q> &lt;&lt; fDx/mm &lt;&lt; <q>" mm \n"</q></td></tr>
+<tr><th id="499">499</th><td>     &lt;&lt; <q>"   half length Y: "</q> &lt;&lt; fDy/mm &lt;&lt; <q>" mm \n"</q></td></tr>
+<tr><th id="500">500</th><td>     &lt;&lt; <q>"   half length Z: "</q> &lt;&lt; fDz/mm &lt;&lt; <q>" mm \n"</q></td></tr>
+<tr><th id="501">501</th><td>     &lt;&lt; <q>"-----------------------------------------------------------\n"</q>;</td></tr>
+<tr><th id="502">502</th><td>  os.precision(oldprc);</td></tr>
+<tr><th id="503">503</th><td>  <b>return</b> os;</td></tr>
+<tr><th id="504">504</th><td>}</td></tr>
+<tr><th id="505">505</th><td></td></tr>
+<tr><th id="506">506</th><td><i>//////////////////////////////////////////////////////////////////////////</i></td></tr>
+<tr><th id="507">507</th><td><i>//</i></td></tr>
+<tr><th id="508">508</th><td><i>// GetPointOnSurface</i></td></tr>
+<tr><th id="509">509</th><td><i>//</i></td></tr>
+<tr><th id="510">510</th><td><i>// Return a point (G4ThreeVector) randomly and uniformly selected</i></td></tr>
+<tr><th id="511">511</th><td><i>// on the solid surface</i></td></tr>
+<tr><th id="512">512</th><td></td></tr>
+<tr><th id="513">513</th><td><a class="typedef" href="../../../../global/management/include/G4ThreeVector.hh.html#G4ThreeVector" title='G4ThreeVector' data-type='CLHEP::Hep3Vector' data-ref="G4ThreeVector">G4ThreeVector</a> <a class="type" href="../include/G4Box.hh.html#G4Box" title='G4Box' data-ref="G4Box">G4Box</a>::<dfn class="virtual decl def" id="_ZNK5G4Box17GetPointOnSurfaceEv" title='G4Box::GetPointOnSurface' data-ref="_ZNK5G4Box17GetPointOnSurfaceEv">GetPointOnSurface</dfn>() <em>const</em></td></tr>
+<tr><th id="514">514</th><td>{</td></tr>
+<tr><th id="515">515</th><td>  <a class="typedef" href="../../../../global/management/include/G4Types.hh.html#G4double" title='G4double' data-type='double' data-ref="G4double">G4double</a> <dfn class="local col2 decl" id="72sxy" title='sxy' data-type='G4double' data-ref="72sxy">sxy</dfn> = <a class="member" href="../include/G4Box.hh.html#G4Box::fDx" title='G4Box::fDx' data-ref="G4Box::fDx">fDx</a>*<a class="member" href="../include/G4Box.hh.html#G4Box::fDy" title='G4Box::fDy' data-ref="G4Box::fDy">fDy</a>, <dfn class="local col3 decl" id="73sxz" title='sxz' data-type='G4double' data-ref="73sxz">sxz</dfn> = <a class="member" href="../include/G4Box.hh.html#G4Box::fDx" title='G4Box::fDx' data-ref="G4Box::fDx">fDx</a>*<a class="member" href="../include/G4Box.hh.html#G4Box::fDz" title='G4Box::fDz' data-ref="G4Box::fDz">fDz</a>, <dfn class="local col4 decl" id="74syz" title='syz' data-type='G4double' data-ref="74syz">syz</dfn> = <a class="member" href="../include/G4Box.hh.html#G4Box::fDy" title='G4Box::fDy' data-ref="G4Box::fDy">fDy</a>*<a class="member" href="../include/G4Box.hh.html#G4Box::fDz" title='G4Box::fDz' data-ref="G4Box::fDz">fDz</a>;</td></tr>
+<tr><th id="516">516</th><td>  <a class="typedef" href="../../../../global/management/include/G4Types.hh.html#G4double" title='G4double' data-type='double' data-ref="G4double">G4double</a> <dfn class="local col5 decl" id="75select" title='select' data-type='G4double' data-ref="75select">select</dfn> = (<a class="local col2 ref" href="#72sxy" title='sxy' data-ref="72sxy">sxy</a> + <a class="local col3 ref" href="#73sxz" title='sxz' data-ref="73sxz">sxz</a> + <a class="local col4 ref" href="#74syz" title='syz' data-ref="74syz">syz</a>)*<a class="macro" href="../../../../global/HEPRandom/include/Randomize.hh.html#52" title="CLHEP::HepRandom::getTheEngine()-&gt;flat()" data-ref="_M/G4UniformRand">G4UniformRand</a>();</td></tr>
+<tr><th id="517">517</th><td></td></tr>
+<tr><th id="518">518</th><td>  <b>if</b> (<a class="local col5 ref" href="#75select" title='select' data-ref="75select">select</a> &lt; <a class="local col2 ref" href="#72sxy" title='sxy' data-ref="72sxy">sxy</a>)</td></tr>
+<tr><th id="519">519</th><td>    <b>return</b> <a class="typedef" href="../../../../global/management/include/G4ThreeVector.hh.html#G4ThreeVector" title='G4ThreeVector' data-type='CLHEP::Hep3Vector' data-ref="G4ThreeVector">G4ThreeVector</a><a class="ref" href="../../../../externals/clhep/include/CLHEP/Vector/ThreeVector.h.html#_ZN5CLHEP10Hep3VectorC1Eddd" title='CLHEP::Hep3Vector::Hep3Vector' data-ref="_ZN5CLHEP10Hep3VectorC1Eddd">(</a>(<var>2.</var>*<a class="macro" href="../../../../global/HEPRandom/include/Randomize.hh.html#52" title="CLHEP::HepRandom::getTheEngine()-&gt;flat()" data-ref="_M/G4UniformRand">G4UniformRand</a>() - <var>1.</var>)*<a class="member" href="../include/G4Box.hh.html#G4Box::fDx" title='G4Box::fDx' data-ref="G4Box::fDx">fDx</a>,</td></tr>
+<tr><th id="520">520</th><td>                         (<var>2.</var>*<a class="macro" href="../../../../global/HEPRandom/include/Randomize.hh.html#52" title="CLHEP::HepRandom::getTheEngine()-&gt;flat()" data-ref="_M/G4UniformRand">G4UniformRand</a>() - <var>1.</var>)*<a class="member" href="../include/G4Box.hh.html#G4Box::fDy" title='G4Box::fDy' data-ref="G4Box::fDy">fDy</a>,</td></tr>
+<tr><th id="521">521</th><td>                         (<a class="local col5 ref" href="#75select" title='select' data-ref="75select">select</a> &lt; <var>0.5</var>*<a class="local col2 ref" href="#72sxy" title='sxy' data-ref="72sxy">sxy</a>) ? -<a class="member" href="../include/G4Box.hh.html#G4Box::fDz" title='G4Box::fDz' data-ref="G4Box::fDz">fDz</a> : <a class="member" href="../include/G4Box.hh.html#G4Box::fDz" title='G4Box::fDz' data-ref="G4Box::fDz">fDz</a>);</td></tr>
+<tr><th id="522">522</th><td></td></tr>
+<tr><th id="523">523</th><td>  <b>if</b> (<a class="local col5 ref" href="#75select" title='select' data-ref="75select">select</a> &lt; <a class="local col2 ref" href="#72sxy" title='sxy' data-ref="72sxy">sxy</a> + <a class="local col3 ref" href="#73sxz" title='sxz' data-ref="73sxz">sxz</a>)</td></tr>
+<tr><th id="524">524</th><td>    <b>return</b> <a class="typedef" href="../../../../global/management/include/G4ThreeVector.hh.html#G4ThreeVector" title='G4ThreeVector' data-type='CLHEP::Hep3Vector' data-ref="G4ThreeVector">G4ThreeVector</a><a class="ref" href="../../../../externals/clhep/include/CLHEP/Vector/ThreeVector.h.html#_ZN5CLHEP10Hep3VectorC1Eddd" title='CLHEP::Hep3Vector::Hep3Vector' data-ref="_ZN5CLHEP10Hep3VectorC1Eddd">(</a>(<var>2.</var>*<a class="macro" href="../../../../global/HEPRandom/include/Randomize.hh.html#52" title="CLHEP::HepRandom::getTheEngine()-&gt;flat()" data-ref="_M/G4UniformRand">G4UniformRand</a>() - <var>1.</var>)*<a class="member" href="../include/G4Box.hh.html#G4Box::fDx" title='G4Box::fDx' data-ref="G4Box::fDx">fDx</a>,</td></tr>
+<tr><th id="525">525</th><td>                         (<a class="local col5 ref" href="#75select" title='select' data-ref="75select">select</a> &lt; <a class="local col2 ref" href="#72sxy" title='sxy' data-ref="72sxy">sxy</a> + <var>0.5</var>*<a class="local col3 ref" href="#73sxz" title='sxz' data-ref="73sxz">sxz</a>) ? -<a class="member" href="../include/G4Box.hh.html#G4Box::fDy" title='G4Box::fDy' data-ref="G4Box::fDy">fDy</a> : <a class="member" href="../include/G4Box.hh.html#G4Box::fDy" title='G4Box::fDy' data-ref="G4Box::fDy">fDy</a>,</td></tr>
+<tr><th id="526">526</th><td>                         (<var>2.</var>*<a class="macro" href="../../../../global/HEPRandom/include/Randomize.hh.html#52" title="CLHEP::HepRandom::getTheEngine()-&gt;flat()" data-ref="_M/G4UniformRand">G4UniformRand</a>() - <var>1.</var>)*<a class="member" href="../include/G4Box.hh.html#G4Box::fDz" title='G4Box::fDz' data-ref="G4Box::fDz">fDz</a>);</td></tr>
+<tr><th id="527">527</th><td>  <b>else</b></td></tr>
+<tr><th id="528">528</th><td>    <b>return</b> <a class="typedef" href="../../../../global/management/include/G4ThreeVector.hh.html#G4ThreeVector" title='G4ThreeVector' data-type='CLHEP::Hep3Vector' data-ref="G4ThreeVector">G4ThreeVector</a><a class="ref" href="../../../../externals/clhep/include/CLHEP/Vector/ThreeVector.h.html#_ZN5CLHEP10Hep3VectorC1Eddd" title='CLHEP::Hep3Vector::Hep3Vector' data-ref="_ZN5CLHEP10Hep3VectorC1Eddd">(</a>(<a class="local col5 ref" href="#75select" title='select' data-ref="75select">select</a> &lt; <a class="local col2 ref" href="#72sxy" title='sxy' data-ref="72sxy">sxy</a> + <a class="local col3 ref" href="#73sxz" title='sxz' data-ref="73sxz">sxz</a> + <var>0.5</var>*<a class="local col4 ref" href="#74syz" title='syz' data-ref="74syz">syz</a>) ? -<a class="member" href="../include/G4Box.hh.html#G4Box::fDx" title='G4Box::fDx' data-ref="G4Box::fDx">fDx</a> : <a class="member" href="../include/G4Box.hh.html#G4Box::fDx" title='G4Box::fDx' data-ref="G4Box::fDx">fDx</a>,</td></tr>
+<tr><th id="529">529</th><td>                         (<var>2.</var>*<a class="macro" href="../../../../global/HEPRandom/include/Randomize.hh.html#52" title="CLHEP::HepRandom::getTheEngine()-&gt;flat()" data-ref="_M/G4UniformRand">G4UniformRand</a>() - <var>1.</var>)*<a class="member" href="../include/G4Box.hh.html#G4Box::fDy" title='G4Box::fDy' data-ref="G4Box::fDy">fDy</a>,</td></tr>
+<tr><th id="530">530</th><td>                         (<var>2.</var>*<a class="macro" href="../../../../global/HEPRandom/include/Randomize.hh.html#52" title="CLHEP::HepRandom::getTheEngine()-&gt;flat()" data-ref="_M/G4UniformRand">G4UniformRand</a>() - <var>1.</var>)*<a class="member" href="../include/G4Box.hh.html#G4Box::fDz" title='G4Box::fDz' data-ref="G4Box::fDz">fDz</a>);</td></tr>
+<tr><th id="531">531</th><td>}</td></tr>
+<tr><th id="532">532</th><td></td></tr>
+<tr><th id="533">533</th><td><i>//////////////////////////////////////////////////////////////////////////</i></td></tr>
+<tr><th id="534">534</th><td><i>//</i></td></tr>
+<tr><th id="535">535</th><td><i>// Make a clone of the object</i></td></tr>
+<tr><th id="536">536</th><td><i>//</i></td></tr>
+<tr><th id="537">537</th><td><a class="type" href="../../../management/include/G4VSolid.hh.html#G4VSolid" title='G4VSolid' data-ref="G4VSolid">G4VSolid</a>* <a class="type" href="../include/G4Box.hh.html#G4Box" title='G4Box' data-ref="G4Box">G4Box</a>::<dfn class="virtual decl def" id="_ZNK5G4Box5CloneEv" title='G4Box::Clone' data-ref="_ZNK5G4Box5CloneEv">Clone</dfn>() <em>const</em></td></tr>
+<tr><th id="538">538</th><td>{</td></tr>
+<tr><th id="539">539</th><td>  <b>return</b> <b>new</b> <a class="type" href="../include/G4Box.hh.html#G4Box" title='G4Box' data-ref="G4Box">G4Box</a><a class="ref" href="#_ZN5G4BoxC1ERKS_" title='G4Box::G4Box' data-ref="_ZN5G4BoxC1ERKS_">(</a>*<b>this</b>);</td></tr>
+<tr><th id="540">540</th><td>}</td></tr>
+<tr><th id="541">541</th><td></td></tr>
+<tr><th id="542">542</th><td><i>//////////////////////////////////////////////////////////////////////////</i></td></tr>
+<tr><th id="543">543</th><td><i>//</i></td></tr>
+<tr><th id="544">544</th><td><i>// Methods for visualisation</i></td></tr>
+<tr><th id="545">545</th><td></td></tr>
+<tr><th id="546">546</th><td><em>void</em> <a class="type" href="../include/G4Box.hh.html#G4Box" title='G4Box' data-ref="G4Box">G4Box</a>::<dfn class="virtual decl def" id="_ZNK5G4Box18DescribeYourselfToER16G4VGraphicsScene" title='G4Box::DescribeYourselfTo' data-ref="_ZNK5G4Box18DescribeYourselfToER16G4VGraphicsScene">DescribeYourselfTo</dfn> (<a class="type" href="../../../../graphics_reps/include/G4VGraphicsScene.hh.html#G4VGraphicsScene" title='G4VGraphicsScene' data-ref="G4VGraphicsScene">G4VGraphicsScene</a>&amp; <dfn class="local col6 decl" id="76scene" title='scene' data-type='G4VGraphicsScene &amp;' data-ref="76scene">scene</dfn>) <em>const</em></td></tr>
+<tr><th id="547">547</th><td>{</td></tr>
+<tr><th id="548">548</th><td>  <a class="local col6 ref" href="#76scene" title='scene' data-ref="76scene">scene</a>.<a class="virtual ref" href="../../../../graphics_reps/include/G4VGraphicsScene.hh.html#_ZN16G4VGraphicsScene8AddSolidERK5G4Box" title='G4VGraphicsScene::AddSolid' data-ref="_ZN16G4VGraphicsScene8AddSolidERK5G4Box">AddSolid</a> (*<b>this</b>);</td></tr>
+<tr><th id="549">549</th><td>}</td></tr>
+<tr><th id="550">550</th><td></td></tr>
+<tr><th id="551">551</th><td><a class="type" href="../../../../graphics_reps/include/G4VisExtent.hh.html#G4VisExtent" title='G4VisExtent' data-ref="G4VisExtent">G4VisExtent</a> <a class="type" href="../include/G4Box.hh.html#G4Box" title='G4Box' data-ref="G4Box">G4Box</a>::<dfn class="virtual decl def" id="_ZNK5G4Box9GetExtentEv" title='G4Box::GetExtent' data-ref="_ZNK5G4Box9GetExtentEv">GetExtent</dfn>() <em>const</em></td></tr>
+<tr><th id="552">552</th><td>{</td></tr>
+<tr><th id="553">553</th><td>  <b>return</b> <a class="type" href="../../../../graphics_reps/include/G4VisExtent.hh.html#G4VisExtent" title='G4VisExtent' data-ref="G4VisExtent">G4VisExtent</a> <a class="ref" href="../../../../graphics_reps/include/G4VisExtent.hh.html#_ZN11G4VisExtentC1Edddddd" title='G4VisExtent::G4VisExtent' data-ref="_ZN11G4VisExtentC1Edddddd">(</a>-<a class="member" href="../include/G4Box.hh.html#G4Box::fDx" title='G4Box::fDx' data-ref="G4Box::fDx">fDx</a>, <a class="member" href="../include/G4Box.hh.html#G4Box::fDx" title='G4Box::fDx' data-ref="G4Box::fDx">fDx</a>, -<a class="member" href="../include/G4Box.hh.html#G4Box::fDy" title='G4Box::fDy' data-ref="G4Box::fDy">fDy</a>, <a class="member" href="../include/G4Box.hh.html#G4Box::fDy" title='G4Box::fDy' data-ref="G4Box::fDy">fDy</a>, -<a class="member" href="../include/G4Box.hh.html#G4Box::fDz" title='G4Box::fDz' data-ref="G4Box::fDz">fDz</a>, <a class="member" href="../include/G4Box.hh.html#G4Box::fDz" title='G4Box::fDz' data-ref="G4Box::fDz">fDz</a>);</td></tr>
+<tr><th id="554">554</th><td>}</td></tr>
+<tr><th id="555">555</th><td></td></tr>
+<tr><th id="556">556</th><td><a class="type" href="../../../../graphics_reps/include/G4Polyhedron.hh.html#G4Polyhedron" title='G4Polyhedron' data-ref="G4Polyhedron">G4Polyhedron</a>* <a class="type" href="../include/G4Box.hh.html#G4Box" title='G4Box' data-ref="G4Box">G4Box</a>::<dfn class="virtual decl def" id="_ZNK5G4Box16CreatePolyhedronEv" title='G4Box::CreatePolyhedron' data-ref="_ZNK5G4Box16CreatePolyhedronEv">CreatePolyhedron</dfn> () <em>const</em></td></tr>
+<tr><th id="557">557</th><td>{</td></tr>
+<tr><th id="558">558</th><td>  <b>return</b> <b>new</b> <a class="type" href="../../../../graphics_reps/include/G4Polyhedron.hh.html#G4PolyhedronBox" title='G4PolyhedronBox' data-ref="G4PolyhedronBox">G4PolyhedronBox</a> <a class="ref" href="../../../../graphics_reps/include/G4Polyhedron.hh.html#_ZN15G4PolyhedronBoxC1Eddd" title='G4PolyhedronBox::G4PolyhedronBox' data-ref="_ZN15G4PolyhedronBoxC1Eddd">(</a><a class="member" href="../include/G4Box.hh.html#G4Box::fDx" title='G4Box::fDx' data-ref="G4Box::fDx">fDx</a>, <a class="member" href="../include/G4Box.hh.html#G4Box::fDy" title='G4Box::fDy' data-ref="G4Box::fDy">fDy</a>, <a class="member" href="../include/G4Box.hh.html#G4Box::fDz" title='G4Box::fDz' data-ref="G4Box::fDz">fDz</a>);</td></tr>
+<tr><th id="559">559</th><td>}</td></tr>
+<tr><th id="560">560</th><td><u>#<span data-ppcond="45">endif</span></u></td></tr>
+<tr><th id="561">561</th><td></td></tr>
+</table><hr/><p id='footer'>
+Generated on <em>2019-Aug-28</em> from project codebrowser<br />Powered by <a href='https://woboq.com'><img alt='Woboq' src='https://code.woboq.org/woboq-16.png' width='41' height='16' /></a> <a href='https://code.woboq.org'>Code Browser</a> 2.1
+<br/>Generator usage only permitted with license.</p>
+</div></body></html>

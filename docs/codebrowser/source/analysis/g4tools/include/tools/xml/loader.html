@@ -1,0 +1,601 @@
+<!doctype html>
+<html>
+<head>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"><title>loader source code [codebrowser/source/analysis/g4tools/include/tools/xml/loader] - Woboq Code Browser</title>
+<meta name="woboq:interestingDefinitions" content="tools::xml::loader "/>
+<link rel="stylesheet" href="../../../../../../../../data/qtcreator.css" title="QtCreator"/>
+<link rel="alternate stylesheet" href="../../../../../../../../data/kdevelop.css" title="KDevelop"/>
+<script type="text/javascript" src="../../../../../../../../data/jquery/jquery.min.js"></script>
+<script type="text/javascript" src="../../../../../../../../data/jquery/jquery-ui.min.js"></script>
+<script>var file = 'codebrowser/source/analysis/g4tools/include/tools/xml/loader'; var root_path = '../../../../../../..'; var data_path = '../../../../../../../../data';</script>
+<script src='../../../../../../../../data/codebrowser.js'></script>
+</head>
+<body><div id='header'><h1 id='breadcrumb'><span>Browse the source code of </span><a href='../../../../../..'>codebrowser</a>/<a href='../../../../..'>source</a>/<a href='../../../..'>analysis</a>/<a href='../../..'>g4tools</a>/<a href='../..'>include</a>/<a href='..'>tools</a>/<a href='./'>xml</a>/<a href='loader.html'>loader</a></h1></div>
+<hr/><div id='content'><table class="code">
+<tr><th id="1">1</th><td><i>// Copyright (C) 2010, Guy Barrand. All rights reserved.</i></td></tr>
+<tr><th id="2">2</th><td><i>// See the file tools.license for terms.</i></td></tr>
+<tr><th id="3">3</th><td></td></tr>
+<tr><th id="4">4</th><td><u>#<span data-ppcond="4">ifndef</span> <span class="macro" data-ref="_M/tools_xml_loader">tools_xml_loader</span></u></td></tr>
+<tr><th id="5">5</th><td><u>#define <dfn class="macro" id="_M/tools_xml_loader" data-ref="_M/tools_xml_loader">tools_xml_loader</dfn></u></td></tr>
+<tr><th id="6">6</th><td></td></tr>
+<tr><th id="7">7</th><td><u>#include <a href="tree.html">&lt;tools/xml/tree&gt;</a></u></td></tr>
+<tr><th id="8">8</th><td><u>#include <a href="../file.html">&lt;tools/file&gt;</a></u></td></tr>
+<tr><th id="9">9</th><td><u>#include <a href="../mnmx.html">&lt;tools/mnmx&gt;</a></u></td></tr>
+<tr><th id="10">10</th><td></td></tr>
+<tr><th id="11">11</th><td><u>#include <span class='error' title="&apos;cstdio&apos; file not found">&lt;</span>cstdio&gt;</u></td></tr>
+<tr><th id="12">12</th><td><u>#include &lt;cctype&gt; //iscntrl</u></td></tr>
+<tr><th id="13">13</th><td></td></tr>
+<tr><th id="14">14</th><td><u>#<span data-ppcond="14">ifndef</span> <span class="macro" data-ref="_M/TOOLS_USE_OUREX_EXPAT">TOOLS_USE_OUREX_EXPAT</span></u></td></tr>
+<tr><th id="15">15</th><td><u>#include &lt;expat.h&gt;</u></td></tr>
+<tr><th id="16">16</th><td><u>#<span data-ppcond="14">else</span></u></td></tr>
+<tr><th id="17">17</th><td><u>#include &lt;ourex_expat.h&gt;</u></td></tr>
+<tr><th id="18">18</th><td><u>#<span data-ppcond="14">endif</span></u></td></tr>
+<tr><th id="19">19</th><td></td></tr>
+<tr><th id="20">20</th><td><u>#<span data-ppcond="20">ifdef</span> <span class="macro" data-ref="_M/TOOLS_MEM">TOOLS_MEM</span></u></td></tr>
+<tr><th id="21">21</th><td><u>#include &lt;tools/mem&gt;</u></td></tr>
+<tr><th id="22">22</th><td><b>namespace</b> tools {</td></tr>
+<tr><th id="23">23</th><td><b>extern</b> <q>"C"</q> {</td></tr>
+<tr><th id="24">24</th><td><b>inline</b> <em>void</em>* xml_malloc(size_t a_size){</td></tr>
+<tr><th id="25">25</th><td>  tools::mem::increment(tools::s_malloc().c_str());</td></tr>
+<tr><th id="26">26</th><td>  <b>return</b> ::malloc(a_size);</td></tr>
+<tr><th id="27">27</th><td>}</td></tr>
+<tr><th id="28">28</th><td><b>inline</b> <em>void</em>* xml_realloc(<em>void</em>* a_ptr,size_t a_size){</td></tr>
+<tr><th id="29">29</th><td>  <b>if</b>(a_ptr==NULL) tools::mem::increment(tools::s_malloc().c_str());</td></tr>
+<tr><th id="30">30</th><td>  <b>return</b> ::realloc(a_ptr,a_size);</td></tr>
+<tr><th id="31">31</th><td>}</td></tr>
+<tr><th id="32">32</th><td><b>inline</b> <em>void</em> xml_free(<em>void</em>* a_ptr){</td></tr>
+<tr><th id="33">33</th><td>  <b>if</b>(a_ptr!=NULL) tools::mem::decrement(tools::s_malloc().c_str());</td></tr>
+<tr><th id="34">34</th><td>  ::free(a_ptr);</td></tr>
+<tr><th id="35">35</th><td>}</td></tr>
+<tr><th id="36">36</th><td>}}</td></tr>
+<tr><th id="37">37</th><td><u>#<span data-ppcond="20">endif</span></u></td></tr>
+<tr><th id="38">38</th><td></td></tr>
+<tr><th id="39">39</th><td><b>namespace</b> <span class="namespace">tools</span> {</td></tr>
+<tr><th id="40">40</th><td><b>namespace</b> <span class="namespace">xml</span> {</td></tr>
+<tr><th id="41">41</th><td></td></tr>
+<tr><th id="42">42</th><td><b>class</b> <dfn class="type def" id="tools::xml::loader" title='tools::xml::loader' data-ref="tools::xml::loader">loader</dfn> {</td></tr>
+<tr><th id="43">43</th><td><u>#<span data-ppcond="43">ifdef</span> <span class="macro" data-ref="_M/TOOLS_MEM">TOOLS_MEM</span></u></td></tr>
+<tr><th id="44">44</th><td>  TOOLS_SCLASS(tools::xml::loader)</td></tr>
+<tr><th id="45">45</th><td><u>#<span data-ppcond="43">endif</span></u></td></tr>
+<tr><th id="46">46</th><td><b>public</b>:</td></tr>
+<tr><th id="47">47</th><td>  <dfn class="decl def" id="_ZN5tools3xml6loaderC1ERNS0_7factoryERib" title='tools::xml::loader::loader' data-ref="_ZN5tools3xml6loaderC1ERNS0_7factoryERib">loader</dfn>(<span class="namespace">tools::xml::</span><a class="type" href="tree.html#tools::xml::factory" title='tools::xml::factory' data-ref="tools::xml::factory">factory</a>&amp; <dfn class="local col1 decl" id="641a_factory" title='a_factory' data-type='tools::xml::factory &amp;' data-ref="641a_factory">a_factory</dfn>,</td></tr>
+<tr><th id="48">48</th><td>         <span class='error' title="use of undeclared identifier &apos;std&apos;">std</span>::ostream&amp; <dfn class="local col2 decl" id="642a_out" title='a_out' data-type='int &amp;' data-ref="642a_out">a_out</dfn>,<em>bool</em> <dfn class="local col3 decl" id="643a_verbose" title='a_verbose' data-type='bool' data-ref="643a_verbose">a_verbose</dfn> = <b>false</b>)</td></tr>
+<tr><th id="49">49</th><td>  :<a class="member" href="#tools::xml::loader::m_factory" title='tools::xml::loader::m_factory' data-ref="tools::xml::loader::m_factory">m_factory</a>(<a class="local col1 ref" href="#641a_factory" title='a_factory' data-ref="641a_factory">a_factory</a>)</td></tr>
+<tr><th id="50">50</th><td>  ,m_out(a_out)</td></tr>
+<tr><th id="51">51</th><td>  ,<a class="member" href="#tools::xml::loader::m_verbose" title='tools::xml::loader::m_verbose' data-ref="tools::xml::loader::m_verbose">m_verbose</a>(<a class="local col3 ref" href="#643a_verbose" title='a_verbose' data-ref="643a_verbose">a_verbose</a>)</td></tr>
+<tr><th id="52">52</th><td>  ,<a class="member" href="#tools::xml::loader::m_take_cntrl" title='tools::xml::loader::m_take_cntrl' data-ref="tools::xml::loader::m_take_cntrl">m_take_cntrl</a>(<b>false</b>)</td></tr>
+<tr><th id="53">53</th><td></td></tr>
+<tr><th id="54">54</th><td>  ,<a class="member" href="#tools::xml::loader::m_errors" title='tools::xml::loader::m_errors' data-ref="tools::xml::loader::m_errors">m_errors</a>(<var>0</var>)</td></tr>
+<tr><th id="55">55</th><td>  ,<a class="member" href="#tools::xml::loader::m_top" title='tools::xml::loader::m_top' data-ref="tools::xml::loader::m_top">m_top</a>(<var>0</var>) <i>// Used to cleanup in case XML parsing failed.</i></td></tr>
+<tr><th id="56">56</th><td>  ,<a class="member" href="#tools::xml::loader::m_current" title='tools::xml::loader::m_current' data-ref="tools::xml::loader::m_current">m_current</a>(<var>0</var>)</td></tr>
+<tr><th id="57">57</th><td>  ,<a class="member" href="#tools::xml::loader::m_compressed_reader" title='tools::xml::loader::m_compressed_reader' data-ref="tools::xml::loader::m_compressed_reader">m_compressed_reader</a>(<var>0</var>)</td></tr>
+<tr><th id="58">58</th><td>  ,<a class="member" href="#tools::xml::loader::m_depth" title='tools::xml::loader::m_depth' data-ref="tools::xml::loader::m_depth">m_depth</a>(<var>0</var>)</td></tr>
+<tr><th id="59">59</th><td>  ,<a class="member" href="#tools::xml::loader::m_abort" title='tools::xml::loader::m_abort' data-ref="tools::xml::loader::m_abort">m_abort</a>(<b>false</b>)</td></tr>
+<tr><th id="60">60</th><td>  {</td></tr>
+<tr><th id="61">61</th><td><u>#<span data-ppcond="61">ifdef</span> <span class="macro" data-ref="_M/TOOLS_MEM">TOOLS_MEM</span></u></td></tr>
+<tr><th id="62">62</th><td>    tools::mem::increment(s_class().c_str());</td></tr>
+<tr><th id="63">63</th><td><u>#<span data-ppcond="61">endif</span></u></td></tr>
+<tr><th id="64">64</th><td>  }</td></tr>
+<tr><th id="65">65</th><td>  </td></tr>
+<tr><th id="66">66</th><td>  <b>virtual</b> <dfn class="virtual decl def" id="_ZN5tools3xml6loaderD1Ev" title='tools::xml::loader::~loader' data-ref="_ZN5tools3xml6loaderD1Ev">~loader</dfn>(){</td></tr>
+<tr><th id="67">67</th><td>    <b>delete</b> <a class="member" href="#tools::xml::loader::m_compressed_reader" title='tools::xml::loader::m_compressed_reader' data-ref="tools::xml::loader::m_compressed_reader">m_compressed_reader</a>;</td></tr>
+<tr><th id="68">68</th><td>    <a class="member" href="#_ZN5tools3xml6loader5clearEv" title='tools::xml::loader::clear' data-ref="_ZN5tools3xml6loader5clearEv">clear</a>();</td></tr>
+<tr><th id="69">69</th><td><u>#<span data-ppcond="69">ifdef</span> <span class="macro" data-ref="_M/TOOLS_MEM">TOOLS_MEM</span></u></td></tr>
+<tr><th id="70">70</th><td>    tools::mem::decrement(s_class().c_str());</td></tr>
+<tr><th id="71">71</th><td><u>#<span data-ppcond="69">endif</span></u></td></tr>
+<tr><th id="72">72</th><td>  }</td></tr>
+<tr><th id="73">73</th><td></td></tr>
+<tr><th id="74">74</th><td><b>protected</b>:</td></tr>
+<tr><th id="75">75</th><td>  <dfn class="decl def" id="_ZN5tools3xml6loaderC1ERKS1_" title='tools::xml::loader::loader' data-ref="_ZN5tools3xml6loaderC1ERKS1_">loader</dfn>(<em>const</em> <a class="type" href="#tools::xml::loader" title='tools::xml::loader' data-ref="tools::xml::loader">loader</a>&amp; <dfn class="local col4 decl" id="644a_from" title='a_from' data-type='const tools::xml::loader &amp;' data-ref="644a_from">a_from</dfn>)</td></tr>
+<tr><th id="76">76</th><td>  :<a class="member" href="#tools::xml::loader::m_factory" title='tools::xml::loader::m_factory' data-ref="tools::xml::loader::m_factory">m_factory</a>(<a class="local col4 ref" href="#644a_from" title='a_from' data-ref="644a_from">a_from</a>.<a class="member" href="#tools::xml::loader::m_factory" title='tools::xml::loader::m_factory' data-ref="tools::xml::loader::m_factory">m_factory</a>)</td></tr>
+<tr><th id="77">77</th><td>  ,m_out(a_from.m_out)</td></tr>
+<tr><th id="78">78</th><td>  ,<a class="member" href="#tools::xml::loader::m_verbose" title='tools::xml::loader::m_verbose' data-ref="tools::xml::loader::m_verbose">m_verbose</a>(<a class="local col4 ref" href="#644a_from" title='a_from' data-ref="644a_from">a_from</a>.<a class="member" href="#tools::xml::loader::m_verbose" title='tools::xml::loader::m_verbose' data-ref="tools::xml::loader::m_verbose">m_verbose</a>)</td></tr>
+<tr><th id="79">79</th><td>  ,<a class="member" href="#tools::xml::loader::m_take_cntrl" title='tools::xml::loader::m_take_cntrl' data-ref="tools::xml::loader::m_take_cntrl">m_take_cntrl</a>(<a class="local col4 ref" href="#644a_from" title='a_from' data-ref="644a_from">a_from</a>.<a class="member" href="#tools::xml::loader::m_take_cntrl" title='tools::xml::loader::m_take_cntrl' data-ref="tools::xml::loader::m_take_cntrl">m_take_cntrl</a>)</td></tr>
+<tr><th id="80">80</th><td></td></tr>
+<tr><th id="81">81</th><td>  ,<a class="member" href="#tools::xml::loader::m_errors" title='tools::xml::loader::m_errors' data-ref="tools::xml::loader::m_errors">m_errors</a>(<var>0</var>)</td></tr>
+<tr><th id="82">82</th><td>  ,<a class="member" href="#tools::xml::loader::m_top" title='tools::xml::loader::m_top' data-ref="tools::xml::loader::m_top">m_top</a>(<var>0</var>) <i>// Used to cleanup in case XML parsing failed.</i></td></tr>
+<tr><th id="83">83</th><td>  ,<a class="member" href="#tools::xml::loader::m_current" title='tools::xml::loader::m_current' data-ref="tools::xml::loader::m_current">m_current</a>(<var>0</var>)</td></tr>
+<tr><th id="84">84</th><td>  ,<a class="member" href="#tools::xml::loader::m_compressed_reader" title='tools::xml::loader::m_compressed_reader' data-ref="tools::xml::loader::m_compressed_reader">m_compressed_reader</a>(<var>0</var>)</td></tr>
+<tr><th id="85">85</th><td>  ,<a class="member" href="#tools::xml::loader::m_depth" title='tools::xml::loader::m_depth' data-ref="tools::xml::loader::m_depth">m_depth</a>(<var>0</var>)</td></tr>
+<tr><th id="86">86</th><td>  ,<a class="member" href="#tools::xml::loader::m_abort" title='tools::xml::loader::m_abort' data-ref="tools::xml::loader::m_abort">m_abort</a>(<b>false</b>)</td></tr>
+<tr><th id="87">87</th><td>  {</td></tr>
+<tr><th id="88">88</th><td><u>#<span data-ppcond="88">ifdef</span> <span class="macro" data-ref="_M/TOOLS_MEM">TOOLS_MEM</span></u></td></tr>
+<tr><th id="89">89</th><td>    tools::mem::increment(s_class().c_str());</td></tr>
+<tr><th id="90">90</th><td><u>#<span data-ppcond="88">endif</span></u></td></tr>
+<tr><th id="91">91</th><td>  }</td></tr>
+<tr><th id="92">92</th><td>  <a class="type" href="#tools::xml::loader" title='tools::xml::loader' data-ref="tools::xml::loader">loader</a>&amp; <dfn class="decl def" id="_ZN5tools3xml6loaderaSERKS1_" title='tools::xml::loader::operator=' data-ref="_ZN5tools3xml6loaderaSERKS1_"><b>operator</b>=</dfn>(<em>const</em> <a class="type" href="#tools::xml::loader" title='tools::xml::loader' data-ref="tools::xml::loader">loader</a>&amp; <dfn class="local col5 decl" id="645a_from" title='a_from' data-type='const tools::xml::loader &amp;' data-ref="645a_from">a_from</dfn>){</td></tr>
+<tr><th id="93">93</th><td>    <b>if</b>(&amp;<a class="local col5 ref" href="#645a_from" title='a_from' data-ref="645a_from">a_from</a>==<b>this</b>) <b>return</b> *<b>this</b>;</td></tr>
+<tr><th id="94">94</th><td></td></tr>
+<tr><th id="95">95</th><td>    <a class="member" href="#tools::xml::loader::m_verbose" title='tools::xml::loader::m_verbose' data-ref="tools::xml::loader::m_verbose">m_verbose</a> = <a class="local col5 ref" href="#645a_from" title='a_from' data-ref="645a_from">a_from</a>.<a class="member" href="#tools::xml::loader::m_verbose" title='tools::xml::loader::m_verbose' data-ref="tools::xml::loader::m_verbose">m_verbose</a>;</td></tr>
+<tr><th id="96">96</th><td>    <a class="member" href="#tools::xml::loader::m_take_cntrl" title='tools::xml::loader::m_take_cntrl' data-ref="tools::xml::loader::m_take_cntrl">m_take_cntrl</a> = <a class="local col5 ref" href="#645a_from" title='a_from' data-ref="645a_from">a_from</a>.<a class="member" href="#tools::xml::loader::m_take_cntrl" title='tools::xml::loader::m_take_cntrl' data-ref="tools::xml::loader::m_take_cntrl">m_take_cntrl</a>;</td></tr>
+<tr><th id="97">97</th><td></td></tr>
+<tr><th id="98">98</th><td>    <a class="member" href="#tools::xml::loader::m_errors" title='tools::xml::loader::m_errors' data-ref="tools::xml::loader::m_errors">m_errors</a> = <var>0</var>;</td></tr>
+<tr><th id="99">99</th><td>    <a class="member" href="#tools::xml::loader::m_top" title='tools::xml::loader::m_top' data-ref="tools::xml::loader::m_top">m_top</a> = <var>0</var>;</td></tr>
+<tr><th id="100">100</th><td>    <a class="member" href="#tools::xml::loader::m_current" title='tools::xml::loader::m_current' data-ref="tools::xml::loader::m_current">m_current</a> = <var>0</var>;</td></tr>
+<tr><th id="101">101</th><td>    <a class="member" href="#tools::xml::loader::m_compressed_reader" title='tools::xml::loader::m_compressed_reader' data-ref="tools::xml::loader::m_compressed_reader">m_compressed_reader</a> = <var>0</var>;</td></tr>
+<tr><th id="102">102</th><td>    <a class="member" href="#tools::xml::loader::m_depth" title='tools::xml::loader::m_depth' data-ref="tools::xml::loader::m_depth">m_depth</a> = <var>0</var>;</td></tr>
+<tr><th id="103">103</th><td>    <a class="member" href="#tools::xml::loader::m_abort" title='tools::xml::loader::m_abort' data-ref="tools::xml::loader::m_abort">m_abort</a> = <b>false</b>;</td></tr>
+<tr><th id="104">104</th><td></td></tr>
+<tr><th id="105">105</th><td>    <b>return</b> *<b>this</b>;</td></tr>
+<tr><th id="106">106</th><td>  }</td></tr>
+<tr><th id="107">107</th><td></td></tr>
+<tr><th id="108">108</th><td><b>public</b>:</td></tr>
+<tr><th id="109">109</th><td>  <b>virtual</b> <em>bool</em> <dfn class="virtual decl def" id="_ZN5tools3xml6loader17visit_end_elementERNS0_4treeERb" title='tools::xml::loader::visit_end_element' data-ref="_ZN5tools3xml6loader17visit_end_elementERNS0_4treeERb">visit_end_element</dfn>(<span class="namespace">tools::xml::</span><a class="type" href="tree.html#tools::xml::tree" title='tools::xml::tree' data-ref="tools::xml::tree">tree</a>&amp;,<em>bool</em>&amp; <dfn class="local col6 decl" id="646a_keep" title='a_keep' data-type='bool &amp;' data-ref="646a_keep">a_keep</dfn>) {</td></tr>
+<tr><th id="110">110</th><td>    <a class="local col6 ref" href="#646a_keep" title='a_keep' data-ref="646a_keep">a_keep</a> = <b>true</b>;</td></tr>
+<tr><th id="111">111</th><td>    <b>return</b> <b>true</b>;</td></tr>
+<tr><th id="112">112</th><td>  }</td></tr>
+<tr><th id="113">113</th><td></td></tr>
+<tr><th id="114">114</th><td><b>public</b>:</td></tr>
+<tr><th id="115">115</th><td>  <em>void</em> <dfn class="decl def" id="_ZN5tools3xml6loader20set_take_cntrl_charsEb" title='tools::xml::loader::set_take_cntrl_chars' data-ref="_ZN5tools3xml6loader20set_take_cntrl_charsEb">set_take_cntrl_chars</dfn>(<em>bool</em> <dfn class="local col7 decl" id="647a_value" title='a_value' data-type='bool' data-ref="647a_value">a_value</dfn>) {<a class="member" href="#tools::xml::loader::m_take_cntrl" title='tools::xml::loader::m_take_cntrl' data-ref="tools::xml::loader::m_take_cntrl">m_take_cntrl</a> = <a class="local col7 ref" href="#647a_value" title='a_value' data-ref="647a_value">a_value</a>;}</td></tr>
+<tr><th id="116">116</th><td></td></tr>
+<tr><th id="117">117</th><td>  <span class='error' title="use of undeclared identifier &apos;std&apos;">std</span>::ostream&amp; <dfn class="decl def" id="_ZNK5tools3xml6loader3outEv" title='tools::xml::loader::out' data-ref="_ZNK5tools3xml6loader3outEv">out</dfn>() <em>const</em> {<b>return</b> m_out;}</td></tr>
+<tr><th id="118">118</th><td>  <em>void</em> <dfn class="decl def" id="_ZN5tools3xml6loader21set_compressed_readerEPNS_4file6readerE" title='tools::xml::loader::set_compressed_reader' data-ref="_ZN5tools3xml6loader21set_compressed_readerEPNS_4file6readerE">set_compressed_reader</dfn>(<span class="namespace">tools::file::</span><a class="type" href="../file_reader.html#tools::file::reader" title='tools::file::reader' data-ref="tools::file::reader">reader</a>* <dfn class="local col8 decl" id="648aReader" title='aReader' data-type='tools::file::reader *' data-ref="648aReader">aReader</dfn>){</td></tr>
+<tr><th id="119">119</th><td>    <b>delete</b> <a class="member" href="#tools::xml::loader::m_compressed_reader" title='tools::xml::loader::m_compressed_reader' data-ref="tools::xml::loader::m_compressed_reader">m_compressed_reader</a>;</td></tr>
+<tr><th id="120">120</th><td>    <a class="member" href="#tools::xml::loader::m_compressed_reader" title='tools::xml::loader::m_compressed_reader' data-ref="tools::xml::loader::m_compressed_reader">m_compressed_reader</a> = <a class="local col8 ref" href="#648aReader" title='aReader' data-ref="648aReader">aReader</a>; <i>//take ownership.</i></td></tr>
+<tr><th id="121">121</th><td>  }</td></tr>
+<tr><th id="122">122</th><td></td></tr>
+<tr><th id="123">123</th><td>  <em>unsigned</em> <em>int</em> <dfn class="decl def" id="_ZNK5tools3xml6loader6errorsEv" title='tools::xml::loader::errors' data-ref="_ZNK5tools3xml6loader6errorsEv">errors</dfn>() <em>const</em> {<b>return</b> <a class="member" href="#tools::xml::loader::m_errors" title='tools::xml::loader::m_errors' data-ref="tools::xml::loader::m_errors">m_errors</a>;}</td></tr>
+<tr><th id="124">124</th><td></td></tr>
+<tr><th id="125">125</th><td>  <em>void</em> <dfn class="decl def" id="_ZN5tools3xml6loader8set_tagsERKi" title='tools::xml::loader::set_tags' data-ref="_ZN5tools3xml6loader8set_tagsERKi">set_tags</dfn>(<em>const</em> <span class='error' title="use of undeclared identifier &apos;std&apos;">std</span>::vector&lt;<span class='error' title="use of undeclared identifier &apos;std&apos;">std</span>::string&gt;&amp; <dfn class="local col9 decl" id="649a_tags" title='a_tags' data-type='const int &amp;' data-ref="649a_tags">a_tags</dfn>){m_tags=a_tags;}</td></tr>
+<tr><th id="126">126</th><td>  <em>void</em> <dfn class="decl def" id="_ZN5tools3xml6loader7add_tagERKi" title='tools::xml::loader::add_tag' data-ref="_ZN5tools3xml6loader7add_tagERKi">add_tag</dfn>(<em>const</em> <span class='error' title="use of undeclared identifier &apos;std&apos;">std</span>::string&amp; <dfn class="local col0 decl" id="650a_tag" title='a_tag' data-type='const int &amp;' data-ref="650a_tag">a_tag</dfn>){m_tags.push_back(a_tag);}</td></tr>
+<tr><th id="127">127</th><td></td></tr>
+<tr><th id="128">128</th><td>  <em>bool</em> <dfn class="decl def" id="_ZN5tools3xml6loader9load_fileERKib" title='tools::xml::loader::load_file' data-ref="_ZN5tools3xml6loader9load_fileERKib">load_file</dfn>(<em>const</em> <span class='error' title="use of undeclared identifier &apos;std&apos;">std</span>::string&amp; <dfn class="local col1 decl" id="651a_file" title='a_file' data-type='const int &amp;' data-ref="651a_file">a_file</dfn>,<em>bool</em> <dfn class="local col2 decl" id="652a_compressed" title='a_compressed' data-type='bool' data-ref="652a_compressed">a_compressed</dfn>) {</td></tr>
+<tr><th id="129">129</th><td>    <a class="member" href="#_ZN5tools3xml6loader5clearEv" title='tools::xml::loader::clear' data-ref="_ZN5tools3xml6loader5clearEv">clear</a>();</td></tr>
+<tr><th id="130">130</th><td>    <b>if</b>(!parse_file(a_file,</td></tr>
+<tr><th id="131">131</th><td>                    (<span class='error' title="use of undeclared identifier &apos;XML_StartElementHandler&apos;">XML_StartElementHandler</span>)start_element,</td></tr>
+<tr><th id="132">132</th><td>                    (<span class='error' title="use of undeclared identifier &apos;XML_EndElementHandler&apos;">XML_EndElementHandler</span>)end_element,</td></tr>
+<tr><th id="133">133</th><td>                    <b>this</b>,a_compressed)) {</td></tr>
+<tr><th id="134">134</th><td>      <a class="member" href="#_ZN5tools3xml6loader5clearEv" title='tools::xml::loader::clear' data-ref="_ZN5tools3xml6loader5clearEv">clear</a>();</td></tr>
+<tr><th id="135">135</th><td>      <b>return</b> <b>false</b>;</td></tr>
+<tr><th id="136">136</th><td>    }</td></tr>
+<tr><th id="137">137</th><td>    <b>if</b>(m_current) m_current-&gt;set_file(a_file);</td></tr>
+<tr><th id="138">138</th><td>    <b>return</b> <b>true</b>;</td></tr>
+<tr><th id="139">139</th><td>  }</td></tr>
+<tr><th id="140">140</th><td>  </td></tr>
+<tr><th id="141">141</th><td>  <em>bool</em> <dfn class="decl def" id="_ZN5tools3xml6loader11load_stringERKi" title='tools::xml::loader::load_string' data-ref="_ZN5tools3xml6loader11load_stringERKi">load_string</dfn>(<em>const</em> <span class='error' title="use of undeclared identifier &apos;std&apos;">std</span>::string&amp; <dfn class="local col3 decl" id="653a_string" title='a_string' data-type='const int &amp;' data-ref="653a_string">a_string</dfn>){</td></tr>
+<tr><th id="142">142</th><td>    <a class="member" href="#_ZN5tools3xml6loader5clearEv" title='tools::xml::loader::clear' data-ref="_ZN5tools3xml6loader5clearEv">clear</a>();</td></tr>
+<tr><th id="143">143</th><td>    <b>if</b>(!parse_buffer(a_string.size(),a_string.c_str(),</td></tr>
+<tr><th id="144">144</th><td>                    (<span class='error' title="use of undeclared identifier &apos;XML_StartElementHandler&apos;">XML_StartElementHandler</span>)start_element,</td></tr>
+<tr><th id="145">145</th><td>                    (<span class='error' title="use of undeclared identifier &apos;XML_EndElementHandler&apos;">XML_EndElementHandler</span>)end_element,</td></tr>
+<tr><th id="146">146</th><td>                    <b>this</b>)) {</td></tr>
+<tr><th id="147">147</th><td>      <a class="member" href="#_ZN5tools3xml6loader5clearEv" title='tools::xml::loader::clear' data-ref="_ZN5tools3xml6loader5clearEv">clear</a>();</td></tr>
+<tr><th id="148">148</th><td>      <b>return</b> <b>false</b>;</td></tr>
+<tr><th id="149">149</th><td>    }</td></tr>
+<tr><th id="150">150</th><td>    <b>return</b> <b>true</b>;</td></tr>
+<tr><th id="151">151</th><td>  }</td></tr>
+<tr><th id="152">152</th><td>  </td></tr>
+<tr><th id="153">153</th><td>  <em>bool</em> <dfn class="decl def" id="_ZN5tools3xml6loader11load_bufferEiPKc" title='tools::xml::loader::load_buffer' data-ref="_ZN5tools3xml6loader11load_bufferEiPKc">load_buffer</dfn>(<span class='error' title="unknown type name &apos;size_t&apos;">size_t</span> <dfn class="local col4 decl" id="654aSize" title='aSize' data-type='int' data-ref="654aSize">aSize</dfn>,<em>const</em> <em>char</em>* <dfn class="local col5 decl" id="655aBuffer" title='aBuffer' data-type='const char *' data-ref="655aBuffer">aBuffer</dfn>){</td></tr>
+<tr><th id="154">154</th><td>    <a class="member" href="#_ZN5tools3xml6loader5clearEv" title='tools::xml::loader::clear' data-ref="_ZN5tools3xml6loader5clearEv">clear</a>();</td></tr>
+<tr><th id="155">155</th><td>    <b>if</b>(!parse_buffer(aSize,aBuffer,</td></tr>
+<tr><th id="156">156</th><td>                    (<span class='error' title="use of undeclared identifier &apos;XML_StartElementHandler&apos;">XML_StartElementHandler</span>)start_element,</td></tr>
+<tr><th id="157">157</th><td>                    (<span class='error' title="use of undeclared identifier &apos;XML_EndElementHandler&apos;">XML_EndElementHandler</span>)end_element,</td></tr>
+<tr><th id="158">158</th><td>                    <b>this</b>)) {</td></tr>
+<tr><th id="159">159</th><td>      <a class="member" href="#_ZN5tools3xml6loader5clearEv" title='tools::xml::loader::clear' data-ref="_ZN5tools3xml6loader5clearEv">clear</a>();</td></tr>
+<tr><th id="160">160</th><td>      <b>return</b> <b>false</b>;</td></tr>
+<tr><th id="161">161</th><td>    }</td></tr>
+<tr><th id="162">162</th><td>    <b>return</b> <b>true</b>;</td></tr>
+<tr><th id="163">163</th><td>  }</td></tr>
+<tr><th id="164">164</th><td>  </td></tr>
+<tr><th id="165">165</th><td>  <em>const</em> <span class="namespace">tools::xml::</span><a class="type" href="tree.html#tools::xml::tree" title='tools::xml::tree' data-ref="tools::xml::tree">tree</a>* <dfn class="decl def" id="_ZNK5tools3xml6loader8top_itemEv" title='tools::xml::loader::top_item' data-ref="_ZNK5tools3xml6loader8top_itemEv">top_item</dfn>() <em>const</em> {<b>return</b> <a class="member" href="#tools::xml::loader::m_current" title='tools::xml::loader::m_current' data-ref="tools::xml::loader::m_current">m_current</a>;}</td></tr>
+<tr><th id="166">166</th><td></td></tr>
+<tr><th id="167">167</th><td>  <span class="namespace">tools::xml::</span><a class="type" href="tree.html#tools::xml::tree" title='tools::xml::tree' data-ref="tools::xml::tree">tree</a>* <dfn class="decl def" id="_ZN5tools3xml6loader8top_itemEv" title='tools::xml::loader::top_item' data-ref="_ZN5tools3xml6loader8top_itemEv">top_item</dfn>(){<b>return</b> <a class="member" href="#tools::xml::loader::m_current" title='tools::xml::loader::m_current' data-ref="tools::xml::loader::m_current">m_current</a>;}</td></tr>
+<tr><th id="168">168</th><td></td></tr>
+<tr><th id="169">169</th><td>  <em>void</em> <dfn class="decl def" id="_ZN5tools3xml6loader5emptyEv" title='tools::xml::loader::empty' data-ref="_ZN5tools3xml6loader5emptyEv">empty</dfn>(){<a class="member" href="#tools::xml::loader::m_top" title='tools::xml::loader::m_top' data-ref="tools::xml::loader::m_top">m_top</a> = <var>0</var>;<a class="member" href="#tools::xml::loader::m_current" title='tools::xml::loader::m_current' data-ref="tools::xml::loader::m_current">m_current</a> = <var>0</var>;}</td></tr>
+<tr><th id="170">170</th><td></td></tr>
+<tr><th id="171">171</th><td>  <em>bool</em> <dfn class="decl def" id="_ZNK5tools3xml6loader6is_tagERKi" title='tools::xml::loader::is_tag' data-ref="_ZNK5tools3xml6loader6is_tagERKi">is_tag</dfn>(<em>const</em> <span class='error' title="use of undeclared identifier &apos;std&apos;">std</span>::string&amp; <dfn class="local col6 decl" id="656a_string" title='a_string' data-type='const int &amp;' data-ref="656a_string">a_string</dfn>) <em>const</em> {</td></tr>
+<tr><th id="172">172</th><td>    <span class='error' title="unknown type name &apos;size_t&apos;">size_t</span> <dfn class="local col7 decl" id="657number" title='number' data-type='int' data-ref="657number">number</dfn> = m_tags.size();</td></tr>
+<tr><th id="173">173</th><td>    <b>for</b>(<span class='error' title="unknown type name &apos;size_t&apos;">size_t</span> <dfn class="local col8 decl" id="658index" title='index' data-type='int' data-ref="658index">index</dfn>=<var>0</var>;index&lt;number;index++) {</td></tr>
+<tr><th id="174">174</th><td>      <b>if</b>(a_string==m_tags[index]) <b>return</b> <b>true</b>;</td></tr>
+<tr><th id="175">175</th><td>    }</td></tr>
+<tr><th id="176">176</th><td>    <b>return</b> <b>false</b>;</td></tr>
+<tr><th id="177">177</th><td>  }</td></tr>
+<tr><th id="178">178</th><td>  </td></tr>
+<tr><th id="179">179</th><td><b>protected</b>:  </td></tr>
+<tr><th id="180">180</th><td>  <em>void</em> <dfn class="decl def" id="_ZN5tools3xml6loader5clearEv" title='tools::xml::loader::clear' data-ref="_ZN5tools3xml6loader5clearEv">clear</dfn>(){</td></tr>
+<tr><th id="181">181</th><td>    <i>// In case of problem, deleting m_current is not sufficient.</i></td></tr>
+<tr><th id="182">182</th><td>    <b>delete</b> <a class="member" href="#tools::xml::loader::m_top" title='tools::xml::loader::m_top' data-ref="tools::xml::loader::m_top">m_top</a>; </td></tr>
+<tr><th id="183">183</th><td>    <a class="member" href="#tools::xml::loader::m_top" title='tools::xml::loader::m_top' data-ref="tools::xml::loader::m_top">m_top</a> = <var>0</var>;</td></tr>
+<tr><th id="184">184</th><td>    <a class="member" href="#tools::xml::loader::m_current" title='tools::xml::loader::m_current' data-ref="tools::xml::loader::m_current">m_current</a> = <var>0</var>;</td></tr>
+<tr><th id="185">185</th><td>  }</td></tr>
+<tr><th id="186">186</th><td></td></tr>
+<tr><th id="187">187</th><td>  <em>bool</em> <dfn class="decl def" id="_ZN5tools3xml6loader12parse_bufferEiPKciiPv" title='tools::xml::loader::parse_buffer' data-ref="_ZN5tools3xml6loader12parse_bufferEiPKciiPv">parse_buffer</dfn>(<span class='error' title="unknown type name &apos;size_t&apos;">size_t</span> <dfn class="local col9 decl" id="659aSize" title='aSize' data-type='int' data-ref="659aSize">aSize</dfn>,<em>const</em> <em>char</em>* <dfn class="local col0 decl" id="660aBuffer" title='aBuffer' data-type='const char *' data-ref="660aBuffer">aBuffer</dfn>,</td></tr>
+<tr><th id="188">188</th><td>                    <span class='error' title="unknown type name &apos;XML_StartElementHandler&apos;">XML_StartElementHandler</span> <dfn class="local col1 decl" id="661a_start" title='a_start' data-type='int' data-ref="661a_start">a_start</dfn>,<span class='error' title="unknown type name &apos;XML_EndElementHandler&apos;">XML_EndElementHandler</span> <dfn class="local col2 decl" id="662a_end" title='a_end' data-type='int' data-ref="662a_end">a_end</dfn>,</td></tr>
+<tr><th id="189">189</th><td>                    <em>void</em>* <dfn class="local col3 decl" id="663a_tag" title='a_tag' data-type='void *' data-ref="663a_tag">a_tag</dfn>){</td></tr>
+<tr><th id="190">190</th><td>    <a class="member" href="#tools::xml::loader::m_errors" title='tools::xml::loader::m_errors' data-ref="tools::xml::loader::m_errors">m_errors</a> = <var>0</var>;</td></tr>
+<tr><th id="191">191</th><td>    <b>if</b>(!aSize) <b>return</b> <b>true</b>; <i>//nothing to do.</i></td></tr>
+<tr><th id="192">192</th><td>    <a class="member" href="#tools::xml::loader::m_depth" title='tools::xml::loader::m_depth' data-ref="tools::xml::loader::m_depth">m_depth</a> = <var>0</var>;</td></tr>
+<tr><th id="193">193</th><td>    <a class="member" href="#tools::xml::loader::m_abort" title='tools::xml::loader::m_abort' data-ref="tools::xml::loader::m_abort">m_abort</a> = <b>false</b>;</td></tr>
+<tr><th id="194">194</th><td></td></tr>
+<tr><th id="195">195</th><td><u>#<span data-ppcond="195">ifdef</span> <span class="macro" data-ref="_M/TOOLS_MEM">TOOLS_MEM</span></u></td></tr>
+<tr><th id="196">196</th><td>    XML_Memory_Handling_Suite mem;</td></tr>
+<tr><th id="197">197</th><td>    mem.malloc_fcn = xml_malloc;</td></tr>
+<tr><th id="198">198</th><td>    mem.realloc_fcn = xml_realloc;</td></tr>
+<tr><th id="199">199</th><td>    mem.free_fcn = xml_free;</td></tr>
+<tr><th id="200">200</th><td>    XML_Parser _parser = XML_ParserCreate_MM(NULL,&amp;mem,NULL);</td></tr>
+<tr><th id="201">201</th><td><u>#<span data-ppcond="195">else</span></u></td></tr>
+<tr><th id="202">202</th><td>    <span class='error' title="unknown type name &apos;XML_Parser&apos;">XML_Parser</span> <dfn class="local col4 decl" id="664_parser" title='_parser' data-type='int' data-ref="664_parser">_parser</dfn> = XML_ParserCreate(<span class='error' title="use of undeclared identifier &apos;NULL&apos;">NULL</span>);</td></tr>
+<tr><th id="203">203</th><td><u>#<span data-ppcond="195">endif</span></u></td></tr>
+<tr><th id="204">204</th><td></td></tr>
+<tr><th id="205">205</th><td>    XML_SetUserData(_parser,a_tag);</td></tr>
+<tr><th id="206">206</th><td>    XML_SetElementHandler(_parser,a_start,a_end);</td></tr>
+<tr><th id="207">207</th><td>    XML_SetCharacterDataHandler(_parser,(<span class='error' title="use of undeclared identifier &apos;XML_CharacterDataHandler&apos;">XML_CharacterDataHandler</span>)character_data_handler);</td></tr>
+<tr><th id="208">208</th><td>  <i>//XML_SetProcessingInstructionHandler(_parser,processingInstructionHandler);</i></td></tr>
+<tr><th id="209">209</th><td>    <em>char</em>* <dfn class="local col5 decl" id="665buf" title='buf' data-type='char *' data-ref="665buf">buf</dfn> = (<em>char</em>*)<a class="local col0 ref" href="#660aBuffer" title='aBuffer' data-ref="660aBuffer">aBuffer</a>;</td></tr>
+<tr><th id="210">210</th><td>    <span class='error' title="unknown type name &apos;size_t&apos;">size_t</span> <dfn class="local col6 decl" id="666l" title='l' data-type='int' data-ref="666l">l</dfn> = aSize;</td></tr>
+<tr><th id="211">211</th><td>    <em>int</em> <dfn class="local col7 decl" id="667done" title='done' data-type='int' data-ref="667done">done</dfn> = <var>0</var>;</td></tr>
+<tr><th id="212">212</th><td>    <b>do</b> {</td></tr>
+<tr><th id="213">213</th><td>      <span class='error' title="unknown type name &apos;size_t&apos;">size_t</span> <dfn class="local col8 decl" id="668len" title='len' data-type='int' data-ref="668len">len</dfn> = tools::mn&lt;<span class='error' title="use of undeclared identifier &apos;size_t&apos;">size_t</span>&gt;(l,BUFSIZ); <i>//BUFSIZ in cstdio</i></td></tr>
+<tr><th id="214">214</th><td>      done = len &lt; <span class='error' title="use of undeclared identifier &apos;BUFSIZ&apos;">BUFSIZ</span> ? <var>1</var> : <var>0</var>;</td></tr>
+<tr><th id="215">215</th><td>      <b>if</b>(XML_Parse(_parser, buf, (<em>int</em>)len, done)==<span class='error' title="use of undeclared identifier &apos;XML_STATUS_ERROR&apos;">XML_STATUS_ERROR</span>) {</td></tr>
+<tr><th id="216">216</th><td>        m_out &lt;&lt; <q>"parse_buffer :"</q> </td></tr>
+<tr><th id="217">217</th><td>            &lt;&lt; <q>" "</q> &lt;&lt; XML_ErrorString(XML_GetErrorCode(_parser)) </td></tr>
+<tr><th id="218">218</th><td>            &lt;&lt; <q>" at line "</q> &lt;&lt; (<em>int</em>)XML_GetCurrentLineNumber(_parser) </td></tr>
+<tr><th id="219">219</th><td>            &lt;&lt; <q>" at byte index "</q> &lt;&lt; (<em>int</em>)XML_GetCurrentByteIndex(_parser)</td></tr>
+<tr><th id="220">220</th><td>            &lt;&lt; <span class='error' title="use of undeclared identifier &apos;std&apos;">std</span>::endl; </td></tr>
+<tr><th id="221">221</th><td>       {<span class='error' title="unknown type name &apos;XML_Index&apos;">XML_Index</span> <dfn class="local col9 decl" id="669pos" title='pos' data-type='int' data-ref="669pos">pos</dfn> = XML_GetCurrentByteIndex(_parser);</td></tr>
+<tr><th id="222">222</th><td>        <span class='error' title="unknown type name &apos;XML_Index&apos;">XML_Index</span> <dfn class="local col0 decl" id="670pmn" title='pmn' data-type='int' data-ref="670pmn">pmn</dfn> = tools::mx&lt;<span class='error' title="use of undeclared identifier &apos;XML_Index&apos;">XML_Index</span>&gt;(pos-<var>10</var>,<var>0</var>);</td></tr>
+<tr><th id="223">223</th><td>        <span class='error' title="unknown type name &apos;XML_Index&apos;">XML_Index</span> <dfn class="local col1 decl" id="671pmx" title='pmx' data-type='int' data-ref="671pmx">pmx</dfn> = tools::mn&lt;<span class='error' title="use of undeclared identifier &apos;XML_Index&apos;">XML_Index</span>&gt;(pos+<var>10</var>,XML_Index(aSize)-<var>1</var>);</td></tr>
+<tr><th id="224">224</th><td>        <span class='error' title="use of undeclared identifier &apos;std&apos;">std</span>::string <dfn class="local col2 decl" id="672c" title='c' data-type='int' data-ref="672c">c</dfn> = <q>" "</q>;</td></tr>
+<tr><th id="225">225</th><td>       {<b>for</b>(<span class='error' title="unknown type name &apos;XML_Index&apos;">XML_Index</span> <dfn class="local col3 decl" id="673p" title='p' data-type='int' data-ref="673p">p</dfn>=pmn;p&lt;=pmx;p++) {c[<var>0</var>] = *(aBuffer+p);m_out &lt;&lt; c;}</td></tr>
+<tr><th id="226">226</th><td>        m_out &lt;&lt; <span class='error' title="use of undeclared identifier &apos;std&apos;">std</span>::endl;}</td></tr>
+<tr><th id="227">227</th><td>       {<b>for</b>(<span class='error' title="unknown type name &apos;XML_Index&apos;">XML_Index</span> p=pmn;p&lt;pos;p++) m_out &lt;&lt; <q>" "</q>;</td></tr>
+<tr><th id="228">228</th><td>        m_out &lt;&lt; <q>"^"</q> &lt;&lt; <span class='error' title="use of undeclared identifier &apos;std&apos;">std</span>::endl;}}</td></tr>
+<tr><th id="229">229</th><td>        XML_ParserFree(_parser);</td></tr>
+<tr><th id="230">230</th><td>        <b>return</b> <b>false</b>;</td></tr>
+<tr><th id="231">231</th><td>      }</td></tr>
+<tr><th id="232">232</th><td>      <b>if</b>(<a class="member" href="#tools::xml::loader::m_abort" title='tools::xml::loader::m_abort' data-ref="tools::xml::loader::m_abort">m_abort</a>) {</td></tr>
+<tr><th id="233">233</th><td>        XML_ParserFree(_parser);</td></tr>
+<tr><th id="234">234</th><td>        <b>return</b> <b>false</b>;</td></tr>
+<tr><th id="235">235</th><td>      }</td></tr>
+<tr><th id="236">236</th><td>      buf += len;</td></tr>
+<tr><th id="237">237</th><td>      l -= len;</td></tr>
+<tr><th id="238">238</th><td>    } <b>while</b> (!<a class="local col7 ref" href="#667done" title='done' data-ref="667done">done</a>);</td></tr>
+<tr><th id="239">239</th><td>    XML_ParserFree(_parser);</td></tr>
+<tr><th id="240">240</th><td>    <b>return</b> <b>true</b>;</td></tr>
+<tr><th id="241">241</th><td>  }</td></tr>
+<tr><th id="242">242</th><td>  </td></tr>
+<tr><th id="243">243</th><td>  <em>bool</em> <dfn class="decl def" id="_ZN5tools3xml6loader10parse_fileERKiiiPvb" title='tools::xml::loader::parse_file' data-ref="_ZN5tools3xml6loader10parse_fileERKiiiPvb">parse_file</dfn>(<em>const</em> <span class='error' title="use of undeclared identifier &apos;std&apos;">std</span>::string&amp; <dfn class="local col4 decl" id="674a_file" title='a_file' data-type='const int &amp;' data-ref="674a_file">a_file</dfn>,</td></tr>
+<tr><th id="244">244</th><td>                  <span class='error' title="unknown type name &apos;XML_StartElementHandler&apos;">XML_StartElementHandler</span> <dfn class="local col5 decl" id="675a_start" title='a_start' data-type='int' data-ref="675a_start">a_start</dfn>,<span class='error' title="unknown type name &apos;XML_EndElementHandler&apos;">XML_EndElementHandler</span> <dfn class="local col6 decl" id="676a_end" title='a_end' data-type='int' data-ref="676a_end">a_end</dfn>,</td></tr>
+<tr><th id="245">245</th><td>                  <em>void</em>* <dfn class="local col7 decl" id="677a_tag" title='a_tag' data-type='void *' data-ref="677a_tag">a_tag</dfn>,<em>bool</em> <dfn class="local col8 decl" id="678a_compressed" title='a_compressed' data-type='bool' data-ref="678a_compressed">a_compressed</dfn>){</td></tr>
+<tr><th id="246">246</th><td>    <b>if</b>(<a class="member" href="#tools::xml::loader::m_verbose" title='tools::xml::loader::m_verbose' data-ref="tools::xml::loader::m_verbose">m_verbose</a>) {</td></tr>
+<tr><th id="247">247</th><td>      m_out &lt;&lt; <q>"parse_file :"</q> </td></tr>
+<tr><th id="248">248</th><td>            &lt;&lt; <q>" parse file "</q> &lt;&lt; tools::sout(a_file) &lt;&lt; <q>"..."</q> &lt;&lt; <span class='error' title="use of undeclared identifier &apos;std&apos;">std</span>::endl;</td></tr>
+<tr><th id="249">249</th><td>    }</td></tr>
+<tr><th id="250">250</th><td>    <a class="member" href="#tools::xml::loader::m_errors" title='tools::xml::loader::m_errors' data-ref="tools::xml::loader::m_errors">m_errors</a> = <var>0</var>;</td></tr>
+<tr><th id="251">251</th><td>  </td></tr>
+<tr><th id="252">252</th><td>    <em>bool</em> <dfn class="local col9 decl" id="679use_zlib" title='use_zlib' data-type='bool' data-ref="679use_zlib">use_zlib</dfn> = <b>false</b>;</td></tr>
+<tr><th id="253">253</th><td>    <b>if</b>(<a class="local col8 ref" href="#678a_compressed" title='a_compressed' data-ref="678a_compressed">a_compressed</a>) {</td></tr>
+<tr><th id="254">254</th><td>      <b>if</b>(<a class="member" href="#tools::xml::loader::m_verbose" title='tools::xml::loader::m_verbose' data-ref="tools::xml::loader::m_verbose">m_verbose</a>) {</td></tr>
+<tr><th id="255">255</th><td>        m_out &lt;&lt; <q>"parse_file :"</q> </td></tr>
+<tr><th id="256">256</th><td>              &lt;&lt; <q>" uncompress requested for file "</q></td></tr>
+<tr><th id="257">257</th><td>              &lt;&lt; tools::sout(a_file) &lt;&lt; <q>"."</q></td></tr>
+<tr><th id="258">258</th><td>              &lt;&lt; <span class='error' title="use of undeclared identifier &apos;std&apos;">std</span>::endl;</td></tr>
+<tr><th id="259">259</th><td>      }</td></tr>
+<tr><th id="260">260</th><td>      <a class="local col9 ref" href="#679use_zlib" title='use_zlib' data-ref="679use_zlib">use_zlib</a> = <b>true</b>;</td></tr>
+<tr><th id="261">261</th><td>    } <b>else</b> {</td></tr>
+<tr><th id="262">262</th><td>      <i>// may be compressed anyway :</i></td></tr>
+<tr><th id="263">263</th><td>      <em>bool</em> <dfn class="local col0 decl" id="680compressed" title='compressed' data-type='bool' data-ref="680compressed">compressed</dfn>;</td></tr>
+<tr><th id="264">264</th><td>      <b>if</b>(!tools::file::is_gzip(a_file,compressed)) {</td></tr>
+<tr><th id="265">265</th><td>        m_out &lt;&lt; <q>"parse_file :"</q></td></tr>
+<tr><th id="266">266</th><td>              &lt;&lt; <q>" tools::file::is_gzip() failed for "</q> &lt;&lt; a_file &lt;&lt; <q>"."</q></td></tr>
+<tr><th id="267">267</th><td>              &lt;&lt; <span class='error' title="use of undeclared identifier &apos;std&apos;">std</span>::endl;</td></tr>
+<tr><th id="268">268</th><td>        <b>return</b> <b>false</b>;</td></tr>
+<tr><th id="269">269</th><td>      }</td></tr>
+<tr><th id="270">270</th><td>      <b>if</b>(<a class="local col0 ref" href="#680compressed" title='compressed' data-ref="680compressed">compressed</a>) <a class="local col9 ref" href="#679use_zlib" title='use_zlib' data-ref="679use_zlib">use_zlib</a> = <b>true</b>;</td></tr>
+<tr><th id="271">271</th><td>    }</td></tr>
+<tr><th id="272">272</th><td></td></tr>
+<tr><th id="273">273</th><td>    <span class="namespace">tools::file::</span><a class="type" href="../file_reader.html#tools::file::reader" title='tools::file::reader' data-ref="tools::file::reader">reader</a>* <dfn class="local col1 decl" id="681freader" title='freader' data-type='tools::file::reader *' data-ref="681freader">freader</dfn> = <var>0</var>;</td></tr>
+<tr><th id="274">274</th><td>    <em>bool</em> <dfn class="local col2 decl" id="682delete_freader" title='delete_freader' data-type='bool' data-ref="682delete_freader">delete_freader</dfn> = <b>false</b>;</td></tr>
+<tr><th id="275">275</th><td>    <b>if</b>(<a class="local col9 ref" href="#679use_zlib" title='use_zlib' data-ref="679use_zlib">use_zlib</a>) {</td></tr>
+<tr><th id="276">276</th><td>      <b>if</b>(!<a class="member" href="#tools::xml::loader::m_compressed_reader" title='tools::xml::loader::m_compressed_reader' data-ref="tools::xml::loader::m_compressed_reader">m_compressed_reader</a>) {</td></tr>
+<tr><th id="277">277</th><td>        m_out &lt;&lt; <q>"parse_file :"</q></td></tr>
+<tr><th id="278">278</th><td>              &lt;&lt; <q>" no compressed reader given."</q></td></tr>
+<tr><th id="279">279</th><td>              &lt;&lt; <span class='error' title="use of undeclared identifier &apos;std&apos;">std</span>::endl;</td></tr>
+<tr><th id="280">280</th><td>        <b>return</b> <b>false</b>;</td></tr>
+<tr><th id="281">281</th><td>      }</td></tr>
+<tr><th id="282">282</th><td>      <a class="local col1 ref" href="#681freader" title='freader' data-ref="681freader">freader</a> = <a class="member" href="#tools::xml::loader::m_compressed_reader" title='tools::xml::loader::m_compressed_reader' data-ref="tools::xml::loader::m_compressed_reader">m_compressed_reader</a>;</td></tr>
+<tr><th id="283">283</th><td>    } <b>else</b> {</td></tr>
+<tr><th id="284">284</th><td>      freader <span class='error' title="assigning to &apos;tools::file::reader *&apos; from incompatible type &apos;tools::FILE_reader *&apos;">=</span> <b>new</b> tools::FILE_reader();</td></tr>
+<tr><th id="285">285</th><td>      <a class="local col2 ref" href="#682delete_freader" title='delete_freader' data-ref="682delete_freader">delete_freader</a> = <b>true</b>;</td></tr>
+<tr><th id="286">286</th><td>    }</td></tr>
+<tr><th id="287">287</th><td>    <b>if</b>(!freader-&gt;open(a_file)) {</td></tr>
+<tr><th id="288">288</th><td>      m_out &lt;&lt; <q>"parse_file :"</q></td></tr>
+<tr><th id="289">289</th><td>            &lt;&lt; <q>" can't open file "</q> &lt;&lt; a_file &lt;&lt; <span class='error' title="use of undeclared identifier &apos;std&apos;">std</span>::endl;</td></tr>
+<tr><th id="290">290</th><td>      <b>if</b>(<a class="local col2 ref" href="#682delete_freader" title='delete_freader' data-ref="682delete_freader">delete_freader</a>) <b>delete</b> <a class="local col1 ref" href="#681freader" title='freader' data-ref="681freader">freader</a>;</td></tr>
+<tr><th id="291">291</th><td>      <b>return</b> <b>false</b>;</td></tr>
+<tr><th id="292">292</th><td>    } </td></tr>
+<tr><th id="293">293</th><td>  </td></tr>
+<tr><th id="294">294</th><td>    <a class="member" href="#tools::xml::loader::m_depth" title='tools::xml::loader::m_depth' data-ref="tools::xml::loader::m_depth">m_depth</a> = <var>0</var>;</td></tr>
+<tr><th id="295">295</th><td>    <a class="member" href="#tools::xml::loader::m_abort" title='tools::xml::loader::m_abort' data-ref="tools::xml::loader::m_abort">m_abort</a> = <b>false</b>;</td></tr>
+<tr><th id="296">296</th><td>  </td></tr>
+<tr><th id="297">297</th><td><u>#<span data-ppcond="297">ifdef</span> <span class="macro" data-ref="_M/TOOLS_MEM">TOOLS_MEM</span></u></td></tr>
+<tr><th id="298">298</th><td>    XML_Memory_Handling_Suite mem;</td></tr>
+<tr><th id="299">299</th><td>    mem.malloc_fcn = xml_malloc;</td></tr>
+<tr><th id="300">300</th><td>    mem.realloc_fcn = xml_realloc;</td></tr>
+<tr><th id="301">301</th><td>    mem.free_fcn = xml_free;</td></tr>
+<tr><th id="302">302</th><td>    XML_Parser _parser = XML_ParserCreate_MM(NULL,&amp;mem,NULL);</td></tr>
+<tr><th id="303">303</th><td><u>#<span data-ppcond="297">else</span></u></td></tr>
+<tr><th id="304">304</th><td>    <span class='error' title="unknown type name &apos;XML_Parser&apos;">XML_Parser</span> <dfn class="local col3 decl" id="683_parser" title='_parser' data-type='int' data-ref="683_parser">_parser</dfn> = XML_ParserCreate(<span class='error' title="use of undeclared identifier &apos;NULL&apos;">NULL</span>);</td></tr>
+<tr><th id="305">305</th><td><u>#<span data-ppcond="297">endif</span></u></td></tr>
+<tr><th id="306">306</th><td></td></tr>
+<tr><th id="307">307</th><td>    XML_SetUserData(_parser,a_tag);</td></tr>
+<tr><th id="308">308</th><td>    XML_SetElementHandler(_parser,a_start,a_end);</td></tr>
+<tr><th id="309">309</th><td>    XML_SetCharacterDataHandler(_parser,(<span class='error' title="use of undeclared identifier &apos;XML_CharacterDataHandler&apos;">XML_CharacterDataHandler</span>)character_data_handler);</td></tr>
+<tr><th id="310">310</th><td>    <i>//XML_SetProcessingInstructionHandler(_parser,</i></td></tr>
+<tr><th id="311">311</th><td><i>    //      processingInstructionHandler);</i></td></tr>
+<tr><th id="312">312</th><td><i>  </i></td></tr>
+<tr><th id="313">313</th><td><i>  </i></td></tr>
+<tr><th id="314">314</th><td><i>    //char buf[1024 * BUFSIZ];</i></td></tr>
+<tr><th id="315">315</th><td>    <em>char</em> <dfn class="local col4 decl" id="684buf" title='buf' data-type='char' data-ref="684buf">buf</dfn>[<span class='error' title="use of undeclared identifier &apos;BUFSIZ&apos;">BUFSIZ</span>];</td></tr>
+<tr><th id="316">316</th><td>    <em>int</em> <dfn class="local col5 decl" id="685done" title='done' data-type='int' data-ref="685done">done</dfn> = <var>0</var>;</td></tr>
+<tr><th id="317">317</th><td>    <b>do</b> {</td></tr>
+<tr><th id="318">318</th><td>      <span class='error' title="unknown type name &apos;size_t&apos;">size_t</span> <dfn class="local col6 decl" id="686len" title='len' data-type='int' data-ref="686len">len</dfn>;</td></tr>
+<tr><th id="319">319</th><td>      <b>if</b>(!freader-&gt;read(buf,<b>sizeof</b>(buf),len)) {</td></tr>
+<tr><th id="320">320</th><td>        XML_ParserFree(_parser);</td></tr>
+<tr><th id="321">321</th><td>        <a class="local col1 ref" href="#681freader" title='freader' data-ref="681freader">freader</a>-&gt;<a class="virtual ref" href="../file_reader.html#_ZN5tools4file6reader5closeEv" title='tools::file::reader::close' data-ref="_ZN5tools4file6reader5closeEv">close</a>();</td></tr>
+<tr><th id="322">322</th><td>        <b>if</b>(<a class="local col2 ref" href="#682delete_freader" title='delete_freader' data-ref="682delete_freader">delete_freader</a>) <b>delete</b> <a class="local col1 ref" href="#681freader" title='freader' data-ref="681freader">freader</a>;</td></tr>
+<tr><th id="323">323</th><td>        <b>return</b> <b>false</b>;</td></tr>
+<tr><th id="324">324</th><td>      }</td></tr>
+<tr><th id="325">325</th><td>      done = len &lt; <b>sizeof</b>(buf) ? <var>1</var> : <var>0</var>;</td></tr>
+<tr><th id="326">326</th><td>      <b>if</b>(XML_Parse(_parser, buf, (<em>int</em>)len, done)==<span class='error' title="use of undeclared identifier &apos;XML_STATUS_ERROR&apos;">XML_STATUS_ERROR</span>) {</td></tr>
+<tr><th id="327">327</th><td>        m_out &lt;&lt; <q>"parse_file :"</q> </td></tr>
+<tr><th id="328">328</th><td>            &lt;&lt; <q>" in file "</q> &lt;&lt; tools::sout(a_file)</td></tr>
+<tr><th id="329">329</th><td>            &lt;&lt; <q>" "</q> &lt;&lt; XML_ErrorString(XML_GetErrorCode(_parser)) </td></tr>
+<tr><th id="330">330</th><td>            &lt;&lt; <q>" at line "</q> &lt;&lt; (<em>int</em>)XML_GetCurrentLineNumber(_parser)</td></tr>
+<tr><th id="331">331</th><td>            &lt;&lt; <span class='error' title="use of undeclared identifier &apos;std&apos;">std</span>::endl;</td></tr>
+<tr><th id="332">332</th><td>        XML_ParserFree(_parser);</td></tr>
+<tr><th id="333">333</th><td>        <a class="local col1 ref" href="#681freader" title='freader' data-ref="681freader">freader</a>-&gt;<a class="virtual ref" href="../file_reader.html#_ZN5tools4file6reader5closeEv" title='tools::file::reader::close' data-ref="_ZN5tools4file6reader5closeEv">close</a>();</td></tr>
+<tr><th id="334">334</th><td>        <b>if</b>(<a class="local col2 ref" href="#682delete_freader" title='delete_freader' data-ref="682delete_freader">delete_freader</a>) <b>delete</b> <a class="local col1 ref" href="#681freader" title='freader' data-ref="681freader">freader</a>;</td></tr>
+<tr><th id="335">335</th><td>        <b>return</b> <b>false</b>;</td></tr>
+<tr><th id="336">336</th><td>      }</td></tr>
+<tr><th id="337">337</th><td>      <b>if</b>(<a class="member" href="#tools::xml::loader::m_abort" title='tools::xml::loader::m_abort' data-ref="tools::xml::loader::m_abort">m_abort</a>) {</td></tr>
+<tr><th id="338">338</th><td>        XML_ParserFree(_parser);</td></tr>
+<tr><th id="339">339</th><td>        <a class="local col1 ref" href="#681freader" title='freader' data-ref="681freader">freader</a>-&gt;<a class="virtual ref" href="../file_reader.html#_ZN5tools4file6reader5closeEv" title='tools::file::reader::close' data-ref="_ZN5tools4file6reader5closeEv">close</a>();</td></tr>
+<tr><th id="340">340</th><td>        <b>if</b>(<a class="local col2 ref" href="#682delete_freader" title='delete_freader' data-ref="682delete_freader">delete_freader</a>) <b>delete</b> <a class="local col1 ref" href="#681freader" title='freader' data-ref="681freader">freader</a>;</td></tr>
+<tr><th id="341">341</th><td>        <b>return</b> <b>false</b>;</td></tr>
+<tr><th id="342">342</th><td>      }</td></tr>
+<tr><th id="343">343</th><td>    } <b>while</b> (!<a class="local col5 ref" href="#685done" title='done' data-ref="685done">done</a>);</td></tr>
+<tr><th id="344">344</th><td>    XML_ParserFree(_parser);</td></tr>
+<tr><th id="345">345</th><td>    <a class="local col1 ref" href="#681freader" title='freader' data-ref="681freader">freader</a>-&gt;<a class="virtual ref" href="../file_reader.html#_ZN5tools4file6reader5closeEv" title='tools::file::reader::close' data-ref="_ZN5tools4file6reader5closeEv">close</a>();</td></tr>
+<tr><th id="346">346</th><td>    <b>if</b>(<a class="member" href="#tools::xml::loader::m_verbose" title='tools::xml::loader::m_verbose' data-ref="tools::xml::loader::m_verbose">m_verbose</a>) {</td></tr>
+<tr><th id="347">347</th><td>      m_out &lt;&lt; <q>"parse_file :"</q> </td></tr>
+<tr><th id="348">348</th><td>          &lt;&lt; <q>" parse file "</q> &lt;&lt; tools::sout(a_file) &lt;&lt; <q>" done."</q> &lt;&lt; <span class='error' title="use of undeclared identifier &apos;std&apos;">std</span>::endl;</td></tr>
+<tr><th id="349">349</th><td>    }</td></tr>
+<tr><th id="350">350</th><td>    <b>if</b>(<a class="local col2 ref" href="#682delete_freader" title='delete_freader' data-ref="682delete_freader">delete_freader</a>) <b>delete</b> <a class="local col1 ref" href="#681freader" title='freader' data-ref="681freader">freader</a>;</td></tr>
+<tr><th id="351">351</th><td>    <b>return</b> <b>true</b>;</td></tr>
+<tr><th id="352">352</th><td>  }</td></tr>
+<tr><th id="353">353</th><td></td></tr>
+<tr><th id="354">354</th><td><b>protected</b>:</td></tr>
+<tr><th id="355">355</th><td>  <em>static</em> <em>void</em> <dfn class="decl def" id="_ZN5tools3xml6loader22character_data_handlerEPvPKii" title='tools::xml::loader::character_data_handler' data-ref="_ZN5tools3xml6loader22character_data_handlerEPvPKii">character_data_handler</dfn>(<em>void</em>* <dfn class="local col7 decl" id="687aUserData" title='aUserData' data-type='void *' data-ref="687aUserData">aUserData</dfn>,<em>const</em> <span class='error' title="unknown type name &apos;XML_Char&apos;">XML_Char</span>* <dfn class="local col8 decl" id="688a_string" title='a_string' data-type='const int *' data-ref="688a_string">a_string</dfn>,<em>int</em> <dfn class="local col9 decl" id="689aLength" title='aLength' data-type='int' data-ref="689aLength">aLength</dfn>){</td></tr>
+<tr><th id="356">356</th><td>    <a class="type" href="#tools::xml::loader" title='tools::xml::loader' data-ref="tools::xml::loader">loader</a>* <dfn class="local col0 decl" id="690This" title='This' data-type='tools::xml::loader *' data-ref="690This">This</dfn> = (<a class="type" href="#tools::xml::loader" title='tools::xml::loader' data-ref="tools::xml::loader">loader</a>*)<a class="local col7 ref" href="#687aUserData" title='aUserData' data-ref="687aUserData">aUserData</a>;</td></tr>
+<tr><th id="357">357</th><td>    <span class='error' title="use of undeclared identifier &apos;std&apos;">std</span>::string <dfn class="local col1 decl" id="691s" title='s' data-type='int' data-ref="691s">s</dfn>;</td></tr>
+<tr><th id="358">358</th><td>    s.resize(aLength);</td></tr>
+<tr><th id="359">359</th><td>    <span class='error' title="unknown type name &apos;size_t&apos;">size_t</span> <dfn class="local col2 decl" id="692count" title='count' data-type='int' data-ref="692count">count</dfn> = <var>0</var>;</td></tr>
+<tr><th id="360">360</th><td>    <em>char</em>* <dfn class="local col3 decl" id="693p" title='p' data-type='char *' data-ref="693p">p</dfn> = (<em>char</em>*)a_string;</td></tr>
+<tr><th id="361">361</th><td>    <b>for</b> (<em>int</em> <dfn class="local col4 decl" id="694i" title='i' data-type='int' data-ref="694i">i</dfn> = <var>0</var>; <a class="local col4 ref" href="#694i" title='i' data-ref="694i">i</a> &lt; <a class="local col9 ref" href="#689aLength" title='aLength' data-ref="689aLength">aLength</a>; <a class="local col4 ref" href="#694i" title='i' data-ref="694i">i</a>++, <a class="local col3 ref" href="#693p" title='p' data-ref="693p">p</a>++) {</td></tr>
+<tr><th id="362">362</th><td>      <b>if</b>(This-&gt;m_take_cntrl || (!<span class='error' title="use of undeclared identifier &apos;iscntrl&apos;">iscntrl</span>(*p))) {</td></tr>
+<tr><th id="363">363</th><td>        s[count] = *p;</td></tr>
+<tr><th id="364">364</th><td>        count++;</td></tr>
+<tr><th id="365">365</th><td>      }</td></tr>
+<tr><th id="366">366</th><td>    }  </td></tr>
+<tr><th id="367">367</th><td>    <b>if</b>(count) {</td></tr>
+<tr><th id="368">368</th><td>      s.resize(count);</td></tr>
+<tr><th id="369">369</th><td>      This-&gt;m_value += s;</td></tr>
+<tr><th id="370">370</th><td>    }</td></tr>
+<tr><th id="371">371</th><td>  }</td></tr>
+<tr><th id="372">372</th><td></td></tr>
+<tr><th id="373">373</th><td>  <em>static</em> <em>void</em> <dfn class="decl def" id="_ZN5tools3xml6loader13start_elementEPvPKiPS4_" title='tools::xml::loader::start_element' data-ref="_ZN5tools3xml6loader13start_elementEPvPKiPS4_">start_element</dfn>(<em>void</em>* <dfn class="local col5 decl" id="695aUserData" title='aUserData' data-type='void *' data-ref="695aUserData">aUserData</dfn>,<em>const</em> <span class='error' title="unknown type name &apos;XML_Char&apos;">XML_Char</span>* <dfn class="local col6 decl" id="696a_name" title='a_name' data-type='const int *' data-ref="696a_name">a_name</dfn>,<em>const</em> <span class='error' title="unknown type name &apos;XML_Char&apos;">XML_Char</span>** <dfn class="local col7 decl" id="697a_atbs" title='a_atbs' data-type='const int **' data-ref="697a_atbs">a_atbs</dfn>){</td></tr>
+<tr><th id="374">374</th><td>    <a class="type" href="#tools::xml::loader" title='tools::xml::loader' data-ref="tools::xml::loader">loader</a>* <dfn class="local col8 decl" id="698This" title='This' data-type='tools::xml::loader *' data-ref="698This">This</dfn> = (<a class="type" href="#tools::xml::loader" title='tools::xml::loader' data-ref="tools::xml::loader">loader</a>*)<a class="local col5 ref" href="#695aUserData" title='aUserData' data-ref="695aUserData">aUserData</a>;</td></tr>
+<tr><th id="375">375</th><td>    <b>if</b>(<a class="local col8 ref" href="#698This" title='This' data-ref="698This">This</a>-&gt;<a class="member" href="#tools::xml::loader::m_abort" title='tools::xml::loader::m_abort' data-ref="tools::xml::loader::m_abort">m_abort</a>) <b>return</b>; <i>//Do nothing.</i></td></tr>
+<tr><th id="376">376</th><td>  </td></tr>
+<tr><th id="377">377</th><td>    <a class="local col8 ref" href="#698This" title='This' data-ref="698This">This</a>-&gt;<a class="member" href="#tools::xml::loader::m_depth" title='tools::xml::loader::m_depth' data-ref="tools::xml::loader::m_depth">m_depth</a>++;</td></tr>
+<tr><th id="378">378</th><td>    This-&gt;m_value = <q>""</q>;</td></tr>
+<tr><th id="379">379</th><td>  </td></tr>
+<tr><th id="380">380</th><td>    <span class='error' title="use of undeclared identifier &apos;std&apos;">std</span>::string <dfn class="local col9 decl" id="699name" title='name' data-type='int' data-ref="699name">name</dfn> = a_name; <i>//Can't be empty</i></td></tr>
+<tr><th id="381">381</th><td>    <b>if</b>(This-&gt;is_tag(name)) {</td></tr>
+<tr><th id="382">382</th><td>  </td></tr>
+<tr><th id="383">383</th><td>      <b>if</b>(!<a class="local col8 ref" href="#698This" title='This' data-ref="698This">This</a>-&gt;<a class="member" href="#tools::xml::loader::m_current" title='tools::xml::loader::m_current' data-ref="tools::xml::loader::m_current">m_current</a>) {</td></tr>
+<tr><th id="384">384</th><td>        <b>if</b>(<a class="local col8 ref" href="#698This" title='This' data-ref="698This">This</a>-&gt;<a class="member" href="#tools::xml::loader::m_depth" title='tools::xml::loader::m_depth' data-ref="tools::xml::loader::m_depth">m_depth</a>==<var>1</var>) {</td></tr>
+<tr><th id="385">385</th><td>          <i>// Ok. Head.</i></td></tr>
+<tr><th id="386">386</th><td>        } <b>else</b> {</td></tr>
+<tr><th id="387">387</th><td>          This-&gt;m_out &lt;&lt; <q>"start_element :"</q> </td></tr>
+<tr><th id="388">388</th><td>              &lt;&lt; <q>" no tag with a depth of "</q> &lt;&lt; This-&gt;m_depth</td></tr>
+<tr><th id="389">389</th><td>              &lt;&lt; <span class='error' title="use of undeclared identifier &apos;std&apos;">std</span>::endl; </td></tr>
+<tr><th id="390">390</th><td>          <a class="local col8 ref" href="#698This" title='This' data-ref="698This">This</a>-&gt;<a class="member" href="#tools::xml::loader::m_abort" title='tools::xml::loader::m_abort' data-ref="tools::xml::loader::m_abort">m_abort</a> = <b>true</b>;</td></tr>
+<tr><th id="391">391</th><td>          <b>return</b>;</td></tr>
+<tr><th id="392">392</th><td>        }</td></tr>
+<tr><th id="393">393</th><td>      } <b>else</b> {</td></tr>
+<tr><th id="394">394</th><td>        <em>int</em> <dfn class="local col0 decl" id="700delta" title='delta' data-type='int' data-ref="700delta">delta</dfn> = <a class="local col8 ref" href="#698This" title='This' data-ref="698This">This</a>-&gt;<a class="member" href="#tools::xml::loader::m_current" title='tools::xml::loader::m_current' data-ref="tools::xml::loader::m_current">m_current</a>-&gt;<a class="ref" href="tree.html#_ZNK5tools3xml4tree5depthEv" title='tools::xml::tree::depth' data-ref="_ZNK5tools3xml4tree5depthEv">depth</a>() - <a class="local col8 ref" href="#698This" title='This' data-ref="698This">This</a>-&gt;<a class="member" href="#tools::xml::loader::m_depth" title='tools::xml::loader::m_depth' data-ref="tools::xml::loader::m_depth">m_depth</a>;</td></tr>
+<tr><th id="395">395</th><td>        <b>if</b>(<a class="local col0 ref" href="#700delta" title='delta' data-ref="700delta">delta</a>&gt;=<var>1</var>) {</td></tr>
+<tr><th id="396">396</th><td>          This-&gt;m_out &lt;&lt; <q>"start_element :"</q> </td></tr>
+<tr><th id="397">397</th><td>              &lt;&lt; <q>" for element "</q> &lt;&lt; tools::sout(name) </td></tr>
+<tr><th id="398">398</th><td>              &lt;&lt; <q>" tag with a delta depth of "</q> &lt;&lt; delta</td></tr>
+<tr><th id="399">399</th><td>              &lt;&lt; <span class='error' title="use of undeclared identifier &apos;std&apos;">std</span>::endl; </td></tr>
+<tr><th id="400">400</th><td>          <a class="local col8 ref" href="#698This" title='This' data-ref="698This">This</a>-&gt;<a class="member" href="#tools::xml::loader::m_abort" title='tools::xml::loader::m_abort' data-ref="tools::xml::loader::m_abort">m_abort</a> = <b>true</b>;</td></tr>
+<tr><th id="401">401</th><td>          <b>return</b>;</td></tr>
+<tr><th id="402">402</th><td>        }</td></tr>
+<tr><th id="403">403</th><td>      }</td></tr>
+<tr><th id="404">404</th><td>  </td></tr>
+<tr><th id="405">405</th><td>      <span class='error' title="use of undeclared identifier &apos;std&apos;">std</span>::vector&lt;tools::xml::tree::<span class='error' title="no member named &apos;atb&apos; in &apos;tools::xml::tree&apos;">atb</span>&gt; <span class='error' title="C++ requires a type specifier for all declarations"><dfn class="local col1 decl" id="701atbs" title='atbs' data-type='int' data-ref="701atbs">atbs</dfn></span>;</td></tr>
+<tr><th id="406">406</th><td>     {<em>const</em> <span class='error' title="unknown type name &apos;XML_Char&apos;">XML_Char</span>** <dfn class="local col2 decl" id="702a_atts" title='a_atts' data-type='const int **' data-ref="702a_atts">a_atts</dfn> = a_atbs;</td></tr>
+<tr><th id="407">407</th><td>      <b>while</b>((*a_atts)&amp;&amp;(*(a_atts+<var>1</var>))) {</td></tr>
+<tr><th id="408">408</th><td>        atbs.push_back(tools::xml::tree::<span class='error' title="no member named &apos;atb&apos; in &apos;tools::xml::tree&apos;">atb</span>(*a_atts,*(a_atts+<var>1</var>)));</td></tr>
+<tr><th id="409">409</th><td>        a_atts+=<var>2</var>;</td></tr>
+<tr><th id="410">410</th><td>      }}</td></tr>
+<tr><th id="411">411</th><td>  </td></tr>
+<tr><th id="412">412</th><td>      <span class="namespace">tools::xml::</span><a class="type" href="tree.html#tools::xml::tree" title='tools::xml::tree' data-ref="tools::xml::tree">tree</a>* <dfn class="local col3 decl" id="703parent" title='parent' data-type='tools::xml::tree *' data-ref="703parent">parent</dfn> = <a class="local col8 ref" href="#698This" title='This' data-ref="698This">This</a>-&gt;<a class="member" href="#tools::xml::loader::m_current" title='tools::xml::loader::m_current' data-ref="tools::xml::loader::m_current">m_current</a>;</td></tr>
+<tr><th id="413">413</th><td>      <span class="namespace">tools::xml::</span><a class="type" href="tree.html#tools::xml::tree" title='tools::xml::tree' data-ref="tools::xml::tree">tree</a>* <dfn class="local col4 decl" id="704_tree" title='_tree' data-type='tools::xml::tree *' data-ref="704_tree">_tree</dfn> = This-&gt;m_factory.create(name,atbs,parent);</td></tr>
+<tr><th id="414">414</th><td>      <b>if</b>(!<a class="local col4 ref" href="#704_tree" title='_tree' data-ref="704_tree">_tree</a>) {</td></tr>
+<tr><th id="415">415</th><td>        This-&gt;m_out &lt;&lt; <q>"start_element :"</q> </td></tr>
+<tr><th id="416">416</th><td>            &lt;&lt; <q>" can't create a tree for tag "</q> &lt;&lt; tools::sout(name) </td></tr>
+<tr><th id="417">417</th><td>            &lt;&lt; <span class='error' title="use of undeclared identifier &apos;std&apos;">std</span>::endl; </td></tr>
+<tr><th id="418">418</th><td>        <a class="local col8 ref" href="#698This" title='This' data-ref="698This">This</a>-&gt;<a class="member" href="#tools::xml::loader::m_abort" title='tools::xml::loader::m_abort' data-ref="tools::xml::loader::m_abort">m_abort</a> = <b>true</b>;</td></tr>
+<tr><th id="419">419</th><td>        <b>return</b>;</td></tr>
+<tr><th id="420">420</th><td>      }</td></tr>
+<tr><th id="421">421</th><td>  </td></tr>
+<tr><th id="422">422</th><td>      <i>//out &lt;&lt; "start_element :" &lt;&lt; std::endl;</i></td></tr>
+<tr><th id="423">423</th><td><i>      //_tree-&gt;print_xml(*(This-&gt;m_printer),"debug : ");</i></td></tr>
+<tr><th id="424">424</th><td>  </td></tr>
+<tr><th id="425">425</th><td>      <b>if</b>(<a class="local col3 ref" href="#703parent" title='parent' data-ref="703parent">parent</a>) <a class="local col3 ref" href="#703parent" title='parent' data-ref="703parent">parent</a>-&gt;<a class="ref" href="tree.html#_ZN5tools3xml4tree9add_childEPS1_" title='tools::xml::tree::add_child' data-ref="_ZN5tools3xml4tree9add_childEPS1_">add_child</a>(<a class="local col4 ref" href="#704_tree" title='_tree' data-ref="704_tree">_tree</a>);</td></tr>
+<tr><th id="426">426</th><td></td></tr>
+<tr><th id="427">427</th><td><i>/*</i></td></tr>
+<tr><th id="428">428</th><td><i>      if(This-&gt;m_current &amp;&amp; !This-&gt;m_current-&gt;parent()) {</i></td></tr>
+<tr><th id="429">429</th><td><i>        This-&gt;m_out &lt;&lt; "start_element :" </i></td></tr>
+<tr><th id="430">430</th><td><i>            &lt;&lt; " warning : current tree without parent."</i></td></tr>
+<tr><th id="431">431</th><td><i>            &lt;&lt; " Potential mem leak."</i></td></tr>
+<tr><th id="432">432</th><td><i>            &lt;&lt; std::endl; </i></td></tr>
+<tr><th id="433">433</th><td><i>      }</i></td></tr>
+<tr><th id="434">434</th><td><i>*/</i></td></tr>
+<tr><th id="435">435</th><td>  </td></tr>
+<tr><th id="436">436</th><td>      <a class="local col8 ref" href="#698This" title='This' data-ref="698This">This</a>-&gt;<a class="member" href="#tools::xml::loader::m_current" title='tools::xml::loader::m_current' data-ref="tools::xml::loader::m_current">m_current</a> = <a class="local col4 ref" href="#704_tree" title='_tree' data-ref="704_tree">_tree</a>;</td></tr>
+<tr><th id="437">437</th><td>      <a class="local col4 ref" href="#704_tree" title='_tree' data-ref="704_tree">_tree</a>-&gt;<a class="ref" href="tree.html#_ZN5tools3xml4tree9set_depthEj" title='tools::xml::tree::set_depth' data-ref="_ZN5tools3xml4tree9set_depthEj">set_depth</a>(<a class="local col8 ref" href="#698This" title='This' data-ref="698This">This</a>-&gt;<a class="member" href="#tools::xml::loader::m_depth" title='tools::xml::loader::m_depth' data-ref="tools::xml::loader::m_depth">m_depth</a>); <i>// Internal only.</i></td></tr>
+<tr><th id="438">438</th><td>  </td></tr>
+<tr><th id="439">439</th><td>      <b>if</b>(!<a class="local col8 ref" href="#698This" title='This' data-ref="698This">This</a>-&gt;<a class="member" href="#tools::xml::loader::m_top" title='tools::xml::loader::m_top' data-ref="tools::xml::loader::m_top">m_top</a>) <a class="local col8 ref" href="#698This" title='This' data-ref="698This">This</a>-&gt;<a class="member" href="#tools::xml::loader::m_top" title='tools::xml::loader::m_top' data-ref="tools::xml::loader::m_top">m_top</a> = <a class="local col4 ref" href="#704_tree" title='_tree' data-ref="704_tree">_tree</a>;</td></tr>
+<tr><th id="440">440</th><td>  </td></tr>
+<tr><th id="441">441</th><td>    } <b>else</b> {</td></tr>
+<tr><th id="442">442</th><td>  </td></tr>
+<tr><th id="443">443</th><td>      <b>if</b>(!<a class="local col8 ref" href="#698This" title='This' data-ref="698This">This</a>-&gt;<a class="member" href="#tools::xml::loader::m_current" title='tools::xml::loader::m_current' data-ref="tools::xml::loader::m_current">m_current</a>) {</td></tr>
+<tr><th id="444">444</th><td>  </td></tr>
+<tr><th id="445">445</th><td>        <i>// Can't be in a non-tag without a tag !</i></td></tr>
+<tr><th id="446">446</th><td>        This-&gt;m_out &lt;&lt; <q>"start_element :"</q> </td></tr>
+<tr><th id="447">447</th><td>            &lt;&lt; <q>" for element "</q> &lt;&lt; tools::sout(name) </td></tr>
+<tr><th id="448">448</th><td>            &lt;&lt; <q>" non-tag without some parent tag."</q></td></tr>
+<tr><th id="449">449</th><td>            &lt;&lt; <span class='error' title="use of undeclared identifier &apos;std&apos;">std</span>::endl; </td></tr>
+<tr><th id="450">450</th><td>        <a class="local col8 ref" href="#698This" title='This' data-ref="698This">This</a>-&gt;<a class="member" href="#tools::xml::loader::m_abort" title='tools::xml::loader::m_abort' data-ref="tools::xml::loader::m_abort">m_abort</a> = <b>true</b>;</td></tr>
+<tr><th id="451">451</th><td>        <b>return</b>;</td></tr>
+<tr><th id="452">452</th><td>  </td></tr>
+<tr><th id="453">453</th><td>      } <b>else</b> {</td></tr>
+<tr><th id="454">454</th><td>  </td></tr>
+<tr><th id="455">455</th><td>        <em>int</em> <dfn class="local col5 decl" id="705delta" title='delta' data-type='int' data-ref="705delta">delta</dfn> =  <a class="local col8 ref" href="#698This" title='This' data-ref="698This">This</a>-&gt;<a class="member" href="#tools::xml::loader::m_depth" title='tools::xml::loader::m_depth' data-ref="tools::xml::loader::m_depth">m_depth</a> - <a class="local col8 ref" href="#698This" title='This' data-ref="698This">This</a>-&gt;<a class="member" href="#tools::xml::loader::m_current" title='tools::xml::loader::m_current' data-ref="tools::xml::loader::m_current">m_current</a>-&gt;<a class="ref" href="tree.html#_ZNK5tools3xml4tree5depthEv" title='tools::xml::tree::depth' data-ref="_ZNK5tools3xml4tree5depthEv">depth</a>();</td></tr>
+<tr><th id="456">456</th><td>        <b>if</b>(<a class="local col5 ref" href="#705delta" title='delta' data-ref="705delta">delta</a>&gt;<var>1</var>) {</td></tr>
+<tr><th id="457">457</th><td>  </td></tr>
+<tr><th id="458">458</th><td>          This-&gt;m_out &lt;&lt; <q>"start_element :"</q> </td></tr>
+<tr><th id="459">459</th><td>              &lt;&lt; <q>" for element "</q> &lt;&lt; tools::sout(name) </td></tr>
+<tr><th id="460">460</th><td>              &lt;&lt; <q>" grand child of a tag."</q></td></tr>
+<tr><th id="461">461</th><td>              &lt;&lt; <span class='error' title="use of undeclared identifier &apos;std&apos;">std</span>::endl; </td></tr>
+<tr><th id="462">462</th><td>          <a class="local col8 ref" href="#698This" title='This' data-ref="698This">This</a>-&gt;<a class="member" href="#tools::xml::loader::m_abort" title='tools::xml::loader::m_abort' data-ref="tools::xml::loader::m_abort">m_abort</a> = <b>true</b>;</td></tr>
+<tr><th id="463">463</th><td>          <b>return</b>;</td></tr>
+<tr><th id="464">464</th><td>  </td></tr>
+<tr><th id="465">465</th><td>        } <b>else</b> <b>if</b>(<a class="local col5 ref" href="#705delta" title='delta' data-ref="705delta">delta</a>==<var>1</var>) { <i>//ok</i></td></tr>
+<tr><th id="466">466</th><td>  </td></tr>
+<tr><th id="467">467</th><td>          This-&gt;<span class='error' title="no member named &apos;m_atbs&apos; in &apos;tools::xml::loader&apos;">m_atbs</span>.clear();</td></tr>
+<tr><th id="468">468</th><td>         {<em>const</em> <span class='error' title="unknown type name &apos;XML_Char&apos;">XML_Char</span>** <dfn class="local col6 decl" id="706a_atts" title='a_atts' data-type='const int **' data-ref="706a_atts">a_atts</dfn> = a_atbs;</td></tr>
+<tr><th id="469">469</th><td>          <b>while</b>((*a_atts)&amp;&amp;(*(a_atts+<var>1</var>))) {</td></tr>
+<tr><th id="470">470</th><td>            This-&gt;<span class='error' title="no member named &apos;m_atbs&apos; in &apos;tools::xml::loader&apos;">m_atbs</span>.push_back(tools::xml::tree::<span class='error' title="no member named &apos;atb&apos; in &apos;tools::xml::tree&apos;">atb</span>(*a_atts,*(a_atts+<var>1</var>)));</td></tr>
+<tr><th id="471">471</th><td>            a_atts+=<var>2</var>;</td></tr>
+<tr><th id="472">472</th><td>          }}</td></tr>
+<tr><th id="473">473</th><td>  </td></tr>
+<tr><th id="474">474</th><td>        } <b>else</b> {</td></tr>
+<tr><th id="475">475</th><td>  </td></tr>
+<tr><th id="476">476</th><td>          This-&gt;m_out &lt;&lt; <q>"start_element :"</q> </td></tr>
+<tr><th id="477">477</th><td>              &lt;&lt; <q>" for element "</q> &lt;&lt; tools::sout(name) </td></tr>
+<tr><th id="478">478</th><td>              &lt;&lt; <q>" non-tag with a delta depth of "</q> &lt;&lt; delta</td></tr>
+<tr><th id="479">479</th><td>              &lt;&lt; <span class='error' title="use of undeclared identifier &apos;std&apos;">std</span>::endl; </td></tr>
+<tr><th id="480">480</th><td>          <a class="local col8 ref" href="#698This" title='This' data-ref="698This">This</a>-&gt;<a class="member" href="#tools::xml::loader::m_abort" title='tools::xml::loader::m_abort' data-ref="tools::xml::loader::m_abort">m_abort</a> = <b>true</b>;</td></tr>
+<tr><th id="481">481</th><td>          <b>return</b>;</td></tr>
+<tr><th id="482">482</th><td>  </td></tr>
+<tr><th id="483">483</th><td>        }</td></tr>
+<tr><th id="484">484</th><td>      }</td></tr>
+<tr><th id="485">485</th><td>  </td></tr>
+<tr><th id="486">486</th><td>    }</td></tr>
+<tr><th id="487">487</th><td>  }</td></tr>
+<tr><th id="488">488</th><td>  </td></tr>
+<tr><th id="489">489</th><td></td></tr>
+<tr><th id="490">490</th><td>  <em>static</em> <em>void</em> <dfn class="decl def" id="_ZN5tools3xml6loader11end_elementEPvPKi" title='tools::xml::loader::end_element' data-ref="_ZN5tools3xml6loader11end_elementEPvPKi">end_element</dfn>(<em>void</em>* <dfn class="local col7 decl" id="707aUserData" title='aUserData' data-type='void *' data-ref="707aUserData">aUserData</dfn>,<em>const</em> <span class='error' title="unknown type name &apos;XML_Char&apos;">XML_Char</span>* <dfn class="local col8 decl" id="708a_name" title='a_name' data-type='const int *' data-ref="708a_name">a_name</dfn>){</td></tr>
+<tr><th id="491">491</th><td>    <a class="type" href="#tools::xml::loader" title='tools::xml::loader' data-ref="tools::xml::loader">loader</a>* <dfn class="local col9 decl" id="709This" title='This' data-type='tools::xml::loader *' data-ref="709This">This</dfn> = (<a class="type" href="#tools::xml::loader" title='tools::xml::loader' data-ref="tools::xml::loader">loader</a>*)<a class="local col7 ref" href="#707aUserData" title='aUserData' data-ref="707aUserData">aUserData</a>;</td></tr>
+<tr><th id="492">492</th><td>    <b>if</b>(<a class="local col9 ref" href="#709This" title='This' data-ref="709This">This</a>-&gt;<a class="member" href="#tools::xml::loader::m_abort" title='tools::xml::loader::m_abort' data-ref="tools::xml::loader::m_abort">m_abort</a>) <b>return</b>; <i>//Do nothing.</i></td></tr>
+<tr><th id="493">493</th><td>  </td></tr>
+<tr><th id="494">494</th><td>    <b>if</b>(<a class="local col9 ref" href="#709This" title='This' data-ref="709This">This</a>-&gt;<a class="member" href="#tools::xml::loader::m_current" title='tools::xml::loader::m_current' data-ref="tools::xml::loader::m_current">m_current</a>) {</td></tr>
+<tr><th id="495">495</th><td>  </td></tr>
+<tr><th id="496">496</th><td>      <span class="namespace">tools::xml::</span><a class="type" href="tree.html#tools::xml::tree" title='tools::xml::tree' data-ref="tools::xml::tree">tree</a>* <dfn class="local col0 decl" id="710tr" title='tr' data-type='tools::xml::tree *' data-ref="710tr">tr</dfn> = <a class="local col9 ref" href="#709This" title='This' data-ref="709This">This</a>-&gt;<a class="member" href="#tools::xml::loader::m_current" title='tools::xml::loader::m_current' data-ref="tools::xml::loader::m_current">m_current</a>;</td></tr>
+<tr><th id="497">497</th><td>      <em>int</em> <dfn class="local col1 decl" id="711delta" title='delta' data-type='int' data-ref="711delta">delta</dfn> = <a class="local col9 ref" href="#709This" title='This' data-ref="709This">This</a>-&gt;<a class="member" href="#tools::xml::loader::m_depth" title='tools::xml::loader::m_depth' data-ref="tools::xml::loader::m_depth">m_depth</a> - <a class="local col0 ref" href="#710tr" title='tr' data-ref="710tr">tr</a>-&gt;<a class="ref" href="tree.html#_ZNK5tools3xml4tree5depthEv" title='tools::xml::tree::depth' data-ref="_ZNK5tools3xml4tree5depthEv">depth</a>();</td></tr>
+<tr><th id="498">498</th><td>      <b>if</b>(<a class="local col1 ref" href="#711delta" title='delta' data-ref="711delta">delta</a>==<var>0</var>) { <i>//Back to a tag :</i></td></tr>
+<tr><th id="499">499</th><td>        </td></tr>
+<tr><th id="500">500</th><td>        <span class="namespace">tools::xml::</span><a class="type" href="tree.html#tools::xml::tree" title='tools::xml::tree' data-ref="tools::xml::tree">tree</a>* <dfn class="local col2 decl" id="712parent" title='parent' data-type='tools::xml::tree *' data-ref="712parent">parent</dfn> = <a class="local col0 ref" href="#710tr" title='tr' data-ref="710tr">tr</a>-&gt;<a class="ref" href="tree.html#_ZNK5tools3xml4tree6parentEv" title='tools::xml::tree::parent' data-ref="_ZNK5tools3xml4tree6parentEv">parent</a>();</td></tr>
+<tr><th id="501">501</th><td>  </td></tr>
+<tr><th id="502">502</th><td>        <em>bool</em> <dfn class="local col3 decl" id="713keep" title='keep' data-type='bool' data-ref="713keep">keep</dfn> = <b>false</b>;</td></tr>
+<tr><th id="503">503</th><td>        <em>bool</em> <dfn class="local col4 decl" id="714cont" title='cont' data-type='bool' data-ref="714cont">cont</dfn> = <a class="local col9 ref" href="#709This" title='This' data-ref="709This">This</a>-&gt;<a class="virtual member" href="#_ZN5tools3xml6loader17visit_end_elementERNS0_4treeERb" title='tools::xml::loader::visit_end_element' data-ref="_ZN5tools3xml6loader17visit_end_elementERNS0_4treeERb">visit_end_element</a>(<span class='refarg'>*<a class="local col0 ref" href="#710tr" title='tr' data-ref="710tr">tr</a></span>,<span class='refarg'><a class="local col3 ref" href="#713keep" title='keep' data-ref="713keep">keep</a></span>);</td></tr>
+<tr><th id="504">504</th><td>        <b>if</b>(<a class="local col3 ref" href="#713keep" title='keep' data-ref="713keep">keep</a>) {</td></tr>
+<tr><th id="505">505</th><td>          <b>if</b>(<a class="local col2 ref" href="#712parent" title='parent' data-ref="712parent">parent</a>) {</td></tr>
+<tr><th id="506">506</th><td><i>/*</i></td></tr>
+<tr><th id="507">507</th><td><i>            if(!This-&gt;m_current-&gt;parent()) {</i></td></tr>
+<tr><th id="508">508</th><td><i>              This-&gt;m_out &lt;&lt; "end_element :" </i></td></tr>
+<tr><th id="509">509</th><td><i>                  &lt;&lt; " warning : current tree without parent (1)."</i></td></tr>
+<tr><th id="510">510</th><td><i>                  &lt;&lt; " Potential mem leak."</i></td></tr>
+<tr><th id="511">511</th><td><i>                  &lt;&lt; std::endl;</i></td></tr>
+<tr><th id="512">512</th><td><i>            }</i></td></tr>
+<tr><th id="513">513</th><td><i>*/</i></td></tr>
+<tr><th id="514">514</th><td>            <a class="local col9 ref" href="#709This" title='This' data-ref="709This">This</a>-&gt;<a class="member" href="#tools::xml::loader::m_current" title='tools::xml::loader::m_current' data-ref="tools::xml::loader::m_current">m_current</a> = <a class="local col2 ref" href="#712parent" title='parent' data-ref="712parent">parent</a>;</td></tr>
+<tr><th id="515">515</th><td>          }</td></tr>
+<tr><th id="516">516</th><td>        } <b>else</b> {</td></tr>
+<tr><th id="517">517</th><td>          <i>//FIXME : the top could be recreated !</i></td></tr>
+<tr><th id="518">518</th><td>          <b>if</b>(<a class="local col9 ref" href="#709This" title='This' data-ref="709This">This</a>-&gt;<a class="member" href="#tools::xml::loader::m_top" title='tools::xml::loader::m_top' data-ref="tools::xml::loader::m_top">m_top</a>==<a class="local col0 ref" href="#710tr" title='tr' data-ref="710tr">tr</a>) <a class="local col9 ref" href="#709This" title='This' data-ref="709This">This</a>-&gt;<a class="member" href="#tools::xml::loader::m_top" title='tools::xml::loader::m_top' data-ref="tools::xml::loader::m_top">m_top</a> = <var>0</var>;</td></tr>
+<tr><th id="519">519</th><td>  </td></tr>
+<tr><th id="520">520</th><td>          <b>if</b>(<a class="local col2 ref" href="#712parent" title='parent' data-ref="712parent">parent</a>) {</td></tr>
+<tr><th id="521">521</th><td>            <a class="local col2 ref" href="#712parent" title='parent' data-ref="712parent">parent</a>-&gt;<a class="ref" href="tree.html#_ZN5tools3xml4tree12remove_childERPS1_b" title='tools::xml::tree::remove_child' data-ref="_ZN5tools3xml4tree12remove_childERPS1_b">remove_child</a>(<span class='refarg'><a class="local col0 ref" href="#710tr" title='tr' data-ref="710tr">tr</a></span>); <i>//delete the tr</i></td></tr>
+<tr><th id="522">522</th><td>          } <b>else</b> {</td></tr>
+<tr><th id="523">523</th><td>            <b>delete</b> <a class="local col0 ref" href="#710tr" title='tr' data-ref="710tr">tr</a>;</td></tr>
+<tr><th id="524">524</th><td>          }</td></tr>
+<tr><th id="525">525</th><td>  </td></tr>
+<tr><th id="526">526</th><td><i>/*</i></td></tr>
+<tr><th id="527">527</th><td><i>          if(!This-&gt;m_current-&gt;parent()) {</i></td></tr>
+<tr><th id="528">528</th><td><i>            This-&gt;m_out &lt;&lt; "end_element :" </i></td></tr>
+<tr><th id="529">529</th><td><i>                   &lt;&lt; " warning : current tree without parent (2)."</i></td></tr>
+<tr><th id="530">530</th><td><i>                   &lt;&lt; " Potential mem leak."</i></td></tr>
+<tr><th id="531">531</th><td><i>                   &lt;&lt; std::endl;</i></td></tr>
+<tr><th id="532">532</th><td><i>          }</i></td></tr>
+<tr><th id="533">533</th><td><i>*/</i></td></tr>
+<tr><th id="534">534</th><td></td></tr>
+<tr><th id="535">535</th><td>          <a class="local col9 ref" href="#709This" title='This' data-ref="709This">This</a>-&gt;<a class="member" href="#tools::xml::loader::m_current" title='tools::xml::loader::m_current' data-ref="tools::xml::loader::m_current">m_current</a> = <a class="local col2 ref" href="#712parent" title='parent' data-ref="712parent">parent</a>; <i>//parent could be 0 : ok.</i></td></tr>
+<tr><th id="536">536</th><td>        }</td></tr>
+<tr><th id="537">537</th><td>  </td></tr>
+<tr><th id="538">538</th><td>        <b>if</b>(!<a class="local col4 ref" href="#714cont" title='cont' data-ref="714cont">cont</a>) <a class="local col9 ref" href="#709This" title='This' data-ref="709This">This</a>-&gt;<a class="member" href="#tools::xml::loader::m_abort" title='tools::xml::loader::m_abort' data-ref="tools::xml::loader::m_abort">m_abort</a> = <b>true</b>;</td></tr>
+<tr><th id="539">539</th><td>  </td></tr>
+<tr><th id="540">540</th><td>      } <b>else</b> <b>if</b>(<a class="local col1 ref" href="#711delta" title='delta' data-ref="711delta">delta</a>==<var>1</var>) { <i>//Back to a child of tag :</i></td></tr>
+<tr><th id="541">541</th><td>  </td></tr>
+<tr><th id="542">542</th><td>        <i>//FIXME : correct m_value ? (Can we pick the one of a sub item ?)</i></td></tr>
+<tr><th id="543">543</th><td>        tr-&gt;<span class='error' title="no member named &apos;add_element&apos; in &apos;tools::xml::tree&apos;">add_element</span>(<span class='error' title="use of undeclared identifier &apos;std&apos;">std</span>::string(a_name),This-&gt;<span class='error' title="no member named &apos;m_atbs&apos; in &apos;tools::xml::loader&apos;">m_atbs</span>,This-&gt;m_value); </td></tr>
+<tr><th id="544">544</th><td>        <i>//This-&gt;m_value = "";</i></td></tr>
+<tr><th id="545">545</th><td>  </td></tr>
+<tr><th id="546">546</th><td>      } <b>else</b> {</td></tr>
+<tr><th id="547">547</th><td>  </td></tr>
+<tr><th id="548">548</th><td>        This-&gt;m_out &lt;&lt; <q>"end_element :"</q> </td></tr>
+<tr><th id="549">549</th><td>            &lt;&lt; <q>" problem for element "</q> &lt;&lt; tools::sout(<span class='error' title="use of undeclared identifier &apos;std&apos;">std</span>::string(a_name)) </td></tr>
+<tr><th id="550">550</th><td>            &lt;&lt; <q>" : delta depth of "</q> &lt;&lt; delta</td></tr>
+<tr><th id="551">551</th><td>            &lt;&lt; <span class='error' title="use of undeclared identifier &apos;std&apos;">std</span>::endl; </td></tr>
+<tr><th id="552">552</th><td>        <a class="local col9 ref" href="#709This" title='This' data-ref="709This">This</a>-&gt;<a class="member" href="#tools::xml::loader::m_abort" title='tools::xml::loader::m_abort' data-ref="tools::xml::loader::m_abort">m_abort</a> = <b>true</b>;</td></tr>
+<tr><th id="553">553</th><td>  </td></tr>
+<tr><th id="554">554</th><td>      }</td></tr>
+<tr><th id="555">555</th><td>  </td></tr>
+<tr><th id="556">556</th><td>    }</td></tr>
+<tr><th id="557">557</th><td>  </td></tr>
+<tr><th id="558">558</th><td>  </td></tr>
+<tr><th id="559">559</th><td>    <a class="local col9 ref" href="#709This" title='This' data-ref="709This">This</a>-&gt;<a class="member" href="#tools::xml::loader::m_depth" title='tools::xml::loader::m_depth' data-ref="tools::xml::loader::m_depth">m_depth</a>--;</td></tr>
+<tr><th id="560">560</th><td>  }</td></tr>
+<tr><th id="561">561</th><td></td></tr>
+<tr><th id="562">562</th><td><b>protected</b>:</td></tr>
+<tr><th id="563">563</th><td>  <span class="namespace">tools::xml::</span><a class="type" href="tree.html#tools::xml::factory" title='tools::xml::factory' data-ref="tools::xml::factory">factory</a>&amp; <dfn class="decl" id="tools::xml::loader::m_factory" title='tools::xml::loader::m_factory' data-ref="tools::xml::loader::m_factory">m_factory</dfn>;</td></tr>
+<tr><th id="564">564</th><td>  <span class='error' title="use of undeclared identifier &apos;std&apos;">std</span>::ostream&amp; <dfn class="decl" id="tools::xml::loader::m_out" title='tools::xml::loader::m_out' data-ref="tools::xml::loader::m_out">m_out</dfn>;</td></tr>
+<tr><th id="565">565</th><td><b>protected</b>:</td></tr>
+<tr><th id="566">566</th><td>  <em>bool</em> <dfn class="decl" id="tools::xml::loader::m_verbose" title='tools::xml::loader::m_verbose' data-ref="tools::xml::loader::m_verbose">m_verbose</dfn>;</td></tr>
+<tr><th id="567">567</th><td>  <em>bool</em> <dfn class="decl" id="tools::xml::loader::m_take_cntrl" title='tools::xml::loader::m_take_cntrl' data-ref="tools::xml::loader::m_take_cntrl">m_take_cntrl</dfn>;</td></tr>
+<tr><th id="568">568</th><td>  <em>unsigned</em> <em>int</em> <dfn class="decl" id="tools::xml::loader::m_errors" title='tools::xml::loader::m_errors' data-ref="tools::xml::loader::m_errors">m_errors</dfn>;</td></tr>
+<tr><th id="569">569</th><td>  <span class='error' title="use of undeclared identifier &apos;std&apos;">std</span>::vector&lt;<span class='error' title="use of undeclared identifier &apos;std&apos;">std</span>::string&gt; <dfn class="decl" id="tools::xml::loader::m_tags" title='tools::xml::loader::m_tags' data-ref="tools::xml::loader::m_tags">m_tags</dfn>;</td></tr>
+<tr><th id="570">570</th><td>  <span class="namespace">tools::xml::</span><a class="type" href="tree.html#tools::xml::tree" title='tools::xml::tree' data-ref="tools::xml::tree">tree</a>* <dfn class="decl" id="tools::xml::loader::m_top" title='tools::xml::loader::m_top' data-ref="tools::xml::loader::m_top">m_top</dfn>;</td></tr>
+<tr><th id="571">571</th><td>  <span class="namespace">tools::xml::</span><a class="type" href="tree.html#tools::xml::tree" title='tools::xml::tree' data-ref="tools::xml::tree">tree</a>* <dfn class="decl" id="tools::xml::loader::m_current" title='tools::xml::loader::m_current' data-ref="tools::xml::loader::m_current">m_current</dfn>;</td></tr>
+<tr><th id="572">572</th><td>  <i>//std::vector&lt;tools::xml::tree::atb&gt; m_atbs;</i></td></tr>
+<tr><th id="573">573</th><td>  <span class='error' title="use of undeclared identifier &apos;std&apos;">std</span>::vector&lt; <span class='error' title="use of undeclared identifier &apos;std&apos;">std</span>::pair&lt;<span class='error' title="use of undeclared identifier &apos;std&apos;">std</span>::string,std::string&gt; <span class='error' title="expected member name or &apos;;&apos; after declaration specifiers">&gt;</span> m_atbs;</td></tr>
+<tr><th id="574">574</th><td>  <span class='error' title="use of undeclared identifier &apos;std&apos;">std</span>::string <dfn class="decl" id="tools::xml::loader::m_value" title='tools::xml::loader::m_value' data-ref="tools::xml::loader::m_value">m_value</dfn>;</td></tr>
+<tr><th id="575">575</th><td>  <span class="namespace">tools::file::</span><a class="type" href="../file_reader.html#tools::file::reader" title='tools::file::reader' data-ref="tools::file::reader">reader</a>* <dfn class="decl" id="tools::xml::loader::m_compressed_reader" title='tools::xml::loader::m_compressed_reader' data-ref="tools::xml::loader::m_compressed_reader">m_compressed_reader</dfn>;</td></tr>
+<tr><th id="576">576</th><td>  <em>unsigned</em> <em>int</em> <dfn class="decl" id="tools::xml::loader::m_depth" title='tools::xml::loader::m_depth' data-ref="tools::xml::loader::m_depth">m_depth</dfn>;</td></tr>
+<tr><th id="577">577</th><td>  <em>bool</em> <dfn class="decl" id="tools::xml::loader::m_abort" title='tools::xml::loader::m_abort' data-ref="tools::xml::loader::m_abort">m_abort</dfn>;</td></tr>
+<tr><th id="578">578</th><td>};</td></tr>
+<tr><th id="579">579</th><td></td></tr>
+<tr><th id="580">580</th><td>}}</td></tr>
+<tr><th id="581">581</th><td></td></tr>
+<tr><th id="582">582</th><td><u>#<span data-ppcond="4">endif</span></u></td></tr>
+<tr><th id="583">583</th><td></td></tr>
+</table><hr/><p id='footer'>
+Generated while processing <a href='../../../../xml/src/G4XmlAnalysisReader.cc.html'>codebrowser/source/analysis/xml/src/G4XmlAnalysisReader.cc</a><br/>Generated on <em>2019-Aug-28</em> from project codebrowser<br />Powered by <a href='https://woboq.com'><img alt='Woboq' src='https://code.woboq.org/woboq-16.png' width='41' height='16' /></a> <a href='https://code.woboq.org'>Code Browser</a> 2.1
+<br/>Generator usage only permitted with license.</p>
+</div></body></html>

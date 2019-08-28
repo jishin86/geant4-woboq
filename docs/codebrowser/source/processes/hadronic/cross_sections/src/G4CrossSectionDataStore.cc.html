@@ -1,0 +1,687 @@
+<!doctype html>
+<html>
+<head>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"><title>G4CrossSectionDataStore.cc source code [codebrowser/source/processes/hadronic/cross_sections/src/G4CrossSectionDataStore.cc] - Woboq Code Browser</title>
+<link rel="stylesheet" href="../../../../../../../data/qtcreator.css" title="QtCreator"/>
+<link rel="alternate stylesheet" href="../../../../../../../data/kdevelop.css" title="KDevelop"/>
+<script type="text/javascript" src="../../../../../../../data/jquery/jquery.min.js"></script>
+<script type="text/javascript" src="../../../../../../../data/jquery/jquery-ui.min.js"></script>
+<script>var file = 'codebrowser/source/processes/hadronic/cross_sections/src/G4CrossSectionDataStore.cc'; var root_path = '../../../../../..'; var data_path = '../../../../../../../data';</script>
+<script src='../../../../../../../data/codebrowser.js'></script>
+</head>
+<body><div id='header'><h1 id='breadcrumb'><span>Browse the source code of </span><a href='../../../../..'>codebrowser</a>/<a href='../../../..'>source</a>/<a href='../../..'>processes</a>/<a href='../..'>hadronic</a>/<a href='..'>cross_sections</a>/<a href='./'>src</a>/<a href='G4CrossSectionDataStore.cc.html'>G4CrossSectionDataStore.cc</a></h1></div>
+<hr/><div id='content'><table class="code">
+<tr><th id="1">1</th><td><i>//</i></td></tr>
+<tr><th id="2">2</th><td><i>// ********************************************************************</i></td></tr>
+<tr><th id="3">3</th><td><i>// * License and Disclaimer                                           *</i></td></tr>
+<tr><th id="4">4</th><td><i>// *                                                                  *</i></td></tr>
+<tr><th id="5">5</th><td><i>// * The  Geant4 software  is  copyright of the Copyright Holders  of *</i></td></tr>
+<tr><th id="6">6</th><td><i>// * the Geant4 Collaboration.  It is provided  under  the terms  and *</i></td></tr>
+<tr><th id="7">7</th><td><i>// * conditions of the Geant4 Software License,  included in the file *</i></td></tr>
+<tr><th id="8">8</th><td><i>// * LICENSE and available at  <a href="http://cern.ch/geant4/license">http://cern.ch/geant4/license</a> .  These *</i></td></tr>
+<tr><th id="9">9</th><td><i>// * include a list of copyright holders.                             *</i></td></tr>
+<tr><th id="10">10</th><td><i>// *                                                                  *</i></td></tr>
+<tr><th id="11">11</th><td><i>// * Neither the authors of this software system, nor their employing *</i></td></tr>
+<tr><th id="12">12</th><td><i>// * institutes,nor the agencies providing financial support for this *</i></td></tr>
+<tr><th id="13">13</th><td><i>// * work  make  any representation or  warranty, express or implied, *</i></td></tr>
+<tr><th id="14">14</th><td><i>// * regarding  this  software system or assume any liability for its *</i></td></tr>
+<tr><th id="15">15</th><td><i>// * use.  Please see the license in the file  LICENSE  and URL above *</i></td></tr>
+<tr><th id="16">16</th><td><i>// * for the full disclaimer and the limitation of liability.         *</i></td></tr>
+<tr><th id="17">17</th><td><i>// *                                                                  *</i></td></tr>
+<tr><th id="18">18</th><td><i>// * This  code  implementation is the result of  the  scientific and *</i></td></tr>
+<tr><th id="19">19</th><td><i>// * technical work of the GEANT4 collaboration.                      *</i></td></tr>
+<tr><th id="20">20</th><td><i>// * By using,  copying,  modifying or  distributing the software (or *</i></td></tr>
+<tr><th id="21">21</th><td><i>// * any work based  on the software)  you  agree  to acknowledge its *</i></td></tr>
+<tr><th id="22">22</th><td><i>// * use  in  resulting  scientific  publications,  and indicate your *</i></td></tr>
+<tr><th id="23">23</th><td><i>// * acceptance of all terms of the Geant4 Software license.          *</i></td></tr>
+<tr><th id="24">24</th><td><i>// ********************************************************************</i></td></tr>
+<tr><th id="25">25</th><td><i>//</i></td></tr>
+<tr><th id="26">26</th><td><i>//</i></td></tr>
+<tr><th id="27">27</th><td><i>// -------------------------------------------------------------------</i></td></tr>
+<tr><th id="28">28</th><td><i>//</i></td></tr>
+<tr><th id="29">29</th><td><i>// GEANT4 Class file</i></td></tr>
+<tr><th id="30">30</th><td><i>//</i></td></tr>
+<tr><th id="31">31</th><td><i>//</i></td></tr>
+<tr><th id="32">32</th><td><i>// File name:     G4CrossSectionDataStore</i></td></tr>
+<tr><th id="33">33</th><td><i>//</i></td></tr>
+<tr><th id="34">34</th><td><i>// Modifications:</i></td></tr>
+<tr><th id="35">35</th><td><i>// 23.01.2009 V.Ivanchenko add destruction of data sets</i></td></tr>
+<tr><th id="36">36</th><td><i>// 29.04.2010 G.Folger     modifictaions for integer A &amp; Z</i></td></tr>
+<tr><th id="37">37</th><td><i>// 14.03.2011 V.Ivanchenko fixed DumpPhysicsTable</i></td></tr>
+<tr><th id="38">38</th><td><i>// 15.08.2011 G.Folger, V.Ivanchenko, T.Koi, D.Wright redesign the class</i></td></tr>
+<tr><th id="39">39</th><td><i>// 07.03.2013 M.Maire cosmetic in DumpPhysicsTable</i></td></tr>
+<tr><th id="40">40</th><td><i>//</i></td></tr>
+<tr><th id="41">41</th><td><i>//....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo.....</i></td></tr>
+<tr><th id="42">42</th><td><i>//....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo.....</i></td></tr>
+<tr><th id="43">43</th><td></td></tr>
+<tr><th id="44">44</th><td><u>#include <a href="../include/G4CrossSectionDataStore.hh.html">"G4CrossSectionDataStore.hh"</a></u></td></tr>
+<tr><th id="45">45</th><td><u>#include <a href="../../../../global/management/include/G4SystemOfUnits.hh.html">"G4SystemOfUnits.hh"</a></u></td></tr>
+<tr><th id="46">46</th><td><u>#include <a href="../../../../global/management/include/G4UnitsTable.hh.html">"G4UnitsTable.hh"</a></u></td></tr>
+<tr><th id="47">47</th><td><u>#include <a href="../../util/include/G4HadronicException.hh.html">"G4HadronicException.hh"</a></u></td></tr>
+<tr><th id="48">48</th><td><u>#include <a href="../../util/include/G4HadTmpUtil.hh.html">"G4HadTmpUtil.hh"</a></u></td></tr>
+<tr><th id="49">49</th><td><u>#include <a href="../../../../global/HEPRandom/include/Randomize.hh.html">"Randomize.hh"</a></u></td></tr>
+<tr><th id="50">50</th><td><u>#include <a href="../../util/include/G4Nucleus.hh.html">"G4Nucleus.hh"</a></u></td></tr>
+<tr><th id="51">51</th><td></td></tr>
+<tr><th id="52">52</th><td><u>#include <a href="../../../../particles/management/include/G4DynamicParticle.hh.html">"G4DynamicParticle.hh"</a></u></td></tr>
+<tr><th id="53">53</th><td><u>#include <a href="../../../../materials/include/G4Isotope.hh.html">"G4Isotope.hh"</a></u></td></tr>
+<tr><th id="54">54</th><td><u>#include <a href="../../../../materials/include/G4Element.hh.html">"G4Element.hh"</a></u></td></tr>
+<tr><th id="55">55</th><td><u>#include <a href="../../../../materials/include/G4Material.hh.html">"G4Material.hh"</a></u></td></tr>
+<tr><th id="56">56</th><td><u>#include <a href="../../../../materials/include/G4NistManager.hh.html">"G4NistManager.hh"</a></u></td></tr>
+<tr><th id="57">57</th><td><u>#include <span class='error' title="&apos;algorithm&apos; file not found">&lt;</span>algorithm&gt;</u></td></tr>
+<tr><th id="58">58</th><td></td></tr>
+<tr><th id="59">59</th><td></td></tr>
+<tr><th id="60">60</th><td><i>//....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo.....</i></td></tr>
+<tr><th id="61">61</th><td></td></tr>
+<tr><th id="62">62</th><td><a class="type" href="../include/G4CrossSectionDataStore.hh.html#G4CrossSectionDataStore" title='G4CrossSectionDataStore' data-ref="G4CrossSectionDataStore">G4CrossSectionDataStore</a>::<dfn class="decl def" id="_ZN23G4CrossSectionDataStoreC1Ev" title='G4CrossSectionDataStore::G4CrossSectionDataStore' data-ref="_ZN23G4CrossSectionDataStoreC1Ev">G4CrossSectionDataStore</dfn>() :</td></tr>
+<tr><th id="63">63</th><td>  <a class="member" href="../include/G4CrossSectionDataStore.hh.html#G4CrossSectionDataStore::nDataSetList" title='G4CrossSectionDataStore::nDataSetList' data-ref="G4CrossSectionDataStore::nDataSetList">nDataSetList</a>(<var>0</var>), <a class="member" href="../include/G4CrossSectionDataStore.hh.html#G4CrossSectionDataStore::verboseLevel" title='G4CrossSectionDataStore::verboseLevel' data-ref="G4CrossSectionDataStore::verboseLevel">verboseLevel</a>(<var>0</var>),<a class="member" href="../include/G4CrossSectionDataStore.hh.html#G4CrossSectionDataStore::fastPathFlags" title='G4CrossSectionDataStore::fastPathFlags' data-ref="G4CrossSectionDataStore::fastPathFlags">fastPathFlags</a><a class="ref" href="../include/G4FastPathHadronicCrossSection.hh.html#_ZN30G4FastPathHadronicCrossSection11controlFlagC1Ev" title='G4FastPathHadronicCrossSection::controlFlag::controlFlag' data-ref="_ZN30G4FastPathHadronicCrossSection11controlFlagC1Ev">(</a>),<a class="member" href="../include/G4CrossSectionDataStore.hh.html#G4CrossSectionDataStore::fastPathParams" title='G4CrossSectionDataStore::fastPathParams' data-ref="G4CrossSectionDataStore::fastPathParams">fastPathParams</a><a class="ref" href="../include/G4FastPathHadronicCrossSection.hh.html#_ZN30G4FastPathHadronicCrossSection18fastPathParametersC1Ev" title='G4FastPathHadronicCrossSection::fastPathParameters::fastPathParameters' data-ref="_ZN30G4FastPathHadronicCrossSection18fastPathParametersC1Ev">(</a>),</td></tr>
+<tr><th id="64">64</th><td>  <a class="member" href="../include/G4CrossSectionDataStore.hh.html#G4CrossSectionDataStore::counters" title='G4CrossSectionDataStore::counters' data-ref="G4CrossSectionDataStore::counters">counters</a><a class="ref" href="../include/G4FastPathHadronicCrossSection.hh.html#_ZN30G4FastPathHadronicCrossSection20getCrossSectionCountC1Ev" title='G4FastPathHadronicCrossSection::getCrossSectionCount::getCrossSectionCount' data-ref="_ZN30G4FastPathHadronicCrossSection20getCrossSectionCountC1Ev">(</a>),fastPathCache()</td></tr>
+<tr><th id="65">65</th><td>{</td></tr>
+<tr><th id="66">66</th><td>  <a class="member" href="../include/G4CrossSectionDataStore.hh.html#G4CrossSectionDataStore::nist" title='G4CrossSectionDataStore::nist' data-ref="G4CrossSectionDataStore::nist">nist</a> = <a class="type" href="../../../../materials/include/G4NistManager.hh.html#G4NistManager" title='G4NistManager' data-ref="G4NistManager">G4NistManager</a>::<a class="ref" href="../../../../materials/include/G4NistManager.hh.html#_ZN13G4NistManager8InstanceEv" title='G4NistManager::Instance' data-ref="_ZN13G4NistManager8InstanceEv">Instance</a>();</td></tr>
+<tr><th id="67">67</th><td>  <a class="member" href="../include/G4CrossSectionDataStore.hh.html#G4CrossSectionDataStore::currentMaterial" title='G4CrossSectionDataStore::currentMaterial' data-ref="G4CrossSectionDataStore::currentMaterial">currentMaterial</a> = <a class="member" href="../include/G4CrossSectionDataStore.hh.html#G4CrossSectionDataStore::elmMaterial" title='G4CrossSectionDataStore::elmMaterial' data-ref="G4CrossSectionDataStore::elmMaterial">elmMaterial</a> = <b>nullptr</b>;</td></tr>
+<tr><th id="68">68</th><td>  <a class="member" href="../include/G4CrossSectionDataStore.hh.html#G4CrossSectionDataStore::currentElement" title='G4CrossSectionDataStore::currentElement' data-ref="G4CrossSectionDataStore::currentElement">currentElement</a> = <b>nullptr</b>;  <i>//ALB 14-Aug-2012 Coverity fix.</i></td></tr>
+<tr><th id="69">69</th><td>  <a class="member" href="../include/G4CrossSectionDataStore.hh.html#G4CrossSectionDataStore::matParticle" title='G4CrossSectionDataStore::matParticle' data-ref="G4CrossSectionDataStore::matParticle">matParticle</a> = <a class="member" href="../include/G4CrossSectionDataStore.hh.html#G4CrossSectionDataStore::elmParticle" title='G4CrossSectionDataStore::elmParticle' data-ref="G4CrossSectionDataStore::elmParticle">elmParticle</a> = <b>nullptr</b>;</td></tr>
+<tr><th id="70">70</th><td>  <a class="member" href="../include/G4CrossSectionDataStore.hh.html#G4CrossSectionDataStore::matKinEnergy" title='G4CrossSectionDataStore::matKinEnergy' data-ref="G4CrossSectionDataStore::matKinEnergy">matKinEnergy</a> = <a class="member" href="../include/G4CrossSectionDataStore.hh.html#G4CrossSectionDataStore::elmKinEnergy" title='G4CrossSectionDataStore::elmKinEnergy' data-ref="G4CrossSectionDataStore::elmKinEnergy">elmKinEnergy</a> = <a class="member" href="../include/G4CrossSectionDataStore.hh.html#G4CrossSectionDataStore::matCrossSection" title='G4CrossSectionDataStore::matCrossSection' data-ref="G4CrossSectionDataStore::matCrossSection">matCrossSection</a> = <a class="member" href="../include/G4CrossSectionDataStore.hh.html#G4CrossSectionDataStore::elmCrossSection" title='G4CrossSectionDataStore::elmCrossSection' data-ref="G4CrossSectionDataStore::elmCrossSection">elmCrossSection</a> = <var>0.0</var>;</td></tr>
+<tr><th id="71">71</th><td>}</td></tr>
+<tr><th id="72">72</th><td></td></tr>
+<tr><th id="73">73</th><td><i>//....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo.....</i></td></tr>
+<tr><th id="74">74</th><td></td></tr>
+<tr><th id="75">75</th><td>G4CrossSectionDataStore::<span class='error' title="exception specification in declaration does not match previous declaration">~</span>G4CrossSectionDataStore()</td></tr>
+<tr><th id="76">76</th><td>{}</td></tr>
+<tr><th id="77">77</th><td></td></tr>
+<tr><th id="78">78</th><td></td></tr>
+<tr><th id="79">79</th><td><i>//....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo.....</i></td></tr>
+<tr><th id="80">80</th><td><a class="typedef" href="../../../../global/management/include/G4Types.hh.html#G4double" title='G4double' data-type='double' data-ref="G4double">G4double</a></td></tr>
+<tr><th id="81">81</th><td><a class="type" href="../include/G4CrossSectionDataStore.hh.html#G4CrossSectionDataStore" title='G4CrossSectionDataStore' data-ref="G4CrossSectionDataStore">G4CrossSectionDataStore</a>::<dfn class="decl def" id="_ZN23G4CrossSectionDataStore15GetCrossSectionEPK17G4DynamicParticlePK10G4Materialb" title='G4CrossSectionDataStore::GetCrossSection' data-ref="_ZN23G4CrossSectionDataStore15GetCrossSectionEPK17G4DynamicParticlePK10G4Materialb">GetCrossSection</dfn>(<em>const</em> <a class="type" href="../../../../particles/management/include/G4DynamicParticle.hh.html#G4DynamicParticle" title='G4DynamicParticle' data-ref="G4DynamicParticle">G4DynamicParticle</a>* <dfn class="local col1 decl" id="1part" title='part' data-type='const G4DynamicParticle *' data-ref="1part">part</dfn>,</td></tr>
+<tr><th id="82">82</th><td>                                         <em>const</em> <a class="type" href="../../../../materials/include/G4Material.hh.html#G4Material" title='G4Material' data-ref="G4Material">G4Material</a>* <dfn class="local col2 decl" id="2mat" title='mat' data-type='const G4Material *' data-ref="2mat">mat</dfn> , <a class="typedef" href="../../../../global/management/include/G4Types.hh.html#G4bool" title='G4bool' data-type='bool' data-ref="G4bool">G4bool</a> <dfn class="local col3 decl" id="3requiresSlowPath" title='requiresSlowPath' data-type='G4bool' data-ref="3requiresSlowPath">requiresSlowPath</dfn>)</td></tr>
+<tr><th id="83">83</th><td>{</td></tr>
+<tr><th id="84">84</th><td>	<i>//The fast-path algorithm</i></td></tr>
+<tr><th id="85">85</th><td><i>	//   requiresSlowPath == true =&gt; Use slow path independently of other conditions</i></td></tr>
+<tr><th id="86">86</th><td><i>	//A. Dotti: modifications to this algorithm following the studies of P. Ruth and R. Fowler</i></td></tr>
+<tr><th id="87">87</th><td><i>	//          on speeding up the cross-sections calculations. Their algorithm is called in the</i></td></tr>
+<tr><th id="88">88</th><td><i>	// 	        following "fast-path" while the normal approach to calcualte cross-section is</i></td></tr>
+<tr><th id="89">89</th><td><i>	//          referred to as "slow-path".</i></td></tr>
+<tr><th id="90">90</th><td><i>	//Some details on the fast-path algorithm:</i></td></tr>
+<tr><th id="91">91</th><td><i>	//The idea is to use a cached approximation of the material cross-section.</i></td></tr>
+<tr><th id="92">92</th><td><i>	//Starting points:</i></td></tr>
+<tr><th id="93">93</th><td><i>	//1- We need the material cross-section for navigation purposes: e.g. to calculate the PIL.</i></td></tr>
+<tr><th id="94">94</th><td><i>	//2- If this interaction occurs at the end of a step we need to select the G4Element on which</i></td></tr>
+<tr><th id="95">95</th><td><i>	//   nucleus the interaction is actually happening. This is done calculating the element cross-section</i></td></tr>
+<tr><th id="96">96</th><td><i>	//   throwing a random number and selecting the appropriate nucleus (see SampleZandA function)</i></td></tr>
+<tr><th id="97">97</th><td><i>	//3- To calculate the material cross section needed for 1- we use the G4Element cross sections.</i></td></tr>
+<tr><th id="98">98</th><td><i>	//   Since the material cross-section is simply the weighted sum of the element cross-sections.</i></td></tr>
+<tr><th id="99">99</th><td><i>	//4- The slow path algorithm here accomplishes two use cases (not very good design IMHO): it</i></td></tr>
+<tr><th id="100">100</th><td><i>	//   calculates the material cross-section and it updates the xsecelem array that contains the</i></td></tr>
+<tr><th id="101">101</th><td><i>	//   relative cross-sections used by SampleZandA to select the element on which the interaction</i></td></tr>
+<tr><th id="102">102</th><td><i>	//   occurs.</i></td></tr>
+<tr><th id="103">103</th><td><i>	//The idea of the fast-path algorithm is to replace the request for 1- with a faster calculation</i></td></tr>
+<tr><th id="104">104</th><td><i>	//of the material cross-section from an approximation contained in cache.</i></td></tr>
+<tr><th id="105">105</th><td><i>	//There two complications to take into account:</i></td></tr>
+<tr><th id="106">106</th><td><i>	//A- If I use a fast parametrization for material cross-section, I still need to do the full</i></td></tr>
+<tr><th id="107">107</th><td><i>	//   calculations if an interaction occurs, because I need to calculate the element cross-sections.</i></td></tr>
+<tr><th id="108">108</th><td><i>	//   Since the function that updates xsecelem is the same (this one) I need to be sure that</i></td></tr>
+<tr><th id="109">109</th><td><i>	//   if I call this method for SampleAandZ the xsecelem is updated.</i></td></tr>
+<tr><th id="110">110</th><td><i>	//B- It exists the possibility to be even fast the the fast-path algorithm: this happens when</i></td></tr>
+<tr><th id="111">111</th><td><i>	//   to select the element of the interaction via SampleZandI I call again this method exactly</i></td></tr>
+<tr><th id="112">112</th><td><i>	//   with the same conditions as when I called this method to calculate the material cross-section.</i></td></tr>
+<tr><th id="113">113</th><td><i>	//   In such a case xsecelem is updated and we do not need to do much more. This happens when</i></td></tr>
+<tr><th id="114">114</th><td><i>	//   for example a neutron undergoes an interaction at the end of the step.</i></td></tr>
+<tr><th id="115">115</th><td><i>	//Dealing with B- complicates a bit the algorithm.</i></td></tr>
+<tr><th id="116">116</th><td><i>	//In summary:</i></td></tr>
+<tr><th id="117">117</th><td><i>	// If no fast-path algo is available (or user does not want that), go with the old plain algorithm</i></td></tr>
+<tr><th id="118">118</th><td><i>	// If a fast-path algo is avilable, use it whenever possible.</i></td></tr>
+<tr><th id="119">119</th><td><i>	//</i></td></tr>
+<tr><th id="120">120</th><td><i>	// In general we expect user to selectively decide for which processes, materials and particle combinations</i></td></tr>
+<tr><th id="121">121</th><td><i>	// we want to use the fast-path. If this is activated we also expect that the cross-section fast-path</i></td></tr>
+<tr><th id="122">122</th><td><i>	// cache is created during the run initialization via calls to this method.</i></td></tr>
+<tr><th id="123">123</th><td><i>	//</i></td></tr>
+<tr><th id="124">124</th><td><i>	//fastPathFlags contains control flags for the fast-path algorithm:</i></td></tr>
+<tr><th id="125">125</th><td><i>	// 	       .prevCalcUsedFastPath == true =&gt; Previous call to GetCrossSection used the fast-path</i></td></tr>
+<tr><th id="126">126</th><td><i>	//             it is used in the decision to assess if xsecelem is correctly set-up</i></td></tr>
+<tr><th id="127">127</th><td><i>	//	       .useFastPathIfAvailable == true =&gt; User requested the use of fast-path algorithm</i></td></tr>
+<tr><th id="128">128</th><td><i>	//	       .initializationPhase == true =&gt; If true we are in Geant4 Init phase before the event-loop</i></td></tr>
+<tr><th id="129">129</th><td><i></i></td></tr>
+<tr><th id="130">130</th><td><i>	//Check user-request, does he want fast-path? if not</i></td></tr>
+<tr><th id="131">131</th><td><i>	// OR</i></td></tr>
+<tr><th id="132">132</th><td><i>	// we want fast-path and we are in initialization phase?</i></td></tr>
+<tr><th id="133">133</th><td>	<b>if</b> ( !<a class="member" href="../include/G4CrossSectionDataStore.hh.html#G4CrossSectionDataStore::fastPathFlags" title='G4CrossSectionDataStore::fastPathFlags' data-ref="G4CrossSectionDataStore::fastPathFlags">fastPathFlags</a>.<a class="ref" href="../include/G4FastPathHadronicCrossSection.hh.html#G4FastPathHadronicCrossSection::controlFlag::useFastPathIfAvailable" title='G4FastPathHadronicCrossSection::controlFlag::useFastPathIfAvailable' data-ref="G4FastPathHadronicCrossSection::controlFlag::useFastPathIfAvailable">useFastPathIfAvailable</a></td></tr>
+<tr><th id="134">134</th><td>		||	(<a class="member" href="../include/G4CrossSectionDataStore.hh.html#G4CrossSectionDataStore::fastPathFlags" title='G4CrossSectionDataStore::fastPathFlags' data-ref="G4CrossSectionDataStore::fastPathFlags">fastPathFlags</a>.<a class="ref" href="../include/G4FastPathHadronicCrossSection.hh.html#G4FastPathHadronicCrossSection::controlFlag::useFastPathIfAvailable" title='G4FastPathHadronicCrossSection::controlFlag::useFastPathIfAvailable' data-ref="G4FastPathHadronicCrossSection::controlFlag::useFastPathIfAvailable">useFastPathIfAvailable</a>&amp;&amp;<a class="member" href="../include/G4CrossSectionDataStore.hh.html#G4CrossSectionDataStore::fastPathFlags" title='G4CrossSectionDataStore::fastPathFlags' data-ref="G4CrossSectionDataStore::fastPathFlags">fastPathFlags</a>.<a class="ref" href="../include/G4FastPathHadronicCrossSection.hh.html#G4FastPathHadronicCrossSection::controlFlag::initializationPhase" title='G4FastPathHadronicCrossSection::controlFlag::initializationPhase' data-ref="G4FastPathHadronicCrossSection::controlFlag::initializationPhase">initializationPhase</a>) ) {</td></tr>
+<tr><th id="135">135</th><td>		<i>//Traditional algorithm is requested</i></td></tr>
+<tr><th id="136">136</th><td>		<a class="local col3 ref" href="#3requiresSlowPath" title='requiresSlowPath' data-ref="3requiresSlowPath">requiresSlowPath</a>=<b>true</b>;</td></tr>
+<tr><th id="137">137</th><td>	}</td></tr>
+<tr><th id="138">138</th><td></td></tr>
+<tr><th id="139">139</th><td>	<i>//Logging for performance calculations and counter, active only in FPDEBUG mode</i></td></tr>
+<tr><th id="140">140</th><td>	<a class="member" href="../include/G4CrossSectionDataStore.hh.html#G4CrossSectionDataStore::counters" title='G4CrossSectionDataStore::counters' data-ref="G4CrossSectionDataStore::counters">counters</a>.<a class="ref" href="../include/G4FastPathHadronicCrossSection.hh.html#_ZN30G4FastPathHadronicCrossSection20getCrossSectionCount12MethodCalledEv" title='G4FastPathHadronicCrossSection::getCrossSectionCount::MethodCalled' data-ref="_ZN30G4FastPathHadronicCrossSection20getCrossSectionCount12MethodCalledEv">MethodCalled</a>();</td></tr>
+<tr><th id="141">141</th><td>	<i>//Measure number of cycles</i></td></tr>
+<tr><th id="142">142</th><td>	<span class="namespace">G4FastPathHadronicCrossSection::</span><a class="ref" href="../include/G4FastPathHadronicCrossSection.hh.html#_ZN30G4FastPathHadronicCrossSection19logStartCountCyclesERNS_6timingE" title='G4FastPathHadronicCrossSection::logStartCountCycles' data-ref="_ZN30G4FastPathHadronicCrossSection19logStartCountCyclesERNS_6timingE">logStartCountCycles</a>(<span class='refarg'><a class="member" href="../include/G4CrossSectionDataStore.hh.html#G4CrossSectionDataStore::timing" title='G4CrossSectionDataStore::timing' data-ref="G4CrossSectionDataStore::timing">timing</a></span>);</td></tr>
+<tr><th id="143">143</th><td></td></tr>
+<tr><th id="144">144</th><td>	<i>//This is the cache entry of the fast-path cross-section parametrization</i></td></tr>
+<tr><th id="145">145</th><td>	<span class="namespace">G4FastPathHadronicCrossSection::</span><a class="type" href="../include/G4FastPathHadronicCrossSection.hh.html#G4FastPathHadronicCrossSection::cycleCountEntry" title='G4FastPathHadronicCrossSection::cycleCountEntry' data-ref="G4FastPathHadronicCrossSection::cycleCountEntry">cycleCountEntry</a>* <dfn class="local col4 decl" id="4entry" title='entry' data-type='G4FastPathHadronicCrossSection::cycleCountEntry *' data-ref="4entry">entry</dfn> = <b>nullptr</b>;</td></tr>
+<tr><th id="146">146</th><td>	<i>//Did user request fast-path in first place and are we not in the initialization phase</i></td></tr>
+<tr><th id="147">147</th><td>	<b>if</b> ( <a class="member" href="../include/G4CrossSectionDataStore.hh.html#G4CrossSectionDataStore::fastPathFlags" title='G4CrossSectionDataStore::fastPathFlags' data-ref="G4CrossSectionDataStore::fastPathFlags">fastPathFlags</a>.<a class="ref" href="../include/G4FastPathHadronicCrossSection.hh.html#G4FastPathHadronicCrossSection::controlFlag::useFastPathIfAvailable" title='G4FastPathHadronicCrossSection::controlFlag::useFastPathIfAvailable' data-ref="G4FastPathHadronicCrossSection::controlFlag::useFastPathIfAvailable">useFastPathIfAvailable</a> &amp;&amp; !<a class="member" href="../include/G4CrossSectionDataStore.hh.html#G4CrossSectionDataStore::fastPathFlags" title='G4CrossSectionDataStore::fastPathFlags' data-ref="G4CrossSectionDataStore::fastPathFlags">fastPathFlags</a>.<a class="ref" href="../include/G4FastPathHadronicCrossSection.hh.html#G4FastPathHadronicCrossSection::controlFlag::initializationPhase" title='G4FastPathHadronicCrossSection::controlFlag::initializationPhase' data-ref="G4FastPathHadronicCrossSection::controlFlag::initializationPhase">initializationPhase</a> ) {</td></tr>
+<tr><th id="148">148</th><td>		<i>//Important: if it is in initialization phase we should NOT use fast path: we are going to build it</i></td></tr>
+<tr><th id="149">149</th><td><i>		//G4FastPathHadronicCrossSection::G4CrossSectionDataStore_Key searchkey = {part-&gt;GetParticleDefinition(),mat};</i></td></tr>
+<tr><th id="150">150</th><td>		entry = fastPathCache[{part-&gt;GetParticleDefinition(),mat}];</td></tr>
+<tr><th id="151">151</th><td>	}</td></tr>
+<tr><th id="152">152</th><td></td></tr>
+<tr><th id="153">153</th><td>  <i>//Super-fast-path: are we calling again this method for exactly the same conditions</i></td></tr>
+<tr><th id="154">154</th><td><i>  //of the triplet {particle,material,energy}?</i></td></tr>
+<tr><th id="155">155</th><td>  <b>if</b>(<a class="local col2 ref" href="#2mat" title='mat' data-ref="2mat">mat</a> == <a class="member" href="../include/G4CrossSectionDataStore.hh.html#G4CrossSectionDataStore::currentMaterial" title='G4CrossSectionDataStore::currentMaterial' data-ref="G4CrossSectionDataStore::currentMaterial">currentMaterial</a> &amp;&amp; <a class="local col1 ref" href="#1part" title='part' data-ref="1part">part</a>-&gt;<a class="ref" href="../../../../particles/management/include/G4DynamicParticle.hh.html#_ZNK17G4DynamicParticle13GetDefinitionEv" title='G4DynamicParticle::GetDefinition' data-ref="_ZNK17G4DynamicParticle13GetDefinitionEv">GetDefinition</a>() == <a class="member" href="../include/G4CrossSectionDataStore.hh.html#G4CrossSectionDataStore::matParticle" title='G4CrossSectionDataStore::matParticle' data-ref="G4CrossSectionDataStore::matParticle">matParticle</a></td></tr>
+<tr><th id="156">156</th><td>     &amp;&amp; <a class="local col1 ref" href="#1part" title='part' data-ref="1part">part</a>-&gt;<a class="ref" href="../../../../particles/management/include/G4DynamicParticle.hh.html#_ZNK17G4DynamicParticle16GetKineticEnergyEv" title='G4DynamicParticle::GetKineticEnergy' data-ref="_ZNK17G4DynamicParticle16GetKineticEnergyEv">GetKineticEnergy</a>() == <a class="member" href="../include/G4CrossSectionDataStore.hh.html#G4CrossSectionDataStore::matKinEnergy" title='G4CrossSectionDataStore::matKinEnergy' data-ref="G4CrossSectionDataStore::matKinEnergy">matKinEnergy</a>) </td></tr>
+<tr><th id="157">157</th><td>    {</td></tr>
+<tr><th id="158">158</th><td>	  <span class="namespace">G4FastPathHadronicCrossSection::</span><a class="ref" href="../include/G4FastPathHadronicCrossSection.hh.html#_ZN30G4FastPathHadronicCrossSectionL25logInvocationTriedOneLineEPNS_15cycleCountEntryE" title='G4FastPathHadronicCrossSection::logInvocationTriedOneLine' data-ref="_ZN30G4FastPathHadronicCrossSectionL25logInvocationTriedOneLineEPNS_15cycleCountEntryE">logInvocationTriedOneLine</a>(<a class="local col4 ref" href="#4entry" title='entry' data-ref="4entry">entry</a>);</td></tr>
+<tr><th id="159">159</th><td>	  <i>//If there is no user-request for the fast-path in first place?</i></td></tr>
+<tr><th id="160">160</th><td><i>	  //It means we built the xsecelem for sure, let's return immediately</i></td></tr>
+<tr><th id="161">161</th><td>	  <b>if</b> ( !<a class="member" href="../include/G4CrossSectionDataStore.hh.html#G4CrossSectionDataStore::fastPathFlags" title='G4CrossSectionDataStore::fastPathFlags' data-ref="G4CrossSectionDataStore::fastPathFlags">fastPathFlags</a>.<a class="ref" href="../include/G4FastPathHadronicCrossSection.hh.html#G4FastPathHadronicCrossSection::controlFlag::useFastPathIfAvailable" title='G4FastPathHadronicCrossSection::controlFlag::useFastPathIfAvailable' data-ref="G4FastPathHadronicCrossSection::controlFlag::useFastPathIfAvailable">useFastPathIfAvailable</a> ) {</td></tr>
+<tr><th id="162">162</th><td>		  <b>return</b> <a class="member" href="../include/G4CrossSectionDataStore.hh.html#G4CrossSectionDataStore::matCrossSection" title='G4CrossSectionDataStore::matCrossSection' data-ref="G4CrossSectionDataStore::matCrossSection">matCrossSection</a>;</td></tr>
+<tr><th id="163">163</th><td>	  } <b>else</b> {</td></tr>
+<tr><th id="164">164</th><td>		  <i>//Check that the last time we called this method we used the slow</i></td></tr>
+<tr><th id="165">165</th><td><i>		  //path: we need the data-member xsecelem to be setup correctly for the current</i></td></tr>
+<tr><th id="166">166</th><td><i>		  //interaction. This is ensured only if: we will do the slow path right now or we</i></td></tr>
+<tr><th id="167">167</th><td><i>		  //did it exactly for the same conditions of the last call.</i></td></tr>
+<tr><th id="168">168</th><td>		  <b>if</b> ( !<a class="member" href="../include/G4CrossSectionDataStore.hh.html#G4CrossSectionDataStore::fastPathFlags" title='G4CrossSectionDataStore::fastPathFlags' data-ref="G4CrossSectionDataStore::fastPathFlags">fastPathFlags</a>.<a class="ref" href="../include/G4FastPathHadronicCrossSection.hh.html#G4FastPathHadronicCrossSection::controlFlag::prevCalcUsedFastPath" title='G4FastPathHadronicCrossSection::controlFlag::prevCalcUsedFastPath' data-ref="G4FastPathHadronicCrossSection::controlFlag::prevCalcUsedFastPath">prevCalcUsedFastPath</a> &amp;&amp; ! <a class="local col3 ref" href="#3requiresSlowPath" title='requiresSlowPath' data-ref="3requiresSlowPath">requiresSlowPath</a> ) {</td></tr>
+<tr><th id="169">169</th><td>			  <a class="member" href="../include/G4CrossSectionDataStore.hh.html#G4CrossSectionDataStore::counters" title='G4CrossSectionDataStore::counters' data-ref="G4CrossSectionDataStore::counters">counters</a>.<a class="ref" href="../include/G4FastPathHadronicCrossSection.hh.html#_ZN30G4FastPathHadronicCrossSection20getCrossSectionCount10HitOneLineEv" title='G4FastPathHadronicCrossSection::getCrossSectionCount::HitOneLine' data-ref="_ZN30G4FastPathHadronicCrossSection20getCrossSectionCount10HitOneLineEv">HitOneLine</a>();</td></tr>
+<tr><th id="170">170</th><td>			  <span class="namespace">G4FastPathHadronicCrossSection::</span><a class="ref" href="../include/G4FastPathHadronicCrossSection.hh.html#_ZN30G4FastPathHadronicCrossSectionL20logInvocationOneLineEPNS_15cycleCountEntryE" title='G4FastPathHadronicCrossSection::logInvocationOneLine' data-ref="_ZN30G4FastPathHadronicCrossSectionL20logInvocationOneLineEPNS_15cycleCountEntryE">logInvocationOneLine</a>(<a class="local col4 ref" href="#4entry" title='entry' data-ref="4entry">entry</a>);</td></tr>
+<tr><th id="171">171</th><td>			  <i>//Good everything is setup correctly, exit!</i></td></tr>
+<tr><th id="172">172</th><td>			  <b>return</b> <a class="member" href="../include/G4CrossSectionDataStore.hh.html#G4CrossSectionDataStore::matCrossSection" title='G4CrossSectionDataStore::matCrossSection' data-ref="G4CrossSectionDataStore::matCrossSection">matCrossSection</a>;</td></tr>
+<tr><th id="173">173</th><td>		  } <b>else</b> {</td></tr>
+<tr><th id="174">174</th><td>			  <i>//We need to follow the slow-path because</i></td></tr>
+<tr><th id="175">175</th><td><i>			  //xsecelem is not calculated correctly</i></td></tr>
+<tr><th id="176">176</th><td>			  <a class="local col3 ref" href="#3requiresSlowPath" title='requiresSlowPath' data-ref="3requiresSlowPath">requiresSlowPath</a> = <b>true</b>;</td></tr>
+<tr><th id="177">177</th><td>		  }</td></tr>
+<tr><th id="178">178</th><td>	  }</td></tr>
+<tr><th id="179">179</th><td>    }</td></tr>
+<tr><th id="180">180</th><td>  </td></tr>
+<tr><th id="181">181</th><td>  <i>//Ok, now check if we have cached for this {particle,material,energy} the cross-section</i></td></tr>
+<tr><th id="182">182</th><td><i>  //in this case let's return immediately, if we are not forced to take the slow path</i></td></tr>
+<tr><th id="183">183</th><td><i>  //(e.g. as before if the xsecelem is not up-to-date we need to take the slow-path).</i></td></tr>
+<tr><th id="184">184</th><td><i>  //Note that this is not equivalent to the previous ultra-fast check: we now have a map here</i></td></tr>
+<tr><th id="185">185</th><td><i>  //So we can have for example a different particle.</i></td></tr>
+<tr><th id="186">186</th><td>  <b>if</b> ( <a class="local col4 ref" href="#4entry" title='entry' data-ref="4entry">entry</a> != <b>nullptr</b> &amp;&amp; <a class="local col4 ref" href="#4entry" title='entry' data-ref="4entry">entry</a>-&gt;<a class="ref" href="../include/G4FastPathHadronicCrossSection.hh.html#G4FastPathHadronicCrossSection::cycleCountEntry::energy" title='G4FastPathHadronicCrossSection::cycleCountEntry::energy' data-ref="G4FastPathHadronicCrossSection::cycleCountEntry::energy">energy</a> == <a class="local col1 ref" href="#1part" title='part' data-ref="1part">part</a>-&gt;<a class="ref" href="../../../../particles/management/include/G4DynamicParticle.hh.html#_ZNK17G4DynamicParticle16GetKineticEnergyEv" title='G4DynamicParticle::GetKineticEnergy' data-ref="_ZNK17G4DynamicParticle16GetKineticEnergyEv">GetKineticEnergy</a>() ) {</td></tr>
+<tr><th id="187">187</th><td>	  <span class="namespace">G4FastPathHadronicCrossSection::</span><a class="ref" href="../include/G4FastPathHadronicCrossSection.hh.html#_ZN30G4FastPathHadronicCrossSectionL6logHitEPNS_15cycleCountEntryE" title='G4FastPathHadronicCrossSection::logHit' data-ref="_ZN30G4FastPathHadronicCrossSectionL6logHitEPNS_15cycleCountEntryE">logHit</a>(<a class="local col4 ref" href="#4entry" title='entry' data-ref="4entry">entry</a>);</td></tr>
+<tr><th id="188">188</th><td>	  <b>if</b> ( !<a class="local col3 ref" href="#3requiresSlowPath" title='requiresSlowPath' data-ref="3requiresSlowPath">requiresSlowPath</a> ) {</td></tr>
+<tr><th id="189">189</th><td>		  <b>return</b> <a class="local col4 ref" href="#4entry" title='entry' data-ref="4entry">entry</a>-&gt;<a class="ref" href="../include/G4FastPathHadronicCrossSection.hh.html#G4FastPathHadronicCrossSection::cycleCountEntry::crossSection" title='G4FastPathHadronicCrossSection::cycleCountEntry::crossSection' data-ref="G4FastPathHadronicCrossSection::cycleCountEntry::crossSection">crossSection</a>;</td></tr>
+<tr><th id="190">190</th><td>	  }</td></tr>
+<tr><th id="191">191</th><td>  }</td></tr>
+<tr><th id="192">192</th><td></td></tr>
+<tr><th id="193">193</th><td>  <a class="member" href="../include/G4CrossSectionDataStore.hh.html#G4CrossSectionDataStore::currentMaterial" title='G4CrossSectionDataStore::currentMaterial' data-ref="G4CrossSectionDataStore::currentMaterial">currentMaterial</a> = <a class="local col2 ref" href="#2mat" title='mat' data-ref="2mat">mat</a>;</td></tr>
+<tr><th id="194">194</th><td>  <a class="member" href="../include/G4CrossSectionDataStore.hh.html#G4CrossSectionDataStore::matParticle" title='G4CrossSectionDataStore::matParticle' data-ref="G4CrossSectionDataStore::matParticle">matParticle</a> = <a class="local col1 ref" href="#1part" title='part' data-ref="1part">part</a>-&gt;<a class="ref" href="../../../../particles/management/include/G4DynamicParticle.hh.html#_ZNK17G4DynamicParticle13GetDefinitionEv" title='G4DynamicParticle::GetDefinition' data-ref="_ZNK17G4DynamicParticle13GetDefinitionEv">GetDefinition</a>();</td></tr>
+<tr><th id="195">195</th><td>  <a class="member" href="../include/G4CrossSectionDataStore.hh.html#G4CrossSectionDataStore::matKinEnergy" title='G4CrossSectionDataStore::matKinEnergy' data-ref="G4CrossSectionDataStore::matKinEnergy">matKinEnergy</a> = <a class="local col1 ref" href="#1part" title='part' data-ref="1part">part</a>-&gt;<a class="ref" href="../../../../particles/management/include/G4DynamicParticle.hh.html#_ZNK17G4DynamicParticle16GetKineticEnergyEv" title='G4DynamicParticle::GetKineticEnergy' data-ref="_ZNK17G4DynamicParticle16GetKineticEnergyEv">GetKineticEnergy</a>();</td></tr>
+<tr><th id="196">196</th><td>  <a class="member" href="../include/G4CrossSectionDataStore.hh.html#G4CrossSectionDataStore::matCrossSection" title='G4CrossSectionDataStore::matCrossSection' data-ref="G4CrossSectionDataStore::matCrossSection">matCrossSection</a> = <var>0</var>;</td></tr>
+<tr><th id="197">197</th><td></td></tr>
+<tr><th id="198">198</th><td>  <i>//Now check if the cache entry has a fast-path cross-section calculation available</i></td></tr>
+<tr><th id="199">199</th><td>  <span class="namespace">G4FastPathHadronicCrossSection::</span><a class="type" href="../include/G4FastPathHadronicCrossSection.hh.html#G4FastPathHadronicCrossSection::fastPathEntry" title='G4FastPathHadronicCrossSection::fastPathEntry' data-ref="G4FastPathHadronicCrossSection::fastPathEntry">fastPathEntry</a>* <dfn class="local col5 decl" id="5fast_entry" title='fast_entry' data-type='G4FastPathHadronicCrossSection::fastPathEntry *' data-ref="5fast_entry">fast_entry</dfn> = <b>nullptr</b>;</td></tr>
+<tr><th id="200">200</th><td>  <b>if</b> ( <a class="local col4 ref" href="#4entry" title='entry' data-ref="4entry">entry</a> != <b>nullptr</b> &amp;&amp; ! <a class="local col3 ref" href="#3requiresSlowPath" title='requiresSlowPath' data-ref="3requiresSlowPath">requiresSlowPath</a> ) {</td></tr>
+<tr><th id="201">201</th><td>	  <a class="local col5 ref" href="#5fast_entry" title='fast_entry' data-ref="5fast_entry">fast_entry</a> = <a class="local col4 ref" href="#4entry" title='entry' data-ref="4entry">entry</a>-&gt;<a class="ref" href="../include/G4FastPathHadronicCrossSection.hh.html#G4FastPathHadronicCrossSection::cycleCountEntry::fastPath" title='G4FastPathHadronicCrossSection::cycleCountEntry::fastPath' data-ref="G4FastPathHadronicCrossSection::cycleCountEntry::fastPath">fastPath</a>;</td></tr>
+<tr><th id="202">202</th><td>	  <span class='error' title="use of undeclared identifier &apos;assert&apos;">assert</span>(fast_entry!=<b>nullptr</b> &amp;&amp; !fastPathFlags.initializationPhase);</td></tr>
+<tr><th id="203">203</th><td>  }</td></tr>
+<tr><th id="204">204</th><td></td></tr>
+<tr><th id="205">205</th><td>  <i>//Each fast-path cross-section has a minimum value of validity, if energy is below</i></td></tr>
+<tr><th id="206">206</th><td><i>  //that skip fast-path algorithm</i></td></tr>
+<tr><th id="207">207</th><td>  <b>if</b> ( <a class="local col5 ref" href="#5fast_entry" title='fast_entry' data-ref="5fast_entry">fast_entry</a> != <b>nullptr</b> &amp;&amp; <a class="local col1 ref" href="#1part" title='part' data-ref="1part">part</a>-&gt;<a class="ref" href="../../../../particles/management/include/G4DynamicParticle.hh.html#_ZNK17G4DynamicParticle16GetKineticEnergyEv" title='G4DynamicParticle::GetKineticEnergy' data-ref="_ZNK17G4DynamicParticle16GetKineticEnergyEv">GetKineticEnergy</a>() &lt; <a class="local col5 ref" href="#5fast_entry" title='fast_entry' data-ref="5fast_entry">fast_entry</a>-&gt;<a class="ref" href="../include/G4FastPathHadronicCrossSection.hh.html#G4FastPathHadronicCrossSection::fastPathEntry::min_cutoff" title='G4FastPathHadronicCrossSection::fastPathEntry::min_cutoff' data-ref="G4FastPathHadronicCrossSection::fastPathEntry::min_cutoff">min_cutoff</a> )</td></tr>
+<tr><th id="208">208</th><td>  {</td></tr>
+<tr><th id="209">209</th><td>	  <span class='error' title="use of undeclared identifier &apos;assert&apos;">assert</span>(requiresSlowPath==<b>false</b>);</td></tr>
+<tr><th id="210">210</th><td>	  <a class="local col3 ref" href="#3requiresSlowPath" title='requiresSlowPath' data-ref="3requiresSlowPath">requiresSlowPath</a> = <b>true</b>;</td></tr>
+<tr><th id="211">211</th><td>  }</td></tr>
+<tr><th id="212">212</th><td></td></tr>
+<tr><th id="213">213</th><td>  <i>//Ready to use the fast-path calculation</i></td></tr>
+<tr><th id="214">214</th><td>  <b>if</b> ( !<a class="local col3 ref" href="#3requiresSlowPath" title='requiresSlowPath' data-ref="3requiresSlowPath">requiresSlowPath</a> &amp;&amp; <a class="local col5 ref" href="#5fast_entry" title='fast_entry' data-ref="5fast_entry">fast_entry</a> != <b>nullptr</b> ) {</td></tr>
+<tr><th id="215">215</th><td>	  <a class="member" href="../include/G4CrossSectionDataStore.hh.html#G4CrossSectionDataStore::counters" title='G4CrossSectionDataStore::counters' data-ref="G4CrossSectionDataStore::counters">counters</a>.<a class="ref" href="../include/G4FastPathHadronicCrossSection.hh.html#_ZN30G4FastPathHadronicCrossSection20getCrossSectionCount8FastPathEv" title='G4FastPathHadronicCrossSection::getCrossSectionCount::FastPath' data-ref="_ZN30G4FastPathHadronicCrossSection20getCrossSectionCount8FastPathEv">FastPath</a>();</td></tr>
+<tr><th id="216">216</th><td>	  <i>//Retrieve cross-section from fast-path cache</i></td></tr>
+<tr><th id="217">217</th><td>	  <a class="member" href="../include/G4CrossSectionDataStore.hh.html#G4CrossSectionDataStore::matCrossSection" title='G4CrossSectionDataStore::matCrossSection' data-ref="G4CrossSectionDataStore::matCrossSection">matCrossSection</a> = <a class="local col5 ref" href="#5fast_entry" title='fast_entry' data-ref="5fast_entry">fast_entry</a>-&gt;<a class="ref" href="../include/G4FastPathHadronicCrossSection.hh.html#_ZNK30G4FastPathHadronicCrossSection13fastPathEntry15GetCrossSectionEd" title='G4FastPathHadronicCrossSection::fastPathEntry::GetCrossSection' data-ref="_ZNK30G4FastPathHadronicCrossSection13fastPathEntry15GetCrossSectionEd">GetCrossSection</a>(<a class="local col1 ref" href="#1part" title='part' data-ref="1part">part</a>-&gt;<a class="ref" href="../../../../particles/management/include/G4DynamicParticle.hh.html#_ZNK17G4DynamicParticle16GetKineticEnergyEv" title='G4DynamicParticle::GetKineticEnergy' data-ref="_ZNK17G4DynamicParticle16GetKineticEnergyEv">GetKineticEnergy</a>());</td></tr>
+<tr><th id="218">218</th><td>	  <a class="member" href="../include/G4CrossSectionDataStore.hh.html#G4CrossSectionDataStore::fastPathFlags" title='G4CrossSectionDataStore::fastPathFlags' data-ref="G4CrossSectionDataStore::fastPathFlags">fastPathFlags</a>.<a class="ref" href="../include/G4FastPathHadronicCrossSection.hh.html#G4FastPathHadronicCrossSection::controlFlag::prevCalcUsedFastPath" title='G4FastPathHadronicCrossSection::controlFlag::prevCalcUsedFastPath' data-ref="G4FastPathHadronicCrossSection::controlFlag::prevCalcUsedFastPath">prevCalcUsedFastPath</a>=<b>true</b>;</td></tr>
+<tr><th id="219">219</th><td>  } <b>else</b> {</td></tr>
+<tr><th id="220">220</th><td>	  <a class="member" href="../include/G4CrossSectionDataStore.hh.html#G4CrossSectionDataStore::counters" title='G4CrossSectionDataStore::counters' data-ref="G4CrossSectionDataStore::counters">counters</a>.<a class="ref" href="../include/G4FastPathHadronicCrossSection.hh.html#_ZN30G4FastPathHadronicCrossSection20getCrossSectionCount8SlowPathEv" title='G4FastPathHadronicCrossSection::getCrossSectionCount::SlowPath' data-ref="_ZN30G4FastPathHadronicCrossSection20getCrossSectionCount8SlowPathEv">SlowPath</a>();</td></tr>
+<tr><th id="221">221</th><td>	  <i>//Remember that we are now doing the full calculation: xsecelem will</i></td></tr>
+<tr><th id="222">222</th><td><i>	  //be made valid</i></td></tr>
+<tr><th id="223">223</th><td>	  <a class="member" href="../include/G4CrossSectionDataStore.hh.html#G4CrossSectionDataStore::fastPathFlags" title='G4CrossSectionDataStore::fastPathFlags' data-ref="G4CrossSectionDataStore::fastPathFlags">fastPathFlags</a>.<a class="ref" href="../include/G4FastPathHadronicCrossSection.hh.html#G4FastPathHadronicCrossSection::controlFlag::prevCalcUsedFastPath" title='G4FastPathHadronicCrossSection::controlFlag::prevCalcUsedFastPath' data-ref="G4FastPathHadronicCrossSection::controlFlag::prevCalcUsedFastPath">prevCalcUsedFastPath</a>=<b>false</b>;</td></tr>
+<tr><th id="224">224</th><td></td></tr>
+<tr><th id="225">225</th><td>	  <a class="typedef" href="../../../../global/management/include/G4Types.hh.html#G4int" title='G4int' data-type='int' data-ref="G4int">G4int</a> <dfn class="local col6 decl" id="6nElements" title='nElements' data-type='G4int' data-ref="6nElements">nElements</dfn> = mat-&gt;GetNumberOfElements();</td></tr>
+<tr><th id="226">226</th><td>	  <em>const</em> <a class="typedef" href="../../../../global/management/include/G4Types.hh.html#G4double" title='G4double' data-type='double' data-ref="G4double">G4double</a>* <dfn class="local col7 decl" id="7nAtomsPerVolume" title='nAtomsPerVolume' data-type='const G4double *' data-ref="7nAtomsPerVolume">nAtomsPerVolume</dfn> = <a class="local col2 ref" href="#2mat" title='mat' data-ref="2mat">mat</a>-&gt;<a class="ref" href="../../../../materials/include/G4Material.hh.html#_ZNK10G4Material24GetVecNbOfAtomsPerVolumeEv" title='G4Material::GetVecNbOfAtomsPerVolume' data-ref="_ZNK10G4Material24GetVecNbOfAtomsPerVolumeEv">GetVecNbOfAtomsPerVolume</a>();</td></tr>
+<tr><th id="227">227</th><td></td></tr>
+<tr><th id="228">228</th><td>	  <b>if</b>(G4int(<span class='error' title="use of undeclared identifier &apos;xsecelm&apos;">xsecelm</span>.size()) &lt; nElements) { <span class='error' title="use of undeclared identifier &apos;xsecelm&apos;">xsecelm</span>.resize(nElements); }</td></tr>
+<tr><th id="229">229</th><td></td></tr>
+<tr><th id="230">230</th><td>	  <b>for</b>(<a class="typedef" href="../../../../global/management/include/G4Types.hh.html#G4int" title='G4int' data-type='int' data-ref="G4int">G4int</a> <dfn class="local col8 decl" id="8i" title='i' data-type='G4int' data-ref="8i">i</dfn>=<var>0</var>; <a class="local col8 ref" href="#8i" title='i' data-ref="8i">i</a>&lt;<a class="local col6 ref" href="#6nElements" title='nElements' data-ref="6nElements">nElements</a>; ++<a class="local col8 ref" href="#8i" title='i' data-ref="8i">i</a>) {</td></tr>
+<tr><th id="231">231</th><td>		  matCrossSection += nAtomsPerVolume[i] *</td></tr>
+<tr><th id="232">232</th><td>				  GetCrossSection(part, (*mat-&gt;GetElementVector())[i], mat);</td></tr>
+<tr><th id="233">233</th><td>		  <span class='error' title="use of undeclared identifier &apos;xsecelm&apos;">xsecelm</span>[i] = matCrossSection;</td></tr>
+<tr><th id="234">234</th><td>	  }</td></tr>
+<tr><th id="235">235</th><td>  }</td></tr>
+<tr><th id="236">236</th><td>  <i>//Stop measurement of cpu cycles</i></td></tr>
+<tr><th id="237">237</th><td>  <span class="namespace">G4FastPathHadronicCrossSection::</span><a class="ref" href="../include/G4FastPathHadronicCrossSection.hh.html#_ZN30G4FastPathHadronicCrossSection18logStopCountCyclesERNS_6timingE" title='G4FastPathHadronicCrossSection::logStopCountCycles' data-ref="_ZN30G4FastPathHadronicCrossSection18logStopCountCyclesERNS_6timingE">logStopCountCycles</a>(<span class='refarg'><a class="member" href="../include/G4CrossSectionDataStore.hh.html#G4CrossSectionDataStore::timing" title='G4CrossSectionDataStore::timing' data-ref="G4CrossSectionDataStore::timing">timing</a></span>);</td></tr>
+<tr><th id="238">238</th><td></td></tr>
+<tr><th id="239">239</th><td>  <b>if</b> ( <a class="local col4 ref" href="#4entry" title='entry' data-ref="4entry">entry</a> != <b>nullptr</b> ) {</td></tr>
+<tr><th id="240">240</th><td>	  <a class="local col4 ref" href="#4entry" title='entry' data-ref="4entry">entry</a>-&gt;<a class="ref" href="../include/G4FastPathHadronicCrossSection.hh.html#G4FastPathHadronicCrossSection::cycleCountEntry::energy" title='G4FastPathHadronicCrossSection::cycleCountEntry::energy' data-ref="G4FastPathHadronicCrossSection::cycleCountEntry::energy">energy</a> = <a class="local col1 ref" href="#1part" title='part' data-ref="1part">part</a>-&gt;<a class="ref" href="../../../../particles/management/include/G4DynamicParticle.hh.html#_ZNK17G4DynamicParticle16GetKineticEnergyEv" title='G4DynamicParticle::GetKineticEnergy' data-ref="_ZNK17G4DynamicParticle16GetKineticEnergyEv">GetKineticEnergy</a>();</td></tr>
+<tr><th id="241">241</th><td>	  <a class="local col4 ref" href="#4entry" title='entry' data-ref="4entry">entry</a>-&gt;<a class="ref" href="../include/G4FastPathHadronicCrossSection.hh.html#G4FastPathHadronicCrossSection::cycleCountEntry::crossSection" title='G4FastPathHadronicCrossSection::cycleCountEntry::crossSection' data-ref="G4FastPathHadronicCrossSection::cycleCountEntry::crossSection">crossSection</a> = <a class="member" href="../include/G4CrossSectionDataStore.hh.html#G4CrossSectionDataStore::matCrossSection" title='G4CrossSectionDataStore::matCrossSection' data-ref="G4CrossSectionDataStore::matCrossSection">matCrossSection</a>;</td></tr>
+<tr><th id="242">242</th><td>  }</td></tr>
+<tr><th id="243">243</th><td>  <i>//Some logging of timing</i></td></tr>
+<tr><th id="244">244</th><td>  <span class="namespace">G4FastPathHadronicCrossSection::</span><a class="ref" href="../include/G4FastPathHadronicCrossSection.hh.html#_ZN30G4FastPathHadronicCrossSectionL9logTimingEPNS_15cycleCountEntryEPNS_13fastPathEntryERNS_6timingE" title='G4FastPathHadronicCrossSection::logTiming' data-ref="_ZN30G4FastPathHadronicCrossSectionL9logTimingEPNS_15cycleCountEntryEPNS_13fastPathEntryERNS_6timingE">logTiming</a>(<a class="local col4 ref" href="#4entry" title='entry' data-ref="4entry">entry</a>,<a class="local col5 ref" href="#5fast_entry" title='fast_entry' data-ref="5fast_entry">fast_entry</a>,<span class='refarg'><a class="member" href="../include/G4CrossSectionDataStore.hh.html#G4CrossSectionDataStore::timing" title='G4CrossSectionDataStore::timing' data-ref="G4CrossSectionDataStore::timing">timing</a></span>);</td></tr>
+<tr><th id="245">245</th><td>  <b>return</b> <a class="member" href="../include/G4CrossSectionDataStore.hh.html#G4CrossSectionDataStore::matCrossSection" title='G4CrossSectionDataStore::matCrossSection' data-ref="G4CrossSectionDataStore::matCrossSection">matCrossSection</a>;</td></tr>
+<tr><th id="246">246</th><td>}</td></tr>
+<tr><th id="247">247</th><td></td></tr>
+<tr><th id="248">248</th><td><i>//....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo.....</i></td></tr>
+<tr><th id="249">249</th><td></td></tr>
+<tr><th id="250">250</th><td><em>void</em></td></tr>
+<tr><th id="251">251</th><td>G4CrossSectionDataStore::DumpFastPath(<em>const</em> G4ParticleDefinition* pd, <em>const</em> G4Material* mat,<span class='error' title="use of undeclared identifier &apos;std&apos;">std</span>::ostream&amp; os)</td></tr>
+<tr><th id="252">252</th><td>{</td></tr>
+<tr><th id="253">253</th><td>	<em>const</em> G4FastPathHadronicCrossSection::cycleCountEntry* entry = fastPathCache[{pd,mat}];</td></tr>
+<tr><th id="254">254</th><td>	<b>if</b> ( entry != <b>nullptr</b> ) {</td></tr>
+<tr><th id="255">255</th><td>		<b>if</b> ( entry-&gt;fastPath != <b>nullptr</b> ) {</td></tr>
+<tr><th id="256">256</th><td>			os&lt;&lt;*entry-&gt;fastPath;</td></tr>
+<tr><th id="257">257</th><td>		} <b>else</b> {</td></tr>
+<tr><th id="258">258</th><td>			os&lt;&lt;<q>"#Cache entry for {"</q>&lt;&lt;(pd!=<b>nullptr</b>?pd-&gt;GetParticleName():<q>"UNDEFINED"</q>)&lt;&lt;<q>","</q>;</td></tr>
+<tr><th id="259">259</th><td>			os&lt;&lt;(mat!=<b>nullptr</b>?mat-&gt;GetName():<q>"UNDEFINED"</q>)&lt;&lt;<q>"} found, but no fast path defined"</q>;</td></tr>
+<tr><th id="260">260</th><td>		}</td></tr>
+<tr><th id="261">261</th><td>	} <b>else</b> {</td></tr>
+<tr><th id="262">262</th><td>		os&lt;&lt;<q>"#Cache entry for {"</q>&lt;&lt;(pd!=<b>nullptr</b>?pd-&gt;GetParticleName():<q>"UNDEFINED"</q>)&lt;&lt;<q>","</q>;</td></tr>
+<tr><th id="263">263</th><td>		os&lt;&lt;(mat!=<b>nullptr</b>?mat-&gt;GetName():<q>"UNDEFINED"</q>)&lt;&lt;<q>"} not found."</q>;</td></tr>
+<tr><th id="264">264</th><td>	}</td></tr>
+<tr><th id="265">265</th><td>}</td></tr>
+<tr><th id="266">266</th><td></td></tr>
+<tr><th id="267">267</th><td><i>//....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo.....</i></td></tr>
+<tr><th id="268">268</th><td></td></tr>
+<tr><th id="269">269</th><td><a class="typedef" href="../../../../global/management/include/G4Types.hh.html#G4double" title='G4double' data-type='double' data-ref="G4double">G4double</a> </td></tr>
+<tr><th id="270">270</th><td><a class="type" href="../include/G4CrossSectionDataStore.hh.html#G4CrossSectionDataStore" title='G4CrossSectionDataStore' data-ref="G4CrossSectionDataStore">G4CrossSectionDataStore</a>::<dfn class="decl def" id="_ZN23G4CrossSectionDataStore19ComputeCrossSectionEPK17G4DynamicParticlePK10G4Material" title='G4CrossSectionDataStore::ComputeCrossSection' data-ref="_ZN23G4CrossSectionDataStore19ComputeCrossSectionEPK17G4DynamicParticlePK10G4Material">ComputeCrossSection</dfn>(<em>const</em> <a class="type" href="../../../../particles/management/include/G4DynamicParticle.hh.html#G4DynamicParticle" title='G4DynamicParticle' data-ref="G4DynamicParticle">G4DynamicParticle</a>* <dfn class="local col9 decl" id="9part" title='part' data-type='const G4DynamicParticle *' data-ref="9part">part</dfn>,</td></tr>
+<tr><th id="271">271</th><td>					     <em>const</em> <a class="type" href="../../../../materials/include/G4Material.hh.html#G4Material" title='G4Material' data-ref="G4Material">G4Material</a>* <dfn class="local col0 decl" id="10mat" title='mat' data-type='const G4Material *' data-ref="10mat">mat</dfn>)</td></tr>
+<tr><th id="272">272</th><td>{</td></tr>
+<tr><th id="273">273</th><td>  <b>if</b>(<a class="local col0 ref" href="#10mat" title='mat' data-ref="10mat">mat</a> == <a class="member" href="../include/G4CrossSectionDataStore.hh.html#G4CrossSectionDataStore::currentMaterial" title='G4CrossSectionDataStore::currentMaterial' data-ref="G4CrossSectionDataStore::currentMaterial">currentMaterial</a> &amp;&amp; <a class="local col9 ref" href="#9part" title='part' data-ref="9part">part</a>-&gt;<a class="ref" href="../../../../particles/management/include/G4DynamicParticle.hh.html#_ZNK17G4DynamicParticle13GetDefinitionEv" title='G4DynamicParticle::GetDefinition' data-ref="_ZNK17G4DynamicParticle13GetDefinitionEv">GetDefinition</a>() == <a class="member" href="../include/G4CrossSectionDataStore.hh.html#G4CrossSectionDataStore::matParticle" title='G4CrossSectionDataStore::matParticle' data-ref="G4CrossSectionDataStore::matParticle">matParticle</a></td></tr>
+<tr><th id="274">274</th><td>     &amp;&amp; <a class="local col9 ref" href="#9part" title='part' data-ref="9part">part</a>-&gt;<a class="ref" href="../../../../particles/management/include/G4DynamicParticle.hh.html#_ZNK17G4DynamicParticle16GetKineticEnergyEv" title='G4DynamicParticle::GetKineticEnergy' data-ref="_ZNK17G4DynamicParticle16GetKineticEnergyEv">GetKineticEnergy</a>() == <a class="member" href="../include/G4CrossSectionDataStore.hh.html#G4CrossSectionDataStore::matKinEnergy" title='G4CrossSectionDataStore::matKinEnergy' data-ref="G4CrossSectionDataStore::matKinEnergy">matKinEnergy</a>) {</td></tr>
+<tr><th id="275">275</th><td>    <b>return</b> <a class="member" href="../include/G4CrossSectionDataStore.hh.html#G4CrossSectionDataStore::matCrossSection" title='G4CrossSectionDataStore::matCrossSection' data-ref="G4CrossSectionDataStore::matCrossSection">matCrossSection</a>;</td></tr>
+<tr><th id="276">276</th><td>  }</td></tr>
+<tr><th id="277">277</th><td>  <a class="member" href="../include/G4CrossSectionDataStore.hh.html#G4CrossSectionDataStore::currentMaterial" title='G4CrossSectionDataStore::currentMaterial' data-ref="G4CrossSectionDataStore::currentMaterial">currentMaterial</a> = <a class="local col0 ref" href="#10mat" title='mat' data-ref="10mat">mat</a>;</td></tr>
+<tr><th id="278">278</th><td>  <a class="member" href="../include/G4CrossSectionDataStore.hh.html#G4CrossSectionDataStore::matParticle" title='G4CrossSectionDataStore::matParticle' data-ref="G4CrossSectionDataStore::matParticle">matParticle</a> = <a class="local col9 ref" href="#9part" title='part' data-ref="9part">part</a>-&gt;<a class="ref" href="../../../../particles/management/include/G4DynamicParticle.hh.html#_ZNK17G4DynamicParticle13GetDefinitionEv" title='G4DynamicParticle::GetDefinition' data-ref="_ZNK17G4DynamicParticle13GetDefinitionEv">GetDefinition</a>();</td></tr>
+<tr><th id="279">279</th><td>  <a class="member" href="../include/G4CrossSectionDataStore.hh.html#G4CrossSectionDataStore::matKinEnergy" title='G4CrossSectionDataStore::matKinEnergy' data-ref="G4CrossSectionDataStore::matKinEnergy">matKinEnergy</a> = <a class="local col9 ref" href="#9part" title='part' data-ref="9part">part</a>-&gt;<a class="ref" href="../../../../particles/management/include/G4DynamicParticle.hh.html#_ZNK17G4DynamicParticle16GetKineticEnergyEv" title='G4DynamicParticle::GetKineticEnergy' data-ref="_ZNK17G4DynamicParticle16GetKineticEnergyEv">GetKineticEnergy</a>();</td></tr>
+<tr><th id="280">280</th><td>  <a class="member" href="../include/G4CrossSectionDataStore.hh.html#G4CrossSectionDataStore::matCrossSection" title='G4CrossSectionDataStore::matCrossSection' data-ref="G4CrossSectionDataStore::matCrossSection">matCrossSection</a> = <var>0.0</var>;</td></tr>
+<tr><th id="281">281</th><td></td></tr>
+<tr><th id="282">282</th><td>  <span class='error' title="unknown type name &apos;size_t&apos;">size_t</span> <dfn class="local col1 decl" id="11nElements" title='nElements' data-type='int' data-ref="11nElements">nElements</dfn> = mat-&gt;GetNumberOfElements();</td></tr>
+<tr><th id="283">283</th><td>  <em>const</em> <a class="typedef" href="../../../../global/management/include/G4Types.hh.html#G4double" title='G4double' data-type='double' data-ref="G4double">G4double</a>* <dfn class="local col2 decl" id="12nAtomsPerVolume" title='nAtomsPerVolume' data-type='const G4double *' data-ref="12nAtomsPerVolume">nAtomsPerVolume</dfn> = <a class="local col0 ref" href="#10mat" title='mat' data-ref="10mat">mat</a>-&gt;<a class="ref" href="../../../../materials/include/G4Material.hh.html#_ZNK10G4Material24GetVecNbOfAtomsPerVolumeEv" title='G4Material::GetVecNbOfAtomsPerVolume' data-ref="_ZNK10G4Material24GetVecNbOfAtomsPerVolumeEv">GetVecNbOfAtomsPerVolume</a>();</td></tr>
+<tr><th id="284">284</th><td></td></tr>
+<tr><th id="285">285</th><td>  <b>if</b>(<span class='error' title="use of undeclared identifier &apos;xsecelm&apos;">xsecelm</span>.size() &lt; nElements) { <span class='error' title="use of undeclared identifier &apos;xsecelm&apos;">xsecelm</span>.resize(nElements); }</td></tr>
+<tr><th id="286">286</th><td></td></tr>
+<tr><th id="287">287</th><td>  <b>for</b>(<span class='error' title="unknown type name &apos;size_t&apos;">size_t</span> <dfn class="local col3 decl" id="13i" title='i' data-type='int' data-ref="13i">i</dfn>=<var>0</var>; i&lt;nElements; ++i) {</td></tr>
+<tr><th id="288">288</th><td>    matCrossSection += nAtomsPerVolume[i] *</td></tr>
+<tr><th id="289">289</th><td>      GetCrossSection(part, mat-&gt;GetElement(i), mat);</td></tr>
+<tr><th id="290">290</th><td>    <span class='error' title="use of undeclared identifier &apos;xsecelm&apos;">xsecelm</span>[i] = matCrossSection;</td></tr>
+<tr><th id="291">291</th><td>  }</td></tr>
+<tr><th id="292">292</th><td>  <b>return</b> <a class="member" href="../include/G4CrossSectionDataStore.hh.html#G4CrossSectionDataStore::matCrossSection" title='G4CrossSectionDataStore::matCrossSection' data-ref="G4CrossSectionDataStore::matCrossSection">matCrossSection</a>;</td></tr>
+<tr><th id="293">293</th><td>}</td></tr>
+<tr><th id="294">294</th><td></td></tr>
+<tr><th id="295">295</th><td><i>//....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo.....</i></td></tr>
+<tr><th id="296">296</th><td></td></tr>
+<tr><th id="297">297</th><td><a class="typedef" href="../../../../global/management/include/G4Types.hh.html#G4double" title='G4double' data-type='double' data-ref="G4double">G4double</a></td></tr>
+<tr><th id="298">298</th><td><a class="type" href="../include/G4CrossSectionDataStore.hh.html#G4CrossSectionDataStore" title='G4CrossSectionDataStore' data-ref="G4CrossSectionDataStore">G4CrossSectionDataStore</a>::<dfn class="decl def" id="_ZN23G4CrossSectionDataStore15GetCrossSectionEPK17G4DynamicParticlePK9G4ElementPK10G4Material" title='G4CrossSectionDataStore::GetCrossSection' data-ref="_ZN23G4CrossSectionDataStore15GetCrossSectionEPK17G4DynamicParticlePK9G4ElementPK10G4Material">GetCrossSection</dfn>(<em>const</em> <a class="type" href="../../../../particles/management/include/G4DynamicParticle.hh.html#G4DynamicParticle" title='G4DynamicParticle' data-ref="G4DynamicParticle">G4DynamicParticle</a>* <dfn class="local col4 decl" id="14part" title='part' data-type='const G4DynamicParticle *' data-ref="14part">part</dfn>,</td></tr>
+<tr><th id="299">299</th><td>                                         <em>const</em> <a class="type" href="../../../../materials/include/G4Element.hh.html#G4Element" title='G4Element' data-ref="G4Element">G4Element</a>* <dfn class="local col5 decl" id="15elm" title='elm' data-type='const G4Element *' data-ref="15elm">elm</dfn>,</td></tr>
+<tr><th id="300">300</th><td>					 <em>const</em> <a class="type" href="../../../../materials/include/G4Material.hh.html#G4Material" title='G4Material' data-ref="G4Material">G4Material</a>* <dfn class="local col6 decl" id="16mat" title='mat' data-type='const G4Material *' data-ref="16mat">mat</dfn>)</td></tr>
+<tr><th id="301">301</th><td>{</td></tr>
+<tr><th id="302">302</th><td>  <b>if</b>(<a class="local col6 ref" href="#16mat" title='mat' data-ref="16mat">mat</a> == <a class="member" href="../include/G4CrossSectionDataStore.hh.html#G4CrossSectionDataStore::elmMaterial" title='G4CrossSectionDataStore::elmMaterial' data-ref="G4CrossSectionDataStore::elmMaterial">elmMaterial</a> &amp;&amp; <a class="local col5 ref" href="#15elm" title='elm' data-ref="15elm">elm</a> == <a class="member" href="../include/G4CrossSectionDataStore.hh.html#G4CrossSectionDataStore::currentElement" title='G4CrossSectionDataStore::currentElement' data-ref="G4CrossSectionDataStore::currentElement">currentElement</a> &amp;&amp;</td></tr>
+<tr><th id="303">303</th><td>     <a class="local col4 ref" href="#14part" title='part' data-ref="14part">part</a>-&gt;<a class="ref" href="../../../../particles/management/include/G4DynamicParticle.hh.html#_ZNK17G4DynamicParticle13GetDefinitionEv" title='G4DynamicParticle::GetDefinition' data-ref="_ZNK17G4DynamicParticle13GetDefinitionEv">GetDefinition</a>() == <a class="member" href="../include/G4CrossSectionDataStore.hh.html#G4CrossSectionDataStore::elmParticle" title='G4CrossSectionDataStore::elmParticle' data-ref="G4CrossSectionDataStore::elmParticle">elmParticle</a> &amp;&amp;</td></tr>
+<tr><th id="304">304</th><td>     <a class="local col4 ref" href="#14part" title='part' data-ref="14part">part</a>-&gt;<a class="ref" href="../../../../particles/management/include/G4DynamicParticle.hh.html#_ZNK17G4DynamicParticle16GetKineticEnergyEv" title='G4DynamicParticle::GetKineticEnergy' data-ref="_ZNK17G4DynamicParticle16GetKineticEnergyEv">GetKineticEnergy</a>() == <a class="member" href="../include/G4CrossSectionDataStore.hh.html#G4CrossSectionDataStore::elmKinEnergy" title='G4CrossSectionDataStore::elmKinEnergy' data-ref="G4CrossSectionDataStore::elmKinEnergy">elmKinEnergy</a>) </td></tr>
+<tr><th id="305">305</th><td>    { <b>return</b> <a class="member" href="../include/G4CrossSectionDataStore.hh.html#G4CrossSectionDataStore::elmCrossSection" title='G4CrossSectionDataStore::elmCrossSection' data-ref="G4CrossSectionDataStore::elmCrossSection">elmCrossSection</a>; }</td></tr>
+<tr><th id="306">306</th><td></td></tr>
+<tr><th id="307">307</th><td>  <a class="member" href="../include/G4CrossSectionDataStore.hh.html#G4CrossSectionDataStore::elmMaterial" title='G4CrossSectionDataStore::elmMaterial' data-ref="G4CrossSectionDataStore::elmMaterial">elmMaterial</a> = <a class="local col6 ref" href="#16mat" title='mat' data-ref="16mat">mat</a>;</td></tr>
+<tr><th id="308">308</th><td>  <a class="member" href="../include/G4CrossSectionDataStore.hh.html#G4CrossSectionDataStore::currentElement" title='G4CrossSectionDataStore::currentElement' data-ref="G4CrossSectionDataStore::currentElement">currentElement</a> = <a class="local col5 ref" href="#15elm" title='elm' data-ref="15elm">elm</a>;</td></tr>
+<tr><th id="309">309</th><td>  <a class="member" href="../include/G4CrossSectionDataStore.hh.html#G4CrossSectionDataStore::elmParticle" title='G4CrossSectionDataStore::elmParticle' data-ref="G4CrossSectionDataStore::elmParticle">elmParticle</a> = <a class="local col4 ref" href="#14part" title='part' data-ref="14part">part</a>-&gt;<a class="ref" href="../../../../particles/management/include/G4DynamicParticle.hh.html#_ZNK17G4DynamicParticle13GetDefinitionEv" title='G4DynamicParticle::GetDefinition' data-ref="_ZNK17G4DynamicParticle13GetDefinitionEv">GetDefinition</a>();</td></tr>
+<tr><th id="310">310</th><td>  <a class="member" href="../include/G4CrossSectionDataStore.hh.html#G4CrossSectionDataStore::elmKinEnergy" title='G4CrossSectionDataStore::elmKinEnergy' data-ref="G4CrossSectionDataStore::elmKinEnergy">elmKinEnergy</a> = <a class="local col4 ref" href="#14part" title='part' data-ref="14part">part</a>-&gt;<a class="ref" href="../../../../particles/management/include/G4DynamicParticle.hh.html#_ZNK17G4DynamicParticle16GetKineticEnergyEv" title='G4DynamicParticle::GetKineticEnergy' data-ref="_ZNK17G4DynamicParticle16GetKineticEnergyEv">GetKineticEnergy</a>();</td></tr>
+<tr><th id="311">311</th><td>  <a class="member" href="../include/G4CrossSectionDataStore.hh.html#G4CrossSectionDataStore::elmCrossSection" title='G4CrossSectionDataStore::elmCrossSection' data-ref="G4CrossSectionDataStore::elmCrossSection">elmCrossSection</a> = <var>0.0</var>;</td></tr>
+<tr><th id="312">312</th><td></td></tr>
+<tr><th id="313">313</th><td>  <a class="typedef" href="../../../../global/management/include/G4Types.hh.html#G4int" title='G4int' data-type='int' data-ref="G4int">G4int</a> <dfn class="local col7 decl" id="17i" title='i' data-type='G4int' data-ref="17i">i</dfn> = <a class="member" href="../include/G4CrossSectionDataStore.hh.html#G4CrossSectionDataStore::nDataSetList" title='G4CrossSectionDataStore::nDataSetList' data-ref="G4CrossSectionDataStore::nDataSetList">nDataSetList</a>-<var>1</var>;  </td></tr>
+<tr><th id="314">314</th><td>  <a class="typedef" href="../../../../global/management/include/G4Types.hh.html#G4int" title='G4int' data-type='int' data-ref="G4int">G4int</a> <dfn class="local col8 decl" id="18Z" title='Z' data-type='G4int' data-ref="18Z">Z</dfn> = <a class="local col5 ref" href="#15elm" title='elm' data-ref="15elm">elm</a>-&gt;<a class="ref" href="../../../../materials/include/G4Element.hh.html#_ZNK9G4Element9GetZasIntEv" title='G4Element::GetZasInt' data-ref="_ZNK9G4Element9GetZasIntEv">GetZasInt</a>();</td></tr>
+<tr><th id="315">315</th><td>  <b>if</b> (elm-&gt;GetNaturalAbundanceFlag() &amp;&amp;</td></tr>
+<tr><th id="316">316</th><td>      <span class='error' title="use of undeclared identifier &apos;dataSetList&apos;">dataSetList</span>[i]-&gt;IsElementApplicable(part, Z, mat)) {</td></tr>
+<tr><th id="317">317</th><td></td></tr>
+<tr><th id="318">318</th><td>    <i>// element wise cross section</i></td></tr>
+<tr><th id="319">319</th><td>    elmCrossSection = <span class='error' title="use of undeclared identifier &apos;dataSetList&apos;">dataSetList</span>[i]-&gt;GetElementCrossSection(part, Z, mat);</td></tr>
+<tr><th id="320">320</th><td></td></tr>
+<tr><th id="321">321</th><td>    <i>//G4cout &lt;&lt; "Element wise " &lt;&lt; elmParticle-&gt;GetParticleName() </i></td></tr>
+<tr><th id="322">322</th><td><i>    //	   &lt;&lt; " xsec(barn)= " &lt;&lt;  elmCrossSection/barn </i></td></tr>
+<tr><th id="323">323</th><td><i>    //	   &lt;&lt; "  E(MeV)= " &lt;&lt; elmKinEnergy/MeV </i></td></tr>
+<tr><th id="324">324</th><td><i>    //	   &lt;&lt; " Z= " &lt;&lt; Z &lt;&lt; " AbundFlag= " &lt;&lt; elm-&gt;GetNaturalAbandancesFlag()</i></td></tr>
+<tr><th id="325">325</th><td><i>    //	   &lt;&lt;G4endl;</i></td></tr>
+<tr><th id="326">326</th><td></td></tr>
+<tr><th id="327">327</th><td>  } <b>else</b> {</td></tr>
+<tr><th id="328">328</th><td>    <i>// isotope wise cross section</i></td></tr>
+<tr><th id="329">329</th><td>    <span class='error' title="unknown type name &apos;size_t&apos;">size_t</span> <dfn class="local col9 decl" id="19nIso" title='nIso' data-type='int' data-ref="19nIso">nIso</dfn> = elm-&gt;GetNumberOfIsotopes();    </td></tr>
+<tr><th id="330">330</th><td></td></tr>
+<tr><th id="331">331</th><td>    <i>// user-defined isotope abundances        </i></td></tr>
+<tr><th id="332">332</th><td>    <em>const</em> <a class="typedef" href="../../../../global/management/include/G4Types.hh.html#G4double" title='G4double' data-type='double' data-ref="G4double">G4double</a>* <dfn class="local col0 decl" id="20abundVector" title='abundVector' data-type='const G4double *' data-ref="20abundVector">abundVector</dfn> = <a class="local col5 ref" href="#15elm" title='elm' data-ref="15elm">elm</a>-&gt;<a class="ref" href="../../../../materials/include/G4Element.hh.html#_ZNK9G4Element26GetRelativeAbundanceVectorEv" title='G4Element::GetRelativeAbundanceVector' data-ref="_ZNK9G4Element26GetRelativeAbundanceVectorEv">GetRelativeAbundanceVector</a>();</td></tr>
+<tr><th id="333">333</th><td></td></tr>
+<tr><th id="334">334</th><td>    <b>for</b> (<span class='error' title="unknown type name &apos;size_t&apos;">size_t</span> <dfn class="local col1 decl" id="21j" title='j' data-type='int' data-ref="21j">j</dfn>=<var>0</var>; j&lt;nIso; ++j) {</td></tr>
+<tr><th id="335">335</th><td>      <b>if</b>(abundVector[j] &gt; <var>0.0</var>) {</td></tr>
+<tr><th id="336">336</th><td>	<em>const</em> <a class="type" href="../../../../materials/include/G4Isotope.hh.html#G4Isotope" title='G4Isotope' data-ref="G4Isotope">G4Isotope</a>* <dfn class="local col2 decl" id="22iso" title='iso' data-type='const G4Isotope *' data-ref="22iso">iso</dfn> = elm-&gt;GetIsotope(j);</td></tr>
+<tr><th id="337">337</th><td>	elmCrossSection += abundVector[j]*</td></tr>
+<tr><th id="338">338</th><td>	  GetIsoCrossSection(part, Z, iso-&gt;GetN(), iso, elm, mat, i);</td></tr>
+<tr><th id="339">339</th><td>	<i>//G4cout &lt;&lt; "Isotope wise " &lt;&lt; elmParticle-&gt;GetParticleName() </i></td></tr>
+<tr><th id="340">340</th><td><i>	//       &lt;&lt; " xsec(barn)= " &lt;&lt;  elmCrossSection/barn </i></td></tr>
+<tr><th id="341">341</th><td><i>	//       &lt;&lt; "  E(MeV)= " &lt;&lt; elmKinEnergy/MeV </i></td></tr>
+<tr><th id="342">342</th><td><i>	//       &lt;&lt; " Z= " &lt;&lt; Z &lt;&lt; "  A= " &lt;&lt; iso-&gt;GetN() &lt;&lt; "  j= " &lt;&lt; j &lt;&lt; G4endl;</i></td></tr>
+<tr><th id="343">343</th><td>      }</td></tr>
+<tr><th id="344">344</th><td>    }</td></tr>
+<tr><th id="345">345</th><td>  }</td></tr>
+<tr><th id="346">346</th><td>  <i>//G4cout &lt;&lt; "  E(MeV)= " &lt;&lt; elmKinEnergy/MeV </i></td></tr>
+<tr><th id="347">347</th><td><i>  //	 &lt;&lt; "xsec(barn)= " &lt;&lt;  elmCrossSection/barn &lt;&lt;G4endl;</i></td></tr>
+<tr><th id="348">348</th><td>  <b>return</b> <a class="member" href="../include/G4CrossSectionDataStore.hh.html#G4CrossSectionDataStore::elmCrossSection" title='G4CrossSectionDataStore::elmCrossSection' data-ref="G4CrossSectionDataStore::elmCrossSection">elmCrossSection</a>;</td></tr>
+<tr><th id="349">349</th><td>}</td></tr>
+<tr><th id="350">350</th><td></td></tr>
+<tr><th id="351">351</th><td><i>//....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo.....</i></td></tr>
+<tr><th id="352">352</th><td></td></tr>
+<tr><th id="353">353</th><td><a class="typedef" href="../../../../global/management/include/G4Types.hh.html#G4double" title='G4double' data-type='double' data-ref="G4double">G4double</a></td></tr>
+<tr><th id="354">354</th><td><a class="type" href="../include/G4CrossSectionDataStore.hh.html#G4CrossSectionDataStore" title='G4CrossSectionDataStore' data-ref="G4CrossSectionDataStore">G4CrossSectionDataStore</a>::<dfn class="decl def" id="_ZN23G4CrossSectionDataStore18GetIsoCrossSectionEPK17G4DynamicParticleiiPK9G4IsotopePK9G4ElementPK10G4Materiali" title='G4CrossSectionDataStore::GetIsoCrossSection' data-ref="_ZN23G4CrossSectionDataStore18GetIsoCrossSectionEPK17G4DynamicParticleiiPK9G4IsotopePK9G4ElementPK10G4Materiali">GetIsoCrossSection</dfn>(<em>const</em> <a class="type" href="../../../../particles/management/include/G4DynamicParticle.hh.html#G4DynamicParticle" title='G4DynamicParticle' data-ref="G4DynamicParticle">G4DynamicParticle</a>* <dfn class="local col3 decl" id="23part" title='part' data-type='const G4DynamicParticle *' data-ref="23part">part</dfn>,</td></tr>
+<tr><th id="355">355</th><td>					    <a class="typedef" href="../../../../global/management/include/G4Types.hh.html#G4int" title='G4int' data-type='int' data-ref="G4int">G4int</a> <dfn class="local col4 decl" id="24Z" title='Z' data-type='G4int' data-ref="24Z">Z</dfn>, <a class="typedef" href="../../../../global/management/include/G4Types.hh.html#G4int" title='G4int' data-type='int' data-ref="G4int">G4int</a> <dfn class="local col5 decl" id="25A" title='A' data-type='G4int' data-ref="25A">A</dfn>, </td></tr>
+<tr><th id="356">356</th><td>					    <em>const</em> <a class="type" href="../../../../materials/include/G4Isotope.hh.html#G4Isotope" title='G4Isotope' data-ref="G4Isotope">G4Isotope</a>* <dfn class="local col6 decl" id="26iso" title='iso' data-type='const G4Isotope *' data-ref="26iso">iso</dfn>,</td></tr>
+<tr><th id="357">357</th><td>					    <em>const</em> <a class="type" href="../../../../materials/include/G4Element.hh.html#G4Element" title='G4Element' data-ref="G4Element">G4Element</a>* <dfn class="local col7 decl" id="27elm" title='elm' data-type='const G4Element *' data-ref="27elm">elm</dfn>,</td></tr>
+<tr><th id="358">358</th><td>					    <em>const</em> <a class="type" href="../../../../materials/include/G4Material.hh.html#G4Material" title='G4Material' data-ref="G4Material">G4Material</a>* <dfn class="local col8 decl" id="28mat" title='mat' data-type='const G4Material *' data-ref="28mat">mat</dfn>, </td></tr>
+<tr><th id="359">359</th><td>					    <a class="typedef" href="../../../../global/management/include/G4Types.hh.html#G4int" title='G4int' data-type='int' data-ref="G4int">G4int</a> <dfn class="local col9 decl" id="29idx" title='idx' data-type='G4int' data-ref="29idx">idx</dfn>)</td></tr>
+<tr><th id="360">360</th><td>{</td></tr>
+<tr><th id="361">361</th><td>  <i>// this methods is called after the check that dataSetList[idx] </i></td></tr>
+<tr><th id="362">362</th><td><i>  // depend on isotopes, so for this DataSet only isotopes are checked</i></td></tr>
+<tr><th id="363">363</th><td><i></i></td></tr>
+<tr><th id="364">364</th><td><i>  // isotope-wise cross section does exist</i></td></tr>
+<tr><th id="365">365</th><td>  <b>if</b>(<span class='error' title="use of undeclared identifier &apos;dataSetList&apos;">dataSetList</span>[idx]-&gt;IsIsoApplicable(part, Z, A, elm, mat) ) {</td></tr>
+<tr><th id="366">366</th><td>    <b>return</b> <span class='error' title="use of undeclared identifier &apos;dataSetList&apos;">dataSetList</span>[idx]-&gt;GetIsoCrossSection(part, Z, A, iso, elm, mat);</td></tr>
+<tr><th id="367">367</th><td></td></tr>
+<tr><th id="368">368</th><td>  } <b>else</b> {</td></tr>
+<tr><th id="369">369</th><td>    <i>// seach for other dataSet</i></td></tr>
+<tr><th id="370">370</th><td>    <b>for</b> (<a class="typedef" href="../../../../global/management/include/G4Types.hh.html#G4int" title='G4int' data-type='int' data-ref="G4int">G4int</a> <dfn class="local col0 decl" id="30j" title='j' data-type='G4int' data-ref="30j">j</dfn> = <a class="member" href="../include/G4CrossSectionDataStore.hh.html#G4CrossSectionDataStore::nDataSetList" title='G4CrossSectionDataStore::nDataSetList' data-ref="G4CrossSectionDataStore::nDataSetList">nDataSetList</a>-<var>1</var>; <a class="local col0 ref" href="#30j" title='j' data-ref="30j">j</a> &gt;= <var>0</var>; --<a class="local col0 ref" href="#30j" title='j' data-ref="30j">j</a>) { </td></tr>
+<tr><th id="371">371</th><td>      <b>if</b> (<span class='error' title="use of undeclared identifier &apos;dataSetList&apos;">dataSetList</span>[j]-&gt;IsElementApplicable(part, Z, mat)) {</td></tr>
+<tr><th id="372">372</th><td>	<b>return</b> <span class='error' title="use of undeclared identifier &apos;dataSetList&apos;">dataSetList</span>[j]-&gt;GetElementCrossSection(part, Z, mat);</td></tr>
+<tr><th id="373">373</th><td>      } <b>else</b> <b>if</b> (<span class='error' title="use of undeclared identifier &apos;dataSetList&apos;">dataSetList</span>[j]-&gt;IsIsoApplicable(part, Z, A, elm, mat)) {</td></tr>
+<tr><th id="374">374</th><td>	<b>return</b> <span class='error' title="use of undeclared identifier &apos;dataSetList&apos;">dataSetList</span>[j]-&gt;GetIsoCrossSection(part, Z, A, iso, elm, mat);</td></tr>
+<tr><th id="375">375</th><td>      }</td></tr>
+<tr><th id="376">376</th><td>    }</td></tr>
+<tr><th id="377">377</th><td>  }</td></tr>
+<tr><th id="378">378</th><td>  <a class="macro" href="../../../../global/management/include/G4ios.hh.html#46" title="(*_G4cout_p())" data-ref="_M/G4cout">G4cout</a> <span class='error' title="invalid operands to binary expression (&apos;int&apos; and &apos;const char *&apos;)">&lt;&lt;</span> <q>"G4CrossSectionDataStore::GetCrossSection ERROR: "</q></td></tr>
+<tr><th id="379">379</th><td>	 &lt;&lt; <q>" no isotope cross section found"</q></td></tr>
+<tr><th id="380">380</th><td>	 &lt;&lt; <a class="macro" href="../../../../global/management/include/G4ios.hh.html#60" title="std::endl" data-ref="_M/G4endl">G4endl</a>;</td></tr>
+<tr><th id="381">381</th><td>  <a class="macro" href="../../../../global/management/include/G4ios.hh.html#46" title="(*_G4cout_p())" data-ref="_M/G4cout">G4cout</a> <span class='error' title="invalid operands to binary expression (&apos;int&apos; and &apos;const char *&apos;)">&lt;&lt;</span> <q>"  for "</q> &lt;&lt; part-&gt;GetDefinition()-&gt;GetParticleName() </td></tr>
+<tr><th id="382">382</th><td>	 &lt;&lt; <q>" off Element "</q> &lt;&lt; elm-&gt;GetName()</td></tr>
+<tr><th id="383">383</th><td>         &lt;&lt; <q>"  in "</q> &lt;&lt; mat-&gt;GetName() </td></tr>
+<tr><th id="384">384</th><td>	 &lt;&lt; <q>" Z= "</q> &lt;&lt; Z &lt;&lt; <q>" A= "</q> &lt;&lt; A</td></tr>
+<tr><th id="385">385</th><td>	 &lt;&lt; <q>" E(MeV)= "</q> &lt;&lt; part-&gt;GetKineticEnergy()/MeV &lt;&lt; <a class="macro" href="../../../../global/management/include/G4ios.hh.html#60" title="std::endl" data-ref="_M/G4endl">G4endl</a>; </td></tr>
+<tr><th id="386">386</th><td>  <b>throw</b> <a class="type" href="../../util/include/G4HadronicException.hh.html#G4HadronicException" title='G4HadronicException' data-ref="G4HadronicException">G4HadronicException</a><a class="ref" href="../../util/include/G4HadronicException.hh.html#_ZN19G4HadronicExceptionC1E8G4StringiS0_" title='G4HadronicException::G4HadronicException' data-ref="_ZN19G4HadronicExceptionC1E8G4StringiS0_">(</a><span class="macro" title="&quot;/home/jishin/app/geant4/1005p1/geant4.10.05.p01/source/processes/hadronic/cross_sections/src/G4CrossSectionDataStore.cc&quot;" data-ref="_M/__FILE__">__FILE__</span>, <span class="macro" title="386" data-ref="_M/__LINE__">__LINE__</span>, </td></tr>
+<tr><th id="387">387</th><td>                      <a class="ref fake" href="../../../../global/management/include/G4String.hh.html#_ZN8G4StringC1EPKc" title='G4String::G4String' data-ref="_ZN8G4StringC1EPKc"></a><q>" no applicable data set found for the isotope"</q>);</td></tr>
+<tr><th id="388">388</th><td>}</td></tr>
+<tr><th id="389">389</th><td></td></tr>
+<tr><th id="390">390</th><td><i>//....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo.....</i></td></tr>
+<tr><th id="391">391</th><td></td></tr>
+<tr><th id="392">392</th><td><a class="typedef" href="../../../../global/management/include/G4Types.hh.html#G4double" title='G4double' data-type='double' data-ref="G4double">G4double</a></td></tr>
+<tr><th id="393">393</th><td><a class="type" href="../include/G4CrossSectionDataStore.hh.html#G4CrossSectionDataStore" title='G4CrossSectionDataStore' data-ref="G4CrossSectionDataStore">G4CrossSectionDataStore</a>::<dfn class="decl def" id="_ZN23G4CrossSectionDataStore15GetCrossSectionEPK17G4DynamicParticleiiPK9G4IsotopePK9G4ElementPK10G4Material" title='G4CrossSectionDataStore::GetCrossSection' data-ref="_ZN23G4CrossSectionDataStore15GetCrossSectionEPK17G4DynamicParticleiiPK9G4IsotopePK9G4ElementPK10G4Material">GetCrossSection</dfn>(<em>const</em> <a class="type" href="../../../../particles/management/include/G4DynamicParticle.hh.html#G4DynamicParticle" title='G4DynamicParticle' data-ref="G4DynamicParticle">G4DynamicParticle</a>* <dfn class="local col1 decl" id="31part" title='part' data-type='const G4DynamicParticle *' data-ref="31part">part</dfn>,</td></tr>
+<tr><th id="394">394</th><td>                                         <a class="typedef" href="../../../../global/management/include/G4Types.hh.html#G4int" title='G4int' data-type='int' data-ref="G4int">G4int</a> <dfn class="local col2 decl" id="32Z" title='Z' data-type='G4int' data-ref="32Z">Z</dfn>, <a class="typedef" href="../../../../global/management/include/G4Types.hh.html#G4int" title='G4int' data-type='int' data-ref="G4int">G4int</a> <dfn class="local col3 decl" id="33A" title='A' data-type='G4int' data-ref="33A">A</dfn>,</td></tr>
+<tr><th id="395">395</th><td>					 <em>const</em> <a class="type" href="../../../../materials/include/G4Isotope.hh.html#G4Isotope" title='G4Isotope' data-ref="G4Isotope">G4Isotope</a>* <dfn class="local col4 decl" id="34iso" title='iso' data-type='const G4Isotope *' data-ref="34iso">iso</dfn>,</td></tr>
+<tr><th id="396">396</th><td>                                         <em>const</em> <a class="type" href="../../../../materials/include/G4Element.hh.html#G4Element" title='G4Element' data-ref="G4Element">G4Element</a>* <dfn class="local col5 decl" id="35elm" title='elm' data-type='const G4Element *' data-ref="35elm">elm</dfn>,</td></tr>
+<tr><th id="397">397</th><td>					 <em>const</em> <a class="type" href="../../../../materials/include/G4Material.hh.html#G4Material" title='G4Material' data-ref="G4Material">G4Material</a>* <dfn class="local col6 decl" id="36mat" title='mat' data-type='const G4Material *' data-ref="36mat">mat</dfn>)</td></tr>
+<tr><th id="398">398</th><td>{</td></tr>
+<tr><th id="399">399</th><td>  <b>for</b> (<a class="typedef" href="../../../../global/management/include/G4Types.hh.html#G4int" title='G4int' data-type='int' data-ref="G4int">G4int</a> <dfn class="local col7 decl" id="37i" title='i' data-type='G4int' data-ref="37i">i</dfn> = <a class="member" href="../include/G4CrossSectionDataStore.hh.html#G4CrossSectionDataStore::nDataSetList" title='G4CrossSectionDataStore::nDataSetList' data-ref="G4CrossSectionDataStore::nDataSetList">nDataSetList</a>-<var>1</var>; <a class="local col7 ref" href="#37i" title='i' data-ref="37i">i</a> &gt;= <var>0</var>; --<a class="local col7 ref" href="#37i" title='i' data-ref="37i">i</a>) {</td></tr>
+<tr><th id="400">400</th><td>    <b>if</b> (<span class='error' title="use of undeclared identifier &apos;dataSetList&apos;">dataSetList</span>[i]-&gt;IsIsoApplicable(part, Z, A, elm, mat) ) {</td></tr>
+<tr><th id="401">401</th><td>      <b>return</b> <span class='error' title="use of undeclared identifier &apos;dataSetList&apos;">dataSetList</span>[i]-&gt;GetIsoCrossSection(part, Z, A, iso, elm, mat);</td></tr>
+<tr><th id="402">402</th><td>    }</td></tr>
+<tr><th id="403">403</th><td>  }</td></tr>
+<tr><th id="404">404</th><td>  <a class="macro" href="../../../../global/management/include/G4ios.hh.html#46" title="(*_G4cout_p())" data-ref="_M/G4cout">G4cout</a> <span class='error' title="invalid operands to binary expression (&apos;int&apos; and &apos;const char *&apos;)">&lt;&lt;</span> <q>"G4CrossSectionDataStore::GetCrossSection ERROR: "</q></td></tr>
+<tr><th id="405">405</th><td>	 &lt;&lt; <q>" no isotope cross section found"</q></td></tr>
+<tr><th id="406">406</th><td>	 &lt;&lt; <a class="macro" href="../../../../global/management/include/G4ios.hh.html#60" title="std::endl" data-ref="_M/G4endl">G4endl</a>;</td></tr>
+<tr><th id="407">407</th><td>  <a class="macro" href="../../../../global/management/include/G4ios.hh.html#46" title="(*_G4cout_p())" data-ref="_M/G4cout">G4cout</a> <span class='error' title="invalid operands to binary expression (&apos;int&apos; and &apos;const char *&apos;)">&lt;&lt;</span> <q>"  for "</q> &lt;&lt; part-&gt;GetDefinition()-&gt;GetParticleName() </td></tr>
+<tr><th id="408">408</th><td>	 &lt;&lt; <q>" off Element "</q> &lt;&lt; elm-&gt;GetName()</td></tr>
+<tr><th id="409">409</th><td>         &lt;&lt; <q>"  in "</q> &lt;&lt; mat-&gt;GetName() </td></tr>
+<tr><th id="410">410</th><td>	 &lt;&lt; <q>" Z= "</q> &lt;&lt; Z &lt;&lt; <q>" A= "</q> &lt;&lt; A</td></tr>
+<tr><th id="411">411</th><td>	 &lt;&lt; <q>" E(MeV)= "</q> &lt;&lt; part-&gt;GetKineticEnergy()/MeV &lt;&lt; <a class="macro" href="../../../../global/management/include/G4ios.hh.html#60" title="std::endl" data-ref="_M/G4endl">G4endl</a>; </td></tr>
+<tr><th id="412">412</th><td>  <b>throw</b> <a class="type" href="../../util/include/G4HadronicException.hh.html#G4HadronicException" title='G4HadronicException' data-ref="G4HadronicException">G4HadronicException</a><a class="ref" href="../../util/include/G4HadronicException.hh.html#_ZN19G4HadronicExceptionC1E8G4StringiS0_" title='G4HadronicException::G4HadronicException' data-ref="_ZN19G4HadronicExceptionC1E8G4StringiS0_">(</a><span class="macro" title="&quot;/home/jishin/app/geant4/1005p1/geant4.10.05.p01/source/processes/hadronic/cross_sections/src/G4CrossSectionDataStore.cc&quot;" data-ref="_M/__FILE__">__FILE__</span>, <span class="macro" title="412" data-ref="_M/__LINE__">__LINE__</span>, </td></tr>
+<tr><th id="413">413</th><td>                  <a class="ref fake" href="../../../../global/management/include/G4String.hh.html#_ZN8G4StringC1EPKc" title='G4String::G4String' data-ref="_ZN8G4StringC1EPKc"></a><q>" no applicable data set found for the isotope"</q>);</td></tr>
+<tr><th id="414">414</th><td>}</td></tr>
+<tr><th id="415">415</th><td></td></tr>
+<tr><th id="416">416</th><td><i>//....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo.....</i></td></tr>
+<tr><th id="417">417</th><td></td></tr>
+<tr><th id="418">418</th><td><em>const</em> <a class="type" href="../../../../materials/include/G4Element.hh.html#G4Element" title='G4Element' data-ref="G4Element">G4Element</a>*</td></tr>
+<tr><th id="419">419</th><td><a class="type" href="../include/G4CrossSectionDataStore.hh.html#G4CrossSectionDataStore" title='G4CrossSectionDataStore' data-ref="G4CrossSectionDataStore">G4CrossSectionDataStore</a>::<dfn class="decl def" id="_ZN23G4CrossSectionDataStore11SampleZandAEPK17G4DynamicParticlePK10G4MaterialR9G4Nucleus" title='G4CrossSectionDataStore::SampleZandA' data-ref="_ZN23G4CrossSectionDataStore11SampleZandAEPK17G4DynamicParticlePK10G4MaterialR9G4Nucleus">SampleZandA</dfn>(<em>const</em> <a class="type" href="../../../../particles/management/include/G4DynamicParticle.hh.html#G4DynamicParticle" title='G4DynamicParticle' data-ref="G4DynamicParticle">G4DynamicParticle</a>* <dfn class="local col8 decl" id="38part" title='part' data-type='const G4DynamicParticle *' data-ref="38part">part</dfn>, </td></tr>
+<tr><th id="420">420</th><td>                                     <em>const</em> <a class="type" href="../../../../materials/include/G4Material.hh.html#G4Material" title='G4Material' data-ref="G4Material">G4Material</a>* <dfn class="local col9 decl" id="39mat" title='mat' data-type='const G4Material *' data-ref="39mat">mat</dfn>,</td></tr>
+<tr><th id="421">421</th><td>				     <a class="type" href="../../util/include/G4Nucleus.hh.html#G4Nucleus" title='G4Nucleus' data-ref="G4Nucleus">G4Nucleus</a>&amp; <dfn class="local col0 decl" id="40target" title='target' data-type='G4Nucleus &amp;' data-ref="40target">target</dfn>)</td></tr>
+<tr><th id="422">422</th><td>{</td></tr>
+<tr><th id="423">423</th><td>  <span class='error' title="unknown type name &apos;size_t&apos;">size_t</span> <dfn class="local col1 decl" id="41nElements" title='nElements' data-type='int' data-ref="41nElements">nElements</dfn> = mat-&gt;GetNumberOfElements();</td></tr>
+<tr><th id="424">424</th><td>  <em>const</em> <a class="type" href="../../../../materials/include/G4Element.hh.html#G4Element" title='G4Element' data-ref="G4Element">G4Element</a>* <dfn class="local col2 decl" id="42anElement" title='anElement' data-type='const G4Element *' data-ref="42anElement">anElement</dfn> = <a class="local col9 ref" href="#39mat" title='mat' data-ref="39mat">mat</a>-&gt;<a class="ref" href="../../../../materials/include/G4Material.hh.html#_ZNK10G4Material10GetElementEi" title='G4Material::GetElement' data-ref="_ZNK10G4Material10GetElementEi">GetElement</a>(<var>0</var>);</td></tr>
+<tr><th id="425">425</th><td></td></tr>
+<tr><th id="426">426</th><td>  <i>// select element from a compound </i></td></tr>
+<tr><th id="427">427</th><td>  <b>if</b>(<var>1</var> &lt; nElements) {</td></tr>
+<tr><th id="428">428</th><td>    <a class="typedef" href="../../../../global/management/include/G4Types.hh.html#G4double" title='G4double' data-type='double' data-ref="G4double">G4double</a> <dfn class="local col3 decl" id="43cross" title='cross' data-type='G4double' data-ref="43cross">cross</dfn> = <a class="member" href="../include/G4CrossSectionDataStore.hh.html#G4CrossSectionDataStore::matCrossSection" title='G4CrossSectionDataStore::matCrossSection' data-ref="G4CrossSectionDataStore::matCrossSection">matCrossSection</a>*<a class="macro" href="../../../../global/HEPRandom/include/Randomize.hh.html#52" title="CLHEP::HepRandom::getTheEngine()-&gt;flat()" data-ref="_M/G4UniformRand">G4UniformRand</a>();</td></tr>
+<tr><th id="429">429</th><td>    <b>for</b>(<span class='error' title="unknown type name &apos;size_t&apos;">size_t</span> <dfn class="local col4 decl" id="44i" title='i' data-type='int' data-ref="44i">i</dfn>=<var>0</var>; i&lt;nElements; ++i) {</td></tr>
+<tr><th id="430">430</th><td>      <b>if</b>(cross &lt;= <span class='error' title="use of undeclared identifier &apos;xsecelm&apos;">xsecelm</span>[i]) {</td></tr>
+<tr><th id="431">431</th><td>	anElement = mat-&gt;GetElement(i);</td></tr>
+<tr><th id="432">432</th><td>        <b>break</b>;</td></tr>
+<tr><th id="433">433</th><td>      }</td></tr>
+<tr><th id="434">434</th><td>    }</td></tr>
+<tr><th id="435">435</th><td>  }</td></tr>
+<tr><th id="436">436</th><td></td></tr>
+<tr><th id="437">437</th><td>  <a class="typedef" href="../../../../global/management/include/G4Types.hh.html#G4int" title='G4int' data-type='int' data-ref="G4int">G4int</a> <dfn class="local col5 decl" id="45Z" title='Z' data-type='G4int' data-ref="45Z">Z</dfn> = <a class="local col2 ref" href="#42anElement" title='anElement' data-ref="42anElement">anElement</a>-&gt;<a class="ref" href="../../../../materials/include/G4Element.hh.html#_ZNK9G4Element9GetZasIntEv" title='G4Element::GetZasInt' data-ref="_ZNK9G4Element9GetZasIntEv">GetZasInt</a>();</td></tr>
+<tr><th id="438">438</th><td>  <em>const</em> <a class="type" href="../../../../materials/include/G4Isotope.hh.html#G4Isotope" title='G4Isotope' data-ref="G4Isotope">G4Isotope</a>* <dfn class="local col6 decl" id="46iso" title='iso' data-type='const G4Isotope *' data-ref="46iso">iso</dfn> = <b>nullptr</b>;</td></tr>
+<tr><th id="439">439</th><td></td></tr>
+<tr><th id="440">440</th><td>  <a class="typedef" href="../../../../global/management/include/G4Types.hh.html#G4int" title='G4int' data-type='int' data-ref="G4int">G4int</a> <dfn class="local col7 decl" id="47i" title='i' data-type='G4int' data-ref="47i">i</dfn> = <a class="member" href="../include/G4CrossSectionDataStore.hh.html#G4CrossSectionDataStore::nDataSetList" title='G4CrossSectionDataStore::nDataSetList' data-ref="G4CrossSectionDataStore::nDataSetList">nDataSetList</a>-<var>1</var>;</td></tr>
+<tr><th id="441">441</th><td>  <b>if</b> (<span class='error' title="use of undeclared identifier &apos;dataSetList&apos;">dataSetList</span>[i]-&gt;IsElementApplicable(part, Z, mat)) {</td></tr>
+<tr><th id="442">442</th><td></td></tr>
+<tr><th id="443">443</th><td>    <i>//----------------------------------------------------------------</i></td></tr>
+<tr><th id="444">444</th><td><i>    // element-wise cross section</i></td></tr>
+<tr><th id="445">445</th><td><i>    // isotope cross section is not computed</i></td></tr>
+<tr><th id="446">446</th><td><i>    //----------------------------------------------------------------</i></td></tr>
+<tr><th id="447">447</th><td>    <span class='error' title="unknown type name &apos;size_t&apos;">size_t</span> <dfn class="local col8 decl" id="48nIso" title='nIso' data-type='int' data-ref="48nIso">nIso</dfn> = anElement-&gt;GetNumberOfIsotopes();</td></tr>
+<tr><th id="448">448</th><td>    <a class="local col6 ref" href="#46iso" title='iso' data-ref="46iso">iso</a> = <a class="local col2 ref" href="#42anElement" title='anElement' data-ref="42anElement">anElement</a>-&gt;<a class="ref" href="../../../../materials/include/G4Element.hh.html#_ZNK9G4Element10GetIsotopeEi" title='G4Element::GetIsotope' data-ref="_ZNK9G4Element10GetIsotopeEi">GetIsotope</a>(<var>0</var>);</td></tr>
+<tr><th id="449">449</th><td></td></tr>
+<tr><th id="450">450</th><td>    <i>// more than 1 isotope</i></td></tr>
+<tr><th id="451">451</th><td>    <b>if</b>(<var>1</var> &lt; nIso) { </td></tr>
+<tr><th id="452">452</th><td>      iso = <span class='error' title="use of undeclared identifier &apos;dataSetList&apos;">dataSetList</span>[i]-&gt;SelectIsotope(anElement, part-&gt;GetKineticEnergy());</td></tr>
+<tr><th id="453">453</th><td>    }</td></tr>
+<tr><th id="454">454</th><td></td></tr>
+<tr><th id="455">455</th><td>  } <b>else</b> {</td></tr>
+<tr><th id="456">456</th><td></td></tr>
+<tr><th id="457">457</th><td>    <i>//----------------------------------------------------------------</i></td></tr>
+<tr><th id="458">458</th><td><i>    // isotope-wise cross section</i></td></tr>
+<tr><th id="459">459</th><td><i>    // isotope cross section is computed</i></td></tr>
+<tr><th id="460">460</th><td><i>    //----------------------------------------------------------------</i></td></tr>
+<tr><th id="461">461</th><td>    <span class='error' title="unknown type name &apos;size_t&apos;">size_t</span> <dfn class="local col9 decl" id="49nIso" title='nIso' data-type='int' data-ref="49nIso">nIso</dfn> = anElement-&gt;GetNumberOfIsotopes();</td></tr>
+<tr><th id="462">462</th><td>    <a class="local col6 ref" href="#46iso" title='iso' data-ref="46iso">iso</a> = <a class="local col2 ref" href="#42anElement" title='anElement' data-ref="42anElement">anElement</a>-&gt;<a class="ref" href="../../../../materials/include/G4Element.hh.html#_ZNK9G4Element10GetIsotopeEi" title='G4Element::GetIsotope' data-ref="_ZNK9G4Element10GetIsotopeEi">GetIsotope</a>(<var>0</var>);</td></tr>
+<tr><th id="463">463</th><td></td></tr>
+<tr><th id="464">464</th><td>    <i>// more than 1 isotope</i></td></tr>
+<tr><th id="465">465</th><td>    <b>if</b>(<var>1</var> &lt; nIso) {</td></tr>
+<tr><th id="466">466</th><td>      <em>const</em> <a class="typedef" href="../../../../global/management/include/G4Types.hh.html#G4double" title='G4double' data-type='double' data-ref="G4double">G4double</a>* <dfn class="local col0 decl" id="50abundVector" title='abundVector' data-type='const G4double *' data-ref="50abundVector">abundVector</dfn> = <a class="local col2 ref" href="#42anElement" title='anElement' data-ref="42anElement">anElement</a>-&gt;<a class="ref" href="../../../../materials/include/G4Element.hh.html#_ZNK9G4Element26GetRelativeAbundanceVectorEv" title='G4Element::GetRelativeAbundanceVector' data-ref="_ZNK9G4Element26GetRelativeAbundanceVectorEv">GetRelativeAbundanceVector</a>();</td></tr>
+<tr><th id="467">467</th><td>      <b>if</b>(<span class='error' title="use of undeclared identifier &apos;xseciso&apos;">xseciso</span>.size() &lt; nIso) { <span class='error' title="use of undeclared identifier &apos;xseciso&apos;">xseciso</span>.resize(nIso); }</td></tr>
+<tr><th id="468">468</th><td></td></tr>
+<tr><th id="469">469</th><td>      <a class="typedef" href="../../../../global/management/include/G4Types.hh.html#G4double" title='G4double' data-type='double' data-ref="G4double">G4double</a> <dfn class="local col1 decl" id="51cross" title='cross' data-type='G4double' data-ref="51cross">cross</dfn> = <var>0.0</var>;</td></tr>
+<tr><th id="470">470</th><td>      <span class='error' title="unknown type name &apos;size_t&apos;">size_t</span> <dfn class="local col2 decl" id="52j" title='j' data-type='int' data-ref="52j">j</dfn>;</td></tr>
+<tr><th id="471">471</th><td>      <b>for</b> (j = <var>0</var>; j&lt;nIso; ++j) {</td></tr>
+<tr><th id="472">472</th><td>	<a class="typedef" href="../../../../global/management/include/G4Types.hh.html#G4double" title='G4double' data-type='double' data-ref="G4double">G4double</a> <dfn class="local col3 decl" id="53xsec" title='xsec' data-type='G4double' data-ref="53xsec">xsec</dfn> = <var>0.0</var>;</td></tr>
+<tr><th id="473">473</th><td>	<b>if</b>(abundVector[j] &gt; <var>0.0</var>) {</td></tr>
+<tr><th id="474">474</th><td>	  iso = anElement-&gt;GetIsotope(j);</td></tr>
+<tr><th id="475">475</th><td>	  xsec = abundVector[j]*</td></tr>
+<tr><th id="476">476</th><td>	    GetIsoCrossSection(part, Z, iso-&gt;GetN(), iso, anElement, mat, i);</td></tr>
+<tr><th id="477">477</th><td>	}</td></tr>
+<tr><th id="478">478</th><td>	<a class="local col1 ref" href="#51cross" title='cross' data-ref="51cross">cross</a> += <a class="local col3 ref" href="#53xsec" title='xsec' data-ref="53xsec">xsec</a>;</td></tr>
+<tr><th id="479">479</th><td>	<span class='error' title="use of undeclared identifier &apos;xseciso&apos;">xseciso</span>[j] = cross;</td></tr>
+<tr><th id="480">480</th><td>      }</td></tr>
+<tr><th id="481">481</th><td>      <a class="local col1 ref" href="#51cross" title='cross' data-ref="51cross">cross</a> *= <a class="macro" href="../../../../global/HEPRandom/include/Randomize.hh.html#52" title="CLHEP::HepRandom::getTheEngine()-&gt;flat()" data-ref="_M/G4UniformRand">G4UniformRand</a>();</td></tr>
+<tr><th id="482">482</th><td>      <b>for</b> (j = <var>0</var>; j&lt;nIso; ++j) {</td></tr>
+<tr><th id="483">483</th><td>	<b>if</b>(cross &lt;= <span class='error' title="use of undeclared identifier &apos;xseciso&apos;">xseciso</span>[j]) {</td></tr>
+<tr><th id="484">484</th><td>	  iso = anElement-&gt;GetIsotope(j);</td></tr>
+<tr><th id="485">485</th><td>	  <b>break</b>;</td></tr>
+<tr><th id="486">486</th><td>	}</td></tr>
+<tr><th id="487">487</th><td>      }</td></tr>
+<tr><th id="488">488</th><td>    }</td></tr>
+<tr><th id="489">489</th><td>  }</td></tr>
+<tr><th id="490">490</th><td>  <a class="local col0 ref" href="#40target" title='target' data-ref="40target">target</a>.<a class="ref" href="../../util/include/G4Nucleus.hh.html#_ZN9G4Nucleus10SetIsotopeEPK9G4Isotope" title='G4Nucleus::SetIsotope' data-ref="_ZN9G4Nucleus10SetIsotopeEPK9G4Isotope">SetIsotope</a>(<a class="local col6 ref" href="#46iso" title='iso' data-ref="46iso">iso</a>);</td></tr>
+<tr><th id="491">491</th><td>  <b>return</b> <a class="local col2 ref" href="#42anElement" title='anElement' data-ref="42anElement">anElement</a>;</td></tr>
+<tr><th id="492">492</th><td>}</td></tr>
+<tr><th id="493">493</th><td></td></tr>
+<tr><th id="494">494</th><td><i>//....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo.....</i></td></tr>
+<tr><th id="495">495</th><td></td></tr>
+<tr><th id="496">496</th><td><em>void</em></td></tr>
+<tr><th id="497">497</th><td><a class="type" href="../include/G4CrossSectionDataStore.hh.html#G4CrossSectionDataStore" title='G4CrossSectionDataStore' data-ref="G4CrossSectionDataStore">G4CrossSectionDataStore</a>::<dfn class="decl def" id="_ZN23G4CrossSectionDataStore17BuildPhysicsTableERK20G4ParticleDefinition" title='G4CrossSectionDataStore::BuildPhysicsTable' data-ref="_ZN23G4CrossSectionDataStore17BuildPhysicsTableERK20G4ParticleDefinition">BuildPhysicsTable</dfn>(<em>const</em> <a class="type" href="../../../../particles/management/include/G4ParticleDefinition.hh.html#G4ParticleDefinition" title='G4ParticleDefinition' data-ref="G4ParticleDefinition">G4ParticleDefinition</a>&amp; <dfn class="local col4 decl" id="54aParticleType" title='aParticleType' data-type='const G4ParticleDefinition &amp;' data-ref="54aParticleType">aParticleType</dfn>)</td></tr>
+<tr><th id="498">498</th><td>{</td></tr>
+<tr><th id="499">499</th><td>  <b>if</b> (<a class="member" href="../include/G4CrossSectionDataStore.hh.html#G4CrossSectionDataStore::nDataSetList" title='G4CrossSectionDataStore::nDataSetList' data-ref="G4CrossSectionDataStore::nDataSetList">nDataSetList</a> == <var>0</var>) </td></tr>
+<tr><th id="500">500</th><td>    {</td></tr>
+<tr><th id="501">501</th><td>      <b>throw</b> <a class="type" href="../../util/include/G4HadronicException.hh.html#G4HadronicException" title='G4HadronicException' data-ref="G4HadronicException">G4HadronicException</a><a class="ref" href="../../util/include/G4HadronicException.hh.html#_ZN19G4HadronicExceptionC1E8G4StringiS0_" title='G4HadronicException::G4HadronicException' data-ref="_ZN19G4HadronicExceptionC1E8G4StringiS0_">(</a><span class="macro" title="&quot;/home/jishin/app/geant4/1005p1/geant4.10.05.p01/source/processes/hadronic/cross_sections/src/G4CrossSectionDataStore.cc&quot;" data-ref="_M/__FILE__">__FILE__</span>, <span class="macro" title="501" data-ref="_M/__LINE__">__LINE__</span>, </td></tr>
+<tr><th id="502">502</th><td>				<a class="ref fake" href="../../../../global/management/include/G4String.hh.html#_ZN8G4StringC1EPKc" title='G4String::G4String' data-ref="_ZN8G4StringC1EPKc"></a><q>"G4CrossSectionDataStore: no data sets registered"</q>);</td></tr>
+<tr><th id="503">503</th><td>      <b>return</b>;</td></tr>
+<tr><th id="504">504</th><td>    }</td></tr>
+<tr><th id="505">505</th><td>  <b>for</b> (<a class="typedef" href="../../../../global/management/include/G4Types.hh.html#G4int" title='G4int' data-type='int' data-ref="G4int">G4int</a> <dfn class="local col5 decl" id="55i" title='i' data-type='G4int' data-ref="55i">i</dfn>=<var>0</var>; <a class="local col5 ref" href="#55i" title='i' data-ref="55i">i</a>&lt;<a class="member" href="../include/G4CrossSectionDataStore.hh.html#G4CrossSectionDataStore::nDataSetList" title='G4CrossSectionDataStore::nDataSetList' data-ref="G4CrossSectionDataStore::nDataSetList">nDataSetList</a>; ++<a class="local col5 ref" href="#55i" title='i' data-ref="55i">i</a>) {</td></tr>
+<tr><th id="506">506</th><td>    <span class='error' title="use of undeclared identifier &apos;dataSetList&apos;">dataSetList</span>[i]-&gt;BuildPhysicsTable(aParticleType);</td></tr>
+<tr><th id="507">507</th><td>  } </td></tr>
+<tr><th id="508">508</th><td>  <i>//A.Dotti: if fast-path has been requested we can now create the surrogate</i></td></tr>
+<tr><th id="509">509</th><td><i>  //         model for fast path.</i></td></tr>
+<tr><th id="510">510</th><td>  <b>if</b> ( <a class="member" href="../include/G4CrossSectionDataStore.hh.html#G4CrossSectionDataStore::fastPathFlags" title='G4CrossSectionDataStore::fastPathFlags' data-ref="G4CrossSectionDataStore::fastPathFlags">fastPathFlags</a>.<a class="ref" href="../include/G4FastPathHadronicCrossSection.hh.html#G4FastPathHadronicCrossSection::controlFlag::useFastPathIfAvailable" title='G4FastPathHadronicCrossSection::controlFlag::useFastPathIfAvailable' data-ref="G4FastPathHadronicCrossSection::controlFlag::useFastPathIfAvailable">useFastPathIfAvailable</a> ) {</td></tr>
+<tr><th id="511">511</th><td>	  <a class="member" href="../include/G4CrossSectionDataStore.hh.html#G4CrossSectionDataStore::fastPathFlags" title='G4CrossSectionDataStore::fastPathFlags' data-ref="G4CrossSectionDataStore::fastPathFlags">fastPathFlags</a>.<a class="ref" href="../include/G4FastPathHadronicCrossSection.hh.html#G4FastPathHadronicCrossSection::controlFlag::initializationPhase" title='G4FastPathHadronicCrossSection::controlFlag::initializationPhase' data-ref="G4FastPathHadronicCrossSection::controlFlag::initializationPhase">initializationPhase</a> = <b>true</b>;</td></tr>
+<tr><th id="512">512</th><td>	  <b>using</b> my_value_type=G4FastPathHadronicCrossSection::<span class='error' title="no member named &apos;G4CrossSectionDataStore_Requests&apos; in namespace &apos;G4FastPathHadronicCrossSection&apos;">G4CrossSectionDataStore_Requests</span>::value_type;</td></tr>
+<tr><th id="513">513</th><td>	  <i>//Loop on all requests, if particle matches create the corresponding fsat-path</i></td></tr>
+<tr><th id="514">514</th><td>	  <span class='error' title="use of undeclared identifier &apos;std&apos;">std</span>::for_each( requests.begin() , requests.end() ,</td></tr>
+<tr><th id="515">515</th><td>			  [&amp;aParticleType,<b>this</b>](<em>const</em> <span class='error' title="unknown type name &apos;my_value_type&apos;">my_value_type</span>&amp; req) {</td></tr>
+<tr><th id="516">516</th><td>  	  	  	  	  <b>if</b> ( aParticleType == *req.part_mat.first ) {</td></tr>
+<tr><th id="517">517</th><td>  	  	  	  		  G4FastPathHadronicCrossSection::cycleCountEntry* entry =</td></tr>
+<tr><th id="518">518</th><td>  	  	  	  				  <b>new</b> G4FastPathHadronicCrossSection::cycleCountEntry(aParticleType.GetParticleName(),req.part_mat.second);</td></tr>
+<tr><th id="519">519</th><td>  	  	  	  		  entry-&gt;fastPath =</td></tr>
+<tr><th id="520">520</th><td>  	  	  	  				  <b>new</b> G4FastPathHadronicCrossSection::fastPathEntry(&amp;aParticleType,req.part_mat.second,req.min_cutoff);</td></tr>
+<tr><th id="521">521</th><td>  	  	  	  		  entry-&gt;fastPath-&gt;Initialize(<b>this</b>);</td></tr>
+<tr><th id="522">522</th><td>  	  	  	  		  fastPathCache[req.part_mat] = entry;</td></tr>
+<tr><th id="523">523</th><td>  	  	  	  	  }</td></tr>
+<tr><th id="524">524</th><td>	  	  	  }</td></tr>
+<tr><th id="525">525</th><td>	  	  );</td></tr>
+<tr><th id="526">526</th><td>	  <a class="member" href="../include/G4CrossSectionDataStore.hh.html#G4CrossSectionDataStore::fastPathFlags" title='G4CrossSectionDataStore::fastPathFlags' data-ref="G4CrossSectionDataStore::fastPathFlags">fastPathFlags</a>.<a class="ref" href="../include/G4FastPathHadronicCrossSection.hh.html#G4FastPathHadronicCrossSection::controlFlag::initializationPhase" title='G4FastPathHadronicCrossSection::controlFlag::initializationPhase' data-ref="G4FastPathHadronicCrossSection::controlFlag::initializationPhase">initializationPhase</a> = <b>false</b>;</td></tr>
+<tr><th id="527">527</th><td>  }</td></tr>
+<tr><th id="528">528</th><td>}</td></tr>
+<tr><th id="529">529</th><td></td></tr>
+<tr><th id="530">530</th><td><i>//....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo.....</i></td></tr>
+<tr><th id="531">531</th><td></td></tr>
+<tr><th id="532">532</th><td><em>void</em> <a class="type" href="../include/G4CrossSectionDataStore.hh.html#G4CrossSectionDataStore" title='G4CrossSectionDataStore' data-ref="G4CrossSectionDataStore">G4CrossSectionDataStore</a>::<dfn class="decl def" id="_ZN23G4CrossSectionDataStore16ActivateFastPathEPK20G4ParticleDefinitionPK10G4Materiald" title='G4CrossSectionDataStore::ActivateFastPath' data-ref="_ZN23G4CrossSectionDataStore16ActivateFastPathEPK20G4ParticleDefinitionPK10G4Materiald">ActivateFastPath</dfn>( <em>const</em> <a class="type" href="../../../../particles/management/include/G4ParticleDefinition.hh.html#G4ParticleDefinition" title='G4ParticleDefinition' data-ref="G4ParticleDefinition">G4ParticleDefinition</a>* <dfn class="local col6 decl" id="56pdef" title='pdef' data-type='const G4ParticleDefinition *' data-ref="56pdef">pdef</dfn>, <em>const</em> <a class="type" href="../../../../materials/include/G4Material.hh.html#G4Material" title='G4Material' data-ref="G4Material">G4Material</a>* <dfn class="local col7 decl" id="57mat" title='mat' data-type='const G4Material *' data-ref="57mat">mat</dfn>, <a class="typedef" href="../../../../global/management/include/G4Types.hh.html#G4double" title='G4double' data-type='double' data-ref="G4double">G4double</a> <dfn class="local col8 decl" id="58min_cutoff" title='min_cutoff' data-type='G4double' data-ref="58min_cutoff">min_cutoff</dfn>)</td></tr>
+<tr><th id="533">533</th><td>{</td></tr>
+<tr><th id="534">534</th><td>	<span class='error' title="use of undeclared identifier &apos;assert&apos;">assert</span>(pdef!=<b>nullptr</b>&amp;&amp;mat!=<b>nullptr</b>);</td></tr>
+<tr><th id="535">535</th><td>	G4FastPathHadronicCrossSection::<span class='error' title="no type named &apos;G4CrossSectionDataStore_Key&apos; in namespace &apos;G4FastPathHadronicCrossSection&apos;">G4CrossSectionDataStore_Key</span> <dfn class="local col9 decl" id="59key" title='key' data-type='int' data-ref="59key">key</dfn>={pdef,mat};</td></tr>
+<tr><th id="536">536</th><td>	<b>if</b> ( requests.insert( { key , min_cutoff } ).second ) {</td></tr>
+<tr><th id="537">537</th><td>		<span class='error' title="use of undeclared identifier &apos;std&apos;">std</span>::ostringstream <dfn class="local col0 decl" id="60msg" title='msg' data-type='int' data-ref="60msg">msg</dfn>;</td></tr>
+<tr><th id="538">538</th><td>		msg&lt;&lt;<q>"Attempting to request FastPath for couple: "</q>&lt;&lt;pdef-&gt;GetParticleName()&lt;&lt;<q>","</q>&lt;&lt;mat-&gt;GetName();</td></tr>
+<tr><th id="539">539</th><td>		msg&lt;&lt;<q>" but combination already exists"</q>;</td></tr>
+<tr><th id="540">540</th><td>		<b>throw</b> G4HadronicException(<span class="macro" title="&quot;/home/jishin/app/geant4/1005p1/geant4.10.05.p01/source/processes/hadronic/cross_sections/src/G4CrossSectionDataStore.cc&quot;" data-ref="_M/__FILE__">__FILE__</span>,<span class="macro" title="540" data-ref="_M/__LINE__">__LINE__</span>,msg.str());</td></tr>
+<tr><th id="541">541</th><td>	}</td></tr>
+<tr><th id="542">542</th><td>}</td></tr>
+<tr><th id="543">543</th><td></td></tr>
+<tr><th id="544">544</th><td><i>//....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo.....</i></td></tr>
+<tr><th id="545">545</th><td></td></tr>
+<tr><th id="546">546</th><td><em>void</em> </td></tr>
+<tr><th id="547">547</th><td><a class="type" href="../include/G4CrossSectionDataStore.hh.html#G4CrossSectionDataStore" title='G4CrossSectionDataStore' data-ref="G4CrossSectionDataStore">G4CrossSectionDataStore</a>::<dfn class="decl def" id="_ZN23G4CrossSectionDataStore16DumpPhysicsTableERK20G4ParticleDefinition" title='G4CrossSectionDataStore::DumpPhysicsTable' data-ref="_ZN23G4CrossSectionDataStore16DumpPhysicsTableERK20G4ParticleDefinition">DumpPhysicsTable</dfn>(<em>const</em> <a class="type" href="../../../../particles/management/include/G4ParticleDefinition.hh.html#G4ParticleDefinition" title='G4ParticleDefinition' data-ref="G4ParticleDefinition">G4ParticleDefinition</a>&amp; <dfn class="local col1 decl" id="61aParticleType" title='aParticleType' data-type='const G4ParticleDefinition &amp;' data-ref="61aParticleType">aParticleType</dfn>)</td></tr>
+<tr><th id="548">548</th><td>{</td></tr>
+<tr><th id="549">549</th><td>  <i>// Print out all cross section data sets used and the energies at</i></td></tr>
+<tr><th id="550">550</th><td><i>  // which they apply</i></td></tr>
+<tr><th id="551">551</th><td></td></tr>
+<tr><th id="552">552</th><td>  <b>if</b> (<a class="member" href="../include/G4CrossSectionDataStore.hh.html#G4CrossSectionDataStore::nDataSetList" title='G4CrossSectionDataStore::nDataSetList' data-ref="G4CrossSectionDataStore::nDataSetList">nDataSetList</a> == <var>0</var>) {</td></tr>
+<tr><th id="553">553</th><td>    <a class="macro" href="../../../../global/management/include/G4ios.hh.html#46" title="(*_G4cout_p())" data-ref="_M/G4cout">G4cout</a> <span class='error' title="invalid operands to binary expression (&apos;int&apos; and &apos;const char *&apos;)">&lt;&lt;</span> <q>"WARNING - G4CrossSectionDataStore::DumpPhysicsTable: "</q></td></tr>
+<tr><th id="554">554</th><td>	   &lt;&lt; <q>" no data sets registered"</q> &lt;&lt; <a class="macro" href="../../../../global/management/include/G4ios.hh.html#60" title="std::endl" data-ref="_M/G4endl">G4endl</a>;</td></tr>
+<tr><th id="555">555</th><td>    <b>return</b>;</td></tr>
+<tr><th id="556">556</th><td>  }</td></tr>
+<tr><th id="557">557</th><td></td></tr>
+<tr><th id="558">558</th><td>  <b>for</b> (<a class="typedef" href="../../../../global/management/include/G4Types.hh.html#G4int" title='G4int' data-type='int' data-ref="G4int">G4int</a> <dfn class="local col2 decl" id="62i" title='i' data-type='G4int' data-ref="62i">i</dfn> = <a class="member" href="../include/G4CrossSectionDataStore.hh.html#G4CrossSectionDataStore::nDataSetList" title='G4CrossSectionDataStore::nDataSetList' data-ref="G4CrossSectionDataStore::nDataSetList">nDataSetList</a>-<var>1</var>; <a class="local col2 ref" href="#62i" title='i' data-ref="62i">i</a> &gt;= <var>0</var>; --<a class="local col2 ref" href="#62i" title='i' data-ref="62i">i</a>) {</td></tr>
+<tr><th id="559">559</th><td>    <a class="typedef" href="../../../../global/management/include/G4Types.hh.html#G4double" title='G4double' data-type='double' data-ref="G4double">G4double</a> <dfn class="local col3 decl" id="63e1" title='e1' data-type='G4double' data-ref="63e1">e1</dfn> = <span class='error' title="use of undeclared identifier &apos;dataSetList&apos;">dataSetList</span>[i]-&gt;GetMinKinEnergy();</td></tr>
+<tr><th id="560">560</th><td>    <a class="typedef" href="../../../../global/management/include/G4Types.hh.html#G4double" title='G4double' data-type='double' data-ref="G4double">G4double</a> <dfn class="local col4 decl" id="64e2" title='e2' data-type='G4double' data-ref="64e2">e2</dfn> = <span class='error' title="use of undeclared identifier &apos;dataSetList&apos;">dataSetList</span>[i]-&gt;GetMaxKinEnergy();</td></tr>
+<tr><th id="561">561</th><td>     <a class="macro" href="../../../../global/management/include/G4ios.hh.html#46" title="(*_G4cout_p())" data-ref="_M/G4cout">G4cout</a> </td></tr>
+<tr><th id="562">562</th><td>      <span class='error' title="invalid operands to binary expression (&apos;int&apos; and &apos;const char *&apos;)">&lt;&lt;</span> <q>"     Cr_sctns: "</q> &lt;&lt; <span class='error' title="use of undeclared identifier &apos;std&apos;">std</span>::setw(<var>25</var>) &lt;&lt; <span class='error' title="use of undeclared identifier &apos;dataSetList&apos;">dataSetList</span>[i]-&gt;GetName() &lt;&lt; <q>": "</q></td></tr>
+<tr><th id="563">563</th><td>      &lt;&lt;  G4BestUnit(e1, <q>"Energy"</q>)</td></tr>
+<tr><th id="564">564</th><td>      &lt;&lt; <q>" ---&gt; "</q></td></tr>
+<tr><th id="565">565</th><td>      &lt;&lt;  G4BestUnit(e2, <q>"Energy"</q>) &lt;&lt; <q>"\n"</q>;</td></tr>
+<tr><th id="566">566</th><td>      <b>if</b> (<span class='error' title="use of undeclared identifier &apos;dataSetList&apos;">dataSetList</span>[i]-&gt;GetName() == <q>"G4CrossSectionPairGG"</q>) {</td></tr>
+<tr><th id="567">567</th><td>        <span class='error' title="use of undeclared identifier &apos;dataSetList&apos;">dataSetList</span>[i]-&gt;DumpPhysicsTable(aParticleType);</td></tr>
+<tr><th id="568">568</th><td>      }</td></tr>
+<tr><th id="569">569</th><td>  }</td></tr>
+<tr><th id="570">570</th><td>}</td></tr>
+<tr><th id="571">571</th><td></td></tr>
+<tr><th id="572">572</th><td><i>//....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo.....</i></td></tr>
+<tr><th id="573">573</th><td><u>#include <span class='error' title="&apos;typeinfo&apos; file not found">&lt;</span>typeinfo&gt;</u></td></tr>
+<tr><th id="574">574</th><td><em>void</em> G4CrossSectionDataStore::DumpHtml(<em>const</em> G4ParticleDefinition&amp; <i>/* pD */</i>,</td></tr>
+<tr><th id="575">575</th><td>                                       std::ofstream&amp; outFile) <em>const</em></td></tr>
+<tr><th id="576">576</th><td>{</td></tr>
+<tr><th id="577">577</th><td>  <i>// Write cross section data set info to html physics list</i></td></tr>
+<tr><th id="578">578</th><td><i>  // documentation page</i></td></tr>
+<tr><th id="579">579</th><td></td></tr>
+<tr><th id="580">580</th><td>  G4double ehi = <var>0</var>;</td></tr>
+<tr><th id="581">581</th><td>  G4double elo = <var>0</var>;</td></tr>
+<tr><th id="582">582</th><td>  G4String physListName(getenv(<q>"G4PhysListName"</q>));</td></tr>
+<tr><th id="583">583</th><td>  <b>for</b> (G4int i = nDataSetList-<var>1</var>; i &gt; <var>0</var>; i--) {</td></tr>
+<tr><th id="584">584</th><td>    elo = dataSetList[i]-&gt;GetMinKinEnergy()/GeV;</td></tr>
+<tr><th id="585">585</th><td>    ehi = dataSetList[i]-&gt;GetMaxKinEnergy()/GeV;</td></tr>
+<tr><th id="586">586</th><td>    outFile &lt;&lt; <q>"      &lt;li&gt;&lt;b&gt;&lt;a href=\""</q> &lt;&lt; physListName &lt;&lt; <q>"_"</q></td></tr>
+<tr><th id="587">587</th><td>	         &lt;&lt; dataSetList[i]-&gt;GetName() &lt;&lt; <q>".html\"&gt; "</q></td></tr>
+<tr><th id="588">588</th><td>            &lt;&lt; dataSetList[i]-&gt;GetName() &lt;&lt; <q>"&lt;/a&gt; from "</q></td></tr>
+<tr><th id="589">589</th><td>            &lt;&lt; elo &lt;&lt; <q>" GeV to "</q> &lt;&lt; ehi &lt;&lt; <q>" GeV &lt;/b&gt;&lt;/li&gt;\n"</q>;</td></tr>
+<tr><th id="590">590</th><td>	 <i>//G4cerr &lt;&lt; i &lt;&lt; ": XS for " &lt;&lt; pD.GetParticleName() &lt;&lt; " : " &lt;&lt; dataSetList[i]-&gt;GetName() </i></td></tr>
+<tr><th id="591">591</th><td><i>	 //       &lt;&lt; " typeid : " &lt;&lt; typeid(dataSetList[i]).name()&lt;&lt; G4endl;			</i></td></tr>
+<tr><th id="592">592</th><td>	 PrintCrossSectionHtml(dataSetList[i]);			</td></tr>
+<tr><th id="593">593</th><td>  }</td></tr>
+<tr><th id="594">594</th><td></td></tr>
+<tr><th id="595">595</th><td>  G4double defaultHi = dataSetList[<var>0</var>]-&gt;GetMaxKinEnergy()/GeV;</td></tr>
+<tr><th id="596">596</th><td>  <b>if</b> (ehi &lt; defaultHi) {</td></tr>
+<tr><th id="597">597</th><td>    outFile &lt;&lt; <q>"      &lt;li&gt;&lt;b&gt;&lt;a href=\""</q> &lt;&lt; dataSetList[<var>0</var>]-&gt;GetName() &lt;&lt; <q>".html\"&gt; "</q></td></tr>
+<tr><th id="598">598</th><td>            &lt;&lt; dataSetList[<var>0</var>]-&gt;GetName() &lt;&lt; <q>"&lt;/a&gt; from "</q></td></tr>
+<tr><th id="599">599</th><td>            &lt;&lt; ehi &lt;&lt; <q>" GeV to "</q> &lt;&lt; defaultHi &lt;&lt; <q>" GeV &lt;/b&gt;&lt;/li&gt;\n"</q>;</td></tr>
+<tr><th id="600">600</th><td>	 PrintCrossSectionHtml(dataSetList[<var>0</var>]);			</td></tr>
+<tr><th id="601">601</th><td>  }</td></tr>
+<tr><th id="602">602</th><td>}</td></tr>
+<tr><th id="603">603</th><td></td></tr>
+<tr><th id="604">604</th><td><i>//....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo.....</i></td></tr>
+<tr><th id="605">605</th><td></td></tr>
+<tr><th id="606">606</th><td><em>void</em> <a class="type" href="../include/G4CrossSectionDataStore.hh.html#G4CrossSectionDataStore" title='G4CrossSectionDataStore' data-ref="G4CrossSectionDataStore">G4CrossSectionDataStore</a>::<dfn class="decl def" id="_ZNK23G4CrossSectionDataStore21PrintCrossSectionHtmlEPK22G4VCrossSectionDataSet" title='G4CrossSectionDataStore::PrintCrossSectionHtml' data-ref="_ZNK23G4CrossSectionDataStore21PrintCrossSectionHtmlEPK22G4VCrossSectionDataSet">PrintCrossSectionHtml</dfn>(<em>const</em> <a class="type" href="../include/G4VCrossSectionDataSet.hh.html#G4VCrossSectionDataSet" title='G4VCrossSectionDataSet' data-ref="G4VCrossSectionDataSet">G4VCrossSectionDataSet</a> *<dfn class="local col5 decl" id="65cs" title='cs' data-type='const G4VCrossSectionDataSet *' data-ref="65cs">cs</dfn>) <em>const</em></td></tr>
+<tr><th id="607">607</th><td>{</td></tr>
+<tr><th id="608">608</th><td>   <a class="type" href="../../../../global/management/include/G4String.hh.html#G4String" title='G4String' data-ref="G4String">G4String</a> <dfn class="local col6 decl" id="66dirName" title='dirName' data-type='G4String' data-ref="66dirName">dirName</dfn>(<span class='error' title="use of undeclared identifier &apos;getenv&apos;">getenv</span>(<q>"G4PhysListDocDir"</q>));</td></tr>
+<tr><th id="609">609</th><td>	<a class="type" href="../../../../global/management/include/G4String.hh.html#G4String" title='G4String' data-ref="G4String">G4String</a> <dfn class="local col7 decl" id="67physListName" title='physListName' data-type='G4String' data-ref="67physListName">physListName</dfn>(<span class='error' title="use of undeclared identifier &apos;getenv&apos;">getenv</span>(<q>"G4PhysListName"</q>));</td></tr>
+<tr><th id="610">610</th><td></td></tr>
+<tr><th id="611">611</th><td>	<a class="type" href="../../../../global/management/include/G4String.hh.html#G4String" title='G4String' data-ref="G4String">G4String</a> <dfn class="local col8 decl" id="68pathName" title='pathName' data-type='G4String' data-ref="68pathName">pathName</dfn> = dirName <span class='error' title="invalid operands to binary expression (&apos;G4String&apos; and &apos;const char *&apos;)">+</span> <q>"/"</q> + physListName + <q>"_"</q> + HtmlFileName(cs-&gt;GetName());</td></tr>
+<tr><th id="612">612</th><td>	<span class='error' title="use of undeclared identifier &apos;std&apos;">std</span>::ofstream <dfn class="local col9 decl" id="69outCS" title='outCS' data-type='int' data-ref="69outCS">outCS</dfn>;</td></tr>
+<tr><th id="613">613</th><td>	outCS.open(pathName);</td></tr>
+<tr><th id="614">614</th><td>	outCS &lt;&lt; <q>"&lt;html&gt;\n"</q>;</td></tr>
+<tr><th id="615">615</th><td>	outCS &lt;&lt; <q>"&lt;head&gt;\n"</q>;</td></tr>
+<tr><th id="616">616</th><td>	outCS &lt;&lt; <q>"&lt;title&gt;Description of "</q> &lt;&lt; cs-&gt;GetName() </td></tr>
+<tr><th id="617">617</th><td>		 &lt;&lt; <q>"&lt;/title&gt;\n"</q>;</td></tr>
+<tr><th id="618">618</th><td>	outCS &lt;&lt; <q>"&lt;/head&gt;\n"</q>;</td></tr>
+<tr><th id="619">619</th><td>	outCS &lt;&lt; <q>"&lt;body&gt;\n"</q>;</td></tr>
+<tr><th id="620">620</th><td></td></tr>
+<tr><th id="621">621</th><td>	cs-&gt;CrossSectionDescription(outCS);</td></tr>
+<tr><th id="622">622</th><td></td></tr>
+<tr><th id="623">623</th><td>	outCS &lt;&lt; <q>"&lt;/body&gt;\n"</q>;</td></tr>
+<tr><th id="624">624</th><td>	outCS &lt;&lt; <q>"&lt;/html&gt;\n"</q>;</td></tr>
+<tr><th id="625">625</th><td></td></tr>
+<tr><th id="626">626</th><td>}</td></tr>
+<tr><th id="627">627</th><td><i>//....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo.....</i></td></tr>
+<tr><th id="628">628</th><td></td></tr>
+<tr><th id="629">629</th><td><a class="type" href="../../../../global/management/include/G4String.hh.html#G4String" title='G4String' data-ref="G4String">G4String</a> <a class="type" href="../include/G4CrossSectionDataStore.hh.html#G4CrossSectionDataStore" title='G4CrossSectionDataStore' data-ref="G4CrossSectionDataStore">G4CrossSectionDataStore</a>::<dfn class="decl def" id="_ZNK23G4CrossSectionDataStore12HtmlFileNameERK8G4String" title='G4CrossSectionDataStore::HtmlFileName' data-ref="_ZNK23G4CrossSectionDataStore12HtmlFileNameERK8G4String">HtmlFileName</dfn>(<em>const</em> <a class="type" href="../../../../global/management/include/G4String.hh.html#G4String" title='G4String' data-ref="G4String">G4String</a> &amp; <dfn class="local col0 decl" id="70in" title='in' data-type='const G4String &amp;' data-ref="70in">in</dfn>) <em>const</em></td></tr>
+<tr><th id="630">630</th><td>{</td></tr>
+<tr><th id="631">631</th><td>   <a class="type" href="../../../../global/management/include/G4String.hh.html#G4String" title='G4String' data-ref="G4String">G4String</a> <dfn class="local col1 decl" id="71str" title='str' data-type='G4String' data-ref="71str">str</dfn><a class="ref" href="../../../../global/management/include/G4String.hh.html#_ZN8G4StringC1ERKS_" title='G4String::G4String' data-ref="_ZN8G4StringC1ERKS_">(</a><a class="local col0 ref" href="#70in" title='in' data-ref="70in">in</a>);</td></tr>
+<tr><th id="632">632</th><td>   <i>// replace blanks by _  C++11 version:</i></td></tr>
+<tr><th id="633">633</th><td>   <span class='error' title="use of undeclared identifier &apos;std&apos;">std</span>::transform(str.<span class='error' title="no member named &apos;begin&apos; in &apos;G4String&apos;">begin</span>(), str.<span class='error' title="no member named &apos;end&apos; in &apos;G4String&apos;">end</span>(), str.<span class='error' title="no member named &apos;begin&apos; in &apos;G4String&apos;">begin</span>(), [](<em>char</em> ch) {</td></tr>
+<tr><th id="634">634</th><td>       <b>return</b> ch == <kbd>' '</kbd> ? <kbd>'_'</kbd> : ch;</td></tr>
+<tr><th id="635">635</th><td>   });</td></tr>
+<tr><th id="636">636</th><td>   str=str <span class='error' title="invalid operands to binary expression (&apos;G4String&apos; and &apos;const char *&apos;)">+</span> <q>".html"</q>;		</td></tr>
+<tr><th id="637">637</th><td>   <b>return</b> <a class="local col1 ref" href="#71str" title='str' data-ref="71str">str</a>;</td></tr>
+<tr><th id="638">638</th><td>}</td></tr>
+<tr><th id="639">639</th><td></td></tr>
+<tr><th id="640">640</th><td><i>//....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo.....</i></td></tr>
+<tr><th id="641">641</th><td></td></tr>
+<tr><th id="642">642</th><td><em>void</em> <a class="type" href="../include/G4CrossSectionDataStore.hh.html#G4CrossSectionDataStore" title='G4CrossSectionDataStore' data-ref="G4CrossSectionDataStore">G4CrossSectionDataStore</a>::<dfn class="decl def" id="_ZN23G4CrossSectionDataStore10AddDataSetEP22G4VCrossSectionDataSet" title='G4CrossSectionDataStore::AddDataSet' data-ref="_ZN23G4CrossSectionDataStore10AddDataSetEP22G4VCrossSectionDataSet">AddDataSet</dfn>(<a class="type" href="../include/G4VCrossSectionDataSet.hh.html#G4VCrossSectionDataSet" title='G4VCrossSectionDataSet' data-ref="G4VCrossSectionDataSet">G4VCrossSectionDataSet</a>* <dfn class="local col2 decl" id="72p" title='p' data-type='G4VCrossSectionDataSet *' data-ref="72p">p</dfn>)</td></tr>
+<tr><th id="643">643</th><td>{</td></tr>
+<tr><th id="644">644</th><td>  <b>if</b>(<a class="local col2 ref" href="#72p" title='p' data-ref="72p">p</a>-&gt;<a class="ref" href="../include/G4VCrossSectionDataSet.hh.html#_ZNK22G4VCrossSectionDataSet22ForAllAtomsAndEnergiesEv" title='G4VCrossSectionDataSet::ForAllAtomsAndEnergies' data-ref="_ZNK22G4VCrossSectionDataSet22ForAllAtomsAndEnergiesEv">ForAllAtomsAndEnergies</a>()) { </td></tr>
+<tr><th id="645">645</th><td>    <span class='error' title="use of undeclared identifier &apos;dataSetList&apos;">dataSetList</span>.clear();</td></tr>
+<tr><th id="646">646</th><td>    <a class="member" href="../include/G4CrossSectionDataStore.hh.html#G4CrossSectionDataStore::nDataSetList" title='G4CrossSectionDataStore::nDataSetList' data-ref="G4CrossSectionDataStore::nDataSetList">nDataSetList</a> = <var>0</var>;</td></tr>
+<tr><th id="647">647</th><td>  }</td></tr>
+<tr><th id="648">648</th><td>  <span class='error' title="use of undeclared identifier &apos;dataSetList&apos;">dataSetList</span>.push_back(p);</td></tr>
+<tr><th id="649">649</th><td>  ++<a class="member" href="../include/G4CrossSectionDataStore.hh.html#G4CrossSectionDataStore::nDataSetList" title='G4CrossSectionDataStore::nDataSetList' data-ref="G4CrossSectionDataStore::nDataSetList">nDataSetList</a>;</td></tr>
+<tr><th id="650">650</th><td>}</td></tr>
+<tr><th id="651">651</th><td></td></tr>
+<tr><th id="652">652</th><td></td></tr>
+<tr><th id="653">653</th><td></td></tr>
+<tr><th id="654">654</th><td><i>//....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo.....</i></td></tr>
+<tr><th id="655">655</th><td></td></tr>
+<tr><th id="656">656</th><td><em>void</em> G4CrossSectionDataStore::AddDataSet(G4VCrossSectionDataSet* p, <span class='error' title="unknown type name &apos;size_t&apos;">size_t</span> i )  </td></tr>
+<tr><th id="657">657</th><td>{</td></tr>
+<tr><th id="658">658</th><td>  <b>if</b>(p-&gt;ForAllAtomsAndEnergies()) {</td></tr>
+<tr><th id="659">659</th><td>    <span class='error' title="use of undeclared identifier &apos;dataSetList&apos;">dataSetList</span>.clear();</td></tr>
+<tr><th id="660">660</th><td>    <span class='error' title="use of undeclared identifier &apos;dataSetList&apos;">dataSetList</span>.push_back(p);</td></tr>
+<tr><th id="661">661</th><td>    nDataSetList = <var>1</var>;</td></tr>
+<tr><th id="662">662</th><td>  } <b>else</b> {</td></tr>
+<tr><th id="663">663</th><td>    <b>if</b> ( i &gt; <span class='error' title="use of undeclared identifier &apos;dataSetList&apos;">dataSetList</span>.size() ) i = <span class='error' title="use of undeclared identifier &apos;dataSetList&apos;">dataSetList</span>.size(); </td></tr>
+<tr><th id="664">664</th><td>    <span class='error' title="use of undeclared identifier &apos;std&apos;">std</span>::vector&lt; <span class='error' title="&apos;G4VCrossSectionDataSet&apos; does not refer to a value">G4VCrossSectionDataSet</span>* <span class='error' title="expected expression">&gt;</span>::<span class='error' title="no member named &apos;iterator&apos; in the global namespace">iterator</span> it = dataSetList.end() - i;</td></tr>
+<tr><th id="665">665</th><td>    <span class='error' title="use of undeclared identifier &apos;dataSetList&apos;">dataSetList</span>.insert(<span class='error' title="use of undeclared identifier &apos;it&apos;">it</span> , p);</td></tr>
+<tr><th id="666">666</th><td>    ++nDataSetList;</td></tr>
+<tr><th id="667">667</th><td>  }</td></tr>
+<tr><th id="668">668</th><td>}</td></tr>
+<tr><th id="669">669</th><td><i>//....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo.....</i></td></tr>
+<tr><th id="670">670</th><td></td></tr>
+</table><hr/><p id='footer'>
+Generated on <em>2019-Aug-28</em> from project codebrowser<br />Powered by <a href='https://woboq.com'><img alt='Woboq' src='https://code.woboq.org/woboq-16.png' width='41' height='16' /></a> <a href='https://code.woboq.org'>Code Browser</a> 2.1
+<br/>Generator usage only permitted with license.</p>
+</div></body></html>

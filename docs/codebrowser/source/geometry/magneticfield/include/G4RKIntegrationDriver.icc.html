@@ -1,0 +1,251 @@
+<!doctype html>
+<html>
+<head>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"><title>G4RKIntegrationDriver.icc source code [codebrowser/source/geometry/magneticfield/include/G4RKIntegrationDriver.icc] - Woboq Code Browser</title>
+<link rel="stylesheet" href="../../../../../../data/qtcreator.css" title="QtCreator"/>
+<link rel="alternate stylesheet" href="../../../../../../data/kdevelop.css" title="KDevelop"/>
+<script type="text/javascript" src="../../../../../../data/jquery/jquery.min.js"></script>
+<script type="text/javascript" src="../../../../../../data/jquery/jquery-ui.min.js"></script>
+<script>var file = 'codebrowser/source/geometry/magneticfield/include/G4RKIntegrationDriver.icc'; var root_path = '../../../../..'; var data_path = '../../../../../../data';</script>
+<script src='../../../../../../data/codebrowser.js'></script>
+</head>
+<body><div id='header'><h1 id='breadcrumb'><span>Browse the source code of </span><a href='../../../..'>codebrowser</a>/<a href='../../..'>source</a>/<a href='../..'>geometry</a>/<a href='..'>magneticfield</a>/<a href='./'>include</a>/<a href='G4RKIntegrationDriver.icc.html'>G4RKIntegrationDriver.icc</a></h1></div>
+<hr/><div id='content'><table class="code">
+<tr><th id="1">1</th><td><i>//</i></td></tr>
+<tr><th id="2">2</th><td><i>// ********************************************************************</i></td></tr>
+<tr><th id="3">3</th><td><i>// * License and Disclaimer                                           *</i></td></tr>
+<tr><th id="4">4</th><td><i>// *                                                                  *</i></td></tr>
+<tr><th id="5">5</th><td><i>// * The  Geant4 software  is  copyright of the Copyright Holders  of *</i></td></tr>
+<tr><th id="6">6</th><td><i>// * the Geant4 Collaboration.  It is provided  under  the terms  and *</i></td></tr>
+<tr><th id="7">7</th><td><i>// * conditions of the Geant4 Software License,  included in the file *</i></td></tr>
+<tr><th id="8">8</th><td><i>// * LICENSE and available at  <a href="http://cern.ch/geant4/license">http://cern.ch/geant4/license</a> .  These *</i></td></tr>
+<tr><th id="9">9</th><td><i>// * include a list of copyright holders.                             *</i></td></tr>
+<tr><th id="10">10</th><td><i>// *                                                                  *</i></td></tr>
+<tr><th id="11">11</th><td><i>// * Neither the authors of this software system, nor their employing *</i></td></tr>
+<tr><th id="12">12</th><td><i>// * institutes,nor the agencies providing financial support for this *</i></td></tr>
+<tr><th id="13">13</th><td><i>// * work  make  any representation or  warranty, express or implied, *</i></td></tr>
+<tr><th id="14">14</th><td><i>// * regarding  this  software system or assume any liability for its *</i></td></tr>
+<tr><th id="15">15</th><td><i>// * use.  Please see the license in the file  LICENSE  and URL above *</i></td></tr>
+<tr><th id="16">16</th><td><i>// * for the full disclaimer and the limitation of liability.         *</i></td></tr>
+<tr><th id="17">17</th><td><i>// *                                                                  *</i></td></tr>
+<tr><th id="18">18</th><td><i>// * This  code  implementation is the result of  the  scientific and *</i></td></tr>
+<tr><th id="19">19</th><td><i>// * technical work of the GEANT4 collaboration.                      *</i></td></tr>
+<tr><th id="20">20</th><td><i>// * By using,  copying,  modifying or  distributing the software (or *</i></td></tr>
+<tr><th id="21">21</th><td><i>// * any work based  on the software)  you  agree  to acknowledge its *</i></td></tr>
+<tr><th id="22">22</th><td><i>// * use  in  resulting  scientific  publications,  and indicate your *</i></td></tr>
+<tr><th id="23">23</th><td><i>// * acceptance of all terms of the Geant4 Software license.          *</i></td></tr>
+<tr><th id="24">24</th><td><i>// ********************************************************************</i></td></tr>
+<tr><th id="25">25</th><td><i>//</i></td></tr>
+<tr><th id="26">26</th><td><i>//</i></td></tr>
+<tr><th id="27">27</th><td><i>//</i></td></tr>
+<tr><th id="28">28</th><td><i>//</i></td></tr>
+<tr><th id="29">29</th><td><i>// class G4RKIntegrationDriver</i></td></tr>
+<tr><th id="30">30</th><td><i>//</i></td></tr>
+<tr><th id="31">31</th><td><i>// Class description:</i></td></tr>
+<tr><th id="32">32</th><td><i>//</i></td></tr>
+<tr><th id="33">33</th><td><i>// Driver class which controls the integration error of a </i></td></tr>
+<tr><th id="34">34</th><td><i>// Runge-Kutta stepper </i></td></tr>
+<tr><th id="35">35</th><td><i></i></td></tr>
+<tr><th id="36">36</th><td><i>// History:</i></td></tr>
+<tr><th id="37">37</th><td><i>// - Created. D.Sorokin</i></td></tr>
+<tr><th id="38">38</th><td><i>// --------------------------------------------------------------------</i></td></tr>
+<tr><th id="39">39</th><td></td></tr>
+<tr><th id="40">40</th><td></td></tr>
+<tr><th id="41">41</th><td><u>#include <a href="../../../global/management/include/globals.hh.html">"globals.hh"</a></u></td></tr>
+<tr><th id="42">42</th><td></td></tr>
+<tr><th id="43">43</th><td><b>template</b> &lt;<b>class</b> T&gt;</td></tr>
+<tr><th id="44">44</th><td><a class="type" href="G4RKIntegrationDriver.hh.html#G4RKIntegrationDriver" title='G4RKIntegrationDriver' data-ref="G4RKIntegrationDriver">G4RKIntegrationDriver</a>&lt;T&gt;::<dfn class="decl def" id="_ZN21G4RKIntegrationDriverC1EPT_" title='G4RKIntegrationDriver::G4RKIntegrationDriver&lt;T&gt;' data-ref="_ZN21G4RKIntegrationDriverC1EPT_">G4RKIntegrationDriver</dfn>(T* <dfn class="local col1 decl" id="41pStepper" title='pStepper' data-type='T *' data-ref="41pStepper">pStepper</dfn>)</td></tr>
+<tr><th id="45">45</th><td>{</td></tr>
+<tr><th id="46">46</th><td>    <a class="member" href="#_ZN21G4RKIntegrationDriver25RenewStepperAndAdjustImplEPT_" title='G4RKIntegrationDriver::RenewStepperAndAdjustImpl' data-ref="_ZN21G4RKIntegrationDriver25RenewStepperAndAdjustImplEPT_">RenewStepperAndAdjustImpl</a>(<a class="local col1 ref" href="#41pStepper" title='pStepper' data-ref="41pStepper">pStepper</a>);</td></tr>
+<tr><th id="47">47</th><td>    <a class="member" href="G4RKIntegrationDriver.hh.html#G4RKIntegrationDriver::fMaxStepBase" title='G4RKIntegrationDriver::fMaxStepBase' data-ref="G4RKIntegrationDriver::fMaxStepBase">fMaxStepBase</a> = <var>250</var>;</td></tr>
+<tr><th id="48">48</th><td>    <a class="member" href="G4RKIntegrationDriver.hh.html#G4RKIntegrationDriver::fMaxNoSteps" title='G4RKIntegrationDriver::fMaxNoSteps' data-ref="G4RKIntegrationDriver::fMaxNoSteps">fMaxNoSteps</a> = <a class="member" href="G4RKIntegrationDriver.hh.html#G4RKIntegrationDriver::fMaxStepBase" title='G4RKIntegrationDriver::fMaxStepBase' data-ref="G4RKIntegrationDriver::fMaxStepBase">fMaxStepBase</a> / <a class="member" href="G4RKIntegrationDriver.hh.html#G4RKIntegrationDriver::pIntStepper" title='G4RKIntegrationDriver::pIntStepper' data-ref="G4RKIntegrationDriver::pIntStepper">pIntStepper</a>-&gt;IntegratorOrder();</td></tr>
+<tr><th id="49">49</th><td>}</td></tr>
+<tr><th id="50">50</th><td></td></tr>
+<tr><th id="51">51</th><td><i>// Step failed; compute the size of retrial Step.</i></td></tr>
+<tr><th id="52">52</th><td><b>template</b> &lt;<b>class</b> T&gt; <a class="typedef" href="../../../global/management/include/G4Types.hh.html#G4double" title='G4double' data-type='double' data-ref="G4double">G4double</a> <a class="type" href="G4RKIntegrationDriver.hh.html#G4RKIntegrationDriver" title='G4RKIntegrationDriver' data-ref="G4RKIntegrationDriver">G4RKIntegrationDriver</a>&lt;T&gt;::</td></tr>
+<tr><th id="53">53</th><td><dfn class="decl def" id="_ZNK21G4RKIntegrationDriver14ShrinkStepSizeEdd" title='G4RKIntegrationDriver::ShrinkStepSize' data-ref="_ZNK21G4RKIntegrationDriver14ShrinkStepSizeEdd">ShrinkStepSize</dfn>(<a class="typedef" href="../../../global/management/include/G4Types.hh.html#G4double" title='G4double' data-type='double' data-ref="G4double">G4double</a> <dfn class="local col2 decl" id="42h" title='h' data-type='G4double' data-ref="42h">h</dfn>, <a class="typedef" href="../../../global/management/include/G4Types.hh.html#G4double" title='G4double' data-type='double' data-ref="G4double">G4double</a> <dfn class="local col3 decl" id="43error" title='error' data-type='G4double' data-ref="43error">error</dfn>) <em>const</em></td></tr>
+<tr><th id="54">54</th><td>{</td></tr>
+<tr><th id="55">55</th><td>    <b>if</b> (<a class="local col3 ref" href="#43error" title='error' data-ref="43error">error</a> &gt; <a class="member" href="G4RKIntegrationDriver.hh.html#G4RKIntegrationDriver::errorConstraintShrink" title='G4RKIntegrationDriver::errorConstraintShrink' data-ref="G4RKIntegrationDriver::errorConstraintShrink">errorConstraintShrink</a>)</td></tr>
+<tr><th id="56">56</th><td>    {</td></tr>
+<tr><th id="57">57</th><td>        <b>return</b> <a class="member" href="G4VIntegrationDriver.hh.html#G4VIntegrationDriver::max_stepping_decrease" title='G4VIntegrationDriver::max_stepping_decrease' data-ref="G4VIntegrationDriver::max_stepping_decrease">max_stepping_decrease</a> * <a class="local col2 ref" href="#42h" title='h' data-ref="42h">h</a>;</td></tr>
+<tr><th id="58">58</th><td>    }</td></tr>
+<tr><th id="59">59</th><td>    <b>return</b> GetSafety() * h * <span class='error' title="use of undeclared identifier &apos;std&apos;">std</span>::pow(error, GetPshrnk());</td></tr>
+<tr><th id="60">60</th><td>}</td></tr>
+<tr><th id="61">61</th><td></td></tr>
+<tr><th id="62">62</th><td><b>template</b> &lt;<b>class</b> T&gt; <a class="typedef" href="../../../global/management/include/G4Types.hh.html#G4double" title='G4double' data-type='double' data-ref="G4double">G4double</a> <a class="type" href="G4RKIntegrationDriver.hh.html#G4RKIntegrationDriver" title='G4RKIntegrationDriver' data-ref="G4RKIntegrationDriver">G4RKIntegrationDriver</a>&lt;T&gt;::</td></tr>
+<tr><th id="63">63</th><td><dfn class="decl def" id="_ZNK21G4RKIntegrationDriver15ShrinkStepSize2Edd" title='G4RKIntegrationDriver::ShrinkStepSize2' data-ref="_ZNK21G4RKIntegrationDriver15ShrinkStepSize2Edd">ShrinkStepSize2</dfn>(<a class="typedef" href="../../../global/management/include/G4Types.hh.html#G4double" title='G4double' data-type='double' data-ref="G4double">G4double</a> <dfn class="local col4 decl" id="44h" title='h' data-type='G4double' data-ref="44h">h</dfn>, <a class="typedef" href="../../../global/management/include/G4Types.hh.html#G4double" title='G4double' data-type='double' data-ref="G4double">G4double</a> <dfn class="local col5 decl" id="45error2" title='error2' data-type='G4double' data-ref="45error2">error2</dfn>) <em>const</em></td></tr>
+<tr><th id="64">64</th><td>{</td></tr>
+<tr><th id="65">65</th><td>    <b>if</b> (<a class="local col5 ref" href="#45error2" title='error2' data-ref="45error2">error2</a> &gt; <a class="member" href="G4RKIntegrationDriver.hh.html#G4RKIntegrationDriver::errorConstraintShrink" title='G4RKIntegrationDriver::errorConstraintShrink' data-ref="G4RKIntegrationDriver::errorConstraintShrink">errorConstraintShrink</a> * <a class="member" href="G4RKIntegrationDriver.hh.html#G4RKIntegrationDriver::errorConstraintShrink" title='G4RKIntegrationDriver::errorConstraintShrink' data-ref="G4RKIntegrationDriver::errorConstraintShrink">errorConstraintShrink</a>)</td></tr>
+<tr><th id="66">66</th><td>    {</td></tr>
+<tr><th id="67">67</th><td>        <b>return</b> <a class="member" href="G4VIntegrationDriver.hh.html#G4VIntegrationDriver::max_stepping_decrease" title='G4VIntegrationDriver::max_stepping_decrease' data-ref="G4VIntegrationDriver::max_stepping_decrease">max_stepping_decrease</a> * <a class="local col4 ref" href="#44h" title='h' data-ref="44h">h</a>;</td></tr>
+<tr><th id="68">68</th><td>    }</td></tr>
+<tr><th id="69">69</th><td>    <b>return</b> GetSafety() * h * <span class='error' title="use of undeclared identifier &apos;std&apos;">std</span>::pow(error2, <var>0.5</var> * GetPshrnk());</td></tr>
+<tr><th id="70">70</th><td>}</td></tr>
+<tr><th id="71">71</th><td></td></tr>
+<tr><th id="72">72</th><td><i>// Compute size of next Step</i></td></tr>
+<tr><th id="73">73</th><td><b>template</b>&lt;<b>class</b> T&gt; <a class="typedef" href="../../../global/management/include/G4Types.hh.html#G4double" title='G4double' data-type='double' data-ref="G4double">G4double</a> <a class="type" href="G4RKIntegrationDriver.hh.html#G4RKIntegrationDriver" title='G4RKIntegrationDriver' data-ref="G4RKIntegrationDriver">G4RKIntegrationDriver</a>&lt;T&gt;::</td></tr>
+<tr><th id="74">74</th><td><dfn class="decl def" id="_ZNK21G4RKIntegrationDriver12GrowStepSizeEdd" title='G4RKIntegrationDriver::GrowStepSize' data-ref="_ZNK21G4RKIntegrationDriver12GrowStepSizeEdd">GrowStepSize</dfn>(<a class="typedef" href="../../../global/management/include/G4Types.hh.html#G4double" title='G4double' data-type='double' data-ref="G4double">G4double</a> <dfn class="local col6 decl" id="46h" title='h' data-type='G4double' data-ref="46h">h</dfn>, <a class="typedef" href="../../../global/management/include/G4Types.hh.html#G4double" title='G4double' data-type='double' data-ref="G4double">G4double</a> <dfn class="local col7 decl" id="47error" title='error' data-type='G4double' data-ref="47error">error</dfn>) <em>const</em></td></tr>
+<tr><th id="75">75</th><td>{</td></tr>
+<tr><th id="76">76</th><td>    <b>if</b> (<a class="local col7 ref" href="#47error" title='error' data-ref="47error">error</a> &lt; <a class="member" href="G4RKIntegrationDriver.hh.html#G4RKIntegrationDriver::errorConstraintGrow" title='G4RKIntegrationDriver::errorConstraintGrow' data-ref="G4RKIntegrationDriver::errorConstraintGrow">errorConstraintGrow</a>)</td></tr>
+<tr><th id="77">77</th><td>    {</td></tr>
+<tr><th id="78">78</th><td>        <b>return</b> <a class="member" href="G4VIntegrationDriver.hh.html#G4VIntegrationDriver::max_stepping_increase" title='G4VIntegrationDriver::max_stepping_increase' data-ref="G4VIntegrationDriver::max_stepping_increase">max_stepping_increase</a> * <a class="local col6 ref" href="#46h" title='h' data-ref="46h">h</a>;</td></tr>
+<tr><th id="79">79</th><td>    }</td></tr>
+<tr><th id="80">80</th><td>    <b>return</b> GetSafety() * h * <span class='error' title="use of undeclared identifier &apos;std&apos;">std</span>::pow(error, GetPgrow());</td></tr>
+<tr><th id="81">81</th><td>}</td></tr>
+<tr><th id="82">82</th><td></td></tr>
+<tr><th id="83">83</th><td><b>template</b>&lt;<b>class</b> T&gt; <a class="typedef" href="../../../global/management/include/G4Types.hh.html#G4double" title='G4double' data-type='double' data-ref="G4double">G4double</a> <a class="type" href="G4RKIntegrationDriver.hh.html#G4RKIntegrationDriver" title='G4RKIntegrationDriver' data-ref="G4RKIntegrationDriver">G4RKIntegrationDriver</a>&lt;T&gt;::</td></tr>
+<tr><th id="84">84</th><td><dfn class="decl def" id="_ZNK21G4RKIntegrationDriver13GrowStepSize2Edd" title='G4RKIntegrationDriver::GrowStepSize2' data-ref="_ZNK21G4RKIntegrationDriver13GrowStepSize2Edd">GrowStepSize2</dfn>(<a class="typedef" href="../../../global/management/include/G4Types.hh.html#G4double" title='G4double' data-type='double' data-ref="G4double">G4double</a> <dfn class="local col8 decl" id="48h" title='h' data-type='G4double' data-ref="48h">h</dfn>, <a class="typedef" href="../../../global/management/include/G4Types.hh.html#G4double" title='G4double' data-type='double' data-ref="G4double">G4double</a> <dfn class="local col9 decl" id="49error2" title='error2' data-type='G4double' data-ref="49error2">error2</dfn>) <em>const</em></td></tr>
+<tr><th id="85">85</th><td>{</td></tr>
+<tr><th id="86">86</th><td>    <b>if</b> (<a class="local col9 ref" href="#49error2" title='error2' data-ref="49error2">error2</a> &lt; <a class="member" href="G4RKIntegrationDriver.hh.html#G4RKIntegrationDriver::errorConstraintGrow" title='G4RKIntegrationDriver::errorConstraintGrow' data-ref="G4RKIntegrationDriver::errorConstraintGrow">errorConstraintGrow</a> * <a class="member" href="G4RKIntegrationDriver.hh.html#G4RKIntegrationDriver::errorConstraintGrow" title='G4RKIntegrationDriver::errorConstraintGrow' data-ref="G4RKIntegrationDriver::errorConstraintGrow">errorConstraintGrow</a>)</td></tr>
+<tr><th id="87">87</th><td>    {</td></tr>
+<tr><th id="88">88</th><td>        <b>return</b> <a class="member" href="G4VIntegrationDriver.hh.html#G4VIntegrationDriver::max_stepping_increase" title='G4VIntegrationDriver::max_stepping_increase' data-ref="G4VIntegrationDriver::max_stepping_increase">max_stepping_increase</a> * <a class="local col8 ref" href="#48h" title='h' data-ref="48h">h</a>;</td></tr>
+<tr><th id="89">89</th><td>    }</td></tr>
+<tr><th id="90">90</th><td>    <b>return</b> GetSafety() * h * <span class='error' title="use of undeclared identifier &apos;std&apos;">std</span>::pow(error2, <var>0.5</var> * GetPgrow());</td></tr>
+<tr><th id="91">91</th><td>}</td></tr>
+<tr><th id="92">92</th><td></td></tr>
+<tr><th id="93">93</th><td><b>template</b> &lt;<b>class</b> T&gt;</td></tr>
+<tr><th id="94">94</th><td><a class="typedef" href="../../../global/management/include/G4Types.hh.html#G4double" title='G4double' data-type='double' data-ref="G4double">G4double</a> <a class="type" href="G4RKIntegrationDriver.hh.html#G4RKIntegrationDriver" title='G4RKIntegrationDriver' data-ref="G4RKIntegrationDriver">G4RKIntegrationDriver</a>&lt;T&gt;::</td></tr>
+<tr><th id="95">95</th><td><dfn class="virtual decl def" id="_ZN21G4RKIntegrationDriver18ComputeNewStepSizeEdd" title='G4RKIntegrationDriver::ComputeNewStepSize' data-ref="_ZN21G4RKIntegrationDriver18ComputeNewStepSizeEdd">ComputeNewStepSize</dfn>( <a class="typedef" href="../../../global/management/include/G4Types.hh.html#G4double" title='G4double' data-type='double' data-ref="G4double">G4double</a>  <dfn class="local col0 decl" id="50errMaxNorm" title='errMaxNorm' data-type='G4double' data-ref="50errMaxNorm">errMaxNorm</dfn>,    <i>// max error  (normalised)</i></td></tr>
+<tr><th id="96">96</th><td>                    <a class="typedef" href="../../../global/management/include/G4Types.hh.html#G4double" title='G4double' data-type='double' data-ref="G4double">G4double</a>  <dfn class="local col1 decl" id="51hstepCurrent" title='hstepCurrent' data-type='G4double' data-ref="51hstepCurrent">hstepCurrent</dfn> ) <i>// current step size</i></td></tr>
+<tr><th id="97">97</th><td>{</td></tr>
+<tr><th id="98">98</th><td>    <b>if</b> (<a class="local col0 ref" href="#50errMaxNorm" title='errMaxNorm' data-ref="50errMaxNorm">errMaxNorm</a> &gt; <var>1</var>)</td></tr>
+<tr><th id="99">99</th><td>    {</td></tr>
+<tr><th id="100">100</th><td>        <b>return</b> <a class="member" href="#_ZNK21G4RKIntegrationDriver14ShrinkStepSizeEdd" title='G4RKIntegrationDriver::ShrinkStepSize' data-ref="_ZNK21G4RKIntegrationDriver14ShrinkStepSizeEdd">ShrinkStepSize</a>(<a class="local col1 ref" href="#51hstepCurrent" title='hstepCurrent' data-ref="51hstepCurrent">hstepCurrent</a>, <a class="local col0 ref" href="#50errMaxNorm" title='errMaxNorm' data-ref="50errMaxNorm">errMaxNorm</a>);</td></tr>
+<tr><th id="101">101</th><td>    }</td></tr>
+<tr><th id="102">102</th><td>    <b>else</b> <b>if</b> (<a class="local col0 ref" href="#50errMaxNorm" title='errMaxNorm' data-ref="50errMaxNorm">errMaxNorm</a> &gt;= <var>0</var>)</td></tr>
+<tr><th id="103">103</th><td>    {</td></tr>
+<tr><th id="104">104</th><td>        <b>return</b> <a class="member" href="#_ZNK21G4RKIntegrationDriver12GrowStepSizeEdd" title='G4RKIntegrationDriver::GrowStepSize' data-ref="_ZNK21G4RKIntegrationDriver12GrowStepSizeEdd">GrowStepSize</a>(<a class="local col1 ref" href="#51hstepCurrent" title='hstepCurrent' data-ref="51hstepCurrent">hstepCurrent</a>, <a class="local col0 ref" href="#50errMaxNorm" title='errMaxNorm' data-ref="50errMaxNorm">errMaxNorm</a>);</td></tr>
+<tr><th id="105">105</th><td>    }</td></tr>
+<tr><th id="106">106</th><td></td></tr>
+<tr><th id="107">107</th><td>    <a class="ref" href="../../../global/management/include/G4Exception.hh.html#_Z11G4ExceptionPKcS0_19G4ExceptionSeverityS0_" title='G4Exception' data-ref="_Z11G4ExceptionPKcS0_19G4ExceptionSeverityS0_">G4Exception</a>(<q>"G4RKIntegrationDriver::ComputeNewStepSize"</q>, <q>"GeomField0003"</q>,</td></tr>
+<tr><th id="108">108</th><td>                <a class="enum" href="../../../global/management/include/G4ExceptionSeverity.hh.html#G4ExceptionSeverity::FatalException" title='G4ExceptionSeverity::FatalException' data-ref="G4ExceptionSeverity::FatalException">FatalException</a>, <q>"Error is negative!"</q>);</td></tr>
+<tr><th id="109">109</th><td></td></tr>
+<tr><th id="110">110</th><td>    <b>return</b> <a class="member" href="G4VIntegrationDriver.hh.html#G4VIntegrationDriver::max_stepping_increase" title='G4VIntegrationDriver::max_stepping_increase' data-ref="G4VIntegrationDriver::max_stepping_increase">max_stepping_increase</a> * <a class="local col1 ref" href="#51hstepCurrent" title='hstepCurrent' data-ref="51hstepCurrent">hstepCurrent</a>;</td></tr>
+<tr><th id="111">111</th><td>}</td></tr>
+<tr><th id="112">112</th><td></td></tr>
+<tr><th id="113">113</th><td><b>template</b> &lt;<b>class</b> T&gt;</td></tr>
+<tr><th id="114">114</th><td><em>void</em> <a class="type" href="G4RKIntegrationDriver.hh.html#G4RKIntegrationDriver" title='G4RKIntegrationDriver' data-ref="G4RKIntegrationDriver">G4RKIntegrationDriver</a>&lt;T&gt;::</td></tr>
+<tr><th id="115">115</th><td><dfn class="virtual decl def" id="_ZNK21G4RKIntegrationDriver14GetDerivativesERK12G4FieldTrackPd" title='G4RKIntegrationDriver::GetDerivatives' data-ref="_ZNK21G4RKIntegrationDriver14GetDerivativesERK12G4FieldTrackPd">GetDerivatives</dfn>( <em>const</em> <a class="type" href="G4FieldTrack.hh.html#G4FieldTrack" title='G4FieldTrack' data-ref="G4FieldTrack">G4FieldTrack</a>&amp; <dfn class="local col2 decl" id="52track" title='track' data-type='const G4FieldTrack &amp;' data-ref="52track">track</dfn>, <a class="typedef" href="../../../global/management/include/G4Types.hh.html#G4double" title='G4double' data-type='double' data-ref="G4double">G4double</a> <dfn class="local col3 decl" id="53dydx" title='dydx' data-type='G4double *' data-ref="53dydx">dydx</dfn>[] ) <em>const</em></td></tr>
+<tr><th id="116">116</th><td>{</td></tr>
+<tr><th id="117">117</th><td>    <a class="typedef" href="../../../global/management/include/G4Types.hh.html#G4double" title='G4double' data-type='double' data-ref="G4double">G4double</a> <dfn class="local col4 decl" id="54y" title='y' data-type='G4double [12]' data-ref="54y">y</dfn>[<a class="type" href="G4FieldTrack.hh.html#G4FieldTrack" title='G4FieldTrack' data-ref="G4FieldTrack">G4FieldTrack</a>::<a class="enum" href="G4FieldTrack.hh.html#G4FieldTrack::ncompSVEC" title='G4FieldTrack::ncompSVEC' data-ref="G4FieldTrack::ncompSVEC">ncompSVEC</a>];</td></tr>
+<tr><th id="118">118</th><td>    <a class="local col2 ref" href="#52track" title='track' data-ref="52track">track</a>.<a class="ref" href="G4FieldTrack.hh.html#_ZNK12G4FieldTrack11DumpToArrayEPd" title='G4FieldTrack::DumpToArray' data-ref="_ZNK12G4FieldTrack11DumpToArrayEPd">DumpToArray</a>(<a class="local col4 ref" href="#54y" title='y' data-ref="54y">y</a>);</td></tr>
+<tr><th id="119">119</th><td>    <a class="member" href="G4RKIntegrationDriver.hh.html#G4RKIntegrationDriver::pIntStepper" title='G4RKIntegrationDriver::pIntStepper' data-ref="G4RKIntegrationDriver::pIntStepper">pIntStepper</a>-&gt;RightHandSide(<a class="local col4 ref" href="#54y" title='y' data-ref="54y">y</a>, <a class="local col3 ref" href="#53dydx" title='dydx' data-ref="53dydx">dydx</a>);</td></tr>
+<tr><th id="120">120</th><td>}</td></tr>
+<tr><th id="121">121</th><td></td></tr>
+<tr><th id="122">122</th><td><b>template</b> &lt;<b>class</b> T&gt;</td></tr>
+<tr><th id="123">123</th><td><em>void</em> <a class="type" href="G4RKIntegrationDriver.hh.html#G4RKIntegrationDriver" title='G4RKIntegrationDriver' data-ref="G4RKIntegrationDriver">G4RKIntegrationDriver</a>&lt;T&gt;::<dfn class="virtual decl def" id="_ZNK21G4RKIntegrationDriver14GetDerivativesERK12G4FieldTrackPdS3_" title='G4RKIntegrationDriver::GetDerivatives' data-ref="_ZNK21G4RKIntegrationDriver14GetDerivativesERK12G4FieldTrackPdS3_">GetDerivatives</dfn>(<em>const</em> <a class="type" href="G4FieldTrack.hh.html#G4FieldTrack" title='G4FieldTrack' data-ref="G4FieldTrack">G4FieldTrack</a>&amp; <dfn class="local col5 decl" id="55track" title='track' data-type='const G4FieldTrack &amp;' data-ref="55track">track</dfn>,</td></tr>
+<tr><th id="124">124</th><td>                                              <a class="typedef" href="../../../global/management/include/G4Types.hh.html#G4double" title='G4double' data-type='double' data-ref="G4double">G4double</a> <dfn class="local col6 decl" id="56dydx" title='dydx' data-type='G4double *' data-ref="56dydx">dydx</dfn>[], </td></tr>
+<tr><th id="125">125</th><td>                                              <a class="typedef" href="../../../global/management/include/G4Types.hh.html#G4double" title='G4double' data-type='double' data-ref="G4double">G4double</a> <dfn class="local col7 decl" id="57field" title='field' data-type='G4double *' data-ref="57field">field</dfn>[]) <em>const</em></td></tr>
+<tr><th id="126">126</th><td>{</td></tr>
+<tr><th id="127">127</th><td>    <a class="typedef" href="../../../global/management/include/G4Types.hh.html#G4double" title='G4double' data-type='double' data-ref="G4double">G4double</a> <dfn class="local col8 decl" id="58y" title='y' data-type='G4double [12]' data-ref="58y">y</dfn>[<a class="type" href="G4FieldTrack.hh.html#G4FieldTrack" title='G4FieldTrack' data-ref="G4FieldTrack">G4FieldTrack</a>::<a class="enum" href="G4FieldTrack.hh.html#G4FieldTrack::ncompSVEC" title='G4FieldTrack::ncompSVEC' data-ref="G4FieldTrack::ncompSVEC">ncompSVEC</a>];</td></tr>
+<tr><th id="128">128</th><td>    <a class="local col5 ref" href="#55track" title='track' data-ref="55track">track</a>.<a class="ref" href="G4FieldTrack.hh.html#_ZNK12G4FieldTrack11DumpToArrayEPd" title='G4FieldTrack::DumpToArray' data-ref="_ZNK12G4FieldTrack11DumpToArrayEPd">DumpToArray</a>(<a class="local col8 ref" href="#58y" title='y' data-ref="58y">y</a>);</td></tr>
+<tr><th id="129">129</th><td>    <a class="member" href="G4RKIntegrationDriver.hh.html#G4RKIntegrationDriver::pIntStepper" title='G4RKIntegrationDriver::pIntStepper' data-ref="G4RKIntegrationDriver::pIntStepper">pIntStepper</a>-&gt;RightHandSide(<a class="local col8 ref" href="#58y" title='y' data-ref="58y">y</a>, <a class="local col6 ref" href="#56dydx" title='dydx' data-ref="56dydx">dydx</a>, <a class="local col7 ref" href="#57field" title='field' data-ref="57field">field</a>);</td></tr>
+<tr><th id="130">130</th><td>}</td></tr>
+<tr><th id="131">131</th><td></td></tr>
+<tr><th id="132">132</th><td><b>template</b> &lt;<b>class</b> T&gt;</td></tr>
+<tr><th id="133">133</th><td><em>void</em> <a class="type" href="G4RKIntegrationDriver.hh.html#G4RKIntegrationDriver" title='G4RKIntegrationDriver' data-ref="G4RKIntegrationDriver">G4RKIntegrationDriver</a>&lt;T&gt;::<dfn class="decl def" id="_ZN21G4RKIntegrationDriver22UpdateErrorConstraintsEv" title='G4RKIntegrationDriver::UpdateErrorConstraints' data-ref="_ZN21G4RKIntegrationDriver22UpdateErrorConstraintsEv">UpdateErrorConstraints</dfn>()</td></tr>
+<tr><th id="134">134</th><td>{</td></tr>
+<tr><th id="135">135</th><td>    errorConstraintShrink = <span class='error' title="use of undeclared identifier &apos;std&apos;">std</span>::pow(</td></tr>
+<tr><th id="136">136</th><td>            max_stepping_decrease / GetSafety(), <var>1.</var> / GetPshrnk());</td></tr>
+<tr><th id="137">137</th><td></td></tr>
+<tr><th id="138">138</th><td>    errorConstraintGrow = <span class='error' title="use of undeclared identifier &apos;std&apos;">std</span>::pow(</td></tr>
+<tr><th id="139">139</th><td>            max_stepping_increase / GetSafety(), <var>1.</var> / GetPgrow());</td></tr>
+<tr><th id="140">140</th><td>}</td></tr>
+<tr><th id="141">141</th><td></td></tr>
+<tr><th id="142">142</th><td><b>template</b> &lt;<b>class</b> T&gt;</td></tr>
+<tr><th id="143">143</th><td><b>inline</b> <a class="typedef" href="../../../global/management/include/G4Types.hh.html#G4double" title='G4double' data-type='double' data-ref="G4double">G4double</a> <a class="type" href="G4RKIntegrationDriver.hh.html#G4RKIntegrationDriver" title='G4RKIntegrationDriver' data-ref="G4RKIntegrationDriver">G4RKIntegrationDriver</a>&lt;T&gt;::<dfn class="decl def" id="_ZNK21G4RKIntegrationDriver9GetSafetyEv" title='G4RKIntegrationDriver::GetSafety' data-ref="_ZNK21G4RKIntegrationDriver9GetSafetyEv">GetSafety</dfn>() <em>const</em></td></tr>
+<tr><th id="144">144</th><td>{</td></tr>
+<tr><th id="145">145</th><td>    <b>return</b> <a class="member" href="G4RKIntegrationDriver.hh.html#G4RKIntegrationDriver::safety" title='G4RKIntegrationDriver::safety' data-ref="G4RKIntegrationDriver::safety">safety</a>;</td></tr>
+<tr><th id="146">146</th><td>}</td></tr>
+<tr><th id="147">147</th><td></td></tr>
+<tr><th id="148">148</th><td><b>template</b> &lt;<b>class</b> T&gt;</td></tr>
+<tr><th id="149">149</th><td><b>inline</b> <a class="typedef" href="../../../global/management/include/G4Types.hh.html#G4double" title='G4double' data-type='double' data-ref="G4double">G4double</a> <a class="type" href="G4RKIntegrationDriver.hh.html#G4RKIntegrationDriver" title='G4RKIntegrationDriver' data-ref="G4RKIntegrationDriver">G4RKIntegrationDriver</a>&lt;T&gt;::<dfn class="decl def" id="_ZNK21G4RKIntegrationDriver9GetPshrnkEv" title='G4RKIntegrationDriver::GetPshrnk' data-ref="_ZNK21G4RKIntegrationDriver9GetPshrnkEv">GetPshrnk</dfn>() <em>const</em></td></tr>
+<tr><th id="150">150</th><td>{</td></tr>
+<tr><th id="151">151</th><td>    <b>return</b> <a class="member" href="G4RKIntegrationDriver.hh.html#G4RKIntegrationDriver::pshrnk" title='G4RKIntegrationDriver::pshrnk' data-ref="G4RKIntegrationDriver::pshrnk">pshrnk</a>;</td></tr>
+<tr><th id="152">152</th><td>}</td></tr>
+<tr><th id="153">153</th><td></td></tr>
+<tr><th id="154">154</th><td><b>template</b> &lt;<b>class</b> T&gt;</td></tr>
+<tr><th id="155">155</th><td><a class="typedef" href="../../../global/management/include/G4Types.hh.html#G4double" title='G4double' data-type='double' data-ref="G4double">G4double</a> <a class="type" href="G4RKIntegrationDriver.hh.html#G4RKIntegrationDriver" title='G4RKIntegrationDriver' data-ref="G4RKIntegrationDriver">G4RKIntegrationDriver</a>&lt;T&gt;::<dfn class="decl def" id="_ZNK21G4RKIntegrationDriver8GetPgrowEv" title='G4RKIntegrationDriver::GetPgrow' data-ref="_ZNK21G4RKIntegrationDriver8GetPgrowEv">GetPgrow</dfn>() <em>const</em></td></tr>
+<tr><th id="156">156</th><td>{</td></tr>
+<tr><th id="157">157</th><td>    <b>return</b> <a class="member" href="G4RKIntegrationDriver.hh.html#G4RKIntegrationDriver::pgrow" title='G4RKIntegrationDriver::pgrow' data-ref="G4RKIntegrationDriver::pgrow">pgrow</a>;</td></tr>
+<tr><th id="158">158</th><td>}</td></tr>
+<tr><th id="159">159</th><td></td></tr>
+<tr><th id="160">160</th><td><b>template</b> &lt;<b>class</b> T&gt;</td></tr>
+<tr><th id="161">161</th><td><em>void</em> <a class="type" href="G4RKIntegrationDriver.hh.html#G4RKIntegrationDriver" title='G4RKIntegrationDriver' data-ref="G4RKIntegrationDriver">G4RKIntegrationDriver</a>&lt;T&gt;::<dfn class="decl def" id="_ZN21G4RKIntegrationDriver15ReSetParametersEd" title='G4RKIntegrationDriver::ReSetParameters' data-ref="_ZN21G4RKIntegrationDriver15ReSetParametersEd">ReSetParameters</dfn>(<a class="typedef" href="../../../global/management/include/G4Types.hh.html#G4double" title='G4double' data-type='double' data-ref="G4double">G4double</a> <dfn class="local col9 decl" id="59new_safety" title='new_safety' data-type='G4double' data-ref="59new_safety">new_safety</dfn>)</td></tr>
+<tr><th id="162">162</th><td>{</td></tr>
+<tr><th id="163">163</th><td>    <a class="member" href="G4RKIntegrationDriver.hh.html#G4RKIntegrationDriver::safety" title='G4RKIntegrationDriver::safety' data-ref="G4RKIntegrationDriver::safety">safety</a> = <a class="local col9 ref" href="#59new_safety" title='new_safety' data-ref="59new_safety">new_safety</a>;</td></tr>
+<tr><th id="164">164</th><td>    <a class="member" href="G4RKIntegrationDriver.hh.html#G4RKIntegrationDriver::pshrnk" title='G4RKIntegrationDriver::pshrnk' data-ref="G4RKIntegrationDriver::pshrnk">pshrnk</a> = -<var>1.0</var> / <a class="member" href="G4RKIntegrationDriver.hh.html#G4RKIntegrationDriver::pIntStepper" title='G4RKIntegrationDriver::pIntStepper' data-ref="G4RKIntegrationDriver::pIntStepper">pIntStepper</a>-&gt;IntegratorOrder();</td></tr>
+<tr><th id="165">165</th><td>    <a class="member" href="G4RKIntegrationDriver.hh.html#G4RKIntegrationDriver::pgrow" title='G4RKIntegrationDriver::pgrow' data-ref="G4RKIntegrationDriver::pgrow">pgrow</a>  = -<var>1.0</var> / (<var>1.0</var> + <a class="member" href="G4RKIntegrationDriver.hh.html#G4RKIntegrationDriver::pIntStepper" title='G4RKIntegrationDriver::pIntStepper' data-ref="G4RKIntegrationDriver::pIntStepper">pIntStepper</a>-&gt;IntegratorOrder());</td></tr>
+<tr><th id="166">166</th><td>    <a class="member" href="#_ZN21G4RKIntegrationDriver22UpdateErrorConstraintsEv" title='G4RKIntegrationDriver::UpdateErrorConstraints' data-ref="_ZN21G4RKIntegrationDriver22UpdateErrorConstraintsEv">UpdateErrorConstraints</a>();</td></tr>
+<tr><th id="167">167</th><td>}</td></tr>
+<tr><th id="168">168</th><td></td></tr>
+<tr><th id="169">169</th><td><b>template</b> &lt;<b>class</b> T&gt;</td></tr>
+<tr><th id="170">170</th><td><em>void</em> <a class="type" href="G4RKIntegrationDriver.hh.html#G4RKIntegrationDriver" title='G4RKIntegrationDriver' data-ref="G4RKIntegrationDriver">G4RKIntegrationDriver</a>&lt;T&gt;::<dfn class="decl def" id="_ZN21G4RKIntegrationDriver9SetSafetyEd" title='G4RKIntegrationDriver::SetSafety' data-ref="_ZN21G4RKIntegrationDriver9SetSafetyEd">SetSafety</dfn>(<a class="typedef" href="../../../global/management/include/G4Types.hh.html#G4double" title='G4double' data-type='double' data-ref="G4double">G4double</a> <dfn class="local col0 decl" id="60val" title='val' data-type='G4double' data-ref="60val">val</dfn>)</td></tr>
+<tr><th id="171">171</th><td>{ </td></tr>
+<tr><th id="172">172</th><td>    <a class="member" href="G4RKIntegrationDriver.hh.html#G4RKIntegrationDriver::safety" title='G4RKIntegrationDriver::safety' data-ref="G4RKIntegrationDriver::safety">safety</a> = <a class="local col0 ref" href="#60val" title='val' data-ref="60val">val</a>;</td></tr>
+<tr><th id="173">173</th><td>    <a class="member" href="#_ZN21G4RKIntegrationDriver22UpdateErrorConstraintsEv" title='G4RKIntegrationDriver::UpdateErrorConstraints' data-ref="_ZN21G4RKIntegrationDriver22UpdateErrorConstraintsEv">UpdateErrorConstraints</a>();</td></tr>
+<tr><th id="174">174</th><td>}</td></tr>
+<tr><th id="175">175</th><td></td></tr>
+<tr><th id="176">176</th><td><b>template</b> &lt;<b>class</b> T&gt; <em>void</em> <a class="type" href="G4RKIntegrationDriver.hh.html#G4RKIntegrationDriver" title='G4RKIntegrationDriver' data-ref="G4RKIntegrationDriver">G4RKIntegrationDriver</a>&lt;T&gt;::</td></tr>
+<tr><th id="177">177</th><td><dfn class="virtual decl def" id="_ZN21G4RKIntegrationDriver21RenewStepperAndAdjustEP22G4MagIntegratorStepper" title='G4RKIntegrationDriver::RenewStepperAndAdjust' data-ref="_ZN21G4RKIntegrationDriver21RenewStepperAndAdjustEP22G4MagIntegratorStepper">RenewStepperAndAdjust</dfn>(<a class="type" href="G4MagIntegratorStepper.hh.html#G4MagIntegratorStepper" title='G4MagIntegratorStepper' data-ref="G4MagIntegratorStepper">G4MagIntegratorStepper</a>* <dfn class="local col1 decl" id="61stepper" title='stepper' data-type='G4MagIntegratorStepper *' data-ref="61stepper">stepper</dfn>)</td></tr>
+<tr><th id="178">178</th><td>{  </td></tr>
+<tr><th id="179">179</th><td>   T* <dfn class="local col2 decl" id="62ourStepper" title='ourStepper' data-type='T *' data-ref="62ourStepper">ourStepper</dfn> = <b>dynamic_cast</b>&lt;T*&gt;(<a class="local col1 ref" href="#61stepper" title='stepper' data-ref="61stepper">stepper</a>);</td></tr>
+<tr><th id="180">180</th><td>   <b>if</b> ( <a class="local col2 ref" href="#62ourStepper" title='ourStepper' data-ref="62ourStepper">ourStepper</a> )</td></tr>
+<tr><th id="181">181</th><td>   {</td></tr>
+<tr><th id="182">182</th><td>      <a class="member" href="#_ZN21G4RKIntegrationDriver25RenewStepperAndAdjustImplEPT_" title='G4RKIntegrationDriver::RenewStepperAndAdjustImpl' data-ref="_ZN21G4RKIntegrationDriver25RenewStepperAndAdjustImplEPT_">RenewStepperAndAdjustImpl</a>( <a class="local col2 ref" href="#62ourStepper" title='ourStepper' data-ref="62ourStepper">ourStepper</a> );</td></tr>
+<tr><th id="183">183</th><td>   }</td></tr>
+<tr><th id="184">184</th><td>   <b>else</b></td></tr>
+<tr><th id="185">185</th><td>   {</td></tr>
+<tr><th id="186">186</th><td>      <a class="ref" href="../../../global/management/include/G4Exception.hh.html#_Z11G4ExceptionPKcS0_19G4ExceptionSeverityS0_" title='G4Exception' data-ref="_Z11G4ExceptionPKcS0_19G4ExceptionSeverityS0_">G4Exception</a>(<q>"G4RKIntegrationDriver::RenewStepperAndAdjust()"</q>,</td></tr>
+<tr><th id="187">187</th><td>                  <q>"GeomField0002"</q>, <a class="enum" href="../../../global/management/include/G4ExceptionSeverity.hh.html#G4ExceptionSeverity::FatalException" title='G4ExceptionSeverity::FatalException' data-ref="G4ExceptionSeverity::FatalException">FatalException</a>,</td></tr>
+<tr><th id="188">188</th><td>     <q>"The type of the stepper provided is incorrect for this templated driver"</q>);</td></tr>
+<tr><th id="189">189</th><td>   }</td></tr>
+<tr><th id="190">190</th><td>}</td></tr>
+<tr><th id="191">191</th><td></td></tr>
+<tr><th id="192">192</th><td><b>template</b> &lt;<b>class</b> T&gt;</td></tr>
+<tr><th id="193">193</th><td><em>void</em> <a class="type" href="G4RKIntegrationDriver.hh.html#G4RKIntegrationDriver" title='G4RKIntegrationDriver' data-ref="G4RKIntegrationDriver">G4RKIntegrationDriver</a>&lt;T&gt;::<dfn class="decl def" id="_ZN21G4RKIntegrationDriver25RenewStepperAndAdjustImplEPT_" title='G4RKIntegrationDriver::RenewStepperAndAdjustImpl' data-ref="_ZN21G4RKIntegrationDriver25RenewStepperAndAdjustImplEPT_">RenewStepperAndAdjustImpl</dfn>(T* <dfn class="local col3 decl" id="63stepper" title='stepper' data-type='T *' data-ref="63stepper">stepper</dfn>)</td></tr>
+<tr><th id="194">194</th><td>{  </td></tr>
+<tr><th id="195">195</th><td>    <a class="member" href="G4RKIntegrationDriver.hh.html#G4RKIntegrationDriver::pIntStepper" title='G4RKIntegrationDriver::pIntStepper' data-ref="G4RKIntegrationDriver::pIntStepper">pIntStepper</a> = <a class="local col3 ref" href="#63stepper" title='stepper' data-ref="63stepper">stepper</a>;</td></tr>
+<tr><th id="196">196</th><td>    <a class="member" href="#_ZN21G4RKIntegrationDriver15ReSetParametersEd" title='G4RKIntegrationDriver::ReSetParameters' data-ref="_ZN21G4RKIntegrationDriver15ReSetParametersEd">ReSetParameters</a>();</td></tr>
+<tr><th id="197">197</th><td>}</td></tr>
+<tr><th id="198">198</th><td></td></tr>
+<tr><th id="199">199</th><td><b>template</b> &lt;<b>class</b> T&gt;</td></tr>
+<tr><th id="200">200</th><td><em>const</em> T* <a class="type" href="G4RKIntegrationDriver.hh.html#G4RKIntegrationDriver" title='G4RKIntegrationDriver' data-ref="G4RKIntegrationDriver">G4RKIntegrationDriver</a>&lt;T&gt;::<dfn class="virtual decl def" id="_ZNK21G4RKIntegrationDriver10GetStepperEv" title='G4RKIntegrationDriver::GetStepper' data-ref="_ZNK21G4RKIntegrationDriver10GetStepperEv">GetStepper</dfn>() <em>const</em></td></tr>
+<tr><th id="201">201</th><td>{</td></tr>
+<tr><th id="202">202</th><td>    <b>return</b> <a class="member" href="G4RKIntegrationDriver.hh.html#G4RKIntegrationDriver::pIntStepper" title='G4RKIntegrationDriver::pIntStepper' data-ref="G4RKIntegrationDriver::pIntStepper">pIntStepper</a>;</td></tr>
+<tr><th id="203">203</th><td>}</td></tr>
+<tr><th id="204">204</th><td></td></tr>
+<tr><th id="205">205</th><td><b>template</b> &lt;<b>class</b> T&gt;</td></tr>
+<tr><th id="206">206</th><td>T* <a class="type" href="G4RKIntegrationDriver.hh.html#G4RKIntegrationDriver" title='G4RKIntegrationDriver' data-ref="G4RKIntegrationDriver">G4RKIntegrationDriver</a>&lt;T&gt;::<dfn class="virtual decl def" id="_ZN21G4RKIntegrationDriver10GetStepperEv" title='G4RKIntegrationDriver::GetStepper' data-ref="_ZN21G4RKIntegrationDriver10GetStepperEv">GetStepper</dfn>()</td></tr>
+<tr><th id="207">207</th><td>{</td></tr>
+<tr><th id="208">208</th><td>    <b>return</b> <a class="member" href="G4RKIntegrationDriver.hh.html#G4RKIntegrationDriver::pIntStepper" title='G4RKIntegrationDriver::pIntStepper' data-ref="G4RKIntegrationDriver::pIntStepper">pIntStepper</a>;</td></tr>
+<tr><th id="209">209</th><td>}</td></tr>
+<tr><th id="210">210</th><td></td></tr>
+<tr><th id="211">211</th><td><b>template</b> &lt;<b>class</b> T&gt;</td></tr>
+<tr><th id="212">212</th><td><a class="typedef" href="../../../global/management/include/G4Types.hh.html#G4int" title='G4int' data-type='int' data-ref="G4int">G4int</a> <a class="type" href="G4RKIntegrationDriver.hh.html#G4RKIntegrationDriver" title='G4RKIntegrationDriver' data-ref="G4RKIntegrationDriver">G4RKIntegrationDriver</a>&lt;T&gt;::<dfn class="decl def" id="_ZNK21G4RKIntegrationDriver13GetMaxNoStepsEv" title='G4RKIntegrationDriver::GetMaxNoSteps' data-ref="_ZNK21G4RKIntegrationDriver13GetMaxNoStepsEv">GetMaxNoSteps</dfn>() <em>const</em></td></tr>
+<tr><th id="213">213</th><td>{</td></tr>
+<tr><th id="214">214</th><td>    <b>return</b> <a class="member" href="G4RKIntegrationDriver.hh.html#G4RKIntegrationDriver::fMaxNoSteps" title='G4RKIntegrationDriver::fMaxNoSteps' data-ref="G4RKIntegrationDriver::fMaxNoSteps">fMaxNoSteps</a>;</td></tr>
+<tr><th id="215">215</th><td>}</td></tr>
+<tr><th id="216">216</th><td></td></tr>
+<tr><th id="217">217</th><td><b>template</b> &lt;<b>class</b> T&gt;</td></tr>
+<tr><th id="218">218</th><td><em>void</em> <a class="type" href="G4RKIntegrationDriver.hh.html#G4RKIntegrationDriver" title='G4RKIntegrationDriver' data-ref="G4RKIntegrationDriver">G4RKIntegrationDriver</a>&lt;T&gt;::<dfn class="decl def" id="_ZN21G4RKIntegrationDriver13SetMaxNoStepsEi" title='G4RKIntegrationDriver::SetMaxNoSteps' data-ref="_ZN21G4RKIntegrationDriver13SetMaxNoStepsEi">SetMaxNoSteps</dfn>(<a class="typedef" href="../../../global/management/include/G4Types.hh.html#G4int" title='G4int' data-type='int' data-ref="G4int">G4int</a> <dfn class="local col4 decl" id="64val" title='val' data-type='G4int' data-ref="64val">val</dfn>)</td></tr>
+<tr><th id="219">219</th><td>{</td></tr>
+<tr><th id="220">220</th><td>    <a class="member" href="G4RKIntegrationDriver.hh.html#G4RKIntegrationDriver::fMaxNoSteps" title='G4RKIntegrationDriver::fMaxNoSteps' data-ref="G4RKIntegrationDriver::fMaxNoSteps">fMaxNoSteps</a> = <a class="local col4 ref" href="#64val" title='val' data-ref="64val">val</a>;</td></tr>
+<tr><th id="221">221</th><td>}</td></tr>
+<tr><th id="222">222</th><td></td></tr>
+<tr><th id="223">223</th><td><b>template</b> &lt;<b>class</b> T&gt;</td></tr>
+<tr><th id="224">224</th><td><a class="type" href="G4EquationOfMotion.hh.html#G4EquationOfMotion" title='G4EquationOfMotion' data-ref="G4EquationOfMotion">G4EquationOfMotion</a>* <a class="type" href="G4RKIntegrationDriver.hh.html#G4RKIntegrationDriver" title='G4RKIntegrationDriver' data-ref="G4RKIntegrationDriver">G4RKIntegrationDriver</a>&lt;T&gt;::<dfn class="virtual decl def" id="_ZN21G4RKIntegrationDriver19GetEquationOfMotionEv" title='G4RKIntegrationDriver::GetEquationOfMotion' data-ref="_ZN21G4RKIntegrationDriver19GetEquationOfMotionEv">GetEquationOfMotion</dfn>()</td></tr>
+<tr><th id="225">225</th><td>{</td></tr>
+<tr><th id="226">226</th><td>    <b>return</b> <a class="member" href="G4RKIntegrationDriver.hh.html#G4RKIntegrationDriver::pIntStepper" title='G4RKIntegrationDriver::pIntStepper' data-ref="G4RKIntegrationDriver::pIntStepper">pIntStepper</a>-&gt;GetEquationOfMotion();</td></tr>
+<tr><th id="227">227</th><td>}</td></tr>
+<tr><th id="228">228</th><td></td></tr>
+<tr><th id="229">229</th><td><b>template</b> &lt;<b>class</b> T&gt;</td></tr>
+<tr><th id="230">230</th><td><em>void</em> <a class="type" href="G4RKIntegrationDriver.hh.html#G4RKIntegrationDriver" title='G4RKIntegrationDriver' data-ref="G4RKIntegrationDriver">G4RKIntegrationDriver</a>&lt;T&gt;::<dfn class="virtual decl def" id="_ZN21G4RKIntegrationDriver19SetEquationOfMotionEP18G4EquationOfMotion" title='G4RKIntegrationDriver::SetEquationOfMotion' data-ref="_ZN21G4RKIntegrationDriver19SetEquationOfMotionEP18G4EquationOfMotion">SetEquationOfMotion</dfn>(<a class="type" href="G4EquationOfMotion.hh.html#G4EquationOfMotion" title='G4EquationOfMotion' data-ref="G4EquationOfMotion">G4EquationOfMotion</a>* <dfn class="local col5 decl" id="65equation" title='equation' data-type='G4EquationOfMotion *' data-ref="65equation">equation</dfn>)</td></tr>
+<tr><th id="231">231</th><td>{</td></tr>
+<tr><th id="232">232</th><td>    <a class="member" href="G4RKIntegrationDriver.hh.html#G4RKIntegrationDriver::pIntStepper" title='G4RKIntegrationDriver::pIntStepper' data-ref="G4RKIntegrationDriver::pIntStepper">pIntStepper</a>-&gt;SetEquationOfMotion(<a class="local col5 ref" href="#65equation" title='equation' data-ref="65equation">equation</a>);</td></tr>
+<tr><th id="233">233</th><td>}</td></tr>
+<tr><th id="234">234</th><td></td></tr>
+</table><hr/><p id='footer'>
+Generated while processing <a href='../src/G4ChordFinder.cc.html'>codebrowser/source/geometry/magneticfield/src/G4ChordFinder.cc</a><br/>Generated on <em>2019-Aug-28</em> from project codebrowser<br />Powered by <a href='https://woboq.com'><img alt='Woboq' src='https://code.woboq.org/woboq-16.png' width='41' height='16' /></a> <a href='https://code.woboq.org'>Code Browser</a> 2.1
+<br/>Generator usage only permitted with license.</p>
+</div></body></html>

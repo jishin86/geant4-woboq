@@ -1,0 +1,267 @@
+<!doctype html>
+<html>
+<head>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"><title>RandFlat.cc source code [codebrowser/source/externals/clhep/src/RandFlat.cc] - Woboq Code Browser</title>
+<link rel="stylesheet" href="../../../../../../data/qtcreator.css" title="QtCreator"/>
+<link rel="alternate stylesheet" href="../../../../../../data/kdevelop.css" title="KDevelop"/>
+<script type="text/javascript" src="../../../../../../data/jquery/jquery.min.js"></script>
+<script type="text/javascript" src="../../../../../../data/jquery/jquery-ui.min.js"></script>
+<script>var file = 'codebrowser/source/externals/clhep/src/RandFlat.cc'; var root_path = '../../../../..'; var data_path = '../../../../../../data';</script>
+<script src='../../../../../../data/codebrowser.js'></script>
+</head>
+<body><div id='header'><h1 id='breadcrumb'><span>Browse the source code of </span><a href='../../../..'>codebrowser</a>/<a href='../../..'>source</a>/<a href='../..'>externals</a>/<a href='..'>clhep</a>/<a href='./'>src</a>/<a href='RandFlat.cc.html'>RandFlat.cc</a></h1></div>
+<hr/><div id='content'><table class="code">
+<tr><th id="1">1</th><td><i>// -*- C++ -*-</i></td></tr>
+<tr><th id="2">2</th><td><i>//</i></td></tr>
+<tr><th id="3">3</th><td><i>// -----------------------------------------------------------------------</i></td></tr>
+<tr><th id="4">4</th><td><i>//                             HEP Random</i></td></tr>
+<tr><th id="5">5</th><td><i>//                          --- RandFlat ---</i></td></tr>
+<tr><th id="6">6</th><td><i>//                      class implementation file</i></td></tr>
+<tr><th id="7">7</th><td><i>// -----------------------------------------------------------------------</i></td></tr>
+<tr><th id="8">8</th><td><i>// This file is part of Geant4 (simulation toolkit for HEP).</i></td></tr>
+<tr><th id="9">9</th><td><i></i></td></tr>
+<tr><th id="10">10</th><td><i>// =======================================================================</i></td></tr>
+<tr><th id="11">11</th><td><i>// Gabriele Cosmo - Created: 17th May 1995</i></td></tr>
+<tr><th id="12">12</th><td><i>//                - Added methods to shoot arrays: 28th July 1997</i></td></tr>
+<tr><th id="13">13</th><td><i>//                - Added operator(): 24th Jul 1997</i></td></tr>
+<tr><th id="14">14</th><td><i>// J.Marraffino   - Added default arguments as attributes and</i></td></tr>
+<tr><th id="15">15</th><td><i>//                  operator() with arguments: 16th Feb 1998</i></td></tr>
+<tr><th id="16">16</th><td><i>// M Fischler     - Copy constructor should supply right engine to HepRandom:</i></td></tr>
+<tr><th id="17">17</th><td><i>//                  1/26/00.</i></td></tr>
+<tr><th id="18">18</th><td><i>// M Fischler	  - Semi-fix to the saveEngineStatus misbehavior causing</i></td></tr>
+<tr><th id="19">19</th><td><i>//		    non-reproducing shootBit() 3/1/00.</i></td></tr>
+<tr><th id="20">20</th><td><i>// M Fischler     - Avoiding hang when file not found in restoreEngineStatus </i></td></tr>
+<tr><th id="21">21</th><td><i>//                  12/3/04</i></td></tr>
+<tr><th id="22">22</th><td><i>// M Fischler     - put and get to/from streams 12/10/04</i></td></tr>
+<tr><th id="23">23</th><td><i>// M Fischler     - save and restore dist to streams 12/20/04</i></td></tr>
+<tr><th id="24">24</th><td><i>// M Fischler	      - put/get to/from streams uses pairs of ulongs when</i></td></tr>
+<tr><th id="25">25</th><td><i>//			+ storing doubles avoid problems with precision </i></td></tr>
+<tr><th id="26">26</th><td><i>//			4/14/05</i></td></tr>
+<tr><th id="27">27</th><td><i>// =======================================================================</i></td></tr>
+<tr><th id="28">28</th><td></td></tr>
+<tr><th id="29">29</th><td><u>#include <a href="../include/CLHEP/Random/RandFlat.h.html">"CLHEP/Random/RandFlat.h"</a></u></td></tr>
+<tr><th id="30">30</th><td><u>#include <a href="../include/CLHEP/Random/DoubConv.h.html">"CLHEP/Random/DoubConv.h"</a></u></td></tr>
+<tr><th id="31">31</th><td><u>#include <span class='error' title="&apos;string.h&apos; file not found">&lt;</span>string.h&gt;	// for strcmp</u></td></tr>
+<tr><th id="32">32</th><td></td></tr>
+<tr><th id="33">33</th><td><b>namespace</b> <span class="namespace">CLHEP</span> {</td></tr>
+<tr><th id="34">34</th><td></td></tr>
+<tr><th id="35">35</th><td><em>const</em> <em>int</em> <a class="type" href="../include/CLHEP/Random/RandFlat.h.html#CLHEP::RandFlat" title='CLHEP::RandFlat' data-ref="CLHEP::RandFlat">RandFlat</a>::<dfn class="decl def" id="CLHEP::RandFlat::MSBBits" title='CLHEP::RandFlat::MSBBits' data-ref="CLHEP::RandFlat::MSBBits">MSBBits</dfn>= <var>15</var>;</td></tr>
+<tr><th id="36">36</th><td><em>const</em> <em>unsigned</em> <em>long</em> <a class="type" href="../include/CLHEP/Random/RandFlat.h.html#CLHEP::RandFlat" title='CLHEP::RandFlat' data-ref="CLHEP::RandFlat">RandFlat</a>::<dfn class="decl def" id="CLHEP::RandFlat::MSB" title='CLHEP::RandFlat::MSB' data-ref="CLHEP::RandFlat::MSB">MSB</dfn>= <var>1ul</var>&lt;&lt;<a class="type" href="../include/CLHEP/Random/RandFlat.h.html#CLHEP::RandFlat" title='CLHEP::RandFlat' data-ref="CLHEP::RandFlat">RandFlat</a>::<a class="ref" href="../include/CLHEP/Random/RandFlat.h.html#CLHEP::RandFlat::MSBBits" title='CLHEP::RandFlat::MSBBits' data-ref="CLHEP::RandFlat::MSBBits">MSBBits</a>;</td></tr>
+<tr><th id="37">37</th><td><a class="macro" href="../include/CLHEP/Utility/thread_local.h.html#13" title="thread_local" data-ref="_M/CLHEP_THREAD_LOCAL">CLHEP_THREAD_LOCAL</a> <em>unsigned</em> <em>long</em> <a class="type" href="../include/CLHEP/Random/RandFlat.h.html#CLHEP::RandFlat" title='CLHEP::RandFlat' data-ref="CLHEP::RandFlat">RandFlat</a>::<dfn class="decl def" id="CLHEP::RandFlat::staticRandomInt" title='CLHEP::RandFlat::staticRandomInt' data-ref="CLHEP::RandFlat::staticRandomInt">staticRandomInt</dfn>= <var>0</var>;</td></tr>
+<tr><th id="38">38</th><td><a class="macro" href="../include/CLHEP/Utility/thread_local.h.html#13" title="thread_local" data-ref="_M/CLHEP_THREAD_LOCAL">CLHEP_THREAD_LOCAL</a> <em>unsigned</em> <em>long</em> <a class="type" href="../include/CLHEP/Random/RandFlat.h.html#CLHEP::RandFlat" title='CLHEP::RandFlat' data-ref="CLHEP::RandFlat">RandFlat</a>::<dfn class="decl def" id="CLHEP::RandFlat::staticFirstUnusedBit" title='CLHEP::RandFlat::staticFirstUnusedBit' data-ref="CLHEP::RandFlat::staticFirstUnusedBit">staticFirstUnusedBit</dfn>= <var>0</var>;</td></tr>
+<tr><th id="39">39</th><td></td></tr>
+<tr><th id="40">40</th><td>std::string RandFlat::name() <em>const</em> {<b>return</b> <q>"RandFlat"</q>;}</td></tr>
+<tr><th id="41">41</th><td><a class="type" href="../include/CLHEP/Random/RandomEngine.h.html#CLHEP::HepRandomEngine" title='CLHEP::HepRandomEngine' data-ref="CLHEP::HepRandomEngine">HepRandomEngine</a> &amp; <a class="type" href="../include/CLHEP/Random/RandFlat.h.html#CLHEP::RandFlat" title='CLHEP::RandFlat' data-ref="CLHEP::RandFlat">RandFlat</a>::<dfn class="virtual decl def" id="_ZN5CLHEP8RandFlat6engineEv" title='CLHEP::RandFlat::engine' data-ref="_ZN5CLHEP8RandFlat6engineEv">engine</dfn>() {<b>return</b> *localEngine;}</td></tr>
+<tr><th id="42">42</th><td></td></tr>
+<tr><th id="43">43</th><td><a class="type" href="../include/CLHEP/Random/RandFlat.h.html#CLHEP::RandFlat" title='CLHEP::RandFlat' data-ref="CLHEP::RandFlat">RandFlat</a>::<dfn class="virtual decl def" id="_ZN5CLHEP8RandFlatD1Ev" title='CLHEP::RandFlat::~RandFlat' data-ref="_ZN5CLHEP8RandFlatD1Ev">~RandFlat</dfn>() {</td></tr>
+<tr><th id="44">44</th><td>}</td></tr>
+<tr><th id="45">45</th><td></td></tr>
+<tr><th id="46">46</th><td><em>double</em> <a class="type" href="../include/CLHEP/Random/RandFlat.h.html#CLHEP::RandFlat" title='CLHEP::RandFlat' data-ref="CLHEP::RandFlat">RandFlat</a>::<dfn class="virtual decl def" id="_ZN5CLHEP8RandFlatclEv" title='CLHEP::RandFlat::operator()' data-ref="_ZN5CLHEP8RandFlatclEv"><b>operator</b>()</dfn>() {</td></tr>
+<tr><th id="47">47</th><td>  <b>return</b> <a class="member" href="../include/CLHEP/Random/RandFlat.h.html#_ZN5CLHEP8RandFlat4fireEdd" title='CLHEP::RandFlat::fire' data-ref="_ZN5CLHEP8RandFlat4fireEdd">fire</a>( <a class="member" href="../include/CLHEP/Random/RandFlat.h.html#CLHEP::RandFlat::defaultA" title='CLHEP::RandFlat::defaultA' data-ref="CLHEP::RandFlat::defaultA">defaultA</a>, <a class="member" href="../include/CLHEP/Random/RandFlat.h.html#CLHEP::RandFlat::defaultB" title='CLHEP::RandFlat::defaultB' data-ref="CLHEP::RandFlat::defaultB">defaultB</a> );</td></tr>
+<tr><th id="48">48</th><td>}</td></tr>
+<tr><th id="49">49</th><td></td></tr>
+<tr><th id="50">50</th><td><em>double</em> <a class="type" href="../include/CLHEP/Random/RandFlat.h.html#CLHEP::RandFlat" title='CLHEP::RandFlat' data-ref="CLHEP::RandFlat">RandFlat</a>::<dfn class="decl def" id="_ZN5CLHEP8RandFlatclEd" title='CLHEP::RandFlat::operator()' data-ref="_ZN5CLHEP8RandFlatclEd"><b>operator</b>()</dfn>( <em>double</em> <dfn class="local col1 decl" id="1w" title='w' data-type='double' data-ref="1w">w</dfn> ) {</td></tr>
+<tr><th id="51">51</th><td>  <b>return</b> <a class="member" href="../include/CLHEP/Random/RandFlat.h.html#_ZN5CLHEP8RandFlat4fireEd" title='CLHEP::RandFlat::fire' data-ref="_ZN5CLHEP8RandFlat4fireEd">fire</a>( <a class="local col1 ref" href="#1w" title='w' data-ref="1w">w</a> );</td></tr>
+<tr><th id="52">52</th><td>}</td></tr>
+<tr><th id="53">53</th><td></td></tr>
+<tr><th id="54">54</th><td><em>double</em> <a class="type" href="../include/CLHEP/Random/RandFlat.h.html#CLHEP::RandFlat" title='CLHEP::RandFlat' data-ref="CLHEP::RandFlat">RandFlat</a>::<dfn class="decl def" id="_ZN5CLHEP8RandFlatclEdd" title='CLHEP::RandFlat::operator()' data-ref="_ZN5CLHEP8RandFlatclEdd"><b>operator</b>()</dfn>( <em>double</em> <dfn class="local col2 decl" id="2a" title='a' data-type='double' data-ref="2a">a</dfn>, <em>double</em> <dfn class="local col3 decl" id="3b" title='b' data-type='double' data-ref="3b">b</dfn> ) {</td></tr>
+<tr><th id="55">55</th><td>  <b>return</b> <a class="member" href="../include/CLHEP/Random/RandFlat.h.html#_ZN5CLHEP8RandFlat4fireEdd" title='CLHEP::RandFlat::fire' data-ref="_ZN5CLHEP8RandFlat4fireEdd">fire</a>( <a class="local col2 ref" href="#2a" title='a' data-ref="2a">a</a>, <a class="local col3 ref" href="#3b" title='b' data-ref="3b">b</a> );</td></tr>
+<tr><th id="56">56</th><td>}</td></tr>
+<tr><th id="57">57</th><td></td></tr>
+<tr><th id="58">58</th><td><em>double</em> <a class="type" href="../include/CLHEP/Random/RandFlat.h.html#CLHEP::RandFlat" title='CLHEP::RandFlat' data-ref="CLHEP::RandFlat">RandFlat</a>::<dfn class="decl def" id="_ZN5CLHEP8RandFlat5shootEv" title='CLHEP::RandFlat::shoot' data-ref="_ZN5CLHEP8RandFlat5shootEv">shoot</dfn>() {</td></tr>
+<tr><th id="59">59</th><td>  <b>return</b> <a class="type" href="../include/CLHEP/Random/Random.h.html#CLHEP::HepRandom" title='CLHEP::HepRandom' data-ref="CLHEP::HepRandom">HepRandom</a>::<a class="member" href="../include/CLHEP/Random/Random.h.html#_ZN5CLHEP9HepRandom12getTheEngineEv" title='CLHEP::HepRandom::getTheEngine' data-ref="_ZN5CLHEP9HepRandom12getTheEngineEv">getTheEngine</a>()-&gt;<a class="virtual ref" href="../include/CLHEP/Random/RandomEngine.h.html#_ZN5CLHEP15HepRandomEngine4flatEv" title='CLHEP::HepRandomEngine::flat' data-ref="_ZN5CLHEP15HepRandomEngine4flatEv">flat</a>();</td></tr>
+<tr><th id="60">60</th><td>}</td></tr>
+<tr><th id="61">61</th><td></td></tr>
+<tr><th id="62">62</th><td><em>void</em> <a class="type" href="../include/CLHEP/Random/RandFlat.h.html#CLHEP::RandFlat" title='CLHEP::RandFlat' data-ref="CLHEP::RandFlat">RandFlat</a>::<dfn class="decl def" id="_ZN5CLHEP8RandFlat10shootArrayEiPd" title='CLHEP::RandFlat::shootArray' data-ref="_ZN5CLHEP8RandFlat10shootArrayEiPd">shootArray</dfn>(<em>const</em> <em>int</em> <dfn class="local col4 decl" id="4size" title='size' data-type='const int' data-ref="4size">size</dfn>, <em>double</em>* <dfn class="local col5 decl" id="5vect" title='vect' data-type='double *' data-ref="5vect">vect</dfn>) {</td></tr>
+<tr><th id="63">63</th><td>  <a class="type" href="../include/CLHEP/Random/Random.h.html#CLHEP::HepRandom" title='CLHEP::HepRandom' data-ref="CLHEP::HepRandom">HepRandom</a>::<a class="member" href="../include/CLHEP/Random/Random.h.html#_ZN5CLHEP9HepRandom12getTheEngineEv" title='CLHEP::HepRandom::getTheEngine' data-ref="_ZN5CLHEP9HepRandom12getTheEngineEv">getTheEngine</a>()-&gt;<a class="virtual ref" href="../include/CLHEP/Random/RandomEngine.h.html#_ZN5CLHEP15HepRandomEngine9flatArrayEiPd" title='CLHEP::HepRandomEngine::flatArray' data-ref="_ZN5CLHEP15HepRandomEngine9flatArrayEiPd">flatArray</a>(<a class="local col4 ref" href="#4size" title='size' data-ref="4size">size</a>,<a class="local col5 ref" href="#5vect" title='vect' data-ref="5vect">vect</a>);</td></tr>
+<tr><th id="64">64</th><td>}</td></tr>
+<tr><th id="65">65</th><td></td></tr>
+<tr><th id="66">66</th><td><em>void</em> <a class="type" href="../include/CLHEP/Random/RandFlat.h.html#CLHEP::RandFlat" title='CLHEP::RandFlat' data-ref="CLHEP::RandFlat">RandFlat</a>::<dfn class="decl def" id="_ZN5CLHEP8RandFlat10shootArrayEiPddd" title='CLHEP::RandFlat::shootArray' data-ref="_ZN5CLHEP8RandFlat10shootArrayEiPddd">shootArray</dfn>( <em>const</em> <em>int</em> <dfn class="local col6 decl" id="6size" title='size' data-type='const int' data-ref="6size">size</dfn>, <em>double</em>* <dfn class="local col7 decl" id="7vect" title='vect' data-type='double *' data-ref="7vect">vect</dfn>,</td></tr>
+<tr><th id="67">67</th><td>                           <em>double</em> <dfn class="local col8 decl" id="8lx" title='lx' data-type='double' data-ref="8lx">lx</dfn>, <em>double</em> <dfn class="local col9 decl" id="9dx" title='dx' data-type='double' data-ref="9dx">dx</dfn>  )</td></tr>
+<tr><th id="68">68</th><td>{</td></tr>
+<tr><th id="69">69</th><td>   <em>int</em> <dfn class="local col0 decl" id="10i" title='i' data-type='int' data-ref="10i">i</dfn>;</td></tr>
+<tr><th id="70">70</th><td></td></tr>
+<tr><th id="71">71</th><td>   <b>for</b> (<a class="local col0 ref" href="#10i" title='i' data-ref="10i">i</a>=<var>0</var>; <a class="local col0 ref" href="#10i" title='i' data-ref="10i">i</a>&lt;<a class="local col6 ref" href="#6size" title='size' data-ref="6size">size</a>; ++<a class="local col0 ref" href="#10i" title='i' data-ref="10i">i</a>)</td></tr>
+<tr><th id="72">72</th><td>     <a class="local col7 ref" href="#7vect" title='vect' data-ref="7vect">vect</a>[<a class="local col0 ref" href="#10i" title='i' data-ref="10i">i</a>] = <a class="member" href="../include/CLHEP/Random/RandFlat.h.html#_ZN5CLHEP8RandFlat5shootEdd" title='CLHEP::RandFlat::shoot' data-ref="_ZN5CLHEP8RandFlat5shootEdd">shoot</a>(<a class="local col8 ref" href="#8lx" title='lx' data-ref="8lx">lx</a>,<a class="local col9 ref" href="#9dx" title='dx' data-ref="9dx">dx</a>);</td></tr>
+<tr><th id="73">73</th><td>}</td></tr>
+<tr><th id="74">74</th><td></td></tr>
+<tr><th id="75">75</th><td><em>void</em> <a class="type" href="../include/CLHEP/Random/RandFlat.h.html#CLHEP::RandFlat" title='CLHEP::RandFlat' data-ref="CLHEP::RandFlat">RandFlat</a>::<dfn class="decl def" id="_ZN5CLHEP8RandFlat10shootArrayEPNS_15HepRandomEngineEiPddd" title='CLHEP::RandFlat::shootArray' data-ref="_ZN5CLHEP8RandFlat10shootArrayEPNS_15HepRandomEngineEiPddd">shootArray</dfn>( <a class="type" href="../include/CLHEP/Random/RandomEngine.h.html#CLHEP::HepRandomEngine" title='CLHEP::HepRandomEngine' data-ref="CLHEP::HepRandomEngine">HepRandomEngine</a>* <dfn class="local col1 decl" id="11anEngine" title='anEngine' data-type='CLHEP::HepRandomEngine *' data-ref="11anEngine">anEngine</dfn>,</td></tr>
+<tr><th id="76">76</th><td>                           <em>const</em> <em>int</em> <dfn class="local col2 decl" id="12size" title='size' data-type='const int' data-ref="12size">size</dfn>, <em>double</em>* <dfn class="local col3 decl" id="13vect" title='vect' data-type='double *' data-ref="13vect">vect</dfn>,</td></tr>
+<tr><th id="77">77</th><td>                           <em>double</em> <dfn class="local col4 decl" id="14lx" title='lx' data-type='double' data-ref="14lx">lx</dfn>, <em>double</em> <dfn class="local col5 decl" id="15dx" title='dx' data-type='double' data-ref="15dx">dx</dfn>  )</td></tr>
+<tr><th id="78">78</th><td>{</td></tr>
+<tr><th id="79">79</th><td>   <em>int</em> <dfn class="local col6 decl" id="16i" title='i' data-type='int' data-ref="16i">i</dfn>;</td></tr>
+<tr><th id="80">80</th><td></td></tr>
+<tr><th id="81">81</th><td>   <b>for</b> (<a class="local col6 ref" href="#16i" title='i' data-ref="16i">i</a>=<var>0</var>; <a class="local col6 ref" href="#16i" title='i' data-ref="16i">i</a>&lt;<a class="local col2 ref" href="#12size" title='size' data-ref="12size">size</a>; ++<a class="local col6 ref" href="#16i" title='i' data-ref="16i">i</a>)</td></tr>
+<tr><th id="82">82</th><td>     <a class="local col3 ref" href="#13vect" title='vect' data-ref="13vect">vect</a>[<a class="local col6 ref" href="#16i" title='i' data-ref="16i">i</a>] = <a class="member" href="../include/CLHEP/Random/RandFlat.h.html#_ZN5CLHEP8RandFlat5shootEPNS_15HepRandomEngineEdd" title='CLHEP::RandFlat::shoot' data-ref="_ZN5CLHEP8RandFlat5shootEPNS_15HepRandomEngineEdd">shoot</a>(<a class="local col1 ref" href="#11anEngine" title='anEngine' data-ref="11anEngine">anEngine</a>,<a class="local col4 ref" href="#14lx" title='lx' data-ref="14lx">lx</a>,<a class="local col5 ref" href="#15dx" title='dx' data-ref="15dx">dx</a>);</td></tr>
+<tr><th id="83">83</th><td>}</td></tr>
+<tr><th id="84">84</th><td></td></tr>
+<tr><th id="85">85</th><td><em>void</em> <a class="type" href="../include/CLHEP/Random/RandFlat.h.html#CLHEP::RandFlat" title='CLHEP::RandFlat' data-ref="CLHEP::RandFlat">RandFlat</a>::<dfn class="decl def" id="_ZN5CLHEP8RandFlat9fireArrayEiPd" title='CLHEP::RandFlat::fireArray' data-ref="_ZN5CLHEP8RandFlat9fireArrayEiPd">fireArray</dfn>( <em>const</em> <em>int</em> <dfn class="local col7 decl" id="17size" title='size' data-type='const int' data-ref="17size">size</dfn>, <em>double</em>* <dfn class="local col8 decl" id="18vect" title='vect' data-type='double *' data-ref="18vect">vect</dfn>)</td></tr>
+<tr><th id="86">86</th><td>{</td></tr>
+<tr><th id="87">87</th><td>   <em>int</em> <dfn class="local col9 decl" id="19i" title='i' data-type='int' data-ref="19i">i</dfn>;</td></tr>
+<tr><th id="88">88</th><td></td></tr>
+<tr><th id="89">89</th><td>   <b>for</b> (<a class="local col9 ref" href="#19i" title='i' data-ref="19i">i</a>=<var>0</var>; <a class="local col9 ref" href="#19i" title='i' data-ref="19i">i</a>&lt;<a class="local col7 ref" href="#17size" title='size' data-ref="17size">size</a>; ++<a class="local col9 ref" href="#19i" title='i' data-ref="19i">i</a>)</td></tr>
+<tr><th id="90">90</th><td>     <a class="local col8 ref" href="#18vect" title='vect' data-ref="18vect">vect</a>[<a class="local col9 ref" href="#19i" title='i' data-ref="19i">i</a>] = <a class="member" href="../include/CLHEP/Random/RandFlat.h.html#_ZN5CLHEP8RandFlat4fireEdd" title='CLHEP::RandFlat::fire' data-ref="_ZN5CLHEP8RandFlat4fireEdd">fire</a>( <a class="member" href="../include/CLHEP/Random/RandFlat.h.html#CLHEP::RandFlat::defaultA" title='CLHEP::RandFlat::defaultA' data-ref="CLHEP::RandFlat::defaultA">defaultA</a>, <a class="member" href="../include/CLHEP/Random/RandFlat.h.html#CLHEP::RandFlat::defaultB" title='CLHEP::RandFlat::defaultB' data-ref="CLHEP::RandFlat::defaultB">defaultB</a> );</td></tr>
+<tr><th id="91">91</th><td>}</td></tr>
+<tr><th id="92">92</th><td></td></tr>
+<tr><th id="93">93</th><td><em>void</em> <a class="type" href="../include/CLHEP/Random/RandFlat.h.html#CLHEP::RandFlat" title='CLHEP::RandFlat' data-ref="CLHEP::RandFlat">RandFlat</a>::<dfn class="decl def" id="_ZN5CLHEP8RandFlat9fireArrayEiPddd" title='CLHEP::RandFlat::fireArray' data-ref="_ZN5CLHEP8RandFlat9fireArrayEiPddd">fireArray</dfn>( <em>const</em> <em>int</em> <dfn class="local col0 decl" id="20size" title='size' data-type='const int' data-ref="20size">size</dfn>, <em>double</em>* <dfn class="local col1 decl" id="21vect" title='vect' data-type='double *' data-ref="21vect">vect</dfn>,</td></tr>
+<tr><th id="94">94</th><td>                          <em>double</em> <dfn class="local col2 decl" id="22lx" title='lx' data-type='double' data-ref="22lx">lx</dfn>, <em>double</em> <dfn class="local col3 decl" id="23dx" title='dx' data-type='double' data-ref="23dx">dx</dfn>  )</td></tr>
+<tr><th id="95">95</th><td>{</td></tr>
+<tr><th id="96">96</th><td>   <em>int</em> <dfn class="local col4 decl" id="24i" title='i' data-type='int' data-ref="24i">i</dfn>;</td></tr>
+<tr><th id="97">97</th><td></td></tr>
+<tr><th id="98">98</th><td>   <b>for</b> (<a class="local col4 ref" href="#24i" title='i' data-ref="24i">i</a>=<var>0</var>; <a class="local col4 ref" href="#24i" title='i' data-ref="24i">i</a>&lt;<a class="local col0 ref" href="#20size" title='size' data-ref="20size">size</a>; ++<a class="local col4 ref" href="#24i" title='i' data-ref="24i">i</a>)</td></tr>
+<tr><th id="99">99</th><td>     <a class="local col1 ref" href="#21vect" title='vect' data-ref="21vect">vect</a>[<a class="local col4 ref" href="#24i" title='i' data-ref="24i">i</a>] = <a class="member" href="../include/CLHEP/Random/RandFlat.h.html#_ZN5CLHEP8RandFlat4fireEdd" title='CLHEP::RandFlat::fire' data-ref="_ZN5CLHEP8RandFlat4fireEdd">fire</a>( <a class="local col2 ref" href="#22lx" title='lx' data-ref="22lx">lx</a>, <a class="local col3 ref" href="#23dx" title='dx' data-ref="23dx">dx</a> );</td></tr>
+<tr><th id="100">100</th><td>}</td></tr>
+<tr><th id="101">101</th><td></td></tr>
+<tr><th id="102">102</th><td><em>void</em> <a class="type" href="../include/CLHEP/Random/RandFlat.h.html#CLHEP::RandFlat" title='CLHEP::RandFlat' data-ref="CLHEP::RandFlat">RandFlat</a>::<dfn class="decl def" id="_ZN5CLHEP8RandFlat16saveEngineStatusEPKc" title='CLHEP::RandFlat::saveEngineStatus' data-ref="_ZN5CLHEP8RandFlat16saveEngineStatusEPKc">saveEngineStatus</dfn> ( <em>const</em> <em>char</em> <dfn class="local col5 decl" id="25filename" title='filename' data-type='const char *' data-ref="25filename">filename</dfn>[] ) {</td></tr>
+<tr><th id="103">103</th><td></td></tr>
+<tr><th id="104">104</th><td>  <i>// First save the engine status just like the base class would do:</i></td></tr>
+<tr><th id="105">105</th><td>  <a class="member" href="../include/CLHEP/Random/Random.h.html#_ZN5CLHEP9HepRandom12getTheEngineEv" title='CLHEP::HepRandom::getTheEngine' data-ref="_ZN5CLHEP9HepRandom12getTheEngineEv">getTheEngine</a>()-&gt;<a class="virtual ref" href="../include/CLHEP/Random/RandomEngine.h.html#_ZNK5CLHEP15HepRandomEngine10saveStatusEPKc" title='CLHEP::HepRandomEngine::saveStatus' data-ref="_ZNK5CLHEP15HepRandomEngine10saveStatusEPKc">saveStatus</a>( <a class="local col5 ref" href="#25filename" title='filename' data-ref="25filename">filename</a> );</td></tr>
+<tr><th id="106">106</th><td></td></tr>
+<tr><th id="107">107</th><td>  <i>// Now append the cached random Int, and first unused bit:</i></td></tr>
+<tr><th id="108">108</th><td></td></tr>
+<tr><th id="109">109</th><td>  std::ofstream outfile ( filename, std::ios::app );</td></tr>
+<tr><th id="110">110</th><td></td></tr>
+<tr><th id="111">111</th><td>  outfile &lt;&lt; <q>"RANDFLAT staticRandomInt: "</q> &lt;&lt; staticRandomInt </td></tr>
+<tr><th id="112">112</th><td>          &lt;&lt; <q>"    staticFirstUnusedBit: "</q> &lt;&lt; staticFirstUnusedBit &lt;&lt; <q>"\n"</q>;</td></tr>
+<tr><th id="113">113</th><td></td></tr>
+<tr><th id="114">114</th><td>} <i>// saveEngineStatus</i></td></tr>
+<tr><th id="115">115</th><td></td></tr>
+<tr><th id="116">116</th><td></td></tr>
+<tr><th id="117">117</th><td><em>void</em> <a class="type" href="../include/CLHEP/Random/RandFlat.h.html#CLHEP::RandFlat" title='CLHEP::RandFlat' data-ref="CLHEP::RandFlat">RandFlat</a>::<dfn class="decl def" id="_ZN5CLHEP8RandFlat19restoreEngineStatusEPKc" title='CLHEP::RandFlat::restoreEngineStatus' data-ref="_ZN5CLHEP8RandFlat19restoreEngineStatusEPKc">restoreEngineStatus</dfn>( <em>const</em> <em>char</em> <dfn class="local col6 decl" id="26filename" title='filename' data-type='const char *' data-ref="26filename">filename</dfn>[] ) {</td></tr>
+<tr><th id="118">118</th><td></td></tr>
+<tr><th id="119">119</th><td>  <i>// First restore the engine status just like the base class would do:</i></td></tr>
+<tr><th id="120">120</th><td>  <a class="member" href="../include/CLHEP/Random/Random.h.html#_ZN5CLHEP9HepRandom12getTheEngineEv" title='CLHEP::HepRandom::getTheEngine' data-ref="_ZN5CLHEP9HepRandom12getTheEngineEv">getTheEngine</a>()-&gt;<a class="virtual ref" href="../include/CLHEP/Random/RandomEngine.h.html#_ZN5CLHEP15HepRandomEngine13restoreStatusEPKc" title='CLHEP::HepRandomEngine::restoreStatus' data-ref="_ZN5CLHEP15HepRandomEngine13restoreStatusEPKc">restoreStatus</a>( <a class="local col6 ref" href="#26filename" title='filename' data-ref="26filename">filename</a> );</td></tr>
+<tr><th id="121">121</th><td></td></tr>
+<tr><th id="122">122</th><td>  <i>// Now find the line describing the cached data:</i></td></tr>
+<tr><th id="123">123</th><td></td></tr>
+<tr><th id="124">124</th><td>  std::ifstream infile ( filename, std::ios::in );</td></tr>
+<tr><th id="125">125</th><td>  <b>if</b> (!infile) <b>return</b>;</td></tr>
+<tr><th id="126">126</th><td>  <em>char</em> <dfn class="local col7 decl" id="27inputword" title='inputword' data-type='char [15]' data-ref="27inputword">inputword</dfn>[] = <q>"NO_KEYWORD    "</q>; <i>// leaves room for 14 characters plus \0</i></td></tr>
+<tr><th id="127">127</th><td>  <b>while</b> (<b>true</b>) {</td></tr>
+<tr><th id="128">128</th><td>    infile.width(<var>13</var>);</td></tr>
+<tr><th id="129">129</th><td>    infile &gt;&gt; inputword;</td></tr>
+<tr><th id="130">130</th><td>    <b>if</b> (strcmp(inputword,<q>"RANDFLAT"</q>)==<var>0</var>) <b>break</b>;</td></tr>
+<tr><th id="131">131</th><td>    <b>if</b> (infile.eof()) <b>break</b>;</td></tr>
+<tr><th id="132">132</th><td>        <i>// If the file ends without the RANDFLAT line, that means this</i></td></tr>
+<tr><th id="133">133</th><td><i>        // was a file produced by an earlier version of RandFlat.  We will</i></td></tr>
+<tr><th id="134">134</th><td><i>        // replicate the old behavior in that case:  staticFirstUnusedBit </i></td></tr>
+<tr><th id="135">135</th><td><i>	// and staticRandomInt retain their existing values.</i></td></tr>
+<tr><th id="136">136</th><td>  }</td></tr>
+<tr><th id="137">137</th><td></td></tr>
+<tr><th id="138">138</th><td>  <i>// Then read and use the caching info:</i></td></tr>
+<tr><th id="139">139</th><td></td></tr>
+<tr><th id="140">140</th><td>  <b>if</b> (strcmp(inputword,<q>"RANDFLAT"</q>)==<var>0</var>) {</td></tr>
+<tr><th id="141">141</th><td>    <em>char</em> <dfn class="local col8 decl" id="28setword" title='setword' data-type='char [40]' data-ref="28setword">setword</dfn>[<var>40</var>];	<i>// the longest, staticFirstUnusedBit: has length 21</i></td></tr>
+<tr><th id="142">142</th><td>    infile.width(<var>39</var>);</td></tr>
+<tr><th id="143">143</th><td>    infile &gt;&gt; setword;</td></tr>
+<tr><th id="144">144</th><td>    <i>// setword should be staticRandomInt:  </i></td></tr>
+<tr><th id="145">145</th><td>    infile &gt;&gt; staticRandomInt;</td></tr>
+<tr><th id="146">146</th><td>    infile.width(<var>39</var>);</td></tr>
+<tr><th id="147">147</th><td>    infile &gt;&gt; setword;</td></tr>
+<tr><th id="148">148</th><td>    <i>// setword should be staticFirstUnusedBit: </i></td></tr>
+<tr><th id="149">149</th><td>    infile &gt;&gt; staticFirstUnusedBit;</td></tr>
+<tr><th id="150">150</th><td>  }</td></tr>
+<tr><th id="151">151</th><td></td></tr>
+<tr><th id="152">152</th><td>} <i>// restoreEngineStatus</i></td></tr>
+<tr><th id="153">153</th><td></td></tr>
+<tr><th id="154">154</th><td>std::ostream &amp; RandFlat::put ( std::ostream &amp; os ) <em>const</em> {</td></tr>
+<tr><th id="155">155</th><td>  <em>int</em> pr=os.precision(<var>20</var>);</td></tr>
+<tr><th id="156">156</th><td>  std::vector&lt;<em>unsigned</em> <em>long</em>&gt; t(<var>2</var>);</td></tr>
+<tr><th id="157">157</th><td>  os &lt;&lt; <q>" "</q> &lt;&lt; name() &lt;&lt; <q>"\n"</q>;</td></tr>
+<tr><th id="158">158</th><td>  os &lt;&lt; <q>"Uvec"</q> &lt;&lt; <q>"\n"</q>;</td></tr>
+<tr><th id="159">159</th><td>  os &lt;&lt; randomInt &lt;&lt; <q>" "</q> &lt;&lt; firstUnusedBit &lt;&lt; <q>"\n"</q>;</td></tr>
+<tr><th id="160">160</th><td>  t = DoubConv::dto2longs(defaultWidth);</td></tr>
+<tr><th id="161">161</th><td>  os &lt;&lt; defaultWidth &lt;&lt; <q>" "</q> &lt;&lt; t[<var>0</var>] &lt;&lt; <q>" "</q> &lt;&lt; t[<var>1</var>] &lt;&lt; <q>"\n"</q>;</td></tr>
+<tr><th id="162">162</th><td>  t = DoubConv::dto2longs(defaultA);</td></tr>
+<tr><th id="163">163</th><td>  os &lt;&lt; defaultA &lt;&lt; <q>" "</q> &lt;&lt; t[<var>0</var>] &lt;&lt; <q>" "</q> &lt;&lt; t[<var>1</var>] &lt;&lt; <q>"\n"</q>;</td></tr>
+<tr><th id="164">164</th><td>  t = DoubConv::dto2longs(defaultB);</td></tr>
+<tr><th id="165">165</th><td>  os &lt;&lt; defaultB &lt;&lt; <q>" "</q> &lt;&lt; t[<var>0</var>] &lt;&lt; <q>" "</q> &lt;&lt; t[<var>1</var>] &lt;&lt; <q>"\n"</q>;</td></tr>
+<tr><th id="166">166</th><td>  os.precision(pr);</td></tr>
+<tr><th id="167">167</th><td>  <b>return</b> os;</td></tr>
+<tr><th id="168">168</th><td>}</td></tr>
+<tr><th id="169">169</th><td></td></tr>
+<tr><th id="170">170</th><td>std::istream &amp; RandFlat::get ( std::istream &amp; is ) {</td></tr>
+<tr><th id="171">171</th><td>  std::string inName;</td></tr>
+<tr><th id="172">172</th><td>  is &gt;&gt; inName;</td></tr>
+<tr><th id="173">173</th><td>  <b>if</b> (inName != name()) {</td></tr>
+<tr><th id="174">174</th><td>    is.clear(std::ios::badbit | is.rdstate());</td></tr>
+<tr><th id="175">175</th><td>    std::cerr &lt;&lt; <q>"Mismatch when expecting to read state of a "</q></td></tr>
+<tr><th id="176">176</th><td>    	      &lt;&lt; name() &lt;&lt; <q>" distribution\n"</q></td></tr>
+<tr><th id="177">177</th><td>	      &lt;&lt; <q>"Name found was "</q> &lt;&lt; inName</td></tr>
+<tr><th id="178">178</th><td>	      &lt;&lt; <q>"\nistream is left in the badbit state\n"</q>;</td></tr>
+<tr><th id="179">179</th><td>    <b>return</b> is;</td></tr>
+<tr><th id="180">180</th><td>  }</td></tr>
+<tr><th id="181">181</th><td>  <b>if</b> (possibleKeywordInput(is, <q>"Uvec"</q>, randomInt)) {</td></tr>
+<tr><th id="182">182</th><td>    std::vector&lt;<em>unsigned</em> <em>long</em>&gt; t(<var>2</var>);</td></tr>
+<tr><th id="183">183</th><td>    is &gt;&gt; randomInt &gt;&gt; firstUnusedBit;</td></tr>
+<tr><th id="184">184</th><td>    is &gt;&gt; defaultWidth &gt;&gt;t[<var>0</var>]&gt;&gt;t[<var>1</var>]; defaultWidth = DoubConv::longs2double(t); </td></tr>
+<tr><th id="185">185</th><td>    is &gt;&gt; defaultA &gt;&gt; t[<var>0</var>] &gt;&gt; t[<var>1</var>]; defaultA = DoubConv::longs2double(t); </td></tr>
+<tr><th id="186">186</th><td>    is &gt;&gt; defaultB &gt;&gt; t[<var>0</var>] &gt;&gt; t[<var>1</var>]; defaultB = DoubConv::longs2double(t); </td></tr>
+<tr><th id="187">187</th><td>    <b>if</b> (!is) {</td></tr>
+<tr><th id="188">188</th><td>      is.clear(std::ios::badbit | is.rdstate());</td></tr>
+<tr><th id="189">189</th><td>      std::cerr &lt;&lt; <q>"\nRandFlat input failed"</q></td></tr>
+<tr><th id="190">190</th><td>	     &lt;&lt; <q>"\nInput stream is probably mispositioned now."</q> &lt;&lt; std::endl;</td></tr>
+<tr><th id="191">191</th><td>      <b>return</b> is;</td></tr>
+<tr><th id="192">192</th><td>    }</td></tr>
+<tr><th id="193">193</th><td>    <b>return</b> is;</td></tr>
+<tr><th id="194">194</th><td>  }</td></tr>
+<tr><th id="195">195</th><td>  <i>// is &gt;&gt; randomInt encompassed by possibleKeywordInput</i></td></tr>
+<tr><th id="196">196</th><td>  is &gt;&gt; firstUnusedBit;</td></tr>
+<tr><th id="197">197</th><td>  is &gt;&gt; defaultWidth &gt;&gt; defaultA &gt;&gt; defaultB;</td></tr>
+<tr><th id="198">198</th><td>  <b>return</b> is;</td></tr>
+<tr><th id="199">199</th><td>}</td></tr>
+<tr><th id="200">200</th><td></td></tr>
+<tr><th id="201">201</th><td>std::ostream &amp; RandFlat::saveDistState ( std::ostream &amp; os ) {</td></tr>
+<tr><th id="202">202</th><td>  os &lt;&lt; distributionName() &lt;&lt; <q>"\n"</q>;</td></tr>
+<tr><th id="203">203</th><td>  <em>int</em> prec = os.precision(<var>20</var>);</td></tr>
+<tr><th id="204">204</th><td>  os &lt;&lt; <q>"RANDFLAT staticRandomInt: "</q> &lt;&lt; staticRandomInt </td></tr>
+<tr><th id="205">205</th><td>     &lt;&lt; <q>"    staticFirstUnusedBit: "</q> &lt;&lt; staticFirstUnusedBit &lt;&lt; <q>"\n"</q>;</td></tr>
+<tr><th id="206">206</th><td>  os.precision(prec);</td></tr>
+<tr><th id="207">207</th><td>  <b>return</b> os;</td></tr>
+<tr><th id="208">208</th><td>}    </td></tr>
+<tr><th id="209">209</th><td></td></tr>
+<tr><th id="210">210</th><td>std::istream &amp; RandFlat::restoreDistState ( std::istream &amp; is ) {</td></tr>
+<tr><th id="211">211</th><td>  std::string inName;</td></tr>
+<tr><th id="212">212</th><td>  is &gt;&gt; inName;</td></tr>
+<tr><th id="213">213</th><td>  <b>if</b> (inName != distributionName()) {</td></tr>
+<tr><th id="214">214</th><td>    is.clear(std::ios::badbit | is.rdstate());</td></tr>
+<tr><th id="215">215</th><td>    std::cerr &lt;&lt; <q>"Mismatch when expecting to read static state of a "</q></td></tr>
+<tr><th id="216">216</th><td>    	      &lt;&lt; distributionName() &lt;&lt; <q>" distribution\n"</q></td></tr>
+<tr><th id="217">217</th><td>	      &lt;&lt; <q>"Name found was "</q> &lt;&lt; inName</td></tr>
+<tr><th id="218">218</th><td>	      &lt;&lt; <q>"\nistream is left in the badbit state\n"</q>;</td></tr>
+<tr><th id="219">219</th><td>    <b>return</b> is;</td></tr>
+<tr><th id="220">220</th><td>  }</td></tr>
+<tr><th id="221">221</th><td>  std::string keyword;</td></tr>
+<tr><th id="222">222</th><td>  std::string c1;</td></tr>
+<tr><th id="223">223</th><td>  std::string c2;</td></tr>
+<tr><th id="224">224</th><td>  is &gt;&gt; keyword;</td></tr>
+<tr><th id="225">225</th><td>  <b>if</b> (keyword!=<q>"RANDFLAT"</q>) {</td></tr>
+<tr><th id="226">226</th><td>    is.clear(std::ios::badbit | is.rdstate());</td></tr>
+<tr><th id="227">227</th><td>    std::cerr &lt;&lt; <q>"Mismatch when expecting to read RANDFLAT bit cache info: "</q></td></tr>
+<tr><th id="228">228</th><td>    	      &lt;&lt; keyword &lt;&lt; <q>"\n"</q>;</td></tr>
+<tr><th id="229">229</th><td>    <b>return</b> is;</td></tr>
+<tr><th id="230">230</th><td>  }</td></tr>
+<tr><th id="231">231</th><td>  is &gt;&gt; c1 &gt;&gt; staticRandomInt &gt;&gt; c2 &gt;&gt; staticFirstUnusedBit;</td></tr>
+<tr><th id="232">232</th><td>  <b>return</b> is;</td></tr>
+<tr><th id="233">233</th><td>} </td></tr>
+<tr><th id="234">234</th><td></td></tr>
+<tr><th id="235">235</th><td>std::ostream &amp; RandFlat::saveFullState ( std::ostream &amp; os ) {</td></tr>
+<tr><th id="236">236</th><td>  HepRandom::saveFullState(os);</td></tr>
+<tr><th id="237">237</th><td>  saveDistState(os);</td></tr>
+<tr><th id="238">238</th><td>  <b>return</b> os;</td></tr>
+<tr><th id="239">239</th><td>}</td></tr>
+<tr><th id="240">240</th><td>  </td></tr>
+<tr><th id="241">241</th><td>std::istream &amp; RandFlat::restoreFullState ( std::istream &amp; is ) {</td></tr>
+<tr><th id="242">242</th><td>  HepRandom::restoreFullState(is);</td></tr>
+<tr><th id="243">243</th><td>  restoreDistState(is);</td></tr>
+<tr><th id="244">244</th><td>  <b>return</b> is;</td></tr>
+<tr><th id="245">245</th><td>}</td></tr>
+<tr><th id="246">246</th><td></td></tr>
+<tr><th id="247">247</th><td></td></tr>
+<tr><th id="248">248</th><td>}  <i>// namespace CLHEP</i></td></tr>
+<tr><th id="249">249</th><td></td></tr>
+<tr><th id="250">250</th><td></td></tr>
+</table><hr/><p id='footer'>
+Generated on <em>2019-Aug-28</em> from project codebrowser<br />Powered by <a href='https://woboq.com'><img alt='Woboq' src='https://code.woboq.org/woboq-16.png' width='41' height='16' /></a> <a href='https://code.woboq.org'>Code Browser</a> 2.1
+<br/>Generator usage only permitted with license.</p>
+</div></body></html>

@@ -1,0 +1,496 @@
+<!doctype html>
+<html>
+<head>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"><title>G4Element.cc source code [codebrowser/source/materials/src/G4Element.cc] - Woboq Code Browser</title>
+<link rel="stylesheet" href="../../../../../data/qtcreator.css" title="QtCreator"/>
+<link rel="alternate stylesheet" href="../../../../../data/kdevelop.css" title="KDevelop"/>
+<script type="text/javascript" src="../../../../../data/jquery/jquery.min.js"></script>
+<script type="text/javascript" src="../../../../../data/jquery/jquery-ui.min.js"></script>
+<script>var file = 'codebrowser/source/materials/src/G4Element.cc'; var root_path = '../../../..'; var data_path = '../../../../../data';</script>
+<script src='../../../../../data/codebrowser.js'></script>
+</head>
+<body><div id='header'><h1 id='breadcrumb'><span>Browse the source code of </span><a href='../../..'>codebrowser</a>/<a href='../..'>source</a>/<a href='..'>materials</a>/<a href='./'>src</a>/<a href='G4Element.cc.html'>G4Element.cc</a></h1></div>
+<hr/><div id='content'><table class="code">
+<tr><th id="1">1</th><td><i>//</i></td></tr>
+<tr><th id="2">2</th><td><i>// ********************************************************************</i></td></tr>
+<tr><th id="3">3</th><td><i>// * License and Disclaimer                                           *</i></td></tr>
+<tr><th id="4">4</th><td><i>// *                                                                  *</i></td></tr>
+<tr><th id="5">5</th><td><i>// * The  Geant4 software  is  copyright of the Copyright Holders  of *</i></td></tr>
+<tr><th id="6">6</th><td><i>// * the Geant4 Collaboration.  It is provided  under  the terms  and *</i></td></tr>
+<tr><th id="7">7</th><td><i>// * conditions of the Geant4 Software License,  included in the file *</i></td></tr>
+<tr><th id="8">8</th><td><i>// * LICENSE and available at  <a href="http://cern.ch/geant4/license">http://cern.ch/geant4/license</a> .  These *</i></td></tr>
+<tr><th id="9">9</th><td><i>// * include a list of copyright holders.                             *</i></td></tr>
+<tr><th id="10">10</th><td><i>// *                                                                  *</i></td></tr>
+<tr><th id="11">11</th><td><i>// * Neither the authors of this software system, nor their employing *</i></td></tr>
+<tr><th id="12">12</th><td><i>// * institutes,nor the agencies providing financial support for this *</i></td></tr>
+<tr><th id="13">13</th><td><i>// * work  make  any representation or  warranty, express or implied, *</i></td></tr>
+<tr><th id="14">14</th><td><i>// * regarding  this  software system or assume any liability for its *</i></td></tr>
+<tr><th id="15">15</th><td><i>// * use.  Please see the license in the file  LICENSE  and URL above *</i></td></tr>
+<tr><th id="16">16</th><td><i>// * for the full disclaimer and the limitation of liability.         *</i></td></tr>
+<tr><th id="17">17</th><td><i>// *                                                                  *</i></td></tr>
+<tr><th id="18">18</th><td><i>// * This  code  implementation is the result of  the  scientific and *</i></td></tr>
+<tr><th id="19">19</th><td><i>// * technical work of the GEANT4 collaboration.                      *</i></td></tr>
+<tr><th id="20">20</th><td><i>// * By using,  copying,  modifying or  distributing the software (or *</i></td></tr>
+<tr><th id="21">21</th><td><i>// * any work based  on the software)  you  agree  to acknowledge its *</i></td></tr>
+<tr><th id="22">22</th><td><i>// * use  in  resulting  scientific  publications,  and indicate your *</i></td></tr>
+<tr><th id="23">23</th><td><i>// * acceptance of all terms of the Geant4 Software license.          *</i></td></tr>
+<tr><th id="24">24</th><td><i>// ********************************************************************</i></td></tr>
+<tr><th id="25">25</th><td><i>//</i></td></tr>
+<tr><th id="26">26</th><td><i>//</i></td></tr>
+<tr><th id="27">27</th><td><i>//</i></td></tr>
+<tr><th id="28">28</th><td><i>//....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......</i></td></tr>
+<tr><th id="29">29</th><td><i></i></td></tr>
+<tr><th id="30">30</th><td><i>// 26-06-96: Code uses operators (+=, *=, ++, -&gt; etc.) correctly, P. Urban</i></td></tr>
+<tr><th id="31">31</th><td><i>// 09-07-96: new data members added by L.Urban</i></td></tr>
+<tr><th id="32">32</th><td><i>// 17-01-97: aesthetic rearrangement, M.Maire</i></td></tr>
+<tr><th id="33">33</th><td><i>// 20-01-97: Compute Tsai's formula for the rad length, M.Maire</i></td></tr>
+<tr><th id="34">34</th><td><i>// 21-01-97: remove mixture flag, M.Maire</i></td></tr>
+<tr><th id="35">35</th><td><i>// 24-01-97: ComputeIonisationParameters(). </i></td></tr>
+<tr><th id="36">36</th><td><i>//           new data member: fTaul, M.Maire</i></td></tr>
+<tr><th id="37">37</th><td><i>// 29-01-97: Forbidden to create Element with Z&lt;1 or N&lt;Z, M.Maire</i></td></tr>
+<tr><th id="38">38</th><td><i>// 20-03-97: corrected initialization of pointers, M.Maire</i></td></tr>
+<tr><th id="39">39</th><td><i>// 28-04-98: atomic subshell binding energies stuff, V. Grichine  </i></td></tr>
+<tr><th id="40">40</th><td><i>// 09-07-98: Ionisation parameters removed from the class, M.Maire</i></td></tr>
+<tr><th id="41">41</th><td><i>// 16-11-98: name Subshell -&gt; Shell; GetBindingEnergy() (mma)</i></td></tr>
+<tr><th id="42">42</th><td><i>// 09-03-01: assignement operator revised (mma)</i></td></tr>
+<tr><th id="43">43</th><td><i>// 02-05-01: check identical Z in AddIsotope (marc)</i></td></tr>
+<tr><th id="44">44</th><td><i>// 03-05-01: flux.precision(prec) at begin/end of operator&lt;&lt;</i></td></tr>
+<tr><th id="45">45</th><td><i>// 13-09-01: suppression of the data member fIndexInTable</i></td></tr>
+<tr><th id="46">46</th><td><i>// 14-09-01: fCountUse: nb of materials which use this element</i></td></tr>
+<tr><th id="47">47</th><td><i>// 26-02-02: fIndexInTable renewed</i></td></tr>
+<tr><th id="48">48</th><td><i>// 30-03-05: warning in GetElement(elementName)</i></td></tr>
+<tr><th id="49">49</th><td><i>// 15-11-05: GetElement(elementName, G4bool warning=true) </i></td></tr>
+<tr><th id="50">50</th><td><i>// 17-10-06: Add fNaturalAbundances (V.Ivanchenko)</i></td></tr>
+<tr><th id="51">51</th><td><i>// 27-07-07: improve destructor (V.Ivanchenko) </i></td></tr>
+<tr><th id="52">52</th><td><i>// 18-10-07: move definition of material index to ComputeDerivedQuantities (VI) </i></td></tr>
+<tr><th id="53">53</th><td><i>// 25.10.11: new scheme for G4Exception  (mma)</i></td></tr>
+<tr><th id="54">54</th><td><i>// 05-03-12: always create isotope vector (V.Ivanchenko) </i></td></tr>
+<tr><th id="55">55</th><td><i> </i></td></tr>
+<tr><th id="56">56</th><td><i>//....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......</i></td></tr>
+<tr><th id="57">57</th><td></td></tr>
+<tr><th id="58">58</th><td><u>#include <span class='error' title="&apos;iomanip&apos; file not found">&lt;</span>iomanip&gt;</u></td></tr>
+<tr><th id="59">59</th><td><u>#include &lt;sstream&gt;</u></td></tr>
+<tr><th id="60">60</th><td></td></tr>
+<tr><th id="61">61</th><td><u>#include <a href="../include/G4Element.hh.html">"G4Element.hh"</a></u></td></tr>
+<tr><th id="62">62</th><td><u>#include <a href="../include/G4AtomicShells.hh.html">"G4AtomicShells.hh"</a></u></td></tr>
+<tr><th id="63">63</th><td><u>#include <a href="../include/G4NistManager.hh.html">"G4NistManager.hh"</a></u></td></tr>
+<tr><th id="64">64</th><td><u>#include <a href="../../global/management/include/G4PhysicalConstants.hh.html">"G4PhysicalConstants.hh"</a></u></td></tr>
+<tr><th id="65">65</th><td><u>#include <a href="../../global/management/include/G4SystemOfUnits.hh.html">"G4SystemOfUnits.hh"</a></u></td></tr>
+<tr><th id="66">66</th><td><u>#include <a href="../../global/management/include/G4Log.hh.html">"G4Log.hh"</a></u></td></tr>
+<tr><th id="67">67</th><td></td></tr>
+<tr><th id="68">68</th><td><span class='error' title="unknown type name &apos;G4ElementTable&apos;">G4ElementTable</span> <a class="type" href="../include/G4Element.hh.html#G4Element" title='G4Element' data-ref="G4Element">G4Element</a>::<dfn class="tu decl def" id="G4Element::theElementTable" title='G4Element::theElementTable' data-type='int' data-ref="G4Element::theElementTable">theElementTable</dfn>;</td></tr>
+<tr><th id="69">69</th><td></td></tr>
+<tr><th id="70">70</th><td><i>//....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......</i></td></tr>
+<tr><th id="71">71</th><td><i></i></td></tr>
+<tr><th id="72">72</th><td><i>// Constructor to Generate an element from scratch</i></td></tr>
+<tr><th id="73">73</th><td></td></tr>
+<tr><th id="74">74</th><td><a class="type" href="../include/G4Element.hh.html#G4Element" title='G4Element' data-ref="G4Element">G4Element</a>::<dfn class="decl def" id="_ZN9G4ElementC1ERK8G4StringS2_dd" title='G4Element::G4Element' data-ref="_ZN9G4ElementC1ERK8G4StringS2_dd">G4Element</dfn>(<em>const</em> <a class="type" href="../../global/management/include/G4String.hh.html#G4String" title='G4String' data-ref="G4String">G4String</a>&amp; <dfn class="local col1 decl" id="1name" title='name' data-type='const G4String &amp;' data-ref="1name">name</dfn>, <em>const</em> <a class="type" href="../../global/management/include/G4String.hh.html#G4String" title='G4String' data-ref="G4String">G4String</a>&amp; <dfn class="local col2 decl" id="2symbol" title='symbol' data-type='const G4String &amp;' data-ref="2symbol">symbol</dfn>,</td></tr>
+<tr><th id="75">75</th><td>                     <a class="typedef" href="../../global/management/include/G4Types.hh.html#G4double" title='G4double' data-type='double' data-ref="G4double">G4double</a> <dfn class="local col3 decl" id="3zeff" title='zeff' data-type='G4double' data-ref="3zeff">zeff</dfn>, <a class="typedef" href="../../global/management/include/G4Types.hh.html#G4double" title='G4double' data-type='double' data-ref="G4double">G4double</a> <dfn class="local col4 decl" id="4aeff" title='aeff' data-type='G4double' data-ref="4aeff">aeff</dfn>)</td></tr>
+<tr><th id="76">76</th><td>  : <a class="member" href="../include/G4Element.hh.html#G4Element::fName" title='G4Element::fName' data-ref="G4Element::fName">fName</a><a class="ref" href="../../global/management/include/G4String.hh.html#_ZN8G4StringC1ERKS_" title='G4String::G4String' data-ref="_ZN8G4StringC1ERKS_">(</a><a class="local col1 ref" href="#1name" title='name' data-ref="1name">name</a>), <a class="member" href="../include/G4Element.hh.html#G4Element::fSymbol" title='G4Element::fSymbol' data-ref="G4Element::fSymbol">fSymbol</a><a class="ref" href="../../global/management/include/G4String.hh.html#_ZN8G4StringC1ERKS_" title='G4String::G4String' data-ref="_ZN8G4StringC1ERKS_">(</a><a class="local col2 ref" href="#2symbol" title='symbol' data-ref="2symbol">symbol</a>)		     </td></tr>
+<tr><th id="77">77</th><td>{</td></tr>
+<tr><th id="78">78</th><td>  <a class="typedef" href="../../global/management/include/G4Types.hh.html#G4int" title='G4int' data-type='int' data-ref="G4int">G4int</a> <dfn class="local col5 decl" id="5iz" title='iz' data-type='G4int' data-ref="5iz">iz</dfn> = <a class="ref" href="../../global/management/include/templates.hh.html#_Z7G4lrintd" title='G4lrint' data-ref="_Z7G4lrintd">G4lrint</a>(<a class="local col3 ref" href="#3zeff" title='zeff' data-ref="3zeff">zeff</a>);</td></tr>
+<tr><th id="79">79</th><td>  <b>if</b> (<a class="local col5 ref" href="#5iz" title='iz' data-ref="5iz">iz</a> &lt; <var>1</var>) {</td></tr>
+<tr><th id="80">80</th><td>    <a class="typedef" href="../../global/management/include/G4Exception.hh.html#G4ExceptionDescription" title='G4ExceptionDescription' data-type='int' data-ref="G4ExceptionDescription">G4ExceptionDescription</a> <dfn class="local col6 decl" id="6ed" title='ed' data-type='G4ExceptionDescription' data-ref="6ed">ed</dfn>;</td></tr>
+<tr><th id="81">81</th><td>    ed <span class='error' title="invalid operands to binary expression (&apos;G4ExceptionDescription&apos; (aka &apos;int&apos;) and &apos;const char *&apos;)">&lt;&lt;</span> <q>"Fail to create G4Element "</q> &lt;&lt; name </td></tr>
+<tr><th id="82">82</th><td>       &lt;&lt; <q>" Z= "</q> &lt;&lt; zeff &lt;&lt; <q>" &lt; 1 !"</q>;</td></tr>
+<tr><th id="83">83</th><td>    <a class="ref" href="../../global/management/include/G4Exception.hh.html#_Z11G4ExceptionPKcS0_19G4ExceptionSeverityRi" title='G4Exception' data-ref="_Z11G4ExceptionPKcS0_19G4ExceptionSeverityRi">G4Exception</a> (<q>"G4Element::G4Element()"</q>, <q>"mat011"</q>,  <a class="enum" href="../../global/management/include/G4ExceptionSeverity.hh.html#G4ExceptionSeverity::FatalException" title='G4ExceptionSeverity::FatalException' data-ref="G4ExceptionSeverity::FatalException">FatalException</a>, <span class='refarg'><a class="local col6 ref" href="#6ed" title='ed' data-ref="6ed">ed</a></span>);</td></tr>
+<tr><th id="84">84</th><td>  }</td></tr>
+<tr><th id="85">85</th><td>  <b>if</b> (<span class='error' title="use of undeclared identifier &apos;std&apos;">std</span>::abs(zeff - iz) &gt; perMillion) {</td></tr>
+<tr><th id="86">86</th><td>    <a class="typedef" href="../../global/management/include/G4Exception.hh.html#G4ExceptionDescription" title='G4ExceptionDescription' data-type='int' data-ref="G4ExceptionDescription">G4ExceptionDescription</a> <dfn class="local col7 decl" id="7ed" title='ed' data-type='G4ExceptionDescription' data-ref="7ed">ed</dfn>;</td></tr>
+<tr><th id="87">87</th><td>    ed <span class='error' title="invalid operands to binary expression (&apos;G4ExceptionDescription&apos; (aka &apos;int&apos;) and &apos;const char *&apos;)">&lt;&lt;</span> <q>"G4Element Warning:  "</q> &lt;&lt; name &lt;&lt; <q>" Z= "</q> &lt;&lt; zeff </td></tr>
+<tr><th id="88">88</th><td>       &lt;&lt; <q>" A= "</q> &lt;&lt; aeff/(g/mole); </td></tr>
+<tr><th id="89">89</th><td>    <a class="ref" href="../../global/management/include/G4Exception.hh.html#_Z11G4ExceptionPKcS0_19G4ExceptionSeverityRi" title='G4Exception' data-ref="_Z11G4ExceptionPKcS0_19G4ExceptionSeverityRi">G4Exception</a>(<q>"G4Element::G4Element()"</q>, <q>"mat017"</q>, <a class="enum" href="../../global/management/include/G4ExceptionSeverity.hh.html#G4ExceptionSeverity::JustWarning" title='G4ExceptionSeverity::JustWarning' data-ref="G4ExceptionSeverity::JustWarning">JustWarning</a>, <span class='refarg'><a class="local col7 ref" href="#7ed" title='ed' data-ref="7ed">ed</a></span>);</td></tr>
+<tr><th id="90">90</th><td>  }</td></tr>
+<tr><th id="91">91</th><td></td></tr>
+<tr><th id="92">92</th><td>  <a class="member" href="#_ZN9G4Element18InitializePointersEv" title='G4Element::InitializePointers' data-ref="_ZN9G4Element18InitializePointersEv">InitializePointers</a>();</td></tr>
+<tr><th id="93">93</th><td></td></tr>
+<tr><th id="94">94</th><td>  <a class="member" href="../include/G4Element.hh.html#G4Element::fZeff" title='G4Element::fZeff' data-ref="G4Element::fZeff">fZeff</a>   = <a class="local col3 ref" href="#3zeff" title='zeff' data-ref="3zeff">zeff</a>;</td></tr>
+<tr><th id="95">95</th><td>  <a class="member" href="../include/G4Element.hh.html#G4Element::fAeff" title='G4Element::fAeff' data-ref="G4Element::fAeff">fAeff</a>   = <a class="local col4 ref" href="#4aeff" title='aeff' data-ref="4aeff">aeff</a>;</td></tr>
+<tr><th id="96">96</th><td>  <a class="member" href="../include/G4Element.hh.html#G4Element::fNeff" title='G4Element::fNeff' data-ref="G4Element::fNeff">fNeff</a>   = <a class="member" href="../include/G4Element.hh.html#G4Element::fAeff" title='G4Element::fAeff' data-ref="G4Element::fAeff">fAeff</a>/(<a class="ref" href="../../externals/clhep/include/CLHEP/Units/SystemOfUnits.h.html#CLHEP::g" title='CLHEP::g' data-ref="CLHEP::g">g</a>/<a class="ref" href="../../externals/clhep/include/CLHEP/Units/SystemOfUnits.h.html#CLHEP::mole" title='CLHEP::mole' data-ref="CLHEP::mole">mole</a>);</td></tr>
+<tr><th id="97">97</th><td></td></tr>
+<tr><th id="98">98</th><td>  <b>if</b>(<a class="member" href="../include/G4Element.hh.html#G4Element::fNeff" title='G4Element::fNeff' data-ref="G4Element::fNeff">fNeff</a> &lt; <var>1.0</var>) <a class="member" href="../include/G4Element.hh.html#G4Element::fNeff" title='G4Element::fNeff' data-ref="G4Element::fNeff">fNeff</a> = <var>1.0</var>;</td></tr>
+<tr><th id="99">99</th><td></td></tr>
+<tr><th id="100">100</th><td>  <b>if</b> (<a class="member" href="../include/G4Element.hh.html#G4Element::fNeff" title='G4Element::fNeff' data-ref="G4Element::fNeff">fNeff</a> &lt; <a class="local col3 ref" href="#3zeff" title='zeff' data-ref="3zeff">zeff</a>) {</td></tr>
+<tr><th id="101">101</th><td>    <a class="typedef" href="../../global/management/include/G4Exception.hh.html#G4ExceptionDescription" title='G4ExceptionDescription' data-type='int' data-ref="G4ExceptionDescription">G4ExceptionDescription</a> <dfn class="local col8 decl" id="8ed" title='ed' data-type='G4ExceptionDescription' data-ref="8ed">ed</dfn>;</td></tr>
+<tr><th id="102">102</th><td>    ed <span class='error' title="invalid operands to binary expression (&apos;G4ExceptionDescription&apos; (aka &apos;int&apos;) and &apos;const char *&apos;)">&lt;&lt;</span> <q>"Fail to create G4Element "</q> &lt;&lt; name </td></tr>
+<tr><th id="103">103</th><td>       &lt;&lt; <q>" with Z= "</q> &lt;&lt; zeff &lt;&lt; <q>"  N= "</q> &lt;&lt; fNeff </td></tr>
+<tr><th id="104">104</th><td>       &lt;&lt; <q>"   N &lt; Z is not allowed"</q> &lt;&lt; <a class="macro" href="../../global/management/include/G4ios.hh.html#60" title="std::endl" data-ref="_M/G4endl">G4endl</a>;</td></tr>
+<tr><th id="105">105</th><td>    <a class="ref" href="../../global/management/include/G4Exception.hh.html#_Z11G4ExceptionPKcS0_19G4ExceptionSeverityRi" title='G4Exception' data-ref="_Z11G4ExceptionPKcS0_19G4ExceptionSeverityRi">G4Exception</a>(<q>"G4Element::G4Element()"</q>, <q>"mat012"</q>,  <a class="enum" href="../../global/management/include/G4ExceptionSeverity.hh.html#G4ExceptionSeverity::FatalException" title='G4ExceptionSeverity::FatalException' data-ref="G4ExceptionSeverity::FatalException">FatalException</a>, <span class='refarg'><a class="local col8 ref" href="#8ed" title='ed' data-ref="8ed">ed</a></span>);</td></tr>
+<tr><th id="106">106</th><td>  }</td></tr>
+<tr><th id="107">107</th><td>   </td></tr>
+<tr><th id="108">108</th><td>  <a class="member" href="../include/G4Element.hh.html#G4Element::fNbOfAtomicShells" title='G4Element::fNbOfAtomicShells' data-ref="G4Element::fNbOfAtomicShells">fNbOfAtomicShells</a>      = <a class="type" href="../include/G4AtomicShells.hh.html#G4AtomicShells" title='G4AtomicShells' data-ref="G4AtomicShells">G4AtomicShells</a>::<a class="ref" href="../include/G4AtomicShells.hh.html#_ZN14G4AtomicShells17GetNumberOfShellsEi" title='G4AtomicShells::GetNumberOfShells' data-ref="_ZN14G4AtomicShells17GetNumberOfShellsEi">GetNumberOfShells</a>(<a class="local col5 ref" href="#5iz" title='iz' data-ref="5iz">iz</a>);</td></tr>
+<tr><th id="109">109</th><td>  <a class="member" href="../include/G4Element.hh.html#G4Element::fAtomicShells" title='G4Element::fAtomicShells' data-ref="G4Element::fAtomicShells">fAtomicShells</a>          = <b>new</b> <a class="typedef" href="../../global/management/include/G4Types.hh.html#G4double" title='G4double' data-type='double' data-ref="G4double">G4double</a>[<a class="member" href="../include/G4Element.hh.html#G4Element::fNbOfAtomicShells" title='G4Element::fNbOfAtomicShells' data-ref="G4Element::fNbOfAtomicShells">fNbOfAtomicShells</a>];</td></tr>
+<tr><th id="110">110</th><td>  <a class="member" href="../include/G4Element.hh.html#G4Element::fNbOfShellElectrons" title='G4Element::fNbOfShellElectrons' data-ref="G4Element::fNbOfShellElectrons">fNbOfShellElectrons</a>    = <b>new</b> <a class="typedef" href="../../global/management/include/G4Types.hh.html#G4int" title='G4int' data-type='int' data-ref="G4int">G4int</a>[<a class="member" href="../include/G4Element.hh.html#G4Element::fNbOfAtomicShells" title='G4Element::fNbOfAtomicShells' data-ref="G4Element::fNbOfAtomicShells">fNbOfAtomicShells</a>];</td></tr>
+<tr><th id="111">111</th><td></td></tr>
+<tr><th id="112">112</th><td>  <a class="member" href="#_ZN9G4Element18AddNaturalIsotopesEv" title='G4Element::AddNaturalIsotopes' data-ref="_ZN9G4Element18AddNaturalIsotopesEv">AddNaturalIsotopes</a>();</td></tr>
+<tr><th id="113">113</th><td></td></tr>
+<tr><th id="114">114</th><td>  <b>for</b> (<a class="typedef" href="../../global/management/include/G4Types.hh.html#G4int" title='G4int' data-type='int' data-ref="G4int">G4int</a> <dfn class="local col9 decl" id="9i" title='i' data-type='G4int' data-ref="9i">i</dfn>=<var>0</var>;<a class="local col9 ref" href="#9i" title='i' data-ref="9i">i</a>&lt;<a class="member" href="../include/G4Element.hh.html#G4Element::fNbOfAtomicShells" title='G4Element::fNbOfAtomicShells' data-ref="G4Element::fNbOfAtomicShells">fNbOfAtomicShells</a>;<a class="local col9 ref" href="#9i" title='i' data-ref="9i">i</a>++) </td></tr>
+<tr><th id="115">115</th><td>  {</td></tr>
+<tr><th id="116">116</th><td>    <a class="member" href="../include/G4Element.hh.html#G4Element::fAtomicShells" title='G4Element::fAtomicShells' data-ref="G4Element::fAtomicShells">fAtomicShells</a>[<a class="local col9 ref" href="#9i" title='i' data-ref="9i">i</a>] = <a class="type" href="../include/G4AtomicShells.hh.html#G4AtomicShells" title='G4AtomicShells' data-ref="G4AtomicShells">G4AtomicShells</a>::<a class="ref" href="../include/G4AtomicShells.hh.html#_ZN14G4AtomicShells16GetBindingEnergyEii" title='G4AtomicShells::GetBindingEnergy' data-ref="_ZN14G4AtomicShells16GetBindingEnergyEii">GetBindingEnergy</a>(<a class="local col5 ref" href="#5iz" title='iz' data-ref="5iz">iz</a>, <a class="local col9 ref" href="#9i" title='i' data-ref="9i">i</a>);</td></tr>
+<tr><th id="117">117</th><td>    <a class="member" href="../include/G4Element.hh.html#G4Element::fNbOfShellElectrons" title='G4Element::fNbOfShellElectrons' data-ref="G4Element::fNbOfShellElectrons">fNbOfShellElectrons</a>[<a class="local col9 ref" href="#9i" title='i' data-ref="9i">i</a>] = <a class="type" href="../include/G4AtomicShells.hh.html#G4AtomicShells" title='G4AtomicShells' data-ref="G4AtomicShells">G4AtomicShells</a>::<a class="ref" href="../include/G4AtomicShells.hh.html#_ZN14G4AtomicShells20GetNumberOfElectronsEii" title='G4AtomicShells::GetNumberOfElectrons' data-ref="_ZN14G4AtomicShells20GetNumberOfElectronsEii">GetNumberOfElectrons</a>(<a class="local col5 ref" href="#5iz" title='iz' data-ref="5iz">iz</a>, <a class="local col9 ref" href="#9i" title='i' data-ref="9i">i</a>);</td></tr>
+<tr><th id="118">118</th><td>  }</td></tr>
+<tr><th id="119">119</th><td>  <a class="member" href="#_ZN9G4Element24ComputeDerivedQuantitiesEv" title='G4Element::ComputeDerivedQuantities' data-ref="_ZN9G4Element24ComputeDerivedQuantitiesEv">ComputeDerivedQuantities</a>();</td></tr>
+<tr><th id="120">120</th><td>}</td></tr>
+<tr><th id="121">121</th><td></td></tr>
+<tr><th id="122">122</th><td><i>//....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......</i></td></tr>
+<tr><th id="123">123</th><td><i></i></td></tr>
+<tr><th id="124">124</th><td><i>// Constructor to Generate element from a List of 'nIsotopes' isotopes, added</i></td></tr>
+<tr><th id="125">125</th><td><i>// via AddIsotope</i></td></tr>
+<tr><th id="126">126</th><td></td></tr>
+<tr><th id="127">127</th><td><a class="type" href="../include/G4Element.hh.html#G4Element" title='G4Element' data-ref="G4Element">G4Element</a>::<dfn class="decl def" id="_ZN9G4ElementC1ERK8G4StringS2_i" title='G4Element::G4Element' data-ref="_ZN9G4ElementC1ERK8G4StringS2_i">G4Element</dfn>(<em>const</em> <a class="type" href="../../global/management/include/G4String.hh.html#G4String" title='G4String' data-ref="G4String">G4String</a>&amp; <dfn class="local col0 decl" id="10name" title='name' data-type='const G4String &amp;' data-ref="10name">name</dfn>,</td></tr>
+<tr><th id="128">128</th><td>                     <em>const</em> <a class="type" href="../../global/management/include/G4String.hh.html#G4String" title='G4String' data-ref="G4String">G4String</a>&amp; <dfn class="local col1 decl" id="11symbol" title='symbol' data-type='const G4String &amp;' data-ref="11symbol">symbol</dfn>, <a class="typedef" href="../../global/management/include/G4Types.hh.html#G4int" title='G4int' data-type='int' data-ref="G4int">G4int</a> <dfn class="local col2 decl" id="12nIsotopes" title='nIsotopes' data-type='G4int' data-ref="12nIsotopes">nIsotopes</dfn>)</td></tr>
+<tr><th id="129">129</th><td>  : <a class="member" href="../include/G4Element.hh.html#G4Element::fName" title='G4Element::fName' data-ref="G4Element::fName">fName</a><a class="ref" href="../../global/management/include/G4String.hh.html#_ZN8G4StringC1ERKS_" title='G4String::G4String' data-ref="_ZN8G4StringC1ERKS_">(</a><a class="local col0 ref" href="#10name" title='name' data-ref="10name">name</a>),<a class="member" href="../include/G4Element.hh.html#G4Element::fSymbol" title='G4Element::fSymbol' data-ref="G4Element::fSymbol">fSymbol</a><a class="ref" href="../../global/management/include/G4String.hh.html#_ZN8G4StringC1ERKS_" title='G4String::G4String' data-ref="_ZN8G4StringC1ERKS_">(</a><a class="local col1 ref" href="#11symbol" title='symbol' data-ref="11symbol">symbol</a>)</td></tr>
+<tr><th id="130">130</th><td>{</td></tr>
+<tr><th id="131">131</th><td>  <a class="member" href="#_ZN9G4Element18InitializePointersEv" title='G4Element::InitializePointers' data-ref="_ZN9G4Element18InitializePointersEv">InitializePointers</a>();</td></tr>
+<tr><th id="132">132</th><td></td></tr>
+<tr><th id="133">133</th><td>  <span class='error' title="unknown type name &apos;size_t&apos;">size_t</span> <dfn class="local col3 decl" id="13n" title='n' data-type='int' data-ref="13n">n</dfn> = <span class='error' title="use of undeclared identifier &apos;size_t&apos;">size_t</span>(nIsotopes);</td></tr>
+<tr><th id="134">134</th><td></td></tr>
+<tr><th id="135">135</th><td>  <b>if</b>(<var>0</var> &gt;= <a class="local col2 ref" href="#12nIsotopes" title='nIsotopes' data-ref="12nIsotopes">nIsotopes</a>) {</td></tr>
+<tr><th id="136">136</th><td>    <a class="typedef" href="../../global/management/include/G4Exception.hh.html#G4ExceptionDescription" title='G4ExceptionDescription' data-type='int' data-ref="G4ExceptionDescription">G4ExceptionDescription</a> <dfn class="local col4 decl" id="14ed" title='ed' data-type='G4ExceptionDescription' data-ref="14ed">ed</dfn>;</td></tr>
+<tr><th id="137">137</th><td>    ed <span class='error' title="invalid operands to binary expression (&apos;G4ExceptionDescription&apos; (aka &apos;int&apos;) and &apos;const char *&apos;)">&lt;&lt;</span> <q>"Fail to create G4Element "</q> &lt;&lt; name </td></tr>
+<tr><th id="138">138</th><td>       &lt;&lt; <q>" &lt;"</q> &lt;&lt; symbol &lt;&lt; <q>"&gt; with "</q> &lt;&lt; nIsotopes</td></tr>
+<tr><th id="139">139</th><td>       &lt;&lt; <q>" isotopes"</q>;</td></tr>
+<tr><th id="140">140</th><td>    <a class="ref" href="../../global/management/include/G4Exception.hh.html#_Z11G4ExceptionPKcS0_19G4ExceptionSeverityRi" title='G4Exception' data-ref="_Z11G4ExceptionPKcS0_19G4ExceptionSeverityRi">G4Exception</a> (<q>"G4Element::G4Element()"</q>, <q>"mat012"</q>,  <a class="enum" href="../../global/management/include/G4ExceptionSeverity.hh.html#G4ExceptionSeverity::FatalException" title='G4ExceptionSeverity::FatalException' data-ref="G4ExceptionSeverity::FatalException">FatalException</a>, <span class='refarg'><a class="local col4 ref" href="#14ed" title='ed' data-ref="14ed">ed</a></span>);</td></tr>
+<tr><th id="141">141</th><td>  } <b>else</b> {</td></tr>
+<tr><th id="142">142</th><td>    theIsotopeVector         = <b>new</b> <span class='error' title="unknown type name &apos;G4IsotopeVector&apos;">G4IsotopeVector</span>(n,<var>0</var>);</td></tr>
+<tr><th id="143">143</th><td>    <a class="member" href="../include/G4Element.hh.html#G4Element::fRelativeAbundanceVector" title='G4Element::fRelativeAbundanceVector' data-ref="G4Element::fRelativeAbundanceVector">fRelativeAbundanceVector</a> = <b>new</b> <a class="typedef" href="../../global/management/include/G4Types.hh.html#G4double" title='G4double' data-type='double' data-ref="G4double">G4double</a>[<a class="local col2 ref" href="#12nIsotopes" title='nIsotopes' data-ref="12nIsotopes">nIsotopes</a>];</td></tr>
+<tr><th id="144">144</th><td>  }</td></tr>
+<tr><th id="145">145</th><td>}</td></tr>
+<tr><th id="146">146</th><td></td></tr>
+<tr><th id="147">147</th><td><i>//....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......</i></td></tr>
+<tr><th id="148">148</th><td><i></i></td></tr>
+<tr><th id="149">149</th><td><i>// Add an isotope to the element</i></td></tr>
+<tr><th id="150">150</th><td></td></tr>
+<tr><th id="151">151</th><td><em>void</em> <a class="type" href="../include/G4Element.hh.html#G4Element" title='G4Element' data-ref="G4Element">G4Element</a>::<dfn class="decl def" id="_ZN9G4Element10AddIsotopeEP9G4Isotoped" title='G4Element::AddIsotope' data-ref="_ZN9G4Element10AddIsotopeEP9G4Isotoped">AddIsotope</dfn>(<a class="type" href="../include/G4Isotope.hh.html#G4Isotope" title='G4Isotope' data-ref="G4Isotope">G4Isotope</a>* <dfn class="local col5 decl" id="15isotope" title='isotope' data-type='G4Isotope *' data-ref="15isotope">isotope</dfn>, <a class="typedef" href="../../global/management/include/G4Types.hh.html#G4double" title='G4double' data-type='double' data-ref="G4double">G4double</a> <dfn class="local col6 decl" id="16abundance" title='abundance' data-type='G4double' data-ref="16abundance">abundance</dfn>)</td></tr>
+<tr><th id="152">152</th><td>{</td></tr>
+<tr><th id="153">153</th><td>  <b>if</b> (theIsotopeVector == <var>0</var>) {</td></tr>
+<tr><th id="154">154</th><td>    <a class="typedef" href="../../global/management/include/G4Exception.hh.html#G4ExceptionDescription" title='G4ExceptionDescription' data-type='int' data-ref="G4ExceptionDescription">G4ExceptionDescription</a> <dfn class="local col7 decl" id="17ed" title='ed' data-type='G4ExceptionDescription' data-ref="17ed">ed</dfn>;</td></tr>
+<tr><th id="155">155</th><td>    ed <span class='error' title="invalid operands to binary expression (&apos;G4ExceptionDescription&apos; (aka &apos;int&apos;) and &apos;const char *&apos;)">&lt;&lt;</span> <q>"Fail to add Isotope to G4Element "</q> &lt;&lt; fName </td></tr>
+<tr><th id="156">156</th><td>       &lt;&lt; <q>" with Z= "</q> &lt;&lt; fZeff &lt;&lt; <q>"  N= "</q> &lt;&lt; fNeff;</td></tr>
+<tr><th id="157">157</th><td>    <a class="ref" href="../../global/management/include/G4Exception.hh.html#_Z11G4ExceptionPKcS0_19G4ExceptionSeverityRi" title='G4Exception' data-ref="_Z11G4ExceptionPKcS0_19G4ExceptionSeverityRi">G4Exception</a> (<q>"G4Element::AddIsotope()"</q>, <q>"mat013"</q>,  <a class="enum" href="../../global/management/include/G4ExceptionSeverity.hh.html#G4ExceptionSeverity::FatalException" title='G4ExceptionSeverity::FatalException' data-ref="G4ExceptionSeverity::FatalException">FatalException</a>, <span class='refarg'><a class="local col7 ref" href="#17ed" title='ed' data-ref="17ed">ed</a></span>);</td></tr>
+<tr><th id="158">158</th><td>    <b>return</b>;</td></tr>
+<tr><th id="159">159</th><td>  }</td></tr>
+<tr><th id="160">160</th><td>  <a class="typedef" href="../../global/management/include/G4Types.hh.html#G4int" title='G4int' data-type='int' data-ref="G4int">G4int</a> <dfn class="local col8 decl" id="18iz" title='iz' data-type='G4int' data-ref="18iz">iz</dfn> = <a class="local col5 ref" href="#15isotope" title='isotope' data-ref="15isotope">isotope</a>-&gt;<a class="ref" href="../include/G4Isotope.hh.html#_ZNK9G4Isotope4GetZEv" title='G4Isotope::GetZ' data-ref="_ZNK9G4Isotope4GetZEv">GetZ</a>();</td></tr>
+<tr><th id="161">161</th><td></td></tr>
+<tr><th id="162">162</th><td>  <i>// filling ...</i></td></tr>
+<tr><th id="163">163</th><td>  <b>if</b> ( fNumberOfIsotopes &lt; (G4int)theIsotopeVector-&gt;size() ) {</td></tr>
+<tr><th id="164">164</th><td>    <i>// check same Z</i></td></tr>
+<tr><th id="165">165</th><td>    <b>if</b> (<a class="member" href="../include/G4Element.hh.html#G4Element::fNumberOfIsotopes" title='G4Element::fNumberOfIsotopes' data-ref="G4Element::fNumberOfIsotopes">fNumberOfIsotopes</a>==<var>0</var>) { <a class="member" href="../include/G4Element.hh.html#G4Element::fZeff" title='G4Element::fZeff' data-ref="G4Element::fZeff">fZeff</a> = <a class="typedef" href="../../global/management/include/G4Types.hh.html#G4double" title='G4double' data-type='double' data-ref="G4double">G4double</a>(<a class="local col8 ref" href="#18iz" title='iz' data-ref="18iz">iz</a>); }</td></tr>
+<tr><th id="166">166</th><td>    <b>else</b> <b>if</b> (<a class="typedef" href="../../global/management/include/G4Types.hh.html#G4double" title='G4double' data-type='double' data-ref="G4double">G4double</a>(<a class="local col8 ref" href="#18iz" title='iz' data-ref="18iz">iz</a>) != <a class="member" href="../include/G4Element.hh.html#G4Element::fZeff" title='G4Element::fZeff' data-ref="G4Element::fZeff">fZeff</a>) { </td></tr>
+<tr><th id="167">167</th><td>      <a class="typedef" href="../../global/management/include/G4Exception.hh.html#G4ExceptionDescription" title='G4ExceptionDescription' data-type='int' data-ref="G4ExceptionDescription">G4ExceptionDescription</a> <dfn class="local col9 decl" id="19ed" title='ed' data-type='G4ExceptionDescription' data-ref="19ed">ed</dfn>;</td></tr>
+<tr><th id="168">168</th><td>      ed <span class='error' title="invalid operands to binary expression (&apos;G4ExceptionDescription&apos; (aka &apos;int&apos;) and &apos;const char *&apos;)">&lt;&lt;</span> <q>"Fail to add Isotope Z= "</q> &lt;&lt; iz &lt;&lt; <q>" to G4Element "</q> &lt;&lt; fName </td></tr>
+<tr><th id="169">169</th><td>	 &lt;&lt; <q>" with different Z= "</q> &lt;&lt; fZeff &lt;&lt; fNeff;</td></tr>
+<tr><th id="170">170</th><td>      <a class="ref" href="../../global/management/include/G4Exception.hh.html#_Z11G4ExceptionPKcS0_19G4ExceptionSeverityRi" title='G4Exception' data-ref="_Z11G4ExceptionPKcS0_19G4ExceptionSeverityRi">G4Exception</a> (<q>"G4Element::AddIsotope()"</q>, <q>"mat014"</q>,  <a class="enum" href="../../global/management/include/G4ExceptionSeverity.hh.html#G4ExceptionSeverity::FatalException" title='G4ExceptionSeverity::FatalException' data-ref="G4ExceptionSeverity::FatalException">FatalException</a>, <span class='refarg'><a class="local col9 ref" href="#19ed" title='ed' data-ref="19ed">ed</a></span>);</td></tr>
+<tr><th id="171">171</th><td>      <b>return</b>;</td></tr>
+<tr><th id="172">172</th><td>    }</td></tr>
+<tr><th id="173">173</th><td>    <i>//Z ok   </i></td></tr>
+<tr><th id="174">174</th><td>    <a class="member" href="../include/G4Element.hh.html#G4Element::fRelativeAbundanceVector" title='G4Element::fRelativeAbundanceVector' data-ref="G4Element::fRelativeAbundanceVector">fRelativeAbundanceVector</a>[<a class="member" href="../include/G4Element.hh.html#G4Element::fNumberOfIsotopes" title='G4Element::fNumberOfIsotopes' data-ref="G4Element::fNumberOfIsotopes">fNumberOfIsotopes</a>] = <a class="local col6 ref" href="#16abundance" title='abundance' data-ref="16abundance">abundance</a>;</td></tr>
+<tr><th id="175">175</th><td>    (*theIsotopeVector)[fNumberOfIsotopes] = isotope;</td></tr>
+<tr><th id="176">176</th><td>    ++<a class="member" href="../include/G4Element.hh.html#G4Element::fNumberOfIsotopes" title='G4Element::fNumberOfIsotopes' data-ref="G4Element::fNumberOfIsotopes">fNumberOfIsotopes</a>;</td></tr>
+<tr><th id="177">177</th><td></td></tr>
+<tr><th id="178">178</th><td>  } <b>else</b> {</td></tr>
+<tr><th id="179">179</th><td>    <a class="typedef" href="../../global/management/include/G4Exception.hh.html#G4ExceptionDescription" title='G4ExceptionDescription' data-type='int' data-ref="G4ExceptionDescription">G4ExceptionDescription</a> <dfn class="local col0 decl" id="20ed" title='ed' data-type='G4ExceptionDescription' data-ref="20ed">ed</dfn>;</td></tr>
+<tr><th id="180">180</th><td>    ed <span class='error' title="invalid operands to binary expression (&apos;G4ExceptionDescription&apos; (aka &apos;int&apos;) and &apos;const char *&apos;)">&lt;&lt;</span> <q>"Fail to add Isotope Z= "</q> &lt;&lt; iz &lt;&lt; <q>" to G4Element "</q> &lt;&lt; fName </td></tr>
+<tr><th id="181">181</th><td>       &lt;&lt; <q>" - more isotopes than declaired "</q>;</td></tr>
+<tr><th id="182">182</th><td>    <a class="ref" href="../../global/management/include/G4Exception.hh.html#_Z11G4ExceptionPKcS0_19G4ExceptionSeverityRi" title='G4Exception' data-ref="_Z11G4ExceptionPKcS0_19G4ExceptionSeverityRi">G4Exception</a> (<q>"G4Element::AddIsotope()"</q>, <q>"mat015"</q>,  <a class="enum" href="../../global/management/include/G4ExceptionSeverity.hh.html#G4ExceptionSeverity::FatalException" title='G4ExceptionSeverity::FatalException' data-ref="G4ExceptionSeverity::FatalException">FatalException</a>, <span class='refarg'><a class="local col0 ref" href="#20ed" title='ed' data-ref="20ed">ed</a></span>);</td></tr>
+<tr><th id="183">183</th><td>    <b>return</b>;</td></tr>
+<tr><th id="184">184</th><td>  }</td></tr>
+<tr><th id="185">185</th><td></td></tr>
+<tr><th id="186">186</th><td>  <i>// filled.</i></td></tr>
+<tr><th id="187">187</th><td>  <b>if</b> ( fNumberOfIsotopes == (G4int)theIsotopeVector-&gt;size() ) {</td></tr>
+<tr><th id="188">188</th><td>    <a class="typedef" href="../../global/management/include/G4Types.hh.html#G4double" title='G4double' data-type='double' data-ref="G4double">G4double</a> <dfn class="local col1 decl" id="21wtSum" title='wtSum' data-type='G4double' data-ref="21wtSum">wtSum</dfn>=<var>0.0</var>;</td></tr>
+<tr><th id="189">189</th><td>    <a class="member" href="../include/G4Element.hh.html#G4Element::fAeff" title='G4Element::fAeff' data-ref="G4Element::fAeff">fAeff</a> = <var>0.0</var>;</td></tr>
+<tr><th id="190">190</th><td>    <b>for</b> (<a class="typedef" href="../../global/management/include/G4Types.hh.html#G4int" title='G4int' data-type='int' data-ref="G4int">G4int</a> <dfn class="local col2 decl" id="22i" title='i' data-type='G4int' data-ref="22i">i</dfn>=<var>0</var>; <a class="local col2 ref" href="#22i" title='i' data-ref="22i">i</a>&lt;<a class="member" href="../include/G4Element.hh.html#G4Element::fNumberOfIsotopes" title='G4Element::fNumberOfIsotopes' data-ref="G4Element::fNumberOfIsotopes">fNumberOfIsotopes</a>; <a class="local col2 ref" href="#22i" title='i' data-ref="22i">i</a>++) {</td></tr>
+<tr><th id="191">191</th><td>      fAeff +=  fRelativeAbundanceVector[i]*(*theIsotopeVector)[i]-&gt;GetA();</td></tr>
+<tr><th id="192">192</th><td>      <a class="local col1 ref" href="#21wtSum" title='wtSum' data-ref="21wtSum">wtSum</a> +=  <a class="member" href="../include/G4Element.hh.html#G4Element::fRelativeAbundanceVector" title='G4Element::fRelativeAbundanceVector' data-ref="G4Element::fRelativeAbundanceVector">fRelativeAbundanceVector</a>[<a class="local col2 ref" href="#22i" title='i' data-ref="22i">i</a>];</td></tr>
+<tr><th id="193">193</th><td>    }</td></tr>
+<tr><th id="194">194</th><td>    <b>if</b>(<a class="local col1 ref" href="#21wtSum" title='wtSum' data-ref="21wtSum">wtSum</a> &gt; <var>0.0</var>) { <a class="member" href="../include/G4Element.hh.html#G4Element::fAeff" title='G4Element::fAeff' data-ref="G4Element::fAeff">fAeff</a>  /= <a class="local col1 ref" href="#21wtSum" title='wtSum' data-ref="21wtSum">wtSum</a>; }</td></tr>
+<tr><th id="195">195</th><td>    <a class="member" href="../include/G4Element.hh.html#G4Element::fNeff" title='G4Element::fNeff' data-ref="G4Element::fNeff">fNeff</a>   = <a class="member" href="../include/G4Element.hh.html#G4Element::fAeff" title='G4Element::fAeff' data-ref="G4Element::fAeff">fAeff</a>/(<a class="ref" href="../../externals/clhep/include/CLHEP/Units/SystemOfUnits.h.html#CLHEP::g" title='CLHEP::g' data-ref="CLHEP::g">g</a>/<a class="ref" href="../../externals/clhep/include/CLHEP/Units/SystemOfUnits.h.html#CLHEP::mole" title='CLHEP::mole' data-ref="CLHEP::mole">mole</a>);</td></tr>
+<tr><th id="196">196</th><td></td></tr>
+<tr><th id="197">197</th><td>    <b>if</b>(<a class="local col1 ref" href="#21wtSum" title='wtSum' data-ref="21wtSum">wtSum</a> != <var>1.0</var>) {</td></tr>
+<tr><th id="198">198</th><td>      <b>for</b>(<a class="typedef" href="../../global/management/include/G4Types.hh.html#G4int" title='G4int' data-type='int' data-ref="G4int">G4int</a> <dfn class="local col3 decl" id="23i" title='i' data-type='G4int' data-ref="23i">i</dfn>=<var>0</var>; <a class="local col3 ref" href="#23i" title='i' data-ref="23i">i</a>&lt;<a class="member" href="../include/G4Element.hh.html#G4Element::fNumberOfIsotopes" title='G4Element::fNumberOfIsotopes' data-ref="G4Element::fNumberOfIsotopes">fNumberOfIsotopes</a>; ++<a class="local col3 ref" href="#23i" title='i' data-ref="23i">i</a>) { </td></tr>
+<tr><th id="199">199</th><td>	<a class="member" href="../include/G4Element.hh.html#G4Element::fRelativeAbundanceVector" title='G4Element::fRelativeAbundanceVector' data-ref="G4Element::fRelativeAbundanceVector">fRelativeAbundanceVector</a>[<a class="local col3 ref" href="#23i" title='i' data-ref="23i">i</a>] /= <a class="local col1 ref" href="#21wtSum" title='wtSum' data-ref="21wtSum">wtSum</a>; </td></tr>
+<tr><th id="200">200</th><td>      }</td></tr>
+<tr><th id="201">201</th><td>    }</td></tr>
+<tr><th id="202">202</th><td>      </td></tr>
+<tr><th id="203">203</th><td>    <a class="member" href="../include/G4Element.hh.html#G4Element::fNbOfAtomicShells" title='G4Element::fNbOfAtomicShells' data-ref="G4Element::fNbOfAtomicShells">fNbOfAtomicShells</a> = <a class="type" href="../include/G4AtomicShells.hh.html#G4AtomicShells" title='G4AtomicShells' data-ref="G4AtomicShells">G4AtomicShells</a>::<a class="ref" href="../include/G4AtomicShells.hh.html#_ZN14G4AtomicShells17GetNumberOfShellsEi" title='G4AtomicShells::GetNumberOfShells' data-ref="_ZN14G4AtomicShells17GetNumberOfShellsEi">GetNumberOfShells</a>(<a class="local col8 ref" href="#18iz" title='iz' data-ref="18iz">iz</a>);</td></tr>
+<tr><th id="204">204</th><td>    <a class="member" href="../include/G4Element.hh.html#G4Element::fAtomicShells" title='G4Element::fAtomicShells' data-ref="G4Element::fAtomicShells">fAtomicShells</a>     = <b>new</b> <a class="typedef" href="../../global/management/include/G4Types.hh.html#G4double" title='G4double' data-type='double' data-ref="G4double">G4double</a>[<a class="member" href="../include/G4Element.hh.html#G4Element::fNbOfAtomicShells" title='G4Element::fNbOfAtomicShells' data-ref="G4Element::fNbOfAtomicShells">fNbOfAtomicShells</a>];</td></tr>
+<tr><th id="205">205</th><td>    <a class="member" href="../include/G4Element.hh.html#G4Element::fNbOfShellElectrons" title='G4Element::fNbOfShellElectrons' data-ref="G4Element::fNbOfShellElectrons">fNbOfShellElectrons</a> = <b>new</b> <a class="typedef" href="../../global/management/include/G4Types.hh.html#G4int" title='G4int' data-type='int' data-ref="G4int">G4int</a>[<a class="member" href="../include/G4Element.hh.html#G4Element::fNbOfAtomicShells" title='G4Element::fNbOfAtomicShells' data-ref="G4Element::fNbOfAtomicShells">fNbOfAtomicShells</a>];</td></tr>
+<tr><th id="206">206</th><td></td></tr>
+<tr><th id="207">207</th><td>    <b>for</b> ( <a class="typedef" href="../../global/management/include/G4Types.hh.html#G4int" title='G4int' data-type='int' data-ref="G4int">G4int</a> <dfn class="local col4 decl" id="24j" title='j' data-type='G4int' data-ref="24j">j</dfn> = <var>0</var>; <a class="local col4 ref" href="#24j" title='j' data-ref="24j">j</a> &lt; <a class="member" href="../include/G4Element.hh.html#G4Element::fNbOfAtomicShells" title='G4Element::fNbOfAtomicShells' data-ref="G4Element::fNbOfAtomicShells">fNbOfAtomicShells</a>; <a class="local col4 ref" href="#24j" title='j' data-ref="24j">j</a>++ ) </td></tr>
+<tr><th id="208">208</th><td>    {</td></tr>
+<tr><th id="209">209</th><td>      <a class="member" href="../include/G4Element.hh.html#G4Element::fAtomicShells" title='G4Element::fAtomicShells' data-ref="G4Element::fAtomicShells">fAtomicShells</a>[<a class="local col4 ref" href="#24j" title='j' data-ref="24j">j</a>]       = <a class="type" href="../include/G4AtomicShells.hh.html#G4AtomicShells" title='G4AtomicShells' data-ref="G4AtomicShells">G4AtomicShells</a>::<a class="ref" href="../include/G4AtomicShells.hh.html#_ZN14G4AtomicShells16GetBindingEnergyEii" title='G4AtomicShells::GetBindingEnergy' data-ref="_ZN14G4AtomicShells16GetBindingEnergyEii">GetBindingEnergy</a>(<a class="local col8 ref" href="#18iz" title='iz' data-ref="18iz">iz</a>, <a class="local col4 ref" href="#24j" title='j' data-ref="24j">j</a>);</td></tr>
+<tr><th id="210">210</th><td>      <a class="member" href="../include/G4Element.hh.html#G4Element::fNbOfShellElectrons" title='G4Element::fNbOfShellElectrons' data-ref="G4Element::fNbOfShellElectrons">fNbOfShellElectrons</a>[<a class="local col4 ref" href="#24j" title='j' data-ref="24j">j</a>] = <a class="type" href="../include/G4AtomicShells.hh.html#G4AtomicShells" title='G4AtomicShells' data-ref="G4AtomicShells">G4AtomicShells</a>::<a class="ref" href="../include/G4AtomicShells.hh.html#_ZN14G4AtomicShells20GetNumberOfElectronsEii" title='G4AtomicShells::GetNumberOfElectrons' data-ref="_ZN14G4AtomicShells20GetNumberOfElectronsEii">GetNumberOfElectrons</a>(<a class="local col8 ref" href="#18iz" title='iz' data-ref="18iz">iz</a>, <a class="local col4 ref" href="#24j" title='j' data-ref="24j">j</a>);</td></tr>
+<tr><th id="211">211</th><td>    }         </td></tr>
+<tr><th id="212">212</th><td>    <a class="member" href="#_ZN9G4Element24ComputeDerivedQuantitiesEv" title='G4Element::ComputeDerivedQuantities' data-ref="_ZN9G4Element24ComputeDerivedQuantitiesEv">ComputeDerivedQuantities</a>();</td></tr>
+<tr><th id="213">213</th><td>  }</td></tr>
+<tr><th id="214">214</th><td>}</td></tr>
+<tr><th id="215">215</th><td></td></tr>
+<tr><th id="216">216</th><td><i>//....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......</i></td></tr>
+<tr><th id="217">217</th><td></td></tr>
+<tr><th id="218">218</th><td><em>void</em> <a class="type" href="../include/G4Element.hh.html#G4Element" title='G4Element' data-ref="G4Element">G4Element</a>::<dfn class="decl def" id="_ZN9G4Element18InitializePointersEv" title='G4Element::InitializePointers' data-ref="_ZN9G4Element18InitializePointersEv">InitializePointers</dfn>()</td></tr>
+<tr><th id="219">219</th><td>{</td></tr>
+<tr><th id="220">220</th><td>  theIsotopeVector = <b>nullptr</b>;</td></tr>
+<tr><th id="221">221</th><td>  <a class="member" href="../include/G4Element.hh.html#G4Element::fRelativeAbundanceVector" title='G4Element::fRelativeAbundanceVector' data-ref="G4Element::fRelativeAbundanceVector">fRelativeAbundanceVector</a> = <b>nullptr</b>;</td></tr>
+<tr><th id="222">222</th><td>  <a class="member" href="../include/G4Element.hh.html#G4Element::fAtomicShells" title='G4Element::fAtomicShells' data-ref="G4Element::fAtomicShells">fAtomicShells</a> = <b>nullptr</b>;</td></tr>
+<tr><th id="223">223</th><td>  <a class="member" href="../include/G4Element.hh.html#G4Element::fNbOfShellElectrons" title='G4Element::fNbOfShellElectrons' data-ref="G4Element::fNbOfShellElectrons">fNbOfShellElectrons</a> = <b>nullptr</b>;</td></tr>
+<tr><th id="224">224</th><td>  <a class="member" href="../include/G4Element.hh.html#G4Element::fIonisation" title='G4Element::fIonisation' data-ref="G4Element::fIonisation">fIonisation</a> = <b>nullptr</b>;</td></tr>
+<tr><th id="225">225</th><td>  <a class="member" href="../include/G4Element.hh.html#G4Element::fNumberOfIsotopes" title='G4Element::fNumberOfIsotopes' data-ref="G4Element::fNumberOfIsotopes">fNumberOfIsotopes</a> = <var>0</var>;</td></tr>
+<tr><th id="226">226</th><td>  <a class="member" href="../include/G4Element.hh.html#G4Element::fNaturalAbundance" title='G4Element::fNaturalAbundance' data-ref="G4Element::fNaturalAbundance">fNaturalAbundance</a> = <b>false</b>;</td></tr>
+<tr><th id="227">227</th><td></td></tr>
+<tr><th id="228">228</th><td>  <i>// add initialisation of all remaining members</i></td></tr>
+<tr><th id="229">229</th><td>  <a class="member" href="../include/G4Element.hh.html#G4Element::fZeff" title='G4Element::fZeff' data-ref="G4Element::fZeff">fZeff</a> = <var>0</var>;</td></tr>
+<tr><th id="230">230</th><td>  <a class="member" href="../include/G4Element.hh.html#G4Element::fNeff" title='G4Element::fNeff' data-ref="G4Element::fNeff">fNeff</a> = <var>0</var>;</td></tr>
+<tr><th id="231">231</th><td>  <a class="member" href="../include/G4Element.hh.html#G4Element::fAeff" title='G4Element::fAeff' data-ref="G4Element::fAeff">fAeff</a> = <var>0</var>;</td></tr>
+<tr><th id="232">232</th><td>  <a class="member" href="../include/G4Element.hh.html#G4Element::fNbOfAtomicShells" title='G4Element::fNbOfAtomicShells' data-ref="G4Element::fNbOfAtomicShells">fNbOfAtomicShells</a> = <var>0</var>; </td></tr>
+<tr><th id="233">233</th><td>  fIndexInTable = <var>0</var>;</td></tr>
+<tr><th id="234">234</th><td>  <a class="member" href="../include/G4Element.hh.html#G4Element::fCoulomb" title='G4Element::fCoulomb' data-ref="G4Element::fCoulomb">fCoulomb</a> = <var>0.0</var>;</td></tr>
+<tr><th id="235">235</th><td>  <a class="member" href="../include/G4Element.hh.html#G4Element::fRadTsai" title='G4Element::fRadTsai' data-ref="G4Element::fRadTsai">fRadTsai</a> = <var>0.0</var>;</td></tr>
+<tr><th id="236">236</th><td>  <a class="member" href="../include/G4Element.hh.html#G4Element::fZ" title='G4Element::fZ' data-ref="G4Element::fZ">fZ</a> = <var>0</var>;</td></tr>
+<tr><th id="237">237</th><td>}</td></tr>
+<tr><th id="238">238</th><td></td></tr>
+<tr><th id="239">239</th><td><i>//....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......</i></td></tr>
+<tr><th id="240">240</th><td><i></i></td></tr>
+<tr><th id="241">241</th><td><i>// Fake default constructor - sets only member data and allocates memory</i></td></tr>
+<tr><th id="242">242</th><td><i>//                            for usage restricted to object persistency</i></td></tr>
+<tr><th id="243">243</th><td></td></tr>
+<tr><th id="244">244</th><td><a class="type" href="../include/G4Element.hh.html#G4Element" title='G4Element' data-ref="G4Element">G4Element</a>::<dfn class="decl def" id="_ZN9G4ElementC1ER8__void__" title='G4Element::G4Element' data-ref="_ZN9G4ElementC1ER8__void__">G4Element</dfn>( <a class="type" href="../../global/management/include/G4Types.hh.html#__void__" title='__void__' data-ref="__void__">__void__</a>&amp; )</td></tr>
+<tr><th id="245">245</th><td>  : <a class="member" href="../include/G4Element.hh.html#G4Element::fZeff" title='G4Element::fZeff' data-ref="G4Element::fZeff">fZeff</a>(<var>0</var>), <a class="member" href="../include/G4Element.hh.html#G4Element::fNeff" title='G4Element::fNeff' data-ref="G4Element::fNeff">fNeff</a>(<var>0</var>), <a class="member" href="../include/G4Element.hh.html#G4Element::fAeff" title='G4Element::fAeff' data-ref="G4Element::fAeff">fAeff</a>(<var>0</var>)</td></tr>
+<tr><th id="246">246</th><td>{</td></tr>
+<tr><th id="247">247</th><td>  <a class="member" href="#_ZN9G4Element18InitializePointersEv" title='G4Element::InitializePointers' data-ref="_ZN9G4Element18InitializePointersEv">InitializePointers</a>();</td></tr>
+<tr><th id="248">248</th><td>}</td></tr>
+<tr><th id="249">249</th><td></td></tr>
+<tr><th id="250">250</th><td><i>//....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......</i></td></tr>
+<tr><th id="251">251</th><td></td></tr>
+<tr><th id="252">252</th><td>G4Element::<span class='error' title="exception specification in declaration does not match previous declaration">~</span>G4Element()</td></tr>
+<tr><th id="253">253</th><td>{</td></tr>
+<tr><th id="254">254</th><td>  <b>if</b> (theIsotopeVector)         { <b>delete</b> theIsotopeVector; }</td></tr>
+<tr><th id="255">255</th><td>  <b>if</b> (fRelativeAbundanceVector) { <b>delete</b> [] fRelativeAbundanceVector; }</td></tr>
+<tr><th id="256">256</th><td>  <b>if</b> (fAtomicShells)            { <b>delete</b> [] fAtomicShells; }</td></tr>
+<tr><th id="257">257</th><td>  <b>if</b> (fNbOfShellElectrons)      { <b>delete</b> [] fNbOfShellElectrons; }</td></tr>
+<tr><th id="258">258</th><td>  <b>if</b> (fIonisation)              { <b>delete</b>    fIonisation; }</td></tr>
+<tr><th id="259">259</th><td>  </td></tr>
+<tr><th id="260">260</th><td>  <i>//remove this element from theElementTable</i></td></tr>
+<tr><th id="261">261</th><td>  theElementTable[fIndexInTable] = <var>0</var>;</td></tr>
+<tr><th id="262">262</th><td>}</td></tr>
+<tr><th id="263">263</th><td></td></tr>
+<tr><th id="264">264</th><td><i>//....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......</i></td></tr>
+<tr><th id="265">265</th><td></td></tr>
+<tr><th id="266">266</th><td><em>void</em> <a class="type" href="../include/G4Element.hh.html#G4Element" title='G4Element' data-ref="G4Element">G4Element</a>::<dfn class="decl def" id="_ZN9G4Element24ComputeDerivedQuantitiesEv" title='G4Element::ComputeDerivedQuantities' data-ref="_ZN9G4Element24ComputeDerivedQuantitiesEv">ComputeDerivedQuantities</dfn>()</td></tr>
+<tr><th id="267">267</th><td>{</td></tr>
+<tr><th id="268">268</th><td>  <i>// some basic functions of the atomic number</i></td></tr>
+<tr><th id="269">269</th><td><i></i></td></tr>
+<tr><th id="270">270</th><td><i>  // Store in table</i></td></tr>
+<tr><th id="271">271</th><td>  theElementTable.push_back(<b>this</b>);</td></tr>
+<tr><th id="272">272</th><td>  fIndexInTable = theElementTable.size() - <var>1</var>;</td></tr>
+<tr><th id="273">273</th><td></td></tr>
+<tr><th id="274">274</th><td>  <i>// Radiation Length</i></td></tr>
+<tr><th id="275">275</th><td>  <a class="member" href="#_ZN9G4Element20ComputeCoulombFactorEv" title='G4Element::ComputeCoulombFactor' data-ref="_ZN9G4Element20ComputeCoulombFactorEv">ComputeCoulombFactor</a>();</td></tr>
+<tr><th id="276">276</th><td>  <a class="member" href="#_ZN9G4Element21ComputeLradTsaiFactorEv" title='G4Element::ComputeLradTsaiFactor' data-ref="_ZN9G4Element21ComputeLradTsaiFactorEv">ComputeLradTsaiFactor</a>(); </td></tr>
+<tr><th id="277">277</th><td></td></tr>
+<tr><th id="278">278</th><td>  <i>// parameters for energy loss by ionisation </i></td></tr>
+<tr><th id="279">279</th><td>  <b>if</b> (<a class="member" href="../include/G4Element.hh.html#G4Element::fIonisation" title='G4Element::fIonisation' data-ref="G4Element::fIonisation">fIonisation</a>) { <b>delete</b> <a class="member" href="../include/G4Element.hh.html#G4Element::fIonisation" title='G4Element::fIonisation' data-ref="G4Element::fIonisation">fIonisation</a>; }  </td></tr>
+<tr><th id="280">280</th><td>  <a class="member" href="../include/G4Element.hh.html#G4Element::fIonisation" title='G4Element::fIonisation' data-ref="G4Element::fIonisation">fIonisation</a> = <b>new</b> <a class="type" href="../include/G4IonisParamElm.hh.html#G4IonisParamElm" title='G4IonisParamElm' data-ref="G4IonisParamElm">G4IonisParamElm</a><a class="ref" href="../include/G4IonisParamElm.hh.html#_ZN15G4IonisParamElmC1Ed" title='G4IonisParamElm::G4IonisParamElm' data-ref="_ZN15G4IonisParamElmC1Ed">(</a><a class="member" href="../include/G4Element.hh.html#G4Element::fZeff" title='G4Element::fZeff' data-ref="G4Element::fZeff">fZeff</a>);</td></tr>
+<tr><th id="281">281</th><td>  <a class="member" href="../include/G4Element.hh.html#G4Element::fZ" title='G4Element::fZ' data-ref="G4Element::fZ">fZ</a> = <a class="ref" href="../../global/management/include/templates.hh.html#_Z7G4lrintd" title='G4lrint' data-ref="_Z7G4lrintd">G4lrint</a>(<a class="member" href="../include/G4Element.hh.html#G4Element::fZeff" title='G4Element::fZeff' data-ref="G4Element::fZeff">fZeff</a>);</td></tr>
+<tr><th id="282">282</th><td>}</td></tr>
+<tr><th id="283">283</th><td></td></tr>
+<tr><th id="284">284</th><td><i>//....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......</i></td></tr>
+<tr><th id="285">285</th><td></td></tr>
+<tr><th id="286">286</th><td><em>void</em> <a class="type" href="../include/G4Element.hh.html#G4Element" title='G4Element' data-ref="G4Element">G4Element</a>::<dfn class="decl def" id="_ZN9G4Element20ComputeCoulombFactorEv" title='G4Element::ComputeCoulombFactor' data-ref="_ZN9G4Element20ComputeCoulombFactorEv">ComputeCoulombFactor</dfn>()</td></tr>
+<tr><th id="287">287</th><td>{</td></tr>
+<tr><th id="288">288</th><td>  <i>//</i></td></tr>
+<tr><th id="289">289</th><td><i>  //  Compute Coulomb correction factor (Phys Rev. D50 3-1 (1994) page 1254)</i></td></tr>
+<tr><th id="290">290</th><td></td></tr>
+<tr><th id="291">291</th><td>  <em>static</em> <em>const</em> <a class="typedef" href="../../global/management/include/G4Types.hh.html#G4double" title='G4double' data-type='double' data-ref="G4double">G4double</a> <dfn class="local col5 decl" id="25k1" title='k1' data-type='const G4double' data-ref="25k1">k1</dfn> = <var>0.0083</var> , <dfn class="local col6 decl" id="26k2" title='k2' data-type='const G4double' data-ref="26k2">k2</dfn> = <var>0.20206</var> ,<dfn class="local col7 decl" id="27k3" title='k3' data-type='const G4double' data-ref="27k3">k3</dfn> = <var>0.0020</var> , <dfn class="local col8 decl" id="28k4" title='k4' data-type='const G4double' data-ref="28k4">k4</dfn> = <var>0.0369</var> ;</td></tr>
+<tr><th id="292">292</th><td></td></tr>
+<tr><th id="293">293</th><td>  <a class="typedef" href="../../global/management/include/G4Types.hh.html#G4double" title='G4double' data-type='double' data-ref="G4double">G4double</a> <dfn class="local col9 decl" id="29az2" title='az2' data-type='G4double' data-ref="29az2">az2</dfn> = (<a class="ref" href="../../externals/clhep/include/CLHEP/Units/PhysicalConstants.h.html#CLHEP::fine_structure_const" title='CLHEP::fine_structure_const' data-ref="CLHEP::fine_structure_const">fine_structure_const</a>*<a class="member" href="../include/G4Element.hh.html#G4Element::fZeff" title='G4Element::fZeff' data-ref="G4Element::fZeff">fZeff</a>)*(<a class="ref" href="../../externals/clhep/include/CLHEP/Units/PhysicalConstants.h.html#CLHEP::fine_structure_const" title='CLHEP::fine_structure_const' data-ref="CLHEP::fine_structure_const">fine_structure_const</a>*<a class="member" href="../include/G4Element.hh.html#G4Element::fZeff" title='G4Element::fZeff' data-ref="G4Element::fZeff">fZeff</a>);</td></tr>
+<tr><th id="294">294</th><td>  <a class="typedef" href="../../global/management/include/G4Types.hh.html#G4double" title='G4double' data-type='double' data-ref="G4double">G4double</a> <dfn class="local col0 decl" id="30az4" title='az4' data-type='G4double' data-ref="30az4">az4</dfn> = <a class="local col9 ref" href="#29az2" title='az2' data-ref="29az2">az2</a> * <a class="local col9 ref" href="#29az2" title='az2' data-ref="29az2">az2</a>;</td></tr>
+<tr><th id="295">295</th><td></td></tr>
+<tr><th id="296">296</th><td>  <a class="member" href="../include/G4Element.hh.html#G4Element::fCoulomb" title='G4Element::fCoulomb' data-ref="G4Element::fCoulomb">fCoulomb</a> = (<a class="local col5 ref" href="#25k1" title='k1' data-ref="25k1">k1</a>*<a class="local col0 ref" href="#30az4" title='az4' data-ref="30az4">az4</a> + <a class="local col6 ref" href="#26k2" title='k2' data-ref="26k2">k2</a> + <var>1.</var>/(<var>1.</var>+<a class="local col9 ref" href="#29az2" title='az2' data-ref="29az2">az2</a>))*<a class="local col9 ref" href="#29az2" title='az2' data-ref="29az2">az2</a> - (<a class="local col7 ref" href="#27k3" title='k3' data-ref="27k3">k3</a>*<a class="local col0 ref" href="#30az4" title='az4' data-ref="30az4">az4</a> + <a class="local col8 ref" href="#28k4" title='k4' data-ref="28k4">k4</a>)*<a class="local col0 ref" href="#30az4" title='az4' data-ref="30az4">az4</a>;</td></tr>
+<tr><th id="297">297</th><td>}</td></tr>
+<tr><th id="298">298</th><td></td></tr>
+<tr><th id="299">299</th><td><i>//....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......</i></td></tr>
+<tr><th id="300">300</th><td></td></tr>
+<tr><th id="301">301</th><td><em>void</em> <a class="type" href="../include/G4Element.hh.html#G4Element" title='G4Element' data-ref="G4Element">G4Element</a>::<dfn class="decl def" id="_ZN9G4Element21ComputeLradTsaiFactorEv" title='G4Element::ComputeLradTsaiFactor' data-ref="_ZN9G4Element21ComputeLradTsaiFactorEv">ComputeLradTsaiFactor</dfn>()</td></tr>
+<tr><th id="302">302</th><td>{</td></tr>
+<tr><th id="303">303</th><td>  <i>//</i></td></tr>
+<tr><th id="304">304</th><td><i>  //  Compute Tsai's Expression for the Radiation Length</i></td></tr>
+<tr><th id="305">305</th><td><i>  //  (Phys Rev. D50 3-1 (1994) page 1254)</i></td></tr>
+<tr><th id="306">306</th><td></td></tr>
+<tr><th id="307">307</th><td>  <em>static</em> <em>const</em> <a class="typedef" href="../../global/management/include/G4Types.hh.html#G4double" title='G4double' data-type='double' data-ref="G4double">G4double</a> <dfn class="local col1 decl" id="31Lrad_light" title='Lrad_light' data-type='const G4double [4]' data-ref="31Lrad_light">Lrad_light</dfn>[]  = {<var>5.31</var>  , <var>4.79</var>  , <var>4.74</var> ,  <var>4.71</var>} ;</td></tr>
+<tr><th id="308">308</th><td>  <em>static</em> <em>const</em> <a class="typedef" href="../../global/management/include/G4Types.hh.html#G4double" title='G4double' data-type='double' data-ref="G4double">G4double</a> <dfn class="local col2 decl" id="32Lprad_light" title='Lprad_light' data-type='const G4double [4]' data-ref="32Lprad_light">Lprad_light</dfn>[] = {<var>6.144</var> , <var>5.621</var> , <var>5.805</var> , <var>5.924</var>} ;</td></tr>
+<tr><th id="309">309</th><td>  </td></tr>
+<tr><th id="310">310</th><td>  <em>const</em> <a class="typedef" href="../../global/management/include/G4Types.hh.html#G4double" title='G4double' data-type='double' data-ref="G4double">G4double</a> <dfn class="local col3 decl" id="33logZ3" title='logZ3' data-type='const G4double' data-ref="33logZ3">logZ3</dfn> = <a class="ref" href="../../global/management/include/G4Log.hh.html#_Z5G4Logd" title='G4Log' data-ref="_Z5G4Logd">G4Log</a>(<a class="member" href="../include/G4Element.hh.html#G4Element::fZeff" title='G4Element::fZeff' data-ref="G4Element::fZeff">fZeff</a>)/<var>3.</var>;</td></tr>
+<tr><th id="311">311</th><td></td></tr>
+<tr><th id="312">312</th><td>  <a class="typedef" href="../../global/management/include/G4Types.hh.html#G4double" title='G4double' data-type='double' data-ref="G4double">G4double</a> <dfn class="local col4 decl" id="34Lrad" title='Lrad' data-type='G4double' data-ref="34Lrad">Lrad</dfn>, <dfn class="local col5 decl" id="35Lprad" title='Lprad' data-type='G4double' data-ref="35Lprad">Lprad</dfn>;</td></tr>
+<tr><th id="313">313</th><td>  <a class="typedef" href="../../global/management/include/G4Types.hh.html#G4int" title='G4int' data-type='int' data-ref="G4int">G4int</a> <dfn class="local col6 decl" id="36iz" title='iz' data-type='G4int' data-ref="36iz">iz</dfn> = <a class="ref" href="../../global/management/include/templates.hh.html#_Z7G4lrintd" title='G4lrint' data-ref="_Z7G4lrintd">G4lrint</a>(<a class="member" href="../include/G4Element.hh.html#G4Element::fZeff" title='G4Element::fZeff' data-ref="G4Element::fZeff">fZeff</a>) - <var>1</var> ;</td></tr>
+<tr><th id="314">314</th><td>  <em>static</em> <em>const</em> <a class="typedef" href="../../global/management/include/G4Types.hh.html#G4double" title='G4double' data-type='double' data-ref="G4double">G4double</a> <dfn class="local col7 decl" id="37log184" title='log184' data-type='const G4double' data-ref="37log184">log184</dfn> = <a class="ref" href="../../global/management/include/G4Log.hh.html#_Z5G4Logd" title='G4Log' data-ref="_Z5G4Logd">G4Log</a>(<var>184.15</var>);</td></tr>
+<tr><th id="315">315</th><td>  <em>static</em> <em>const</em> <a class="typedef" href="../../global/management/include/G4Types.hh.html#G4double" title='G4double' data-type='double' data-ref="G4double">G4double</a> <dfn class="local col8 decl" id="38log1194" title='log1194' data-type='const G4double' data-ref="38log1194">log1194</dfn> = <a class="ref" href="../../global/management/include/G4Log.hh.html#_Z5G4Logd" title='G4Log' data-ref="_Z5G4Logd">G4Log</a>(<var>1194.</var>);</td></tr>
+<tr><th id="316">316</th><td>  <b>if</b> (<a class="local col6 ref" href="#36iz" title='iz' data-ref="36iz">iz</a> &lt;= <var>3</var>) { <a class="local col4 ref" href="#34Lrad" title='Lrad' data-ref="34Lrad">Lrad</a> = <a class="local col1 ref" href="#31Lrad_light" title='Lrad_light' data-ref="31Lrad_light">Lrad_light</a>[<a class="local col6 ref" href="#36iz" title='iz' data-ref="36iz">iz</a>] ;  <a class="local col5 ref" href="#35Lprad" title='Lprad' data-ref="35Lprad">Lprad</a> = <a class="local col2 ref" href="#32Lprad_light" title='Lprad_light' data-ref="32Lprad_light">Lprad_light</a>[<a class="local col6 ref" href="#36iz" title='iz' data-ref="36iz">iz</a>] ; }</td></tr>
+<tr><th id="317">317</th><td>  <b>else</b> { <a class="local col4 ref" href="#34Lrad" title='Lrad' data-ref="34Lrad">Lrad</a> = <a class="local col7 ref" href="#37log184" title='log184' data-ref="37log184">log184</a> - <a class="local col3 ref" href="#33logZ3" title='logZ3' data-ref="33logZ3">logZ3</a> ; <a class="local col5 ref" href="#35Lprad" title='Lprad' data-ref="35Lprad">Lprad</a> = <a class="local col8 ref" href="#38log1194" title='log1194' data-ref="38log1194">log1194</a> - <var>2</var>*<a class="local col3 ref" href="#33logZ3" title='logZ3' data-ref="33logZ3">logZ3</a>;}</td></tr>
+<tr><th id="318">318</th><td></td></tr>
+<tr><th id="319">319</th><td>  <a class="member" href="../include/G4Element.hh.html#G4Element::fRadTsai" title='G4Element::fRadTsai' data-ref="G4Element::fRadTsai">fRadTsai</a> = <var>4</var>*<a class="ref" href="../../externals/clhep/include/CLHEP/Units/PhysicalConstants.h.html#CLHEP::alpha_rcl2" title='CLHEP::alpha_rcl2' data-ref="CLHEP::alpha_rcl2">alpha_rcl2</a>*<a class="member" href="../include/G4Element.hh.html#G4Element::fZeff" title='G4Element::fZeff' data-ref="G4Element::fZeff">fZeff</a>*(<a class="member" href="../include/G4Element.hh.html#G4Element::fZeff" title='G4Element::fZeff' data-ref="G4Element::fZeff">fZeff</a>*(<a class="local col4 ref" href="#34Lrad" title='Lrad' data-ref="34Lrad">Lrad</a>-<a class="member" href="../include/G4Element.hh.html#G4Element::fCoulomb" title='G4Element::fCoulomb' data-ref="G4Element::fCoulomb">fCoulomb</a>) + <a class="local col5 ref" href="#35Lprad" title='Lprad' data-ref="35Lprad">Lprad</a>); </td></tr>
+<tr><th id="320">320</th><td>}</td></tr>
+<tr><th id="321">321</th><td></td></tr>
+<tr><th id="322">322</th><td><i>//....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......</i></td></tr>
+<tr><th id="323">323</th><td></td></tr>
+<tr><th id="324">324</th><td><em>void</em> <a class="type" href="../include/G4Element.hh.html#G4Element" title='G4Element' data-ref="G4Element">G4Element</a>::<dfn class="decl def" id="_ZN9G4Element18AddNaturalIsotopesEv" title='G4Element::AddNaturalIsotopes' data-ref="_ZN9G4Element18AddNaturalIsotopesEv">AddNaturalIsotopes</dfn>()</td></tr>
+<tr><th id="325">325</th><td>{</td></tr>
+<tr><th id="326">326</th><td>  <a class="typedef" href="../../global/management/include/G4Types.hh.html#G4int" title='G4int' data-type='int' data-ref="G4int">G4int</a> <dfn class="local col9 decl" id="39Z" title='Z' data-type='G4int' data-ref="39Z">Z</dfn> = <a class="ref" href="../../global/management/include/templates.hh.html#_Z7G4lrintd" title='G4lrint' data-ref="_Z7G4lrintd">G4lrint</a>(<a class="member" href="../include/G4Element.hh.html#G4Element::fZeff" title='G4Element::fZeff' data-ref="G4Element::fZeff">fZeff</a>);</td></tr>
+<tr><th id="327">327</th><td>  <a class="type" href="../include/G4NistManager.hh.html#G4NistManager" title='G4NistManager' data-ref="G4NistManager">G4NistManager</a>* <dfn class="local col0 decl" id="40nist" title='nist' data-type='G4NistManager *' data-ref="40nist">nist</dfn> = <a class="type" href="../include/G4NistManager.hh.html#G4NistManager" title='G4NistManager' data-ref="G4NistManager">G4NistManager</a>::<a class="ref" href="../include/G4NistManager.hh.html#_ZN13G4NistManager8InstanceEv" title='G4NistManager::Instance' data-ref="_ZN13G4NistManager8InstanceEv">Instance</a>();</td></tr>
+<tr><th id="328">328</th><td>  <a class="typedef" href="../../global/management/include/G4Types.hh.html#G4int" title='G4int' data-type='int' data-ref="G4int">G4int</a> <dfn class="local col1 decl" id="41n" title='n' data-type='G4int' data-ref="41n">n</dfn> = <a class="local col0 ref" href="#40nist" title='nist' data-ref="40nist">nist</a>-&gt;<a class="ref" href="../include/G4NistManager.hh.html#_ZNK13G4NistManager23GetNumberOfNistIsotopesEi" title='G4NistManager::GetNumberOfNistIsotopes' data-ref="_ZNK13G4NistManager23GetNumberOfNistIsotopesEi">GetNumberOfNistIsotopes</a>(<a class="local col9 ref" href="#39Z" title='Z' data-ref="39Z">Z</a>);</td></tr>
+<tr><th id="329">329</th><td>  <a class="typedef" href="../../global/management/include/G4Types.hh.html#G4int" title='G4int' data-type='int' data-ref="G4int">G4int</a> <dfn class="local col2 decl" id="42N0" title='N0' data-type='G4int' data-ref="42N0">N0</dfn> = <a class="local col0 ref" href="#40nist" title='nist' data-ref="40nist">nist</a>-&gt;<a class="ref" href="../include/G4NistManager.hh.html#_ZNK13G4NistManager20GetNistFirstIsotopeNEi" title='G4NistManager::GetNistFirstIsotopeN' data-ref="_ZNK13G4NistManager20GetNistFirstIsotopeNEi">GetNistFirstIsotopeN</a>(<a class="local col9 ref" href="#39Z" title='Z' data-ref="39Z">Z</a>);</td></tr>
+<tr><th id="330">330</th><td></td></tr>
+<tr><th id="331">331</th><td>  <b>if</b>(<q>""</q> == <a class="ref fake" href="../../global/management/include/G4String.hh.html#_ZNK8G4StringcvPKcEv" title='G4String::operator const char *' data-ref="_ZNK8G4StringcvPKcEv"></a><a class="member" href="../include/G4Element.hh.html#G4Element::fSymbol" title='G4Element::fSymbol' data-ref="G4Element::fSymbol">fSymbol</a>) {</td></tr>
+<tr><th id="332">332</th><td>    <em>const</em> <span class='error' title="use of undeclared identifier &apos;std&apos;">std</span>::vector<span class='error' title="expected unqualified-id">&lt;</span>G4String&gt; elmnames = </td></tr>
+<tr><th id="333">333</th><td>      G4NistManager::Instance()-&gt;GetNistElementNames();</td></tr>
+<tr><th id="334">334</th><td>    <b>if</b>(Z &lt; (G4int)<span class='error' title="use of undeclared identifier &apos;elmnames&apos;">elmnames</span>.size()) { fSymbol = <span class='error' title="use of undeclared identifier &apos;elmnames&apos;">elmnames</span>[Z]; }</td></tr>
+<tr><th id="335">335</th><td>    <b>else</b> { <a class="member" href="../include/G4Element.hh.html#G4Element::fSymbol" title='G4Element::fSymbol' data-ref="G4Element::fSymbol">fSymbol</a> <a class="ref" href="../../global/management/include/G4String.hh.html#_ZN8G4StringaSERKS_" title='G4String::operator=' data-ref="_ZN8G4StringaSERKS_">=</a> <a class="member" href="../include/G4Element.hh.html#G4Element::fName" title='G4Element::fName' data-ref="G4Element::fName">fName</a>; }</td></tr>
+<tr><th id="336">336</th><td>  }</td></tr>
+<tr><th id="337">337</th><td></td></tr>
+<tr><th id="338">338</th><td>  <a class="member" href="../include/G4Element.hh.html#G4Element::fNumberOfIsotopes" title='G4Element::fNumberOfIsotopes' data-ref="G4Element::fNumberOfIsotopes">fNumberOfIsotopes</a> = <var>0</var>;</td></tr>
+<tr><th id="339">339</th><td>  <b>for</b>(<a class="typedef" href="../../global/management/include/G4Types.hh.html#G4int" title='G4int' data-type='int' data-ref="G4int">G4int</a> <dfn class="local col3 decl" id="43i" title='i' data-type='G4int' data-ref="43i">i</dfn>=<var>0</var>; <a class="local col3 ref" href="#43i" title='i' data-ref="43i">i</a>&lt;<a class="local col1 ref" href="#41n" title='n' data-ref="41n">n</a>; ++<a class="local col3 ref" href="#43i" title='i' data-ref="43i">i</a>) {</td></tr>
+<tr><th id="340">340</th><td>    <b>if</b>(<a class="local col0 ref" href="#40nist" title='nist' data-ref="40nist">nist</a>-&gt;<a class="ref" href="../include/G4NistManager.hh.html#_ZNK13G4NistManager19GetIsotopeAbundanceEii" title='G4NistManager::GetIsotopeAbundance' data-ref="_ZNK13G4NistManager19GetIsotopeAbundanceEii">GetIsotopeAbundance</a>(<a class="local col9 ref" href="#39Z" title='Z' data-ref="39Z">Z</a>, <a class="local col2 ref" href="#42N0" title='N0' data-ref="42N0">N0</a>+<a class="local col3 ref" href="#43i" title='i' data-ref="43i">i</a>) &gt; <var>0.0</var>) { ++<a class="member" href="../include/G4Element.hh.html#G4Element::fNumberOfIsotopes" title='G4Element::fNumberOfIsotopes' data-ref="G4Element::fNumberOfIsotopes">fNumberOfIsotopes</a>; }</td></tr>
+<tr><th id="341">341</th><td>  }</td></tr>
+<tr><th id="342">342</th><td>  theIsotopeVector = <b>new</b> <span class='error' title="unknown type name &apos;G4IsotopeVector&apos;">G4IsotopeVector</span>((<em>unsigned</em> <em>int</em>)fNumberOfIsotopes,<var>0</var>);</td></tr>
+<tr><th id="343">343</th><td>  <a class="member" href="../include/G4Element.hh.html#G4Element::fRelativeAbundanceVector" title='G4Element::fRelativeAbundanceVector' data-ref="G4Element::fRelativeAbundanceVector">fRelativeAbundanceVector</a> = <b>new</b> <a class="typedef" href="../../global/management/include/G4Types.hh.html#G4double" title='G4double' data-type='double' data-ref="G4double">G4double</a>[<a class="member" href="../include/G4Element.hh.html#G4Element::fNumberOfIsotopes" title='G4Element::fNumberOfIsotopes' data-ref="G4Element::fNumberOfIsotopes">fNumberOfIsotopes</a>];</td></tr>
+<tr><th id="344">344</th><td>  <a class="typedef" href="../../global/management/include/G4Types.hh.html#G4int" title='G4int' data-type='int' data-ref="G4int">G4int</a> <dfn class="local col4 decl" id="44idx" title='idx' data-type='G4int' data-ref="44idx">idx</dfn> = <var>0</var>;</td></tr>
+<tr><th id="345">345</th><td>  <a class="typedef" href="../../global/management/include/G4Types.hh.html#G4double" title='G4double' data-type='double' data-ref="G4double">G4double</a> <dfn class="local col5 decl" id="45xsum" title='xsum' data-type='G4double' data-ref="45xsum">xsum</dfn> = <var>0.0</var>;</td></tr>
+<tr><th id="346">346</th><td>  <b>for</b>(<a class="typedef" href="../../global/management/include/G4Types.hh.html#G4int" title='G4int' data-type='int' data-ref="G4int">G4int</a> <dfn class="local col6 decl" id="46i" title='i' data-type='G4int' data-ref="46i">i</dfn>=<var>0</var>; <a class="local col6 ref" href="#46i" title='i' data-ref="46i">i</a>&lt;<a class="local col1 ref" href="#41n" title='n' data-ref="41n">n</a>; ++<a class="local col6 ref" href="#46i" title='i' data-ref="46i">i</a>) {</td></tr>
+<tr><th id="347">347</th><td>    <a class="typedef" href="../../global/management/include/G4Types.hh.html#G4int" title='G4int' data-type='int' data-ref="G4int">G4int</a> <dfn class="local col7 decl" id="47N" title='N' data-type='G4int' data-ref="47N">N</dfn> = <a class="local col2 ref" href="#42N0" title='N0' data-ref="42N0">N0</a> + <a class="local col6 ref" href="#46i" title='i' data-ref="46i">i</a>;</td></tr>
+<tr><th id="348">348</th><td>    <a class="typedef" href="../../global/management/include/G4Types.hh.html#G4double" title='G4double' data-type='double' data-ref="G4double">G4double</a> <dfn class="local col8 decl" id="48x" title='x' data-type='G4double' data-ref="48x">x</dfn> = <a class="local col0 ref" href="#40nist" title='nist' data-ref="40nist">nist</a>-&gt;<a class="ref" href="../include/G4NistManager.hh.html#_ZNK13G4NistManager19GetIsotopeAbundanceEii" title='G4NistManager::GetIsotopeAbundance' data-ref="_ZNK13G4NistManager19GetIsotopeAbundanceEii">GetIsotopeAbundance</a>(<a class="local col9 ref" href="#39Z" title='Z' data-ref="39Z">Z</a>, <a class="local col7 ref" href="#47N" title='N' data-ref="47N">N</a>); </td></tr>
+<tr><th id="349">349</th><td>    <b>if</b>(<a class="local col8 ref" href="#48x" title='x' data-ref="48x">x</a> &gt; <var>0.0</var>) {</td></tr>
+<tr><th id="350">350</th><td>      <span class='error' title="use of undeclared identifier &apos;std&apos;">std</span>::ostringstream <dfn class="local col9 decl" id="49strm" title='strm' data-type='int' data-ref="49strm">strm</dfn>;</td></tr>
+<tr><th id="351">351</th><td>      strm &lt;&lt; fSymbol &lt;&lt; N;</td></tr>
+<tr><th id="352">352</th><td>      (*theIsotopeVector)[idx] = <b>new</b> G4Isotope(strm.str(), Z, N, <var>0.0</var>, <var>0</var>);</td></tr>
+<tr><th id="353">353</th><td>      <a class="member" href="../include/G4Element.hh.html#G4Element::fRelativeAbundanceVector" title='G4Element::fRelativeAbundanceVector' data-ref="G4Element::fRelativeAbundanceVector">fRelativeAbundanceVector</a>[<a class="local col4 ref" href="#44idx" title='idx' data-ref="44idx">idx</a>] = <a class="local col8 ref" href="#48x" title='x' data-ref="48x">x</a>;</td></tr>
+<tr><th id="354">354</th><td>      <a class="local col5 ref" href="#45xsum" title='xsum' data-ref="45xsum">xsum</a> += <a class="local col8 ref" href="#48x" title='x' data-ref="48x">x</a>;</td></tr>
+<tr><th id="355">355</th><td>      ++<a class="local col4 ref" href="#44idx" title='idx' data-ref="44idx">idx</a>;</td></tr>
+<tr><th id="356">356</th><td>    }</td></tr>
+<tr><th id="357">357</th><td>  }</td></tr>
+<tr><th id="358">358</th><td>  <b>if</b>(<a class="local col5 ref" href="#45xsum" title='xsum' data-ref="45xsum">xsum</a> != <var>0.0</var> &amp;&amp; <a class="local col5 ref" href="#45xsum" title='xsum' data-ref="45xsum">xsum</a> != <var>1.0</var>) {</td></tr>
+<tr><th id="359">359</th><td>    <b>for</b>(<a class="typedef" href="../../global/management/include/G4Types.hh.html#G4int" title='G4int' data-type='int' data-ref="G4int">G4int</a> <dfn class="local col0 decl" id="50i" title='i' data-type='G4int' data-ref="50i">i</dfn>=<var>0</var>; <a class="local col0 ref" href="#50i" title='i' data-ref="50i">i</a>&lt;<a class="local col4 ref" href="#44idx" title='idx' data-ref="44idx">idx</a>; ++<a class="local col0 ref" href="#50i" title='i' data-ref="50i">i</a>) { <a class="member" href="../include/G4Element.hh.html#G4Element::fRelativeAbundanceVector" title='G4Element::fRelativeAbundanceVector' data-ref="G4Element::fRelativeAbundanceVector">fRelativeAbundanceVector</a>[<a class="local col0 ref" href="#50i" title='i' data-ref="50i">i</a>] /= <a class="local col5 ref" href="#45xsum" title='xsum' data-ref="45xsum">xsum</a>; }</td></tr>
+<tr><th id="360">360</th><td>  }</td></tr>
+<tr><th id="361">361</th><td>  <a class="member" href="../include/G4Element.hh.html#G4Element::fNaturalAbundance" title='G4Element::fNaturalAbundance' data-ref="G4Element::fNaturalAbundance">fNaturalAbundance</a> = <b>true</b>;</td></tr>
+<tr><th id="362">362</th><td>}</td></tr>
+<tr><th id="363">363</th><td></td></tr>
+<tr><th id="364">364</th><td><i>//....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......</i></td></tr>
+<tr><th id="365">365</th><td></td></tr>
+<tr><th id="366">366</th><td><a class="typedef" href="../../global/management/include/G4Types.hh.html#G4double" title='G4double' data-type='double' data-ref="G4double">G4double</a> <a class="type" href="../include/G4Element.hh.html#G4Element" title='G4Element' data-ref="G4Element">G4Element</a>::<dfn class="decl def" id="_ZNK9G4Element14GetAtomicShellEi" title='G4Element::GetAtomicShell' data-ref="_ZNK9G4Element14GetAtomicShellEi">GetAtomicShell</dfn>(<a class="typedef" href="../../global/management/include/G4Types.hh.html#G4int" title='G4int' data-type='int' data-ref="G4int">G4int</a> <dfn class="local col1 decl" id="51i" title='i' data-type='G4int' data-ref="51i">i</dfn>) <em>const</em></td></tr>
+<tr><th id="367">367</th><td>{</td></tr>
+<tr><th id="368">368</th><td>  <b>if</b> (<a class="local col1 ref" href="#51i" title='i' data-ref="51i">i</a>&lt;<var>0</var> || <a class="local col1 ref" href="#51i" title='i' data-ref="51i">i</a>&gt;=<a class="member" href="../include/G4Element.hh.html#G4Element::fNbOfAtomicShells" title='G4Element::fNbOfAtomicShells' data-ref="G4Element::fNbOfAtomicShells">fNbOfAtomicShells</a>) {</td></tr>
+<tr><th id="369">369</th><td>    <a class="typedef" href="../../global/management/include/G4Exception.hh.html#G4ExceptionDescription" title='G4ExceptionDescription' data-type='int' data-ref="G4ExceptionDescription">G4ExceptionDescription</a> <dfn class="local col2 decl" id="52ed" title='ed' data-type='G4ExceptionDescription' data-ref="52ed">ed</dfn>;</td></tr>
+<tr><th id="370">370</th><td>    ed <span class='error' title="invalid operands to binary expression (&apos;G4ExceptionDescription&apos; (aka &apos;int&apos;) and &apos;const char *&apos;)">&lt;&lt;</span> <q>"Invalid argument "</q> &lt;&lt; i &lt;&lt; <q>" in for G4Element "</q> &lt;&lt; fName </td></tr>
+<tr><th id="371">371</th><td>       &lt;&lt; <q>" with Z= "</q> &lt;&lt; fZeff </td></tr>
+<tr><th id="372">372</th><td>       &lt;&lt; <q>" and Nshells= "</q> &lt;&lt; fNbOfAtomicShells;</td></tr>
+<tr><th id="373">373</th><td>    <a class="ref" href="../../global/management/include/G4Exception.hh.html#_Z11G4ExceptionPKcS0_19G4ExceptionSeverityRi" title='G4Exception' data-ref="_Z11G4ExceptionPKcS0_19G4ExceptionSeverityRi">G4Exception</a>(<q>"G4Element::GetAtomicShell()"</q>, <q>"mat016"</q>, <a class="enum" href="../../global/management/include/G4ExceptionSeverity.hh.html#G4ExceptionSeverity::FatalException" title='G4ExceptionSeverity::FatalException' data-ref="G4ExceptionSeverity::FatalException">FatalException</a>, <span class='refarg'><a class="local col2 ref" href="#52ed" title='ed' data-ref="52ed">ed</a></span>);</td></tr>
+<tr><th id="374">374</th><td>    <b>return</b> <var>0.0</var>;</td></tr>
+<tr><th id="375">375</th><td>  }</td></tr>
+<tr><th id="376">376</th><td>  <b>return</b> <a class="member" href="../include/G4Element.hh.html#G4Element::fAtomicShells" title='G4Element::fAtomicShells' data-ref="G4Element::fAtomicShells">fAtomicShells</a>[<a class="local col1 ref" href="#51i" title='i' data-ref="51i">i</a>];</td></tr>
+<tr><th id="377">377</th><td>}</td></tr>
+<tr><th id="378">378</th><td></td></tr>
+<tr><th id="379">379</th><td><i>//....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......</i></td></tr>
+<tr><th id="380">380</th><td></td></tr>
+<tr><th id="381">381</th><td><a class="typedef" href="../../global/management/include/G4Types.hh.html#G4int" title='G4int' data-type='int' data-ref="G4int">G4int</a> <a class="type" href="../include/G4Element.hh.html#G4Element" title='G4Element' data-ref="G4Element">G4Element</a>::<dfn class="decl def" id="_ZNK9G4Element21GetNbOfShellElectronsEi" title='G4Element::GetNbOfShellElectrons' data-ref="_ZNK9G4Element21GetNbOfShellElectronsEi">GetNbOfShellElectrons</dfn>(<a class="typedef" href="../../global/management/include/G4Types.hh.html#G4int" title='G4int' data-type='int' data-ref="G4int">G4int</a> <dfn class="local col3 decl" id="53i" title='i' data-type='G4int' data-ref="53i">i</dfn>) <em>const</em></td></tr>
+<tr><th id="382">382</th><td>{</td></tr>
+<tr><th id="383">383</th><td>  <b>if</b> (<a class="local col3 ref" href="#53i" title='i' data-ref="53i">i</a>&lt;<var>0</var> || <a class="local col3 ref" href="#53i" title='i' data-ref="53i">i</a>&gt;=<a class="member" href="../include/G4Element.hh.html#G4Element::fNbOfAtomicShells" title='G4Element::fNbOfAtomicShells' data-ref="G4Element::fNbOfAtomicShells">fNbOfAtomicShells</a>) {</td></tr>
+<tr><th id="384">384</th><td>    <a class="typedef" href="../../global/management/include/G4Exception.hh.html#G4ExceptionDescription" title='G4ExceptionDescription' data-type='int' data-ref="G4ExceptionDescription">G4ExceptionDescription</a> <dfn class="local col4 decl" id="54ed" title='ed' data-type='G4ExceptionDescription' data-ref="54ed">ed</dfn>;</td></tr>
+<tr><th id="385">385</th><td>    ed <span class='error' title="invalid operands to binary expression (&apos;G4ExceptionDescription&apos; (aka &apos;int&apos;) and &apos;const char *&apos;)">&lt;&lt;</span> <q>"Invalid argument "</q> &lt;&lt; i &lt;&lt; <q>" for G4Element "</q> &lt;&lt; fName </td></tr>
+<tr><th id="386">386</th><td>       &lt;&lt; <q>" with Z= "</q> &lt;&lt; fZeff </td></tr>
+<tr><th id="387">387</th><td>       &lt;&lt; <q>" and Nshells= "</q> &lt;&lt; fNbOfAtomicShells;</td></tr>
+<tr><th id="388">388</th><td>    <a class="ref" href="../../global/management/include/G4Exception.hh.html#_Z11G4ExceptionPKcS0_19G4ExceptionSeverityRi" title='G4Exception' data-ref="_Z11G4ExceptionPKcS0_19G4ExceptionSeverityRi">G4Exception</a>(<q>"G4Element::GetNbOfShellElectrons()"</q>, <q>"mat016"</q>, </td></tr>
+<tr><th id="389">389</th><td>		<a class="enum" href="../../global/management/include/G4ExceptionSeverity.hh.html#G4ExceptionSeverity::FatalException" title='G4ExceptionSeverity::FatalException' data-ref="G4ExceptionSeverity::FatalException">FatalException</a>, <span class='refarg'><a class="local col4 ref" href="#54ed" title='ed' data-ref="54ed">ed</a></span>);</td></tr>
+<tr><th id="390">390</th><td>    <b>return</b> <var>0</var>;</td></tr>
+<tr><th id="391">391</th><td>  }</td></tr>
+<tr><th id="392">392</th><td>  <b>return</b> <a class="member" href="../include/G4Element.hh.html#G4Element::fNbOfShellElectrons" title='G4Element::fNbOfShellElectrons' data-ref="G4Element::fNbOfShellElectrons">fNbOfShellElectrons</a>[<a class="local col3 ref" href="#53i" title='i' data-ref="53i">i</a>];</td></tr>
+<tr><th id="393">393</th><td>}</td></tr>
+<tr><th id="394">394</th><td></td></tr>
+<tr><th id="395">395</th><td><i>//....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......</i></td></tr>
+<tr><th id="396">396</th><td></td></tr>
+<tr><th id="397">397</th><td><span class='error' title="unknown type name &apos;G4ElementTable&apos;">G4ElementTable</span>* G4Element::GetElementTable()</td></tr>
+<tr><th id="398">398</th><td>{</td></tr>
+<tr><th id="399">399</th><td>  <b>return</b> &amp;theElementTable;</td></tr>
+<tr><th id="400">400</th><td>}</td></tr>
+<tr><th id="401">401</th><td></td></tr>
+<tr><th id="402">402</th><td><i>//....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......</i></td></tr>
+<tr><th id="403">403</th><td></td></tr>
+<tr><th id="404">404</th><td><span class='error' title="unknown type name &apos;size_t&apos;">size_t</span> G4Element::GetNumberOfElements()</td></tr>
+<tr><th id="405">405</th><td>{</td></tr>
+<tr><th id="406">406</th><td>  <b>return</b> theElementTable.size();</td></tr>
+<tr><th id="407">407</th><td>}</td></tr>
+<tr><th id="408">408</th><td></td></tr>
+<tr><th id="409">409</th><td><i>//....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......</i></td></tr>
+<tr><th id="410">410</th><td></td></tr>
+<tr><th id="411">411</th><td><a class="type" href="../include/G4Element.hh.html#G4Element" title='G4Element' data-ref="G4Element">G4Element</a>* <a class="type" href="../include/G4Element.hh.html#G4Element" title='G4Element' data-ref="G4Element">G4Element</a>::<dfn class="decl def" id="_ZN9G4Element10GetElementE8G4Stringb" title='G4Element::GetElement' data-ref="_ZN9G4Element10GetElementE8G4Stringb">GetElement</dfn>(<a class="type" href="../../global/management/include/G4String.hh.html#G4String" title='G4String' data-ref="G4String">G4String</a> <dfn class="local col5 decl" id="55elementName" title='elementName' data-type='G4String' data-ref="55elementName">elementName</dfn>, <a class="typedef" href="../../global/management/include/G4Types.hh.html#G4bool" title='G4bool' data-type='bool' data-ref="G4bool">G4bool</a> <dfn class="local col6 decl" id="56warning" title='warning' data-type='G4bool' data-ref="56warning">warning</dfn>)</td></tr>
+<tr><th id="412">412</th><td>{  </td></tr>
+<tr><th id="413">413</th><td>  <i>// search the element by its name </i></td></tr>
+<tr><th id="414">414</th><td>  <b>for</b> (<span class='error' title="unknown type name &apos;size_t&apos;">size_t</span> <dfn class="local col7 decl" id="57J" title='J' data-type='int' data-ref="57J">J</dfn>=<var>0</var>; J&lt;theElementTable.size(); ++J)</td></tr>
+<tr><th id="415">415</th><td>   {</td></tr>
+<tr><th id="416">416</th><td>     <b>if</b> (theElementTable[J]-&gt;GetName() == elementName)</td></tr>
+<tr><th id="417">417</th><td>       <b>return</b> theElementTable[J];</td></tr>
+<tr><th id="418">418</th><td>   }</td></tr>
+<tr><th id="419">419</th><td>   </td></tr>
+<tr><th id="420">420</th><td>  <i>// the element does not exist in the table</i></td></tr>
+<tr><th id="421">421</th><td>  <b>if</b> (<a class="local col6 ref" href="#56warning" title='warning' data-ref="56warning">warning</a>) {</td></tr>
+<tr><th id="422">422</th><td>    <a class="macro" href="../../global/management/include/G4ios.hh.html#46" title="(*_G4cout_p())" data-ref="_M/G4cout">G4cout</a> <span class='error' title="invalid operands to binary expression (&apos;int&apos; and &apos;const char *&apos;)">&lt;&lt;</span> <q>"\n---&gt; warning from G4Element::GetElement(). The element: "</q></td></tr>
+<tr><th id="423">423</th><td>	   &lt;&lt; elementName &lt;&lt; <q>" does not exist in the table. Return NULL pointer."</q></td></tr>
+<tr><th id="424">424</th><td>	   &lt;&lt; <a class="macro" href="../../global/management/include/G4ios.hh.html#60" title="std::endl" data-ref="_M/G4endl">G4endl</a>;</td></tr>
+<tr><th id="425">425</th><td>  }   </td></tr>
+<tr><th id="426">426</th><td>  <b>return</b> <b>nullptr</b>;</td></tr>
+<tr><th id="427">427</th><td>}</td></tr>
+<tr><th id="428">428</th><td></td></tr>
+<tr><th id="429">429</th><td><i>//....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......</i></td></tr>
+<tr><th id="430">430</th><td></td></tr>
+<tr><th id="431">431</th><td><span class='error' title="use of undeclared identifier &apos;std&apos;">std</span>::ostream&amp; <b>operator</b>&lt;&lt;(<span class='error' title="use of undeclared identifier &apos;std&apos;">std</span>::ostream&amp; flux, <em>const</em> G4Element* element)</td></tr>
+<tr><th id="432">432</th><td>{</td></tr>
+<tr><th id="433">433</th><td>  <span class='error' title="use of undeclared identifier &apos;std&apos;">std</span>::ios::fmtflags mode = flux.flags();</td></tr>
+<tr><th id="434">434</th><td>  flux.setf(<span class='error' title="use of undeclared identifier &apos;std&apos;">std</span>::ios::fixed,<span class='error' title="use of undeclared identifier &apos;std&apos;">std</span>::ios::floatfield);</td></tr>
+<tr><th id="435">435</th><td>  G4long prec = flux.precision(<var>3</var>);</td></tr>
+<tr><th id="436">436</th><td>  </td></tr>
+<tr><th id="437">437</th><td>  flux</td></tr>
+<tr><th id="438">438</th><td>    &lt;&lt; <q>" Element: "</q> &lt;&lt; element-&gt;fName   &lt;&lt; <q>" ("</q> &lt;&lt; element-&gt;fSymbol &lt;&lt; <q>")"</q></td></tr>
+<tr><th id="439">439</th><td>    &lt;&lt; <q>"   Z = "</q> &lt;&lt; <span class='error' title="use of undeclared identifier &apos;std&apos;">std</span>::setw(<var>4</var>) &lt;&lt; <span class='error' title="use of undeclared identifier &apos;std&apos;">std</span>::setprecision(<var>1</var>) &lt;&lt;  element-&gt;fZeff </td></tr>
+<tr><th id="440">440</th><td>    &lt;&lt; <q>"   N = "</q> &lt;&lt; <span class='error' title="use of undeclared identifier &apos;std&apos;">std</span>::setw(<var>5</var>) &lt;&lt; <span class='error' title="use of undeclared identifier &apos;std&apos;">std</span>::setprecision(<var>1</var>) </td></tr>
+<tr><th id="441">441</th><td>    &lt;&lt;  G4lrint(element-&gt;fNeff)</td></tr>
+<tr><th id="442">442</th><td>    &lt;&lt; <q>"   A = "</q> &lt;&lt; <span class='error' title="use of undeclared identifier &apos;std&apos;">std</span>::setw(<var>6</var>) &lt;&lt; <span class='error' title="use of undeclared identifier &apos;std&apos;">std</span>::setprecision(<var>3</var>)</td></tr>
+<tr><th id="443">443</th><td>                 &lt;&lt; (element-&gt;fAeff)/(g/mole) &lt;&lt; <q>" g/mole"</q>;</td></tr>
+<tr><th id="444">444</th><td>   </td></tr>
+<tr><th id="445">445</th><td>  <b>for</b> (G4int i=<var>0</var>; i&lt;element-&gt;fNumberOfIsotopes; i++)</td></tr>
+<tr><th id="446">446</th><td>  flux </td></tr>
+<tr><th id="447">447</th><td>    &lt;&lt; <q>"\n         ---&gt; "</q> &lt;&lt; (*(element-&gt;theIsotopeVector))[i] </td></tr>
+<tr><th id="448">448</th><td>    &lt;&lt; <q>"   abundance: "</q> &lt;&lt; <span class='error' title="use of undeclared identifier &apos;std&apos;">std</span>::setw(<var>6</var>) &lt;&lt; <span class='error' title="use of undeclared identifier &apos;std&apos;">std</span>::setprecision(<var>3</var>) </td></tr>
+<tr><th id="449">449</th><td>    &lt;&lt; (element-&gt;fRelativeAbundanceVector[i])/perCent &lt;&lt; <q>" %"</q>;</td></tr>
+<tr><th id="450">450</th><td>    </td></tr>
+<tr><th id="451">451</th><td>  flux.precision(prec);        </td></tr>
+<tr><th id="452">452</th><td>  flux.setf(mode,<span class='error' title="use of undeclared identifier &apos;std&apos;">std</span>::ios::floatfield);         </td></tr>
+<tr><th id="453">453</th><td>  <b>return</b> flux;</td></tr>
+<tr><th id="454">454</th><td>}</td></tr>
+<tr><th id="455">455</th><td></td></tr>
+<tr><th id="456">456</th><td><i>//....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......</i></td></tr>
+<tr><th id="457">457</th><td></td></tr>
+<tr><th id="458">458</th><td> <span class='error' title="use of undeclared identifier &apos;std&apos;">std</span>::ostream&amp; <b>operator</b>&lt;&lt;(<span class='error' title="use of undeclared identifier &apos;std&apos;">std</span>::ostream&amp; flux, <em>const</em> G4Element&amp; element)</td></tr>
+<tr><th id="459">459</th><td>{</td></tr>
+<tr><th id="460">460</th><td>  flux &lt;&lt; &amp;element;        </td></tr>
+<tr><th id="461">461</th><td>  <b>return</b> flux;</td></tr>
+<tr><th id="462">462</th><td>}</td></tr>
+<tr><th id="463">463</th><td></td></tr>
+<tr><th id="464">464</th><td><i>//....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......</i></td></tr>
+<tr><th id="465">465</th><td>     </td></tr>
+<tr><th id="466">466</th><td><span class='error' title="use of undeclared identifier &apos;std&apos;">std</span>::ostream&amp; <b>operator</b>&lt;&lt;(<span class='error' title="use of undeclared identifier &apos;std&apos;">std</span>::ostream&amp; flux, <span class='error' title="unknown type name &apos;G4ElementTable&apos;">G4ElementTable</span> ElementTable)</td></tr>
+<tr><th id="467">467</th><td>{</td></tr>
+<tr><th id="468">468</th><td>  <i>//Dump info for all known elements</i></td></tr>
+<tr><th id="469">469</th><td>  flux &lt;&lt; <q>"\n***** Table : Nb of elements = "</q> &lt;&lt; ElementTable.size() </td></tr>
+<tr><th id="470">470</th><td>       &lt;&lt; <q>" *****\n"</q> &lt;&lt; <a class="macro" href="../../global/management/include/G4ios.hh.html#60" title="std::endl" data-ref="_M/G4endl">G4endl</a>;</td></tr>
+<tr><th id="471">471</th><td>        </td></tr>
+<tr><th id="472">472</th><td>  <b>for</b> (<span class='error' title="unknown type name &apos;size_t&apos;">size_t</span> i=<var>0</var>; i&lt;ElementTable.size(); i++) flux &lt;&lt; ElementTable[i] </td></tr>
+<tr><th id="473">473</th><td>						    &lt;&lt; <a class="macro" href="../../global/management/include/G4ios.hh.html#60" title="std::endl" data-ref="_M/G4endl">G4endl</a> &lt;&lt; <a class="macro" href="../../global/management/include/G4ios.hh.html#60" title="std::endl" data-ref="_M/G4endl">G4endl</a>;</td></tr>
+<tr><th id="474">474</th><td></td></tr>
+<tr><th id="475">475</th><td>  <b>return</b> flux;</td></tr>
+<tr><th id="476">476</th><td>}</td></tr>
+<tr><th id="477">477</th><td>      </td></tr>
+<tr><th id="478">478</th><td><i>//....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......</i></td></tr>
+<tr><th id="479">479</th><td></td></tr>
+</table><hr/><p id='footer'>
+Generated on <em>2019-Aug-28</em> from project codebrowser<br />Powered by <a href='https://woboq.com'><img alt='Woboq' src='https://code.woboq.org/woboq-16.png' width='41' height='16' /></a> <a href='https://code.woboq.org'>Code Browser</a> 2.1
+<br/>Generator usage only permitted with license.</p>
+</div></body></html>

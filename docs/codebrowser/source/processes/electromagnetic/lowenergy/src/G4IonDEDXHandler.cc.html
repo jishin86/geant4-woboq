@@ -1,0 +1,572 @@
+<!doctype html>
+<html>
+<head>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"><title>G4IonDEDXHandler.cc source code [codebrowser/source/processes/electromagnetic/lowenergy/src/G4IonDEDXHandler.cc] - Woboq Code Browser</title>
+<link rel="stylesheet" href="../../../../../../../data/qtcreator.css" title="QtCreator"/>
+<link rel="alternate stylesheet" href="../../../../../../../data/kdevelop.css" title="KDevelop"/>
+<script type="text/javascript" src="../../../../../../../data/jquery/jquery.min.js"></script>
+<script type="text/javascript" src="../../../../../../../data/jquery/jquery-ui.min.js"></script>
+<script>var file = 'codebrowser/source/processes/electromagnetic/lowenergy/src/G4IonDEDXHandler.cc'; var root_path = '../../../../../..'; var data_path = '../../../../../../../data';</script>
+<script src='../../../../../../../data/codebrowser.js'></script>
+</head>
+<body><div id='header'><h1 id='breadcrumb'><span>Browse the source code of </span><a href='../../../../..'>codebrowser</a>/<a href='../../../..'>source</a>/<a href='../../..'>processes</a>/<a href='../..'>electromagnetic</a>/<a href='..'>lowenergy</a>/<a href='./'>src</a>/<a href='G4IonDEDXHandler.cc.html'>G4IonDEDXHandler.cc</a></h1></div>
+<hr/><div id='content'><table class="code">
+<tr><th id="1">1</th><td><i>//</i></td></tr>
+<tr><th id="2">2</th><td><i>// ********************************************************************</i></td></tr>
+<tr><th id="3">3</th><td><i>// * License and Disclaimer                                           *</i></td></tr>
+<tr><th id="4">4</th><td><i>// *                                                                  *</i></td></tr>
+<tr><th id="5">5</th><td><i>// * The  Geant4 software  is  copyright of the Copyright Holders  of *</i></td></tr>
+<tr><th id="6">6</th><td><i>// * the Geant4 Collaboration.  It is provided  under  the terms  and *</i></td></tr>
+<tr><th id="7">7</th><td><i>// * conditions of the Geant4 Software License,  included in the file *</i></td></tr>
+<tr><th id="8">8</th><td><i>// * LICENSE and available at  <a href="http://cern.ch/geant4/license">http://cern.ch/geant4/license</a> .  These *</i></td></tr>
+<tr><th id="9">9</th><td><i>// * include a list of copyright holders.                             *</i></td></tr>
+<tr><th id="10">10</th><td><i>// *                                                                  *</i></td></tr>
+<tr><th id="11">11</th><td><i>// * Neither the authors of this software system, nor their employing *</i></td></tr>
+<tr><th id="12">12</th><td><i>// * institutes,nor the agencies providing financial support for this *</i></td></tr>
+<tr><th id="13">13</th><td><i>// * work  make  any representation or  warranty, express or implied, *</i></td></tr>
+<tr><th id="14">14</th><td><i>// * regarding  this  software system or assume any liability for its *</i></td></tr>
+<tr><th id="15">15</th><td><i>// * use.  Please see the license in the file  LICENSE  and URL above *</i></td></tr>
+<tr><th id="16">16</th><td><i>// * for the full disclaimer and the limitation of liability.         *</i></td></tr>
+<tr><th id="17">17</th><td><i>// *                                                                  *</i></td></tr>
+<tr><th id="18">18</th><td><i>// * This  code  implementation is the result of  the  scientific and *</i></td></tr>
+<tr><th id="19">19</th><td><i>// * technical work of the GEANT4 collaboration.                      *</i></td></tr>
+<tr><th id="20">20</th><td><i>// * By using,  copying,  modifying or  distributing the software (or *</i></td></tr>
+<tr><th id="21">21</th><td><i>// * any work based  on the software)  you  agree  to acknowledge its *</i></td></tr>
+<tr><th id="22">22</th><td><i>// * use  in  resulting  scientific  publications,  and indicate your *</i></td></tr>
+<tr><th id="23">23</th><td><i>// * acceptance of all terms of the Geant4 Software license.          *</i></td></tr>
+<tr><th id="24">24</th><td><i>// ********************************************************************</i></td></tr>
+<tr><th id="25">25</th><td><i>//</i></td></tr>
+<tr><th id="26">26</th><td><i>//</i></td></tr>
+<tr><th id="27">27</th><td><i>//</i></td></tr>
+<tr><th id="28">28</th><td><i>// ===========================================================================</i></td></tr>
+<tr><th id="29">29</th><td><i>// GEANT4 class source file</i></td></tr>
+<tr><th id="30">30</th><td><i>//</i></td></tr>
+<tr><th id="31">31</th><td><i>// Class:                G4IonDEDXHandler</i></td></tr>
+<tr><th id="32">32</th><td><i>//</i></td></tr>
+<tr><th id="33">33</th><td><i>// Author:               Anton Lechner (Anton.Lechner@cern.ch)</i></td></tr>
+<tr><th id="34">34</th><td><i>//</i></td></tr>
+<tr><th id="35">35</th><td><i>// First implementation: 11. 03. 2009</i></td></tr>
+<tr><th id="36">36</th><td><i>//</i></td></tr>
+<tr><th id="37">37</th><td><i>// Modifications: 12. 11 .2009 - Function BuildDEDXTable: Using adapted build</i></td></tr>
+<tr><th id="38">38</th><td><i>//                               methods of stopping power classes according</i></td></tr>
+<tr><th id="39">39</th><td><i>//                               to interface change in G4VIonDEDXTable.</i></td></tr>
+<tr><th id="40">40</th><td><i>//                               Function UpdateCacheValue: Using adapted</i></td></tr>
+<tr><th id="41">41</th><td><i>//                               ScalingFactorEnergy function according to</i></td></tr>
+<tr><th id="42">42</th><td><i>//                               interface change in G4VIonDEDXScaling-</i></td></tr>
+<tr><th id="43">43</th><td><i>//                               Algorithm (AL)</i></td></tr>
+<tr><th id="44">44</th><td><i>//</i></td></tr>
+<tr><th id="45">45</th><td><i>// Class description:</i></td></tr>
+<tr><th id="46">46</th><td><i>//    Ion dE/dx table handler.</i></td></tr>
+<tr><th id="47">47</th><td><i>//</i></td></tr>
+<tr><th id="48">48</th><td><i>// Comments:</i></td></tr>
+<tr><th id="49">49</th><td><i>//</i></td></tr>
+<tr><th id="50">50</th><td><i>// ===========================================================================</i></td></tr>
+<tr><th id="51">51</th><td></td></tr>
+<tr><th id="52">52</th><td><u>#include <span class='error' title="&apos;iomanip&apos; file not found">&lt;</span>iomanip&gt;</u></td></tr>
+<tr><th id="53">53</th><td></td></tr>
+<tr><th id="54">54</th><td><u>#include <a href="../include/G4IonDEDXHandler.hh.html">"G4IonDEDXHandler.hh"</a></u></td></tr>
+<tr><th id="55">55</th><td><u>#include <a href="../../../../global/management/include/G4SystemOfUnits.hh.html">"G4SystemOfUnits.hh"</a></u></td></tr>
+<tr><th id="56">56</th><td><u>#include <a href="../../../../materials/include/G4VIonDEDXTable.hh.html">"G4VIonDEDXTable.hh"</a></u></td></tr>
+<tr><th id="57">57</th><td><u>#include <a href="../include/G4VIonDEDXScalingAlgorithm.hh.html">"G4VIonDEDXScalingAlgorithm.hh"</a></u></td></tr>
+<tr><th id="58">58</th><td><u>#include <a href="../../../../particles/management/include/G4ParticleDefinition.hh.html">"G4ParticleDefinition.hh"</a></u></td></tr>
+<tr><th id="59">59</th><td><u>#include <a href="../../../../materials/include/G4Material.hh.html">"G4Material.hh"</a></u></td></tr>
+<tr><th id="60">60</th><td><u>#include <a href="../../../../global/management/include/G4LPhysicsFreeVector.hh.html">"G4LPhysicsFreeVector.hh"</a></u></td></tr>
+<tr><th id="61">61</th><td><u>#include <a href="../../../../global/management/include/G4Exp.hh.html">"G4Exp.hh"</a></u></td></tr>
+<tr><th id="62">62</th><td></td></tr>
+<tr><th id="63">63</th><td><i>//#define PRINT_DEBUG</i></td></tr>
+<tr><th id="64">64</th><td><i></i></td></tr>
+<tr><th id="65">65</th><td><i></i></td></tr>
+<tr><th id="66">66</th><td><i>// #########################################################################</i></td></tr>
+<tr><th id="67">67</th><td></td></tr>
+<tr><th id="68">68</th><td><a class="type" href="../include/G4IonDEDXHandler.hh.html#G4IonDEDXHandler" title='G4IonDEDXHandler' data-ref="G4IonDEDXHandler">G4IonDEDXHandler</a>::<dfn class="decl def" id="_ZN16G4IonDEDXHandlerC1EP15G4VIonDEDXTableP26G4VIonDEDXScalingAlgorithmRK8G4Stringib" title='G4IonDEDXHandler::G4IonDEDXHandler' data-ref="_ZN16G4IonDEDXHandlerC1EP15G4VIonDEDXTableP26G4VIonDEDXScalingAlgorithmRK8G4Stringib">G4IonDEDXHandler</dfn>(</td></tr>
+<tr><th id="69">69</th><td>                            <a class="type" href="../../../../materials/include/G4VIonDEDXTable.hh.html#G4VIonDEDXTable" title='G4VIonDEDXTable' data-ref="G4VIonDEDXTable">G4VIonDEDXTable</a>* <dfn class="local col2 decl" id="2ionTable" title='ionTable' data-type='G4VIonDEDXTable *' data-ref="2ionTable">ionTable</dfn>,</td></tr>
+<tr><th id="70">70</th><td>                            <a class="type" href="../include/G4VIonDEDXScalingAlgorithm.hh.html#G4VIonDEDXScalingAlgorithm" title='G4VIonDEDXScalingAlgorithm' data-ref="G4VIonDEDXScalingAlgorithm">G4VIonDEDXScalingAlgorithm</a>* <dfn class="local col3 decl" id="3ionAlgorithm" title='ionAlgorithm' data-type='G4VIonDEDXScalingAlgorithm *' data-ref="3ionAlgorithm">ionAlgorithm</dfn>,</td></tr>
+<tr><th id="71">71</th><td>                            <em>const</em> <a class="type" href="../../../../global/management/include/G4String.hh.html#G4String" title='G4String' data-ref="G4String">G4String</a>&amp; <dfn class="local col4 decl" id="4name" title='name' data-type='const G4String &amp;' data-ref="4name">name</dfn>,</td></tr>
+<tr><th id="72">72</th><td>                            <a class="typedef" href="../../../../global/management/include/G4Types.hh.html#G4int" title='G4int' data-type='int' data-ref="G4int">G4int</a> <dfn class="local col5 decl" id="5maxCacheSize" title='maxCacheSize' data-type='G4int' data-ref="5maxCacheSize">maxCacheSize</dfn>,</td></tr>
+<tr><th id="73">73</th><td>                            <a class="typedef" href="../../../../global/management/include/G4Types.hh.html#G4bool" title='G4bool' data-type='bool' data-ref="G4bool">G4bool</a> <dfn class="local col6 decl" id="6splines" title='splines' data-type='G4bool' data-ref="6splines">splines</dfn>) :</td></tr>
+<tr><th id="74">74</th><td>  <a class="member" href="../include/G4IonDEDXHandler.hh.html#G4IonDEDXHandler::table" title='G4IonDEDXHandler::table' data-ref="G4IonDEDXHandler::table">table</a>(<a class="local col2 ref" href="#2ionTable" title='ionTable' data-ref="2ionTable">ionTable</a>),</td></tr>
+<tr><th id="75">75</th><td>  <a class="member" href="../include/G4IonDEDXHandler.hh.html#G4IonDEDXHandler::algorithm" title='G4IonDEDXHandler::algorithm' data-ref="G4IonDEDXHandler::algorithm">algorithm</a>(<a class="local col3 ref" href="#3ionAlgorithm" title='ionAlgorithm' data-ref="3ionAlgorithm">ionAlgorithm</a>),</td></tr>
+<tr><th id="76">76</th><td>  <a class="member" href="../include/G4IonDEDXHandler.hh.html#G4IonDEDXHandler::tableName" title='G4IonDEDXHandler::tableName' data-ref="G4IonDEDXHandler::tableName">tableName</a><a class="ref" href="../../../../global/management/include/G4String.hh.html#_ZN8G4StringC1ERKS_" title='G4String::G4String' data-ref="_ZN8G4StringC1ERKS_">(</a><a class="local col4 ref" href="#4name" title='name' data-ref="4name">name</a>),</td></tr>
+<tr><th id="77">77</th><td>  <a class="member" href="../include/G4IonDEDXHandler.hh.html#G4IonDEDXHandler::useSplines" title='G4IonDEDXHandler::useSplines' data-ref="G4IonDEDXHandler::useSplines">useSplines</a>(<a class="local col6 ref" href="#6splines" title='splines' data-ref="6splines">splines</a>),</td></tr>
+<tr><th id="78">78</th><td>  <a class="member" href="../include/G4IonDEDXHandler.hh.html#G4IonDEDXHandler::maxCacheEntries" title='G4IonDEDXHandler::maxCacheEntries' data-ref="G4IonDEDXHandler::maxCacheEntries">maxCacheEntries</a>(<a class="local col5 ref" href="#5maxCacheSize" title='maxCacheSize' data-ref="5maxCacheSize">maxCacheSize</a>) {</td></tr>
+<tr><th id="79">79</th><td></td></tr>
+<tr><th id="80">80</th><td>  <b>if</b>(<a class="member" href="../include/G4IonDEDXHandler.hh.html#G4IonDEDXHandler::table" title='G4IonDEDXHandler::table' data-ref="G4IonDEDXHandler::table">table</a> == <var>0</var>) {</td></tr>
+<tr><th id="81">81</th><td>     <a class="macro" href="../../../../global/management/include/G4ios.hh.html#47" title="(*_G4cerr_p())" data-ref="_M/G4cerr">G4cerr</a> <span class='error' title="invalid operands to binary expression (&apos;int&apos; and &apos;const char *&apos;)">&lt;&lt;</span> <q>"G4IonDEDXHandler::G4IonDEDXHandler() "</q></td></tr>
+<tr><th id="82">82</th><td>            &lt;&lt; <q>" Pointer to G4VIonDEDXTable object is null-pointer."</q></td></tr>
+<tr><th id="83">83</th><td>            &lt;&lt; <a class="macro" href="../../../../global/management/include/G4ios.hh.html#60" title="std::endl" data-ref="_M/G4endl">G4endl</a>;</td></tr>
+<tr><th id="84">84</th><td>  }</td></tr>
+<tr><th id="85">85</th><td></td></tr>
+<tr><th id="86">86</th><td>  <b>if</b>(<a class="member" href="../include/G4IonDEDXHandler.hh.html#G4IonDEDXHandler::algorithm" title='G4IonDEDXHandler::algorithm' data-ref="G4IonDEDXHandler::algorithm">algorithm</a> == <var>0</var>) {</td></tr>
+<tr><th id="87">87</th><td>     <a class="macro" href="../../../../global/management/include/G4ios.hh.html#47" title="(*_G4cerr_p())" data-ref="_M/G4cerr">G4cerr</a> <span class='error' title="invalid operands to binary expression (&apos;int&apos; and &apos;const char *&apos;)">&lt;&lt;</span> <q>"G4IonDEDXHandler::G4IonDEDXHandler() "</q></td></tr>
+<tr><th id="88">88</th><td>            &lt;&lt; <q>" Pointer to G4VIonDEDXScalingAlgorithm object is null-pointer."</q></td></tr>
+<tr><th id="89">89</th><td>            &lt;&lt; <a class="macro" href="../../../../global/management/include/G4ios.hh.html#60" title="std::endl" data-ref="_M/G4endl">G4endl</a>;</td></tr>
+<tr><th id="90">90</th><td>  }</td></tr>
+<tr><th id="91">91</th><td></td></tr>
+<tr><th id="92">92</th><td>  <b>if</b>(<a class="member" href="../include/G4IonDEDXHandler.hh.html#G4IonDEDXHandler::maxCacheEntries" title='G4IonDEDXHandler::maxCacheEntries' data-ref="G4IonDEDXHandler::maxCacheEntries">maxCacheEntries</a> &lt;= <var>0</var>) {</td></tr>
+<tr><th id="93">93</th><td>     <a class="macro" href="../../../../global/management/include/G4ios.hh.html#47" title="(*_G4cerr_p())" data-ref="_M/G4cerr">G4cerr</a> <span class='error' title="invalid operands to binary expression (&apos;int&apos; and &apos;const char *&apos;)">&lt;&lt;</span> <q>"G4IonDEDXHandler::G4IonDEDXHandler() "</q></td></tr>
+<tr><th id="94">94</th><td>            &lt;&lt; <q>" Cache size &lt;=0. Resetting to 5."</q></td></tr>
+<tr><th id="95">95</th><td>            &lt;&lt; <a class="macro" href="../../../../global/management/include/G4ios.hh.html#60" title="std::endl" data-ref="_M/G4endl">G4endl</a>;</td></tr>
+<tr><th id="96">96</th><td>     <a class="member" href="../include/G4IonDEDXHandler.hh.html#G4IonDEDXHandler::maxCacheEntries" title='G4IonDEDXHandler::maxCacheEntries' data-ref="G4IonDEDXHandler::maxCacheEntries">maxCacheEntries</a> = <var>5</var>;</td></tr>
+<tr><th id="97">97</th><td>  }</td></tr>
+<tr><th id="98">98</th><td>}</td></tr>
+<tr><th id="99">99</th><td></td></tr>
+<tr><th id="100">100</th><td><i>// #########################################################################</i></td></tr>
+<tr><th id="101">101</th><td></td></tr>
+<tr><th id="102">102</th><td>G4IonDEDXHandler::<span class='error' title="exception specification in declaration does not match previous declaration">~</span>G4IonDEDXHandler() {</td></tr>
+<tr><th id="103">103</th><td></td></tr>
+<tr><th id="104">104</th><td>  ClearCache();</td></tr>
+<tr><th id="105">105</th><td></td></tr>
+<tr><th id="106">106</th><td>  <i>// All stopping power vectors built according to Bragg's addivitiy rule</i></td></tr>
+<tr><th id="107">107</th><td><i>  // are deleted. All other stopping power vectors are expected to be</i></td></tr>
+<tr><th id="108">108</th><td><i>  // deleted by their creator class (sub-class of G4VIonDEDXTable).</i></td></tr>
+<tr><th id="109">109</th><td><i>  // DEDXTableBraggRule::iterator iter = stoppingPowerTableBragg.begin();</i></td></tr>
+<tr><th id="110">110</th><td><i>  // DEDXTableBraggRule::iterator iter_end = stoppingPowerTableBragg.end();</i></td></tr>
+<tr><th id="111">111</th><td><i></i></td></tr>
+<tr><th id="112">112</th><td><i>  //  for(;iter != iter_end; iter++) delete iter -&gt; second;</i></td></tr>
+<tr><th id="113">113</th><td>  stoppingPowerTableBragg.clear();</td></tr>
+<tr><th id="114">114</th><td></td></tr>
+<tr><th id="115">115</th><td>  stoppingPowerTable.clear();</td></tr>
+<tr><th id="116">116</th><td></td></tr>
+<tr><th id="117">117</th><td>  <b>if</b>(table != <var>0</var>) <b>delete</b> table;</td></tr>
+<tr><th id="118">118</th><td>  <b>if</b>(algorithm != <var>0</var>) <b>delete</b> algorithm;</td></tr>
+<tr><th id="119">119</th><td>}</td></tr>
+<tr><th id="120">120</th><td></td></tr>
+<tr><th id="121">121</th><td><i>// #########################################################################</i></td></tr>
+<tr><th id="122">122</th><td></td></tr>
+<tr><th id="123">123</th><td><a class="typedef" href="../../../../global/management/include/G4Types.hh.html#G4bool" title='G4bool' data-type='bool' data-ref="G4bool">G4bool</a> <a class="type" href="../include/G4IonDEDXHandler.hh.html#G4IonDEDXHandler" title='G4IonDEDXHandler' data-ref="G4IonDEDXHandler">G4IonDEDXHandler</a>::<dfn class="decl def" id="_ZN16G4IonDEDXHandler12IsApplicableEPK20G4ParticleDefinitionPK10G4Material" title='G4IonDEDXHandler::IsApplicable' data-ref="_ZN16G4IonDEDXHandler12IsApplicableEPK20G4ParticleDefinitionPK10G4Material">IsApplicable</dfn>(</td></tr>
+<tr><th id="124">124</th><td>                 <em>const</em> <a class="type" href="../../../../particles/management/include/G4ParticleDefinition.hh.html#G4ParticleDefinition" title='G4ParticleDefinition' data-ref="G4ParticleDefinition">G4ParticleDefinition</a>* <dfn class="local col7 decl" id="7particle" title='particle' data-type='const G4ParticleDefinition *' data-ref="7particle">particle</dfn>,  <i>// Projectile (ion)</i></td></tr>
+<tr><th id="125">125</th><td>                 <em>const</em> <a class="type" href="../../../../materials/include/G4Material.hh.html#G4Material" title='G4Material' data-ref="G4Material">G4Material</a>* <dfn class="local col8 decl" id="8material" title='material' data-type='const G4Material *' data-ref="8material">material</dfn>) {          <i>// Target material</i></td></tr>
+<tr><th id="126">126</th><td></td></tr>
+<tr><th id="127">127</th><td>  <a class="typedef" href="../../../../global/management/include/G4Types.hh.html#G4bool" title='G4bool' data-type='bool' data-ref="G4bool">G4bool</a> <dfn class="local col9 decl" id="9isApplicable" title='isApplicable' data-type='G4bool' data-ref="9isApplicable">isApplicable</dfn> = <b>true</b>;</td></tr>
+<tr><th id="128">128</th><td></td></tr>
+<tr><th id="129">129</th><td>  <b>if</b>(<a class="member" href="../include/G4IonDEDXHandler.hh.html#G4IonDEDXHandler::table" title='G4IonDEDXHandler::table' data-ref="G4IonDEDXHandler::table">table</a> == <var>0</var> || <a class="member" href="../include/G4IonDEDXHandler.hh.html#G4IonDEDXHandler::algorithm" title='G4IonDEDXHandler::algorithm' data-ref="G4IonDEDXHandler::algorithm">algorithm</a> == <var>0</var>) {</td></tr>
+<tr><th id="130">130</th><td>     <a class="local col9 ref" href="#9isApplicable" title='isApplicable' data-ref="9isApplicable">isApplicable</a> = <b>false</b>;</td></tr>
+<tr><th id="131">131</th><td>  }</td></tr>
+<tr><th id="132">132</th><td>  <b>else</b> {</td></tr>
+<tr><th id="133">133</th><td></td></tr>
+<tr><th id="134">134</th><td>     <a class="typedef" href="../../../../global/management/include/G4Types.hh.html#G4int" title='G4int' data-type='int' data-ref="G4int">G4int</a> <dfn class="local col0 decl" id="10atomicNumberIon" title='atomicNumberIon' data-type='G4int' data-ref="10atomicNumberIon">atomicNumberIon</dfn> = <a class="local col7 ref" href="#7particle" title='particle' data-ref="7particle">particle</a> -&gt; <a class="ref" href="../../../../particles/management/include/G4ParticleDefinition.hh.html#_ZNK20G4ParticleDefinition15GetAtomicNumberEv" title='G4ParticleDefinition::GetAtomicNumber' data-ref="_ZNK20G4ParticleDefinition15GetAtomicNumberEv">GetAtomicNumber</a>();</td></tr>
+<tr><th id="135">135</th><td>     <a class="typedef" href="../../../../global/management/include/G4Types.hh.html#G4int" title='G4int' data-type='int' data-ref="G4int">G4int</a> <dfn class="local col1 decl" id="11atomicNumberBase" title='atomicNumberBase' data-type='G4int' data-ref="11atomicNumberBase">atomicNumberBase</dfn> =</td></tr>
+<tr><th id="136">136</th><td>                <a class="member" href="../include/G4IonDEDXHandler.hh.html#G4IonDEDXHandler::algorithm" title='G4IonDEDXHandler::algorithm' data-ref="G4IonDEDXHandler::algorithm">algorithm</a> -&gt; <a class="virtual ref" href="../include/G4VIonDEDXScalingAlgorithm.hh.html#_ZN26G4VIonDEDXScalingAlgorithm19AtomicNumberBaseIonEiPK10G4Material" title='G4VIonDEDXScalingAlgorithm::AtomicNumberBaseIon' data-ref="_ZN26G4VIonDEDXScalingAlgorithm19AtomicNumberBaseIonEiPK10G4Material">AtomicNumberBaseIon</a>(<a class="local col0 ref" href="#10atomicNumberIon" title='atomicNumberIon' data-ref="10atomicNumberIon">atomicNumberIon</a>, <a class="local col8 ref" href="#8material" title='material' data-ref="8material">material</a>);</td></tr>
+<tr><th id="137">137</th><td></td></tr>
+<tr><th id="138">138</th><td>     <span class='error' title="unknown type name &apos;G4IonKey&apos;">G4IonKey</span> <dfn class="local col2 decl" id="12key" title='key' data-type='int' data-ref="12key">key</dfn> = <span class='error' title="use of undeclared identifier &apos;std&apos;">std</span>::make_pair(atomicNumberBase, material);</td></tr>
+<tr><th id="139">139</th><td></td></tr>
+<tr><th id="140">140</th><td>     <span class='error' title="use of undeclared identifier &apos;DEDXTable&apos;">DEDXTable</span>::iterator <dfn class="local col3 decl" id="13iter" title='iter' data-type='int' data-ref="13iter">iter</dfn> = stoppingPowerTable.find(key);</td></tr>
+<tr><th id="141">141</th><td>     <b>if</b>(iter == stoppingPowerTable.end()) <a class="local col9 ref" href="#9isApplicable" title='isApplicable' data-ref="9isApplicable">isApplicable</a> = <b>false</b>;</td></tr>
+<tr><th id="142">142</th><td>  }</td></tr>
+<tr><th id="143">143</th><td></td></tr>
+<tr><th id="144">144</th><td>  <b>return</b> <a class="local col9 ref" href="#9isApplicable" title='isApplicable' data-ref="9isApplicable">isApplicable</a>;</td></tr>
+<tr><th id="145">145</th><td>}</td></tr>
+<tr><th id="146">146</th><td></td></tr>
+<tr><th id="147">147</th><td><i>// #########################################################################</i></td></tr>
+<tr><th id="148">148</th><td></td></tr>
+<tr><th id="149">149</th><td><a class="typedef" href="../../../../global/management/include/G4Types.hh.html#G4double" title='G4double' data-type='double' data-ref="G4double">G4double</a> <a class="type" href="../include/G4IonDEDXHandler.hh.html#G4IonDEDXHandler" title='G4IonDEDXHandler' data-ref="G4IonDEDXHandler">G4IonDEDXHandler</a>::<dfn class="decl def" id="_ZN16G4IonDEDXHandler7GetDEDXEPK20G4ParticleDefinitionPK10G4Materiald" title='G4IonDEDXHandler::GetDEDX' data-ref="_ZN16G4IonDEDXHandler7GetDEDXEPK20G4ParticleDefinitionPK10G4Materiald">GetDEDX</dfn>(</td></tr>
+<tr><th id="150">150</th><td>                 <em>const</em> <a class="type" href="../../../../particles/management/include/G4ParticleDefinition.hh.html#G4ParticleDefinition" title='G4ParticleDefinition' data-ref="G4ParticleDefinition">G4ParticleDefinition</a>* <dfn class="local col4 decl" id="14particle" title='particle' data-type='const G4ParticleDefinition *' data-ref="14particle">particle</dfn>,  <i>// Projectile (ion)</i></td></tr>
+<tr><th id="151">151</th><td>                 <em>const</em> <a class="type" href="../../../../materials/include/G4Material.hh.html#G4Material" title='G4Material' data-ref="G4Material">G4Material</a>* <dfn class="local col5 decl" id="15material" title='material' data-type='const G4Material *' data-ref="15material">material</dfn>,   <i>// Target material</i></td></tr>
+<tr><th id="152">152</th><td>                 <a class="typedef" href="../../../../global/management/include/G4Types.hh.html#G4double" title='G4double' data-type='double' data-ref="G4double">G4double</a> <dfn class="local col6 decl" id="16kineticEnergy" title='kineticEnergy' data-type='G4double' data-ref="16kineticEnergy">kineticEnergy</dfn>) {     <i>// Kinetic energy of projectile</i></td></tr>
+<tr><th id="153">153</th><td></td></tr>
+<tr><th id="154">154</th><td>  <a class="typedef" href="../../../../global/management/include/G4Types.hh.html#G4double" title='G4double' data-type='double' data-ref="G4double">G4double</a> <dfn class="local col7 decl" id="17dedx" title='dedx' data-type='G4double' data-ref="17dedx">dedx</dfn> = <var>0.0</var>;</td></tr>
+<tr><th id="155">155</th><td></td></tr>
+<tr><th id="156">156</th><td>  <a class="typedef" href="../include/G4IonDEDXHandler.hh.html#G4CacheValue" title='G4CacheValue' data-type='struct CacheValue' data-ref="G4CacheValue">G4CacheValue</a> <dfn class="local col8 decl" id="18value" title='value' data-type='G4CacheValue' data-ref="18value">value</dfn> = <a class="member" href="#_ZN16G4IonDEDXHandler13GetCacheValueEPK20G4ParticleDefinitionPK10G4Material" title='G4IonDEDXHandler::GetCacheValue' data-ref="_ZN16G4IonDEDXHandler13GetCacheValueEPK20G4ParticleDefinitionPK10G4Material">GetCacheValue</a>(<a class="local col4 ref" href="#14particle" title='particle' data-ref="14particle">particle</a>, <a class="local col5 ref" href="#15material" title='material' data-ref="15material">material</a>);</td></tr>
+<tr><th id="157">157</th><td></td></tr>
+<tr><th id="158">158</th><td>  <b>if</b>(<a class="local col6 ref" href="#16kineticEnergy" title='kineticEnergy' data-ref="16kineticEnergy">kineticEnergy</a> &lt;= <var>0.0</var>) <a class="local col7 ref" href="#17dedx" title='dedx' data-ref="17dedx">dedx</a> = <var>0.0</var>;</td></tr>
+<tr><th id="159">159</th><td>  <b>else</b> <b>if</b>(<a class="local col8 ref" href="#18value" title='value' data-ref="18value">value</a>.<a class="ref" href="../include/G4IonDEDXHandler.hh.html#CacheValue::dedxVector" title='CacheValue::dedxVector' data-ref="CacheValue::dedxVector">dedxVector</a> != <var>0</var>) {</td></tr>
+<tr><th id="160">160</th><td></td></tr>
+<tr><th id="161">161</th><td>     <a class="typedef" href="../../../../global/management/include/G4Types.hh.html#G4bool" title='G4bool' data-type='bool' data-ref="G4bool">G4bool</a> <dfn class="local col9 decl" id="19b" title='b' data-type='G4bool' data-ref="19b">b</dfn>;</td></tr>
+<tr><th id="162">162</th><td>     <a class="typedef" href="../../../../global/management/include/G4Types.hh.html#G4double" title='G4double' data-type='double' data-ref="G4double">G4double</a> <dfn class="local col0 decl" id="20factor" title='factor' data-type='G4double' data-ref="20factor">factor</dfn> = <a class="local col8 ref" href="#18value" title='value' data-ref="18value">value</a>.<a class="ref" href="../include/G4IonDEDXHandler.hh.html#CacheValue::density" title='CacheValue::density' data-ref="CacheValue::density">density</a>;</td></tr>
+<tr><th id="163">163</th><td></td></tr>
+<tr><th id="164">164</th><td>     <a class="local col0 ref" href="#20factor" title='factor' data-ref="20factor">factor</a> *= <a class="member" href="../include/G4IonDEDXHandler.hh.html#G4IonDEDXHandler::algorithm" title='G4IonDEDXHandler::algorithm' data-ref="G4IonDEDXHandler::algorithm">algorithm</a> -&gt; <a class="virtual ref" href="../include/G4VIonDEDXScalingAlgorithm.hh.html#_ZN26G4VIonDEDXScalingAlgorithm17ScalingFactorDEDXEPK20G4ParticleDefinitionPK10G4Materiald" title='G4VIonDEDXScalingAlgorithm::ScalingFactorDEDX' data-ref="_ZN26G4VIonDEDXScalingAlgorithm17ScalingFactorDEDXEPK20G4ParticleDefinitionPK10G4Materiald">ScalingFactorDEDX</a>(<a class="local col4 ref" href="#14particle" title='particle' data-ref="14particle">particle</a>,</td></tr>
+<tr><th id="165">165</th><td>                                             <a class="local col5 ref" href="#15material" title='material' data-ref="15material">material</a>,</td></tr>
+<tr><th id="166">166</th><td>                                             <a class="local col6 ref" href="#16kineticEnergy" title='kineticEnergy' data-ref="16kineticEnergy">kineticEnergy</a>);</td></tr>
+<tr><th id="167">167</th><td>     <a class="typedef" href="../../../../global/management/include/G4Types.hh.html#G4double" title='G4double' data-type='double' data-ref="G4double">G4double</a> <dfn class="local col1 decl" id="21scaledKineticEnergy" title='scaledKineticEnergy' data-type='G4double' data-ref="21scaledKineticEnergy">scaledKineticEnergy</dfn> = <a class="local col6 ref" href="#16kineticEnergy" title='kineticEnergy' data-ref="16kineticEnergy">kineticEnergy</a> * <a class="local col8 ref" href="#18value" title='value' data-ref="18value">value</a>.<a class="ref" href="../include/G4IonDEDXHandler.hh.html#CacheValue::energyScaling" title='CacheValue::energyScaling' data-ref="CacheValue::energyScaling">energyScaling</a>;</td></tr>
+<tr><th id="168">168</th><td></td></tr>
+<tr><th id="169">169</th><td>     <b>if</b>(<a class="local col1 ref" href="#21scaledKineticEnergy" title='scaledKineticEnergy' data-ref="21scaledKineticEnergy">scaledKineticEnergy</a> &lt; <a class="local col8 ref" href="#18value" title='value' data-ref="18value">value</a>.<a class="ref" href="../include/G4IonDEDXHandler.hh.html#CacheValue::lowerEnergyEdge" title='CacheValue::lowerEnergyEdge' data-ref="CacheValue::lowerEnergyEdge">lowerEnergyEdge</a>) {</td></tr>
+<tr><th id="170">170</th><td></td></tr>
+<tr><th id="171">171</th><td>        factor *= <span class='error' title="use of undeclared identifier &apos;std&apos;">std</span>::sqrt(scaledKineticEnergy / value.lowerEnergyEdge);</td></tr>
+<tr><th id="172">172</th><td>        <a class="local col1 ref" href="#21scaledKineticEnergy" title='scaledKineticEnergy' data-ref="21scaledKineticEnergy">scaledKineticEnergy</a> = <a class="local col8 ref" href="#18value" title='value' data-ref="18value">value</a>.<a class="ref" href="../include/G4IonDEDXHandler.hh.html#CacheValue::lowerEnergyEdge" title='CacheValue::lowerEnergyEdge' data-ref="CacheValue::lowerEnergyEdge">lowerEnergyEdge</a>;</td></tr>
+<tr><th id="173">173</th><td>     }</td></tr>
+<tr><th id="174">174</th><td></td></tr>
+<tr><th id="175">175</th><td>     <a class="local col7 ref" href="#17dedx" title='dedx' data-ref="17dedx">dedx</a> = <a class="local col0 ref" href="#20factor" title='factor' data-ref="20factor">factor</a> * <a class="local col8 ref" href="#18value" title='value' data-ref="18value">value</a>.<a class="ref" href="../include/G4IonDEDXHandler.hh.html#CacheValue::dedxVector" title='CacheValue::dedxVector' data-ref="CacheValue::dedxVector">dedxVector</a> -&gt; <a class="ref" href="../../../../global/management/include/G4PhysicsVector.hh.html#_ZNK15G4PhysicsVector8GetValueEdRb" title='G4PhysicsVector::GetValue' data-ref="_ZNK15G4PhysicsVector8GetValueEdRb">GetValue</a>(<a class="local col1 ref" href="#21scaledKineticEnergy" title='scaledKineticEnergy' data-ref="21scaledKineticEnergy">scaledKineticEnergy</a>, <span class='refarg'><a class="local col9 ref" href="#19b" title='b' data-ref="19b">b</a></span>);</td></tr>
+<tr><th id="176">176</th><td></td></tr>
+<tr><th id="177">177</th><td>     <b>if</b>(<a class="local col7 ref" href="#17dedx" title='dedx' data-ref="17dedx">dedx</a> &lt; <var>0.0</var>) <a class="local col7 ref" href="#17dedx" title='dedx' data-ref="17dedx">dedx</a> = <var>0.0</var>;</td></tr>
+<tr><th id="178">178</th><td>  }</td></tr>
+<tr><th id="179">179</th><td>  <b>else</b> <a class="local col7 ref" href="#17dedx" title='dedx' data-ref="17dedx">dedx</a> = <var>0.0</var>;</td></tr>
+<tr><th id="180">180</th><td></td></tr>
+<tr><th id="181">181</th><td><u>#<span data-ppcond="181">ifdef</span> <span class="macro" data-ref="_M/PRINT_DEBUG">PRINT_DEBUG</span></u></td></tr>
+<tr><th id="182">182</th><td>     G4cout &lt;&lt; <q>"G4IonDEDXHandler::GetDEDX() E = "</q></td></tr>
+<tr><th id="183">183</th><td>            &lt;&lt; kineticEnergy / MeV &lt;&lt; <q>" MeV * "</q></td></tr>
+<tr><th id="184">184</th><td>            &lt;&lt; value.energyScaling &lt;&lt; <q>" = "</q></td></tr>
+<tr><th id="185">185</th><td>            &lt;&lt; kineticEnergy * value.energyScaling / MeV</td></tr>
+<tr><th id="186">186</th><td>            &lt;&lt; <q>" MeV, dE/dx = "</q> &lt;&lt; dedx / MeV * cm &lt;&lt; <q>" MeV/cm"</q></td></tr>
+<tr><th id="187">187</th><td>            &lt;&lt; <q>", material = "</q> &lt;&lt; material -&gt; GetName()</td></tr>
+<tr><th id="188">188</th><td>            &lt;&lt; G4endl;</td></tr>
+<tr><th id="189">189</th><td><u>#<span data-ppcond="181">endif</span></u></td></tr>
+<tr><th id="190">190</th><td></td></tr>
+<tr><th id="191">191</th><td>  <b>return</b> <a class="local col7 ref" href="#17dedx" title='dedx' data-ref="17dedx">dedx</a>;</td></tr>
+<tr><th id="192">192</th><td>}</td></tr>
+<tr><th id="193">193</th><td></td></tr>
+<tr><th id="194">194</th><td><i>// #########################################################################</i></td></tr>
+<tr><th id="195">195</th><td></td></tr>
+<tr><th id="196">196</th><td><a class="typedef" href="../../../../global/management/include/G4Types.hh.html#G4bool" title='G4bool' data-type='bool' data-ref="G4bool">G4bool</a> <a class="type" href="../include/G4IonDEDXHandler.hh.html#G4IonDEDXHandler" title='G4IonDEDXHandler' data-ref="G4IonDEDXHandler">G4IonDEDXHandler</a>::<dfn class="decl def" id="_ZN16G4IonDEDXHandler14BuildDEDXTableEPK20G4ParticleDefinitionPK10G4Material" title='G4IonDEDXHandler::BuildDEDXTable' data-ref="_ZN16G4IonDEDXHandler14BuildDEDXTableEPK20G4ParticleDefinitionPK10G4Material">BuildDEDXTable</dfn>(</td></tr>
+<tr><th id="197">197</th><td>                 <em>const</em> <a class="type" href="../../../../particles/management/include/G4ParticleDefinition.hh.html#G4ParticleDefinition" title='G4ParticleDefinition' data-ref="G4ParticleDefinition">G4ParticleDefinition</a>* <dfn class="local col2 decl" id="22particle" title='particle' data-type='const G4ParticleDefinition *' data-ref="22particle">particle</dfn>,  <i>// Projectile (ion)</i></td></tr>
+<tr><th id="198">198</th><td>                 <em>const</em> <a class="type" href="../../../../materials/include/G4Material.hh.html#G4Material" title='G4Material' data-ref="G4Material">G4Material</a>* <dfn class="local col3 decl" id="23material" title='material' data-type='const G4Material *' data-ref="23material">material</dfn>) {          <i>// Target material</i></td></tr>
+<tr><th id="199">199</th><td></td></tr>
+<tr><th id="200">200</th><td>  <a class="typedef" href="../../../../global/management/include/G4Types.hh.html#G4int" title='G4int' data-type='int' data-ref="G4int">G4int</a> <dfn class="local col4 decl" id="24atomicNumberIon" title='atomicNumberIon' data-type='G4int' data-ref="24atomicNumberIon">atomicNumberIon</dfn> = <a class="local col2 ref" href="#22particle" title='particle' data-ref="22particle">particle</a> -&gt; <a class="ref" href="../../../../particles/management/include/G4ParticleDefinition.hh.html#_ZNK20G4ParticleDefinition15GetAtomicNumberEv" title='G4ParticleDefinition::GetAtomicNumber' data-ref="_ZNK20G4ParticleDefinition15GetAtomicNumberEv">GetAtomicNumber</a>();</td></tr>
+<tr><th id="201">201</th><td></td></tr>
+<tr><th id="202">202</th><td>  <a class="typedef" href="../../../../global/management/include/G4Types.hh.html#G4bool" title='G4bool' data-type='bool' data-ref="G4bool">G4bool</a> <dfn class="local col5 decl" id="25isApplicable" title='isApplicable' data-type='G4bool' data-ref="25isApplicable">isApplicable</dfn> = <a class="member" href="#_ZN16G4IonDEDXHandler14BuildDEDXTableEiPK10G4Material" title='G4IonDEDXHandler::BuildDEDXTable' data-ref="_ZN16G4IonDEDXHandler14BuildDEDXTableEiPK10G4Material">BuildDEDXTable</a>(<a class="local col4 ref" href="#24atomicNumberIon" title='atomicNumberIon' data-ref="24atomicNumberIon">atomicNumberIon</a>, <a class="local col3 ref" href="#23material" title='material' data-ref="23material">material</a>);</td></tr>
+<tr><th id="203">203</th><td></td></tr>
+<tr><th id="204">204</th><td>  <b>return</b> <a class="local col5 ref" href="#25isApplicable" title='isApplicable' data-ref="25isApplicable">isApplicable</a>;</td></tr>
+<tr><th id="205">205</th><td>}</td></tr>
+<tr><th id="206">206</th><td></td></tr>
+<tr><th id="207">207</th><td></td></tr>
+<tr><th id="208">208</th><td><i>// #########################################################################</i></td></tr>
+<tr><th id="209">209</th><td></td></tr>
+<tr><th id="210">210</th><td><a class="typedef" href="../../../../global/management/include/G4Types.hh.html#G4bool" title='G4bool' data-type='bool' data-ref="G4bool">G4bool</a> <a class="type" href="../include/G4IonDEDXHandler.hh.html#G4IonDEDXHandler" title='G4IonDEDXHandler' data-ref="G4IonDEDXHandler">G4IonDEDXHandler</a>::<dfn class="decl def" id="_ZN16G4IonDEDXHandler14BuildDEDXTableEiPK10G4Material" title='G4IonDEDXHandler::BuildDEDXTable' data-ref="_ZN16G4IonDEDXHandler14BuildDEDXTableEiPK10G4Material">BuildDEDXTable</dfn>(</td></tr>
+<tr><th id="211">211</th><td>                 <a class="typedef" href="../../../../global/management/include/G4Types.hh.html#G4int" title='G4int' data-type='int' data-ref="G4int">G4int</a> <dfn class="local col6 decl" id="26atomicNumberIon" title='atomicNumberIon' data-type='G4int' data-ref="26atomicNumberIon">atomicNumberIon</dfn>,                <i>// Projectile (ion)</i></td></tr>
+<tr><th id="212">212</th><td>                 <em>const</em> <a class="type" href="../../../../materials/include/G4Material.hh.html#G4Material" title='G4Material' data-ref="G4Material">G4Material</a>* <dfn class="local col7 decl" id="27material" title='material' data-type='const G4Material *' data-ref="27material">material</dfn>) {         <i>// Target material</i></td></tr>
+<tr><th id="213">213</th><td></td></tr>
+<tr><th id="214">214</th><td>  <a class="typedef" href="../../../../global/management/include/G4Types.hh.html#G4bool" title='G4bool' data-type='bool' data-ref="G4bool">G4bool</a> <dfn class="local col8 decl" id="28isApplicable" title='isApplicable' data-type='G4bool' data-ref="28isApplicable">isApplicable</dfn> = <b>true</b>;</td></tr>
+<tr><th id="215">215</th><td></td></tr>
+<tr><th id="216">216</th><td>  <b>if</b>(<a class="member" href="../include/G4IonDEDXHandler.hh.html#G4IonDEDXHandler::table" title='G4IonDEDXHandler::table' data-ref="G4IonDEDXHandler::table">table</a> == <var>0</var> || <a class="member" href="../include/G4IonDEDXHandler.hh.html#G4IonDEDXHandler::algorithm" title='G4IonDEDXHandler::algorithm' data-ref="G4IonDEDXHandler::algorithm">algorithm</a> == <var>0</var>) {</td></tr>
+<tr><th id="217">217</th><td>     <a class="local col8 ref" href="#28isApplicable" title='isApplicable' data-ref="28isApplicable">isApplicable</a> = <b>false</b>;</td></tr>
+<tr><th id="218">218</th><td>     <b>return</b> <a class="local col8 ref" href="#28isApplicable" title='isApplicable' data-ref="28isApplicable">isApplicable</a>;</td></tr>
+<tr><th id="219">219</th><td>  }</td></tr>
+<tr><th id="220">220</th><td></td></tr>
+<tr><th id="221">221</th><td>  <a class="typedef" href="../../../../global/management/include/G4Types.hh.html#G4int" title='G4int' data-type='int' data-ref="G4int">G4int</a> <dfn class="local col9 decl" id="29atomicNumberBase" title='atomicNumberBase' data-type='G4int' data-ref="29atomicNumberBase">atomicNumberBase</dfn> =</td></tr>
+<tr><th id="222">222</th><td>                <a class="member" href="../include/G4IonDEDXHandler.hh.html#G4IonDEDXHandler::algorithm" title='G4IonDEDXHandler::algorithm' data-ref="G4IonDEDXHandler::algorithm">algorithm</a> -&gt; <a class="virtual ref" href="../include/G4VIonDEDXScalingAlgorithm.hh.html#_ZN26G4VIonDEDXScalingAlgorithm19AtomicNumberBaseIonEiPK10G4Material" title='G4VIonDEDXScalingAlgorithm::AtomicNumberBaseIon' data-ref="_ZN26G4VIonDEDXScalingAlgorithm19AtomicNumberBaseIonEiPK10G4Material">AtomicNumberBaseIon</a>(<a class="local col6 ref" href="#26atomicNumberIon" title='atomicNumberIon' data-ref="26atomicNumberIon">atomicNumberIon</a>, <a class="local col7 ref" href="#27material" title='material' data-ref="27material">material</a>);</td></tr>
+<tr><th id="223">223</th><td></td></tr>
+<tr><th id="224">224</th><td>  <i>// Checking if vector is already built, and returns if this is indeed</i></td></tr>
+<tr><th id="225">225</th><td><i>  // the case</i></td></tr>
+<tr><th id="226">226</th><td>  <span class='error' title="unknown type name &apos;G4IonKey&apos;">G4IonKey</span> <dfn class="local col0 decl" id="30key" title='key' data-type='int' data-ref="30key">key</dfn> = <span class='error' title="use of undeclared identifier &apos;std&apos;">std</span>::make_pair(atomicNumberBase, material);</td></tr>
+<tr><th id="227">227</th><td></td></tr>
+<tr><th id="228">228</th><td>  <span class='error' title="use of undeclared identifier &apos;DEDXTable&apos;">DEDXTable</span>::iterator <dfn class="local col1 decl" id="31iter" title='iter' data-type='int' data-ref="31iter">iter</dfn> = stoppingPowerTable.find(key);</td></tr>
+<tr><th id="229">229</th><td>  <b>if</b>(iter != stoppingPowerTable.end()) <b>return</b> <a class="local col8 ref" href="#28isApplicable" title='isApplicable' data-ref="28isApplicable">isApplicable</a>;</td></tr>
+<tr><th id="230">230</th><td></td></tr>
+<tr><th id="231">231</th><td>  <i>// Checking if table contains stopping power vector for given material name</i></td></tr>
+<tr><th id="232">232</th><td><i>  // or chemical formula</i></td></tr>
+<tr><th id="233">233</th><td>  <em>const</em> <a class="type" href="../../../../global/management/include/G4String.hh.html#G4String" title='G4String' data-ref="G4String">G4String</a>&amp; <dfn class="local col2 decl" id="32chemFormula" title='chemFormula' data-type='const G4String &amp;' data-ref="32chemFormula">chemFormula</dfn> = <a class="local col7 ref" href="#27material" title='material' data-ref="27material">material</a> -&gt; <a class="ref" href="../../../../materials/include/G4Material.hh.html#_ZNK10G4Material18GetChemicalFormulaEv" title='G4Material::GetChemicalFormula' data-ref="_ZNK10G4Material18GetChemicalFormulaEv">GetChemicalFormula</a>();</td></tr>
+<tr><th id="234">234</th><td>  <em>const</em> <a class="type" href="../../../../global/management/include/G4String.hh.html#G4String" title='G4String' data-ref="G4String">G4String</a>&amp; <dfn class="local col3 decl" id="33materialName" title='materialName' data-type='const G4String &amp;' data-ref="33materialName">materialName</dfn> = <a class="local col7 ref" href="#27material" title='material' data-ref="27material">material</a> -&gt; <a class="ref" href="../../../../materials/include/G4Material.hh.html#_ZNK10G4Material7GetNameEv" title='G4Material::GetName' data-ref="_ZNK10G4Material7GetNameEv">GetName</a>();</td></tr>
+<tr><th id="235">235</th><td></td></tr>
+<tr><th id="236">236</th><td>  <a class="local col8 ref" href="#28isApplicable" title='isApplicable' data-ref="28isApplicable">isApplicable</a> = <a class="member" href="../include/G4IonDEDXHandler.hh.html#G4IonDEDXHandler::table" title='G4IonDEDXHandler::table' data-ref="G4IonDEDXHandler::table">table</a> -&gt; <a class="virtual ref" href="../../../../materials/include/G4VIonDEDXTable.hh.html#_ZN15G4VIonDEDXTable18BuildPhysicsVectorEiRK8G4String" title='G4VIonDEDXTable::BuildPhysicsVector' data-ref="_ZN15G4VIonDEDXTable18BuildPhysicsVectorEiRK8G4String">BuildPhysicsVector</a>(<a class="local col9 ref" href="#29atomicNumberBase" title='atomicNumberBase' data-ref="29atomicNumberBase">atomicNumberBase</a>, <a class="local col2 ref" href="#32chemFormula" title='chemFormula' data-ref="32chemFormula">chemFormula</a>);</td></tr>
+<tr><th id="237">237</th><td></td></tr>
+<tr><th id="238">238</th><td>  <b>if</b>(<a class="local col8 ref" href="#28isApplicable" title='isApplicable' data-ref="28isApplicable">isApplicable</a>) {</td></tr>
+<tr><th id="239">239</th><td>     stoppingPowerTable[key] =</td></tr>
+<tr><th id="240">240</th><td>              table -&gt; GetPhysicsVector(atomicNumberBase, chemFormula);</td></tr>
+<tr><th id="241">241</th><td>     <b>return</b> <a class="local col8 ref" href="#28isApplicable" title='isApplicable' data-ref="28isApplicable">isApplicable</a>;</td></tr>
+<tr><th id="242">242</th><td>  }</td></tr>
+<tr><th id="243">243</th><td></td></tr>
+<tr><th id="244">244</th><td>  <a class="local col8 ref" href="#28isApplicable" title='isApplicable' data-ref="28isApplicable">isApplicable</a> = <a class="member" href="../include/G4IonDEDXHandler.hh.html#G4IonDEDXHandler::table" title='G4IonDEDXHandler::table' data-ref="G4IonDEDXHandler::table">table</a> -&gt; <a class="virtual ref" href="../../../../materials/include/G4VIonDEDXTable.hh.html#_ZN15G4VIonDEDXTable18BuildPhysicsVectorEiRK8G4String" title='G4VIonDEDXTable::BuildPhysicsVector' data-ref="_ZN15G4VIonDEDXTable18BuildPhysicsVectorEiRK8G4String">BuildPhysicsVector</a>(<a class="local col9 ref" href="#29atomicNumberBase" title='atomicNumberBase' data-ref="29atomicNumberBase">atomicNumberBase</a>, <a class="local col3 ref" href="#33materialName" title='materialName' data-ref="33materialName">materialName</a>);</td></tr>
+<tr><th id="245">245</th><td>  <b>if</b>(<a class="local col8 ref" href="#28isApplicable" title='isApplicable' data-ref="28isApplicable">isApplicable</a>) {</td></tr>
+<tr><th id="246">246</th><td>     stoppingPowerTable[key] =</td></tr>
+<tr><th id="247">247</th><td>              table -&gt; GetPhysicsVector(atomicNumberBase, materialName);</td></tr>
+<tr><th id="248">248</th><td>     <b>return</b> <a class="local col8 ref" href="#28isApplicable" title='isApplicable' data-ref="28isApplicable">isApplicable</a>;</td></tr>
+<tr><th id="249">249</th><td>  }</td></tr>
+<tr><th id="250">250</th><td></td></tr>
+<tr><th id="251">251</th><td>  <i>// Building the stopping power vector based on Bragg's additivity rule</i></td></tr>
+<tr><th id="252">252</th><td>  <em>const</em> <span class='error' title="unknown type name &apos;G4ElementVector&apos;">G4ElementVector</span>* <dfn class="local col4 decl" id="34elementVector" title='elementVector' data-type='const int *' data-ref="34elementVector">elementVector</dfn> = material -&gt; GetElementVector() ;</td></tr>
+<tr><th id="253">253</th><td></td></tr>
+<tr><th id="254">254</th><td>  <span class='error' title="use of undeclared identifier &apos;std&apos;">std</span>::vector&lt;<span class='error' title="&apos;G4PhysicsVector&apos; does not refer to a value">G4PhysicsVector</span>*<span class='error' title="expected expression">&gt;</span> <span class='error' title="use of undeclared identifier &apos;dEdxTable&apos;">dEdxTable</span>;</td></tr>
+<tr><th id="255">255</th><td></td></tr>
+<tr><th id="256">256</th><td>  <span class='error' title="unknown type name &apos;size_t&apos;">size_t</span> <dfn class="local col5 decl" id="35nmbElements" title='nmbElements' data-type='int' data-ref="35nmbElements">nmbElements</dfn> = material -&gt; GetNumberOfElements();</td></tr>
+<tr><th id="257">257</th><td></td></tr>
+<tr><th id="258">258</th><td>  <b>for</b>(<span class='error' title="unknown type name &apos;size_t&apos;">size_t</span> <dfn class="local col6 decl" id="36i" title='i' data-type='int' data-ref="36i">i</dfn> = <var>0</var>; i &lt; nmbElements; i++) {</td></tr>
+<tr><th id="259">259</th><td></td></tr>
+<tr><th id="260">260</th><td>      <a class="typedef" href="../../../../global/management/include/G4Types.hh.html#G4int" title='G4int' data-type='int' data-ref="G4int">G4int</a> <dfn class="local col7 decl" id="37atomicNumberMat" title='atomicNumberMat' data-type='G4int' data-ref="37atomicNumberMat">atomicNumberMat</dfn> = G4int((*elementVector)[i] -&gt; GetZ());</td></tr>
+<tr><th id="261">261</th><td></td></tr>
+<tr><th id="262">262</th><td>      <a class="local col8 ref" href="#28isApplicable" title='isApplicable' data-ref="28isApplicable">isApplicable</a> = <a class="member" href="../include/G4IonDEDXHandler.hh.html#G4IonDEDXHandler::table" title='G4IonDEDXHandler::table' data-ref="G4IonDEDXHandler::table">table</a> -&gt; <a class="virtual ref" href="../../../../materials/include/G4VIonDEDXTable.hh.html#_ZN15G4VIonDEDXTable18BuildPhysicsVectorEii" title='G4VIonDEDXTable::BuildPhysicsVector' data-ref="_ZN15G4VIonDEDXTable18BuildPhysicsVectorEii">BuildPhysicsVector</a>(<a class="local col9 ref" href="#29atomicNumberBase" title='atomicNumberBase' data-ref="29atomicNumberBase">atomicNumberBase</a>, <a class="local col7 ref" href="#37atomicNumberMat" title='atomicNumberMat' data-ref="37atomicNumberMat">atomicNumberMat</a>);</td></tr>
+<tr><th id="263">263</th><td></td></tr>
+<tr><th id="264">264</th><td>      <b>if</b>(<a class="local col8 ref" href="#28isApplicable" title='isApplicable' data-ref="28isApplicable">isApplicable</a>) {</td></tr>
+<tr><th id="265">265</th><td></td></tr>
+<tr><th id="266">266</th><td>         <a class="type" href="../../../../global/management/include/G4PhysicsVector.hh.html#G4PhysicsVector" title='G4PhysicsVector' data-ref="G4PhysicsVector">G4PhysicsVector</a>* <dfn class="local col8 decl" id="38dEdx" title='dEdx' data-type='G4PhysicsVector *' data-ref="38dEdx">dEdx</dfn> =</td></tr>
+<tr><th id="267">267</th><td>                  <a class="member" href="../include/G4IonDEDXHandler.hh.html#G4IonDEDXHandler::table" title='G4IonDEDXHandler::table' data-ref="G4IonDEDXHandler::table">table</a> -&gt; <a class="virtual ref" href="../../../../materials/include/G4VIonDEDXTable.hh.html#_ZN15G4VIonDEDXTable16GetPhysicsVectorEii" title='G4VIonDEDXTable::GetPhysicsVector' data-ref="_ZN15G4VIonDEDXTable16GetPhysicsVectorEii">GetPhysicsVector</a>(<a class="local col9 ref" href="#29atomicNumberBase" title='atomicNumberBase' data-ref="29atomicNumberBase">atomicNumberBase</a>, <a class="local col7 ref" href="#37atomicNumberMat" title='atomicNumberMat' data-ref="37atomicNumberMat">atomicNumberMat</a>);</td></tr>
+<tr><th id="268">268</th><td>         <span class='error' title="use of undeclared identifier &apos;dEdxTable&apos;">dEdxTable</span>.push_back(dEdx);</td></tr>
+<tr><th id="269">269</th><td>      }</td></tr>
+<tr><th id="270">270</th><td>      <b>else</b> {</td></tr>
+<tr><th id="271">271</th><td></td></tr>
+<tr><th id="272">272</th><td>         <span class='error' title="use of undeclared identifier &apos;dEdxTable&apos;">dEdxTable</span>.clear();</td></tr>
+<tr><th id="273">273</th><td>         <b>break</b>;</td></tr>
+<tr><th id="274">274</th><td>      }</td></tr>
+<tr><th id="275">275</th><td>  }</td></tr>
+<tr><th id="276">276</th><td></td></tr>
+<tr><th id="277">277</th><td>  <b>if</b>(<a class="local col8 ref" href="#28isApplicable" title='isApplicable' data-ref="28isApplicable">isApplicable</a>) {</td></tr>
+<tr><th id="278">278</th><td></td></tr>
+<tr><th id="279">279</th><td>     <b>if</b>(<span class='error' title="use of undeclared identifier &apos;dEdxTable&apos;">dEdxTable</span>.size() &gt; <var>0</var>) {</td></tr>
+<tr><th id="280">280</th><td></td></tr>
+<tr><th id="281">281</th><td>        <span class='error' title="unknown type name &apos;size_t&apos;">size_t</span> <dfn class="local col9 decl" id="39nmbdEdxBins" title='nmbdEdxBins' data-type='int' data-ref="39nmbdEdxBins">nmbdEdxBins</dfn> = <span class='error' title="use of undeclared identifier &apos;dEdxTable&apos;">dEdxTable</span>[<var>0</var>] -&gt; GetVectorLength();</td></tr>
+<tr><th id="282">282</th><td>        <a class="typedef" href="../../../../global/management/include/G4Types.hh.html#G4double" title='G4double' data-type='double' data-ref="G4double">G4double</a> <dfn class="local col0 decl" id="40lowerEdge" title='lowerEdge' data-type='G4double' data-ref="40lowerEdge">lowerEdge</dfn> = <span class='error' title="use of undeclared identifier &apos;dEdxTable&apos;">dEdxTable</span>[<var>0</var>] -&gt; GetLowEdgeEnergy(<var>0</var>);</td></tr>
+<tr><th id="283">283</th><td>        <a class="typedef" href="../../../../global/management/include/G4Types.hh.html#G4double" title='G4double' data-type='double' data-ref="G4double">G4double</a> <dfn class="local col1 decl" id="41upperEdge" title='upperEdge' data-type='G4double' data-ref="41upperEdge">upperEdge</dfn> = <span class='error' title="use of undeclared identifier &apos;dEdxTable&apos;">dEdxTable</span>[<var>0</var>] -&gt; GetLowEdgeEnergy(nmbdEdxBins-<var>1</var>);</td></tr>
+<tr><th id="284">284</th><td></td></tr>
+<tr><th id="285">285</th><td>        <a class="type" href="../../../../global/management/include/G4LPhysicsFreeVector.hh.html#G4LPhysicsFreeVector" title='G4LPhysicsFreeVector' data-ref="G4LPhysicsFreeVector">G4LPhysicsFreeVector</a>* <dfn class="local col2 decl" id="42dEdxBragg" title='dEdxBragg' data-type='G4LPhysicsFreeVector *' data-ref="42dEdxBragg">dEdxBragg</dfn> =</td></tr>
+<tr><th id="286">286</th><td>                    <b>new</b> G4LPhysicsFreeVector(nmbdEdxBins,</td></tr>
+<tr><th id="287">287</th><td>                                             lowerEdge,</td></tr>
+<tr><th id="288">288</th><td>                                             upperEdge);</td></tr>
+<tr><th id="289">289</th><td></td></tr>
+<tr><th id="290">290</th><td>        <em>const</em> <a class="typedef" href="../../../../global/management/include/G4Types.hh.html#G4double" title='G4double' data-type='double' data-ref="G4double">G4double</a>* <dfn class="local col3 decl" id="43massFractionVector" title='massFractionVector' data-type='const G4double *' data-ref="43massFractionVector">massFractionVector</dfn> = <a class="local col7 ref" href="#27material" title='material' data-ref="27material">material</a> -&gt; <a class="ref" href="../../../../materials/include/G4Material.hh.html#_ZNK10G4Material17GetFractionVectorEv" title='G4Material::GetFractionVector' data-ref="_ZNK10G4Material17GetFractionVectorEv">GetFractionVector</a>();</td></tr>
+<tr><th id="291">291</th><td></td></tr>
+<tr><th id="292">292</th><td>        <a class="typedef" href="../../../../global/management/include/G4Types.hh.html#G4bool" title='G4bool' data-type='bool' data-ref="G4bool">G4bool</a> <dfn class="local col4 decl" id="44b" title='b' data-type='G4bool' data-ref="44b">b</dfn>;</td></tr>
+<tr><th id="293">293</th><td>        <b>for</b>(<span class='error' title="unknown type name &apos;size_t&apos;">size_t</span> <dfn class="local col5 decl" id="45j" title='j' data-type='int' data-ref="45j">j</dfn> = <var>0</var>; j &lt; nmbdEdxBins; j++) {</td></tr>
+<tr><th id="294">294</th><td></td></tr>
+<tr><th id="295">295</th><td>            <a class="typedef" href="../../../../global/management/include/G4Types.hh.html#G4double" title='G4double' data-type='double' data-ref="G4double">G4double</a> <dfn class="local col6 decl" id="46edge" title='edge' data-type='G4double' data-ref="46edge">edge</dfn> = <span class='error' title="use of undeclared identifier &apos;dEdxTable&apos;">dEdxTable</span>[<var>0</var>] -&gt; GetLowEdgeEnergy(j);</td></tr>
+<tr><th id="296">296</th><td></td></tr>
+<tr><th id="297">297</th><td>            <a class="typedef" href="../../../../global/management/include/G4Types.hh.html#G4double" title='G4double' data-type='double' data-ref="G4double">G4double</a> <dfn class="local col7 decl" id="47value" title='value' data-type='G4double' data-ref="47value">value</dfn> = <var>0.0</var>;</td></tr>
+<tr><th id="298">298</th><td>  	    <b>for</b>(<span class='error' title="unknown type name &apos;size_t&apos;">size_t</span> <dfn class="local col8 decl" id="48i" title='i' data-type='int' data-ref="48i">i</dfn> = <var>0</var>; i &lt; nmbElements; i++) {</td></tr>
+<tr><th id="299">299</th><td></td></tr>
+<tr><th id="300">300</th><td>                value += (<span class='error' title="use of undeclared identifier &apos;dEdxTable&apos;">dEdxTable</span>[i] -&gt; GetValue(edge ,b)) *</td></tr>
+<tr><th id="301">301</th><td>                                                       massFractionVector[i];</td></tr>
+<tr><th id="302">302</th><td>	    }</td></tr>
+<tr><th id="303">303</th><td></td></tr>
+<tr><th id="304">304</th><td>            dEdxBragg -&gt; PutValues(j, edge, value);</td></tr>
+<tr><th id="305">305</th><td>	}</td></tr>
+<tr><th id="306">306</th><td>        <span class='error' title="cannot initialize object parameter of type &apos;G4PhysicsVector&apos; with an expression of type &apos;G4LPhysicsFreeVector&apos;">dEdxBragg</span> -&gt; SetSpline(useSplines);</td></tr>
+<tr><th id="307">307</th><td></td></tr>
+<tr><th id="308">308</th><td><u>#<span data-ppcond="308">ifdef</span> <span class="macro" data-ref="_M/PRINT_DEBUG">PRINT_DEBUG</span></u></td></tr>
+<tr><th id="309">309</th><td>        G4cout &lt;&lt; <q>"G4IonDEDXHandler::BuildPhysicsVector() for ion with Z="</q></td></tr>
+<tr><th id="310">310</th><td>               &lt;&lt; atomicNumberBase &lt;&lt; <q>" in "</q></td></tr>
+<tr><th id="311">311</th><td>               &lt;&lt; material -&gt; GetName()</td></tr>
+<tr><th id="312">312</th><td>               &lt;&lt; G4endl;</td></tr>
+<tr><th id="313">313</th><td></td></tr>
+<tr><th id="314">314</th><td>        G4cout &lt;&lt; *dEdxBragg;</td></tr>
+<tr><th id="315">315</th><td><u>#<span data-ppcond="308">endif</span></u></td></tr>
+<tr><th id="316">316</th><td></td></tr>
+<tr><th id="317">317</th><td>	stoppingPowerTable[key] = dEdxBragg;</td></tr>
+<tr><th id="318">318</th><td>	stoppingPowerTableBragg[key] = dEdxBragg;</td></tr>
+<tr><th id="319">319</th><td>     }</td></tr>
+<tr><th id="320">320</th><td>  }</td></tr>
+<tr><th id="321">321</th><td></td></tr>
+<tr><th id="322">322</th><td>  <a class="member" href="#_ZN16G4IonDEDXHandler10ClearCacheEv" title='G4IonDEDXHandler::ClearCache' data-ref="_ZN16G4IonDEDXHandler10ClearCacheEv">ClearCache</a>();</td></tr>
+<tr><th id="323">323</th><td></td></tr>
+<tr><th id="324">324</th><td>  <b>return</b> <a class="local col8 ref" href="#28isApplicable" title='isApplicable' data-ref="28isApplicable">isApplicable</a>;</td></tr>
+<tr><th id="325">325</th><td>}</td></tr>
+<tr><th id="326">326</th><td></td></tr>
+<tr><th id="327">327</th><td><i>// #########################################################################</i></td></tr>
+<tr><th id="328">328</th><td></td></tr>
+<tr><th id="329">329</th><td><a class="typedef" href="../include/G4IonDEDXHandler.hh.html#G4CacheValue" title='G4CacheValue' data-type='struct CacheValue' data-ref="G4CacheValue">G4CacheValue</a> <a class="type" href="../include/G4IonDEDXHandler.hh.html#G4IonDEDXHandler" title='G4IonDEDXHandler' data-ref="G4IonDEDXHandler">G4IonDEDXHandler</a>::<dfn class="decl def" id="_ZN16G4IonDEDXHandler16UpdateCacheValueEPK20G4ParticleDefinitionPK10G4Material" title='G4IonDEDXHandler::UpdateCacheValue' data-ref="_ZN16G4IonDEDXHandler16UpdateCacheValueEPK20G4ParticleDefinitionPK10G4Material">UpdateCacheValue</dfn>(</td></tr>
+<tr><th id="330">330</th><td>              <em>const</em> <a class="type" href="../../../../particles/management/include/G4ParticleDefinition.hh.html#G4ParticleDefinition" title='G4ParticleDefinition' data-ref="G4ParticleDefinition">G4ParticleDefinition</a>* <dfn class="local col9 decl" id="49particle" title='particle' data-type='const G4ParticleDefinition *' data-ref="49particle">particle</dfn>,  <i>// Projectile (ion)</i></td></tr>
+<tr><th id="331">331</th><td>              <em>const</em> <a class="type" href="../../../../materials/include/G4Material.hh.html#G4Material" title='G4Material' data-ref="G4Material">G4Material</a>* <dfn class="local col0 decl" id="50material" title='material' data-type='const G4Material *' data-ref="50material">material</dfn>) {          <i>// Target material</i></td></tr>
+<tr><th id="332">332</th><td></td></tr>
+<tr><th id="333">333</th><td>  <a class="typedef" href="../include/G4IonDEDXHandler.hh.html#G4CacheValue" title='G4CacheValue' data-type='struct CacheValue' data-ref="G4CacheValue">G4CacheValue</a> <a class="ref fake" href="../include/G4IonDEDXHandler.hh.html#68" title='CacheValue::CacheValue' data-ref="_ZN10CacheValueC1Ev"></a><dfn class="local col1 decl" id="51value" title='value' data-type='G4CacheValue' data-ref="51value">value</dfn>;</td></tr>
+<tr><th id="334">334</th><td></td></tr>
+<tr><th id="335">335</th><td>  <a class="typedef" href="../../../../global/management/include/G4Types.hh.html#G4int" title='G4int' data-type='int' data-ref="G4int">G4int</a> <dfn class="local col2 decl" id="52atomicNumberIon" title='atomicNumberIon' data-type='G4int' data-ref="52atomicNumberIon">atomicNumberIon</dfn> = <a class="local col9 ref" href="#49particle" title='particle' data-ref="49particle">particle</a> -&gt; <a class="ref" href="../../../../particles/management/include/G4ParticleDefinition.hh.html#_ZNK20G4ParticleDefinition15GetAtomicNumberEv" title='G4ParticleDefinition::GetAtomicNumber' data-ref="_ZNK20G4ParticleDefinition15GetAtomicNumberEv">GetAtomicNumber</a>();</td></tr>
+<tr><th id="336">336</th><td>  <a class="typedef" href="../../../../global/management/include/G4Types.hh.html#G4int" title='G4int' data-type='int' data-ref="G4int">G4int</a> <dfn class="local col3 decl" id="53atomicNumberBase" title='atomicNumberBase' data-type='G4int' data-ref="53atomicNumberBase">atomicNumberBase</dfn> =</td></tr>
+<tr><th id="337">337</th><td>                <a class="member" href="../include/G4IonDEDXHandler.hh.html#G4IonDEDXHandler::algorithm" title='G4IonDEDXHandler::algorithm' data-ref="G4IonDEDXHandler::algorithm">algorithm</a> -&gt; <a class="virtual ref" href="../include/G4VIonDEDXScalingAlgorithm.hh.html#_ZN26G4VIonDEDXScalingAlgorithm19AtomicNumberBaseIonEiPK10G4Material" title='G4VIonDEDXScalingAlgorithm::AtomicNumberBaseIon' data-ref="_ZN26G4VIonDEDXScalingAlgorithm19AtomicNumberBaseIonEiPK10G4Material">AtomicNumberBaseIon</a>(<a class="local col2 ref" href="#52atomicNumberIon" title='atomicNumberIon' data-ref="52atomicNumberIon">atomicNumberIon</a>, <a class="local col0 ref" href="#50material" title='material' data-ref="50material">material</a>);</td></tr>
+<tr><th id="338">338</th><td></td></tr>
+<tr><th id="339">339</th><td>  <span class='error' title="unknown type name &apos;G4IonKey&apos;">G4IonKey</span> <dfn class="local col4 decl" id="54key" title='key' data-type='int' data-ref="54key">key</dfn> = <span class='error' title="use of undeclared identifier &apos;std&apos;">std</span>::make_pair(atomicNumberBase, material);</td></tr>
+<tr><th id="340">340</th><td></td></tr>
+<tr><th id="341">341</th><td>  <span class='error' title="use of undeclared identifier &apos;DEDXTable&apos;">DEDXTable</span>::iterator <dfn class="local col5 decl" id="55iter" title='iter' data-type='int' data-ref="55iter">iter</dfn> = stoppingPowerTable.find(key);</td></tr>
+<tr><th id="342">342</th><td></td></tr>
+<tr><th id="343">343</th><td>  <b>if</b>(iter != stoppingPowerTable.end()) {</td></tr>
+<tr><th id="344">344</th><td>     value.dedxVector = iter -&gt; second;</td></tr>
+<tr><th id="345">345</th><td></td></tr>
+<tr><th id="346">346</th><td>     <a class="typedef" href="../../../../global/management/include/G4Types.hh.html#G4double" title='G4double' data-type='double' data-ref="G4double">G4double</a> <dfn class="local col6 decl" id="56nmbNucleons" title='nmbNucleons' data-type='G4double' data-ref="56nmbNucleons">nmbNucleons</dfn> = <a class="typedef" href="../../../../global/management/include/G4Types.hh.html#G4double" title='G4double' data-type='double' data-ref="G4double">G4double</a>(<a class="local col9 ref" href="#49particle" title='particle' data-ref="49particle">particle</a> -&gt; <a class="ref" href="../../../../particles/management/include/G4ParticleDefinition.hh.html#_ZNK20G4ParticleDefinition13GetAtomicMassEv" title='G4ParticleDefinition::GetAtomicMass' data-ref="_ZNK20G4ParticleDefinition13GetAtomicMassEv">GetAtomicMass</a>());</td></tr>
+<tr><th id="347">347</th><td>     <a class="local col1 ref" href="#51value" title='value' data-ref="51value">value</a>.<a class="ref" href="../include/G4IonDEDXHandler.hh.html#CacheValue::energyScaling" title='CacheValue::energyScaling' data-ref="CacheValue::energyScaling">energyScaling</a> =</td></tr>
+<tr><th id="348">348</th><td>           <a class="member" href="../include/G4IonDEDXHandler.hh.html#G4IonDEDXHandler::algorithm" title='G4IonDEDXHandler::algorithm' data-ref="G4IonDEDXHandler::algorithm">algorithm</a> -&gt; <a class="virtual ref" href="../include/G4VIonDEDXScalingAlgorithm.hh.html#_ZN26G4VIonDEDXScalingAlgorithm19ScalingFactorEnergyEPK20G4ParticleDefinitionPK10G4Material" title='G4VIonDEDXScalingAlgorithm::ScalingFactorEnergy' data-ref="_ZN26G4VIonDEDXScalingAlgorithm19ScalingFactorEnergyEPK20G4ParticleDefinitionPK10G4Material">ScalingFactorEnergy</a>(<a class="local col9 ref" href="#49particle" title='particle' data-ref="49particle">particle</a>, <a class="local col0 ref" href="#50material" title='material' data-ref="50material">material</a>) / <a class="local col6 ref" href="#56nmbNucleons" title='nmbNucleons' data-ref="56nmbNucleons">nmbNucleons</a>;</td></tr>
+<tr><th id="349">349</th><td></td></tr>
+<tr><th id="350">350</th><td>     <span class='error' title="unknown type name &apos;size_t&apos;">size_t</span> <dfn class="local col7 decl" id="57nmbdEdxBins" title='nmbdEdxBins' data-type='int' data-ref="57nmbdEdxBins">nmbdEdxBins</dfn> = value.dedxVector -&gt; GetVectorLength();</td></tr>
+<tr><th id="351">351</th><td>     value.lowerEnergyEdge = value.dedxVector -&gt; GetLowEdgeEnergy(<var>0</var>);</td></tr>
+<tr><th id="352">352</th><td></td></tr>
+<tr><th id="353">353</th><td>     value.upperEnergyEdge =</td></tr>
+<tr><th id="354">354</th><td>                       value.dedxVector -&gt; GetLowEdgeEnergy(nmbdEdxBins-<var>1</var>);</td></tr>
+<tr><th id="355">355</th><td>     <a class="local col1 ref" href="#51value" title='value' data-ref="51value">value</a>.<a class="ref" href="../include/G4IonDEDXHandler.hh.html#CacheValue::density" title='CacheValue::density' data-ref="CacheValue::density">density</a> = <a class="local col0 ref" href="#50material" title='material' data-ref="50material">material</a> -&gt; <a class="ref" href="../../../../materials/include/G4Material.hh.html#_ZNK10G4Material10GetDensityEv" title='G4Material::GetDensity' data-ref="_ZNK10G4Material10GetDensityEv">GetDensity</a>();</td></tr>
+<tr><th id="356">356</th><td>  }</td></tr>
+<tr><th id="357">357</th><td>  <b>else</b> {</td></tr>
+<tr><th id="358">358</th><td>     <a class="local col1 ref" href="#51value" title='value' data-ref="51value">value</a>.<a class="ref" href="../include/G4IonDEDXHandler.hh.html#CacheValue::dedxVector" title='CacheValue::dedxVector' data-ref="CacheValue::dedxVector">dedxVector</a> = <var>0</var>;</td></tr>
+<tr><th id="359">359</th><td>     <a class="local col1 ref" href="#51value" title='value' data-ref="51value">value</a>.<a class="ref" href="../include/G4IonDEDXHandler.hh.html#CacheValue::energyScaling" title='CacheValue::energyScaling' data-ref="CacheValue::energyScaling">energyScaling</a> = <var>0.0</var>;</td></tr>
+<tr><th id="360">360</th><td>     <a class="local col1 ref" href="#51value" title='value' data-ref="51value">value</a>.<a class="ref" href="../include/G4IonDEDXHandler.hh.html#CacheValue::lowerEnergyEdge" title='CacheValue::lowerEnergyEdge' data-ref="CacheValue::lowerEnergyEdge">lowerEnergyEdge</a> = <var>0.0</var>;</td></tr>
+<tr><th id="361">361</th><td>     <a class="local col1 ref" href="#51value" title='value' data-ref="51value">value</a>.<a class="ref" href="../include/G4IonDEDXHandler.hh.html#CacheValue::upperEnergyEdge" title='CacheValue::upperEnergyEdge' data-ref="CacheValue::upperEnergyEdge">upperEnergyEdge</a> = <var>0.0</var>;</td></tr>
+<tr><th id="362">362</th><td>     <a class="local col1 ref" href="#51value" title='value' data-ref="51value">value</a>.<a class="ref" href="../include/G4IonDEDXHandler.hh.html#CacheValue::density" title='CacheValue::density' data-ref="CacheValue::density">density</a> = <var>0.0</var>;</td></tr>
+<tr><th id="363">363</th><td>  }</td></tr>
+<tr><th id="364">364</th><td></td></tr>
+<tr><th id="365">365</th><td><u>#<span data-ppcond="365">ifdef</span> <span class="macro" data-ref="_M/PRINT_DEBUG">PRINT_DEBUG</span></u></td></tr>
+<tr><th id="366">366</th><td>  G4cout &lt;&lt; <q>"G4IonDEDXHandler::UpdateCacheValue() for "</q></td></tr>
+<tr><th id="367">367</th><td>         &lt;&lt; particle -&gt; GetParticleName() &lt;&lt; <q>" in "</q></td></tr>
+<tr><th id="368">368</th><td>         &lt;&lt; material -&gt; GetName()</td></tr>
+<tr><th id="369">369</th><td>         &lt;&lt; G4endl;</td></tr>
+<tr><th id="370">370</th><td><u>#<span data-ppcond="365">endif</span></u></td></tr>
+<tr><th id="371">371</th><td></td></tr>
+<tr><th id="372">372</th><td>  <b>return</b> <a class="local col1 ref" href="#51value" title='value' data-ref="51value">value</a>;</td></tr>
+<tr><th id="373">373</th><td>}</td></tr>
+<tr><th id="374">374</th><td></td></tr>
+<tr><th id="375">375</th><td><i>// #########################################################################</i></td></tr>
+<tr><th id="376">376</th><td></td></tr>
+<tr><th id="377">377</th><td><a class="typedef" href="../include/G4IonDEDXHandler.hh.html#G4CacheValue" title='G4CacheValue' data-type='struct CacheValue' data-ref="G4CacheValue">G4CacheValue</a> <a class="type" href="../include/G4IonDEDXHandler.hh.html#G4IonDEDXHandler" title='G4IonDEDXHandler' data-ref="G4IonDEDXHandler">G4IonDEDXHandler</a>::<dfn class="decl def" id="_ZN16G4IonDEDXHandler13GetCacheValueEPK20G4ParticleDefinitionPK10G4Material" title='G4IonDEDXHandler::GetCacheValue' data-ref="_ZN16G4IonDEDXHandler13GetCacheValueEPK20G4ParticleDefinitionPK10G4Material">GetCacheValue</dfn>(</td></tr>
+<tr><th id="378">378</th><td>              <em>const</em> <a class="type" href="../../../../particles/management/include/G4ParticleDefinition.hh.html#G4ParticleDefinition" title='G4ParticleDefinition' data-ref="G4ParticleDefinition">G4ParticleDefinition</a>* <dfn class="local col8 decl" id="58particle" title='particle' data-type='const G4ParticleDefinition *' data-ref="58particle">particle</dfn>,  <i>// Projectile (ion)</i></td></tr>
+<tr><th id="379">379</th><td>              <em>const</em> <a class="type" href="../../../../materials/include/G4Material.hh.html#G4Material" title='G4Material' data-ref="G4Material">G4Material</a>* <dfn class="local col9 decl" id="59material" title='material' data-type='const G4Material *' data-ref="59material">material</dfn>) {          <i>// Target material</i></td></tr>
+<tr><th id="380">380</th><td></td></tr>
+<tr><th id="381">381</th><td>  <span class='error' title="unknown type name &apos;G4CacheKey&apos;">G4CacheKey</span> <dfn class="local col0 decl" id="60key" title='key' data-type='int' data-ref="60key">key</dfn> = <span class='error' title="use of undeclared identifier &apos;std&apos;">std</span>::make_pair(particle, material);</td></tr>
+<tr><th id="382">382</th><td></td></tr>
+<tr><th id="383">383</th><td>  <a class="typedef" href="../include/G4IonDEDXHandler.hh.html#G4IonDEDXHandler::G4CacheEntry" title='G4IonDEDXHandler::G4CacheEntry' data-type='struct CacheEntry' data-ref="G4IonDEDXHandler::G4CacheEntry">G4CacheEntry</a> <a class="ref fake" href="../include/G4IonDEDXHandler.hh.html#183" title='G4IonDEDXHandler::CacheEntry::CacheEntry' data-ref="_ZN16G4IonDEDXHandler10CacheEntryC1Ev"></a><dfn class="local col1 decl" id="61entry" title='entry' data-type='G4CacheEntry' data-ref="61entry">entry</dfn>;</td></tr>
+<tr><th id="384">384</th><td>  <span class='error' title="use of undeclared identifier &apos;CacheEntryList&apos;">CacheEntryList</span>::iterator* <dfn class="local col2 decl" id="62pointerIter" title='pointerIter' data-type='int *' data-ref="62pointerIter">pointerIter</dfn> =</td></tr>
+<tr><th id="385">385</th><td>                  (<span class='error' title="use of undeclared identifier &apos;CacheEntryList&apos;">CacheEntryList</span>::iterator*<span class='error' title="expected expression">)</span> cacheKeyPointers[key];</td></tr>
+<tr><th id="386">386</th><td></td></tr>
+<tr><th id="387">387</th><td>  <b>if</b>(!pointerIter) {</td></tr>
+<tr><th id="388">388</th><td>      <a class="local col1 ref" href="#61entry" title='entry' data-ref="61entry">entry</a>.<a class="ref" href="../include/G4IonDEDXHandler.hh.html#G4IonDEDXHandler::CacheEntry::value" title='G4IonDEDXHandler::CacheEntry::value' data-ref="G4IonDEDXHandler::CacheEntry::value">value</a> <a class="ref" href="../include/G4IonDEDXHandler.hh.html#68" title='CacheValue::operator=' data-ref="_ZN10CacheValueaSEOS_">=</a> <a class="member" href="#_ZN16G4IonDEDXHandler16UpdateCacheValueEPK20G4ParticleDefinitionPK10G4Material" title='G4IonDEDXHandler::UpdateCacheValue' data-ref="_ZN16G4IonDEDXHandler16UpdateCacheValueEPK20G4ParticleDefinitionPK10G4Material">UpdateCacheValue</a>(<a class="local col8 ref" href="#58particle" title='particle' data-ref="58particle">particle</a>, <a class="local col9 ref" href="#59material" title='material' data-ref="59material">material</a>);</td></tr>
+<tr><th id="389">389</th><td></td></tr>
+<tr><th id="390">390</th><td>      entry.key = key;</td></tr>
+<tr><th id="391">391</th><td>      cacheEntries.push_front(entry);</td></tr>
+<tr><th id="392">392</th><td></td></tr>
+<tr><th id="393">393</th><td>      <span class='error' title="use of undeclared identifier &apos;CacheEntryList&apos;">CacheEntryList</span>::iterator* <dfn class="local col3 decl" id="63pointerIter1" title='pointerIter1' data-type='int *' data-ref="63pointerIter1">pointerIter1</dfn> =</td></tr>
+<tr><th id="394">394</th><td>                                   <b>new</b> <span class='error' title="use of undeclared identifier &apos;CacheEntryList&apos;">CacheEntryList</span>::iterator();</td></tr>
+<tr><th id="395">395</th><td>      *pointerIter1 = cacheEntries.begin();</td></tr>
+<tr><th id="396">396</th><td>      cacheKeyPointers[key] = pointerIter1;</td></tr>
+<tr><th id="397">397</th><td></td></tr>
+<tr><th id="398">398</th><td>      <b>if</b>(G4int(cacheEntries.size()) &gt; maxCacheEntries) {</td></tr>
+<tr><th id="399">399</th><td></td></tr>
+<tr><th id="400">400</th><td>  	 <a class="typedef" href="../include/G4IonDEDXHandler.hh.html#G4IonDEDXHandler::G4CacheEntry" title='G4IonDEDXHandler::G4CacheEntry' data-type='struct CacheEntry' data-ref="G4IonDEDXHandler::G4CacheEntry">G4CacheEntry</a> <dfn class="local col4 decl" id="64lastEntry" title='lastEntry' data-type='G4CacheEntry' data-ref="64lastEntry">lastEntry</dfn> = cacheEntries.back();</td></tr>
+<tr><th id="401">401</th><td></td></tr>
+<tr><th id="402">402</th><td>         <em>void</em>* <dfn class="local col5 decl" id="65pointerIter2" title='pointerIter2' data-type='void *' data-ref="65pointerIter2">pointerIter2</dfn> = cacheKeyPointers[lastEntry.key];</td></tr>
+<tr><th id="403">403</th><td>         <span class='error' title="use of undeclared identifier &apos;CacheEntryList&apos;">CacheEntryList</span>::iterator* <dfn class="local col6 decl" id="66listPointerIter" title='listPointerIter' data-type='int *' data-ref="66listPointerIter">listPointerIter</dfn> =</td></tr>
+<tr><th id="404">404</th><td>                      	  (<span class='error' title="use of undeclared identifier &apos;CacheEntryList&apos;">CacheEntryList</span>::iterator*<span class='error' title="expected expression">)</span> pointerIter2;</td></tr>
+<tr><th id="405">405</th><td></td></tr>
+<tr><th id="406">406</th><td>         cacheEntries.erase(*listPointerIter);</td></tr>
+<tr><th id="407">407</th><td></td></tr>
+<tr><th id="408">408</th><td>         <b>delete</b> listPointerIter;</td></tr>
+<tr><th id="409">409</th><td>         cacheKeyPointers.erase(lastEntry.key);</td></tr>
+<tr><th id="410">410</th><td>      }</td></tr>
+<tr><th id="411">411</th><td>  }</td></tr>
+<tr><th id="412">412</th><td>  <b>else</b> {</td></tr>
+<tr><th id="413">413</th><td>      entry = *(*pointerIter);</td></tr>
+<tr><th id="414">414</th><td>      <i>// Cache entries are currently not re-ordered.</i></td></tr>
+<tr><th id="415">415</th><td><i>      // Uncomment for activating re-ordering:</i></td></tr>
+<tr><th id="416">416</th><td><i>      //      cacheEntries.erase(*pointerIter);</i></td></tr>
+<tr><th id="417">417</th><td><i>      //      cacheEntries.push_front(entry);</i></td></tr>
+<tr><th id="418">418</th><td><i>      //      *pointerIter = cacheEntries.begin();</i></td></tr>
+<tr><th id="419">419</th><td>  }</td></tr>
+<tr><th id="420">420</th><td>  <b>return</b> <a class="ref fake" href="../include/G4IonDEDXHandler.hh.html#68" title='CacheValue::CacheValue' data-ref="_ZN10CacheValueC1ERKS_"></a><a class="local col1 ref" href="#61entry" title='entry' data-ref="61entry">entry</a>.<a class="ref" href="../include/G4IonDEDXHandler.hh.html#G4IonDEDXHandler::CacheEntry::value" title='G4IonDEDXHandler::CacheEntry::value' data-ref="G4IonDEDXHandler::CacheEntry::value">value</a>;</td></tr>
+<tr><th id="421">421</th><td>}</td></tr>
+<tr><th id="422">422</th><td></td></tr>
+<tr><th id="423">423</th><td><i>// #########################################################################</i></td></tr>
+<tr><th id="424">424</th><td></td></tr>
+<tr><th id="425">425</th><td><em>void</em> <a class="type" href="../include/G4IonDEDXHandler.hh.html#G4IonDEDXHandler" title='G4IonDEDXHandler' data-ref="G4IonDEDXHandler">G4IonDEDXHandler</a>::<dfn class="decl def" id="_ZN16G4IonDEDXHandler10ClearCacheEv" title='G4IonDEDXHandler::ClearCache' data-ref="_ZN16G4IonDEDXHandler10ClearCacheEv">ClearCache</dfn>() {</td></tr>
+<tr><th id="426">426</th><td></td></tr>
+<tr><th id="427">427</th><td>  <span class='error' title="use of undeclared identifier &apos;CacheIterPointerMap&apos;">CacheIterPointerMap</span>::iterator <dfn class="local col7 decl" id="67iter" title='iter' data-type='int' data-ref="67iter">iter</dfn> = cacheKeyPointers.begin();</td></tr>
+<tr><th id="428">428</th><td>  <span class='error' title="use of undeclared identifier &apos;CacheIterPointerMap&apos;">CacheIterPointerMap</span>::iterator <dfn class="local col8 decl" id="68iter_end" title='iter_end' data-type='int' data-ref="68iter_end">iter_end</dfn> = cacheKeyPointers.end();</td></tr>
+<tr><th id="429">429</th><td></td></tr>
+<tr><th id="430">430</th><td>  <b>for</b>(;iter != iter_end; iter++) {</td></tr>
+<tr><th id="431">431</th><td>      <em>void</em>* <dfn class="local col9 decl" id="69pointerIter" title='pointerIter' data-type='void *' data-ref="69pointerIter">pointerIter</dfn> = iter -&gt; second;</td></tr>
+<tr><th id="432">432</th><td>      <span class='error' title="use of undeclared identifier &apos;CacheEntryList&apos;">CacheEntryList</span>::iterator* <dfn class="local col0 decl" id="70listPointerIter" title='listPointerIter' data-type='int *' data-ref="70listPointerIter">listPointerIter</dfn> =</td></tr>
+<tr><th id="433">433</th><td>                      	  (<span class='error' title="use of undeclared identifier &apos;CacheEntryList&apos;">CacheEntryList</span>::iterator*<span class='error' title="expected expression">)</span> pointerIter;</td></tr>
+<tr><th id="434">434</th><td></td></tr>
+<tr><th id="435">435</th><td>      <b>delete</b> listPointerIter;</td></tr>
+<tr><th id="436">436</th><td>  }</td></tr>
+<tr><th id="437">437</th><td></td></tr>
+<tr><th id="438">438</th><td>  cacheEntries.clear();</td></tr>
+<tr><th id="439">439</th><td>  cacheKeyPointers.clear();</td></tr>
+<tr><th id="440">440</th><td>}</td></tr>
+<tr><th id="441">441</th><td></td></tr>
+<tr><th id="442">442</th><td><i>// #########################################################################</i></td></tr>
+<tr><th id="443">443</th><td></td></tr>
+<tr><th id="444">444</th><td><em>void</em> <a class="type" href="../include/G4IonDEDXHandler.hh.html#G4IonDEDXHandler" title='G4IonDEDXHandler' data-ref="G4IonDEDXHandler">G4IonDEDXHandler</a>::<dfn class="decl def" id="_ZN16G4IonDEDXHandler14PrintDEDXTableEPK20G4ParticleDefinitionPK10G4Materialddib" title='G4IonDEDXHandler::PrintDEDXTable' data-ref="_ZN16G4IonDEDXHandler14PrintDEDXTableEPK20G4ParticleDefinitionPK10G4Materialddib">PrintDEDXTable</dfn>(</td></tr>
+<tr><th id="445">445</th><td>                  <em>const</em> <a class="type" href="../../../../particles/management/include/G4ParticleDefinition.hh.html#G4ParticleDefinition" title='G4ParticleDefinition' data-ref="G4ParticleDefinition">G4ParticleDefinition</a>* <dfn class="local col1 decl" id="71particle" title='particle' data-type='const G4ParticleDefinition *' data-ref="71particle">particle</dfn>,  <i>// Projectile (ion)</i></td></tr>
+<tr><th id="446">446</th><td>                  <em>const</em> <a class="type" href="../../../../materials/include/G4Material.hh.html#G4Material" title='G4Material' data-ref="G4Material">G4Material</a>* <dfn class="local col2 decl" id="72material" title='material' data-type='const G4Material *' data-ref="72material">material</dfn>,  <i>// Target material</i></td></tr>
+<tr><th id="447">447</th><td>                  <a class="typedef" href="../../../../global/management/include/G4Types.hh.html#G4double" title='G4double' data-type='double' data-ref="G4double">G4double</a> <dfn class="local col3 decl" id="73lowerBoundary" title='lowerBoundary' data-type='G4double' data-ref="73lowerBoundary">lowerBoundary</dfn>,      <i>// Minimum energy per nucleon</i></td></tr>
+<tr><th id="448">448</th><td>                  <a class="typedef" href="../../../../global/management/include/G4Types.hh.html#G4double" title='G4double' data-type='double' data-ref="G4double">G4double</a> <dfn class="local col4 decl" id="74upperBoundary" title='upperBoundary' data-type='G4double' data-ref="74upperBoundary">upperBoundary</dfn>,      <i>// Maximum energy per nucleon</i></td></tr>
+<tr><th id="449">449</th><td>                  <a class="typedef" href="../../../../global/management/include/G4Types.hh.html#G4int" title='G4int' data-type='int' data-ref="G4int">G4int</a> <dfn class="local col5 decl" id="75nmbBins" title='nmbBins' data-type='G4int' data-ref="75nmbBins">nmbBins</dfn>,               <i>// Number of bins</i></td></tr>
+<tr><th id="450">450</th><td>                  <a class="typedef" href="../../../../global/management/include/G4Types.hh.html#G4bool" title='G4bool' data-type='bool' data-ref="G4bool">G4bool</a> <dfn class="local col6 decl" id="76logScaleEnergy" title='logScaleEnergy' data-type='G4bool' data-ref="76logScaleEnergy">logScaleEnergy</dfn>) {     <i>// Logarithmic scaling of energy</i></td></tr>
+<tr><th id="451">451</th><td></td></tr>
+<tr><th id="452">452</th><td>  <a class="typedef" href="../../../../global/management/include/G4Types.hh.html#G4double" title='G4double' data-type='double' data-ref="G4double">G4double</a> <dfn class="local col7 decl" id="77atomicMassNumber" title='atomicMassNumber' data-type='G4double' data-ref="77atomicMassNumber">atomicMassNumber</dfn> = <a class="local col1 ref" href="#71particle" title='particle' data-ref="71particle">particle</a> -&gt; <a class="ref" href="../../../../particles/management/include/G4ParticleDefinition.hh.html#_ZNK20G4ParticleDefinition13GetAtomicMassEv" title='G4ParticleDefinition::GetAtomicMass' data-ref="_ZNK20G4ParticleDefinition13GetAtomicMassEv">GetAtomicMass</a>();</td></tr>
+<tr><th id="453">453</th><td>  <a class="typedef" href="../../../../global/management/include/G4Types.hh.html#G4double" title='G4double' data-type='double' data-ref="G4double">G4double</a> <dfn class="local col8 decl" id="78materialDensity" title='materialDensity' data-type='G4double' data-ref="78materialDensity">materialDensity</dfn> = <a class="local col2 ref" href="#72material" title='material' data-ref="72material">material</a> -&gt; <a class="ref" href="../../../../materials/include/G4Material.hh.html#_ZNK10G4Material10GetDensityEv" title='G4Material::GetDensity' data-ref="_ZNK10G4Material10GetDensityEv">GetDensity</a>();</td></tr>
+<tr><th id="454">454</th><td></td></tr>
+<tr><th id="455">455</th><td>  <a class="macro" href="../../../../global/management/include/G4ios.hh.html#46" title="(*_G4cout_p())" data-ref="_M/G4cout">G4cout</a> <span class='error' title="invalid operands to binary expression (&apos;int&apos; and &apos;const char *&apos;)">&lt;&lt;</span> <q>"# dE/dx table for "</q> &lt;&lt; particle -&gt; GetParticleName()</td></tr>
+<tr><th id="456">456</th><td>         &lt;&lt; <q>" in material "</q> &lt;&lt; material -&gt; GetName()</td></tr>
+<tr><th id="457">457</th><td>         &lt;&lt; <q>" of density "</q> &lt;&lt; materialDensity / g * cm3</td></tr>
+<tr><th id="458">458</th><td>         &lt;&lt; <q>" g/cm3"</q></td></tr>
+<tr><th id="459">459</th><td>         &lt;&lt; <a class="macro" href="../../../../global/management/include/G4ios.hh.html#60" title="std::endl" data-ref="_M/G4endl">G4endl</a></td></tr>
+<tr><th id="460">460</th><td>         &lt;&lt; <q>"# Projectile mass number A1 = "</q> &lt;&lt; atomicMassNumber</td></tr>
+<tr><th id="461">461</th><td>         &lt;&lt; <a class="macro" href="../../../../global/management/include/G4ios.hh.html#60" title="std::endl" data-ref="_M/G4endl">G4endl</a></td></tr>
+<tr><th id="462">462</th><td>         &lt;&lt; <q>"# Energy range (per nucleon) of tabulation: "</q></td></tr>
+<tr><th id="463">463</th><td>         &lt;&lt; GetLowerEnergyEdge(particle, material) / atomicMassNumber / MeV</td></tr>
+<tr><th id="464">464</th><td>         &lt;&lt; <q>" - "</q></td></tr>
+<tr><th id="465">465</th><td>         &lt;&lt; GetUpperEnergyEdge(particle, material) / atomicMassNumber / MeV</td></tr>
+<tr><th id="466">466</th><td>         &lt;&lt; <q>" MeV"</q></td></tr>
+<tr><th id="467">467</th><td>         &lt;&lt; <a class="macro" href="../../../../global/management/include/G4ios.hh.html#60" title="std::endl" data-ref="_M/G4endl">G4endl</a></td></tr>
+<tr><th id="468">468</th><td>         &lt;&lt; <q>"# ------------------------------------------------------"</q></td></tr>
+<tr><th id="469">469</th><td>         &lt;&lt; <a class="macro" href="../../../../global/management/include/G4ios.hh.html#60" title="std::endl" data-ref="_M/G4endl">G4endl</a>;</td></tr>
+<tr><th id="470">470</th><td>  <a class="macro" href="../../../../global/management/include/G4ios.hh.html#46" title="(*_G4cout_p())" data-ref="_M/G4cout">G4cout</a> <span class='error' title="invalid operands to binary expression (&apos;int&apos; and &apos;const char *&apos;)">&lt;&lt;</span> <q>"#"</q></td></tr>
+<tr><th id="471">471</th><td>         &lt;&lt; <span class='error' title="use of undeclared identifier &apos;std&apos;">std</span>::setw(<var>13</var>) &lt;&lt; <span class='error' title="use of undeclared identifier &apos;std&apos;">std</span>::right &lt;&lt; <q>"E"</q></td></tr>
+<tr><th id="472">472</th><td>         &lt;&lt; <span class='error' title="use of undeclared identifier &apos;std&apos;">std</span>::setw(<var>14</var>) &lt;&lt; <q>"E/A1"</q></td></tr>
+<tr><th id="473">473</th><td>         &lt;&lt; <span class='error' title="use of undeclared identifier &apos;std&apos;">std</span>::setw(<var>14</var>) &lt;&lt; <q>"dE/dx"</q></td></tr>
+<tr><th id="474">474</th><td>         &lt;&lt; <span class='error' title="use of undeclared identifier &apos;std&apos;">std</span>::setw(<var>14</var>) &lt;&lt; <q>"1/rho*dE/dx"</q></td></tr>
+<tr><th id="475">475</th><td>         &lt;&lt; <a class="macro" href="../../../../global/management/include/G4ios.hh.html#60" title="std::endl" data-ref="_M/G4endl">G4endl</a>;</td></tr>
+<tr><th id="476">476</th><td>  <a class="macro" href="../../../../global/management/include/G4ios.hh.html#46" title="(*_G4cout_p())" data-ref="_M/G4cout">G4cout</a> <span class='error' title="invalid operands to binary expression (&apos;int&apos; and &apos;const char *&apos;)">&lt;&lt;</span> <q>"#"</q></td></tr>
+<tr><th id="477">477</th><td>         &lt;&lt; <span class='error' title="use of undeclared identifier &apos;std&apos;">std</span>::setw(<var>13</var>) &lt;&lt; <span class='error' title="use of undeclared identifier &apos;std&apos;">std</span>::right &lt;&lt; <q>"(MeV)"</q></td></tr>
+<tr><th id="478">478</th><td>         &lt;&lt; <span class='error' title="use of undeclared identifier &apos;std&apos;">std</span>::setw(<var>14</var>) &lt;&lt; <q>"(MeV)"</q></td></tr>
+<tr><th id="479">479</th><td>         &lt;&lt; <span class='error' title="use of undeclared identifier &apos;std&apos;">std</span>::setw(<var>14</var>) &lt;&lt; <q>"(MeV/cm)"</q></td></tr>
+<tr><th id="480">480</th><td>         &lt;&lt; <span class='error' title="use of undeclared identifier &apos;std&apos;">std</span>::setw(<var>14</var>) &lt;&lt; <q>"(MeV*cm2/mg)"</q></td></tr>
+<tr><th id="481">481</th><td>         &lt;&lt; <a class="macro" href="../../../../global/management/include/G4ios.hh.html#60" title="std::endl" data-ref="_M/G4endl">G4endl</a></td></tr>
+<tr><th id="482">482</th><td>         &lt;&lt; <q>"# ------------------------------------------------------"</q></td></tr>
+<tr><th id="483">483</th><td>         &lt;&lt; <a class="macro" href="../../../../global/management/include/G4ios.hh.html#60" title="std::endl" data-ref="_M/G4endl">G4endl</a>;</td></tr>
+<tr><th id="484">484</th><td></td></tr>
+<tr><th id="485">485</th><td>  <i>//G4CacheValue value = GetCacheValue(particle, material);</i></td></tr>
+<tr><th id="486">486</th><td></td></tr>
+<tr><th id="487">487</th><td>  <a class="typedef" href="../../../../global/management/include/G4Types.hh.html#G4double" title='G4double' data-type='double' data-ref="G4double">G4double</a> <dfn class="local col9 decl" id="79energyLowerBoundary" title='energyLowerBoundary' data-type='G4double' data-ref="79energyLowerBoundary">energyLowerBoundary</dfn> = <a class="local col3 ref" href="#73lowerBoundary" title='lowerBoundary' data-ref="73lowerBoundary">lowerBoundary</a> * <a class="local col7 ref" href="#77atomicMassNumber" title='atomicMassNumber' data-ref="77atomicMassNumber">atomicMassNumber</a>;</td></tr>
+<tr><th id="488">488</th><td>  <a class="typedef" href="../../../../global/management/include/G4Types.hh.html#G4double" title='G4double' data-type='double' data-ref="G4double">G4double</a> <dfn class="local col0 decl" id="80energyUpperBoundary" title='energyUpperBoundary' data-type='G4double' data-ref="80energyUpperBoundary">energyUpperBoundary</dfn> = <a class="local col4 ref" href="#74upperBoundary" title='upperBoundary' data-ref="74upperBoundary">upperBoundary</a> * <a class="local col7 ref" href="#77atomicMassNumber" title='atomicMassNumber' data-ref="77atomicMassNumber">atomicMassNumber</a>;</td></tr>
+<tr><th id="489">489</th><td></td></tr>
+<tr><th id="490">490</th><td>  <b>if</b>(<a class="local col6 ref" href="#76logScaleEnergy" title='logScaleEnergy' data-ref="76logScaleEnergy">logScaleEnergy</a>) {</td></tr>
+<tr><th id="491">491</th><td></td></tr>
+<tr><th id="492">492</th><td>     energyLowerBoundary = <span class='error' title="use of undeclared identifier &apos;std&apos;">std</span>::log(energyLowerBoundary);</td></tr>
+<tr><th id="493">493</th><td>     energyUpperBoundary = <span class='error' title="use of undeclared identifier &apos;std&apos;">std</span>::log(energyUpperBoundary);</td></tr>
+<tr><th id="494">494</th><td>  }</td></tr>
+<tr><th id="495">495</th><td></td></tr>
+<tr><th id="496">496</th><td>  <a class="typedef" href="../../../../global/management/include/G4Types.hh.html#G4double" title='G4double' data-type='double' data-ref="G4double">G4double</a> <dfn class="local col1 decl" id="81deltaEnergy" title='deltaEnergy' data-type='G4double' data-ref="81deltaEnergy">deltaEnergy</dfn> = (<a class="local col0 ref" href="#80energyUpperBoundary" title='energyUpperBoundary' data-ref="80energyUpperBoundary">energyUpperBoundary</a> - <a class="local col9 ref" href="#79energyLowerBoundary" title='energyLowerBoundary' data-ref="79energyLowerBoundary">energyLowerBoundary</a>) /</td></tr>
+<tr><th id="497">497</th><td>                                                           <a class="typedef" href="../../../../global/management/include/G4Types.hh.html#G4double" title='G4double' data-type='double' data-ref="G4double">G4double</a>(<a class="local col5 ref" href="#75nmbBins" title='nmbBins' data-ref="75nmbBins">nmbBins</a>);</td></tr>
+<tr><th id="498">498</th><td></td></tr>
+<tr><th id="499">499</th><td>  <a class="macro" href="../../../../global/management/include/G4ios.hh.html#46" title="(*_G4cout_p())" data-ref="_M/G4cout">G4cout</a><span class='error' title="member reference base type &apos;int&apos; is not a structure or union">.</span>precision(<var>6</var>);</td></tr>
+<tr><th id="500">500</th><td>  <b>for</b>(<em>int</em> <dfn class="local col2 decl" id="82i" title='i' data-type='int' data-ref="82i">i</dfn> = <var>0</var>; <a class="local col2 ref" href="#82i" title='i' data-ref="82i">i</a> &lt; <a class="local col5 ref" href="#75nmbBins" title='nmbBins' data-ref="75nmbBins">nmbBins</a> + <var>1</var>; <a class="local col2 ref" href="#82i" title='i' data-ref="82i">i</a>++) {</td></tr>
+<tr><th id="501">501</th><td></td></tr>
+<tr><th id="502">502</th><td>      <a class="typedef" href="../../../../global/management/include/G4Types.hh.html#G4double" title='G4double' data-type='double' data-ref="G4double">G4double</a> <dfn class="local col3 decl" id="83energy" title='energy' data-type='G4double' data-ref="83energy">energy</dfn> = <a class="local col9 ref" href="#79energyLowerBoundary" title='energyLowerBoundary' data-ref="79energyLowerBoundary">energyLowerBoundary</a> + <a class="local col2 ref" href="#82i" title='i' data-ref="82i">i</a> * <a class="local col1 ref" href="#81deltaEnergy" title='deltaEnergy' data-ref="81deltaEnergy">deltaEnergy</a>;</td></tr>
+<tr><th id="503">503</th><td>      <b>if</b>(<a class="local col6 ref" href="#76logScaleEnergy" title='logScaleEnergy' data-ref="76logScaleEnergy">logScaleEnergy</a>) <a class="local col3 ref" href="#83energy" title='energy' data-ref="83energy">energy</a> = <a class="ref" href="../../../../global/management/include/G4Exp.hh.html#_Z5G4Expd" title='G4Exp' data-ref="_Z5G4Expd">G4Exp</a>(<a class="local col3 ref" href="#83energy" title='energy' data-ref="83energy">energy</a>);</td></tr>
+<tr><th id="504">504</th><td></td></tr>
+<tr><th id="505">505</th><td>      <a class="typedef" href="../../../../global/management/include/G4Types.hh.html#G4double" title='G4double' data-type='double' data-ref="G4double">G4double</a> <dfn class="local col4 decl" id="84loss" title='loss' data-type='G4double' data-ref="84loss">loss</dfn> = <a class="member" href="#_ZN16G4IonDEDXHandler7GetDEDXEPK20G4ParticleDefinitionPK10G4Materiald" title='G4IonDEDXHandler::GetDEDX' data-ref="_ZN16G4IonDEDXHandler7GetDEDXEPK20G4ParticleDefinitionPK10G4Materiald">GetDEDX</a>(<a class="local col1 ref" href="#71particle" title='particle' data-ref="71particle">particle</a>, <a class="local col2 ref" href="#72material" title='material' data-ref="72material">material</a>, <a class="local col3 ref" href="#83energy" title='energy' data-ref="83energy">energy</a>);</td></tr>
+<tr><th id="506">506</th><td></td></tr>
+<tr><th id="507">507</th><td>      <a class="macro" href="../../../../global/management/include/G4ios.hh.html#46" title="(*_G4cout_p())" data-ref="_M/G4cout">G4cout</a> &lt;&lt; <span class='error' title="use of undeclared identifier &apos;std&apos;">std</span>::setw(<var>14</var>) &lt;&lt; <span class='error' title="use of undeclared identifier &apos;std&apos;">std</span>::right &lt;&lt; energy / MeV</td></tr>
+<tr><th id="508">508</th><td>             &lt;&lt; <span class='error' title="use of undeclared identifier &apos;std&apos;">std</span>::setw(<var>14</var>) &lt;&lt; energy / atomicMassNumber / MeV</td></tr>
+<tr><th id="509">509</th><td>             &lt;&lt; <span class='error' title="use of undeclared identifier &apos;std&apos;">std</span>::setw(<var>14</var>) &lt;&lt; loss / MeV * cm</td></tr>
+<tr><th id="510">510</th><td>             &lt;&lt; <span class='error' title="use of undeclared identifier &apos;std&apos;">std</span>::setw(<var>14</var>) &lt;&lt; loss / materialDensity / (MeV*cm2/(<var>0.001</var>*g))</td></tr>
+<tr><th id="511">511</th><td>             &lt;&lt; <a class="macro" href="../../../../global/management/include/G4ios.hh.html#60" title="std::endl" data-ref="_M/G4endl">G4endl</a>;</td></tr>
+<tr><th id="512">512</th><td>  }</td></tr>
+<tr><th id="513">513</th><td>}</td></tr>
+<tr><th id="514">514</th><td></td></tr>
+<tr><th id="515">515</th><td><i>// #########################################################################</i></td></tr>
+<tr><th id="516">516</th><td></td></tr>
+<tr><th id="517">517</th><td><a class="typedef" href="../../../../global/management/include/G4Types.hh.html#G4double" title='G4double' data-type='double' data-ref="G4double">G4double</a> <a class="type" href="../include/G4IonDEDXHandler.hh.html#G4IonDEDXHandler" title='G4IonDEDXHandler' data-ref="G4IonDEDXHandler">G4IonDEDXHandler</a>::<dfn class="decl def" id="_ZN16G4IonDEDXHandler18GetLowerEnergyEdgeEPK20G4ParticleDefinitionPK10G4Material" title='G4IonDEDXHandler::GetLowerEnergyEdge' data-ref="_ZN16G4IonDEDXHandler18GetLowerEnergyEdgeEPK20G4ParticleDefinitionPK10G4Material">GetLowerEnergyEdge</dfn>(</td></tr>
+<tr><th id="518">518</th><td>                 <em>const</em> <a class="type" href="../../../../particles/management/include/G4ParticleDefinition.hh.html#G4ParticleDefinition" title='G4ParticleDefinition' data-ref="G4ParticleDefinition">G4ParticleDefinition</a>* <dfn class="local col5 decl" id="85particle" title='particle' data-type='const G4ParticleDefinition *' data-ref="85particle">particle</dfn>,  <i>// Projectile (ion)</i></td></tr>
+<tr><th id="519">519</th><td>                 <em>const</em> <a class="type" href="../../../../materials/include/G4Material.hh.html#G4Material" title='G4Material' data-ref="G4Material">G4Material</a>* <dfn class="local col6 decl" id="86material" title='material' data-type='const G4Material *' data-ref="86material">material</dfn>) {          <i>// Target material</i></td></tr>
+<tr><th id="520">520</th><td></td></tr>
+<tr><th id="521">521</th><td>  <a class="typedef" href="../../../../global/management/include/G4Types.hh.html#G4double" title='G4double' data-type='double' data-ref="G4double">G4double</a> <dfn class="local col7 decl" id="87edge" title='edge' data-type='G4double' data-ref="87edge">edge</dfn> = <var>0.0</var>;</td></tr>
+<tr><th id="522">522</th><td></td></tr>
+<tr><th id="523">523</th><td>  <a class="typedef" href="../include/G4IonDEDXHandler.hh.html#G4CacheValue" title='G4CacheValue' data-type='struct CacheValue' data-ref="G4CacheValue">G4CacheValue</a> <dfn class="local col8 decl" id="88value" title='value' data-type='G4CacheValue' data-ref="88value">value</dfn> = <a class="member" href="#_ZN16G4IonDEDXHandler13GetCacheValueEPK20G4ParticleDefinitionPK10G4Material" title='G4IonDEDXHandler::GetCacheValue' data-ref="_ZN16G4IonDEDXHandler13GetCacheValueEPK20G4ParticleDefinitionPK10G4Material">GetCacheValue</a>(<a class="local col5 ref" href="#85particle" title='particle' data-ref="85particle">particle</a>, <a class="local col6 ref" href="#86material" title='material' data-ref="86material">material</a>);</td></tr>
+<tr><th id="524">524</th><td></td></tr>
+<tr><th id="525">525</th><td>  <b>if</b>(<a class="local col8 ref" href="#88value" title='value' data-ref="88value">value</a>.<a class="ref" href="../include/G4IonDEDXHandler.hh.html#CacheValue::energyScaling" title='CacheValue::energyScaling' data-ref="CacheValue::energyScaling">energyScaling</a> &gt; <var>0</var>)</td></tr>
+<tr><th id="526">526</th><td>          <a class="local col7 ref" href="#87edge" title='edge' data-ref="87edge">edge</a> = <a class="local col8 ref" href="#88value" title='value' data-ref="88value">value</a>.<a class="ref" href="../include/G4IonDEDXHandler.hh.html#CacheValue::lowerEnergyEdge" title='CacheValue::lowerEnergyEdge' data-ref="CacheValue::lowerEnergyEdge">lowerEnergyEdge</a> / <a class="local col8 ref" href="#88value" title='value' data-ref="88value">value</a>.<a class="ref" href="../include/G4IonDEDXHandler.hh.html#CacheValue::energyScaling" title='CacheValue::energyScaling' data-ref="CacheValue::energyScaling">energyScaling</a>;</td></tr>
+<tr><th id="527">527</th><td></td></tr>
+<tr><th id="528">528</th><td>  <b>return</b> <a class="local col7 ref" href="#87edge" title='edge' data-ref="87edge">edge</a>;</td></tr>
+<tr><th id="529">529</th><td>}</td></tr>
+<tr><th id="530">530</th><td></td></tr>
+<tr><th id="531">531</th><td><i>// #########################################################################</i></td></tr>
+<tr><th id="532">532</th><td></td></tr>
+<tr><th id="533">533</th><td><a class="typedef" href="../../../../global/management/include/G4Types.hh.html#G4double" title='G4double' data-type='double' data-ref="G4double">G4double</a> <a class="type" href="../include/G4IonDEDXHandler.hh.html#G4IonDEDXHandler" title='G4IonDEDXHandler' data-ref="G4IonDEDXHandler">G4IonDEDXHandler</a>::<dfn class="decl def" id="_ZN16G4IonDEDXHandler18GetUpperEnergyEdgeEPK20G4ParticleDefinitionPK10G4Material" title='G4IonDEDXHandler::GetUpperEnergyEdge' data-ref="_ZN16G4IonDEDXHandler18GetUpperEnergyEdgeEPK20G4ParticleDefinitionPK10G4Material">GetUpperEnergyEdge</dfn>(</td></tr>
+<tr><th id="534">534</th><td>                 <em>const</em> <a class="type" href="../../../../particles/management/include/G4ParticleDefinition.hh.html#G4ParticleDefinition" title='G4ParticleDefinition' data-ref="G4ParticleDefinition">G4ParticleDefinition</a>* <dfn class="local col9 decl" id="89particle" title='particle' data-type='const G4ParticleDefinition *' data-ref="89particle">particle</dfn>,  <i>// Projectile (ion)</i></td></tr>
+<tr><th id="535">535</th><td>                 <em>const</em> <a class="type" href="../../../../materials/include/G4Material.hh.html#G4Material" title='G4Material' data-ref="G4Material">G4Material</a>* <dfn class="local col0 decl" id="90material" title='material' data-type='const G4Material *' data-ref="90material">material</dfn>) {          <i>// Target material</i></td></tr>
+<tr><th id="536">536</th><td></td></tr>
+<tr><th id="537">537</th><td>  <a class="typedef" href="../../../../global/management/include/G4Types.hh.html#G4double" title='G4double' data-type='double' data-ref="G4double">G4double</a> <dfn class="local col1 decl" id="91edge" title='edge' data-type='G4double' data-ref="91edge">edge</dfn> = <var>0.0</var>;</td></tr>
+<tr><th id="538">538</th><td></td></tr>
+<tr><th id="539">539</th><td>  <a class="typedef" href="../include/G4IonDEDXHandler.hh.html#G4CacheValue" title='G4CacheValue' data-type='struct CacheValue' data-ref="G4CacheValue">G4CacheValue</a> <dfn class="local col2 decl" id="92value" title='value' data-type='G4CacheValue' data-ref="92value">value</dfn> = <a class="member" href="#_ZN16G4IonDEDXHandler13GetCacheValueEPK20G4ParticleDefinitionPK10G4Material" title='G4IonDEDXHandler::GetCacheValue' data-ref="_ZN16G4IonDEDXHandler13GetCacheValueEPK20G4ParticleDefinitionPK10G4Material">GetCacheValue</a>(<a class="local col9 ref" href="#89particle" title='particle' data-ref="89particle">particle</a>, <a class="local col0 ref" href="#90material" title='material' data-ref="90material">material</a>);</td></tr>
+<tr><th id="540">540</th><td></td></tr>
+<tr><th id="541">541</th><td>  <b>if</b>(<a class="local col2 ref" href="#92value" title='value' data-ref="92value">value</a>.<a class="ref" href="../include/G4IonDEDXHandler.hh.html#CacheValue::energyScaling" title='CacheValue::energyScaling' data-ref="CacheValue::energyScaling">energyScaling</a> &gt; <var>0</var>)</td></tr>
+<tr><th id="542">542</th><td>          <a class="local col1 ref" href="#91edge" title='edge' data-ref="91edge">edge</a> = <a class="local col2 ref" href="#92value" title='value' data-ref="92value">value</a>.<a class="ref" href="../include/G4IonDEDXHandler.hh.html#CacheValue::upperEnergyEdge" title='CacheValue::upperEnergyEdge' data-ref="CacheValue::upperEnergyEdge">upperEnergyEdge</a> / <a class="local col2 ref" href="#92value" title='value' data-ref="92value">value</a>.<a class="ref" href="../include/G4IonDEDXHandler.hh.html#CacheValue::energyScaling" title='CacheValue::energyScaling' data-ref="CacheValue::energyScaling">energyScaling</a>;</td></tr>
+<tr><th id="543">543</th><td></td></tr>
+<tr><th id="544">544</th><td>  <b>return</b> <a class="local col1 ref" href="#91edge" title='edge' data-ref="91edge">edge</a>;</td></tr>
+<tr><th id="545">545</th><td>}</td></tr>
+<tr><th id="546">546</th><td></td></tr>
+<tr><th id="547">547</th><td><i>// #########################################################################</i></td></tr>
+<tr><th id="548">548</th><td></td></tr>
+<tr><th id="549">549</th><td><a class="type" href="../../../../global/management/include/G4String.hh.html#G4String" title='G4String' data-ref="G4String">G4String</a> <a class="type" href="../include/G4IonDEDXHandler.hh.html#G4IonDEDXHandler" title='G4IonDEDXHandler' data-ref="G4IonDEDXHandler">G4IonDEDXHandler</a>::<dfn class="decl def" id="_ZN16G4IonDEDXHandler7GetNameEv" title='G4IonDEDXHandler::GetName' data-ref="_ZN16G4IonDEDXHandler7GetNameEv">GetName</dfn>() {</td></tr>
+<tr><th id="550">550</th><td></td></tr>
+<tr><th id="551">551</th><td>  <b>return</b> <a class="ref fake" href="../../../../global/management/include/G4String.hh.html#_ZN8G4StringC1ERKS_" title='G4String::G4String' data-ref="_ZN8G4StringC1ERKS_"></a><a class="member" href="../include/G4IonDEDXHandler.hh.html#G4IonDEDXHandler::tableName" title='G4IonDEDXHandler::tableName' data-ref="G4IonDEDXHandler::tableName">tableName</a>;</td></tr>
+<tr><th id="552">552</th><td>}</td></tr>
+<tr><th id="553">553</th><td></td></tr>
+<tr><th id="554">554</th><td><i>// #########################################################################</i></td></tr>
+<tr><th id="555">555</th><td></td></tr>
+</table><hr/><p id='footer'>
+Generated on <em>2019-Aug-28</em> from project codebrowser<br />Powered by <a href='https://woboq.com'><img alt='Woboq' src='https://code.woboq.org/woboq-16.png' width='41' height='16' /></a> <a href='https://code.woboq.org'>Code Browser</a> 2.1
+<br/>Generator usage only permitted with license.</p>
+</div></body></html>

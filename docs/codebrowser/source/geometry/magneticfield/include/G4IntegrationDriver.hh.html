@@ -1,0 +1,174 @@
+<!doctype html>
+<html>
+<head>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"><title>G4IntegrationDriver.hh source code [codebrowser/source/geometry/magneticfield/include/G4IntegrationDriver.hh] - Woboq Code Browser</title>
+<meta name="woboq:interestingDefinitions" content="G4IntegrationDriver "/>
+<link rel="stylesheet" href="../../../../../../data/qtcreator.css" title="QtCreator"/>
+<link rel="alternate stylesheet" href="../../../../../../data/kdevelop.css" title="KDevelop"/>
+<script type="text/javascript" src="../../../../../../data/jquery/jquery.min.js"></script>
+<script type="text/javascript" src="../../../../../../data/jquery/jquery-ui.min.js"></script>
+<script>var file = 'codebrowser/source/geometry/magneticfield/include/G4IntegrationDriver.hh'; var root_path = '../../../../..'; var data_path = '../../../../../../data';</script>
+<script src='../../../../../../data/codebrowser.js'></script>
+</head>
+<body><div id='header'><h1 id='breadcrumb'><span>Browse the source code of </span><a href='../../../..'>codebrowser</a>/<a href='../../..'>source</a>/<a href='../..'>geometry</a>/<a href='..'>magneticfield</a>/<a href='./'>include</a>/<a href='G4IntegrationDriver.hh.html'>G4IntegrationDriver.hh</a></h1></div>
+<hr/><div id='content'><table class="code">
+<tr><th id="1">1</th><td><i>//</i></td></tr>
+<tr><th id="2">2</th><td><i>// ********************************************************************</i></td></tr>
+<tr><th id="3">3</th><td><i>// * License and Disclaimer                                           *</i></td></tr>
+<tr><th id="4">4</th><td><i>// *                                                                  *</i></td></tr>
+<tr><th id="5">5</th><td><i>// * The  Geant4 software  is  copyright of the Copyright Holders  of *</i></td></tr>
+<tr><th id="6">6</th><td><i>// * the Geant4 Collaboration.  It is provided  under  the terms  and *</i></td></tr>
+<tr><th id="7">7</th><td><i>// * conditions of the Geant4 Software License,  included in the file *</i></td></tr>
+<tr><th id="8">8</th><td><i>// * LICENSE and available at  <a href="http://cern.ch/geant4/license">http://cern.ch/geant4/license</a> .  These *</i></td></tr>
+<tr><th id="9">9</th><td><i>// * include a list of copyright holders.                             *</i></td></tr>
+<tr><th id="10">10</th><td><i>// *                                                                  *</i></td></tr>
+<tr><th id="11">11</th><td><i>// * Neither the authors of this software system, nor their employing *</i></td></tr>
+<tr><th id="12">12</th><td><i>// * institutes,nor the agencies providing financial support for this *</i></td></tr>
+<tr><th id="13">13</th><td><i>// * work  make  any representation or  warranty, express or implied, *</i></td></tr>
+<tr><th id="14">14</th><td><i>// * regarding  this  software system or assume any liability for its *</i></td></tr>
+<tr><th id="15">15</th><td><i>// * use.  Please see the license in the file  LICENSE  and URL above *</i></td></tr>
+<tr><th id="16">16</th><td><i>// * for the full disclaimer and the limitation of liability.         *</i></td></tr>
+<tr><th id="17">17</th><td><i>// *                                                                  *</i></td></tr>
+<tr><th id="18">18</th><td><i>// * This  code  implementation is the result of  the  scientific and *</i></td></tr>
+<tr><th id="19">19</th><td><i>// * technical work of the GEANT4 collaboration.                      *</i></td></tr>
+<tr><th id="20">20</th><td><i>// * By using,  copying,  modifying or  distributing the software (or *</i></td></tr>
+<tr><th id="21">21</th><td><i>// * any work based  on the software)  you  agree  to acknowledge its *</i></td></tr>
+<tr><th id="22">22</th><td><i>// * use  in  resulting  scientific  publications,  and indicate your *</i></td></tr>
+<tr><th id="23">23</th><td><i>// * acceptance of all terms of the Geant4 Software license.          *</i></td></tr>
+<tr><th id="24">24</th><td><i>// ********************************************************************</i></td></tr>
+<tr><th id="25">25</th><td><i>//</i></td></tr>
+<tr><th id="26">26</th><td><i>//</i></td></tr>
+<tr><th id="27">27</th><td><i>//</i></td></tr>
+<tr><th id="28">28</th><td><i>// class G4IntegrationDriver</i></td></tr>
+<tr><th id="29">29</th><td><i>//</i></td></tr>
+<tr><th id="30">30</th><td><i>// Class description:</i></td></tr>
+<tr><th id="31">31</th><td><i>//</i></td></tr>
+<tr><th id="32">32</th><td><i>//   Templated driver class which controls the integration error of a </i></td></tr>
+<tr><th id="33">33</th><td><i>// Runge-Kutta stepper.</i></td></tr>
+<tr><th id="34">34</th><td><i>//   It's purpose is to provide a replacement of G4MagIntegratorDriver</i></td></tr>
+<tr><th id="35">35</th><td><i>// and work for all types of steppers.  </i></td></tr>
+<tr><th id="36">36</th><td><i>//   It will serve as the driver of choice for steppers which do not </i></td></tr>
+<tr><th id="37">37</th><td><i>// have extra capabilities, in particular First Same As Last (FSAL)</i></td></tr>
+<tr><th id="38">38</th><td><i>// and/or interpolation.</i></td></tr>
+<tr><th id="39">39</th><td><i>//</i></td></tr>
+<tr><th id="40">40</th><td><i>//    Implementation by Dmitry Sorokin - GSoC 2017</i></td></tr>
+<tr><th id="41">41</th><td><i>//       Work supported by Google as part of Google Summer of Code 2017.</i></td></tr>
+<tr><th id="42">42</th><td><i>//    Supervision / code review: John Apostolakis</i></td></tr>
+<tr><th id="43">43</th><td><i>//</i></td></tr>
+<tr><th id="44">44</th><td><i>// History:</i></td></tr>
+<tr><th id="45">45</th><td><i>// - Created. D.Sorokin</i></td></tr>
+<tr><th id="46">46</th><td><i>// --------------------------------------------------------------------</i></td></tr>
+<tr><th id="47">47</th><td></td></tr>
+<tr><th id="48">48</th><td><u>#<span data-ppcond="48">ifndef</span> <span class="macro" data-ref="_M/G4IntegrationDriver_HH">G4IntegrationDriver_HH</span></u></td></tr>
+<tr><th id="49">49</th><td><u>#define <dfn class="macro" id="_M/G4IntegrationDriver_HH" data-ref="_M/G4IntegrationDriver_HH">G4IntegrationDriver_HH</dfn></u></td></tr>
+<tr><th id="50">50</th><td></td></tr>
+<tr><th id="51">51</th><td><u>#include <a href="G4RKIntegrationDriver.hh.html">"G4RKIntegrationDriver.hh"</a></u></td></tr>
+<tr><th id="52">52</th><td><u>#include <a href="G4ChordFinderDelegate.hh.html">"G4ChordFinderDelegate.hh"</a></u></td></tr>
+<tr><th id="53">53</th><td></td></tr>
+<tr><th id="54">54</th><td><b>template</b> &lt;<b>class</b> T&gt;</td></tr>
+<tr><th id="55">55</th><td><b>class</b> <dfn class="type def" id="G4IntegrationDriver" title='G4IntegrationDriver' data-ref="G4IntegrationDriver">G4IntegrationDriver</dfn> : <b>public</b> <a class="type" href="G4RKIntegrationDriver.hh.html#G4RKIntegrationDriver" title='G4RKIntegrationDriver' data-ref="G4RKIntegrationDriver">G4RKIntegrationDriver</a>&lt;T&gt;,</td></tr>
+<tr><th id="56">56</th><td>                            <b>public</b> <a class="type" href="G4ChordFinderDelegate.hh.html#G4ChordFinderDelegate" title='G4ChordFinderDelegate' data-ref="G4ChordFinderDelegate">G4ChordFinderDelegate</a>&lt;<a class="type" href="#G4IntegrationDriver" title='G4IntegrationDriver' data-ref="G4IntegrationDriver">G4IntegrationDriver</a>&lt;T&gt;&gt; {</td></tr>
+<tr><th id="57">57</th><td><b>public</b>:</td></tr>
+<tr><th id="58">58</th><td>    <a class="decl" href="G4IntegrationDriver.icc.html#_ZN19G4IntegrationDriverC1EdPT_ii" title='G4IntegrationDriver::G4IntegrationDriver&lt;T&gt;' data-ref="_ZN19G4IntegrationDriverC1EdPT_ii" id="_ZN19G4IntegrationDriverC1EdPT_ii">G4IntegrationDriver</a>(  <a class="typedef" href="../../../global/management/include/G4Types.hh.html#G4double" title='G4double' data-type='double' data-ref="G4double">G4double</a> <dfn class="local col0 decl" id="210hminimum" title='hminimum' data-type='G4double' data-ref="210hminimum">hminimum</dfn>,</td></tr>
+<tr><th id="59">59</th><td>                          T*       <dfn class="local col1 decl" id="211stepper" title='stepper' data-type='T *' data-ref="211stepper">stepper</dfn>,</td></tr>
+<tr><th id="60">60</th><td>                          <a class="typedef" href="../../../global/management/include/G4Types.hh.html#G4int" title='G4int' data-type='int' data-ref="G4int">G4int</a>    <dfn class="local col2 decl" id="212numberOfComponents" title='numberOfComponents' data-type='G4int' data-ref="212numberOfComponents">numberOfComponents</dfn> = <var>6</var>,</td></tr>
+<tr><th id="61">61</th><td>                          <a class="typedef" href="../../../global/management/include/G4Types.hh.html#G4int" title='G4int' data-type='int' data-ref="G4int">G4int</a>    <dfn class="local col3 decl" id="213statisticsVerbosity" title='statisticsVerbosity' data-type='G4int' data-ref="213statisticsVerbosity">statisticsVerbosity</dfn> = <var>1</var>);</td></tr>
+<tr><th id="62">62</th><td></td></tr>
+<tr><th id="63">63</th><td>    <b>virtual</b> <a class="virtual decl" href="G4IntegrationDriver.icc.html#_ZN19G4IntegrationDriverD1Ev" title='G4IntegrationDriver::~G4IntegrationDriver&lt;T&gt;' data-ref="_ZN19G4IntegrationDriverD1Ev" id="_ZN19G4IntegrationDriverD1Ev"><span class='error' title="&apos;~G4IntegrationDriver&apos; marked &apos;override&apos; but does not override any member functions">~</span>G4IntegrationDriver</a>() override;</td></tr>
+<tr><th id="64">64</th><td></td></tr>
+<tr><th id="65">65</th><td>    <dfn class="decl def" id="_ZN19G4IntegrationDriverC1ERK19G4IntegrationDriverIT_E" title='G4IntegrationDriver::G4IntegrationDriver&lt;T&gt;' data-ref="_ZN19G4IntegrationDriverC1ERK19G4IntegrationDriverIT_E">G4IntegrationDriver</dfn>(<em>const</em> G4IntegrationDriver &amp;) = <b>delete</b>;</td></tr>
+<tr><th id="66">66</th><td>    <em>const</em> G4IntegrationDriver&amp; <dfn class="decl def" id="_ZN19G4IntegrationDriveraSERK19G4IntegrationDriverIT_E" title='G4IntegrationDriver::operator=' data-ref="_ZN19G4IntegrationDriveraSERK19G4IntegrationDriverIT_E"><b>operator</b> =</dfn>(<em>const</em> G4IntegrationDriver &amp;) = <b>delete</b>;</td></tr>
+<tr><th id="67">67</th><td></td></tr>
+<tr><th id="68">68</th><td>    <b>virtual</b> <a class="typedef" href="../../../global/management/include/G4Types.hh.html#G4double" title='G4double' data-type='double' data-ref="G4double">G4double</a> <span class='error' title="&apos;AdvanceChordLimited&apos; marked &apos;override&apos; but does not override any member functions"><dfn class="virtual decl def" id="_ZN19G4IntegrationDriver19AdvanceChordLimitedER12G4FieldTrackddd" title='G4IntegrationDriver::AdvanceChordLimited' data-ref="_ZN19G4IntegrationDriver19AdvanceChordLimitedER12G4FieldTrackddd">AdvanceChordLimited</dfn></span>(<a class="type" href="G4FieldTrack.hh.html#G4FieldTrack" title='G4FieldTrack' data-ref="G4FieldTrack">G4FieldTrack</a>&amp; <dfn class="local col4 decl" id="214track" title='track' data-type='G4FieldTrack &amp;' data-ref="214track">track</dfn>, </td></tr>
+<tr><th id="69">69</th><td>                                        <a class="typedef" href="../../../global/management/include/G4Types.hh.html#G4double" title='G4double' data-type='double' data-ref="G4double">G4double</a> <dfn class="local col5 decl" id="215stepMax" title='stepMax' data-type='G4double' data-ref="215stepMax">stepMax</dfn>, </td></tr>
+<tr><th id="70">70</th><td>                                        <a class="typedef" href="../../../global/management/include/G4Types.hh.html#G4double" title='G4double' data-type='double' data-ref="G4double">G4double</a> <dfn class="local col6 decl" id="216epsStep" title='epsStep' data-type='G4double' data-ref="216epsStep">epsStep</dfn>,</td></tr>
+<tr><th id="71">71</th><td>                                        <a class="typedef" href="../../../global/management/include/G4Types.hh.html#G4double" title='G4double' data-type='double' data-ref="G4double">G4double</a> <dfn class="local col7 decl" id="217chordDistance" title='chordDistance' data-type='G4double' data-ref="217chordDistance">chordDistance</dfn>) override</td></tr>
+<tr><th id="72">72</th><td>    {</td></tr>
+<tr><th id="73">73</th><td>        <b>return</b> <a class="typedef" href="#G4IntegrationDriver::ChordFinderDelegate" title='G4IntegrationDriver::ChordFinderDelegate' data-type='G4ChordFinderDelegate&lt;G4IntegrationDriver&lt;T&gt; &gt;' data-ref="G4IntegrationDriver::ChordFinderDelegate">ChordFinderDelegate</a>::AdvanceChordLimitedImpl(</td></tr>
+<tr><th id="74">74</th><td>            <a class="local col4 ref" href="#214track" title='track' data-ref="214track">track</a>, <a class="local col5 ref" href="#215stepMax" title='stepMax' data-ref="215stepMax">stepMax</a>, <a class="local col6 ref" href="#216epsStep" title='epsStep' data-ref="216epsStep">epsStep</a>, <a class="local col7 ref" href="#217chordDistance" title='chordDistance' data-ref="217chordDistance">chordDistance</a>);</td></tr>
+<tr><th id="75">75</th><td>    }</td></tr>
+<tr><th id="76">76</th><td></td></tr>
+<tr><th id="77">77</th><td>    <b>virtual</b> <em>void</em> <span class='error' title="&apos;OnStartTracking&apos; marked &apos;override&apos; but does not override any member functions"><dfn class="virtual decl def" id="_ZN19G4IntegrationDriver15OnStartTrackingEv" title='G4IntegrationDriver::OnStartTracking' data-ref="_ZN19G4IntegrationDriver15OnStartTrackingEv">OnStartTracking</dfn></span>() override</td></tr>
+<tr><th id="78">78</th><td>    {</td></tr>
+<tr><th id="79">79</th><td>        <a class="typedef" href="#G4IntegrationDriver::ChordFinderDelegate" title='G4IntegrationDriver::ChordFinderDelegate' data-type='G4ChordFinderDelegate&lt;G4IntegrationDriver&lt;T&gt; &gt;' data-ref="G4IntegrationDriver::ChordFinderDelegate">ChordFinderDelegate</a>::ResetStepEstimate();</td></tr>
+<tr><th id="80">80</th><td>    }</td></tr>
+<tr><th id="81">81</th><td></td></tr>
+<tr><th id="82">82</th><td>    <b>virtual</b> <em>void</em> <span class='error' title="&apos;OnComputeStep&apos; marked &apos;override&apos; but does not override any member functions"><dfn class="virtual decl def" id="_ZN19G4IntegrationDriver13OnComputeStepEv" title='G4IntegrationDriver::OnComputeStep' data-ref="_ZN19G4IntegrationDriver13OnComputeStepEv">OnComputeStep</dfn></span>() override {};</td></tr>
+<tr><th id="83">83</th><td></td></tr>
+<tr><th id="84">84</th><td>    <i>// Integrates ODE from current s (s=s0) to s=s0+h with accuracy eps.</i></td></tr>
+<tr><th id="85">85</th><td><i>    // On output track is replaced by value at end of interval.</i></td></tr>
+<tr><th id="86">86</th><td><i>    // The concept is similar to the odeint routine from NRC p.721-722.</i></td></tr>
+<tr><th id="87">87</th><td>    <b>virtual</b> <a class="typedef" href="../../../global/management/include/G4Types.hh.html#G4bool" title='G4bool' data-type='bool' data-ref="G4bool">G4bool</a> <span class='error' title="&apos;AccurateAdvance&apos; marked &apos;override&apos; but does not override any member functions"><a class="virtual decl" href="G4IntegrationDriver.icc.html#_ZN19G4IntegrationDriver15AccurateAdvanceER12G4FieldTrackddd" title='G4IntegrationDriver::AccurateAdvance' data-ref="_ZN19G4IntegrationDriver15AccurateAdvanceER12G4FieldTrackddd" id="_ZN19G4IntegrationDriver15AccurateAdvanceER12G4FieldTrackddd">AccurateAdvance</a></span>(</td></tr>
+<tr><th id="88">88</th><td>        <a class="type" href="G4FieldTrack.hh.html#G4FieldTrack" title='G4FieldTrack' data-ref="G4FieldTrack">G4FieldTrack</a>&amp; <dfn class="local col8 decl" id="218track" title='track' data-type='G4FieldTrack &amp;' data-ref="218track">track</dfn>,</td></tr>
+<tr><th id="89">89</th><td>        <a class="typedef" href="../../../global/management/include/G4Types.hh.html#G4double" title='G4double' data-type='double' data-ref="G4double">G4double</a> <dfn class="local col9 decl" id="219hstep" title='hstep' data-type='G4double' data-ref="219hstep">hstep</dfn>,</td></tr>
+<tr><th id="90">90</th><td>        <a class="typedef" href="../../../global/management/include/G4Types.hh.html#G4double" title='G4double' data-type='double' data-ref="G4double">G4double</a> <dfn class="local col0 decl" id="220eps" title='eps' data-type='G4double' data-ref="220eps">eps</dfn>,                     <i>// Requested y_err/hstep</i></td></tr>
+<tr><th id="91">91</th><td>        <a class="typedef" href="../../../global/management/include/G4Types.hh.html#G4double" title='G4double' data-type='double' data-ref="G4double">G4double</a> <dfn class="local col1 decl" id="221hinitial" title='hinitial' data-type='G4double' data-ref="221hinitial">hinitial</dfn> = <var>0</var>) override;  <i>// Suggested 1st interval</i></td></tr>
+<tr><th id="92">92</th><td></td></tr>
+<tr><th id="93">93</th><td>    <i>// QuickAdvance just tries one Step - it does not ensure accuracy.</i></td></tr>
+<tr><th id="94">94</th><td>    <b>virtual</b> <a class="typedef" href="../../../global/management/include/G4Types.hh.html#G4bool" title='G4bool' data-type='bool' data-ref="G4bool">G4bool</a> <span class='error' title="&apos;QuickAdvance&apos; marked &apos;override&apos; but does not override any member functions"><a class="virtual decl" href="G4IntegrationDriver.icc.html#_ZN19G4IntegrationDriver12QuickAdvanceER12G4FieldTrackPKdddRdS4_" title='G4IntegrationDriver::QuickAdvance' data-ref="_ZN19G4IntegrationDriver12QuickAdvanceER12G4FieldTrackPKdddRdS4_" id="_ZN19G4IntegrationDriver12QuickAdvanceER12G4FieldTrackPKdddRdS4_">QuickAdvance</a></span>(</td></tr>
+<tr><th id="95">95</th><td>        <a class="type" href="G4FieldTrack.hh.html#G4FieldTrack" title='G4FieldTrack' data-ref="G4FieldTrack">G4FieldTrack</a>&amp; <dfn class="local col2 decl" id="222fieldTrack" title='fieldTrack' data-type='G4FieldTrack &amp;' data-ref="222fieldTrack">fieldTrack</dfn>,</td></tr>
+<tr><th id="96">96</th><td>        <em>const</em> <a class="typedef" href="../../../global/management/include/G4Types.hh.html#G4double" title='G4double' data-type='double' data-ref="G4double">G4double</a> <dfn class="local col3 decl" id="223dydx" title='dydx' data-type='const G4double *' data-ref="223dydx">dydx</dfn>[],</td></tr>
+<tr><th id="97">97</th><td>        <a class="typedef" href="../../../global/management/include/G4Types.hh.html#G4double" title='G4double' data-type='double' data-ref="G4double">G4double</a> <dfn class="local col4 decl" id="224hstep" title='hstep' data-type='G4double' data-ref="224hstep">hstep</dfn>,</td></tr>
+<tr><th id="98">98</th><td>        <a class="typedef" href="../../../global/management/include/G4Types.hh.html#G4double" title='G4double' data-type='double' data-ref="G4double">G4double</a> <dfn class="local col5 decl" id="225inverseCurvatureRadius" title='inverseCurvatureRadius' data-type='G4double' data-ref="225inverseCurvatureRadius">inverseCurvatureRadius</dfn>,</td></tr>
+<tr><th id="99">99</th><td>        <a class="typedef" href="../../../global/management/include/G4Types.hh.html#G4double" title='G4double' data-type='double' data-ref="G4double">G4double</a>&amp; <dfn class="local col6 decl" id="226dchord_step" title='dchord_step' data-type='G4double &amp;' data-ref="226dchord_step">dchord_step</dfn>,</td></tr>
+<tr><th id="100">100</th><td>        <a class="typedef" href="../../../global/management/include/G4Types.hh.html#G4double" title='G4double' data-type='double' data-ref="G4double">G4double</a>&amp; <dfn class="local col7 decl" id="227dyerr" title='dyerr' data-type='G4double &amp;' data-ref="227dyerr">dyerr</dfn>) override;</td></tr>
+<tr><th id="101">101</th><td></td></tr>
+<tr><th id="102">102</th><td>    <b>virtual</b> <em>void</em> <span class='error' title="&apos;SetVerboseLevel&apos; marked &apos;override&apos; but does not override any member functions"><a class="virtual decl" href="G4IntegrationDriver.icc.html#_ZN19G4IntegrationDriver15SetVerboseLevelEi" title='G4IntegrationDriver::SetVerboseLevel' data-ref="_ZN19G4IntegrationDriver15SetVerboseLevelEi" id="_ZN19G4IntegrationDriver15SetVerboseLevelEi">SetVerboseLevel</a></span>(<a class="typedef" href="../../../global/management/include/G4Types.hh.html#G4int" title='G4int' data-type='int' data-ref="G4int">G4int</a> <dfn class="local col8 decl" id="228newLevel" title='newLevel' data-type='G4int' data-ref="228newLevel">newLevel</dfn>) override;</td></tr>
+<tr><th id="103">103</th><td>    <b>virtual</b> <a class="typedef" href="../../../global/management/include/G4Types.hh.html#G4int" title='G4int' data-type='int' data-ref="G4int">G4int</a> <span class='error' title="&apos;GetVerboseLevel&apos; marked &apos;override&apos; but does not override any member functions"><a class="virtual decl" href="G4IntegrationDriver.icc.html#_ZNK19G4IntegrationDriver15GetVerboseLevelEv" title='G4IntegrationDriver::GetVerboseLevel' data-ref="_ZNK19G4IntegrationDriver15GetVerboseLevelEv" id="_ZNK19G4IntegrationDriver15GetVerboseLevelEv">GetVerboseLevel</a></span>() <em>const</em> override;</td></tr>
+<tr><th id="104">104</th><td></td></tr>
+<tr><th id="105">105</th><td>    <i>// Accessors.</i></td></tr>
+<tr><th id="106">106</th><td>    <a class="typedef" href="../../../global/management/include/G4Types.hh.html#G4double" title='G4double' data-type='double' data-ref="G4double">G4double</a> <a class="decl" href="G4IntegrationDriver.icc.html#_ZNK19G4IntegrationDriver14GetMinimumStepEv" title='G4IntegrationDriver::GetMinimumStep' data-ref="_ZNK19G4IntegrationDriver14GetMinimumStepEv" id="_ZNK19G4IntegrationDriver14GetMinimumStepEv">GetMinimumStep</a>() <em>const</em>;</td></tr>
+<tr><th id="107">107</th><td>    <em>void</em> <a class="decl" href="G4IntegrationDriver.icc.html#_ZN19G4IntegrationDriver14SetMinimumStepEd" title='G4IntegrationDriver::SetMinimumStep' data-ref="_ZN19G4IntegrationDriver14SetMinimumStepEd" id="_ZN19G4IntegrationDriver14SetMinimumStepEd">SetMinimumStep</a>(<a class="typedef" href="../../../global/management/include/G4Types.hh.html#G4double" title='G4double' data-type='double' data-ref="G4double">G4double</a> <dfn class="local col9 decl" id="229newval" title='newval' data-type='G4double' data-ref="229newval">newval</dfn>);</td></tr>
+<tr><th id="108">108</th><td></td></tr>
+<tr><th id="109">109</th><td>    <i>// This takes one Step that is of size htry, or as large </i></td></tr>
+<tr><th id="110">110</th><td><i>    // as possible while satisfying the accuracy criterion of:</i></td></tr>
+<tr><th id="111">111</th><td><i>    //     yerr &lt; eps * |y_end-y_start|</i></td></tr>
+<tr><th id="112">112</th><td>    <em>void</em> <a class="decl" href="G4IntegrationDriver.icc.html#_ZN19G4IntegrationDriver11OneGoodStepEPdPKdRdddS3_S3_" title='G4IntegrationDriver::OneGoodStep' data-ref="_ZN19G4IntegrationDriver11OneGoodStepEPdPKdRdddS3_S3_" id="_ZN19G4IntegrationDriver11OneGoodStepEPdPKdRdddS3_S3_">OneGoodStep</a>(      <a class="typedef" href="../../../global/management/include/G4Types.hh.html#G4double" title='G4double' data-type='double' data-ref="G4double">G4double</a>  <dfn class="local col0 decl" id="230yVar" title='yVar' data-type='G4double *' data-ref="230yVar">yVar</dfn>[],  <i>// InOut</i></td></tr>
+<tr><th id="113">113</th><td>                     <em>const</em> <a class="typedef" href="../../../global/management/include/G4Types.hh.html#G4double" title='G4double' data-type='double' data-ref="G4double">G4double</a>  <dfn class="local col1 decl" id="231dydx" title='dydx' data-type='const G4double *' data-ref="231dydx">dydx</dfn>[],</td></tr>
+<tr><th id="114">114</th><td>                           <a class="typedef" href="../../../global/management/include/G4Types.hh.html#G4double" title='G4double' data-type='double' data-ref="G4double">G4double</a>&amp; <dfn class="local col2 decl" id="232curveLength" title='curveLength' data-type='G4double &amp;' data-ref="232curveLength">curveLength</dfn>,</td></tr>
+<tr><th id="115">115</th><td>                           <a class="typedef" href="../../../global/management/include/G4Types.hh.html#G4double" title='G4double' data-type='double' data-ref="G4double">G4double</a>  <dfn class="local col3 decl" id="233htry" title='htry' data-type='G4double' data-ref="233htry">htry</dfn>,</td></tr>
+<tr><th id="116">116</th><td>                           <a class="typedef" href="../../../global/management/include/G4Types.hh.html#G4double" title='G4double' data-type='double' data-ref="G4double">G4double</a>  <dfn class="local col4 decl" id="234eps" title='eps' data-type='G4double' data-ref="234eps">eps</dfn>,</td></tr>
+<tr><th id="117">117</th><td>                           <a class="typedef" href="../../../global/management/include/G4Types.hh.html#G4double" title='G4double' data-type='double' data-ref="G4double">G4double</a>&amp; <dfn class="local col5 decl" id="235hdid" title='hdid' data-type='G4double &amp;' data-ref="235hdid">hdid</dfn>,</td></tr>
+<tr><th id="118">118</th><td>                           <a class="typedef" href="../../../global/management/include/G4Types.hh.html#G4double" title='G4double' data-type='double' data-ref="G4double">G4double</a>&amp; <dfn class="local col6 decl" id="236hnext" title='hnext' data-type='G4double &amp;' data-ref="236hnext">hnext</dfn>);</td></tr>
+<tr><th id="119">119</th><td></td></tr>
+<tr><th id="120">120</th><td>     <a class="typedef" href="../../../global/management/include/G4Types.hh.html#G4double" title='G4double' data-type='double' data-ref="G4double">G4double</a> <a class="decl" href="G4IntegrationDriver.icc.html#_ZNK19G4IntegrationDriver19GetSmallestFractionEv" title='G4IntegrationDriver::GetSmallestFraction' data-ref="_ZNK19G4IntegrationDriver19GetSmallestFractionEv" id="_ZNK19G4IntegrationDriver19GetSmallestFractionEv">GetSmallestFraction</a>() <em>const</em>;</td></tr>
+<tr><th id="121">121</th><td>     <em>void</em> <a class="decl" href="G4IntegrationDriver.icc.html#_ZN19G4IntegrationDriver19SetSmallestFractionEd" title='G4IntegrationDriver::SetSmallestFraction' data-ref="_ZN19G4IntegrationDriver19SetSmallestFractionEd" id="_ZN19G4IntegrationDriver19SetSmallestFractionEd">SetSmallestFraction</a>(<a class="typedef" href="../../../global/management/include/G4Types.hh.html#G4double" title='G4double' data-type='double' data-ref="G4double">G4double</a> <dfn class="local col7 decl" id="237val" title='val' data-type='G4double' data-ref="237val">val</dfn>);</td></tr>
+<tr><th id="122">122</th><td></td></tr>
+<tr><th id="123">123</th><td><b>protected</b>:</td></tr>
+<tr><th id="124">124</th><td>    <em>void</em> <a class="decl" href="G4IntegrationDriver.icc.html#_ZN19G4IntegrationDriver26IncrementQuickAdvanceCallsEv" title='G4IntegrationDriver::IncrementQuickAdvanceCalls' data-ref="_ZN19G4IntegrationDriver26IncrementQuickAdvanceCallsEv" id="_ZN19G4IntegrationDriver26IncrementQuickAdvanceCallsEv">IncrementQuickAdvanceCalls</a>();</td></tr>
+<tr><th id="125">125</th><td></td></tr>
+<tr><th id="126">126</th><td><b>private</b>:</td></tr>
+<tr><th id="127">127</th><td>    <em>void</em> <a class="decl" href="G4IntegrationDriver.icc.html#_ZN19G4IntegrationDriver9CheckStepERKN5CLHEP10Hep3VectorES3_d" title='G4IntegrationDriver::CheckStep' data-ref="_ZN19G4IntegrationDriver9CheckStepERKN5CLHEP10Hep3VectorES3_d" id="_ZN19G4IntegrationDriver9CheckStepERKN5CLHEP10Hep3VectorES3_d">CheckStep</a>(<em>const</em> <a class="typedef" href="../../../global/management/include/G4ThreeVector.hh.html#G4ThreeVector" title='G4ThreeVector' data-type='CLHEP::Hep3Vector' data-ref="G4ThreeVector">G4ThreeVector</a>&amp; <dfn class="local col8 decl" id="238posIn" title='posIn' data-type='const G4ThreeVector &amp;' data-ref="238posIn">posIn</dfn>, </td></tr>
+<tr><th id="128">128</th><td>                   <em>const</em> <a class="typedef" href="../../../global/management/include/G4ThreeVector.hh.html#G4ThreeVector" title='G4ThreeVector' data-type='CLHEP::Hep3Vector' data-ref="G4ThreeVector">G4ThreeVector</a>&amp; <dfn class="local col9 decl" id="239posOut" title='posOut' data-type='const G4ThreeVector &amp;' data-ref="239posOut">posOut</dfn>, </td></tr>
+<tr><th id="129">129</th><td>                   <a class="typedef" href="../../../global/management/include/G4Types.hh.html#G4double" title='G4double' data-type='double' data-ref="G4double">G4double</a> <dfn class="local col0 decl" id="240hdid" title='hdid' data-type='G4double' data-ref="240hdid">hdid</dfn>);</td></tr>
+<tr><th id="130">130</th><td></td></tr>
+<tr><th id="131">131</th><td>    <i>// Minimum Step allowed in a Step (in absolute units)</i></td></tr>
+<tr><th id="132">132</th><td>    <a class="typedef" href="../../../global/management/include/G4Types.hh.html#G4double" title='G4double' data-type='double' data-ref="G4double">G4double</a> <dfn class="decl" id="G4IntegrationDriver::fMinimumStep" title='G4IntegrationDriver::fMinimumStep' data-ref="G4IntegrationDriver::fMinimumStep">fMinimumStep</dfn>;</td></tr>
+<tr><th id="133">133</th><td></td></tr>
+<tr><th id="134">134</th><td>    <i>// Smallest fraction of (existing) curve length - in relative units</i></td></tr>
+<tr><th id="135">135</th><td><i>    // below this fraction the current step will be the last</i></td></tr>
+<tr><th id="136">136</th><td>    <a class="typedef" href="../../../global/management/include/G4Types.hh.html#G4double" title='G4double' data-type='double' data-ref="G4double">G4double</a> <dfn class="decl" id="G4IntegrationDriver::fSmallestFraction" title='G4IntegrationDriver::fSmallestFraction' data-ref="G4IntegrationDriver::fSmallestFraction">fSmallestFraction</dfn>;</td></tr>
+<tr><th id="137">137</th><td>    <i>//  Expected range: smaller than 0.1 * epsilon and bigger than 5e-13</i></td></tr>
+<tr><th id="138">138</th><td><i>    //    ( Note: this range is not enforced. )</i></td></tr>
+<tr><th id="139">139</th><td><i></i></td></tr>
+<tr><th id="140">140</th><td><i>    // Verbosity level for printing (debug, ..)</i></td></tr>
+<tr><th id="141">141</th><td><i>    // Could be varied during tracking - to help identify issues</i></td></tr>
+<tr><th id="142">142</th><td>    <a class="typedef" href="../../../global/management/include/G4Types.hh.html#G4int" title='G4int' data-type='int' data-ref="G4int">G4int</a> <dfn class="decl" id="G4IntegrationDriver::fVerboseLevel" title='G4IntegrationDriver::fVerboseLevel' data-ref="G4IntegrationDriver::fVerboseLevel">fVerboseLevel</dfn>;</td></tr>
+<tr><th id="143">143</th><td></td></tr>
+<tr><th id="144">144</th><td>    <a class="typedef" href="../../../global/management/include/G4Types.hh.html#G4int" title='G4int' data-type='int' data-ref="G4int">G4int</a> <dfn class="decl" id="G4IntegrationDriver::fNoQuickAvanceCalls" title='G4IntegrationDriver::fNoQuickAvanceCalls' data-ref="G4IntegrationDriver::fNoQuickAvanceCalls">fNoQuickAvanceCalls</dfn>;</td></tr>
+<tr><th id="145">145</th><td>    <a class="typedef" href="../../../global/management/include/G4Types.hh.html#G4int" title='G4int' data-type='int' data-ref="G4int">G4int</a> <dfn class="decl" id="G4IntegrationDriver::fNoAccurateAdvanceCalls" title='G4IntegrationDriver::fNoAccurateAdvanceCalls' data-ref="G4IntegrationDriver::fNoAccurateAdvanceCalls">fNoAccurateAdvanceCalls</dfn>;</td></tr>
+<tr><th id="146">146</th><td>    <a class="typedef" href="../../../global/management/include/G4Types.hh.html#G4int" title='G4int' data-type='int' data-ref="G4int">G4int</a> <dfn class="decl" id="G4IntegrationDriver::fNoAccurateAdvanceBadSteps" title='G4IntegrationDriver::fNoAccurateAdvanceBadSteps' data-ref="G4IntegrationDriver::fNoAccurateAdvanceBadSteps">fNoAccurateAdvanceBadSteps</dfn>;</td></tr>
+<tr><th id="147">147</th><td>    <a class="typedef" href="../../../global/management/include/G4Types.hh.html#G4int" title='G4int' data-type='int' data-ref="G4int">G4int</a> <dfn class="decl" id="G4IntegrationDriver::fNoAccurateAdvanceGoodSteps" title='G4IntegrationDriver::fNoAccurateAdvanceGoodSteps' data-ref="G4IntegrationDriver::fNoAccurateAdvanceGoodSteps">fNoAccurateAdvanceGoodSteps</dfn>;</td></tr>
+<tr><th id="148">148</th><td></td></tr>
+<tr><th id="149">149</th><td>    <b>using</b> <dfn class="typedef" id="G4IntegrationDriver::Base" title='G4IntegrationDriver::Base' data-type='G4RKIntegrationDriver&lt;T&gt;' data-ref="G4IntegrationDriver::Base">Base</dfn> = <a class="type" href="G4RKIntegrationDriver.hh.html#G4RKIntegrationDriver" title='G4RKIntegrationDriver' data-ref="G4RKIntegrationDriver">G4RKIntegrationDriver</a>&lt;T&gt;;</td></tr>
+<tr><th id="150">150</th><td>    <b>using</b> <dfn class="typedef" id="G4IntegrationDriver::ChordFinderDelegate" title='G4IntegrationDriver::ChordFinderDelegate' data-type='G4ChordFinderDelegate&lt;G4IntegrationDriver&lt;T&gt; &gt;' data-ref="G4IntegrationDriver::ChordFinderDelegate">ChordFinderDelegate</dfn> = <a class="type" href="G4ChordFinderDelegate.hh.html#G4ChordFinderDelegate" title='G4ChordFinderDelegate' data-ref="G4ChordFinderDelegate">G4ChordFinderDelegate</a>&lt;<a class="type" href="#G4IntegrationDriver" title='G4IntegrationDriver' data-ref="G4IntegrationDriver">G4IntegrationDriver</a>&lt;T&gt;&gt;;</td></tr>
+<tr><th id="151">151</th><td>};</td></tr>
+<tr><th id="152">152</th><td></td></tr>
+<tr><th id="153">153</th><td><u>#include <a href="G4IntegrationDriver.icc.html">"G4IntegrationDriver.icc"</a></u></td></tr>
+<tr><th id="154">154</th><td></td></tr>
+<tr><th id="155">155</th><td><u>#<span data-ppcond="48">endif</span></u></td></tr>
+<tr><th id="156">156</th><td></td></tr>
+</table><hr/><p id='footer'>
+Generated while processing <a href='../src/G4ChordFinder.cc.html'>codebrowser/source/geometry/magneticfield/src/G4ChordFinder.cc</a><br/>Generated on <em>2019-Aug-28</em> from project codebrowser<br />Powered by <a href='https://woboq.com'><img alt='Woboq' src='https://code.woboq.org/woboq-16.png' width='41' height='16' /></a> <a href='https://code.woboq.org'>Code Browser</a> 2.1
+<br/>Generator usage only permitted with license.</p>
+</div></body></html>

@@ -1,0 +1,310 @@
+<!doctype html>
+<html>
+<head>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"><title>G4LatticeManager.cc source code [codebrowser/source/processes/solidstate/phonon/src/G4LatticeManager.cc] - Woboq Code Browser</title>
+<link rel="stylesheet" href="../../../../../../../data/qtcreator.css" title="QtCreator"/>
+<link rel="alternate stylesheet" href="../../../../../../../data/kdevelop.css" title="KDevelop"/>
+<script type="text/javascript" src="../../../../../../../data/jquery/jquery.min.js"></script>
+<script type="text/javascript" src="../../../../../../../data/jquery/jquery-ui.min.js"></script>
+<script>var file = 'codebrowser/source/processes/solidstate/phonon/src/G4LatticeManager.cc'; var root_path = '../../../../../..'; var data_path = '../../../../../../../data';</script>
+<script src='../../../../../../../data/codebrowser.js'></script>
+</head>
+<body><div id='header'><h1 id='breadcrumb'><span>Browse the source code of </span><a href='../../../../..'>codebrowser</a>/<a href='../../../..'>source</a>/<a href='../../..'>processes</a>/<a href='../..'>solidstate</a>/<a href='..'>phonon</a>/<a href='./'>src</a>/<a href='G4LatticeManager.cc.html'>G4LatticeManager.cc</a></h1></div>
+<hr/><div id='content'><table class="code">
+<tr><th id="1">1</th><td><i>//</i></td></tr>
+<tr><th id="2">2</th><td><i>// ********************************************************************</i></td></tr>
+<tr><th id="3">3</th><td><i>// * License and Disclaimer                                           *</i></td></tr>
+<tr><th id="4">4</th><td><i>// *                                                                  *</i></td></tr>
+<tr><th id="5">5</th><td><i>// * The  Geant4 software  is  copyright of the Copyright Holders  of *</i></td></tr>
+<tr><th id="6">6</th><td><i>// * the Geant4 Collaboration.  It is provided  under  the terms  and *</i></td></tr>
+<tr><th id="7">7</th><td><i>// * conditions of the Geant4 Software License,  included in the file *</i></td></tr>
+<tr><th id="8">8</th><td><i>// * LICENSE and available at  <a href="http://cern.ch/geant4/license">http://cern.ch/geant4/license</a> .  These *</i></td></tr>
+<tr><th id="9">9</th><td><i>// * include a list of copyright holders.                             *</i></td></tr>
+<tr><th id="10">10</th><td><i>// *                                                                  *</i></td></tr>
+<tr><th id="11">11</th><td><i>// * Neither the authors of this software system, nor their employing *</i></td></tr>
+<tr><th id="12">12</th><td><i>// * institutes,nor the agencies providing financial support for this *</i></td></tr>
+<tr><th id="13">13</th><td><i>// * work  make  any representation or  warranty, express or implied, *</i></td></tr>
+<tr><th id="14">14</th><td><i>// * regarding  this  software system or assume any liability for its *</i></td></tr>
+<tr><th id="15">15</th><td><i>// * use.  Please see the license in the file  LICENSE  and URL above *</i></td></tr>
+<tr><th id="16">16</th><td><i>// * for the full disclaimer and the limitation of liability.         *</i></td></tr>
+<tr><th id="17">17</th><td><i>// *                                                                  *</i></td></tr>
+<tr><th id="18">18</th><td><i>// * This  code  implementation is the result of  the  scientific and *</i></td></tr>
+<tr><th id="19">19</th><td><i>// * technical work of the GEANT4 collaboration.                      *</i></td></tr>
+<tr><th id="20">20</th><td><i>// * By using,  copying,  modifying or  distributing the software (or *</i></td></tr>
+<tr><th id="21">21</th><td><i>// * any work based  on the software)  you  agree  to acknowledge its *</i></td></tr>
+<tr><th id="22">22</th><td><i>// * use  in  resulting  scientific  publications,  and indicate your *</i></td></tr>
+<tr><th id="23">23</th><td><i>// * acceptance of all terms of the Geant4 Software license.          *</i></td></tr>
+<tr><th id="24">24</th><td><i>// ********************************************************************</i></td></tr>
+<tr><th id="25">25</th><td><i>//</i></td></tr>
+<tr><th id="26">26</th><td><i>/// \file materials/src/G4LatticeManager.cc</i></td></tr>
+<tr><th id="27">27</th><td><i>/// \brief Implementation of the G4LatticeManager class</i></td></tr>
+<tr><th id="28">28</th><td><i>//</i></td></tr>
+<tr><th id="29">29</th><td><i>//</i></td></tr>
+<tr><th id="30">30</th><td><i>// 20131113  Delete lattices in (new) registry, not in lookup maps</i></td></tr>
+<tr><th id="31">31</th><td><i>// 20141008  Change to global singleton; must be shared across worker threads</i></td></tr>
+<tr><th id="32">32</th><td></td></tr>
+<tr><th id="33">33</th><td><u>#include <a href="../include/G4LatticeManager.hh.html">"G4LatticeManager.hh"</a></u></td></tr>
+<tr><th id="34">34</th><td><u>#include <a href="../../../../global/management/include/G4AutoLock.hh.html">"G4AutoLock.hh"</a></u></td></tr>
+<tr><th id="35">35</th><td><u>#include <a href="../../../../materials/include/G4LatticeLogical.hh.html">"G4LatticeLogical.hh"</a></u></td></tr>
+<tr><th id="36">36</th><td><u>#include <a href="../../../../materials/include/G4LatticePhysical.hh.html">"G4LatticePhysical.hh"</a></u></td></tr>
+<tr><th id="37">37</th><td><u>#include <a href="../include/G4LatticeReader.hh.html">"G4LatticeReader.hh"</a></u></td></tr>
+<tr><th id="38">38</th><td><u>#include <a href="../../../../geometry/management/include/G4LogicalVolume.hh.html">"G4LogicalVolume.hh"</a></u></td></tr>
+<tr><th id="39">39</th><td><u>#include <a href="../../../../materials/include/G4Material.hh.html">"G4Material.hh"</a></u></td></tr>
+<tr><th id="40">40</th><td><u>#include <a href="../../../../geometry/management/include/G4VPhysicalVolume.hh.html">"G4VPhysicalVolume.hh"</a></u></td></tr>
+<tr><th id="41">41</th><td><u>#include <a href="../../../../global/management/include/G4SystemOfUnits.hh.html">"G4SystemOfUnits.hh"</a></u></td></tr>
+<tr><th id="42">42</th><td><u>#include <a href="../../../../global/management/include/G4Threading.hh.html">"G4Threading.hh"</a></u></td></tr>
+<tr><th id="43">43</th><td><u>#include <span class='error' title="&apos;fstream&apos; file not found">&lt;</span>fstream&gt;</u></td></tr>
+<tr><th id="44">44</th><td></td></tr>
+<tr><th id="45">45</th><td><a class="type" href="../include/G4LatticeManager.hh.html#G4LatticeManager" title='G4LatticeManager' data-ref="G4LatticeManager">G4LatticeManager</a>* <a class="type" href="../include/G4LatticeManager.hh.html#G4LatticeManager" title='G4LatticeManager' data-ref="G4LatticeManager">G4LatticeManager</a>::<dfn class="decl def" id="G4LatticeManager::fLM" title='G4LatticeManager::fLM' data-ref="G4LatticeManager::fLM">fLM</dfn> = <var>0</var>;	<i>// Global (shared) singleton</i></td></tr>
+<tr><th id="46">46</th><td></td></tr>
+<tr><th id="47">47</th><td><b>namespace</b> {</td></tr>
+<tr><th id="48">48</th><td>  G4Mutex <dfn class="tu decl def" id="(anonymousnamespace)::latMutex" title='(anonymous namespace)::latMutex' data-type='int' data-ref="(anonymousnamespace)::latMutex">latMutex</dfn> = <a class="macro" href="../../../../global/management/include/G4Threading.hh.html#88" title="{}" data-ref="_M/G4MUTEX_INITIALIZER">G4MUTEX_INITIALIZER</a>;	<i  data-doc="(anonymousnamespace)::latMutex">// For thread protection</i></td></tr>
+<tr><th id="49">49</th><td>}</td></tr>
+<tr><th id="50">50</th><td></td></tr>
+<tr><th id="51">51</th><td><i>//....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo....</i></td></tr>
+<tr><th id="52">52</th><td></td></tr>
+<tr><th id="53">53</th><td><a class="type" href="../include/G4LatticeManager.hh.html#G4LatticeManager" title='G4LatticeManager' data-ref="G4LatticeManager">G4LatticeManager</a>::<dfn class="decl def" id="_ZN16G4LatticeManagerC1Ev" title='G4LatticeManager::G4LatticeManager' data-ref="_ZN16G4LatticeManagerC1Ev">G4LatticeManager</dfn>() : <a class="member" href="../include/G4LatticeManager.hh.html#G4LatticeManager::verboseLevel" title='G4LatticeManager::verboseLevel' data-ref="G4LatticeManager::verboseLevel">verboseLevel</a>(<var>0</var>) {</td></tr>
+<tr><th id="54">54</th><td>  <a class="member" href="#_ZN16G4LatticeManager5ClearEv" title='G4LatticeManager::Clear' data-ref="_ZN16G4LatticeManager5ClearEv">Clear</a>();</td></tr>
+<tr><th id="55">55</th><td>}</td></tr>
+<tr><th id="56">56</th><td></td></tr>
+<tr><th id="57">57</th><td>G4LatticeManager::<span class='error' title="exception specification in declaration does not match previous declaration">~</span>G4LatticeManager() {</td></tr>
+<tr><th id="58">58</th><td>  Reset();			<i>// Deletes all lattices</i></td></tr>
+<tr><th id="59">59</th><td>}</td></tr>
+<tr><th id="60">60</th><td></td></tr>
+<tr><th id="61">61</th><td><i>// Delete all registered lattices and clear entries from lookup tables</i></td></tr>
+<tr><th id="62">62</th><td></td></tr>
+<tr><th id="63">63</th><td><em>void</em> <a class="type" href="../include/G4LatticeManager.hh.html#G4LatticeManager" title='G4LatticeManager' data-ref="G4LatticeManager">G4LatticeManager</a>::<dfn class="decl def" id="_ZN16G4LatticeManager5ResetEv" title='G4LatticeManager::Reset' data-ref="_ZN16G4LatticeManager5ResetEv">Reset</dfn>() {</td></tr>
+<tr><th id="64">64</th><td>  <b>for</b> (<span class='error' title="use of undeclared identifier &apos;LatticeLogReg&apos;">LatticeLogReg</span>::iterator <dfn class="local col9 decl" id="9lm" title='lm' data-type='int' data-ref="9lm">lm</dfn>=fLLattices.begin();</td></tr>
+<tr><th id="65">65</th><td>       lm != fLLattices.end(); ++lm) {</td></tr>
+<tr><th id="66">66</th><td>    <b>delete</b> (*lm);</td></tr>
+<tr><th id="67">67</th><td>  }</td></tr>
+<tr><th id="68">68</th><td></td></tr>
+<tr><th id="69">69</th><td>  <b>for</b> (<span class='error' title="use of undeclared identifier &apos;LatticePhyReg&apos;">LatticePhyReg</span>::iterator <dfn class="local col0 decl" id="10pm" title='pm' data-type='int' data-ref="10pm">pm</dfn>=fPLattices.begin();</td></tr>
+<tr><th id="70">70</th><td>       pm != fPLattices.end(); ++pm) {</td></tr>
+<tr><th id="71">71</th><td>    <b>delete</b> (*pm);</td></tr>
+<tr><th id="72">72</th><td>  }</td></tr>
+<tr><th id="73">73</th><td></td></tr>
+<tr><th id="74">74</th><td>  <a class="member" href="#_ZN16G4LatticeManager5ClearEv" title='G4LatticeManager::Clear' data-ref="_ZN16G4LatticeManager5ClearEv">Clear</a>();</td></tr>
+<tr><th id="75">75</th><td>}</td></tr>
+<tr><th id="76">76</th><td></td></tr>
+<tr><th id="77">77</th><td><i>// Remove entries without deletion (for begin-job and end-job initializing)</i></td></tr>
+<tr><th id="78">78</th><td></td></tr>
+<tr><th id="79">79</th><td><em>void</em> <a class="type" href="../include/G4LatticeManager.hh.html#G4LatticeManager" title='G4LatticeManager' data-ref="G4LatticeManager">G4LatticeManager</a>::<dfn class="decl def" id="_ZN16G4LatticeManager5ClearEv" title='G4LatticeManager::Clear' data-ref="_ZN16G4LatticeManager5ClearEv">Clear</dfn>() {</td></tr>
+<tr><th id="80">80</th><td>  fPLatticeList.clear();</td></tr>
+<tr><th id="81">81</th><td>  fPLattices.clear();</td></tr>
+<tr><th id="82">82</th><td></td></tr>
+<tr><th id="83">83</th><td>  fLLatticeList.clear();</td></tr>
+<tr><th id="84">84</th><td>  fLLattices.clear();</td></tr>
+<tr><th id="85">85</th><td>}</td></tr>
+<tr><th id="86">86</th><td></td></tr>
+<tr><th id="87">87</th><td><i>//....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo....</i></td></tr>
+<tr><th id="88">88</th><td></td></tr>
+<tr><th id="89">89</th><td><a class="type" href="../include/G4LatticeManager.hh.html#G4LatticeManager" title='G4LatticeManager' data-ref="G4LatticeManager">G4LatticeManager</a>* <a class="type" href="../include/G4LatticeManager.hh.html#G4LatticeManager" title='G4LatticeManager' data-ref="G4LatticeManager">G4LatticeManager</a>::<dfn class="decl def" id="_ZN16G4LatticeManager17GetLatticeManagerEv" title='G4LatticeManager::GetLatticeManager' data-ref="_ZN16G4LatticeManager17GetLatticeManagerEv">GetLatticeManager</dfn>() {</td></tr>
+<tr><th id="90">90</th><td>  <i>// if no lattice manager exists, create one.</i></td></tr>
+<tr><th id="91">91</th><td>  <a class="typedef" href="../../../../global/management/include/G4AutoLock.hh.html#G4AutoLock" title='G4AutoLock' data-type='int' data-ref="G4AutoLock">G4AutoLock</a> <dfn class="local col1 decl" id="11latLock" title='latLock' data-type='G4AutoLock' data-ref="11latLock">latLock</dfn>(&amp;latMutex);	<i>// Protect before changing pointer</i></td></tr>
+<tr><th id="92">92</th><td>  <b>if</b> (!<a class="member" href="../include/G4LatticeManager.hh.html#G4LatticeManager::fLM" title='G4LatticeManager::fLM' data-ref="G4LatticeManager::fLM">fLM</a>) <a class="member" href="../include/G4LatticeManager.hh.html#G4LatticeManager::fLM" title='G4LatticeManager::fLM' data-ref="G4LatticeManager::fLM">fLM</a> = <b>new</b> <a class="type" href="../include/G4LatticeManager.hh.html#G4LatticeManager" title='G4LatticeManager' data-ref="G4LatticeManager">G4LatticeManager</a><a class="ref" href="#_ZN16G4LatticeManagerC1Ev" title='G4LatticeManager::G4LatticeManager' data-ref="_ZN16G4LatticeManagerC1Ev">(</a>);</td></tr>
+<tr><th id="93">93</th><td>  latLock<span class='error' title="member reference base type &apos;G4AutoLock&apos; (aka &apos;int&apos;) is not a structure or union">.</span>unlock();</td></tr>
+<tr><th id="94">94</th><td></td></tr>
+<tr><th id="95">95</th><td>  <b>return</b> <a class="member" href="../include/G4LatticeManager.hh.html#G4LatticeManager::fLM" title='G4LatticeManager::fLM' data-ref="G4LatticeManager::fLM">fLM</a>;</td></tr>
+<tr><th id="96">96</th><td>}</td></tr>
+<tr><th id="97">97</th><td></td></tr>
+<tr><th id="98">98</th><td><i>//....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo....</i></td></tr>
+<tr><th id="99">99</th><td><i></i></td></tr>
+<tr><th id="100">100</th><td><i>// Associate logical lattice with material</i></td></tr>
+<tr><th id="101">101</th><td></td></tr>
+<tr><th id="102">102</th><td><a class="typedef" href="../../../../global/management/include/G4Types.hh.html#G4bool" title='G4bool' data-type='bool' data-ref="G4bool">G4bool</a> <a class="type" href="../include/G4LatticeManager.hh.html#G4LatticeManager" title='G4LatticeManager' data-ref="G4LatticeManager">G4LatticeManager</a>::<dfn class="decl def" id="_ZN16G4LatticeManager15RegisterLatticeEP10G4MaterialP16G4LatticeLogical" title='G4LatticeManager::RegisterLattice' data-ref="_ZN16G4LatticeManager15RegisterLatticeEP10G4MaterialP16G4LatticeLogical">RegisterLattice</dfn>(<a class="type" href="../../../../materials/include/G4Material.hh.html#G4Material" title='G4Material' data-ref="G4Material">G4Material</a>* <dfn class="local col2 decl" id="12Mat" title='Mat' data-type='G4Material *' data-ref="12Mat">Mat</dfn>,</td></tr>
+<tr><th id="103">103</th><td>					 <a class="type" href="../../../../materials/include/G4LatticeLogical.hh.html#G4LatticeLogical" title='G4LatticeLogical' data-ref="G4LatticeLogical">G4LatticeLogical</a>* <dfn class="local col3 decl" id="13Lat" title='Lat' data-type='G4LatticeLogical *' data-ref="13Lat">Lat</dfn>) {</td></tr>
+<tr><th id="104">104</th><td>  <b>if</b> (!<a class="local col2 ref" href="#12Mat" title='Mat' data-ref="12Mat">Mat</a> || !<a class="local col3 ref" href="#13Lat" title='Lat' data-ref="13Lat">Lat</a>) <b>return</b> <b>false</b>;	<i>// Don't register null pointers</i></td></tr>
+<tr><th id="105">105</th><td></td></tr>
+<tr><th id="106">106</th><td>  <a class="typedef" href="../../../../global/management/include/G4AutoLock.hh.html#G4AutoLock" title='G4AutoLock' data-type='int' data-ref="G4AutoLock">G4AutoLock</a> <dfn class="local col4 decl" id="14latLock" title='latLock' data-type='G4AutoLock' data-ref="14latLock">latLock</dfn>(&amp;latMutex);	<i>// Protect before changing registry</i></td></tr>
+<tr><th id="107">107</th><td>  fLLattices.insert(Lat);		<i>// Take ownership in registry</i></td></tr>
+<tr><th id="108">108</th><td>  fLLatticeList[Mat] = Lat;</td></tr>
+<tr><th id="109">109</th><td>  latLock<span class='error' title="member reference base type &apos;G4AutoLock&apos; (aka &apos;int&apos;) is not a structure or union">.</span>unlock();</td></tr>
+<tr><th id="110">110</th><td></td></tr>
+<tr><th id="111">111</th><td>  <b>if</b> (<a class="member" href="../include/G4LatticeManager.hh.html#G4LatticeManager::verboseLevel" title='G4LatticeManager::verboseLevel' data-ref="G4LatticeManager::verboseLevel">verboseLevel</a>) {</td></tr>
+<tr><th id="112">112</th><td>    <a class="macro" href="../../../../global/management/include/G4ios.hh.html#46" title="(*_G4cout_p())" data-ref="_M/G4cout">G4cout</a> <span class='error' title="invalid operands to binary expression (&apos;int&apos; and &apos;const char *&apos;)">&lt;&lt;</span> <q>"G4LatticeManager::RegisterLattice: "</q></td></tr>
+<tr><th id="113">113</th><td>	   &lt;&lt; <q>" Total number of logical lattices: "</q> &lt;&lt; fLLatticeList.size()</td></tr>
+<tr><th id="114">114</th><td>	   &lt;&lt; <q>" ("</q> &lt;&lt; fLLattices.size() &lt;&lt; <q>" unique)"</q> &lt;&lt; <a class="macro" href="../../../../global/management/include/G4ios.hh.html#60" title="std::endl" data-ref="_M/G4endl">G4endl</a>;</td></tr>
+<tr><th id="115">115</th><td>  }</td></tr>
+<tr><th id="116">116</th><td></td></tr>
+<tr><th id="117">117</th><td>  <b>return</b> <b>true</b>; </td></tr>
+<tr><th id="118">118</th><td>}</td></tr>
+<tr><th id="119">119</th><td></td></tr>
+<tr><th id="120">120</th><td><i>// Construct logical lattice for material from config file</i></td></tr>
+<tr><th id="121">121</th><td></td></tr>
+<tr><th id="122">122</th><td><a class="type" href="../../../../materials/include/G4LatticeLogical.hh.html#G4LatticeLogical" title='G4LatticeLogical' data-ref="G4LatticeLogical">G4LatticeLogical</a>* <a class="type" href="../include/G4LatticeManager.hh.html#G4LatticeManager" title='G4LatticeManager' data-ref="G4LatticeManager">G4LatticeManager</a>::<dfn class="decl def" id="_ZN16G4LatticeManager11LoadLatticeEP10G4MaterialRK8G4String" title='G4LatticeManager::LoadLattice' data-ref="_ZN16G4LatticeManager11LoadLatticeEP10G4MaterialRK8G4String">LoadLattice</dfn>(<a class="type" href="../../../../materials/include/G4Material.hh.html#G4Material" title='G4Material' data-ref="G4Material">G4Material</a>* <dfn class="local col5 decl" id="15Mat" title='Mat' data-type='G4Material *' data-ref="15Mat">Mat</dfn>,</td></tr>
+<tr><th id="123">123</th><td>						<em>const</em> <a class="type" href="../../../../global/management/include/G4String.hh.html#G4String" title='G4String' data-ref="G4String">G4String</a>&amp; <dfn class="local col6 decl" id="16latDir" title='latDir' data-type='const G4String &amp;' data-ref="16latDir">latDir</dfn>) {</td></tr>
+<tr><th id="124">124</th><td>  <b>if</b> (<a class="member" href="../include/G4LatticeManager.hh.html#G4LatticeManager::verboseLevel" title='G4LatticeManager::verboseLevel' data-ref="G4LatticeManager::verboseLevel">verboseLevel</a>) {</td></tr>
+<tr><th id="125">125</th><td>    <a class="macro" href="../../../../global/management/include/G4ios.hh.html#46" title="(*_G4cout_p())" data-ref="_M/G4cout">G4cout</a> <span class='error' title="invalid operands to binary expression (&apos;int&apos; and &apos;const char *&apos;)">&lt;&lt;</span> <q>"G4LatticeManager::LoadLattice material "</q> &lt;&lt; Mat-&gt;GetName()</td></tr>
+<tr><th id="126">126</th><td>	   &lt;&lt; <q>" "</q> &lt;&lt; latDir &lt;&lt; <a class="macro" href="../../../../global/management/include/G4ios.hh.html#60" title="std::endl" data-ref="_M/G4endl">G4endl</a>;</td></tr>
+<tr><th id="127">127</th><td>  }</td></tr>
+<tr><th id="128">128</th><td>		      </td></tr>
+<tr><th id="129">129</th><td>  <a class="type" href="../include/G4LatticeReader.hh.html#G4LatticeReader" title='G4LatticeReader' data-ref="G4LatticeReader">G4LatticeReader</a> <dfn class="local col7 decl" id="17latReader" title='latReader' data-type='G4LatticeReader' data-ref="17latReader">latReader</dfn><a class="ref" href="../include/G4LatticeReader.hh.html#_ZN15G4LatticeReaderC1Ei" title='G4LatticeReader::G4LatticeReader' data-ref="_ZN15G4LatticeReaderC1Ei">(</a><a class="member" href="../include/G4LatticeManager.hh.html#G4LatticeManager::verboseLevel" title='G4LatticeManager::verboseLevel' data-ref="G4LatticeManager::verboseLevel">verboseLevel</a>);</td></tr>
+<tr><th id="130">130</th><td>  <a class="type" href="../../../../materials/include/G4LatticeLogical.hh.html#G4LatticeLogical" title='G4LatticeLogical' data-ref="G4LatticeLogical">G4LatticeLogical</a>* <dfn class="local col8 decl" id="18newLat" title='newLat' data-type='G4LatticeLogical *' data-ref="18newLat">newLat</dfn> = latReader.MakeLattice(latDir<span class='error' title="invalid operands to binary expression (&apos;const G4String&apos; and &apos;const char *&apos;)">+</span><q>"/config.txt"</q>);</td></tr>
+<tr><th id="131">131</th><td>  <b>if</b> (verboseLevel&gt;<var>1</var>) <a class="macro" href="../../../../global/management/include/G4ios.hh.html#46" title="(*_G4cout_p())" data-ref="_M/G4cout">G4cout</a> <span class='error' title="invalid operands to binary expression (&apos;int&apos; and &apos;const char *&apos;)">&lt;&lt;</span> <q>" Created newLat "</q> &lt;&lt; newLat &lt;&lt; <a class="macro" href="../../../../global/management/include/G4ios.hh.html#60" title="std::endl" data-ref="_M/G4endl">G4endl</a>;</td></tr>
+<tr><th id="132">132</th><td></td></tr>
+<tr><th id="133">133</th><td>  <b>if</b> (<a class="local col8 ref" href="#18newLat" title='newLat' data-ref="18newLat">newLat</a>) <a class="member" href="#_ZN16G4LatticeManager15RegisterLatticeEP10G4MaterialP16G4LatticeLogical" title='G4LatticeManager::RegisterLattice' data-ref="_ZN16G4LatticeManager15RegisterLatticeEP10G4MaterialP16G4LatticeLogical">RegisterLattice</a>(<a class="local col5 ref" href="#15Mat" title='Mat' data-ref="15Mat">Mat</a>, <a class="local col8 ref" href="#18newLat" title='newLat' data-ref="18newLat">newLat</a>);</td></tr>
+<tr><th id="134">134</th><td>  <b>else</b> {</td></tr>
+<tr><th id="135">135</th><td>    <a class="macro" href="../../../../global/management/include/G4ios.hh.html#47" title="(*_G4cerr_p())" data-ref="_M/G4cerr">G4cerr</a> <span class='error' title="invalid operands to binary expression (&apos;int&apos; and &apos;const char *&apos;)">&lt;&lt;</span> <q>"ERROR creating "</q> &lt;&lt; latDir &lt;&lt; <q>" lattice for material "</q></td></tr>
+<tr><th id="136">136</th><td>	   &lt;&lt; Mat-&gt;GetName() &lt;&lt; <a class="macro" href="../../../../global/management/include/G4ios.hh.html#60" title="std::endl" data-ref="_M/G4endl">G4endl</a>;</td></tr>
+<tr><th id="137">137</th><td>  }</td></tr>
+<tr><th id="138">138</th><td></td></tr>
+<tr><th id="139">139</th><td>  <b>return</b> <a class="local col8 ref" href="#18newLat" title='newLat' data-ref="18newLat">newLat</a>;</td></tr>
+<tr><th id="140">140</th><td>}</td></tr>
+<tr><th id="141">141</th><td></td></tr>
+<tr><th id="142">142</th><td><i>// Combine loading and registration (Material extracted from volume)</i></td></tr>
+<tr><th id="143">143</th><td></td></tr>
+<tr><th id="144">144</th><td><a class="type" href="../../../../materials/include/G4LatticePhysical.hh.html#G4LatticePhysical" title='G4LatticePhysical' data-ref="G4LatticePhysical">G4LatticePhysical</a>* <a class="type" href="../include/G4LatticeManager.hh.html#G4LatticeManager" title='G4LatticeManager' data-ref="G4LatticeManager">G4LatticeManager</a>::<dfn class="decl def" id="_ZN16G4LatticeManager11LoadLatticeEP17G4VPhysicalVolumeRK8G4String" title='G4LatticeManager::LoadLattice' data-ref="_ZN16G4LatticeManager11LoadLatticeEP17G4VPhysicalVolumeRK8G4String">LoadLattice</dfn>(<a class="type" href="../../../../geometry/management/include/G4VPhysicalVolume.hh.html#G4VPhysicalVolume" title='G4VPhysicalVolume' data-ref="G4VPhysicalVolume">G4VPhysicalVolume</a>* <dfn class="local col9 decl" id="19Vol" title='Vol' data-type='G4VPhysicalVolume *' data-ref="19Vol">Vol</dfn>,</td></tr>
+<tr><th id="145">145</th><td>						<em>const</em> <a class="type" href="../../../../global/management/include/G4String.hh.html#G4String" title='G4String' data-ref="G4String">G4String</a>&amp; <dfn class="local col0 decl" id="20latDir" title='latDir' data-type='const G4String &amp;' data-ref="20latDir">latDir</dfn>) {</td></tr>
+<tr><th id="146">146</th><td>  <b>if</b> (<a class="member" href="../include/G4LatticeManager.hh.html#G4LatticeManager::verboseLevel" title='G4LatticeManager::verboseLevel' data-ref="G4LatticeManager::verboseLevel">verboseLevel</a>) {</td></tr>
+<tr><th id="147">147</th><td>    <a class="macro" href="../../../../global/management/include/G4ios.hh.html#46" title="(*_G4cout_p())" data-ref="_M/G4cout">G4cout</a> <span class='error' title="invalid operands to binary expression (&apos;int&apos; and &apos;const char *&apos;)">&lt;&lt;</span> <q>"G4LatticeManager::LoadLattice volume "</q> &lt;&lt; Vol-&gt;GetName()</td></tr>
+<tr><th id="148">148</th><td>	   &lt;&lt; <q>" "</q> &lt;&lt; latDir &lt;&lt; <a class="macro" href="../../../../global/management/include/G4ios.hh.html#60" title="std::endl" data-ref="_M/G4endl">G4endl</a>;</td></tr>
+<tr><th id="149">149</th><td>  }</td></tr>
+<tr><th id="150">150</th><td>		      </td></tr>
+<tr><th id="151">151</th><td>  <a class="type" href="../../../../materials/include/G4Material.hh.html#G4Material" title='G4Material' data-ref="G4Material">G4Material</a>* <dfn class="local col1 decl" id="21theMat" title='theMat' data-type='G4Material *' data-ref="21theMat">theMat</dfn> = <a class="local col9 ref" href="#19Vol" title='Vol' data-ref="19Vol">Vol</a>-&gt;<a class="ref" href="../../../../geometry/management/include/G4VPhysicalVolume.hh.html#_ZNK17G4VPhysicalVolume16GetLogicalVolumeEv" title='G4VPhysicalVolume::GetLogicalVolume' data-ref="_ZNK17G4VPhysicalVolume16GetLogicalVolumeEv">GetLogicalVolume</a>()-&gt;<a class="ref" href="../../../../geometry/management/include/G4LogicalVolume.hh.html#_ZNK15G4LogicalVolume11GetMaterialEv" title='G4LogicalVolume::GetMaterial' data-ref="_ZNK15G4LogicalVolume11GetMaterialEv">GetMaterial</a>();</td></tr>
+<tr><th id="152">152</th><td></td></tr>
+<tr><th id="153">153</th><td>  <i>// Create and register the logical lattice, then the physical lattice</i></td></tr>
+<tr><th id="154">154</th><td>  <a class="type" href="../../../../materials/include/G4LatticeLogical.hh.html#G4LatticeLogical" title='G4LatticeLogical' data-ref="G4LatticeLogical">G4LatticeLogical</a>* <dfn class="local col2 decl" id="22lLattice" title='lLattice' data-type='G4LatticeLogical *' data-ref="22lLattice">lLattice</dfn> = <a class="member" href="#_ZN16G4LatticeManager11LoadLatticeEP10G4MaterialRK8G4String" title='G4LatticeManager::LoadLattice' data-ref="_ZN16G4LatticeManager11LoadLatticeEP10G4MaterialRK8G4String">LoadLattice</a>(<a class="local col1 ref" href="#21theMat" title='theMat' data-ref="21theMat">theMat</a>, <a class="local col0 ref" href="#20latDir" title='latDir' data-ref="20latDir">latDir</a>);</td></tr>
+<tr><th id="155">155</th><td>  <b>if</b> (!<a class="local col2 ref" href="#22lLattice" title='lLattice' data-ref="22lLattice">lLattice</a>) <b>return</b> <var>0</var>;</td></tr>
+<tr><th id="156">156</th><td></td></tr>
+<tr><th id="157">157</th><td>  <a class="type" href="../../../../materials/include/G4LatticePhysical.hh.html#G4LatticePhysical" title='G4LatticePhysical' data-ref="G4LatticePhysical">G4LatticePhysical</a>* <dfn class="local col3 decl" id="23pLattice" title='pLattice' data-type='G4LatticePhysical *' data-ref="23pLattice">pLattice</dfn> =</td></tr>
+<tr><th id="158">158</th><td>    <b>new</b> <a class="type" href="../../../../materials/include/G4LatticePhysical.hh.html#G4LatticePhysical" title='G4LatticePhysical' data-ref="G4LatticePhysical">G4LatticePhysical</a><a class="ref" href="../../../../materials/include/G4LatticePhysical.hh.html#_ZN17G4LatticePhysicalC1EPK16G4LatticeLogicalPKN5CLHEP11HepRotationE" title='G4LatticePhysical::G4LatticePhysical' data-ref="_ZN17G4LatticePhysicalC1EPK16G4LatticeLogicalPKN5CLHEP11HepRotationE">(</a><a class="local col2 ref" href="#22lLattice" title='lLattice' data-ref="22lLattice">lLattice</a>, <a class="local col9 ref" href="#19Vol" title='Vol' data-ref="19Vol">Vol</a>-&gt;<a class="ref" href="../../../../geometry/management/include/G4VPhysicalVolume.hh.html#_ZNK17G4VPhysicalVolume16GetFrameRotationEv" title='G4VPhysicalVolume::GetFrameRotation' data-ref="_ZNK17G4VPhysicalVolume16GetFrameRotationEv">GetFrameRotation</a>());</td></tr>
+<tr><th id="159">159</th><td>  <b>if</b> (<a class="local col3 ref" href="#23pLattice" title='pLattice' data-ref="23pLattice">pLattice</a>) <a class="member" href="#_ZN16G4LatticeManager15RegisterLatticeEP17G4VPhysicalVolumeP17G4LatticePhysical" title='G4LatticeManager::RegisterLattice' data-ref="_ZN16G4LatticeManager15RegisterLatticeEP17G4VPhysicalVolumeP17G4LatticePhysical">RegisterLattice</a>(<a class="local col9 ref" href="#19Vol" title='Vol' data-ref="19Vol">Vol</a>, <a class="local col3 ref" href="#23pLattice" title='pLattice' data-ref="23pLattice">pLattice</a>);</td></tr>
+<tr><th id="160">160</th><td></td></tr>
+<tr><th id="161">161</th><td>  <b>if</b> (verboseLevel&gt;<var>1</var>) <a class="macro" href="../../../../global/management/include/G4ios.hh.html#46" title="(*_G4cout_p())" data-ref="_M/G4cout">G4cout</a> <span class='error' title="invalid operands to binary expression (&apos;int&apos; and &apos;const char *&apos;)">&lt;&lt;</span> <q>" Created pLattice "</q> &lt;&lt; pLattice &lt;&lt; <a class="macro" href="../../../../global/management/include/G4ios.hh.html#60" title="std::endl" data-ref="_M/G4endl">G4endl</a>;</td></tr>
+<tr><th id="162">162</th><td></td></tr>
+<tr><th id="163">163</th><td>  <b>return</b> <a class="local col3 ref" href="#23pLattice" title='pLattice' data-ref="23pLattice">pLattice</a>;</td></tr>
+<tr><th id="164">164</th><td>}</td></tr>
+<tr><th id="165">165</th><td></td></tr>
+<tr><th id="166">166</th><td></td></tr>
+<tr><th id="167">167</th><td><i>//....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo....</i></td></tr>
+<tr><th id="168">168</th><td><i></i></td></tr>
+<tr><th id="169">169</th><td><i>// Associate physical (oriented) lattice with physical volume</i></td></tr>
+<tr><th id="170">170</th><td></td></tr>
+<tr><th id="171">171</th><td><a class="typedef" href="../../../../global/management/include/G4Types.hh.html#G4bool" title='G4bool' data-type='bool' data-ref="G4bool">G4bool</a> <a class="type" href="../include/G4LatticeManager.hh.html#G4LatticeManager" title='G4LatticeManager' data-ref="G4LatticeManager">G4LatticeManager</a>::<dfn class="decl def" id="_ZN16G4LatticeManager15RegisterLatticeEP17G4VPhysicalVolumeP17G4LatticePhysical" title='G4LatticeManager::RegisterLattice' data-ref="_ZN16G4LatticeManager15RegisterLatticeEP17G4VPhysicalVolumeP17G4LatticePhysical">RegisterLattice</dfn>(<a class="type" href="../../../../geometry/management/include/G4VPhysicalVolume.hh.html#G4VPhysicalVolume" title='G4VPhysicalVolume' data-ref="G4VPhysicalVolume">G4VPhysicalVolume</a>* <dfn class="local col4 decl" id="24Vol" title='Vol' data-type='G4VPhysicalVolume *' data-ref="24Vol">Vol</dfn>,</td></tr>
+<tr><th id="172">172</th><td>					 <a class="type" href="../../../../materials/include/G4LatticePhysical.hh.html#G4LatticePhysical" title='G4LatticePhysical' data-ref="G4LatticePhysical">G4LatticePhysical</a>* <dfn class="local col5 decl" id="25Lat" title='Lat' data-type='G4LatticePhysical *' data-ref="25Lat">Lat</dfn>) {</td></tr>
+<tr><th id="173">173</th><td>  <b>if</b> (!<a class="local col4 ref" href="#24Vol" title='Vol' data-ref="24Vol">Vol</a> || !<a class="local col5 ref" href="#25Lat" title='Lat' data-ref="25Lat">Lat</a>) <b>return</b> <b>false</b>;	<i>// Don't register null pointers</i></td></tr>
+<tr><th id="174">174</th><td></td></tr>
+<tr><th id="175">175</th><td>  <a class="typedef" href="../../../../global/management/include/G4AutoLock.hh.html#G4AutoLock" title='G4AutoLock' data-type='int' data-ref="G4AutoLock">G4AutoLock</a> <dfn class="local col6 decl" id="26latLock" title='latLock' data-type='G4AutoLock' data-ref="26latLock">latLock</dfn>(&amp;latMutex);	<i>// Protect before changing registry</i></td></tr>
+<tr><th id="176">176</th><td></td></tr>
+<tr><th id="177">177</th><td>  <i>// SPECIAL: Register first lattice with a null volume to act as default</i></td></tr>
+<tr><th id="178">178</th><td>  <b>if</b> (fPLatticeList.empty()) fPLatticeList[<var>0</var>] = Lat;</td></tr>
+<tr><th id="179">179</th><td></td></tr>
+<tr><th id="180">180</th><td>  fPLattices.insert(Lat);</td></tr>
+<tr><th id="181">181</th><td>  fPLatticeList[Vol] = Lat;</td></tr>
+<tr><th id="182">182</th><td></td></tr>
+<tr><th id="183">183</th><td>  latLock<span class='error' title="member reference base type &apos;G4AutoLock&apos; (aka &apos;int&apos;) is not a structure or union">.</span>unlock();</td></tr>
+<tr><th id="184">184</th><td></td></tr>
+<tr><th id="185">185</th><td>  <b>if</b> (<a class="member" href="../include/G4LatticeManager.hh.html#G4LatticeManager::verboseLevel" title='G4LatticeManager::verboseLevel' data-ref="G4LatticeManager::verboseLevel">verboseLevel</a>) {</td></tr>
+<tr><th id="186">186</th><td>    <a class="macro" href="../../../../global/management/include/G4ios.hh.html#46" title="(*_G4cout_p())" data-ref="_M/G4cout">G4cout</a> <span class='error' title="invalid operands to binary expression (&apos;int&apos; and &apos;const char *&apos;)">&lt;&lt;</span> <q>"G4LatticeManager::RegisterLattice: "</q></td></tr>
+<tr><th id="187">187</th><td>	   &lt;&lt; <q>" Total number of physical lattices: "</q> &lt;&lt; fPLatticeList.size()-<var>1</var></td></tr>
+<tr><th id="188">188</th><td>	   &lt;&lt; <q>" ("</q> &lt;&lt; fPLattices.size() &lt;&lt; <q>" unique)"</q> &lt;&lt; <a class="macro" href="../../../../global/management/include/G4ios.hh.html#60" title="std::endl" data-ref="_M/G4endl">G4endl</a>;</td></tr>
+<tr><th id="189">189</th><td>  }</td></tr>
+<tr><th id="190">190</th><td></td></tr>
+<tr><th id="191">191</th><td>  <b>return</b> <b>true</b>; </td></tr>
+<tr><th id="192">192</th><td>}</td></tr>
+<tr><th id="193">193</th><td></td></tr>
+<tr><th id="194">194</th><td><a class="typedef" href="../../../../global/management/include/G4Types.hh.html#G4bool" title='G4bool' data-type='bool' data-ref="G4bool">G4bool</a> <a class="type" href="../include/G4LatticeManager.hh.html#G4LatticeManager" title='G4LatticeManager' data-ref="G4LatticeManager">G4LatticeManager</a>::<dfn class="decl def" id="_ZN16G4LatticeManager15RegisterLatticeEP17G4VPhysicalVolumeP16G4LatticeLogical" title='G4LatticeManager::RegisterLattice' data-ref="_ZN16G4LatticeManager15RegisterLatticeEP17G4VPhysicalVolumeP16G4LatticeLogical">RegisterLattice</dfn>(<a class="type" href="../../../../geometry/management/include/G4VPhysicalVolume.hh.html#G4VPhysicalVolume" title='G4VPhysicalVolume' data-ref="G4VPhysicalVolume">G4VPhysicalVolume</a>* <dfn class="local col7 decl" id="27Vol" title='Vol' data-type='G4VPhysicalVolume *' data-ref="27Vol">Vol</dfn>,</td></tr>
+<tr><th id="195">195</th><td>					 <a class="type" href="../../../../materials/include/G4LatticeLogical.hh.html#G4LatticeLogical" title='G4LatticeLogical' data-ref="G4LatticeLogical">G4LatticeLogical</a>* <dfn class="local col8 decl" id="28LLat" title='LLat' data-type='G4LatticeLogical *' data-ref="28LLat">LLat</dfn>) {</td></tr>
+<tr><th id="196">196</th><td>  <b>if</b> (!<a class="local col7 ref" href="#27Vol" title='Vol' data-ref="27Vol">Vol</a> || !<a class="local col8 ref" href="#28LLat" title='LLat' data-ref="28LLat">LLat</a>) <b>return</b> <b>false</b>;	<i>// Don't register null pointers</i></td></tr>
+<tr><th id="197">197</th><td></td></tr>
+<tr><th id="198">198</th><td>  <i>// Make sure logical lattice is registered for material</i></td></tr>
+<tr><th id="199">199</th><td>  <a class="member" href="#_ZN16G4LatticeManager15RegisterLatticeEP10G4MaterialP16G4LatticeLogical" title='G4LatticeManager::RegisterLattice' data-ref="_ZN16G4LatticeManager15RegisterLatticeEP10G4MaterialP16G4LatticeLogical">RegisterLattice</a>(<a class="local col7 ref" href="#27Vol" title='Vol' data-ref="27Vol">Vol</a>-&gt;<a class="ref" href="../../../../geometry/management/include/G4VPhysicalVolume.hh.html#_ZNK17G4VPhysicalVolume16GetLogicalVolumeEv" title='G4VPhysicalVolume::GetLogicalVolume' data-ref="_ZNK17G4VPhysicalVolume16GetLogicalVolumeEv">GetLogicalVolume</a>()-&gt;<a class="ref" href="../../../../geometry/management/include/G4LogicalVolume.hh.html#_ZNK15G4LogicalVolume11GetMaterialEv" title='G4LogicalVolume::GetMaterial' data-ref="_ZNK15G4LogicalVolume11GetMaterialEv">GetMaterial</a>(), <a class="local col8 ref" href="#28LLat" title='LLat' data-ref="28LLat">LLat</a>);</td></tr>
+<tr><th id="200">200</th><td></td></tr>
+<tr><th id="201">201</th><td>  <i>// Create and register new physical lattice to go with volume</i></td></tr>
+<tr><th id="202">202</th><td>  <b>return</b> <a class="member" href="#_ZN16G4LatticeManager15RegisterLatticeEP17G4VPhysicalVolumeP17G4LatticePhysical" title='G4LatticeManager::RegisterLattice' data-ref="_ZN16G4LatticeManager15RegisterLatticeEP17G4VPhysicalVolumeP17G4LatticePhysical">RegisterLattice</a>(<a class="local col7 ref" href="#27Vol" title='Vol' data-ref="27Vol">Vol</a>, <b>new</b> <a class="type" href="../../../../materials/include/G4LatticePhysical.hh.html#G4LatticePhysical" title='G4LatticePhysical' data-ref="G4LatticePhysical">G4LatticePhysical</a><a class="ref" href="../../../../materials/include/G4LatticePhysical.hh.html#_ZN17G4LatticePhysicalC1EPK16G4LatticeLogicalPKN5CLHEP11HepRotationE" title='G4LatticePhysical::G4LatticePhysical' data-ref="_ZN17G4LatticePhysicalC1EPK16G4LatticeLogicalPKN5CLHEP11HepRotationE">(</a><a class="local col8 ref" href="#28LLat" title='LLat' data-ref="28LLat">LLat</a>, <a class="local col7 ref" href="#27Vol" title='Vol' data-ref="27Vol">Vol</a>-&gt;<a class="ref" href="../../../../geometry/management/include/G4VPhysicalVolume.hh.html#_ZNK17G4VPhysicalVolume16GetFrameRotationEv" title='G4VPhysicalVolume::GetFrameRotation' data-ref="_ZNK17G4VPhysicalVolume16GetFrameRotationEv">GetFrameRotation</a>()));</td></tr>
+<tr><th id="203">203</th><td>}</td></tr>
+<tr><th id="204">204</th><td></td></tr>
+<tr><th id="205">205</th><td><i>//....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo....</i></td></tr>
+<tr><th id="206">206</th><td><i></i></td></tr>
+<tr><th id="207">207</th><td><i>// Returns a pointer to the LatticeLogical associated with material</i></td></tr>
+<tr><th id="208">208</th><td></td></tr>
+<tr><th id="209">209</th><td><a class="type" href="../../../../materials/include/G4LatticeLogical.hh.html#G4LatticeLogical" title='G4LatticeLogical' data-ref="G4LatticeLogical">G4LatticeLogical</a>* <a class="type" href="../include/G4LatticeManager.hh.html#G4LatticeManager" title='G4LatticeManager' data-ref="G4LatticeManager">G4LatticeManager</a>::<dfn class="decl def" id="_ZNK16G4LatticeManager10GetLatticeEP10G4Material" title='G4LatticeManager::GetLattice' data-ref="_ZNK16G4LatticeManager10GetLatticeEP10G4Material">GetLattice</dfn>(<a class="type" href="../../../../materials/include/G4Material.hh.html#G4Material" title='G4Material' data-ref="G4Material">G4Material</a>* <dfn class="local col9 decl" id="29Mat" title='Mat' data-type='G4Material *' data-ref="29Mat">Mat</dfn>) <em>const</em> {</td></tr>
+<tr><th id="210">210</th><td>  <span class='error' title="use of undeclared identifier &apos;LatticeMatMap&apos;">LatticeMatMap</span>::const_iterator <dfn class="local col0 decl" id="30latFind" title='latFind' data-type='int' data-ref="30latFind">latFind</dfn> = fLLatticeList.find(Mat);</td></tr>
+<tr><th id="211">211</th><td>  <b>if</b> (latFind != fLLatticeList.end()) {</td></tr>
+<tr><th id="212">212</th><td>    <b>if</b> (verboseLevel)</td></tr>
+<tr><th id="213">213</th><td>      <a class="macro" href="../../../../global/management/include/G4ios.hh.html#46" title="(*_G4cout_p())" data-ref="_M/G4cout">G4cout</a> <span class='error' title="invalid operands to binary expression (&apos;int&apos; and &apos;const char *&apos;)">&lt;&lt;</span> <q>"G4LatticeManager::GetLattice found "</q> &lt;&lt; latFind-&gt;second</td></tr>
+<tr><th id="214">214</th><td>	     &lt;&lt; <q>" for "</q> &lt;&lt; (Mat?Mat-&gt;GetName():<q>"NULL"</q>) &lt;&lt; <q>"."</q> &lt;&lt; <a class="macro" href="../../../../global/management/include/G4ios.hh.html#60" title="std::endl" data-ref="_M/G4endl">G4endl</a>;</td></tr>
+<tr><th id="215">215</th><td>    <b>return</b> latFind-&gt;second;</td></tr>
+<tr><th id="216">216</th><td>  }</td></tr>
+<tr><th id="217">217</th><td></td></tr>
+<tr><th id="218">218</th><td>  <b>if</b> (verboseLevel) </td></tr>
+<tr><th id="219">219</th><td>    <a class="macro" href="../../../../global/management/include/G4ios.hh.html#47" title="(*_G4cerr_p())" data-ref="_M/G4cerr">G4cerr</a> <span class='error' title="invalid operands to binary expression (&apos;int&apos; and &apos;const char *&apos;)">&lt;&lt;</span> <q>"G4LatticeManager:: Found no matching lattices for "</q></td></tr>
+<tr><th id="220">220</th><td>	   &lt;&lt; (Mat?Mat-&gt;GetName():<q>"NULL"</q>) &lt;&lt; <q>"."</q> &lt;&lt; <a class="macro" href="../../../../global/management/include/G4ios.hh.html#60" title="std::endl" data-ref="_M/G4endl">G4endl</a>;</td></tr>
+<tr><th id="221">221</th><td></td></tr>
+<tr><th id="222">222</th><td>  <b>return</b> <var>0</var>;			<i>// No lattice associated with volume</i></td></tr>
+<tr><th id="223">223</th><td>}</td></tr>
+<tr><th id="224">224</th><td></td></tr>
+<tr><th id="225">225</th><td><i>// Returns a pointer to the LatticePhysical associated with volume</i></td></tr>
+<tr><th id="226">226</th><td><i>// NOTE:  Passing Vol==0 will return the default lattice</i></td></tr>
+<tr><th id="227">227</th><td></td></tr>
+<tr><th id="228">228</th><td><a class="type" href="../../../../materials/include/G4LatticePhysical.hh.html#G4LatticePhysical" title='G4LatticePhysical' data-ref="G4LatticePhysical">G4LatticePhysical</a>* <a class="type" href="../include/G4LatticeManager.hh.html#G4LatticeManager" title='G4LatticeManager' data-ref="G4LatticeManager">G4LatticeManager</a>::<dfn class="decl def" id="_ZNK16G4LatticeManager10GetLatticeEP17G4VPhysicalVolume" title='G4LatticeManager::GetLattice' data-ref="_ZNK16G4LatticeManager10GetLatticeEP17G4VPhysicalVolume">GetLattice</dfn>(<a class="type" href="../../../../geometry/management/include/G4VPhysicalVolume.hh.html#G4VPhysicalVolume" title='G4VPhysicalVolume' data-ref="G4VPhysicalVolume">G4VPhysicalVolume</a>* <dfn class="local col1 decl" id="31Vol" title='Vol' data-type='G4VPhysicalVolume *' data-ref="31Vol">Vol</dfn>) <em>const</em> {</td></tr>
+<tr><th id="229">229</th><td>  <span class='error' title="use of undeclared identifier &apos;LatticeVolMap&apos;">LatticeVolMap</span>::const_iterator <dfn class="local col2 decl" id="32latFind" title='latFind' data-type='int' data-ref="32latFind">latFind</dfn> = fPLatticeList.find(Vol);</td></tr>
+<tr><th id="230">230</th><td>  <b>if</b> (latFind != fPLatticeList.end()) {</td></tr>
+<tr><th id="231">231</th><td>    <b>if</b> (verboseLevel)</td></tr>
+<tr><th id="232">232</th><td>      <a class="macro" href="../../../../global/management/include/G4ios.hh.html#46" title="(*_G4cout_p())" data-ref="_M/G4cout">G4cout</a> <span class='error' title="invalid operands to binary expression (&apos;int&apos; and &apos;const char *&apos;)">&lt;&lt;</span> <q>"G4LatticeManager::GetLattice found "</q> &lt;&lt; latFind-&gt;second</td></tr>
+<tr><th id="233">233</th><td>	     &lt;&lt; <q>" for "</q> &lt;&lt; (Vol?Vol-&gt;GetName():<q>"default"</q>) &lt;&lt; <q>"."</q> &lt;&lt; <a class="macro" href="../../../../global/management/include/G4ios.hh.html#60" title="std::endl" data-ref="_M/G4endl">G4endl</a>;</td></tr>
+<tr><th id="234">234</th><td>    <b>return</b> latFind-&gt;second;</td></tr>
+<tr><th id="235">235</th><td>  }</td></tr>
+<tr><th id="236">236</th><td></td></tr>
+<tr><th id="237">237</th><td>  <b>if</b> (verboseLevel) </td></tr>
+<tr><th id="238">238</th><td>    <a class="macro" href="../../../../global/management/include/G4ios.hh.html#47" title="(*_G4cerr_p())" data-ref="_M/G4cerr">G4cerr</a> <span class='error' title="invalid operands to binary expression (&apos;int&apos; and &apos;const char *&apos;)">&lt;&lt;</span> <q>"G4LatticeManager::GetLattice found no matching lattices for "</q></td></tr>
+<tr><th id="239">239</th><td>	   &lt;&lt; (Vol?Vol-&gt;GetName():<q>"default"</q>) &lt;&lt; <q>"."</q> &lt;&lt; <a class="macro" href="../../../../global/management/include/G4ios.hh.html#60" title="std::endl" data-ref="_M/G4endl">G4endl</a>;</td></tr>
+<tr><th id="240">240</th><td></td></tr>
+<tr><th id="241">241</th><td>  <b>return</b> <var>0</var>;			<i>// No lattice associated with volume</i></td></tr>
+<tr><th id="242">242</th><td>}</td></tr>
+<tr><th id="243">243</th><td></td></tr>
+<tr><th id="244">244</th><td><i>//....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo....</i></td></tr>
+<tr><th id="245">245</th><td><i></i></td></tr>
+<tr><th id="246">246</th><td><i>// Return true if volume Vol has a physical lattice</i></td></tr>
+<tr><th id="247">247</th><td></td></tr>
+<tr><th id="248">248</th><td><a class="typedef" href="../../../../global/management/include/G4Types.hh.html#G4bool" title='G4bool' data-type='bool' data-ref="G4bool">G4bool</a> <a class="type" href="../include/G4LatticeManager.hh.html#G4LatticeManager" title='G4LatticeManager' data-ref="G4LatticeManager">G4LatticeManager</a>::<dfn class="decl def" id="_ZNK16G4LatticeManager10HasLatticeEP17G4VPhysicalVolume" title='G4LatticeManager::HasLattice' data-ref="_ZNK16G4LatticeManager10HasLatticeEP17G4VPhysicalVolume">HasLattice</dfn>(<a class="type" href="../../../../geometry/management/include/G4VPhysicalVolume.hh.html#G4VPhysicalVolume" title='G4VPhysicalVolume' data-ref="G4VPhysicalVolume">G4VPhysicalVolume</a>* <dfn class="local col3 decl" id="33Vol" title='Vol' data-type='G4VPhysicalVolume *' data-ref="33Vol">Vol</dfn>) <em>const</em> {</td></tr>
+<tr><th id="249">249</th><td>  <b>return</b> (fPLatticeList.find(Vol) != fPLatticeList.end());</td></tr>
+<tr><th id="250">250</th><td>}</td></tr>
+<tr><th id="251">251</th><td></td></tr>
+<tr><th id="252">252</th><td><i>// Return true if material Mat has a logical lattice</i></td></tr>
+<tr><th id="253">253</th><td></td></tr>
+<tr><th id="254">254</th><td><a class="typedef" href="../../../../global/management/include/G4Types.hh.html#G4bool" title='G4bool' data-type='bool' data-ref="G4bool">G4bool</a> <a class="type" href="../include/G4LatticeManager.hh.html#G4LatticeManager" title='G4LatticeManager' data-ref="G4LatticeManager">G4LatticeManager</a>::<dfn class="decl def" id="_ZNK16G4LatticeManager10HasLatticeEP10G4Material" title='G4LatticeManager::HasLattice' data-ref="_ZNK16G4LatticeManager10HasLatticeEP10G4Material">HasLattice</dfn>(<a class="type" href="../../../../materials/include/G4Material.hh.html#G4Material" title='G4Material' data-ref="G4Material">G4Material</a>* <dfn class="local col4 decl" id="34Mat" title='Mat' data-type='G4Material *' data-ref="34Mat">Mat</dfn>) <em>const</em> {</td></tr>
+<tr><th id="255">255</th><td>  <b>return</b> (fLLatticeList.find(Mat) != fLLatticeList.end());</td></tr>
+<tr><th id="256">256</th><td>}</td></tr>
+<tr><th id="257">257</th><td></td></tr>
+<tr><th id="258">258</th><td><i>//....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo....</i></td></tr>
+<tr><th id="259">259</th><td><i></i></td></tr>
+<tr><th id="260">260</th><td><i>//Given the phonon wave vector k, phonon physical volume Vol </i></td></tr>
+<tr><th id="261">261</th><td><i>//and polarizationState(0=LON, 1=FT, 2=ST), </i></td></tr>
+<tr><th id="262">262</th><td><i>//returns phonon velocity in m/s</i></td></tr>
+<tr><th id="263">263</th><td></td></tr>
+<tr><th id="264">264</th><td><a class="typedef" href="../../../../global/management/include/G4Types.hh.html#G4double" title='G4double' data-type='double' data-ref="G4double">G4double</a> <a class="type" href="../include/G4LatticeManager.hh.html#G4LatticeManager" title='G4LatticeManager' data-ref="G4LatticeManager">G4LatticeManager</a>::<dfn class="decl def" id="_ZNK16G4LatticeManager7MapKtoVEP17G4VPhysicalVolumeiRKN5CLHEP10Hep3VectorE" title='G4LatticeManager::MapKtoV' data-ref="_ZNK16G4LatticeManager7MapKtoVEP17G4VPhysicalVolumeiRKN5CLHEP10Hep3VectorE">MapKtoV</dfn>(<a class="type" href="../../../../geometry/management/include/G4VPhysicalVolume.hh.html#G4VPhysicalVolume" title='G4VPhysicalVolume' data-ref="G4VPhysicalVolume">G4VPhysicalVolume</a>* <dfn class="local col5 decl" id="35Vol" title='Vol' data-type='G4VPhysicalVolume *' data-ref="35Vol">Vol</dfn>,</td></tr>
+<tr><th id="265">265</th><td>				 <a class="typedef" href="../../../../global/management/include/G4Types.hh.html#G4int" title='G4int' data-type='int' data-ref="G4int">G4int</a> <dfn class="local col6 decl" id="36polarizationState" title='polarizationState' data-type='G4int' data-ref="36polarizationState">polarizationState</dfn>,</td></tr>
+<tr><th id="266">266</th><td>				 <em>const</em> <a class="typedef" href="../../../../global/management/include/G4ThreeVector.hh.html#G4ThreeVector" title='G4ThreeVector' data-type='CLHEP::Hep3Vector' data-ref="G4ThreeVector">G4ThreeVector</a> &amp; <dfn class="local col7 decl" id="37k" title='k' data-type='const G4ThreeVector &amp;' data-ref="37k">k</dfn>) <em>const</em> {</td></tr>
+<tr><th id="267">267</th><td>  <a class="type" href="../../../../materials/include/G4LatticePhysical.hh.html#G4LatticePhysical" title='G4LatticePhysical' data-ref="G4LatticePhysical">G4LatticePhysical</a>* <dfn class="local col8 decl" id="38theLattice" title='theLattice' data-type='G4LatticePhysical *' data-ref="38theLattice">theLattice</dfn> = <a class="member" href="#_ZNK16G4LatticeManager10GetLatticeEP17G4VPhysicalVolume" title='G4LatticeManager::GetLattice' data-ref="_ZNK16G4LatticeManager10GetLatticeEP17G4VPhysicalVolume">GetLattice</a>(<a class="local col5 ref" href="#35Vol" title='Vol' data-ref="35Vol">Vol</a>);</td></tr>
+<tr><th id="268">268</th><td>  <b>if</b> (verboseLevel)</td></tr>
+<tr><th id="269">269</th><td>    <a class="macro" href="../../../../global/management/include/G4ios.hh.html#46" title="(*_G4cout_p())" data-ref="_M/G4cout">G4cout</a> <span class='error' title="invalid operands to binary expression (&apos;int&apos; and &apos;const char *&apos;)">&lt;&lt;</span> <q>"G4LatticeManager::MapKtoV using lattice "</q> &lt;&lt; theLattice</td></tr>
+<tr><th id="270">270</th><td>	   &lt;&lt; <a class="macro" href="../../../../global/management/include/G4ios.hh.html#60" title="std::endl" data-ref="_M/G4endl">G4endl</a>;</td></tr>
+<tr><th id="271">271</th><td></td></tr>
+<tr><th id="272">272</th><td>  <i>// If no lattice available, use generic "speed of sound"</i></td></tr>
+<tr><th id="273">273</th><td>  <b>return</b> <a class="local col8 ref" href="#38theLattice" title='theLattice' data-ref="38theLattice">theLattice</a> ? <a class="local col8 ref" href="#38theLattice" title='theLattice' data-ref="38theLattice">theLattice</a>-&gt;<a class="ref" href="../../../../materials/include/G4LatticePhysical.hh.html#_ZNK17G4LatticePhysical7MapKtoVEiN5CLHEP10Hep3VectorE" title='G4LatticePhysical::MapKtoV' data-ref="_ZNK17G4LatticePhysical7MapKtoVEiN5CLHEP10Hep3VectorE">MapKtoV</a>(<a class="local col6 ref" href="#36polarizationState" title='polarizationState' data-ref="36polarizationState">polarizationState</a>, <a class="ref fake" href="../../../../externals/clhep/include/CLHEP/Vector/ThreeVector.h.html#_ZN5CLHEP10Hep3VectorC1ERKS0_" title='CLHEP::Hep3Vector::Hep3Vector' data-ref="_ZN5CLHEP10Hep3VectorC1ERKS0_"></a><a class="local col7 ref" href="#37k" title='k' data-ref="37k">k</a>) : <var>300.</var>*<a class="ref" href="../../../../externals/clhep/include/CLHEP/Units/SystemOfUnits.h.html#CLHEP::m" title='CLHEP::m' data-ref="CLHEP::m">m</a>/<a class="ref" href="../../../../externals/clhep/include/CLHEP/Units/SystemOfUnits.h.html#CLHEP::s" title='CLHEP::s' data-ref="CLHEP::s">s</a>;</td></tr>
+<tr><th id="274">274</th><td>}</td></tr>
+<tr><th id="275">275</th><td></td></tr>
+<tr><th id="276">276</th><td><i>//....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo....</i></td></tr>
+<tr><th id="277">277</th><td><i></i></td></tr>
+<tr><th id="278">278</th><td><i>// Given the phonon wave vector k, phonon physical volume Vol </i></td></tr>
+<tr><th id="279">279</th><td><i>// and polarizationState(0=LON, 1=FT, 2=ST), </i></td></tr>
+<tr><th id="280">280</th><td><i>// returns phonon propagation direction as dimensionless unit vector</i></td></tr>
+<tr><th id="281">281</th><td></td></tr>
+<tr><th id="282">282</th><td><a class="typedef" href="../../../../global/management/include/G4ThreeVector.hh.html#G4ThreeVector" title='G4ThreeVector' data-type='CLHEP::Hep3Vector' data-ref="G4ThreeVector">G4ThreeVector</a> <a class="type" href="../include/G4LatticeManager.hh.html#G4LatticeManager" title='G4LatticeManager' data-ref="G4LatticeManager">G4LatticeManager</a>::<dfn class="decl def" id="_ZNK16G4LatticeManager10MapKtoVDirEP17G4VPhysicalVolumeiRKN5CLHEP10Hep3VectorE" title='G4LatticeManager::MapKtoVDir' data-ref="_ZNK16G4LatticeManager10MapKtoVDirEP17G4VPhysicalVolumeiRKN5CLHEP10Hep3VectorE">MapKtoVDir</dfn>(<a class="type" href="../../../../geometry/management/include/G4VPhysicalVolume.hh.html#G4VPhysicalVolume" title='G4VPhysicalVolume' data-ref="G4VPhysicalVolume">G4VPhysicalVolume</a>* <dfn class="local col9 decl" id="39Vol" title='Vol' data-type='G4VPhysicalVolume *' data-ref="39Vol">Vol</dfn>,</td></tr>
+<tr><th id="283">283</th><td>					   <a class="typedef" href="../../../../global/management/include/G4Types.hh.html#G4int" title='G4int' data-type='int' data-ref="G4int">G4int</a> <dfn class="local col0 decl" id="40polarizationState" title='polarizationState' data-type='G4int' data-ref="40polarizationState">polarizationState</dfn>,</td></tr>
+<tr><th id="284">284</th><td>					   <em>const</em> <a class="typedef" href="../../../../global/management/include/G4ThreeVector.hh.html#G4ThreeVector" title='G4ThreeVector' data-type='CLHEP::Hep3Vector' data-ref="G4ThreeVector">G4ThreeVector</a> &amp; <dfn class="local col1 decl" id="41k" title='k' data-type='const G4ThreeVector &amp;' data-ref="41k">k</dfn>) <em>const</em> {</td></tr>
+<tr><th id="285">285</th><td>  <a class="type" href="../../../../materials/include/G4LatticePhysical.hh.html#G4LatticePhysical" title='G4LatticePhysical' data-ref="G4LatticePhysical">G4LatticePhysical</a>* <dfn class="local col2 decl" id="42theLattice" title='theLattice' data-type='G4LatticePhysical *' data-ref="42theLattice">theLattice</dfn> = <a class="member" href="#_ZNK16G4LatticeManager10GetLatticeEP17G4VPhysicalVolume" title='G4LatticeManager::GetLattice' data-ref="_ZNK16G4LatticeManager10GetLatticeEP17G4VPhysicalVolume">GetLattice</a>(<a class="local col9 ref" href="#39Vol" title='Vol' data-ref="39Vol">Vol</a>);</td></tr>
+<tr><th id="286">286</th><td>  <b>if</b> (verboseLevel)</td></tr>
+<tr><th id="287">287</th><td>    <a class="macro" href="../../../../global/management/include/G4ios.hh.html#46" title="(*_G4cout_p())" data-ref="_M/G4cout">G4cout</a> <span class='error' title="invalid operands to binary expression (&apos;int&apos; and &apos;const char *&apos;)">&lt;&lt;</span> <q>"G4LatticeManager::MapKtoVDir using lattice "</q> &lt;&lt; theLattice</td></tr>
+<tr><th id="288">288</th><td>	   &lt;&lt; <a class="macro" href="../../../../global/management/include/G4ios.hh.html#60" title="std::endl" data-ref="_M/G4endl">G4endl</a>;</td></tr>
+<tr><th id="289">289</th><td></td></tr>
+<tr><th id="290">290</th><td>  <i>// If no lattice available, propagate along input wavevector</i></td></tr>
+<tr><th id="291">291</th><td>  <b>return</b> <a class="local col2 ref" href="#42theLattice" title='theLattice' data-ref="42theLattice">theLattice</a> ? <a class="local col2 ref" href="#42theLattice" title='theLattice' data-ref="42theLattice">theLattice</a>-&gt;<a class="ref" href="../../../../materials/include/G4LatticePhysical.hh.html#_ZNK17G4LatticePhysical10MapKtoVDirEiN5CLHEP10Hep3VectorE" title='G4LatticePhysical::MapKtoVDir' data-ref="_ZNK17G4LatticePhysical10MapKtoVDirEiN5CLHEP10Hep3VectorE">MapKtoVDir</a>(<a class="local col0 ref" href="#40polarizationState" title='polarizationState' data-ref="40polarizationState">polarizationState</a>, <a class="ref fake" href="../../../../externals/clhep/include/CLHEP/Vector/ThreeVector.h.html#_ZN5CLHEP10Hep3VectorC1ERKS0_" title='CLHEP::Hep3Vector::Hep3Vector' data-ref="_ZN5CLHEP10Hep3VectorC1ERKS0_"></a><a class="local col1 ref" href="#41k" title='k' data-ref="41k">k</a>) : <a class="local col1 ref" href="#41k" title='k' data-ref="41k">k</a>.<a class="ref" href="../../../../externals/clhep/include/CLHEP/Vector/ThreeVector.h.html#_ZNK5CLHEP10Hep3Vector4unitEv" title='CLHEP::Hep3Vector::unit' data-ref="_ZNK5CLHEP10Hep3Vector4unitEv">unit</a>();</td></tr>
+<tr><th id="292">292</th><td>}</td></tr>
+<tr><th id="293">293</th><td></td></tr>
+</table><hr/><p id='footer'>
+Generated on <em>2019-Aug-28</em> from project codebrowser<br />Powered by <a href='https://woboq.com'><img alt='Woboq' src='https://code.woboq.org/woboq-16.png' width='41' height='16' /></a> <a href='https://code.woboq.org'>Code Browser</a> 2.1
+<br/>Generator usage only permitted with license.</p>
+</div></body></html>

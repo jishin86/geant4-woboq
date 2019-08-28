@@ -1,0 +1,141 @@
+<def f='codebrowser/source/analysis/g4tools/include/tools/sg/plotter' l='4938' ll='5021' type='void tools::sg::plotter::update_legends(int &amp; a_out)'/>
+<doc f='codebrowser/source/analysis/g4tools/include/tools/sg/plotter' l='4797'>/*
+  void update_legends(std::ostream&amp; a_out){
+    if(!legends_visible) return;
+
+    if(m_legend_strings.empty()) return;
+    if(m_legend_colors.size()!=m_legend_strings.size()) return;
+
+    //m_legend_sep contains :
+    //   one global mtx
+    //   one sep per legend.
+
+   {matrix* _tsf = new matrix;
+    m_legend_sep.add(_tsf);
+
+    float zz = _zinfos();
+
+    //set legends layout :
+    if(legends_attached_to_infos) { 
+      _tsf-&gt;set_translate(0,0,zz);
+    } else {
+      if(legends_origin_unit==unit_axis) {        
+    
+        // legends_origin is in axes coordinates. 
+        float x = legends_origin.value()[0];
+        float y = legends_origin.value()[1];
+    
+        vec3f pos;
+        if(!axis_2_vp(vec3f(x,y,0),pos)) {
+          //SoDebugError::postInfo(&quot;SoPlotterRegion::updateChildren&quot;,
+   	    //		             &quot;failed for %g %g.&quot;,x,y);
+        } else {
+          //pos is in NDC of [0,width][0,height].
+  
+          float xx = width  * (-0.5f+pos[0]);
+          float yy = height * (-0.5f+pos[1]);
+
+          _tsf-&gt;set_translate(xx,yy,zz);
+
+        }
+    
+      } else { //unit_percent
+        // legends_origin is 
+        // the UR corner of legend region relative 
+        // to UR of plotter region.
+        float xur = legends_origin.value()[0];
+        float yur = legends_origin.value()[1];
+
+        vec2f ur(1-xur,1-yur);
+
+        float w = legends_size.value()[0];
+        float h = legends_size.value()[1];
+
+        float x = ur[0]-w;
+        float y = ur[1]-h;
+
+        float xx = width  * (x-0.5f);
+        float yy = height * (y-0.5f);
+
+        _tsf-&gt;set_translate(xx,yy,zz);
+
+      }
+    }}
+
+    size_t number = m_legend_strings.size();
+    for(size_t index=0;index&lt;number;index++) {
+
+      separator* sep = new separator;
+      m_legend_sep.add(sep);
+
+      matrix* _tsf = new matrix;
+      sep-&gt;add(_tsf);
+
+      //sg::text* text = new sg::text;
+      legend* text = new legend(m_ttf);
+      //text-&gt;confine = true;
+      text-&gt;strings.add(m_legend_strings[index]);
+      sep-&gt;add(text);
+      text-&gt;color = m_legend_colors[index];
+  
+      if(legends_attached_to_infos) { 
+        // global tsf should be the identity.
+  
+        // legend box geometry and placement is relative
+        // to the infos box placement and geometry :
+        if(m_infos_style.visible) {
+          sg::infos_box* inode = get_infos_node();
+          if(!inode) {delete sep;return;}
+          matrix* imtx = get_infos_matrix();
+          if(!imtx) {delete sep;return;}
+    
+          float wbox = inode-&gt;width;
+          float hbox = inode-&gt;height/number;
+    
+          text-&gt;width = wbox;
+          text-&gt;height = hbox;
+    
+          _tsf-&gt;mtx = imtx-&gt;mtx;
+
+          float xx = width*0.5f-wbox*0.5f;
+    
+          float yy = height*0.5f-inode-&gt;height-hbox*0.5f-hbox*index;
+    
+          _tsf-&gt;set_translate(xx,yy,0);
+    
+        } else {
+          float wbox = width  * legends_size.value()[0];
+          float hbox = (height * legends_size.value()[1])/number;
+    
+          text-&gt;width = wbox;
+          text-&gt;height = hbox;
+    
+          float xx = width*0.5f-wbox*0.5f - width*infos_x_margin;
+          float yy = height*0.5f-hbox*0.5F - height*infos_y_margin;
+    
+          yy -= hbox*index;
+  
+          _tsf-&gt;set_translate(xx,yy,0);
+        }
+  
+      } else {
+  
+        //legends_size is in NDC of [0,width][0,height].
+        float w = width  * legends_size.value()[0];
+        float h = height * legends_size.value()[1];
+  
+        text-&gt;width = w;
+        text-&gt;height = h/number;
+  
+        float xx = w * 0.5f;
+        float yy = text-&gt;height * 0.5f;
+        yy += text-&gt;height*(number-index-1);
+    
+        _tsf-&gt;set_translate(xx,yy,0);
+  
+      }
+      _tsf-&gt;mul_scale(1,1,_zscale_text());
+  
+    }
+  }
+*/</doc>

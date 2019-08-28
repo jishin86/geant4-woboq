@@ -1,0 +1,418 @@
+<!doctype html>
+<html>
+<head>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"><title>RotationInterfaces.h source code [codebrowser/source/externals/clhep/include/CLHEP/Vector/RotationInterfaces.h] - Woboq Code Browser</title>
+<meta name="woboq:interestingDefinitions" content="CLHEP::Hep3RotationInterface,CLHEP::Hep4RotationInterface,CLHEP::HepRep3x3,CLHEP::HepRep4x4,CLHEP::HepRep4x4Symmetric "/>
+<link rel="stylesheet" href="../../../../../../../../data/qtcreator.css" title="QtCreator"/>
+<link rel="alternate stylesheet" href="../../../../../../../../data/kdevelop.css" title="KDevelop"/>
+<script type="text/javascript" src="../../../../../../../../data/jquery/jquery.min.js"></script>
+<script type="text/javascript" src="../../../../../../../../data/jquery/jquery-ui.min.js"></script>
+<script>var file = 'codebrowser/source/externals/clhep/include/CLHEP/Vector/RotationInterfaces.h'; var root_path = '../../../../../../..'; var data_path = '../../../../../../../../data';</script>
+<script src='../../../../../../../../data/codebrowser.js'></script>
+</head>
+<body><div id='header'><h1 id='breadcrumb'><span>Browse the source code of </span><a href='../../../../../..'>codebrowser</a>/<a href='../../../../..'>source</a>/<a href='../../../..'>externals</a>/<a href='../../..'>clhep</a>/<a href='../..'>include</a>/<a href='..'>CLHEP</a>/<a href='./'>Vector</a>/<a href='RotationInterfaces.h.html'>RotationInterfaces.h</a></h1></div>
+<hr/><div id='content'><table class="code">
+<tr><th id="1">1</th><td><i>// -*- C++ -*-</i></td></tr>
+<tr><th id="2">2</th><td><i>// CLASSDOC OFF</i></td></tr>
+<tr><th id="3">3</th><td><i>// ---------------------------------------------------------------------------</i></td></tr>
+<tr><th id="4">4</th><td><i>// CLASSDOC ON</i></td></tr>
+<tr><th id="5">5</th><td><i>//</i></td></tr>
+<tr><th id="6">6</th><td><i>// This file is a part of the CLHEP - a Class Library for High Energy Physics.</i></td></tr>
+<tr><th id="7">7</th><td><i>//</i></td></tr>
+<tr><th id="8">8</th><td><i>// This contains the definition of two abstract interface classes:</i></td></tr>
+<tr><th id="9">9</th><td><i>// Hep4RotationInterface </i></td></tr>
+<tr><th id="10">10</th><td><i>// Hep3RotationInterface.  </i></td></tr>
+<tr><th id="11">11</th><td><i>// However, these are mostly for defining methods which should be present in</i></td></tr>
+<tr><th id="12">12</th><td><i>// any 4- or 3-rotation class, however specialized.  The actual classes do</i></td></tr>
+<tr><th id="13">13</th><td><i>// not inherit from these.  The virtual function overhead turns out </i></td></tr>
+<tr><th id="14">14</th><td><i>// to be too steep for that to be practical.</i></td></tr>
+<tr><th id="15">15</th><td><i>//</i></td></tr>
+<tr><th id="16">16</th><td><i>// It may be desirable in the future to turn these classes into constraints</i></td></tr>
+<tr><th id="17">17</th><td><i>// in the Stroustrup sense, so as to enforce this interface, still without </i></td></tr>
+<tr><th id="18">18</th><td><i>// inheritance.  However, they do contain an important static:</i></td></tr>
+<tr><th id="19">19</th><td><i>// static double tolerance to set criteria for relative nearness.</i></td></tr>
+<tr><th id="20">20</th><td><i>//</i></td></tr>
+<tr><th id="21">21</th><td><i>// This file also defines structs </i></td></tr>
+<tr><th id="22">22</th><td><i>// HepRep3x3;</i></td></tr>
+<tr><th id="23">23</th><td><i>// HepRep4x4;</i></td></tr>
+<tr><th id="24">24</th><td><i>// HepRep4x4Symmetric;</i></td></tr>
+<tr><th id="25">25</th><td><i>// which are used by various Rotation classes.</i></td></tr>
+<tr><th id="26">26</th><td><i>// </i></td></tr>
+<tr><th id="27">27</th><td><i>// Hep4RotationInterface </i></td></tr>
+<tr><th id="28">28</th><td><i>//	contains all the methods to get attributes of either a</i></td></tr>
+<tr><th id="29">29</th><td><i>// 	HepLorentzRotation or a HepRotation -- any information </i></td></tr>
+<tr><th id="30">30</th><td><i>//	that pertains to a LorentzRotation can also be defined</i></td></tr>
+<tr><th id="31">31</th><td><i>//	for a HepRotation.(For example, the 4x4 representation</i></td></tr>
+<tr><th id="32">32</th><td><i>//	would just have 0's in the space-time entries and 1 in</i></td></tr>
+<tr><th id="33">33</th><td><i>//	the time-time entry.) </i></td></tr>
+<tr><th id="34">34</th><td><i>//</i></td></tr>
+<tr><th id="35">35</th><td><i>// Hep3RotationInterface </i></td></tr>
+<tr><th id="36">36</th><td><i>//	inherits from Hep4RotationInterface,  and adds methods</i></td></tr>
+<tr><th id="37">37</th><td><i>//	which are well-defined only in the case of a Rotation.</i></td></tr>
+<tr><th id="38">38</th><td><i>//	For example, a 3x3 representation is an attribute only</i></td></tr>
+<tr><th id="39">39</th><td><i>//	if the generic LorentzRotation involves no boost.</i></td></tr>
+<tr><th id="40">40</th><td><i>//</i></td></tr>
+<tr><th id="41">41</th><td><i>// In terms of classes in the ZOOM PhysicsVectors package, </i></td></tr>
+<tr><th id="42">42</th><td><i>//	Hep4RotationInterface &lt;--&gt; LorentzTransformationInterface</i></td></tr>
+<tr><th id="43">43</th><td><i>//	Hep3RotationInterface &lt;--&gt; RotationInterface</i></td></tr>
+<tr><th id="44">44</th><td><i>//</i></td></tr>
+<tr><th id="45">45</th><td><i>// Hep4RotationInterface defines the required methods for:</i></td></tr>
+<tr><th id="46">46</th><td><i>//	HepLorentzRotation</i></td></tr>
+<tr><th id="47">47</th><td><i>//	HepBoost</i></td></tr>
+<tr><th id="48">48</th><td><i>//	HepBoostX</i></td></tr>
+<tr><th id="49">49</th><td><i>//	HepBoostY</i></td></tr>
+<tr><th id="50">50</th><td><i>//	HepBoostZ</i></td></tr>
+<tr><th id="51">51</th><td><i>//</i></td></tr>
+<tr><th id="52">52</th><td><i>// Hep3RotationInterface defines the required methods for:</i></td></tr>
+<tr><th id="53">53</th><td><i>//	HepRotation</i></td></tr>
+<tr><th id="54">54</th><td><i>//	HepRotationX</i></td></tr>
+<tr><th id="55">55</th><td><i>//	HepRotationY</i></td></tr>
+<tr><th id="56">56</th><td><i>//	HepRotationZ</i></td></tr>
+<tr><th id="57">57</th><td><i>//</i></td></tr>
+<tr><th id="58">58</th><td><i>// .SS See Also</i></td></tr>
+<tr><th id="59">59</th><td><i>// Rotation.h, LorentzRotation.h</i></td></tr>
+<tr><th id="60">60</th><td><i>//</i></td></tr>
+<tr><th id="61">61</th><td><i>// .SS Author</i></td></tr>
+<tr><th id="62">62</th><td><i>// Mark Fischler</i></td></tr>
+<tr><th id="63">63</th><td><i>//</i></td></tr>
+<tr><th id="64">64</th><td></td></tr>
+<tr><th id="65">65</th><td><u>#<span data-ppcond="65">ifndef</span> <span class="macro" data-ref="_M/HEP_ROTATION_INTERFACES_H">HEP_ROTATION_INTERFACES_H</span></u></td></tr>
+<tr><th id="66">66</th><td><u>#define <dfn class="macro" id="_M/HEP_ROTATION_INTERFACES_H" data-ref="_M/HEP_ROTATION_INTERFACES_H">HEP_ROTATION_INTERFACES_H</dfn></u></td></tr>
+<tr><th id="67">67</th><td></td></tr>
+<tr><th id="68">68</th><td><u>#include <a href="ThreeVector.h.html">"CLHEP/Vector/ThreeVector.h"</a></u></td></tr>
+<tr><th id="69">69</th><td><u>#include <a href="LorentzVector.h.html">"CLHEP/Vector/LorentzVector.h"</a></u></td></tr>
+<tr><th id="70">70</th><td><u>#include <a href="AxisAngle.h.html">"CLHEP/Vector/AxisAngle.h"</a></u></td></tr>
+<tr><th id="71">71</th><td></td></tr>
+<tr><th id="72">72</th><td><b>namespace</b> <span class="namespace">CLHEP</span> {</td></tr>
+<tr><th id="73">73</th><td></td></tr>
+<tr><th id="74">74</th><td><b>struct</b> <a class="type" href="#CLHEP::HepRep3x3" title='CLHEP::HepRep3x3' data-ref="CLHEP::HepRep3x3">HepRep3x3</a>;</td></tr>
+<tr><th id="75">75</th><td><b>struct</b> <a class="type" href="#CLHEP::HepRep4x4" title='CLHEP::HepRep4x4' data-ref="CLHEP::HepRep4x4">HepRep4x4</a>;</td></tr>
+<tr><th id="76">76</th><td><b>struct</b> <a class="type" href="#CLHEP::HepRep4x4Symmetric" title='CLHEP::HepRep4x4Symmetric' data-ref="CLHEP::HepRep4x4Symmetric">HepRep4x4Symmetric</a>;</td></tr>
+<tr><th id="77">77</th><td></td></tr>
+<tr><th id="78">78</th><td><b>class</b> <a class="type" href="Rotation.h.html#CLHEP::HepRotation" title='CLHEP::HepRotation' data-ref="CLHEP::HepRotation" id="CLHEP::HepRotation">HepRotation</a>;</td></tr>
+<tr><th id="79">79</th><td><b>class</b> <a class="type" href="RotationX.h.html#CLHEP::HepRotationX" title='CLHEP::HepRotationX' data-ref="CLHEP::HepRotationX" id="CLHEP::HepRotationX">HepRotationX</a>;</td></tr>
+<tr><th id="80">80</th><td><b>class</b> <a class="type" href="RotationY.h.html#CLHEP::HepRotationY" title='CLHEP::HepRotationY' data-ref="CLHEP::HepRotationY" id="CLHEP::HepRotationY">HepRotationY</a>;</td></tr>
+<tr><th id="81">81</th><td><b>class</b> <a class="type" href="RotationZ.h.html#CLHEP::HepRotationZ" title='CLHEP::HepRotationZ' data-ref="CLHEP::HepRotationZ" id="CLHEP::HepRotationZ">HepRotationZ</a>;</td></tr>
+<tr><th id="82">82</th><td><b>class</b> <a class="type" href="LorentzVector.h.html#CLHEP::HepLorentzRotation" title='CLHEP::HepLorentzRotation' data-ref="CLHEP::HepLorentzRotation" id="CLHEP::HepLorentzRotation">HepLorentzRotation</a>;</td></tr>
+<tr><th id="83">83</th><td><b>class</b> <dfn class="type" id="CLHEP::HepBoost" title='CLHEP::HepBoost' data-ref="CLHEP::HepBoost">HepBoost</dfn>;</td></tr>
+<tr><th id="84">84</th><td><b>class</b> <dfn class="type" id="CLHEP::HepBoostX" title='CLHEP::HepBoostX' data-ref="CLHEP::HepBoostX">HepBoostX</dfn>;</td></tr>
+<tr><th id="85">85</th><td><b>class</b> <dfn class="type" id="CLHEP::HepBoostY" title='CLHEP::HepBoostY' data-ref="CLHEP::HepBoostY">HepBoostY</dfn>;</td></tr>
+<tr><th id="86">86</th><td><b>class</b> <dfn class="type" id="CLHEP::HepBoostZ" title='CLHEP::HepBoostZ' data-ref="CLHEP::HepBoostZ">HepBoostZ</dfn>;</td></tr>
+<tr><th id="87">87</th><td></td></tr>
+<tr><th id="88">88</th><td><i>//-******************************</i></td></tr>
+<tr><th id="89">89</th><td><i>//</i></td></tr>
+<tr><th id="90">90</th><td><i>// Hep4RotationInterface </i></td></tr>
+<tr><th id="91">91</th><td><i>//</i></td></tr>
+<tr><th id="92">92</th><td><i>//-******************************</i></td></tr>
+<tr><th id="93">93</th><td></td></tr>
+<tr><th id="94">94</th><td><i class="doc">/**</i></td></tr>
+<tr><th id="95">95</th><td><i class="doc"> * <span class="command">@author</span></i></td></tr>
+<tr><th id="96">96</th><td><i class="doc"> * <span class="command">@ingroup</span> <span class="verb">vector</span></i></td></tr>
+<tr><th id="97">97</th><td><i class="doc"> */</i></td></tr>
+<tr><th id="98">98</th><td><b>class</b> <dfn class="type def" id="CLHEP::Hep4RotationInterface" title='CLHEP::Hep4RotationInterface' data-ref="CLHEP::Hep4RotationInterface">Hep4RotationInterface</dfn>  {</td></tr>
+<tr><th id="99">99</th><td></td></tr>
+<tr><th id="100">100</th><td>  <i>// All attributes of shared by HepLorentzRotation, HepBoost, </i></td></tr>
+<tr><th id="101">101</th><td><i>  // HepBoostX, HepBoostY, HepBoostZ.  HepRotation, HepRotationX, </i></td></tr>
+<tr><th id="102">102</th><td><i>  // HepRotationY, HepRotationZ also share this attribute interface.</i></td></tr>
+<tr><th id="103">103</th><td></td></tr>
+<tr><th id="104">104</th><td>  <b>friend</b> <b>class</b>  <a class="type" href="Rotation.h.html#CLHEP::HepRotation" title='CLHEP::HepRotation' data-ref="CLHEP::HepRotation">HepRotation</a>;</td></tr>
+<tr><th id="105">105</th><td>  <b>friend</b> <b>class</b>  <a class="type" href="RotationX.h.html#CLHEP::HepRotationX" title='CLHEP::HepRotationX' data-ref="CLHEP::HepRotationX">HepRotationX</a>;</td></tr>
+<tr><th id="106">106</th><td>  <b>friend</b> <b>class</b>  <a class="type" href="RotationY.h.html#CLHEP::HepRotationY" title='CLHEP::HepRotationY' data-ref="CLHEP::HepRotationY">HepRotationY</a>;</td></tr>
+<tr><th id="107">107</th><td>  <b>friend</b> <b>class</b>  <a class="type" href="RotationZ.h.html#CLHEP::HepRotationZ" title='CLHEP::HepRotationZ' data-ref="CLHEP::HepRotationZ">HepRotationZ</a>;</td></tr>
+<tr><th id="108">108</th><td>  <b>friend</b> <b>class</b>  <a class="type" href="LorentzVector.h.html#CLHEP::HepLorentzRotation" title='CLHEP::HepLorentzRotation' data-ref="CLHEP::HepLorentzRotation">HepLorentzRotation</a>;</td></tr>
+<tr><th id="109">109</th><td>  <b>friend</b> <b>class</b>  <a class="type" href="#CLHEP::HepBoost" title='CLHEP::HepBoost' data-ref="CLHEP::HepBoost">HepBoost</a>;</td></tr>
+<tr><th id="110">110</th><td>  <b>friend</b> <b>class</b>  <a class="type" href="#CLHEP::HepBoostX" title='CLHEP::HepBoostX' data-ref="CLHEP::HepBoostX">HepBoostX</a>;</td></tr>
+<tr><th id="111">111</th><td>  <b>friend</b> <b>class</b>  <a class="type" href="#CLHEP::HepBoostY" title='CLHEP::HepBoostY' data-ref="CLHEP::HepBoostY">HepBoostY</a>;</td></tr>
+<tr><th id="112">112</th><td>  <b>friend</b> <b>class</b>  <a class="type" href="#CLHEP::HepBoostZ" title='CLHEP::HepBoostZ' data-ref="CLHEP::HepBoostZ">HepBoostZ</a>;</td></tr>
+<tr><th id="113">113</th><td></td></tr>
+<tr><th id="114">114</th><td><b>public</b>:</td></tr>
+<tr><th id="115">115</th><td></td></tr>
+<tr><th id="116">116</th><td>  <a class="macro" href="../Utility/defs.h.html#19" title="" data-ref="_M/DLL_API">DLL_API</a> <em>static</em> <em>double</em> <dfn class="decl" id="CLHEP::Hep4RotationInterface::tolerance" title='CLHEP::Hep4RotationInterface::tolerance' data-ref="CLHEP::Hep4RotationInterface::tolerance">tolerance</dfn>;        <i>// to determine relative nearness</i></td></tr>
+<tr><th id="117">117</th><td></td></tr>
+<tr><th id="118">118</th><td>  <i>// ----------  Accessors:</i></td></tr>
+<tr><th id="119">119</th><td></td></tr>
+<tr><th id="120">120</th><td><u>#<span data-ppcond="120">ifdef</span> <span class="macro" data-ref="_M/ONLY_IN_CONCRETE_CLASSES">ONLY_IN_CONCRETE_CLASSES</span></u></td></tr>
+<tr><th id="121">121</th><td>  <i>//  orthosymplectic 4-vectors:</i></td></tr>
+<tr><th id="122">122</th><td>  HepLorentzVector col1() <em>const</em>;</td></tr>
+<tr><th id="123">123</th><td>  HepLorentzVector col2() <em>const</em>;</td></tr>
+<tr><th id="124">124</th><td>  HepLorentzVector col3() <em>const</em>;</td></tr>
+<tr><th id="125">125</th><td>  HepLorentzVector col4() <em>const</em>;</td></tr>
+<tr><th id="126">126</th><td>  HepLorentzVector row1() <em>const</em>;</td></tr>
+<tr><th id="127">127</th><td>  HepLorentzVector row2() <em>const</em>;</td></tr>
+<tr><th id="128">128</th><td>  HepLorentzVector row3() <em>const</em>;</td></tr>
+<tr><th id="129">129</th><td>  HepLorentzVector row4() <em>const</em>;</td></tr>
+<tr><th id="130">130</th><td></td></tr>
+<tr><th id="131">131</th><td>  <i>//  individual elements:</i></td></tr>
+<tr><th id="132">132</th><td>  <em>double</em> xx() <em>const</em>  ;</td></tr>
+<tr><th id="133">133</th><td>  <em>double</em> xy() <em>const</em>  ;</td></tr>
+<tr><th id="134">134</th><td>  <em>double</em> xz() <em>const</em>  ;</td></tr>
+<tr><th id="135">135</th><td>  <em>double</em> xt() <em>const</em>  ;</td></tr>
+<tr><th id="136">136</th><td>  <em>double</em> yx() <em>const</em>  ;</td></tr>
+<tr><th id="137">137</th><td>  <em>double</em> yy() <em>const</em>  ;</td></tr>
+<tr><th id="138">138</th><td>  <em>double</em> yz() <em>const</em>  ;</td></tr>
+<tr><th id="139">139</th><td>  <em>double</em> yt() <em>const</em>  ;</td></tr>
+<tr><th id="140">140</th><td>  <em>double</em> zx() <em>const</em>  ;</td></tr>
+<tr><th id="141">141</th><td>  <em>double</em> zy() <em>const</em>  ;</td></tr>
+<tr><th id="142">142</th><td>  <em>double</em> zz() <em>const</em>  ;</td></tr>
+<tr><th id="143">143</th><td>  <em>double</em> zt() <em>const</em>  ;</td></tr>
+<tr><th id="144">144</th><td>  <em>double</em> tx() <em>const</em>  ;</td></tr>
+<tr><th id="145">145</th><td>  <em>double</em> ty() <em>const</em>  ;</td></tr>
+<tr><th id="146">146</th><td>  <em>double</em> tz() <em>const</em>  ;</td></tr>
+<tr><th id="147">147</th><td>  <em>double</em> tt() <em>const</em>  ;</td></tr>
+<tr><th id="148">148</th><td></td></tr>
+<tr><th id="149">149</th><td>  <i>//   4x4 representation:</i></td></tr>
+<tr><th id="150">150</th><td><i>//HepRep4x4 rep4x4() const;	JMM  Declared here but not defined anywhere!</i></td></tr>
+<tr><th id="151">151</th><td><i></i></td></tr>
+<tr><th id="152">152</th><td><i>  // ----------  Operations:</i></td></tr>
+<tr><th id="153">153</th><td><i>  //   comparisons:</i></td></tr>
+<tr><th id="154">154</th><td></td></tr>
+<tr><th id="155">155</th><td>  <b>inline</b> <em>int</em> compare( <em>const</em> Hep4RotationInterface &amp; lt ) <em>const</em>;</td></tr>
+<tr><th id="156">156</th><td>  <i>// Dictionary-order comparisons, utilizing the decompose(b,r) method</i></td></tr>
+<tr><th id="157">157</th><td><i></i></td></tr>
+<tr><th id="158">158</th><td><i>  //   decomposition:</i></td></tr>
+<tr><th id="159">159</th><td></td></tr>
+<tr><th id="160">160</th><td>  <em>void</em> decompose (HepAxisAngle &amp; rotation, Hep3Vector &amp; boost)<em>const</em>;</td></tr>
+<tr><th id="161">161</th><td>  <i>// Decompose as T= R * B, where R is pure rotation, B is pure boost.</i></td></tr>
+<tr><th id="162">162</th><td></td></tr>
+<tr><th id="163">163</th><td>  <em>void</em> decompose (Hep3Vector &amp; boost, HepAxisAngle &amp; rotation)<em>const</em>;</td></tr>
+<tr><th id="164">164</th><td>  <i>// Decompose as T= B * R, where R is pure rotation, B is pure boost.</i></td></tr>
+<tr><th id="165">165</th><td></td></tr>
+<tr><th id="166">166</th><td>  <em>bool</em> <b>operator</b> == (<em>const</em> Hep4RotationInterface &amp; r) <em>const</em>;</td></tr>
+<tr><th id="167">167</th><td>  <em>bool</em> <b>operator</b> != (<em>const</em> Hep4RotationInterface &amp; r) <em>const</em>;</td></tr>
+<tr><th id="168">168</th><td></td></tr>
+<tr><th id="169">169</th><td>  <i>//   relative comparison:</i></td></tr>
+<tr><th id="170">170</th><td></td></tr>
+<tr><th id="171">171</th><td>  <em>double</em> norm2() <em>const</em>  ;</td></tr>
+<tr><th id="172">172</th><td>  <em>double</em>  distance2( <em>const</em> Hep4RotationInterface &amp; lt ) <em>const</em>  ;</td></tr>
+<tr><th id="173">173</th><td>  <em>double</em>  howNear( <em>const</em> Hep4RotationInterface &amp; lt ) <em>const</em>  ;</td></tr>
+<tr><th id="174">174</th><td>  <em>bool</em> isNear (<em>const</em> Hep4RotationInterface &amp; lt, </td></tr>
+<tr><th id="175">175</th><td>				   <em>double</em> epsilon=tolerance) <em>const</em>  ;</td></tr>
+<tr><th id="176">176</th><td></td></tr>
+<tr><th id="177">177</th><td>  <em>void</em> rectify()  ;</td></tr>
+<tr><th id="178">178</th><td>  <i>// non-const but logically const correction for accumulated roundoff errors</i></td></tr>
+<tr><th id="179">179</th><td><i></i></td></tr>
+<tr><th id="180">180</th><td><i>  // ----------  Apply LorentzTransformations:</i></td></tr>
+<tr><th id="181">181</th><td></td></tr>
+<tr><th id="182">182</th><td>  HepLorentzVector <b>operator</b>* ( <em>const</em> HepLorentzVector &amp; w ) <em>const</em>  ;</td></tr>
+<tr><th id="183">183</th><td>  HepLorentzVector <b>operator</b>()( <em>const</em> HepLorentzVector &amp; w ) <em>const</em>  ;</td></tr>
+<tr><th id="184">184</th><td>  <i>// Apply to a 4-vector</i></td></tr>
+<tr><th id="185">185</th><td><i></i></td></tr>
+<tr><th id="186">186</th><td><i>  // ----------  I/O:</i></td></tr>
+<tr><th id="187">187</th><td></td></tr>
+<tr><th id="188">188</th><td>  std::ostream &amp; print( std::ostream &amp; os ) <em>const</em>;</td></tr>
+<tr><th id="189">189</th><td></td></tr>
+<tr><th id="190">190</th><td><u>#<span data-ppcond="120">endif</span> /* ONLY_IN_CONCRETE_CLASSES */</u></td></tr>
+<tr><th id="191">191</th><td></td></tr>
+<tr><th id="192">192</th><td>  <em>static</em> <em>double</em> <dfn class="decl" id="_ZN5CLHEP21Hep4RotationInterface12getToleranceEv" title='CLHEP::Hep4RotationInterface::getTolerance' data-ref="_ZN5CLHEP21Hep4RotationInterface12getToleranceEv">getTolerance</dfn>();</td></tr>
+<tr><th id="193">193</th><td>  <em>static</em> <em>double</em> <dfn class="decl" id="_ZN5CLHEP21Hep4RotationInterface12setToleranceEd" title='CLHEP::Hep4RotationInterface::setTolerance' data-ref="_ZN5CLHEP21Hep4RotationInterface12setToleranceEd">setTolerance</dfn>( <em>double</em> <dfn class="local col9 decl" id="319tol" title='tol' data-type='double' data-ref="319tol">tol</dfn> );</td></tr>
+<tr><th id="194">194</th><td></td></tr>
+<tr><th id="195">195</th><td>  <b>enum</b> { <dfn class="enum" id="CLHEP::Hep4RotationInterface::ToleranceTicks" title='CLHEP::Hep4RotationInterface::ToleranceTicks' data-ref="CLHEP::Hep4RotationInterface::ToleranceTicks">ToleranceTicks</dfn> = <var>100</var> };</td></tr>
+<tr><th id="196">196</th><td></td></tr>
+<tr><th id="197">197</th><td><b>protected</b>:</td></tr>
+<tr><th id="198">198</th><td></td></tr>
+<tr><th id="199">199</th><td>  <dfn class="decl def" id="_ZN5CLHEP21Hep4RotationInterfaceD1Ev" title='CLHEP::Hep4RotationInterface::~Hep4RotationInterface' data-ref="_ZN5CLHEP21Hep4RotationInterfaceD1Ev">~Hep4RotationInterface</dfn>() {}	<i>// protect destructor to forbid instatiation</i></td></tr>
+<tr><th id="200">200</th><td></td></tr>
+<tr><th id="201">201</th><td>};  <i>// Hep4RotationInterface</i></td></tr>
+<tr><th id="202">202</th><td></td></tr>
+<tr><th id="203">203</th><td></td></tr>
+<tr><th id="204">204</th><td><i>//-******************************</i></td></tr>
+<tr><th id="205">205</th><td><i>//</i></td></tr>
+<tr><th id="206">206</th><td><i>// Hep3RotationInterface </i></td></tr>
+<tr><th id="207">207</th><td><i>//</i></td></tr>
+<tr><th id="208">208</th><td><i>//-******************************</i></td></tr>
+<tr><th id="209">209</th><td></td></tr>
+<tr><th id="210">210</th><td><i class="doc">/**</i></td></tr>
+<tr><th id="211">211</th><td><i class="doc"> * <span class="command">@author</span></i></td></tr>
+<tr><th id="212">212</th><td><i class="doc"> * <span class="command">@ingroup</span> <span class="verb">vector</span></i></td></tr>
+<tr><th id="213">213</th><td><i class="doc"> */</i></td></tr>
+<tr><th id="214">214</th><td><b>class</b> <dfn class="type def" id="CLHEP::Hep3RotationInterface" title='CLHEP::Hep3RotationInterface' data-ref="CLHEP::Hep3RotationInterface">Hep3RotationInterface</dfn> : <b>public</b> <a class="type" href="#CLHEP::Hep4RotationInterface" title='CLHEP::Hep4RotationInterface' data-ref="CLHEP::Hep4RotationInterface">Hep4RotationInterface</a> {</td></tr>
+<tr><th id="215">215</th><td></td></tr>
+<tr><th id="216">216</th><td>  <i>// All attributes of HepRotation, HepRotationX, HepRotationY, HepRotationZ</i></td></tr>
+<tr><th id="217">217</th><td><i>  // beyond those available by virtue of being a Hep3RotationInterface.</i></td></tr>
+<tr><th id="218">218</th><td></td></tr>
+<tr><th id="219">219</th><td>  <b>friend</b> <b>class</b>  <a class="type" href="Rotation.h.html#CLHEP::HepRotation" title='CLHEP::HepRotation' data-ref="CLHEP::HepRotation">HepRotation</a>;</td></tr>
+<tr><th id="220">220</th><td>  <b>friend</b> <b>class</b>  <a class="type" href="RotationX.h.html#CLHEP::HepRotationX" title='CLHEP::HepRotationX' data-ref="CLHEP::HepRotationX">HepRotationX</a>;</td></tr>
+<tr><th id="221">221</th><td>  <b>friend</b> <b>class</b>  <a class="type" href="RotationY.h.html#CLHEP::HepRotationY" title='CLHEP::HepRotationY' data-ref="CLHEP::HepRotationY">HepRotationY</a>;</td></tr>
+<tr><th id="222">222</th><td>  <b>friend</b> <b>class</b>  <a class="type" href="RotationZ.h.html#CLHEP::HepRotationZ" title='CLHEP::HepRotationZ' data-ref="CLHEP::HepRotationZ">HepRotationZ</a>;</td></tr>
+<tr><th id="223">223</th><td></td></tr>
+<tr><th id="224">224</th><td><b>public</b>:</td></tr>
+<tr><th id="225">225</th><td></td></tr>
+<tr><th id="226">226</th><td><u>#<span data-ppcond="226">ifdef</span> <span class="macro" data-ref="_M/ONLY_IN_CONCRETE_CLASSES">ONLY_IN_CONCRETE_CLASSES</span></u></td></tr>
+<tr><th id="227">227</th><td></td></tr>
+<tr><th id="228">228</th><td>  <i>//   Euler angles:</i></td></tr>
+<tr><th id="229">229</th><td>  <em>double</em> getPhi  () <em>const</em>  ;</td></tr>
+<tr><th id="230">230</th><td>  <em>double</em> getTheta() <em>const</em>  ;</td></tr>
+<tr><th id="231">231</th><td>  <em>double</em> getPsi  () <em>const</em>  ;</td></tr>
+<tr><th id="232">232</th><td>  <em>double</em>    phi  () <em>const</em>  ;</td></tr>
+<tr><th id="233">233</th><td>  <em>double</em>    theta() <em>const</em>  ;</td></tr>
+<tr><th id="234">234</th><td>  <em>double</em>    psi  () <em>const</em>  ;</td></tr>
+<tr><th id="235">235</th><td>  HepEulerAngles eulerAngles() <em>const</em>  ;</td></tr>
+<tr><th id="236">236</th><td></td></tr>
+<tr><th id="237">237</th><td>  <i>//   axis &amp; angle of rotation:</i></td></tr>
+<tr><th id="238">238</th><td>  <em>double</em>  getDelta() <em>const</em>  ;</td></tr>
+<tr><th id="239">239</th><td>  Hep3Vector getAxis () <em>const</em>  ;</td></tr>
+<tr><th id="240">240</th><td>  <em>double</em>     delta() <em>const</em>  ;</td></tr>
+<tr><th id="241">241</th><td>  Hep3Vector    axis () <em>const</em>  ;</td></tr>
+<tr><th id="242">242</th><td>  HepAxisAngle axisAngle() <em>const</em>  ;</td></tr>
+<tr><th id="243">243</th><td></td></tr>
+<tr><th id="244">244</th><td>  <i>//   orthogonal unit-length vectors:</i></td></tr>
+<tr><th id="245">245</th><td>  Hep3Vector rowX() <em>const</em>;</td></tr>
+<tr><th id="246">246</th><td>  Hep3Vector rowY() <em>const</em>;</td></tr>
+<tr><th id="247">247</th><td>  Hep3Vector rowZ() <em>const</em>;</td></tr>
+<tr><th id="248">248</th><td></td></tr>
+<tr><th id="249">249</th><td>  Hep3Vector colX() <em>const</em>;</td></tr>
+<tr><th id="250">250</th><td>  Hep3Vector colY() <em>const</em>;</td></tr>
+<tr><th id="251">251</th><td>  Hep3Vector colZ() <em>const</em>;</td></tr>
+<tr><th id="252">252</th><td></td></tr>
+<tr><th id="253">253</th><td><i>//HepRep3x3 rep3x3() const;	JMM  Declared here but not defined anywhere!</i></td></tr>
+<tr><th id="254">254</th><td><i>  //   3x3 representation</i></td></tr>
+<tr><th id="255">255</th><td><i></i></td></tr>
+<tr><th id="256">256</th><td><i>  //  orthosymplectic 4-vectors treating this as a 4-rotation:</i></td></tr>
+<tr><th id="257">257</th><td>  HepLorentzVector col1() <em>const</em>;</td></tr>
+<tr><th id="258">258</th><td>  HepLorentzVector col2() <em>const</em>;</td></tr>
+<tr><th id="259">259</th><td>  HepLorentzVector col3() <em>const</em>;</td></tr>
+<tr><th id="260">260</th><td>  HepLorentzVector col4() <em>const</em>;</td></tr>
+<tr><th id="261">261</th><td>  HepLorentzVector row1() <em>const</em>;</td></tr>
+<tr><th id="262">262</th><td>  HepLorentzVector row2() <em>const</em>;</td></tr>
+<tr><th id="263">263</th><td>  HepLorentzVector row3() <em>const</em>;</td></tr>
+<tr><th id="264">264</th><td>  HepLorentzVector row4() <em>const</em>;</td></tr>
+<tr><th id="265">265</th><td></td></tr>
+<tr><th id="266">266</th><td>  <i>//  individual elements treating this as a 4-rotation:</i></td></tr>
+<tr><th id="267">267</th><td>  <em>double</em> xt() <em>const</em>; </td></tr>
+<tr><th id="268">268</th><td>  <em>double</em> yt() <em>const</em>; </td></tr>
+<tr><th id="269">269</th><td>  <em>double</em> zt() <em>const</em>; </td></tr>
+<tr><th id="270">270</th><td>  <em>double</em> tx() <em>const</em>; </td></tr>
+<tr><th id="271">271</th><td>  <em>double</em> ty() <em>const</em>;</td></tr>
+<tr><th id="272">272</th><td>  <em>double</em> tz() <em>const</em>;</td></tr>
+<tr><th id="273">273</th><td>  <em>double</em> tt() <em>const</em>;</td></tr>
+<tr><th id="274">274</th><td></td></tr>
+<tr><th id="275">275</th><td>  <i>// ---------- Operations in the Rotation group</i></td></tr>
+<tr><th id="276">276</th><td></td></tr>
+<tr><th id="277">277</th><td>  HepRotation <b>operator</b> * ( <em>const</em> Hep3RotationInterface &amp; r ) <em>const</em>  ;</td></tr>
+<tr><th id="278">278</th><td></td></tr>
+<tr><th id="279">279</th><td>  <i>// ---------- Application</i></td></tr>
+<tr><th id="280">280</th><td></td></tr>
+<tr><th id="281">281</th><td>  HepLorentzVector <b>operator</b>* ( <em>const</em> HepLorentzVector &amp; w ) <em>const</em>  ;</td></tr>
+<tr><th id="282">282</th><td>  HepLorentzVector <b>operator</b>()( <em>const</em> HepLorentzVector &amp; w ) <em>const</em>  ;</td></tr>
+<tr><th id="283">283</th><td>  <i>//   apply to HepLorentzVector</i></td></tr>
+<tr><th id="284">284</th><td></td></tr>
+<tr><th id="285">285</th><td>  Hep3Vector <b>operator</b>* ( <em>const</em> Hep3Vector &amp; v ) <em>const</em>  ;</td></tr>
+<tr><th id="286">286</th><td>  Hep3Vector <b>operator</b>()( <em>const</em> Hep3Vector &amp; v ) <em>const</em>  ;</td></tr>
+<tr><th id="287">287</th><td>  <i>//   apply to Hep3Vector</i></td></tr>
+<tr><th id="288">288</th><td><i></i></td></tr>
+<tr><th id="289">289</th><td><i>  // ---------- I/O and a helper method</i></td></tr>
+<tr><th id="290">290</th><td></td></tr>
+<tr><th id="291">291</th><td>  std::ostream &amp; print( std::ostream &amp; os ) <em>const</em>;</td></tr>
+<tr><th id="292">292</th><td></td></tr>
+<tr><th id="293">293</th><td><u>#<span data-ppcond="226">endif</span> /* ONLY_IN_CONCRETE_CLASSES */</u></td></tr>
+<tr><th id="294">294</th><td></td></tr>
+<tr><th id="295">295</th><td><b>private</b>:</td></tr>
+<tr><th id="296">296</th><td></td></tr>
+<tr><th id="297">297</th><td>  <dfn class="decl def" id="_ZN5CLHEP21Hep3RotationInterfaceD1Ev" title='CLHEP::Hep3RotationInterface::~Hep3RotationInterface' data-ref="_ZN5CLHEP21Hep3RotationInterfaceD1Ev">~Hep3RotationInterface</dfn>() {}	<i>// private destructor to forbid instatiation</i></td></tr>
+<tr><th id="298">298</th><td></td></tr>
+<tr><th id="299">299</th><td>};  <i>// Hep3RotationInterface</i></td></tr>
+<tr><th id="300">300</th><td></td></tr>
+<tr><th id="301">301</th><td><i>//-***************************</i></td></tr>
+<tr><th id="302">302</th><td><i>// 3x3 and 4x4 representations</i></td></tr>
+<tr><th id="303">303</th><td><i>//-***************************</i></td></tr>
+<tr><th id="304">304</th><td></td></tr>
+<tr><th id="305">305</th><td><b>struct</b> <dfn class="type def" id="CLHEP::HepRep3x3" title='CLHEP::HepRep3x3' data-ref="CLHEP::HepRep3x3">HepRep3x3</dfn> {</td></tr>
+<tr><th id="306">306</th><td></td></tr>
+<tr><th id="307">307</th><td>  <i>// -----  Constructors:</i></td></tr>
+<tr><th id="308">308</th><td></td></tr>
+<tr><th id="309">309</th><td>  <b>inline</b> <a class="decl" href="RotationInterfaces.icc.html#_ZN5CLHEP9HepRep3x3C1Ev" title='CLHEP::HepRep3x3::HepRep3x3' data-ref="_ZN5CLHEP9HepRep3x3C1Ev" id="_ZN5CLHEP9HepRep3x3C1Ev">HepRep3x3</a>();</td></tr>
+<tr><th id="310">310</th><td></td></tr>
+<tr><th id="311">311</th><td>  <b>inline</b> <a class="decl" href="RotationInterfaces.icc.html#_ZN5CLHEP9HepRep3x3C1Eddddddddd" title='CLHEP::HepRep3x3::HepRep3x3' data-ref="_ZN5CLHEP9HepRep3x3C1Eddddddddd" id="_ZN5CLHEP9HepRep3x3C1Eddddddddd">HepRep3x3</a>(  <em>double</em> <dfn class="local col0 decl" id="320xx" title='xx' data-type='double' data-ref="320xx">xx</dfn>, <em>double</em> <dfn class="local col1 decl" id="321xy" title='xy' data-type='double' data-ref="321xy">xy</dfn>, <em>double</em> <dfn class="local col2 decl" id="322xz" title='xz' data-type='double' data-ref="322xz">xz</dfn></td></tr>
+<tr><th id="312">312</th><td>                   , <em>double</em> <dfn class="local col3 decl" id="323yx" title='yx' data-type='double' data-ref="323yx">yx</dfn>, <em>double</em> <dfn class="local col4 decl" id="324yy" title='yy' data-type='double' data-ref="324yy">yy</dfn>, <em>double</em> <dfn class="local col5 decl" id="325yz" title='yz' data-type='double' data-ref="325yz">yz</dfn></td></tr>
+<tr><th id="313">313</th><td>                   , <em>double</em> <dfn class="local col6 decl" id="326zx" title='zx' data-type='double' data-ref="326zx">zx</dfn>, <em>double</em> <dfn class="local col7 decl" id="327zy" title='zy' data-type='double' data-ref="327zy">zy</dfn>, <em>double</em> <dfn class="local col8 decl" id="328zz" title='zz' data-type='double' data-ref="328zz">zz</dfn></td></tr>
+<tr><th id="314">314</th><td>                   );</td></tr>
+<tr><th id="315">315</th><td></td></tr>
+<tr><th id="316">316</th><td>  <b>inline</b> <a class="decl" href="RotationInterfaces.icc.html#_ZN5CLHEP9HepRep3x3C1EPKd" title='CLHEP::HepRep3x3::HepRep3x3' data-ref="_ZN5CLHEP9HepRep3x3C1EPKd" id="_ZN5CLHEP9HepRep3x3C1EPKd">HepRep3x3</a>( <em>const</em> <em>double</em> * <dfn class="local col9 decl" id="329array" title='array' data-type='const double *' data-ref="329array">array</dfn> );</td></tr>
+<tr><th id="317">317</th><td>  <i>// construct from an array of doubles, holding the rotation matrix</i></td></tr>
+<tr><th id="318">318</th><td><i>  // in ROW order (xx, xy, ...)</i></td></tr>
+<tr><th id="319">319</th><td></td></tr>
+<tr><th id="320">320</th><td>  <b>inline</b> <em>void</em> <a class="decl" href="RotationInterfaces.icc.html#_ZN5CLHEP9HepRep3x313setToIdentityEv" title='CLHEP::HepRep3x3::setToIdentity' data-ref="_ZN5CLHEP9HepRep3x313setToIdentityEv" id="_ZN5CLHEP9HepRep3x313setToIdentityEv">setToIdentity</a>();</td></tr>
+<tr><th id="321">321</th><td></td></tr>
+<tr><th id="322">322</th><td>  <i>// -----  The data members are public:</i></td></tr>
+<tr><th id="323">323</th><td>  <em>double</em> <dfn class="decl" id="CLHEP::HepRep3x3::xx_" title='CLHEP::HepRep3x3::xx_' data-ref="CLHEP::HepRep3x3::xx_">xx_</dfn>, <dfn class="decl" id="CLHEP::HepRep3x3::xy_" title='CLHEP::HepRep3x3::xy_' data-ref="CLHEP::HepRep3x3::xy_">xy_</dfn>, <dfn class="decl" id="CLHEP::HepRep3x3::xz_" title='CLHEP::HepRep3x3::xz_' data-ref="CLHEP::HepRep3x3::xz_">xz_</dfn>,</td></tr>
+<tr><th id="324">324</th><td>            <dfn class="decl" id="CLHEP::HepRep3x3::yx_" title='CLHEP::HepRep3x3::yx_' data-ref="CLHEP::HepRep3x3::yx_">yx_</dfn>, <dfn class="decl" id="CLHEP::HepRep3x3::yy_" title='CLHEP::HepRep3x3::yy_' data-ref="CLHEP::HepRep3x3::yy_">yy_</dfn>, <dfn class="decl" id="CLHEP::HepRep3x3::yz_" title='CLHEP::HepRep3x3::yz_' data-ref="CLHEP::HepRep3x3::yz_">yz_</dfn>,</td></tr>
+<tr><th id="325">325</th><td>            <dfn class="decl" id="CLHEP::HepRep3x3::zx_" title='CLHEP::HepRep3x3::zx_' data-ref="CLHEP::HepRep3x3::zx_">zx_</dfn>, <dfn class="decl" id="CLHEP::HepRep3x3::zy_" title='CLHEP::HepRep3x3::zy_' data-ref="CLHEP::HepRep3x3::zy_">zy_</dfn>, <dfn class="decl" id="CLHEP::HepRep3x3::zz_" title='CLHEP::HepRep3x3::zz_' data-ref="CLHEP::HepRep3x3::zz_">zz_</dfn>;</td></tr>
+<tr><th id="326">326</th><td></td></tr>
+<tr><th id="327">327</th><td>  <b>inline</b> <em>void</em> <a class="decl" href="RotationInterfaces.icc.html#_ZNK5CLHEP9HepRep3x38getArrayEPd" title='CLHEP::HepRep3x3::getArray' data-ref="_ZNK5CLHEP9HepRep3x38getArrayEPd" id="_ZNK5CLHEP9HepRep3x38getArrayEPd">getArray</a> ( <em>double</em> * <dfn class="local col0 decl" id="330array" title='array' data-type='double *' data-ref="330array">array</dfn> ) <em>const</em>;</td></tr>
+<tr><th id="328">328</th><td>  <i>// fill array with the NINE doubles xx, xy, xz ... zz</i></td></tr>
+<tr><th id="329">329</th><td></td></tr>
+<tr><th id="330">330</th><td>};  <i>// HepRep3x3</i></td></tr>
+<tr><th id="331">331</th><td></td></tr>
+<tr><th id="332">332</th><td><b>struct</b> <dfn class="type def" id="CLHEP::HepRep4x4" title='CLHEP::HepRep4x4' data-ref="CLHEP::HepRep4x4">HepRep4x4</dfn> {</td></tr>
+<tr><th id="333">333</th><td></td></tr>
+<tr><th id="334">334</th><td>  <i>// -----  Constructors:</i></td></tr>
+<tr><th id="335">335</th><td>  <b>inline</b> <a class="decl" href="RotationInterfaces.icc.html#_ZN5CLHEP9HepRep4x4C1Ev" title='CLHEP::HepRep4x4::HepRep4x4' data-ref="_ZN5CLHEP9HepRep4x4C1Ev" id="_ZN5CLHEP9HepRep4x4C1Ev">HepRep4x4</a>();</td></tr>
+<tr><th id="336">336</th><td></td></tr>
+<tr><th id="337">337</th><td>  <b>inline</b> <a class="decl" href="RotationInterfaces.icc.html#_ZN5CLHEP9HepRep4x4C1Edddddddddddddddd" title='CLHEP::HepRep4x4::HepRep4x4' data-ref="_ZN5CLHEP9HepRep4x4C1Edddddddddddddddd" id="_ZN5CLHEP9HepRep4x4C1Edddddddddddddddd">HepRep4x4</a>(  <em>double</em> <dfn class="local col1 decl" id="331xx" title='xx' data-type='double' data-ref="331xx">xx</dfn>, <em>double</em> <dfn class="local col2 decl" id="332xy" title='xy' data-type='double' data-ref="332xy">xy</dfn>, <em>double</em> <dfn class="local col3 decl" id="333xz" title='xz' data-type='double' data-ref="333xz">xz</dfn>, <em>double</em> <dfn class="local col4 decl" id="334xt" title='xt' data-type='double' data-ref="334xt">xt</dfn></td></tr>
+<tr><th id="338">338</th><td>                   , <em>double</em> <dfn class="local col5 decl" id="335yx" title='yx' data-type='double' data-ref="335yx">yx</dfn>, <em>double</em> <dfn class="local col6 decl" id="336yy" title='yy' data-type='double' data-ref="336yy">yy</dfn>, <em>double</em> <dfn class="local col7 decl" id="337yz" title='yz' data-type='double' data-ref="337yz">yz</dfn>, <em>double</em> <dfn class="local col8 decl" id="338yt" title='yt' data-type='double' data-ref="338yt">yt</dfn></td></tr>
+<tr><th id="339">339</th><td>                   , <em>double</em> <dfn class="local col9 decl" id="339zx" title='zx' data-type='double' data-ref="339zx">zx</dfn>, <em>double</em> <dfn class="local col0 decl" id="340zy" title='zy' data-type='double' data-ref="340zy">zy</dfn>, <em>double</em> <dfn class="local col1 decl" id="341zz" title='zz' data-type='double' data-ref="341zz">zz</dfn>, <em>double</em> <dfn class="local col2 decl" id="342zt" title='zt' data-type='double' data-ref="342zt">zt</dfn></td></tr>
+<tr><th id="340">340</th><td>                   , <em>double</em> <dfn class="local col3 decl" id="343tx" title='tx' data-type='double' data-ref="343tx">tx</dfn>, <em>double</em> <dfn class="local col4 decl" id="344ty" title='ty' data-type='double' data-ref="344ty">ty</dfn>, <em>double</em> <dfn class="local col5 decl" id="345tz" title='tz' data-type='double' data-ref="345tz">tz</dfn>, <em>double</em> <dfn class="local col6 decl" id="346tt" title='tt' data-type='double' data-ref="346tt">tt</dfn></td></tr>
+<tr><th id="341">341</th><td>                   );</td></tr>
+<tr><th id="342">342</th><td></td></tr>
+<tr><th id="343">343</th><td>  <b>inline</b> <a class="decl" href="RotationInterfaces.icc.html#_ZN5CLHEP9HepRep4x4C1ERKNS_18HepRep4x4SymmetricE" title='CLHEP::HepRep4x4::HepRep4x4' data-ref="_ZN5CLHEP9HepRep4x4C1ERKNS_18HepRep4x4SymmetricE" id="_ZN5CLHEP9HepRep4x4C1ERKNS_18HepRep4x4SymmetricE">HepRep4x4</a>( <em>const</em> <a class="type" href="#CLHEP::HepRep4x4Symmetric" title='CLHEP::HepRep4x4Symmetric' data-ref="CLHEP::HepRep4x4Symmetric">HepRep4x4Symmetric</a> &amp; <dfn class="local col7 decl" id="347rep" title='rep' data-type='const CLHEP::HepRep4x4Symmetric &amp;' data-ref="347rep">rep</dfn> );</td></tr>
+<tr><th id="344">344</th><td></td></tr>
+<tr><th id="345">345</th><td>  <b>inline</b> <a class="decl" href="RotationInterfaces.icc.html#_ZN5CLHEP9HepRep4x4C1EPKd" title='CLHEP::HepRep4x4::HepRep4x4' data-ref="_ZN5CLHEP9HepRep4x4C1EPKd" id="_ZN5CLHEP9HepRep4x4C1EPKd">HepRep4x4</a>( <em>const</em> <em>double</em> * <dfn class="local col8 decl" id="348array" title='array' data-type='const double *' data-ref="348array">array</dfn> );</td></tr>
+<tr><th id="346">346</th><td>  <i>// construct from an array of doubles, holding the transformation matrix</i></td></tr>
+<tr><th id="347">347</th><td><i>  // in ROW order xx, xy, ...</i></td></tr>
+<tr><th id="348">348</th><td></td></tr>
+<tr><th id="349">349</th><td>  <b>inline</b> <em>void</em> <a class="decl" href="RotationInterfaces.icc.html#_ZN5CLHEP9HepRep4x413setToIdentityEv" title='CLHEP::HepRep4x4::setToIdentity' data-ref="_ZN5CLHEP9HepRep4x413setToIdentityEv" id="_ZN5CLHEP9HepRep4x413setToIdentityEv">setToIdentity</a>();</td></tr>
+<tr><th id="350">350</th><td></td></tr>
+<tr><th id="351">351</th><td>  <i>// -----  The data members are public:</i></td></tr>
+<tr><th id="352">352</th><td>  <em>double</em> <dfn class="decl" id="CLHEP::HepRep4x4::xx_" title='CLHEP::HepRep4x4::xx_' data-ref="CLHEP::HepRep4x4::xx_">xx_</dfn>, <dfn class="decl" id="CLHEP::HepRep4x4::xy_" title='CLHEP::HepRep4x4::xy_' data-ref="CLHEP::HepRep4x4::xy_">xy_</dfn>, <dfn class="decl" id="CLHEP::HepRep4x4::xz_" title='CLHEP::HepRep4x4::xz_' data-ref="CLHEP::HepRep4x4::xz_">xz_</dfn>, <dfn class="decl" id="CLHEP::HepRep4x4::xt_" title='CLHEP::HepRep4x4::xt_' data-ref="CLHEP::HepRep4x4::xt_">xt_</dfn>,</td></tr>
+<tr><th id="353">353</th><td>            <dfn class="decl" id="CLHEP::HepRep4x4::yx_" title='CLHEP::HepRep4x4::yx_' data-ref="CLHEP::HepRep4x4::yx_">yx_</dfn>, <dfn class="decl" id="CLHEP::HepRep4x4::yy_" title='CLHEP::HepRep4x4::yy_' data-ref="CLHEP::HepRep4x4::yy_">yy_</dfn>, <dfn class="decl" id="CLHEP::HepRep4x4::yz_" title='CLHEP::HepRep4x4::yz_' data-ref="CLHEP::HepRep4x4::yz_">yz_</dfn>, <dfn class="decl" id="CLHEP::HepRep4x4::yt_" title='CLHEP::HepRep4x4::yt_' data-ref="CLHEP::HepRep4x4::yt_">yt_</dfn>,</td></tr>
+<tr><th id="354">354</th><td>            <dfn class="decl" id="CLHEP::HepRep4x4::zx_" title='CLHEP::HepRep4x4::zx_' data-ref="CLHEP::HepRep4x4::zx_">zx_</dfn>, <dfn class="decl" id="CLHEP::HepRep4x4::zy_" title='CLHEP::HepRep4x4::zy_' data-ref="CLHEP::HepRep4x4::zy_">zy_</dfn>, <dfn class="decl" id="CLHEP::HepRep4x4::zz_" title='CLHEP::HepRep4x4::zz_' data-ref="CLHEP::HepRep4x4::zz_">zz_</dfn>, <dfn class="decl" id="CLHEP::HepRep4x4::zt_" title='CLHEP::HepRep4x4::zt_' data-ref="CLHEP::HepRep4x4::zt_">zt_</dfn>,</td></tr>
+<tr><th id="355">355</th><td>            <dfn class="decl" id="CLHEP::HepRep4x4::tx_" title='CLHEP::HepRep4x4::tx_' data-ref="CLHEP::HepRep4x4::tx_">tx_</dfn>, <dfn class="decl" id="CLHEP::HepRep4x4::ty_" title='CLHEP::HepRep4x4::ty_' data-ref="CLHEP::HepRep4x4::ty_">ty_</dfn>, <dfn class="decl" id="CLHEP::HepRep4x4::tz_" title='CLHEP::HepRep4x4::tz_' data-ref="CLHEP::HepRep4x4::tz_">tz_</dfn>, <dfn class="decl" id="CLHEP::HepRep4x4::tt_" title='CLHEP::HepRep4x4::tt_' data-ref="CLHEP::HepRep4x4::tt_">tt_</dfn>;</td></tr>
+<tr><th id="356">356</th><td>                         </td></tr>
+<tr><th id="357">357</th><td>  <b>inline</b> <em>void</em> <a class="decl" href="RotationInterfaces.icc.html#_ZNK5CLHEP9HepRep4x48getArrayEPd" title='CLHEP::HepRep4x4::getArray' data-ref="_ZNK5CLHEP9HepRep4x48getArrayEPd" id="_ZNK5CLHEP9HepRep4x48getArrayEPd">getArray</a> ( <em>double</em> * <dfn class="local col9 decl" id="349array" title='array' data-type='double *' data-ref="349array">array</dfn> ) <em>const</em>;</td></tr>
+<tr><th id="358">358</th><td>  <i>// fill array with the SIXTEEN doubles xx, xy, xz ... tz, tt</i></td></tr>
+<tr><th id="359">359</th><td></td></tr>
+<tr><th id="360">360</th><td>  <b>inline</b> <em>bool</em> <a class="decl" href="RotationInterfaces.icc.html#_ZNK5CLHEP9HepRep4x4eqERKS0_" title='CLHEP::HepRep4x4::operator==' data-ref="_ZNK5CLHEP9HepRep4x4eqERKS0_" id="_ZNK5CLHEP9HepRep4x4eqERKS0_"><b>operator</b>==</a>(<a class="type" href="#CLHEP::HepRep4x4" title='CLHEP::HepRep4x4' data-ref="CLHEP::HepRep4x4">HepRep4x4</a> <em>const</em> &amp; <dfn class="local col0 decl" id="350r" title='r' data-type='const CLHEP::HepRep4x4 &amp;' data-ref="350r">r</dfn>) <em>const</em>;</td></tr>
+<tr><th id="361">361</th><td>  <b>inline</b> <em>bool</em> <a class="decl" href="RotationInterfaces.icc.html#_ZNK5CLHEP9HepRep4x4neERKS0_" title='CLHEP::HepRep4x4::operator!=' data-ref="_ZNK5CLHEP9HepRep4x4neERKS0_" id="_ZNK5CLHEP9HepRep4x4neERKS0_"><b>operator</b>!=</a>(<a class="type" href="#CLHEP::HepRep4x4" title='CLHEP::HepRep4x4' data-ref="CLHEP::HepRep4x4">HepRep4x4</a> <em>const</em> &amp; <dfn class="local col1 decl" id="351r" title='r' data-type='const CLHEP::HepRep4x4 &amp;' data-ref="351r">r</dfn>) <em>const</em>;</td></tr>
+<tr><th id="362">362</th><td></td></tr>
+<tr><th id="363">363</th><td></td></tr>
+<tr><th id="364">364</th><td>};  <i>// HepRep4x4</i></td></tr>
+<tr><th id="365">365</th><td></td></tr>
+<tr><th id="366">366</th><td><b>struct</b> <dfn class="type def" id="CLHEP::HepRep4x4Symmetric" title='CLHEP::HepRep4x4Symmetric' data-ref="CLHEP::HepRep4x4Symmetric">HepRep4x4Symmetric</dfn> {</td></tr>
+<tr><th id="367">367</th><td></td></tr>
+<tr><th id="368">368</th><td>  <i>// -----  Constructors:</i></td></tr>
+<tr><th id="369">369</th><td></td></tr>
+<tr><th id="370">370</th><td>  <b>inline</b> <a class="decl" href="RotationInterfaces.icc.html#_ZN5CLHEP18HepRep4x4SymmetricC1Ev" title='CLHEP::HepRep4x4Symmetric::HepRep4x4Symmetric' data-ref="_ZN5CLHEP18HepRep4x4SymmetricC1Ev" id="_ZN5CLHEP18HepRep4x4SymmetricC1Ev">HepRep4x4Symmetric</a>();</td></tr>
+<tr><th id="371">371</th><td></td></tr>
+<tr><th id="372">372</th><td>  <b>inline</b> <a class="decl" href="RotationInterfaces.icc.html#_ZN5CLHEP18HepRep4x4SymmetricC1Edddddddddd" title='CLHEP::HepRep4x4Symmetric::HepRep4x4Symmetric' data-ref="_ZN5CLHEP18HepRep4x4SymmetricC1Edddddddddd" id="_ZN5CLHEP18HepRep4x4SymmetricC1Edddddddddd">HepRep4x4Symmetric</a></td></tr>
+<tr><th id="373">373</th><td>	( <em>double</em> <dfn class="local col2 decl" id="352xx" title='xx' data-type='double' data-ref="352xx">xx</dfn>, <em>double</em> <dfn class="local col3 decl" id="353xy" title='xy' data-type='double' data-ref="353xy">xy</dfn>, <em>double</em> <dfn class="local col4 decl" id="354xz" title='xz' data-type='double' data-ref="354xz">xz</dfn>, <em>double</em> <dfn class="local col5 decl" id="355xt" title='xt' data-type='double' data-ref="355xt">xt</dfn></td></tr>
+<tr><th id="374">374</th><td>                      , <em>double</em> <dfn class="local col6 decl" id="356yy" title='yy' data-type='double' data-ref="356yy">yy</dfn>, <em>double</em> <dfn class="local col7 decl" id="357yz" title='yz' data-type='double' data-ref="357yz">yz</dfn>, <em>double</em> <dfn class="local col8 decl" id="358yt" title='yt' data-type='double' data-ref="358yt">yt</dfn></td></tr>
+<tr><th id="375">375</th><td>                                    , <em>double</em> <dfn class="local col9 decl" id="359zz" title='zz' data-type='double' data-ref="359zz">zz</dfn>, <em>double</em> <dfn class="local col0 decl" id="360zt" title='zt' data-type='double' data-ref="360zt">zt</dfn></td></tr>
+<tr><th id="376">376</th><td>                                                  , <em>double</em> <dfn class="local col1 decl" id="361tt" title='tt' data-type='double' data-ref="361tt">tt</dfn> );</td></tr>
+<tr><th id="377">377</th><td></td></tr>
+<tr><th id="378">378</th><td>  <b>inline</b> <a class="decl" href="RotationInterfaces.icc.html#_ZN5CLHEP18HepRep4x4SymmetricC1EPKd" title='CLHEP::HepRep4x4Symmetric::HepRep4x4Symmetric' data-ref="_ZN5CLHEP18HepRep4x4SymmetricC1EPKd" id="_ZN5CLHEP18HepRep4x4SymmetricC1EPKd">HepRep4x4Symmetric</a>( <em>const</em> <em>double</em> * <dfn class="local col2 decl" id="362array" title='array' data-type='const double *' data-ref="362array">array</dfn> );</td></tr>
+<tr><th id="379">379</th><td>  <i>// construct from an array of doubles, holding the transformation matrix</i></td></tr>
+<tr><th id="380">380</th><td><i>  // elements in this order:  xx, xy, xz, xt, yy, yz, yt, zz, zt, tt</i></td></tr>
+<tr><th id="381">381</th><td></td></tr>
+<tr><th id="382">382</th><td>  <b>inline</b> <em>void</em> <a class="decl" href="RotationInterfaces.icc.html#_ZN5CLHEP18HepRep4x4Symmetric13setToIdentityEv" title='CLHEP::HepRep4x4Symmetric::setToIdentity' data-ref="_ZN5CLHEP18HepRep4x4Symmetric13setToIdentityEv" id="_ZN5CLHEP18HepRep4x4Symmetric13setToIdentityEv">setToIdentity</a>();</td></tr>
+<tr><th id="383">383</th><td></td></tr>
+<tr><th id="384">384</th><td>  <i>// -----  The data members are public:</i></td></tr>
+<tr><th id="385">385</th><td>  <em>double</em> <dfn class="decl" id="CLHEP::HepRep4x4Symmetric::xx_" title='CLHEP::HepRep4x4Symmetric::xx_' data-ref="CLHEP::HepRep4x4Symmetric::xx_">xx_</dfn>, <dfn class="decl" id="CLHEP::HepRep4x4Symmetric::xy_" title='CLHEP::HepRep4x4Symmetric::xy_' data-ref="CLHEP::HepRep4x4Symmetric::xy_">xy_</dfn>, <dfn class="decl" id="CLHEP::HepRep4x4Symmetric::xz_" title='CLHEP::HepRep4x4Symmetric::xz_' data-ref="CLHEP::HepRep4x4Symmetric::xz_">xz_</dfn>, <dfn class="decl" id="CLHEP::HepRep4x4Symmetric::xt_" title='CLHEP::HepRep4x4Symmetric::xt_' data-ref="CLHEP::HepRep4x4Symmetric::xt_">xt_</dfn>,</td></tr>
+<tr><th id="386">386</th><td>                 <dfn class="decl" id="CLHEP::HepRep4x4Symmetric::yy_" title='CLHEP::HepRep4x4Symmetric::yy_' data-ref="CLHEP::HepRep4x4Symmetric::yy_">yy_</dfn>, <dfn class="decl" id="CLHEP::HepRep4x4Symmetric::yz_" title='CLHEP::HepRep4x4Symmetric::yz_' data-ref="CLHEP::HepRep4x4Symmetric::yz_">yz_</dfn>, <dfn class="decl" id="CLHEP::HepRep4x4Symmetric::yt_" title='CLHEP::HepRep4x4Symmetric::yt_' data-ref="CLHEP::HepRep4x4Symmetric::yt_">yt_</dfn>,</td></tr>
+<tr><th id="387">387</th><td>                      <dfn class="decl" id="CLHEP::HepRep4x4Symmetric::zz_" title='CLHEP::HepRep4x4Symmetric::zz_' data-ref="CLHEP::HepRep4x4Symmetric::zz_">zz_</dfn>, <dfn class="decl" id="CLHEP::HepRep4x4Symmetric::zt_" title='CLHEP::HepRep4x4Symmetric::zt_' data-ref="CLHEP::HepRep4x4Symmetric::zt_">zt_</dfn>,</td></tr>
+<tr><th id="388">388</th><td>                           <dfn class="decl" id="CLHEP::HepRep4x4Symmetric::tt_" title='CLHEP::HepRep4x4Symmetric::tt_' data-ref="CLHEP::HepRep4x4Symmetric::tt_">tt_</dfn>;</td></tr>
+<tr><th id="389">389</th><td></td></tr>
+<tr><th id="390">390</th><td>  <b>inline</b> <em>void</em> <a class="decl" href="RotationInterfaces.icc.html#_ZNK5CLHEP18HepRep4x4Symmetric8getArrayEPd" title='CLHEP::HepRep4x4Symmetric::getArray' data-ref="_ZNK5CLHEP18HepRep4x4Symmetric8getArrayEPd" id="_ZNK5CLHEP18HepRep4x4Symmetric8getArrayEPd">getArray</a> ( <em>double</em> * <dfn class="local col3 decl" id="363array" title='array' data-type='double *' data-ref="363array">array</dfn> ) <em>const</em>;</td></tr>
+<tr><th id="391">391</th><td>  <i>// fill array with the TEN doubles xx, xy, xz, xt, yy, yz, yt, zz, zt, tt</i></td></tr>
+<tr><th id="392">392</th><td></td></tr>
+<tr><th id="393">393</th><td>};</td></tr>
+<tr><th id="394">394</th><td></td></tr>
+<tr><th id="395">395</th><td>}  <i>// namespace CLHEP</i></td></tr>
+<tr><th id="396">396</th><td></td></tr>
+<tr><th id="397">397</th><td><u>#include <a href="RotationInterfaces.icc.html">"CLHEP/Vector/RotationInterfaces.icc"</a></u></td></tr>
+<tr><th id="398">398</th><td></td></tr>
+<tr><th id="399">399</th><td><u>#<span data-ppcond="65">endif</span> // ROTATION_INTERFACES_H</u></td></tr>
+<tr><th id="400">400</th><td></td></tr>
+</table><hr/><p id='footer'>
+Generated while processing <a href='../../../../../digits_hits/detector/src/G4CellScoreComposer.cc.html'>codebrowser/source/digits_hits/detector/src/G4CellScoreComposer.cc</a><br/>Generated on <em>2019-Aug-28</em> from project codebrowser<br />Powered by <a href='https://woboq.com'><img alt='Woboq' src='https://code.woboq.org/woboq-16.png' width='41' height='16' /></a> <a href='https://code.woboq.org'>Code Browser</a> 2.1
+<br/>Generator usage only permitted with license.</p>
+</div></body></html>

@@ -1,0 +1,172 @@
+<!doctype html>
+<html>
+<head>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"><title>G4IonisParamElm.cc source code [codebrowser/source/materials/src/G4IonisParamElm.cc] - Woboq Code Browser</title>
+<link rel="stylesheet" href="../../../../../data/qtcreator.css" title="QtCreator"/>
+<link rel="alternate stylesheet" href="../../../../../data/kdevelop.css" title="KDevelop"/>
+<script type="text/javascript" src="../../../../../data/jquery/jquery.min.js"></script>
+<script type="text/javascript" src="../../../../../data/jquery/jquery-ui.min.js"></script>
+<script>var file = 'codebrowser/source/materials/src/G4IonisParamElm.cc'; var root_path = '../../../..'; var data_path = '../../../../../data';</script>
+<script src='../../../../../data/codebrowser.js'></script>
+</head>
+<body><div id='header'><h1 id='breadcrumb'><span>Browse the source code of </span><a href='../../..'>codebrowser</a>/<a href='../..'>source</a>/<a href='..'>materials</a>/<a href='./'>src</a>/<a href='G4IonisParamElm.cc.html'>G4IonisParamElm.cc</a></h1></div>
+<hr/><div id='content'><table class="code">
+<tr><th id="1">1</th><td><i>//</i></td></tr>
+<tr><th id="2">2</th><td><i>// ********************************************************************</i></td></tr>
+<tr><th id="3">3</th><td><i>// * License and Disclaimer                                           *</i></td></tr>
+<tr><th id="4">4</th><td><i>// *                                                                  *</i></td></tr>
+<tr><th id="5">5</th><td><i>// * The  Geant4 software  is  copyright of the Copyright Holders  of *</i></td></tr>
+<tr><th id="6">6</th><td><i>// * the Geant4 Collaboration.  It is provided  under  the terms  and *</i></td></tr>
+<tr><th id="7">7</th><td><i>// * conditions of the Geant4 Software License,  included in the file *</i></td></tr>
+<tr><th id="8">8</th><td><i>// * LICENSE and available at  <a href="http://cern.ch/geant4/license">http://cern.ch/geant4/license</a> .  These *</i></td></tr>
+<tr><th id="9">9</th><td><i>// * include a list of copyright holders.                             *</i></td></tr>
+<tr><th id="10">10</th><td><i>// *                                                                  *</i></td></tr>
+<tr><th id="11">11</th><td><i>// * Neither the authors of this software system, nor their employing *</i></td></tr>
+<tr><th id="12">12</th><td><i>// * institutes,nor the agencies providing financial support for this *</i></td></tr>
+<tr><th id="13">13</th><td><i>// * work  make  any representation or  warranty, express or implied, *</i></td></tr>
+<tr><th id="14">14</th><td><i>// * regarding  this  software system or assume any liability for its *</i></td></tr>
+<tr><th id="15">15</th><td><i>// * use.  Please see the license in the file  LICENSE  and URL above *</i></td></tr>
+<tr><th id="16">16</th><td><i>// * for the full disclaimer and the limitation of liability.         *</i></td></tr>
+<tr><th id="17">17</th><td><i>// *                                                                  *</i></td></tr>
+<tr><th id="18">18</th><td><i>// * This  code  implementation is the result of  the  scientific and *</i></td></tr>
+<tr><th id="19">19</th><td><i>// * technical work of the GEANT4 collaboration.                      *</i></td></tr>
+<tr><th id="20">20</th><td><i>// * By using,  copying,  modifying or  distributing the software (or *</i></td></tr>
+<tr><th id="21">21</th><td><i>// * any work based  on the software)  you  agree  to acknowledge its *</i></td></tr>
+<tr><th id="22">22</th><td><i>// * use  in  resulting  scientific  publications,  and indicate your *</i></td></tr>
+<tr><th id="23">23</th><td><i>// * acceptance of all terms of the Geant4 Software license.          *</i></td></tr>
+<tr><th id="24">24</th><td><i>// ********************************************************************</i></td></tr>
+<tr><th id="25">25</th><td><i>//</i></td></tr>
+<tr><th id="26">26</th><td><i>//</i></td></tr>
+<tr><th id="27">27</th><td><i>//</i></td></tr>
+<tr><th id="28">28</th><td><i>//</i></td></tr>
+<tr><th id="29">29</th><td><i>//....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo.... ....oooOO0OOooo....</i></td></tr>
+<tr><th id="30">30</th><td><i>//</i></td></tr>
+<tr><th id="31">31</th><td><i>// 09-07-98, data moved from G4Element. M.Maire</i></td></tr>
+<tr><th id="32">32</th><td><i>// 22-11-00, tabulation of ionisation potential from </i></td></tr>
+<tr><th id="33">33</th><td><i>//           the ICRU Report N#37. V.Ivanchenko</i></td></tr>
+<tr><th id="34">34</th><td><i>// 08-03-01, correct handling of fShellCorrectionVector. M.Maire</i></td></tr>
+<tr><th id="35">35</th><td><i>// 17-10-02, Fix excitation energy interpolation. V.Ivanchenko</i></td></tr>
+<tr><th id="36">36</th><td><i>// 06-09-04, Update calculated values after any change of ionisation </i></td></tr>
+<tr><th id="37">37</th><td><i>//           potential change. V.Ivanchenko</i></td></tr>
+<tr><th id="38">38</th><td><i>// 29-04-10, Using G4Pow and mean ionisation energy from NIST V.Ivanchenko</i></td></tr>
+<tr><th id="39">39</th><td><i>// 27.10.11: new scheme for G4Exception  (mma)</i></td></tr>
+<tr><th id="40">40</th><td><i>//</i></td></tr>
+<tr><th id="41">41</th><td><i>//....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo.... ....oooOO0OOooo....</i></td></tr>
+<tr><th id="42">42</th><td></td></tr>
+<tr><th id="43">43</th><td><u>#include <a href="../include/G4IonisParamElm.hh.html">"G4IonisParamElm.hh"</a></u></td></tr>
+<tr><th id="44">44</th><td><u>#include <a href="../include/G4NistManager.hh.html">"G4NistManager.hh"</a></u></td></tr>
+<tr><th id="45">45</th><td><u>#include <a href="../../global/management/include/G4Pow.hh.html">"G4Pow.hh"</a></u></td></tr>
+<tr><th id="46">46</th><td><u>#include <a href="../../global/management/include/G4PhysicalConstants.hh.html">"G4PhysicalConstants.hh"</a></u></td></tr>
+<tr><th id="47">47</th><td><u>#include <a href="../../global/management/include/G4SystemOfUnits.hh.html">"G4SystemOfUnits.hh"</a></u></td></tr>
+<tr><th id="48">48</th><td></td></tr>
+<tr><th id="49">49</th><td><i>//....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo.... ....oooOO0OOooo....</i></td></tr>
+<tr><th id="50">50</th><td></td></tr>
+<tr><th id="51">51</th><td><a class="type" href="../include/G4IonisParamElm.hh.html#G4IonisParamElm" title='G4IonisParamElm' data-ref="G4IonisParamElm">G4IonisParamElm</a>::<dfn class="decl def" id="_ZN15G4IonisParamElmC1Ed" title='G4IonisParamElm::G4IonisParamElm' data-ref="_ZN15G4IonisParamElmC1Ed">G4IonisParamElm</dfn>(<a class="typedef" href="../../global/management/include/G4Types.hh.html#G4double" title='G4double' data-type='double' data-ref="G4double">G4double</a> <dfn class="local col1 decl" id="1AtomNumber" title='AtomNumber' data-type='G4double' data-ref="1AtomNumber">AtomNumber</dfn>)</td></tr>
+<tr><th id="52">52</th><td>{</td></tr>
+<tr><th id="53">53</th><td>  <a class="typedef" href="../../global/management/include/G4Types.hh.html#G4int" title='G4int' data-type='int' data-ref="G4int">G4int</a> <dfn class="local col2 decl" id="2Z" title='Z' data-type='G4int' data-ref="2Z">Z</dfn> = <a class="ref" href="../../global/management/include/templates.hh.html#_Z7G4lrintd" title='G4lrint' data-ref="_Z7G4lrintd">G4lrint</a>(<a class="local col1 ref" href="#1AtomNumber" title='AtomNumber' data-ref="1AtomNumber">AtomNumber</a>);</td></tr>
+<tr><th id="54">54</th><td>  <b>if</b> (<a class="local col2 ref" href="#2Z" title='Z' data-ref="2Z">Z</a> &lt; <var>1</var>) {</td></tr>
+<tr><th id="55">55</th><td>    <a class="ref" href="../../global/management/include/G4Exception.hh.html#_Z11G4ExceptionPKcS0_19G4ExceptionSeverityS0_" title='G4Exception' data-ref="_Z11G4ExceptionPKcS0_19G4ExceptionSeverityS0_">G4Exception</a>(<q>"G4IonisParamElm::G4IonisParamElm()"</q>,  <q>"mat501"</q>, <a class="enum" href="../../global/management/include/G4ExceptionSeverity.hh.html#G4ExceptionSeverity::FatalException" title='G4ExceptionSeverity::FatalException' data-ref="G4ExceptionSeverity::FatalException">FatalException</a>,</td></tr>
+<tr><th id="56">56</th><td>                <q>"It is not allowed to create an Element with Z&lt;1"</q>);</td></tr>
+<tr><th id="57">57</th><td>  }</td></tr>
+<tr><th id="58">58</th><td>  <a class="type" href="../../global/management/include/G4Pow.hh.html#G4Pow" title='G4Pow' data-ref="G4Pow">G4Pow</a>* <dfn class="local col3 decl" id="3g4pow" title='g4pow' data-type='G4Pow *' data-ref="3g4pow">g4pow</dfn> = <a class="type" href="../../global/management/include/G4Pow.hh.html#G4Pow" title='G4Pow' data-ref="G4Pow">G4Pow</a>::<a class="ref" href="../../global/management/include/G4Pow.hh.html#_ZN5G4Pow11GetInstanceEv" title='G4Pow::GetInstance' data-ref="_ZN5G4Pow11GetInstanceEv">GetInstance</a>();</td></tr>
+<tr><th id="59">59</th><td></td></tr>
+<tr><th id="60">60</th><td>  <i>// some basic functions of the atomic number</i></td></tr>
+<tr><th id="61">61</th><td>  <a class="member" href="../include/G4IonisParamElm.hh.html#G4IonisParamElm::fZ" title='G4IonisParamElm::fZ' data-ref="G4IonisParamElm::fZ">fZ</a>     = <a class="local col2 ref" href="#2Z" title='Z' data-ref="2Z">Z</a>;</td></tr>
+<tr><th id="62">62</th><td>  <a class="member" href="../include/G4IonisParamElm.hh.html#G4IonisParamElm::fZ3" title='G4IonisParamElm::fZ3' data-ref="G4IonisParamElm::fZ3">fZ3</a>    = <a class="local col3 ref" href="#3g4pow" title='g4pow' data-ref="3g4pow">g4pow</a>-&gt;<a class="ref" href="../../global/management/include/G4Pow.hh.html#_ZNK5G4Pow3Z13Ei" title='G4Pow::Z13' data-ref="_ZNK5G4Pow3Z13Ei">Z13</a>(<a class="local col2 ref" href="#2Z" title='Z' data-ref="2Z">Z</a>);</td></tr>
+<tr><th id="63">63</th><td>  <a class="member" href="../include/G4IonisParamElm.hh.html#G4IonisParamElm::fZZ3" title='G4IonisParamElm::fZZ3' data-ref="G4IonisParamElm::fZZ3">fZZ3</a>   = <a class="member" href="../include/G4IonisParamElm.hh.html#G4IonisParamElm::fZ3" title='G4IonisParamElm::fZ3' data-ref="G4IonisParamElm::fZ3">fZ3</a>*<a class="local col3 ref" href="#3g4pow" title='g4pow' data-ref="3g4pow">g4pow</a>-&gt;<a class="ref" href="../../global/management/include/G4Pow.hh.html#_ZNK5G4Pow3Z13Ei" title='G4Pow::Z13' data-ref="_ZNK5G4Pow3Z13Ei">Z13</a>(<a class="local col2 ref" href="#2Z" title='Z' data-ref="2Z">Z</a>+<var>1</var>);</td></tr>
+<tr><th id="64">64</th><td>  <a class="member" href="../include/G4IonisParamElm.hh.html#G4IonisParamElm::flogZ3" title='G4IonisParamElm::flogZ3' data-ref="G4IonisParamElm::flogZ3">flogZ3</a> = <a class="local col3 ref" href="#3g4pow" title='g4pow' data-ref="3g4pow">g4pow</a>-&gt;<a class="ref" href="../../global/management/include/G4Pow.hh.html#_ZNK5G4Pow4logZEi" title='G4Pow::logZ' data-ref="_ZNK5G4Pow4logZEi">logZ</a>(<a class="local col2 ref" href="#2Z" title='Z' data-ref="2Z">Z</a>)/<var>3.</var>;</td></tr>
+<tr><th id="65">65</th><td>   </td></tr>
+<tr><th id="66">66</th><td>  <a class="member" href="../include/G4IonisParamElm.hh.html#G4IonisParamElm::fMeanExcitationEnergy" title='G4IonisParamElm::fMeanExcitationEnergy' data-ref="G4IonisParamElm::fMeanExcitationEnergy">fMeanExcitationEnergy</a> = </td></tr>
+<tr><th id="67">67</th><td>    <a class="type" href="../include/G4NistManager.hh.html#G4NistManager" title='G4NistManager' data-ref="G4NistManager">G4NistManager</a>::<a class="ref" href="../include/G4NistManager.hh.html#_ZN13G4NistManager8InstanceEv" title='G4NistManager::Instance' data-ref="_ZN13G4NistManager8InstanceEv">Instance</a>()-&gt;<a class="ref" href="../include/G4NistManager.hh.html#_ZNK13G4NistManager23GetMeanIonisationEnergyEi" title='G4NistManager::GetMeanIonisationEnergy' data-ref="_ZNK13G4NistManager23GetMeanIonisationEnergyEi">GetMeanIonisationEnergy</a>(<a class="local col2 ref" href="#2Z" title='Z' data-ref="2Z">Z</a>);</td></tr>
+<tr><th id="68">68</th><td></td></tr>
+<tr><th id="69">69</th><td>  <i>// compute parameters for ion transport</i></td></tr>
+<tr><th id="70">70</th><td><i>  // The aproximation from:</i></td></tr>
+<tr><th id="71">71</th><td><i>  // J.F.Ziegler, J.P. Biersack, U. Littmark</i></td></tr>
+<tr><th id="72">72</th><td><i>  // The Stopping and Range of Ions in Matter,</i></td></tr>
+<tr><th id="73">73</th><td><i>  // Vol.1, Pergamon Press, 1985</i></td></tr>
+<tr><th id="74">74</th><td><i>  // Fast ions or hadrons</i></td></tr>
+<tr><th id="75">75</th><td></td></tr>
+<tr><th id="76">76</th><td>  <a class="typedef" href="../../global/management/include/G4Types.hh.html#G4int" title='G4int' data-type='int' data-ref="G4int">G4int</a> <dfn class="local col4 decl" id="4iz" title='iz' data-type='G4int' data-ref="4iz">iz</dfn> = <a class="local col2 ref" href="#2Z" title='Z' data-ref="2Z">Z</a> - <var>1</var>;</td></tr>
+<tr><th id="77">77</th><td>  <b>if</b>(<var>91</var> &lt; <a class="local col4 ref" href="#4iz" title='iz' data-ref="4iz">iz</a>) { <a class="local col4 ref" href="#4iz" title='iz' data-ref="4iz">iz</a> = <var>91</var>; }</td></tr>
+<tr><th id="78">78</th><td></td></tr>
+<tr><th id="79">79</th><td>  <em>static</em> <em>const</em> <a class="typedef" href="../../global/management/include/G4Types.hh.html#G4double" title='G4double' data-type='double' data-ref="G4double">G4double</a> <dfn class="local col5 decl" id="5vFermi" title='vFermi' data-type='const G4double [92]' data-ref="5vFermi">vFermi</dfn>[<var>92</var>] = {</td></tr>
+<tr><th id="80">80</th><td>    <var>1.0309</var>,  <var>0.15976</var>, <var>0.59782</var>, <var>1.0781</var>,  <var>1.0486</var>,  <var>1.0</var>,     <var>1.058</var>,   <var>0.93942</var>, <var>0.74562</var>, <var>0.3424</var>,</td></tr>
+<tr><th id="81">81</th><td>    <var>0.45259</var>, <var>0.71074</var>, <var>0.90519</var>, <var>0.97411</var>, <var>0.97184</var>, <var>0.89852</var>, <var>0.70827</var>, <var>0.39816</var>, <var>0.36552</var>, <var>0.62712</var>,</td></tr>
+<tr><th id="82">82</th><td>    <var>0.81707</var>, <var>0.9943</var>,  <var>1.1423</var>,  <var>1.2381</var>,  <var>1.1222</var>,  <var>0.92705</var>, <var>1.0047</var>,  <var>1.2</var>,     <var>1.0661</var>,  <var>0.97411</var>,</td></tr>
+<tr><th id="83">83</th><td>    <var>0.84912</var>, <var>0.95</var>,    <var>1.0903</var>,  <var>1.0429</var>,  <var>0.49715</var>, <var>0.37755</var>, <var>0.35211</var>, <var>0.57801</var>, <var>0.77773</var>, <var>1.0207</var>,</td></tr>
+<tr><th id="84">84</th><td>    <var>1.029</var>,   <var>1.2542</var>,  <var>1.122</var>,   <var>1.1241</var>,  <var>1.0882</var>,  <var>1.2709</var>,  <var>1.2542</var>,  <var>0.90094</var>, <var>0.74093</var>, <var>0.86054</var>,</td></tr>
+<tr><th id="85">85</th><td>    <var>0.93155</var>, <var>1.0047</var>,  <var>0.55379</var>, <var>0.43289</var>, <var>0.32636</var>, <var>0.5131</var>,  <var>0.695</var>,   <var>0.72591</var>, <var>0.71202</var>, <var>0.67413</var>,</td></tr>
+<tr><th id="86">86</th><td>    <var>0.71418</var>, <var>0.71453</var>, <var>0.5911</var>,  <var>0.70263</var>, <var>0.68049</var>, <var>0.68203</var>, <var>0.68121</var>, <var>0.68532</var>, <var>0.68715</var>, <var>0.61884</var>,</td></tr>
+<tr><th id="87">87</th><td>    <var>0.71801</var>, <var>0.83048</var>, <var>1.1222</var>,  <var>1.2381</var>,  <var>1.045</var>,   <var>1.0733</var>,  <var>1.0953</var>,  <var>1.2381</var>,  <var>1.2879</var>,  <var>0.78654</var>,</td></tr>
+<tr><th id="88">88</th><td>    <var>0.66401</var>, <var>0.84912</var>, <var>0.88433</var>, <var>0.80746</var>, <var>0.43357</var>, <var>0.41923</var>, <var>0.43638</var>, <var>0.51464</var>, <var>0.73087</var>, <var>0.81065</var>,</td></tr>
+<tr><th id="89">89</th><td>    <var>1.9578</var>,  <var>1.0257</var>} ;</td></tr>
+<tr><th id="90">90</th><td></td></tr>
+<tr><th id="91">91</th><td>  <em>static</em> <em>const</em> <a class="typedef" href="../../global/management/include/G4Types.hh.html#G4double" title='G4double' data-type='double' data-ref="G4double">G4double</a> <dfn class="local col6 decl" id="6lFactor" title='lFactor' data-type='const G4double [92]' data-ref="6lFactor">lFactor</dfn>[<var>92</var>] = {</td></tr>
+<tr><th id="92">92</th><td>    <var>1.0</var>,  <var>1.0</var>,  <var>1.1</var>,  <var>1.06</var>, <var>1.01</var>, <var>1.03</var>, <var>1.04</var>, <var>0.99</var>, <var>0.95</var>, <var>0.9</var>,</td></tr>
+<tr><th id="93">93</th><td>    <var>0.82</var>, <var>0.81</var>, <var>0.83</var>, <var>0.88</var>, <var>1.0</var>,  <var>0.95</var>, <var>0.97</var>, <var>0.99</var>, <var>0.98</var>, <var>0.97</var>,</td></tr>
+<tr><th id="94">94</th><td>    <var>0.98</var>, <var>0.97</var>, <var>0.96</var>, <var>0.93</var>, <var>0.91</var>, <var>0.9</var>,  <var>0.88</var>, <var>0.9</var>,  <var>0.9</var>,  <var>0.9</var>,</td></tr>
+<tr><th id="95">95</th><td>    <var>0.9</var>,  <var>0.85</var>, <var>0.9</var>,  <var>0.9</var>,  <var>0.91</var>, <var>0.92</var>, <var>0.9</var>,  <var>0.9</var>,  <var>0.9</var>,  <var>0.9</var>,</td></tr>
+<tr><th id="96">96</th><td>    <var>0.9</var>,  <var>0.88</var>, <var>0.9</var>,  <var>0.88</var>, <var>0.88</var>, <var>0.9</var>,  <var>0.9</var>,  <var>0.88</var>, <var>0.9</var>,  <var>0.9</var>,</td></tr>
+<tr><th id="97">97</th><td>    <var>0.9</var>,  <var>0.9</var>,  <var>0.96</var>, <var>1.2</var>,  <var>0.9</var>,  <var>0.88</var>, <var>0.88</var>, <var>0.85</var>, <var>0.9</var>,  <var>0.9</var>,</td></tr>
+<tr><th id="98">98</th><td>    <var>0.92</var>, <var>0.95</var>, <var>0.99</var>, <var>1.03</var>, <var>1.05</var>, <var>1.07</var>, <var>1.08</var>, <var>1.1</var>,  <var>1.08</var>, <var>1.08</var>,</td></tr>
+<tr><th id="99">99</th><td>    <var>1.08</var>, <var>1.08</var>, <var>1.09</var>, <var>1.09</var>, <var>1.1</var>,  <var>1.11</var>, <var>1.12</var>, <var>1.13</var>, <var>1.14</var>, <var>1.15</var>,</td></tr>
+<tr><th id="100">100</th><td>    <var>1.17</var>, <var>1.2</var>,  <var>1.18</var>, <var>1.17</var>, <var>1.17</var>, <var>1.16</var>, <var>1.16</var>, <var>1.16</var>, <var>1.16</var>, <var>1.16</var>,</td></tr>
+<tr><th id="101">101</th><td>    <var>1.16</var>, <var>1.16</var>} ;</td></tr>
+<tr><th id="102">102</th><td></td></tr>
+<tr><th id="103">103</th><td>  <a class="member" href="../include/G4IonisParamElm.hh.html#G4IonisParamElm::fVFermi" title='G4IonisParamElm::fVFermi' data-ref="G4IonisParamElm::fVFermi">fVFermi</a>  = <a class="local col5 ref" href="#5vFermi" title='vFermi' data-ref="5vFermi">vFermi</a>[<a class="local col4 ref" href="#4iz" title='iz' data-ref="4iz">iz</a>];</td></tr>
+<tr><th id="104">104</th><td>  <a class="member" href="../include/G4IonisParamElm.hh.html#G4IonisParamElm::fLFactor" title='G4IonisParamElm::fLFactor' data-ref="G4IonisParamElm::fLFactor">fLFactor</a> = <a class="local col6 ref" href="#6lFactor" title='lFactor' data-ref="6lFactor">lFactor</a>[<a class="local col4 ref" href="#4iz" title='iz' data-ref="4iz">iz</a>];</td></tr>
+<tr><th id="105">105</th><td></td></tr>
+<tr><th id="106">106</th><td>  <i>// obsolete parameters for ionisation</i></td></tr>
+<tr><th id="107">107</th><td>  <a class="member" href="../include/G4IonisParamElm.hh.html#G4IonisParamElm::fTau0" title='G4IonisParamElm::fTau0' data-ref="G4IonisParamElm::fTau0">fTau0</a> = <var>0.1</var>*<a class="member" href="../include/G4IonisParamElm.hh.html#G4IonisParamElm::fZ3" title='G4IonisParamElm::fZ3' data-ref="G4IonisParamElm::fZ3">fZ3</a>*<a class="ref" href="../../externals/clhep/include/CLHEP/Units/SystemOfUnits.h.html#CLHEP::MeV" title='CLHEP::MeV' data-ref="CLHEP::MeV">MeV</a>/<a class="ref" href="../../externals/clhep/include/CLHEP/Units/PhysicalConstants.h.html#CLHEP::proton_mass_c2" title='CLHEP::proton_mass_c2' data-ref="CLHEP::proton_mass_c2">proton_mass_c2</a>;</td></tr>
+<tr><th id="108">108</th><td>  <a class="member" href="../include/G4IonisParamElm.hh.html#G4IonisParamElm::fTaul" title='G4IonisParamElm::fTaul' data-ref="G4IonisParamElm::fTaul">fTaul</a> = <var>2.</var>*<a class="ref" href="../../externals/clhep/include/CLHEP/Units/SystemOfUnits.h.html#CLHEP::MeV" title='CLHEP::MeV' data-ref="CLHEP::MeV">MeV</a>/<a class="ref" href="../../externals/clhep/include/CLHEP/Units/PhysicalConstants.h.html#CLHEP::proton_mass_c2" title='CLHEP::proton_mass_c2' data-ref="CLHEP::proton_mass_c2">proton_mass_c2</a>;</td></tr>
+<tr><th id="109">109</th><td></td></tr>
+<tr><th id="110">110</th><td>  <i>// compute the Bethe-Bloch formula for energy = fTaul*particle mass</i></td></tr>
+<tr><th id="111">111</th><td>  <a class="typedef" href="../../global/management/include/G4Types.hh.html#G4double" title='G4double' data-type='double' data-ref="G4double">G4double</a> <dfn class="local col7 decl" id="7rate" title='rate' data-type='G4double' data-ref="7rate">rate</dfn> = <a class="member" href="../include/G4IonisParamElm.hh.html#G4IonisParamElm::fMeanExcitationEnergy" title='G4IonisParamElm::fMeanExcitationEnergy' data-ref="G4IonisParamElm::fMeanExcitationEnergy">fMeanExcitationEnergy</a>/<a class="ref" href="../../externals/clhep/include/CLHEP/Units/PhysicalConstants.h.html#CLHEP::electron_mass_c2" title='CLHEP::electron_mass_c2' data-ref="CLHEP::electron_mass_c2">electron_mass_c2</a> ;</td></tr>
+<tr><th id="112">112</th><td>  <a class="typedef" href="../../global/management/include/G4Types.hh.html#G4double" title='G4double' data-type='double' data-ref="G4double">G4double</a> <dfn class="local col8 decl" id="8w" title='w' data-type='G4double' data-ref="8w">w</dfn> = <a class="member" href="../include/G4IonisParamElm.hh.html#G4IonisParamElm::fTaul" title='G4IonisParamElm::fTaul' data-ref="G4IonisParamElm::fTaul">fTaul</a>*(<a class="member" href="../include/G4IonisParamElm.hh.html#G4IonisParamElm::fTaul" title='G4IonisParamElm::fTaul' data-ref="G4IonisParamElm::fTaul">fTaul</a>+<var>2.</var>) ;</td></tr>
+<tr><th id="113">113</th><td>  fBetheBlochLow = (fTaul+<var>1.</var>)*(fTaul+<var>1.</var>)*<span class='error' title="use of undeclared identifier &apos;std&apos;">std</span>::log(<var>2.</var>*w/rate)/w - <var>1.</var> ;</td></tr>
+<tr><th id="114">114</th><td>  <a class="member" href="../include/G4IonisParamElm.hh.html#G4IonisParamElm::fBetheBlochLow" title='G4IonisParamElm::fBetheBlochLow' data-ref="G4IonisParamElm::fBetheBlochLow">fBetheBlochLow</a> = <var>2.</var>*<a class="member" href="../include/G4IonisParamElm.hh.html#G4IonisParamElm::fZ" title='G4IonisParamElm::fZ' data-ref="G4IonisParamElm::fZ">fZ</a>*<a class="ref" href="../../externals/clhep/include/CLHEP/Units/PhysicalConstants.h.html#CLHEP::twopi_mc2_rcl2" title='CLHEP::twopi_mc2_rcl2' data-ref="CLHEP::twopi_mc2_rcl2">twopi_mc2_rcl2</a>*<a class="member" href="../include/G4IonisParamElm.hh.html#G4IonisParamElm::fBetheBlochLow" title='G4IonisParamElm::fBetheBlochLow' data-ref="G4IonisParamElm::fBetheBlochLow">fBetheBlochLow</a> ; </td></tr>
+<tr><th id="115">115</th><td>  </td></tr>
+<tr><th id="116">116</th><td>  fClow = <span class='error' title="use of undeclared identifier &apos;std&apos;">std</span>::sqrt(fTaul)*fBetheBlochLow;</td></tr>
+<tr><th id="117">117</th><td>  <a class="member" href="../include/G4IonisParamElm.hh.html#G4IonisParamElm::fAlow" title='G4IonisParamElm::fAlow' data-ref="G4IonisParamElm::fAlow">fAlow</a> = <var>6.458040</var> * <a class="member" href="../include/G4IonisParamElm.hh.html#G4IonisParamElm::fClow" title='G4IonisParamElm::fClow' data-ref="G4IonisParamElm::fClow">fClow</a>/<a class="member" href="../include/G4IonisParamElm.hh.html#G4IonisParamElm::fTau0" title='G4IonisParamElm::fTau0' data-ref="G4IonisParamElm::fTau0">fTau0</a>;</td></tr>
+<tr><th id="118">118</th><td>  <a class="typedef" href="../../global/management/include/G4Types.hh.html#G4double" title='G4double' data-type='double' data-ref="G4double">G4double</a> <dfn class="local col9 decl" id="9Taum" title='Taum' data-type='G4double' data-ref="9Taum">Taum</dfn> = <var>0.035</var>*<a class="member" href="../include/G4IonisParamElm.hh.html#G4IonisParamElm::fZ3" title='G4IonisParamElm::fZ3' data-ref="G4IonisParamElm::fZ3">fZ3</a>*<a class="ref" href="../../externals/clhep/include/CLHEP/Units/SystemOfUnits.h.html#CLHEP::MeV" title='CLHEP::MeV' data-ref="CLHEP::MeV">MeV</a>/<a class="ref" href="../../externals/clhep/include/CLHEP/Units/PhysicalConstants.h.html#CLHEP::proton_mass_c2" title='CLHEP::proton_mass_c2' data-ref="CLHEP::proton_mass_c2">proton_mass_c2</a>;</td></tr>
+<tr><th id="119">119</th><td>  fBlow =-<var>3.229020</var>*fClow/(fTau0*<span class='error' title="use of undeclared identifier &apos;std&apos;">std</span>::sqrt(Taum));</td></tr>
+<tr><th id="120">120</th><td></td></tr>
+<tr><th id="121">121</th><td>  <i>// Shell correction parameterization</i></td></tr>
+<tr><th id="122">122</th><td>  <a class="member" href="../include/G4IonisParamElm.hh.html#G4IonisParamElm::fShellCorrectionVector" title='G4IonisParamElm::fShellCorrectionVector' data-ref="G4IonisParamElm::fShellCorrectionVector">fShellCorrectionVector</a> = <b>new</b> <a class="typedef" href="../../global/management/include/G4Types.hh.html#G4double" title='G4double' data-type='double' data-ref="G4double">G4double</a>[<var>3</var>]; <i>//[3]</i></td></tr>
+<tr><th id="123">123</th><td>  <a class="local col7 ref" href="#7rate" title='rate' data-ref="7rate">rate</a> = <var>0.001</var>*<a class="member" href="../include/G4IonisParamElm.hh.html#G4IonisParamElm::fMeanExcitationEnergy" title='G4IonisParamElm::fMeanExcitationEnergy' data-ref="G4IonisParamElm::fMeanExcitationEnergy">fMeanExcitationEnergy</a>/<a class="ref" href="../../externals/clhep/include/CLHEP/Units/SystemOfUnits.h.html#CLHEP::eV" title='CLHEP::eV' data-ref="CLHEP::eV">eV</a>;</td></tr>
+<tr><th id="124">124</th><td>  <a class="typedef" href="../../global/management/include/G4Types.hh.html#G4double" title='G4double' data-type='double' data-ref="G4double">G4double</a> <dfn class="local col0 decl" id="10rate2" title='rate2' data-type='G4double' data-ref="10rate2">rate2</dfn> = <a class="local col7 ref" href="#7rate" title='rate' data-ref="7rate">rate</a>*<a class="local col7 ref" href="#7rate" title='rate' data-ref="7rate">rate</a>;</td></tr>
+<tr><th id="125">125</th><td>    <i>/*    </i></td></tr>
+<tr><th id="126">126</th><td><i>    fShellCorrectionVector[0] = ( 1.10289e5 + 5.14781e8*rate)*rate2 ;</i></td></tr>
+<tr><th id="127">127</th><td><i>    fShellCorrectionVector[1] = ( 7.93805e3 - 2.22565e7*rate)*rate2 ;</i></td></tr>
+<tr><th id="128">128</th><td><i>    fShellCorrectionVector[2] = (-9.92256e1 + 2.10823e5*rate)*rate2 ;</i></td></tr>
+<tr><th id="129">129</th><td><i>    */</i></td></tr>
+<tr><th id="130">130</th><td>  <a class="member" href="../include/G4IonisParamElm.hh.html#G4IonisParamElm::fShellCorrectionVector" title='G4IonisParamElm::fShellCorrectionVector' data-ref="G4IonisParamElm::fShellCorrectionVector">fShellCorrectionVector</a>[<var>0</var>] = ( <var>0.422377</var>   + <var>3.858019</var>*<a class="local col7 ref" href="#7rate" title='rate' data-ref="7rate">rate</a>)*<a class="local col0 ref" href="#10rate2" title='rate2' data-ref="10rate2">rate2</a> ;</td></tr>
+<tr><th id="131">131</th><td>  <a class="member" href="../include/G4IonisParamElm.hh.html#G4IonisParamElm::fShellCorrectionVector" title='G4IonisParamElm::fShellCorrectionVector' data-ref="G4IonisParamElm::fShellCorrectionVector">fShellCorrectionVector</a>[<var>1</var>] = ( <var>0.0304043</var>  - <var>0.1667989</var>*<a class="local col7 ref" href="#7rate" title='rate' data-ref="7rate">rate</a>)*<a class="local col0 ref" href="#10rate2" title='rate2' data-ref="10rate2">rate2</a> ;</td></tr>
+<tr><th id="132">132</th><td>  <a class="member" href="../include/G4IonisParamElm.hh.html#G4IonisParamElm::fShellCorrectionVector" title='G4IonisParamElm::fShellCorrectionVector' data-ref="G4IonisParamElm::fShellCorrectionVector">fShellCorrectionVector</a>[<var>2</var>] = (-<var>0.00038106</var> + <var>0.00157955</var>*<a class="local col7 ref" href="#7rate" title='rate' data-ref="7rate">rate</a>)*<a class="local col0 ref" href="#10rate2" title='rate2' data-ref="10rate2">rate2</a> ;</td></tr>
+<tr><th id="133">133</th><td>}</td></tr>
+<tr><th id="134">134</th><td></td></tr>
+<tr><th id="135">135</th><td><i>//....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo.... ....oooOO0OOooo....</i></td></tr>
+<tr><th id="136">136</th><td><i></i></td></tr>
+<tr><th id="137">137</th><td><i>// Fake default constructor - sets only member data and allocates memory</i></td></tr>
+<tr><th id="138">138</th><td><i>//                            for usage restricted to object persistency</i></td></tr>
+<tr><th id="139">139</th><td></td></tr>
+<tr><th id="140">140</th><td><a class="type" href="../include/G4IonisParamElm.hh.html#G4IonisParamElm" title='G4IonisParamElm' data-ref="G4IonisParamElm">G4IonisParamElm</a>::<dfn class="decl def" id="_ZN15G4IonisParamElmC1ER8__void__" title='G4IonisParamElm::G4IonisParamElm' data-ref="_ZN15G4IonisParamElmC1ER8__void__">G4IonisParamElm</dfn>(<a class="type" href="../../global/management/include/G4Types.hh.html#__void__" title='__void__' data-ref="__void__">__void__</a>&amp;)</td></tr>
+<tr><th id="141">141</th><td>  : <a class="member" href="../include/G4IonisParamElm.hh.html#G4IonisParamElm::fShellCorrectionVector" title='G4IonisParamElm::fShellCorrectionVector' data-ref="G4IonisParamElm::fShellCorrectionVector">fShellCorrectionVector</a>(<b>nullptr</b>)</td></tr>
+<tr><th id="142">142</th><td>{</td></tr>
+<tr><th id="143">143</th><td>  <a class="member" href="../include/G4IonisParamElm.hh.html#G4IonisParamElm::fZ" title='G4IonisParamElm::fZ' data-ref="G4IonisParamElm::fZ">fZ</a>=<a class="member" href="../include/G4IonisParamElm.hh.html#G4IonisParamElm::fZ3" title='G4IonisParamElm::fZ3' data-ref="G4IonisParamElm::fZ3">fZ3</a>=<a class="member" href="../include/G4IonisParamElm.hh.html#G4IonisParamElm::fZZ3" title='G4IonisParamElm::fZZ3' data-ref="G4IonisParamElm::fZZ3">fZZ3</a>=<a class="member" href="../include/G4IonisParamElm.hh.html#G4IonisParamElm::flogZ3" title='G4IonisParamElm::flogZ3' data-ref="G4IonisParamElm::flogZ3">flogZ3</a>=<a class="member" href="../include/G4IonisParamElm.hh.html#G4IonisParamElm::fTau0" title='G4IonisParamElm::fTau0' data-ref="G4IonisParamElm::fTau0">fTau0</a>=<a class="member" href="../include/G4IonisParamElm.hh.html#G4IonisParamElm::fTaul" title='G4IonisParamElm::fTaul' data-ref="G4IonisParamElm::fTaul">fTaul</a>=<a class="member" href="../include/G4IonisParamElm.hh.html#G4IonisParamElm::fBetheBlochLow" title='G4IonisParamElm::fBetheBlochLow' data-ref="G4IonisParamElm::fBetheBlochLow">fBetheBlochLow</a>=<a class="member" href="../include/G4IonisParamElm.hh.html#G4IonisParamElm::fAlow" title='G4IonisParamElm::fAlow' data-ref="G4IonisParamElm::fAlow">fAlow</a>=<a class="member" href="../include/G4IonisParamElm.hh.html#G4IonisParamElm::fBlow" title='G4IonisParamElm::fBlow' data-ref="G4IonisParamElm::fBlow">fBlow</a>=<a class="member" href="../include/G4IonisParamElm.hh.html#G4IonisParamElm::fClow" title='G4IonisParamElm::fClow' data-ref="G4IonisParamElm::fClow">fClow</a></td></tr>
+<tr><th id="144">144</th><td>    =<a class="member" href="../include/G4IonisParamElm.hh.html#G4IonisParamElm::fMeanExcitationEnergy" title='G4IonisParamElm::fMeanExcitationEnergy' data-ref="G4IonisParamElm::fMeanExcitationEnergy">fMeanExcitationEnergy</a>=<a class="member" href="../include/G4IonisParamElm.hh.html#G4IonisParamElm::fVFermi" title='G4IonisParamElm::fVFermi' data-ref="G4IonisParamElm::fVFermi">fVFermi</a>=<a class="member" href="../include/G4IonisParamElm.hh.html#G4IonisParamElm::fLFactor" title='G4IonisParamElm::fLFactor' data-ref="G4IonisParamElm::fLFactor">fLFactor</a>=<var>0.0</var>;</td></tr>
+<tr><th id="145">145</th><td>}</td></tr>
+<tr><th id="146">146</th><td></td></tr>
+<tr><th id="147">147</th><td><i>//....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo.... ....oooOO0OOooo....</i></td></tr>
+<tr><th id="148">148</th><td></td></tr>
+<tr><th id="149">149</th><td><a class="type" href="../include/G4IonisParamElm.hh.html#G4IonisParamElm" title='G4IonisParamElm' data-ref="G4IonisParamElm">G4IonisParamElm</a>::<dfn class="decl def" id="_ZN15G4IonisParamElmD1Ev" title='G4IonisParamElm::~G4IonisParamElm' data-ref="_ZN15G4IonisParamElmD1Ev">~G4IonisParamElm</dfn>()</td></tr>
+<tr><th id="150">150</th><td>{</td></tr>
+<tr><th id="151">151</th><td>  <b>if</b> (<a class="member" href="../include/G4IonisParamElm.hh.html#G4IonisParamElm::fShellCorrectionVector" title='G4IonisParamElm::fShellCorrectionVector' data-ref="G4IonisParamElm::fShellCorrectionVector">fShellCorrectionVector</a>) { <b>delete</b> [] <a class="member" href="../include/G4IonisParamElm.hh.html#G4IonisParamElm::fShellCorrectionVector" title='G4IonisParamElm::fShellCorrectionVector' data-ref="G4IonisParamElm::fShellCorrectionVector">fShellCorrectionVector</a>; }</td></tr>
+<tr><th id="152">152</th><td>}</td></tr>
+<tr><th id="153">153</th><td></td></tr>
+<tr><th id="154">154</th><td><i>//....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo.... ....oooOO0OOooo....</i></td></tr>
+<tr><th id="155">155</th><td></td></tr>
+</table><hr/><p id='footer'>
+Generated on <em>2019-Aug-28</em> from project codebrowser<br />Powered by <a href='https://woboq.com'><img alt='Woboq' src='https://code.woboq.org/woboq-16.png' width='41' height='16' /></a> <a href='https://code.woboq.org'>Code Browser</a> 2.1
+<br/>Generator usage only permitted with license.</p>
+</div></body></html>

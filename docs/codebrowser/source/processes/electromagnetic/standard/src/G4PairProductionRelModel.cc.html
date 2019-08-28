@@ -1,0 +1,630 @@
+<!doctype html>
+<html>
+<head>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"><title>G4PairProductionRelModel.cc source code [codebrowser/source/processes/electromagnetic/standard/src/G4PairProductionRelModel.cc] - Woboq Code Browser</title>
+<link rel="stylesheet" href="../../../../../../../data/qtcreator.css" title="QtCreator"/>
+<link rel="alternate stylesheet" href="../../../../../../../data/kdevelop.css" title="KDevelop"/>
+<script type="text/javascript" src="../../../../../../../data/jquery/jquery.min.js"></script>
+<script type="text/javascript" src="../../../../../../../data/jquery/jquery-ui.min.js"></script>
+<script>var file = 'codebrowser/source/processes/electromagnetic/standard/src/G4PairProductionRelModel.cc'; var root_path = '../../../../../..'; var data_path = '../../../../../../../data';</script>
+<script src='../../../../../../../data/codebrowser.js'></script>
+</head>
+<body><div id='header'><h1 id='breadcrumb'><span>Browse the source code of </span><a href='../../../../..'>codebrowser</a>/<a href='../../../..'>source</a>/<a href='../../..'>processes</a>/<a href='../..'>electromagnetic</a>/<a href='..'>standard</a>/<a href='./'>src</a>/<a href='G4PairProductionRelModel.cc.html'>G4PairProductionRelModel.cc</a></h1></div>
+<hr/><div id='content'><table class="code">
+<tr><th id="1">1</th><td><i>//</i></td></tr>
+<tr><th id="2">2</th><td><i>// ********************************************************************</i></td></tr>
+<tr><th id="3">3</th><td><i>// * License and Disclaimer                                           *</i></td></tr>
+<tr><th id="4">4</th><td><i>// *                                                                  *</i></td></tr>
+<tr><th id="5">5</th><td><i>// * The  Geant4 software  is  copyright of the Copyright Holders  of *</i></td></tr>
+<tr><th id="6">6</th><td><i>// * the Geant4 Collaboration.  It is provided  under  the terms  and *</i></td></tr>
+<tr><th id="7">7</th><td><i>// * conditions of the Geant4 Software License,  included in the file *</i></td></tr>
+<tr><th id="8">8</th><td><i>// * LICENSE and available at  <a href="http://cern.ch/geant4/license">http://cern.ch/geant4/license</a> .  These *</i></td></tr>
+<tr><th id="9">9</th><td><i>// * include a list of copyright holders.                             *</i></td></tr>
+<tr><th id="10">10</th><td><i>// *                                                                  *</i></td></tr>
+<tr><th id="11">11</th><td><i>// * Neither the authors of this software system, nor their employing *</i></td></tr>
+<tr><th id="12">12</th><td><i>// * institutes,nor the agencies providing financial support for this *</i></td></tr>
+<tr><th id="13">13</th><td><i>// * work  make  any representation or  warranty, express or implied, *</i></td></tr>
+<tr><th id="14">14</th><td><i>// * regarding  this  software system or assume any liability for its *</i></td></tr>
+<tr><th id="15">15</th><td><i>// * use.  Please see the license in the file  LICENSE  and URL above *</i></td></tr>
+<tr><th id="16">16</th><td><i>// * for the full disclaimer and the limitation of liability.         *</i></td></tr>
+<tr><th id="17">17</th><td><i>// *                                                                  *</i></td></tr>
+<tr><th id="18">18</th><td><i>// * This  code  implementation is the result of  the  scientific and *</i></td></tr>
+<tr><th id="19">19</th><td><i>// * technical work of the GEANT4 collaboration.                      *</i></td></tr>
+<tr><th id="20">20</th><td><i>// * By using,  copying,  modifying or  distributing the software (or *</i></td></tr>
+<tr><th id="21">21</th><td><i>// * any work based  on the software)  you  agree  to acknowledge its *</i></td></tr>
+<tr><th id="22">22</th><td><i>// * use  in  resulting  scientific  publications,  and indicate your *</i></td></tr>
+<tr><th id="23">23</th><td><i>// * acceptance of all terms of the Geant4 Software license.          *</i></td></tr>
+<tr><th id="24">24</th><td><i>// ********************************************************************</i></td></tr>
+<tr><th id="25">25</th><td><i>//</i></td></tr>
+<tr><th id="26">26</th><td><i>//</i></td></tr>
+<tr><th id="27">27</th><td><i>// -------------------------------------------------------------------</i></td></tr>
+<tr><th id="28">28</th><td><i>//</i></td></tr>
+<tr><th id="29">29</th><td><i>// GEANT4 Class file</i></td></tr>
+<tr><th id="30">30</th><td><i>//</i></td></tr>
+<tr><th id="31">31</th><td><i>//</i></td></tr>
+<tr><th id="32">32</th><td><i>// File name:     G4PairProductionRelModel</i></td></tr>
+<tr><th id="33">33</th><td><i>//</i></td></tr>
+<tr><th id="34">34</th><td><i>// Author:        Andreas Schaelicke</i></td></tr>
+<tr><th id="35">35</th><td><i>//</i></td></tr>
+<tr><th id="36">36</th><td><i>// Creation date: 02.04.2009</i></td></tr>
+<tr><th id="37">37</th><td><i>//</i></td></tr>
+<tr><th id="38">38</th><td><i>// Modifications:</i></td></tr>
+<tr><th id="39">39</th><td><i>// 20.03.17 Change LPMconstant such that it gives suppression variable 's'</i></td></tr>
+<tr><th id="40">40</th><td><i>//          that consistent to Migdal's one; fix a small bug in 'logTS1'</i></td></tr>
+<tr><th id="41">41</th><td><i>//          computation; suppression is consistent now with the one in the</i></td></tr>
+<tr><th id="42">42</th><td><i>//          brem. model (F.Hariri)</i></td></tr>
+<tr><th id="43">43</th><td><i>// 28-05-18 New version with improved screening function approximation, improved</i></td></tr>
+<tr><th id="44">44</th><td><i>//          LPM function approximation, efficiency, documentation and cleanup. </i></td></tr>
+<tr><th id="45">45</th><td><i>//          Corrected call to selecting target atom in the final state sampling. </i></td></tr>
+<tr><th id="46">46</th><td><i>//          (M. Novak)</i></td></tr>
+<tr><th id="47">47</th><td><i>//</i></td></tr>
+<tr><th id="48">48</th><td><i>// Class Description:</i></td></tr>
+<tr><th id="49">49</th><td><i>//</i></td></tr>
+<tr><th id="50">50</th><td><i>// Main References:</i></td></tr>
+<tr><th id="51">51</th><td><i>//  J.W.Motz et.al., Rev. Mod. Phys. 41 (1969) 581.</i></td></tr>
+<tr><th id="52">52</th><td><i>//  S.Klein,  Rev. Mod. Phys. 71 (1999) 1501.</i></td></tr>
+<tr><th id="53">53</th><td><i>//  T.Stanev et.al., Phys. Rev. D25 (1982) 1291.</i></td></tr>
+<tr><th id="54">54</th><td><i>//  M.L.Ter-Mikaelian, High-energy Electromagnetic Processes in Condensed Media,</i></td></tr>
+<tr><th id="55">55</th><td><i>//                     Wiley, 1972.</i></td></tr>
+<tr><th id="56">56</th><td><i>//</i></td></tr>
+<tr><th id="57">57</th><td><i>// -------------------------------------------------------------------</i></td></tr>
+<tr><th id="58">58</th><td></td></tr>
+<tr><th id="59">59</th><td><u>#include <a href="../include/G4PairProductionRelModel.hh.html">"G4PairProductionRelModel.hh"</a></u></td></tr>
+<tr><th id="60">60</th><td><u>#include <a href="../../../../global/management/include/G4PhysicalConstants.hh.html">"G4PhysicalConstants.hh"</a></u></td></tr>
+<tr><th id="61">61</th><td><u>#include <a href="../../../../global/management/include/G4SystemOfUnits.hh.html">"G4SystemOfUnits.hh"</a></u></td></tr>
+<tr><th id="62">62</th><td><u>#include <a href="../../../../particles/bosons/include/G4Gamma.hh.html">"G4Gamma.hh"</a></u></td></tr>
+<tr><th id="63">63</th><td><u>#include <a href="../../../../particles/leptons/include/G4Electron.hh.html">"G4Electron.hh"</a></u></td></tr>
+<tr><th id="64">64</th><td><u>#include <a href="../../../../particles/leptons/include/G4Positron.hh.html">"G4Positron.hh"</a></u></td></tr>
+<tr><th id="65">65</th><td><u>#include <a href="../../../../track/include/G4ParticleChangeForGamma.hh.html">"G4ParticleChangeForGamma.hh"</a></u></td></tr>
+<tr><th id="66">66</th><td><u>#include <a href="../../utils/include/G4LossTableManager.hh.html">"G4LossTableManager.hh"</a></u></td></tr>
+<tr><th id="67">67</th><td><u>#include <a href="../include/G4ModifiedTsai.hh.html">"G4ModifiedTsai.hh"</a></u></td></tr>
+<tr><th id="68">68</th><td></td></tr>
+<tr><th id="69">69</th><td></td></tr>
+<tr><th id="70">70</th><td><em>const</em> <a class="typedef" href="../../../../global/management/include/G4Types.hh.html#G4int" title='G4int' data-type='int' data-ref="G4int">G4int</a> <a class="type" href="../include/G4PairProductionRelModel.hh.html#G4PairProductionRelModel" title='G4PairProductionRelModel' data-ref="G4PairProductionRelModel">G4PairProductionRelModel</a>::<dfn class="decl def" id="G4PairProductionRelModel::gMaxZet" title='G4PairProductionRelModel::gMaxZet' data-ref="G4PairProductionRelModel::gMaxZet">gMaxZet</dfn> = <var>120</var>; </td></tr>
+<tr><th id="71">71</th><td></td></tr>
+<tr><th id="72">72</th><td><i>// LPM constant: \alpha(mc^2)^2/(4\pi*\hbar c)</i></td></tr>
+<tr><th id="73">73</th><td><em>const</em> <a class="typedef" href="../../../../global/management/include/G4Types.hh.html#G4double" title='G4double' data-type='double' data-ref="G4double">G4double</a> <a class="type" href="../include/G4PairProductionRelModel.hh.html#G4PairProductionRelModel" title='G4PairProductionRelModel' data-ref="G4PairProductionRelModel">G4PairProductionRelModel</a>::<dfn class="decl def" id="G4PairProductionRelModel::gLPMconstant" title='G4PairProductionRelModel::gLPMconstant' data-ref="G4PairProductionRelModel::gLPMconstant">gLPMconstant</dfn> = </td></tr>
+<tr><th id="74">74</th><td>  <span class="namespace">CLHEP::</span><a class="ref" href="../../../../externals/clhep/include/CLHEP/Units/PhysicalConstants.h.html#CLHEP::fine_structure_const" title='CLHEP::fine_structure_const' data-ref="CLHEP::fine_structure_const">fine_structure_const</a>*<span class="namespace">CLHEP::</span><a class="ref" href="../../../../externals/clhep/include/CLHEP/Units/PhysicalConstants.h.html#CLHEP::electron_mass_c2" title='CLHEP::electron_mass_c2' data-ref="CLHEP::electron_mass_c2">electron_mass_c2</a>*<span class="namespace">CLHEP::</span><a class="ref" href="../../../../externals/clhep/include/CLHEP/Units/PhysicalConstants.h.html#CLHEP::electron_mass_c2" title='CLHEP::electron_mass_c2' data-ref="CLHEP::electron_mass_c2">electron_mass_c2</a></td></tr>
+<tr><th id="75">75</th><td>  /(<var>4.</var>*<span class="namespace">CLHEP::</span><a class="ref" href="../../../../externals/clhep/include/CLHEP/Units/SystemOfUnits.h.html#CLHEP::pi" title='CLHEP::pi' data-ref="CLHEP::pi">pi</a>*<span class="namespace">CLHEP::</span><a class="ref" href="../../../../externals/clhep/include/CLHEP/Units/PhysicalConstants.h.html#CLHEP::hbarc" title='CLHEP::hbarc' data-ref="CLHEP::hbarc">hbarc</a>);</td></tr>
+<tr><th id="76">76</th><td></td></tr>
+<tr><th id="77">77</th><td><i>// abscissas and weights of an 8 point Gauss-Legendre quadrature </i></td></tr>
+<tr><th id="78">78</th><td><i>// for numerical integration on [0,1]</i></td></tr>
+<tr><th id="79">79</th><td><em>const</em> <a class="typedef" href="../../../../global/management/include/G4Types.hh.html#G4double" title='G4double' data-type='double' data-ref="G4double">G4double</a> <a class="type" href="../include/G4PairProductionRelModel.hh.html#G4PairProductionRelModel" title='G4PairProductionRelModel' data-ref="G4PairProductionRelModel">G4PairProductionRelModel</a>::<dfn class="decl def" id="G4PairProductionRelModel::gXGL" title='G4PairProductionRelModel::gXGL' data-ref="G4PairProductionRelModel::gXGL">gXGL</dfn>[] = { </td></tr>
+<tr><th id="80">80</th><td>  <var>1.98550718e-02</var>, <var>1.01666761e-01</var>, <var>2.37233795e-01</var>, <var>4.08282679e-01</var>,</td></tr>
+<tr><th id="81">81</th><td>  <var>5.91717321e-01</var>, <var>7.62766205e-01</var>, <var>8.98333239e-01</var>, <var>9.80144928e-01</var> </td></tr>
+<tr><th id="82">82</th><td>};</td></tr>
+<tr><th id="83">83</th><td><em>const</em> <a class="typedef" href="../../../../global/management/include/G4Types.hh.html#G4double" title='G4double' data-type='double' data-ref="G4double">G4double</a> <a class="type" href="../include/G4PairProductionRelModel.hh.html#G4PairProductionRelModel" title='G4PairProductionRelModel' data-ref="G4PairProductionRelModel">G4PairProductionRelModel</a>::<dfn class="decl def" id="G4PairProductionRelModel::gWGL" title='G4PairProductionRelModel::gWGL' data-ref="G4PairProductionRelModel::gWGL">gWGL</dfn>[] = {</td></tr>
+<tr><th id="84">84</th><td>  <var>5.06142681e-02</var>, <var>1.11190517e-01</var>, <var>1.56853323e-01</var>, <var>1.81341892e-01</var>,</td></tr>
+<tr><th id="85">85</th><td>  <var>1.81341892e-01</var>, <var>1.56853323e-01</var>, <var>1.11190517e-01</var>, <var>5.06142681e-02</var> </td></tr>
+<tr><th id="86">86</th><td>};</td></tr>
+<tr><th id="87">87</th><td></td></tr>
+<tr><th id="88">88</th><td><i>// elastic and inelatic radiation logarithms for light elements (where the </i></td></tr>
+<tr><th id="89">89</th><td><i>// Thomas-Fermi model doesn't work): computed by using Dirac-Fock model of atom. </i></td></tr>
+<tr><th id="90">90</th><td><em>const</em> <a class="typedef" href="../../../../global/management/include/G4Types.hh.html#G4double" title='G4double' data-type='double' data-ref="G4double">G4double</a> <a class="type" href="../include/G4PairProductionRelModel.hh.html#G4PairProductionRelModel" title='G4PairProductionRelModel' data-ref="G4PairProductionRelModel">G4PairProductionRelModel</a>::<dfn class="decl def" id="G4PairProductionRelModel::gFelLowZet" title='G4PairProductionRelModel::gFelLowZet' data-ref="G4PairProductionRelModel::gFelLowZet">gFelLowZet</dfn>  [] = {</td></tr>
+<tr><th id="91">91</th><td>  <var>0.0</var>, <var>5.3104</var>, <var>4.7935</var>, <var>4.7402</var>, <var>4.7112</var>, <var>4.6694</var>, <var>4.6134</var>, <var>4.5520</var></td></tr>
+<tr><th id="92">92</th><td>};</td></tr>
+<tr><th id="93">93</th><td><em>const</em> <a class="typedef" href="../../../../global/management/include/G4Types.hh.html#G4double" title='G4double' data-type='double' data-ref="G4double">G4double</a> <a class="type" href="../include/G4PairProductionRelModel.hh.html#G4PairProductionRelModel" title='G4PairProductionRelModel' data-ref="G4PairProductionRelModel">G4PairProductionRelModel</a>::<dfn class="decl def" id="G4PairProductionRelModel::gFinelLowZet" title='G4PairProductionRelModel::gFinelLowZet' data-ref="G4PairProductionRelModel::gFinelLowZet">gFinelLowZet</dfn>[] = {</td></tr>
+<tr><th id="94">94</th><td>  <var>0.0</var>, <var>5.9173</var>, <var>5.6125</var>, <var>5.5377</var>, <var>5.4728</var>, <var>5.4174</var>, <var>5.3688</var>, <var>5.3236</var></td></tr>
+<tr><th id="95">95</th><td>};</td></tr>
+<tr><th id="96">96</th><td></td></tr>
+<tr><th id="97">97</th><td><i>// constant cross section factor</i></td></tr>
+<tr><th id="98">98</th><td><em>const</em> <a class="typedef" href="../../../../global/management/include/G4Types.hh.html#G4double" title='G4double' data-type='double' data-ref="G4double">G4double</a> <a class="type" href="../include/G4PairProductionRelModel.hh.html#G4PairProductionRelModel" title='G4PairProductionRelModel' data-ref="G4PairProductionRelModel">G4PairProductionRelModel</a>::<dfn class="decl def" id="G4PairProductionRelModel::gXSecFactor" title='G4PairProductionRelModel::gXSecFactor' data-ref="G4PairProductionRelModel::gXSecFactor">gXSecFactor</dfn> = </td></tr>
+<tr><th id="99">99</th><td>  <var>4.</var>*<span class="namespace">CLHEP::</span><a class="ref" href="../../../../externals/clhep/include/CLHEP/Units/PhysicalConstants.h.html#CLHEP::fine_structure_const" title='CLHEP::fine_structure_const' data-ref="CLHEP::fine_structure_const">fine_structure_const</a>*<span class="namespace">CLHEP::</span><a class="ref" href="../../../../externals/clhep/include/CLHEP/Units/PhysicalConstants.h.html#CLHEP::classic_electr_radius" title='CLHEP::classic_electr_radius' data-ref="CLHEP::classic_electr_radius">classic_electr_radius</a></td></tr>
+<tr><th id="100">100</th><td>  *<span class="namespace">CLHEP::</span><a class="ref" href="../../../../externals/clhep/include/CLHEP/Units/PhysicalConstants.h.html#CLHEP::classic_electr_radius" title='CLHEP::classic_electr_radius' data-ref="CLHEP::classic_electr_radius">classic_electr_radius</a>;</td></tr>
+<tr><th id="101">101</th><td></td></tr>
+<tr><th id="102">102</th><td><i>// gamma energy limit above which LPM suppression will be applied (if the </i></td></tr>
+<tr><th id="103">103</th><td><i>// fIsUseLPMCorrection flag is true)</i></td></tr>
+<tr><th id="104">104</th><td><em>const</em> <a class="typedef" href="../../../../global/management/include/G4Types.hh.html#G4double" title='G4double' data-type='double' data-ref="G4double">G4double</a> <a class="type" href="../include/G4PairProductionRelModel.hh.html#G4PairProductionRelModel" title='G4PairProductionRelModel' data-ref="G4PairProductionRelModel">G4PairProductionRelModel</a>::<dfn class="decl def" id="G4PairProductionRelModel::gEgLPMActivation" title='G4PairProductionRelModel::gEgLPMActivation' data-ref="G4PairProductionRelModel::gEgLPMActivation">gEgLPMActivation</dfn> = <var>100.</var>*<span class="namespace">CLHEP::</span><a class="ref" href="../../../../externals/clhep/include/CLHEP/Units/SystemOfUnits.h.html#CLHEP::GeV" title='CLHEP::GeV' data-ref="CLHEP::GeV">GeV</a>;</td></tr>
+<tr><th id="105">105</th><td></td></tr>
+<tr><th id="106">106</th><td><i>// special data structure per element i.e. per Z </i></td></tr>
+<tr><th id="107">107</th><td><span class='error' title="use of undeclared identifier &apos;std&apos;">std</span>::vector<span class='error' title="expected unqualified-id">&lt;</span>G4PairProductionRelModel::ElementData*&gt; G4PairProductionRelModel::gElementData;</td></tr>
+<tr><th id="108">108</th><td></td></tr>
+<tr><th id="109">109</th><td><i>// LPM supression functions evaluated at initialisation time</i></td></tr>
+<tr><th id="110">110</th><td><a class="type" href="../include/G4PairProductionRelModel.hh.html#G4PairProductionRelModel" title='G4PairProductionRelModel' data-ref="G4PairProductionRelModel">G4PairProductionRelModel</a>::<a class="type" href="../include/G4PairProductionRelModel.hh.html#G4PairProductionRelModel::LPMFuncs" title='G4PairProductionRelModel::LPMFuncs' data-ref="G4PairProductionRelModel::LPMFuncs">LPMFuncs</a> <a class="type" href="../include/G4PairProductionRelModel.hh.html#G4PairProductionRelModel" title='G4PairProductionRelModel' data-ref="G4PairProductionRelModel">G4PairProductionRelModel</a>::<a class="ref fake" href="../include/G4PairProductionRelModel.hh.html#_ZN24G4PairProductionRelModel8LPMFuncsC1Ev" title='G4PairProductionRelModel::LPMFuncs::LPMFuncs' data-ref="_ZN24G4PairProductionRelModel8LPMFuncsC1Ev"></a><dfn class="decl def" id="G4PairProductionRelModel::gLPMFuncs" title='G4PairProductionRelModel::gLPMFuncs' data-ref="G4PairProductionRelModel::gLPMFuncs">gLPMFuncs</dfn>;</td></tr>
+<tr><th id="111">111</th><td></td></tr>
+<tr><th id="112">112</th><td><i>// CTR</i></td></tr>
+<tr><th id="113">113</th><td><a class="type" href="../include/G4PairProductionRelModel.hh.html#G4PairProductionRelModel" title='G4PairProductionRelModel' data-ref="G4PairProductionRelModel">G4PairProductionRelModel</a>::<dfn class="decl def" id="_ZN24G4PairProductionRelModelC1EPK20G4ParticleDefinitionRK8G4String" title='G4PairProductionRelModel::G4PairProductionRelModel' data-ref="_ZN24G4PairProductionRelModelC1EPK20G4ParticleDefinitionRK8G4String">G4PairProductionRelModel</dfn>(<em>const</em> <a class="type" href="../../../../particles/management/include/G4ParticleDefinition.hh.html#G4ParticleDefinition" title='G4ParticleDefinition' data-ref="G4ParticleDefinition">G4ParticleDefinition</a>*,</td></tr>
+<tr><th id="114">114</th><td>                                                   <em>const</em> <a class="type" href="../../../../global/management/include/G4String.hh.html#G4String" title='G4String' data-ref="G4String">G4String</a>&amp; <dfn class="local col1 decl" id="1nam" title='nam' data-type='const G4String &amp;' data-ref="1nam">nam</dfn>)</td></tr>
+<tr><th id="115">115</th><td>  : <a class="type" href="../../utils/include/G4VEmModel.hh.html#G4VEmModel" title='G4VEmModel' data-ref="G4VEmModel">G4VEmModel</a><a class="ref" href="../../utils/include/G4VEmModel.hh.html#_ZN10G4VEmModelC1ERK8G4String" title='G4VEmModel::G4VEmModel' data-ref="_ZN10G4VEmModelC1ERK8G4String">(</a><a class="local col1 ref" href="#1nam" title='nam' data-ref="1nam">nam</a>), <a class="member" href="../include/G4PairProductionRelModel.hh.html#G4PairProductionRelModel::fIsUseLPMCorrection" title='G4PairProductionRelModel::fIsUseLPMCorrection' data-ref="G4PairProductionRelModel::fIsUseLPMCorrection">fIsUseLPMCorrection</a>(<b>true</b>), <a class="member" href="../include/G4PairProductionRelModel.hh.html#G4PairProductionRelModel::fIsUseCompleteScreening" title='G4PairProductionRelModel::fIsUseCompleteScreening' data-ref="G4PairProductionRelModel::fIsUseCompleteScreening">fIsUseCompleteScreening</a>(<b>false</b>),</td></tr>
+<tr><th id="116">116</th><td>  <a class="member" href="../include/G4PairProductionRelModel.hh.html#G4PairProductionRelModel::fLPMEnergy" title='G4PairProductionRelModel::fLPMEnergy' data-ref="G4PairProductionRelModel::fLPMEnergy">fLPMEnergy</a>(<var>0.</var>), fG4Calc(<span class='error' title="incomplete type &apos;G4Pow&apos; named in nested name specifier">G4Pow</span>::GetInstance()), <a class="member" href="../include/G4PairProductionRelModel.hh.html#G4PairProductionRelModel::fTheGamma" title='G4PairProductionRelModel::fTheGamma' data-ref="G4PairProductionRelModel::fTheGamma">fTheGamma</a>(<a class="type" href="../../../../particles/bosons/include/G4Gamma.hh.html#G4Gamma" title='G4Gamma' data-ref="G4Gamma">G4Gamma</a>::<a class="ref" href="../../../../particles/bosons/include/G4Gamma.hh.html#_ZN7G4Gamma5GammaEv" title='G4Gamma::Gamma' data-ref="_ZN7G4Gamma5GammaEv">Gamma</a>()),</td></tr>
+<tr><th id="117">117</th><td>  <a class="member" href="../include/G4PairProductionRelModel.hh.html#G4PairProductionRelModel::fTheElectron" title='G4PairProductionRelModel::fTheElectron' data-ref="G4PairProductionRelModel::fTheElectron">fTheElectron</a>(<a class="type" href="../../../../particles/leptons/include/G4Electron.hh.html#G4Electron" title='G4Electron' data-ref="G4Electron">G4Electron</a>::<a class="ref" href="../../../../particles/leptons/include/G4Electron.hh.html#_ZN10G4Electron8ElectronEv" title='G4Electron::Electron' data-ref="_ZN10G4Electron8ElectronEv">Electron</a>()), <a class="member" href="../include/G4PairProductionRelModel.hh.html#G4PairProductionRelModel::fThePositron" title='G4PairProductionRelModel::fThePositron' data-ref="G4PairProductionRelModel::fThePositron">fThePositron</a>(<a class="type" href="../../../../particles/leptons/include/G4Positron.hh.html#G4Positron" title='G4Positron' data-ref="G4Positron">G4Positron</a>::<a class="ref" href="../../../../particles/leptons/include/G4Positron.hh.html#_ZN10G4Positron8PositronEv" title='G4Positron::Positron' data-ref="_ZN10G4Positron8PositronEv">Positron</a>()),</td></tr>
+<tr><th id="118">118</th><td>  <a class="member" href="../include/G4PairProductionRelModel.hh.html#G4PairProductionRelModel::fParticleChange" title='G4PairProductionRelModel::fParticleChange' data-ref="G4PairProductionRelModel::fParticleChange">fParticleChange</a>(<b>nullptr</b>) </td></tr>
+<tr><th id="119">119</th><td>{</td></tr>
+<tr><th id="120">120</th><td>  <span class='error' title="cannot initialize object parameter of type &apos;G4VEmModel&apos; with an expression of type &apos;G4PairProductionRelModel&apos;">SetAngularDistribution</span>(<b>new</b> G4ModifiedTsai());</td></tr>
+<tr><th id="121">121</th><td>}</td></tr>
+<tr><th id="122">122</th><td></td></tr>
+<tr><th id="123">123</th><td><i>// DTR</i></td></tr>
+<tr><th id="124">124</th><td>G4PairProductionRelModel::<span class='error' title="exception specification in declaration does not match previous declaration">~</span>G4PairProductionRelModel()</td></tr>
+<tr><th id="125">125</th><td>{</td></tr>
+<tr><th id="126">126</th><td>  <b>if</b> (<span class='error' title="cannot initialize object parameter of type &apos;const G4VEmModel&apos; with an expression of type &apos;G4PairProductionRelModel&apos;">IsMaster</span>()) {</td></tr>
+<tr><th id="127">127</th><td>    <i>// clear ElementData container</i></td></tr>
+<tr><th id="128">128</th><td>    <b>for</b> (<span class='error' title="unknown type name &apos;size_t&apos;">size_t</span> iz = <var>0</var>; iz &lt; <span class='error' title="use of undeclared identifier &apos;gElementData&apos;">gElementData</span>.size(); ++iz) {</td></tr>
+<tr><th id="129">129</th><td>      <b>if</b> (<span class='error' title="use of undeclared identifier &apos;gElementData&apos;">gElementData</span>[iz]) <b>delete</b> <span class='error' title="use of undeclared identifier &apos;gElementData&apos;">gElementData</span>[iz];</td></tr>
+<tr><th id="130">130</th><td>    }</td></tr>
+<tr><th id="131">131</th><td>    <span class='error' title="use of undeclared identifier &apos;gElementData&apos;">gElementData</span>.clear(); </td></tr>
+<tr><th id="132">132</th><td>    <i>// clear LPMFunctions (if any)</i></td></tr>
+<tr><th id="133">133</th><td>    <b>if</b> (fIsUseLPMCorrection) {</td></tr>
+<tr><th id="134">134</th><td>      gLPMFuncs.<span class='error' title="no member named &apos;fLPMFuncG&apos; in &apos;G4PairProductionRelModel::LPMFuncs&apos;">fLPMFuncG</span>.clear();</td></tr>
+<tr><th id="135">135</th><td>      gLPMFuncs.<span class='error' title="no member named &apos;fLPMFuncPhi&apos; in &apos;G4PairProductionRelModel::LPMFuncs&apos;">fLPMFuncPhi</span>.clear();</td></tr>
+<tr><th id="136">136</th><td>      gLPMFuncs.fIsInitialized = <b>false</b>;</td></tr>
+<tr><th id="137">137</th><td>    }</td></tr>
+<tr><th id="138">138</th><td>  }</td></tr>
+<tr><th id="139">139</th><td>}</td></tr>
+<tr><th id="140">140</th><td></td></tr>
+<tr><th id="141">141</th><td><em>void</em> <a class="type" href="../include/G4PairProductionRelModel.hh.html#G4PairProductionRelModel" title='G4PairProductionRelModel' data-ref="G4PairProductionRelModel">G4PairProductionRelModel</a>::<dfn class="virtual decl def" id="_ZN24G4PairProductionRelModel10InitialiseEPK20G4ParticleDefinitionRK12G4DataVector" title='G4PairProductionRelModel::Initialise' data-ref="_ZN24G4PairProductionRelModel10InitialiseEPK20G4ParticleDefinitionRK12G4DataVector">Initialise</dfn>(<em>const</em> <a class="type" href="../../../../particles/management/include/G4ParticleDefinition.hh.html#G4ParticleDefinition" title='G4ParticleDefinition' data-ref="G4ParticleDefinition">G4ParticleDefinition</a>* <dfn class="local col2 decl" id="2p" title='p' data-type='const G4ParticleDefinition *' data-ref="2p">p</dfn>,</td></tr>
+<tr><th id="142">142</th><td>                                          <em>const</em> <a class="type" href="../../../../global/management/include/G4DataVector.hh.html#G4DataVector" title='G4DataVector' data-ref="G4DataVector">G4DataVector</a>&amp; <dfn class="local col3 decl" id="3cuts" title='cuts' data-type='const G4DataVector &amp;' data-ref="3cuts">cuts</dfn>)</td></tr>
+<tr><th id="143">143</th><td>{</td></tr>
+<tr><th id="144">144</th><td>  <b>if</b> (<span class='error' title="cannot initialize object parameter of type &apos;const G4VEmModel&apos; with an expression of type &apos;G4PairProductionRelModel&apos;">IsMaster</span>()) {</td></tr>
+<tr><th id="145">145</th><td>    <i>// init element data and LPM funcs</i></td></tr>
+<tr><th id="146">146</th><td>    <b>if</b> (<span class='error' title="cannot initialize object parameter of type &apos;const G4VEmModel&apos; with an expression of type &apos;G4PairProductionRelModel&apos;">IsMaster</span>()) {</td></tr>
+<tr><th id="147">147</th><td>      <a class="member" href="../include/G4PairProductionRelModel.hh.html#_ZN24G4PairProductionRelModel21InitialiseElementDataEv" title='G4PairProductionRelModel::InitialiseElementData' data-ref="_ZN24G4PairProductionRelModel21InitialiseElementDataEv">InitialiseElementData</a>();</td></tr>
+<tr><th id="148">148</th><td>      <b>if</b> (<a class="member" href="../include/G4PairProductionRelModel.hh.html#G4PairProductionRelModel::fIsUseLPMCorrection" title='G4PairProductionRelModel::fIsUseLPMCorrection' data-ref="G4PairProductionRelModel::fIsUseLPMCorrection">fIsUseLPMCorrection</a>) {</td></tr>
+<tr><th id="149">149</th><td>        <a class="member" href="../include/G4PairProductionRelModel.hh.html#_ZN24G4PairProductionRelModel16InitLPMFunctionsEv" title='G4PairProductionRelModel::InitLPMFunctions' data-ref="_ZN24G4PairProductionRelModel16InitLPMFunctionsEv">InitLPMFunctions</a>();</td></tr>
+<tr><th id="150">150</th><td>      }</td></tr>
+<tr><th id="151">151</th><td>    }</td></tr>
+<tr><th id="152">152</th><td>  }</td></tr>
+<tr><th id="153">153</th><td>  <b>if</b>(!<a class="member" href="../include/G4PairProductionRelModel.hh.html#G4PairProductionRelModel::fParticleChange" title='G4PairProductionRelModel::fParticleChange' data-ref="G4PairProductionRelModel::fParticleChange">fParticleChange</a>) { fParticleChange = <span class='error' title="cannot initialize object parameter of type &apos;G4VEmModel&apos; with an expression of type &apos;G4PairProductionRelModel&apos;">GetParticleChangeForGamma</span>(); }</td></tr>
+<tr><th id="154">154</th><td>  <b>if</b>(<span class='error' title="cannot initialize object parameter of type &apos;const G4VEmModel&apos; with an expression of type &apos;G4PairProductionRelModel&apos;">IsMaster</span>() &amp;&amp; <span class='error' title="cannot initialize object parameter of type &apos;const G4VEmModel&apos; with an expression of type &apos;G4PairProductionRelModel&apos;">LowEnergyLimit</span>() &lt; <span class='error' title="cannot initialize object parameter of type &apos;const G4VEmModel&apos; with an expression of type &apos;G4PairProductionRelModel&apos;">HighEnergyLimit</span>()) {</td></tr>
+<tr><th id="155">155</th><td>    <span class='error' title="cannot initialize object parameter of type &apos;G4VEmModel&apos; with an expression of type &apos;G4PairProductionRelModel&apos;">InitialiseElementSelectors</span>(p, cuts);</td></tr>
+<tr><th id="156">156</th><td>  }</td></tr>
+<tr><th id="157">157</th><td>}</td></tr>
+<tr><th id="158">158</th><td></td></tr>
+<tr><th id="159">159</th><td><em>void</em> <a class="type" href="../include/G4PairProductionRelModel.hh.html#G4PairProductionRelModel" title='G4PairProductionRelModel' data-ref="G4PairProductionRelModel">G4PairProductionRelModel</a>::<dfn class="virtual decl def" id="_ZN24G4PairProductionRelModel15InitialiseLocalEPK20G4ParticleDefinitionP10G4VEmModel" title='G4PairProductionRelModel::InitialiseLocal' data-ref="_ZN24G4PairProductionRelModel15InitialiseLocalEPK20G4ParticleDefinitionP10G4VEmModel">InitialiseLocal</dfn>(<em>const</em> <a class="type" href="../../../../particles/management/include/G4ParticleDefinition.hh.html#G4ParticleDefinition" title='G4ParticleDefinition' data-ref="G4ParticleDefinition">G4ParticleDefinition</a>*,</td></tr>
+<tr><th id="160">160</th><td>                                               <a class="type" href="../../utils/include/G4VEmModel.hh.html#G4VEmModel" title='G4VEmModel' data-ref="G4VEmModel">G4VEmModel</a>* <dfn class="local col4 decl" id="4masterModel" title='masterModel' data-type='G4VEmModel *' data-ref="4masterModel">masterModel</dfn>)</td></tr>
+<tr><th id="161">161</th><td>{</td></tr>
+<tr><th id="162">162</th><td>  <b>if</b>(<span class='error' title="cannot initialize object parameter of type &apos;const G4VEmModel&apos; with an expression of type &apos;G4PairProductionRelModel&apos;">LowEnergyLimit</span>() &lt; <span class='error' title="cannot initialize object parameter of type &apos;const G4VEmModel&apos; with an expression of type &apos;G4PairProductionRelModel&apos;">HighEnergyLimit</span>()) {</td></tr>
+<tr><th id="163">163</th><td>    SetElementSelectors(masterModel-&gt;<span class='error' title="no member named &apos;GetElementSelectors&apos; in &apos;G4VEmModel&apos;">GetElementSelectors</span>());</td></tr>
+<tr><th id="164">164</th><td>  }</td></tr>
+<tr><th id="165">165</th><td>}</td></tr>
+<tr><th id="166">166</th><td></td></tr>
+<tr><th id="167">167</th><td><a class="typedef" href="../../../../global/management/include/G4Types.hh.html#G4double" title='G4double' data-type='double' data-ref="G4double">G4double</a> <a class="type" href="../include/G4PairProductionRelModel.hh.html#G4PairProductionRelModel" title='G4PairProductionRelModel' data-ref="G4PairProductionRelModel">G4PairProductionRelModel</a>::<dfn class="decl def" id="_ZN24G4PairProductionRelModel22ComputeXSectionPerAtomEdd" title='G4PairProductionRelModel::ComputeXSectionPerAtom' data-ref="_ZN24G4PairProductionRelModel22ComputeXSectionPerAtomEdd">ComputeXSectionPerAtom</dfn>(<a class="typedef" href="../../../../global/management/include/G4Types.hh.html#G4double" title='G4double' data-type='double' data-ref="G4double">G4double</a> <dfn class="local col5 decl" id="5gammaEnergy" title='gammaEnergy' data-type='G4double' data-ref="5gammaEnergy">gammaEnergy</dfn>, </td></tr>
+<tr><th id="168">168</th><td>                                                          <a class="typedef" href="../../../../global/management/include/G4Types.hh.html#G4double" title='G4double' data-type='double' data-ref="G4double">G4double</a> <dfn class="local col6 decl" id="6Z" title='Z' data-type='G4double' data-ref="6Z">Z</dfn>)</td></tr>
+<tr><th id="169">169</th><td>{</td></tr>
+<tr><th id="170">170</th><td>  <a class="typedef" href="../../../../global/management/include/G4Types.hh.html#G4double" title='G4double' data-type='double' data-ref="G4double">G4double</a> <dfn class="local col7 decl" id="7xSection" title='xSection' data-type='G4double' data-ref="7xSection">xSection</dfn> = <var>0.0</var>;</td></tr>
+<tr><th id="171">171</th><td>  <i>// check if LPM suppression needs to be used</i></td></tr>
+<tr><th id="172">172</th><td>  <em>const</em> <a class="typedef" href="../../../../global/management/include/G4Types.hh.html#G4bool" title='G4bool' data-type='bool' data-ref="G4bool">G4bool</a>   <dfn class="local col8 decl" id="8isLPM" title='isLPM' data-type='const G4bool' data-ref="8isLPM">isLPM</dfn>  = (<a class="member" href="../include/G4PairProductionRelModel.hh.html#G4PairProductionRelModel::fIsUseLPMCorrection" title='G4PairProductionRelModel::fIsUseLPMCorrection' data-ref="G4PairProductionRelModel::fIsUseLPMCorrection">fIsUseLPMCorrection</a> &amp;&amp; <a class="local col5 ref" href="#5gammaEnergy" title='gammaEnergy' data-ref="5gammaEnergy">gammaEnergy</a>&gt;<a class="member" href="../include/G4PairProductionRelModel.hh.html#G4PairProductionRelModel::gEgLPMActivation" title='G4PairProductionRelModel::gEgLPMActivation' data-ref="G4PairProductionRelModel::gEgLPMActivation">gEgLPMActivation</a>); </td></tr>
+<tr><th id="173">173</th><td>  <i>// determine the kinematical limits (taken into account the correction due to</i></td></tr>
+<tr><th id="174">174</th><td><i>  // the way in which the Coulomb correction is applied i.e. avoid negative DCS)</i></td></tr>
+<tr><th id="175">175</th><td>  <em>const</em> <a class="typedef" href="../../../../global/management/include/G4Types.hh.html#G4int" title='G4int' data-type='int' data-ref="G4int">G4int</a>    <dfn class="local col9 decl" id="9iz" title='iz' data-type='const G4int' data-ref="9iz">iz</dfn>     = <span class='error' title="use of undeclared identifier &apos;std&apos;">std</span>::min(gMaxZet, G4lrint(Z)); </td></tr>
+<tr><th id="176">176</th><td>  <em>const</em> <a class="typedef" href="../../../../global/management/include/G4Types.hh.html#G4double" title='G4double' data-type='double' data-ref="G4double">G4double</a> <dfn class="local col0 decl" id="10eps0" title='eps0' data-type='const G4double' data-ref="10eps0">eps0</dfn>   = <span class="namespace">CLHEP::</span><a class="ref" href="../../../../externals/clhep/include/CLHEP/Units/PhysicalConstants.h.html#CLHEP::electron_mass_c2" title='CLHEP::electron_mass_c2' data-ref="CLHEP::electron_mass_c2">electron_mass_c2</a>/<a class="local col5 ref" href="#5gammaEnergy" title='gammaEnergy' data-ref="5gammaEnergy">gammaEnergy</a>;</td></tr>
+<tr><th id="177">177</th><td>  <em>const</em> <a class="typedef" href="../../../../global/management/include/G4Types.hh.html#G4double" title='G4double' data-type='double' data-ref="G4double">G4double</a> <dfn class="local col1 decl" id="11dmax" title='dmax' data-type='const G4double' data-ref="11dmax">dmax</dfn>   = <span class='error' title="use of undeclared identifier &apos;gElementData&apos;">gElementData</span>[iz]-&gt;fDeltaMax;</td></tr>
+<tr><th id="178">178</th><td>  <em>const</em> <a class="typedef" href="../../../../global/management/include/G4Types.hh.html#G4double" title='G4double' data-type='double' data-ref="G4double">G4double</a> <dfn class="local col2 decl" id="12dmin" title='dmin' data-type='const G4double' data-ref="12dmin">dmin</dfn>   = <var>4.</var>*eps0*<span class='error' title="use of undeclared identifier &apos;gElementData&apos;">gElementData</span>[iz]-&gt;fDeltaFactor;</td></tr>
+<tr><th id="179">179</th><td>  <em>const</em> <a class="typedef" href="../../../../global/management/include/G4Types.hh.html#G4double" title='G4double' data-type='double' data-ref="G4double">G4double</a> <dfn class="local col3 decl" id="13eps1" title='eps1' data-type='const G4double' data-ref="13eps1">eps1</dfn>   = <var>0.5</var> - <var>0.5</var>*<span class='error' title="use of undeclared identifier &apos;std&apos;">std</span>::sqrt(<var>1.</var>-dmin/dmax);</td></tr>
+<tr><th id="180">180</th><td>  <em>const</em> <a class="typedef" href="../../../../global/management/include/G4Types.hh.html#G4double" title='G4double' data-type='double' data-ref="G4double">G4double</a> <dfn class="local col4 decl" id="14epsMin" title='epsMin' data-type='const G4double' data-ref="14epsMin">epsMin</dfn> = <span class='error' title="use of undeclared identifier &apos;std&apos;">std</span>::max(eps0, eps1);</td></tr>
+<tr><th id="181">181</th><td>  <em>const</em> <a class="typedef" href="../../../../global/management/include/G4Types.hh.html#G4double" title='G4double' data-type='double' data-ref="G4double">G4double</a> <dfn class="local col5 decl" id="15epsMax" title='epsMax' data-type='const G4double' data-ref="15epsMax">epsMax</dfn> = <var>0.5</var>; <i>// DCS is symmetric around eps=0.5</i></td></tr>
+<tr><th id="182">182</th><td>  <i>// let Et be the total energy transferred to the e- or to the e+</i></td></tr>
+<tr><th id="183">183</th><td><i>  // the [Et-min, Et-max] interval will be divided into i=1,2,..,n subintervals</i></td></tr>
+<tr><th id="184">184</th><td><i>  // with width of dInterv = (Et-max - Et-min)/n and numerical integration will </i></td></tr>
+<tr><th id="185">185</th><td><i>  // be done in each sub-inteval using the xi = (Et - Et_i-min)/dInterv variable</i></td></tr>
+<tr><th id="186">186</th><td><i>  // that is in [0,1]. The 8-point GL q. is used for the integration on [0,1]. </i></td></tr>
+<tr><th id="187">187</th><td>  <em>const</em> <a class="typedef" href="../../../../global/management/include/G4Types.hh.html#G4int" title='G4int' data-type='int' data-ref="G4int">G4int</a>    <dfn class="local col6 decl" id="16numSub" title='numSub' data-type='const G4int' data-ref="16numSub">numSub</dfn> = <var>2</var>;</td></tr>
+<tr><th id="188">188</th><td>  <em>const</em> <a class="typedef" href="../../../../global/management/include/G4Types.hh.html#G4double" title='G4double' data-type='double' data-ref="G4double">G4double</a> <dfn class="local col7 decl" id="17dInterv" title='dInterv' data-type='const G4double' data-ref="17dInterv">dInterv</dfn>= (<a class="local col5 ref" href="#15epsMax" title='epsMax' data-ref="15epsMax">epsMax</a> - <a class="local col4 ref" href="#14epsMin" title='epsMin' data-ref="14epsMin">epsMin</a>)*<a class="local col5 ref" href="#5gammaEnergy" title='gammaEnergy' data-ref="5gammaEnergy">gammaEnergy</a>/<a class="typedef" href="../../../../global/management/include/G4Types.hh.html#G4double" title='G4double' data-type='double' data-ref="G4double">G4double</a>(<a class="local col6 ref" href="#16numSub" title='numSub' data-ref="16numSub">numSub</a>); </td></tr>
+<tr><th id="189">189</th><td>  <a class="typedef" href="../../../../global/management/include/G4Types.hh.html#G4double" title='G4double' data-type='double' data-ref="G4double">G4double</a> <dfn class="local col8 decl" id="18minEti" title='minEti' data-type='G4double' data-ref="18minEti">minEti</dfn>       = <a class="local col4 ref" href="#14epsMin" title='epsMin' data-ref="14epsMin">epsMin</a>*<a class="local col5 ref" href="#5gammaEnergy" title='gammaEnergy' data-ref="5gammaEnergy">gammaEnergy</a>;  <i>// Et-min i.e. Et_0-min </i></td></tr>
+<tr><th id="190">190</th><td>  <b>for</b> (<a class="typedef" href="../../../../global/management/include/G4Types.hh.html#G4int" title='G4int' data-type='int' data-ref="G4int">G4int</a> <dfn class="local col9 decl" id="19i" title='i' data-type='G4int' data-ref="19i">i</dfn> = <var>0</var>; <a class="local col9 ref" href="#19i" title='i' data-ref="19i">i</a> &lt; <a class="local col6 ref" href="#16numSub" title='numSub' data-ref="16numSub">numSub</a>; ++<a class="local col9 ref" href="#19i" title='i' data-ref="19i">i</a>) {</td></tr>
+<tr><th id="191">191</th><td>    <b>for</b> (<a class="typedef" href="../../../../global/management/include/G4Types.hh.html#G4int" title='G4int' data-type='int' data-ref="G4int">G4int</a> <dfn class="local col0 decl" id="20ngl" title='ngl' data-type='G4int' data-ref="20ngl">ngl</dfn> = <var>0</var>; <a class="local col0 ref" href="#20ngl" title='ngl' data-ref="20ngl">ngl</a> &lt; <var>8</var>; ++<a class="local col0 ref" href="#20ngl" title='ngl' data-ref="20ngl">ngl</a>) {</td></tr>
+<tr><th id="192">192</th><td>      <em>const</em> <a class="typedef" href="../../../../global/management/include/G4Types.hh.html#G4double" title='G4double' data-type='double' data-ref="G4double">G4double</a> <dfn class="local col1 decl" id="21Et" title='Et' data-type='const G4double' data-ref="21Et">Et</dfn> = (<a class="local col8 ref" href="#18minEti" title='minEti' data-ref="18minEti">minEti</a> + <a class="member" href="../include/G4PairProductionRelModel.hh.html#G4PairProductionRelModel::gXGL" title='G4PairProductionRelModel::gXGL' data-ref="G4PairProductionRelModel::gXGL">gXGL</a>[<a class="local col0 ref" href="#20ngl" title='ngl' data-ref="20ngl">ngl</a>]*<a class="local col7 ref" href="#17dInterv" title='dInterv' data-ref="17dInterv">dInterv</a>);</td></tr>
+<tr><th id="193">193</th><td>      <em>const</em> <a class="typedef" href="../../../../global/management/include/G4Types.hh.html#G4double" title='G4double' data-type='double' data-ref="G4double">G4double</a> <dfn class="local col2 decl" id="22xs" title='xs' data-type='const G4double' data-ref="22xs">xs</dfn> = <a class="local col8 ref" href="#8isLPM" title='isLPM' data-ref="8isLPM">isLPM</a> ? <a class="member" href="#_ZN24G4PairProductionRelModel26ComputeRelDXSectionPerAtomEddd" title='G4PairProductionRelModel::ComputeRelDXSectionPerAtom' data-ref="_ZN24G4PairProductionRelModel26ComputeRelDXSectionPerAtomEddd">ComputeRelDXSectionPerAtom</a>(<a class="local col1 ref" href="#21Et" title='Et' data-ref="21Et">Et</a>, <a class="local col5 ref" href="#5gammaEnergy" title='gammaEnergy' data-ref="5gammaEnergy">gammaEnergy</a>, <a class="local col6 ref" href="#6Z" title='Z' data-ref="6Z">Z</a>)</td></tr>
+<tr><th id="194">194</th><td>                                : <a class="member" href="#_ZN24G4PairProductionRelModel23ComputeDXSectionPerAtomEddd" title='G4PairProductionRelModel::ComputeDXSectionPerAtom' data-ref="_ZN24G4PairProductionRelModel23ComputeDXSectionPerAtomEddd">ComputeDXSectionPerAtom</a>(<a class="local col1 ref" href="#21Et" title='Et' data-ref="21Et">Et</a>, <a class="local col5 ref" href="#5gammaEnergy" title='gammaEnergy' data-ref="5gammaEnergy">gammaEnergy</a>, <a class="local col6 ref" href="#6Z" title='Z' data-ref="6Z">Z</a>);</td></tr>
+<tr><th id="195">195</th><td>      <a class="local col7 ref" href="#7xSection" title='xSection' data-ref="7xSection">xSection</a> += <a class="member" href="../include/G4PairProductionRelModel.hh.html#G4PairProductionRelModel::gWGL" title='G4PairProductionRelModel::gWGL' data-ref="G4PairProductionRelModel::gWGL">gWGL</a>[<a class="local col0 ref" href="#20ngl" title='ngl' data-ref="20ngl">ngl</a>]*<a class="local col2 ref" href="#22xs" title='xs' data-ref="22xs">xs</a>;</td></tr>
+<tr><th id="196">196</th><td>    }</td></tr>
+<tr><th id="197">197</th><td>    <i>// update minimum Et of the sub-inteval</i></td></tr>
+<tr><th id="198">198</th><td>    <a class="local col8 ref" href="#18minEti" title='minEti' data-ref="18minEti">minEti</a> += <a class="local col7 ref" href="#17dInterv" title='dInterv' data-ref="17dInterv">dInterv</a>;</td></tr>
+<tr><th id="199">199</th><td>  }</td></tr>
+<tr><th id="200">200</th><td>  <i>// apply corrections of variable transformation and half interval integration </i></td></tr>
+<tr><th id="201">201</th><td>  xSection = <span class='error' title="use of undeclared identifier &apos;std&apos;">std</span>::max(<var>2.</var>*xSection*dInterv, <var>0.</var>);</td></tr>
+<tr><th id="202">202</th><td>  <b>return</b> <a class="local col7 ref" href="#7xSection" title='xSection' data-ref="7xSection">xSection</a>;</td></tr>
+<tr><th id="203">203</th><td>}</td></tr>
+<tr><th id="204">204</th><td></td></tr>
+<tr><th id="205">205</th><td><i>// DCS WITHOUT LPM SUPPRESSION</i></td></tr>
+<tr><th id="206">206</th><td><i>// Computes DCS value for a given target element (Z), initial gamma energy (Eg), </i></td></tr>
+<tr><th id="207">207</th><td><i>// total energy transferred to one of the e-/e+ pair(Et) WITHOUT LPM suppression</i></td></tr>
+<tr><th id="208">208</th><td><i>// The constant factor 4 \alpha r_0^2 Z (Z +\eta(Z)) is not included here and </i></td></tr>
+<tr><th id="209">209</th><td><i>// the returned value will be differential in total energy transfer instead of </i></td></tr>
+<tr><th id="210">210</th><td><i>// the eps=Et/Eg. The computed part of the DCS</i></td></tr>
+<tr><th id="211">211</th><td><i>// NORMAL CASE: DEFAULT STTING (i.e. fIsUseCompleteScreening = FALSE)</i></td></tr>
+<tr><th id="212">212</th><td><i>// ds/deps(Et,Eg,Z) = ds/deps(eps,Z) = (eps^2+(1-eps)^2)*[phi1(d)/4-ln(Z)/3-fc]</i></td></tr>
+<tr><th id="213">213</th><td><i>// + 2*eps(1-eps)*[phi2(d)/4-ln(Z)/3-fc]/3 where the universal (in the TF model)</i></td></tr>
+<tr><th id="214">214</th><td><i>// screening variable d=d(eps)=136Z^(-1/3)eps0/[eps*(1-eps)] with eps0=mc^2/Eg.  </i></td></tr>
+<tr><th id="215">215</th><td><i>// COMPLETE SCREENING (when d(eps) approx-equal-to 0) : NEED TO BE SET BY USER </i></td></tr>
+<tr><th id="216">216</th><td><i>// ds/deps(Et,Eg,Z) = ds/deps(eps,Z) = (eps^2+(1-eps)^2+eps*(1-eps)/3)*[Lel-fc]</i></td></tr>
+<tr><th id="217">217</th><td><i>// -eps(1-eps)/9 where Lel=phi1(0)/4-ln(Z)/3 is the elastic(coherent) radiation</i></td></tr>
+<tr><th id="218">218</th><td><i>// logarithm, fc is the Coulomb correction and the relation phi2(0)/4-ln(Z)/3 =</i></td></tr>
+<tr><th id="219">219</th><td><i>// phi1(0)/4-1/6-ln(Z)/3 = Lel-1/6 (due to phi2(0)=phi1(0)-2/3) was used.</i></td></tr>
+<tr><th id="220">220</th><td><a class="typedef" href="../../../../global/management/include/G4Types.hh.html#G4double" title='G4double' data-type='double' data-ref="G4double">G4double</a> <a class="type" href="../include/G4PairProductionRelModel.hh.html#G4PairProductionRelModel" title='G4PairProductionRelModel' data-ref="G4PairProductionRelModel">G4PairProductionRelModel</a>::<dfn class="decl def" id="_ZN24G4PairProductionRelModel23ComputeDXSectionPerAtomEddd" title='G4PairProductionRelModel::ComputeDXSectionPerAtom' data-ref="_ZN24G4PairProductionRelModel23ComputeDXSectionPerAtomEddd">ComputeDXSectionPerAtom</dfn>(<a class="typedef" href="../../../../global/management/include/G4Types.hh.html#G4double" title='G4double' data-type='double' data-ref="G4double">G4double</a> <dfn class="local col3 decl" id="23pEnergy" title='pEnergy' data-type='G4double' data-ref="23pEnergy">pEnergy</dfn>,</td></tr>
+<tr><th id="221">221</th><td>                                                  <a class="typedef" href="../../../../global/management/include/G4Types.hh.html#G4double" title='G4double' data-type='double' data-ref="G4double">G4double</a> <dfn class="local col4 decl" id="24gammaEnergy" title='gammaEnergy' data-type='G4double' data-ref="24gammaEnergy">gammaEnergy</dfn>,</td></tr>
+<tr><th id="222">222</th><td>                                                  <a class="typedef" href="../../../../global/management/include/G4Types.hh.html#G4double" title='G4double' data-type='double' data-ref="G4double">G4double</a> <dfn class="local col5 decl" id="25Z" title='Z' data-type='G4double' data-ref="25Z">Z</dfn>)</td></tr>
+<tr><th id="223">223</th><td>{</td></tr>
+<tr><th id="224">224</th><td>  <a class="typedef" href="../../../../global/management/include/G4Types.hh.html#G4double" title='G4double' data-type='double' data-ref="G4double">G4double</a> <dfn class="local col6 decl" id="26xSection" title='xSection' data-type='G4double' data-ref="26xSection">xSection</dfn> = <var>0.</var>;</td></tr>
+<tr><th id="225">225</th><td>  <em>const</em> <a class="typedef" href="../../../../global/management/include/G4Types.hh.html#G4int" title='G4int' data-type='int' data-ref="G4int">G4int</a>    <dfn class="local col7 decl" id="27iz" title='iz' data-type='const G4int' data-ref="27iz">iz</dfn>   = <span class='error' title="use of undeclared identifier &apos;std&apos;">std</span>::min(gMaxZet, G4lrint(Z)); </td></tr>
+<tr><th id="226">226</th><td>  <em>const</em> <a class="typedef" href="../../../../global/management/include/G4Types.hh.html#G4double" title='G4double' data-type='double' data-ref="G4double">G4double</a> <dfn class="local col8 decl" id="28eps" title='eps' data-type='const G4double' data-ref="28eps">eps</dfn>  = <a class="local col3 ref" href="#23pEnergy" title='pEnergy' data-ref="23pEnergy">pEnergy</a>/<a class="local col4 ref" href="#24gammaEnergy" title='gammaEnergy' data-ref="24gammaEnergy">gammaEnergy</a>;</td></tr>
+<tr><th id="227">227</th><td>  <em>const</em> <a class="typedef" href="../../../../global/management/include/G4Types.hh.html#G4double" title='G4double' data-type='double' data-ref="G4double">G4double</a> <dfn class="local col9 decl" id="29epsm" title='epsm' data-type='const G4double' data-ref="29epsm">epsm</dfn> = <var>1.</var>-<a class="local col8 ref" href="#28eps" title='eps' data-ref="28eps">eps</a>;</td></tr>
+<tr><th id="228">228</th><td>  <em>const</em> <a class="typedef" href="../../../../global/management/include/G4Types.hh.html#G4double" title='G4double' data-type='double' data-ref="G4double">G4double</a> <dfn class="local col0 decl" id="30dum" title='dum' data-type='const G4double' data-ref="30dum">dum</dfn>  = <a class="local col8 ref" href="#28eps" title='eps' data-ref="28eps">eps</a>*<a class="local col9 ref" href="#29epsm" title='epsm' data-ref="29epsm">epsm</a>;</td></tr>
+<tr><th id="229">229</th><td>  <b>if</b> (<a class="member" href="../include/G4PairProductionRelModel.hh.html#G4PairProductionRelModel::fIsUseCompleteScreening" title='G4PairProductionRelModel::fIsUseCompleteScreening' data-ref="G4PairProductionRelModel::fIsUseCompleteScreening">fIsUseCompleteScreening</a>) {</td></tr>
+<tr><th id="230">230</th><td>    <i>// complete screening: </i></td></tr>
+<tr><th id="231">231</th><td>    <em>const</em> <a class="typedef" href="../../../../global/management/include/G4Types.hh.html#G4double" title='G4double' data-type='double' data-ref="G4double">G4double</a> <dfn class="local col1 decl" id="31Lel" title='Lel' data-type='const G4double' data-ref="31Lel">Lel</dfn>   = <span class='error' title="use of undeclared identifier &apos;gElementData&apos;">gElementData</span>[iz]-&gt;fLradEl;</td></tr>
+<tr><th id="232">232</th><td>    <em>const</em> <a class="typedef" href="../../../../global/management/include/G4Types.hh.html#G4double" title='G4double' data-type='double' data-ref="G4double">G4double</a> <dfn class="local col2 decl" id="32fc" title='fc' data-type='const G4double' data-ref="32fc">fc</dfn>    = <span class='error' title="use of undeclared identifier &apos;gElementData&apos;">gElementData</span>[iz]-&gt;fCoulomb;</td></tr>
+<tr><th id="233">233</th><td>    <a class="local col6 ref" href="#26xSection" title='xSection' data-ref="26xSection">xSection</a> = (<a class="local col8 ref" href="#28eps" title='eps' data-ref="28eps">eps</a>*<a class="local col8 ref" href="#28eps" title='eps' data-ref="28eps">eps</a> + <a class="local col9 ref" href="#29epsm" title='epsm' data-ref="29epsm">epsm</a>*<a class="local col9 ref" href="#29epsm" title='epsm' data-ref="29epsm">epsm</a> + <var>2.</var>*<a class="local col0 ref" href="#30dum" title='dum' data-ref="30dum">dum</a>/<var>3.</var>)*(<a class="local col1 ref" href="#31Lel" title='Lel' data-ref="31Lel">Lel</a>-<a class="local col2 ref" href="#32fc" title='fc' data-ref="32fc">fc</a>) - <a class="local col0 ref" href="#30dum" title='dum' data-ref="30dum">dum</a>/<var>9.</var>;  </td></tr>
+<tr><th id="234">234</th><td>  } <b>else</b> {</td></tr>
+<tr><th id="235">235</th><td>    <i>// normal case:</i></td></tr>
+<tr><th id="236">236</th><td>    <em>const</em> <a class="typedef" href="../../../../global/management/include/G4Types.hh.html#G4double" title='G4double' data-type='double' data-ref="G4double">G4double</a> <dfn class="local col3 decl" id="33eps0" title='eps0' data-type='const G4double' data-ref="33eps0">eps0</dfn>  = <span class="namespace">CLHEP::</span><a class="ref" href="../../../../externals/clhep/include/CLHEP/Units/PhysicalConstants.h.html#CLHEP::electron_mass_c2" title='CLHEP::electron_mass_c2' data-ref="CLHEP::electron_mass_c2">electron_mass_c2</a>/<a class="local col4 ref" href="#24gammaEnergy" title='gammaEnergy' data-ref="24gammaEnergy">gammaEnergy</a>;</td></tr>
+<tr><th id="237">237</th><td>    <em>const</em> <a class="typedef" href="../../../../global/management/include/G4Types.hh.html#G4double" title='G4double' data-type='double' data-ref="G4double">G4double</a> <dfn class="local col4 decl" id="34fc" title='fc' data-type='const G4double' data-ref="34fc">fc</dfn>    = <span class='error' title="use of undeclared identifier &apos;gElementData&apos;">gElementData</span>[iz]-&gt;fCoulomb;</td></tr>
+<tr><th id="238">238</th><td>    <em>const</em> <a class="typedef" href="../../../../global/management/include/G4Types.hh.html#G4double" title='G4double' data-type='double' data-ref="G4double">G4double</a> <dfn class="local col5 decl" id="35lnZ13" title='lnZ13' data-type='const G4double' data-ref="35lnZ13">lnZ13</dfn> = <span class='error' title="use of undeclared identifier &apos;gElementData&apos;">gElementData</span>[iz]-&gt;fLogZ13;</td></tr>
+<tr><th id="239">239</th><td>    <em>const</em> <a class="typedef" href="../../../../global/management/include/G4Types.hh.html#G4double" title='G4double' data-type='double' data-ref="G4double">G4double</a> <dfn class="local col6 decl" id="36delta" title='delta' data-type='const G4double' data-ref="36delta">delta</dfn> = <span class='error' title="use of undeclared identifier &apos;gElementData&apos;">gElementData</span>[iz]-&gt;fDeltaFactor*eps0/dum;</td></tr>
+<tr><th id="240">240</th><td>    <a class="typedef" href="../../../../global/management/include/G4Types.hh.html#G4double" title='G4double' data-type='double' data-ref="G4double">G4double</a> <dfn class="local col7 decl" id="37phi1" title='phi1' data-type='G4double' data-ref="37phi1">phi1</dfn>, <dfn class="local col8 decl" id="38phi2" title='phi2' data-type='G4double' data-ref="38phi2">phi2</dfn>;</td></tr>
+<tr><th id="241">241</th><td>    <a class="member" href="../include/G4PairProductionRelModel.hh.html#_ZN24G4PairProductionRelModel12ComputePhi12EdRdS0_" title='G4PairProductionRelModel::ComputePhi12' data-ref="_ZN24G4PairProductionRelModel12ComputePhi12EdRdS0_">ComputePhi12</a>(<a class="local col6 ref" href="#36delta" title='delta' data-ref="36delta">delta</a>, <span class='refarg'><a class="local col7 ref" href="#37phi1" title='phi1' data-ref="37phi1">phi1</a></span>, <span class='refarg'><a class="local col8 ref" href="#38phi2" title='phi2' data-ref="38phi2">phi2</a></span>);</td></tr>
+<tr><th id="242">242</th><td>    <a class="local col6 ref" href="#26xSection" title='xSection' data-ref="26xSection">xSection</a> =  (<a class="local col8 ref" href="#28eps" title='eps' data-ref="28eps">eps</a>*<a class="local col8 ref" href="#28eps" title='eps' data-ref="28eps">eps</a> + <a class="local col9 ref" href="#29epsm" title='epsm' data-ref="29epsm">epsm</a>*<a class="local col9 ref" href="#29epsm" title='epsm' data-ref="29epsm">epsm</a>)*(<var>0.25</var>*<a class="local col7 ref" href="#37phi1" title='phi1' data-ref="37phi1">phi1</a>-<a class="local col5 ref" href="#35lnZ13" title='lnZ13' data-ref="35lnZ13">lnZ13</a>-<a class="local col4 ref" href="#34fc" title='fc' data-ref="34fc">fc</a>)</td></tr>
+<tr><th id="243">243</th><td>               + <var>2.</var>*<a class="local col0 ref" href="#30dum" title='dum' data-ref="30dum">dum</a>*(<var>0.25</var>*<a class="local col8 ref" href="#38phi2" title='phi2' data-ref="38phi2">phi2</a>-<a class="local col5 ref" href="#35lnZ13" title='lnZ13' data-ref="35lnZ13">lnZ13</a>-<a class="local col4 ref" href="#34fc" title='fc' data-ref="34fc">fc</a>)/<var>3.</var>;     </td></tr>
+<tr><th id="244">244</th><td>  }</td></tr>
+<tr><th id="245">245</th><td>  <i>// non-const. part of the DCS differential in total energy transfer not in eps</i></td></tr>
+<tr><th id="246">246</th><td><i>  // ds/dEt=ds/deps deps/dEt with deps/dEt=1/Eg </i></td></tr>
+<tr><th id="247">247</th><td>  <b>return</b> <span class='error' title="use of undeclared identifier &apos;std&apos;">std</span>::max(xSection, <var>0.0</var>)/gammaEnergy;</td></tr>
+<tr><th id="248">248</th><td>}</td></tr>
+<tr><th id="249">249</th><td></td></tr>
+<tr><th id="250">250</th><td><i>// DCS WITH POSSIBLE LPM SUPPRESSION</i></td></tr>
+<tr><th id="251">251</th><td><i>// Computes DCS value for a given target element (Z), initial gamma energy (Eg), </i></td></tr>
+<tr><th id="252">252</th><td><i>// total energy transferred to one of the e-/e+ pair(Et) WITH LPM suppression. </i></td></tr>
+<tr><th id="253">253</th><td><i>// For a given Z, the LPM suppression will depend on the material through the </i></td></tr>
+<tr><th id="254">254</th><td><i>// LMP-Energy. This will determine the suppression variable s and the LPM sup-</i></td></tr>
+<tr><th id="255">255</th><td><i>// pression functions xi(s), fi(s) and G(s). </i></td></tr>
+<tr><th id="256">256</th><td><i>// The constant factor 4 \alpha r_0^2 Z (Z +\eta(Z)) is not included here and </i></td></tr>
+<tr><th id="257">257</th><td><i>// the returned value will be differential in total energy transfer instead of </i></td></tr>
+<tr><th id="258">258</th><td><i>// the eps=Et/Eg. The computed part of the DCS</i></td></tr>
+<tr><th id="259">259</th><td><i>// NORMAL CASE: DEFAULT STTING (i.e. fIsUseCompleteScreening = FALSE)</i></td></tr>
+<tr><th id="260">260</th><td><i>// ds/deps(Et,Eg,Z)=ds/deps(eps,Z) = xi(s)*{ (eps^2+(1-eps)^2)*[2fi(s)/3+G(s)/3]</i></td></tr>
+<tr><th id="261">261</th><td><i>// *[phi1(d)/4-ln(Z)/3-fc] + 2*eps(1-eps)*G(s)*[phi2(d)/4-ln(Z)/3-fc]/3 } where </i></td></tr>
+<tr><th id="262">262</th><td><i>// the universal (in the TF model) screening variable d=d(eps)=136Z^(-1/3)eps0</i></td></tr>
+<tr><th id="263">263</th><td><i>// /[eps*(1-eps)] with eps0=mc^2/Eg.  </i></td></tr>
+<tr><th id="264">264</th><td><i>// COMPLETE SCREENING (when d(eps) approx-equal-to 0) : NEED TO BE SET BY USER </i></td></tr>
+<tr><th id="265">265</th><td><i>// ds/deps(Et,Eg,Z) = ds/deps(eps,Z) = xi(s)*{ [Lel-fc]*[ (eps^2+(1-eps)^2+eps</i></td></tr>
+<tr><th id="266">266</th><td><i>// *(1-eps)/3)*2fi(s)/3 + G(s)/3] - eps(1-eps)*G(s)/9 } </i></td></tr>
+<tr><th id="267">267</th><td><i>// Note, that when the LPM suppression is absent i.e. xi(s)=fi(s)=G(s)=1, both</i></td></tr>
+<tr><th id="268">268</th><td><i>// the normal and the complete screening DCS give back the NO-LMP case above. </i></td></tr>
+<tr><th id="269">269</th><td><a class="typedef" href="../../../../global/management/include/G4Types.hh.html#G4double" title='G4double' data-type='double' data-ref="G4double">G4double</a> <a class="type" href="../include/G4PairProductionRelModel.hh.html#G4PairProductionRelModel" title='G4PairProductionRelModel' data-ref="G4PairProductionRelModel">G4PairProductionRelModel</a>::<dfn class="decl def" id="_ZN24G4PairProductionRelModel26ComputeRelDXSectionPerAtomEddd" title='G4PairProductionRelModel::ComputeRelDXSectionPerAtom' data-ref="_ZN24G4PairProductionRelModel26ComputeRelDXSectionPerAtomEddd">ComputeRelDXSectionPerAtom</dfn>(<a class="typedef" href="../../../../global/management/include/G4Types.hh.html#G4double" title='G4double' data-type='double' data-ref="G4double">G4double</a> <dfn class="local col9 decl" id="39pEnergy" title='pEnergy' data-type='G4double' data-ref="39pEnergy">pEnergy</dfn>,</td></tr>
+<tr><th id="270">270</th><td>                                                           <a class="typedef" href="../../../../global/management/include/G4Types.hh.html#G4double" title='G4double' data-type='double' data-ref="G4double">G4double</a> <dfn class="local col0 decl" id="40gammaEnergy" title='gammaEnergy' data-type='G4double' data-ref="40gammaEnergy">gammaEnergy</dfn>,</td></tr>
+<tr><th id="271">271</th><td>                                                           <a class="typedef" href="../../../../global/management/include/G4Types.hh.html#G4double" title='G4double' data-type='double' data-ref="G4double">G4double</a> <dfn class="local col1 decl" id="41Z" title='Z' data-type='G4double' data-ref="41Z">Z</dfn>)</td></tr>
+<tr><th id="272">272</th><td>{</td></tr>
+<tr><th id="273">273</th><td>  <a class="typedef" href="../../../../global/management/include/G4Types.hh.html#G4double" title='G4double' data-type='double' data-ref="G4double">G4double</a> <dfn class="local col2 decl" id="42xSection" title='xSection' data-type='G4double' data-ref="42xSection">xSection</dfn> = <var>0.</var>;</td></tr>
+<tr><th id="274">274</th><td>  <em>const</em> <a class="typedef" href="../../../../global/management/include/G4Types.hh.html#G4int" title='G4int' data-type='int' data-ref="G4int">G4int</a>    <dfn class="local col3 decl" id="43iz" title='iz' data-type='const G4int' data-ref="43iz">iz</dfn>   = <span class='error' title="use of undeclared identifier &apos;std&apos;">std</span>::min(gMaxZet, G4lrint(Z)); </td></tr>
+<tr><th id="275">275</th><td>  <em>const</em> <a class="typedef" href="../../../../global/management/include/G4Types.hh.html#G4double" title='G4double' data-type='double' data-ref="G4double">G4double</a> <dfn class="local col4 decl" id="44eps" title='eps' data-type='const G4double' data-ref="44eps">eps</dfn>  = <a class="local col9 ref" href="#39pEnergy" title='pEnergy' data-ref="39pEnergy">pEnergy</a>/<a class="local col0 ref" href="#40gammaEnergy" title='gammaEnergy' data-ref="40gammaEnergy">gammaEnergy</a>;</td></tr>
+<tr><th id="276">276</th><td>  <em>const</em> <a class="typedef" href="../../../../global/management/include/G4Types.hh.html#G4double" title='G4double' data-type='double' data-ref="G4double">G4double</a> <dfn class="local col5 decl" id="45epsm" title='epsm' data-type='const G4double' data-ref="45epsm">epsm</dfn> = <var>1.</var>-<a class="local col4 ref" href="#44eps" title='eps' data-ref="44eps">eps</a>;</td></tr>
+<tr><th id="277">277</th><td>  <em>const</em> <a class="typedef" href="../../../../global/management/include/G4Types.hh.html#G4double" title='G4double' data-type='double' data-ref="G4double">G4double</a> <dfn class="local col6 decl" id="46dum" title='dum' data-type='const G4double' data-ref="46dum">dum</dfn>  = <a class="local col4 ref" href="#44eps" title='eps' data-ref="44eps">eps</a>*<a class="local col5 ref" href="#45epsm" title='epsm' data-ref="45epsm">epsm</a>;</td></tr>
+<tr><th id="278">278</th><td>  <i>// evaluate LPM suppression functions</i></td></tr>
+<tr><th id="279">279</th><td>  <a class="typedef" href="../../../../global/management/include/G4Types.hh.html#G4double" title='G4double' data-type='double' data-ref="G4double">G4double</a> <dfn class="local col7 decl" id="47fXiS" title='fXiS' data-type='G4double' data-ref="47fXiS">fXiS</dfn>, <dfn class="local col8 decl" id="48fGS" title='fGS' data-type='G4double' data-ref="48fGS">fGS</dfn>, <dfn class="local col9 decl" id="49fPhiS" title='fPhiS' data-type='G4double' data-ref="49fPhiS">fPhiS</dfn>;</td></tr>
+<tr><th id="280">280</th><td>  <a class="member" href="../include/G4PairProductionRelModel.hh.html#_ZN24G4PairProductionRelModel19ComputeLPMfunctionsERdS0_S0_ddi" title='G4PairProductionRelModel::ComputeLPMfunctions' data-ref="_ZN24G4PairProductionRelModel19ComputeLPMfunctionsERdS0_S0_ddi">ComputeLPMfunctions</a>(<span class='refarg'><a class="local col7 ref" href="#47fXiS" title='fXiS' data-ref="47fXiS">fXiS</a></span>, <span class='refarg'><a class="local col8 ref" href="#48fGS" title='fGS' data-ref="48fGS">fGS</a></span>, <span class='refarg'><a class="local col9 ref" href="#49fPhiS" title='fPhiS' data-ref="49fPhiS">fPhiS</a></span>, <a class="local col4 ref" href="#44eps" title='eps' data-ref="44eps">eps</a>, <a class="local col0 ref" href="#40gammaEnergy" title='gammaEnergy' data-ref="40gammaEnergy">gammaEnergy</a>, <a class="local col3 ref" href="#43iz" title='iz' data-ref="43iz">iz</a>);   </td></tr>
+<tr><th id="281">281</th><td>  <b>if</b> (<a class="member" href="../include/G4PairProductionRelModel.hh.html#G4PairProductionRelModel::fIsUseCompleteScreening" title='G4PairProductionRelModel::fIsUseCompleteScreening' data-ref="G4PairProductionRelModel::fIsUseCompleteScreening">fIsUseCompleteScreening</a>) {</td></tr>
+<tr><th id="282">282</th><td>    <i>// complete screening: </i></td></tr>
+<tr><th id="283">283</th><td>    <em>const</em> <a class="typedef" href="../../../../global/management/include/G4Types.hh.html#G4double" title='G4double' data-type='double' data-ref="G4double">G4double</a> <dfn class="local col0 decl" id="50Lel" title='Lel' data-type='const G4double' data-ref="50Lel">Lel</dfn>   = <span class='error' title="use of undeclared identifier &apos;gElementData&apos;">gElementData</span>[iz]-&gt;fLradEl;</td></tr>
+<tr><th id="284">284</th><td>    <em>const</em> <a class="typedef" href="../../../../global/management/include/G4Types.hh.html#G4double" title='G4double' data-type='double' data-ref="G4double">G4double</a> <dfn class="local col1 decl" id="51fc" title='fc' data-type='const G4double' data-ref="51fc">fc</dfn>    = <span class='error' title="use of undeclared identifier &apos;gElementData&apos;">gElementData</span>[iz]-&gt;fCoulomb;</td></tr>
+<tr><th id="285">285</th><td>    <a class="local col2 ref" href="#42xSection" title='xSection' data-ref="42xSection">xSection</a> = (<a class="local col0 ref" href="#50Lel" title='Lel' data-ref="50Lel">Lel</a>-<a class="local col1 ref" href="#51fc" title='fc' data-ref="51fc">fc</a>)*((<a class="local col4 ref" href="#44eps" title='eps' data-ref="44eps">eps</a>*<a class="local col4 ref" href="#44eps" title='eps' data-ref="44eps">eps</a>+<a class="local col5 ref" href="#45epsm" title='epsm' data-ref="45epsm">epsm</a>*<a class="local col5 ref" href="#45epsm" title='epsm' data-ref="45epsm">epsm</a>)*<var>2.</var>*<a class="local col9 ref" href="#49fPhiS" title='fPhiS' data-ref="49fPhiS">fPhiS</a> + <a class="local col8 ref" href="#48fGS" title='fGS' data-ref="48fGS">fGS</a>)/<var>3.</var> - <a class="local col6 ref" href="#46dum" title='dum' data-ref="46dum">dum</a>*<a class="local col8 ref" href="#48fGS" title='fGS' data-ref="48fGS">fGS</a>/<var>9.</var>;  </td></tr>
+<tr><th id="286">286</th><td>  } <b>else</b> {</td></tr>
+<tr><th id="287">287</th><td>    <i>// normal case:</i></td></tr>
+<tr><th id="288">288</th><td>    <em>const</em> <a class="typedef" href="../../../../global/management/include/G4Types.hh.html#G4double" title='G4double' data-type='double' data-ref="G4double">G4double</a> <dfn class="local col2 decl" id="52eps0" title='eps0' data-type='const G4double' data-ref="52eps0">eps0</dfn>  = <span class="namespace">CLHEP::</span><a class="ref" href="../../../../externals/clhep/include/CLHEP/Units/PhysicalConstants.h.html#CLHEP::electron_mass_c2" title='CLHEP::electron_mass_c2' data-ref="CLHEP::electron_mass_c2">electron_mass_c2</a>/<a class="local col0 ref" href="#40gammaEnergy" title='gammaEnergy' data-ref="40gammaEnergy">gammaEnergy</a>;</td></tr>
+<tr><th id="289">289</th><td>    <em>const</em> <a class="typedef" href="../../../../global/management/include/G4Types.hh.html#G4double" title='G4double' data-type='double' data-ref="G4double">G4double</a> <dfn class="local col3 decl" id="53fc" title='fc' data-type='const G4double' data-ref="53fc">fc</dfn>    = <span class='error' title="use of undeclared identifier &apos;gElementData&apos;">gElementData</span>[iz]-&gt;fCoulomb;</td></tr>
+<tr><th id="290">290</th><td>    <em>const</em> <a class="typedef" href="../../../../global/management/include/G4Types.hh.html#G4double" title='G4double' data-type='double' data-ref="G4double">G4double</a> <dfn class="local col4 decl" id="54lnZ13" title='lnZ13' data-type='const G4double' data-ref="54lnZ13">lnZ13</dfn> = <span class='error' title="use of undeclared identifier &apos;gElementData&apos;">gElementData</span>[iz]-&gt;fLogZ13;</td></tr>
+<tr><th id="291">291</th><td>    <em>const</em> <a class="typedef" href="../../../../global/management/include/G4Types.hh.html#G4double" title='G4double' data-type='double' data-ref="G4double">G4double</a> <dfn class="local col5 decl" id="55delta" title='delta' data-type='const G4double' data-ref="55delta">delta</dfn> = <span class='error' title="use of undeclared identifier &apos;gElementData&apos;">gElementData</span>[iz]-&gt;fDeltaFactor*eps0/dum;</td></tr>
+<tr><th id="292">292</th><td>    <a class="typedef" href="../../../../global/management/include/G4Types.hh.html#G4double" title='G4double' data-type='double' data-ref="G4double">G4double</a> <dfn class="local col6 decl" id="56phi1" title='phi1' data-type='G4double' data-ref="56phi1">phi1</dfn>, <dfn class="local col7 decl" id="57phi2" title='phi2' data-type='G4double' data-ref="57phi2">phi2</dfn>;</td></tr>
+<tr><th id="293">293</th><td>    <a class="member" href="../include/G4PairProductionRelModel.hh.html#_ZN24G4PairProductionRelModel12ComputePhi12EdRdS0_" title='G4PairProductionRelModel::ComputePhi12' data-ref="_ZN24G4PairProductionRelModel12ComputePhi12EdRdS0_">ComputePhi12</a>(<a class="local col5 ref" href="#55delta" title='delta' data-ref="55delta">delta</a>, <span class='refarg'><a class="local col6 ref" href="#56phi1" title='phi1' data-ref="56phi1">phi1</a></span>, <span class='refarg'><a class="local col7 ref" href="#57phi2" title='phi2' data-ref="57phi2">phi2</a></span>);</td></tr>
+<tr><th id="294">294</th><td>    <a class="local col2 ref" href="#42xSection" title='xSection' data-ref="42xSection">xSection</a> =  (<a class="local col4 ref" href="#44eps" title='eps' data-ref="44eps">eps</a>*<a class="local col4 ref" href="#44eps" title='eps' data-ref="44eps">eps</a> + <a class="local col5 ref" href="#45epsm" title='epsm' data-ref="45epsm">epsm</a>*<a class="local col5 ref" href="#45epsm" title='epsm' data-ref="45epsm">epsm</a>)*(<var>2.</var>*<a class="local col9 ref" href="#49fPhiS" title='fPhiS' data-ref="49fPhiS">fPhiS</a>+<a class="local col8 ref" href="#48fGS" title='fGS' data-ref="48fGS">fGS</a>)*(<var>0.25</var>*<a class="local col6 ref" href="#56phi1" title='phi1' data-ref="56phi1">phi1</a>-<a class="local col4 ref" href="#54lnZ13" title='lnZ13' data-ref="54lnZ13">lnZ13</a>-<a class="local col3 ref" href="#53fc" title='fc' data-ref="53fc">fc</a>)/<var>3.</var></td></tr>
+<tr><th id="295">295</th><td>               + <var>2.</var>*<a class="local col6 ref" href="#46dum" title='dum' data-ref="46dum">dum</a>*<a class="local col8 ref" href="#48fGS" title='fGS' data-ref="48fGS">fGS</a>*(<var>0.25</var>*<a class="local col7 ref" href="#57phi2" title='phi2' data-ref="57phi2">phi2</a>-<a class="local col4 ref" href="#54lnZ13" title='lnZ13' data-ref="54lnZ13">lnZ13</a>-<a class="local col3 ref" href="#53fc" title='fc' data-ref="53fc">fc</a>)/<var>3.</var>;     </td></tr>
+<tr><th id="296">296</th><td>  }</td></tr>
+<tr><th id="297">297</th><td>  <i>// non-const. part of the DCS differential in total energy transfer not in eps</i></td></tr>
+<tr><th id="298">298</th><td><i>  // ds/dEt=ds/deps deps/dEt with deps/dEt=1/Eg </i></td></tr>
+<tr><th id="299">299</th><td>  <b>return</b> <span class='error' title="use of undeclared identifier &apos;std&apos;">std</span>::max(fXiS*xSection, <var>0.0</var>)/gammaEnergy;</td></tr>
+<tr><th id="300">300</th><td>}</td></tr>
+<tr><th id="301">301</th><td></td></tr>
+<tr><th id="302">302</th><td><a class="typedef" href="../../../../global/management/include/G4Types.hh.html#G4double" title='G4double' data-type='double' data-ref="G4double">G4double</a></td></tr>
+<tr><th id="303">303</th><td><a class="type" href="../include/G4PairProductionRelModel.hh.html#G4PairProductionRelModel" title='G4PairProductionRelModel' data-ref="G4PairProductionRelModel">G4PairProductionRelModel</a>::<dfn class="virtual decl def" id="_ZN24G4PairProductionRelModel26ComputeCrossSectionPerAtomEPK20G4ParticleDefinitionddddd" title='G4PairProductionRelModel::ComputeCrossSectionPerAtom' data-ref="_ZN24G4PairProductionRelModel26ComputeCrossSectionPerAtomEPK20G4ParticleDefinitionddddd">ComputeCrossSectionPerAtom</dfn>(<em>const</em> <a class="type" href="../../../../particles/management/include/G4ParticleDefinition.hh.html#G4ParticleDefinition" title='G4ParticleDefinition' data-ref="G4ParticleDefinition">G4ParticleDefinition</a>*,</td></tr>
+<tr><th id="304">304</th><td>      <a class="typedef" href="../../../../global/management/include/G4Types.hh.html#G4double" title='G4double' data-type='double' data-ref="G4double">G4double</a> <dfn class="local col8 decl" id="58gammaEnergy" title='gammaEnergy' data-type='G4double' data-ref="58gammaEnergy">gammaEnergy</dfn>, <a class="typedef" href="../../../../global/management/include/G4Types.hh.html#G4double" title='G4double' data-type='double' data-ref="G4double">G4double</a> <dfn class="local col9 decl" id="59Z" title='Z' data-type='G4double' data-ref="59Z">Z</dfn>, <a class="typedef" href="../../../../global/management/include/G4Types.hh.html#G4double" title='G4double' data-type='double' data-ref="G4double">G4double</a>, <a class="typedef" href="../../../../global/management/include/G4Types.hh.html#G4double" title='G4double' data-type='double' data-ref="G4double">G4double</a>, <a class="typedef" href="../../../../global/management/include/G4Types.hh.html#G4double" title='G4double' data-type='double' data-ref="G4double">G4double</a>)</td></tr>
+<tr><th id="305">305</th><td>{</td></tr>
+<tr><th id="306">306</th><td>  <a class="typedef" href="../../../../global/management/include/G4Types.hh.html#G4double" title='G4double' data-type='double' data-ref="G4double">G4double</a> <dfn class="local col0 decl" id="60crossSection" title='crossSection' data-type='G4double' data-ref="60crossSection">crossSection</dfn> = <var>0.0</var> ;</td></tr>
+<tr><th id="307">307</th><td>  <i>// check kinematical limit</i></td></tr>
+<tr><th id="308">308</th><td>  <b>if</b> ( <a class="local col8 ref" href="#58gammaEnergy" title='gammaEnergy' data-ref="58gammaEnergy">gammaEnergy</a> &lt;= <var>2.0</var>*<a class="ref" href="../../../../externals/clhep/include/CLHEP/Units/PhysicalConstants.h.html#CLHEP::electron_mass_c2" title='CLHEP::electron_mass_c2' data-ref="CLHEP::electron_mass_c2">electron_mass_c2</a> ) { <b>return</b> <a class="local col0 ref" href="#60crossSection" title='crossSection' data-ref="60crossSection">crossSection</a>; }</td></tr>
+<tr><th id="309">309</th><td>  <i>// Computes the cross section with or without LPM suppression depending on </i></td></tr>
+<tr><th id="310">310</th><td><i>  // settings (by default with if the gamma energy is above a given threshold) </i></td></tr>
+<tr><th id="311">311</th><td><i>  // and using or not using complete sreening approximation (by default not).</i></td></tr>
+<tr><th id="312">312</th><td><i>  // Only the dependent part is computed in the numerical integration of the DCS</i></td></tr>
+<tr><th id="313">313</th><td><i>  // i.e. the result must be multiplied here with 4 \alpha r_0^2 Z(Z+\eta(Z))</i></td></tr>
+<tr><th id="314">314</th><td>  <a class="local col0 ref" href="#60crossSection" title='crossSection' data-ref="60crossSection">crossSection</a> = <a class="member" href="#_ZN24G4PairProductionRelModel22ComputeXSectionPerAtomEdd" title='G4PairProductionRelModel::ComputeXSectionPerAtom' data-ref="_ZN24G4PairProductionRelModel22ComputeXSectionPerAtomEdd">ComputeXSectionPerAtom</a>(<a class="local col8 ref" href="#58gammaEnergy" title='gammaEnergy' data-ref="58gammaEnergy">gammaEnergy</a>, <a class="local col9 ref" href="#59Z" title='Z' data-ref="59Z">Z</a>);</td></tr>
+<tr><th id="315">315</th><td>  <i>// apply the constant factors: </i></td></tr>
+<tr><th id="316">316</th><td><i>  // - eta(Z) is a correction to account interaction in the field of e-</i></td></tr>
+<tr><th id="317">317</th><td><i>  // - gXSecFactor = 4 \alpha r_0^2</i></td></tr>
+<tr><th id="318">318</th><td>  <em>const</em> <a class="typedef" href="../../../../global/management/include/G4Types.hh.html#G4int" title='G4int' data-type='int' data-ref="G4int">G4int</a> <dfn class="local col1 decl" id="61iz" title='iz' data-type='const G4int' data-ref="61iz">iz</dfn>     = <span class='error' title="use of undeclared identifier &apos;std&apos;">std</span>::min(gMaxZet, G4lrint(Z));</td></tr>
+<tr><th id="319">319</th><td>  <em>const</em> <a class="typedef" href="../../../../global/management/include/G4Types.hh.html#G4double" title='G4double' data-type='double' data-ref="G4double">G4double</a> <dfn class="local col2 decl" id="62eta" title='eta' data-type='const G4double' data-ref="62eta">eta</dfn> = <span class='error' title="use of undeclared identifier &apos;gElementData&apos;">gElementData</span>[iz]-&gt;fEtaValue; </td></tr>
+<tr><th id="320">320</th><td>  <a class="local col0 ref" href="#60crossSection" title='crossSection' data-ref="60crossSection">crossSection</a>      *= <a class="member" href="../include/G4PairProductionRelModel.hh.html#G4PairProductionRelModel::gXSecFactor" title='G4PairProductionRelModel::gXSecFactor' data-ref="G4PairProductionRelModel::gXSecFactor">gXSecFactor</a>*<a class="local col9 ref" href="#59Z" title='Z' data-ref="59Z">Z</a>*(<a class="local col9 ref" href="#59Z" title='Z' data-ref="59Z">Z</a>+<a class="local col2 ref" href="#62eta" title='eta' data-ref="62eta">eta</a>);</td></tr>
+<tr><th id="321">321</th><td>  <i>// final protection</i></td></tr>
+<tr><th id="322">322</th><td>  <b>return</b> <span class='error' title="use of undeclared identifier &apos;std&apos;">std</span>::max(crossSection, <var>0.</var>);</td></tr>
+<tr><th id="323">323</th><td>}</td></tr>
+<tr><th id="324">324</th><td></td></tr>
+<tr><th id="325">325</th><td><em>void</em> <a class="type" href="../include/G4PairProductionRelModel.hh.html#G4PairProductionRelModel" title='G4PairProductionRelModel' data-ref="G4PairProductionRelModel">G4PairProductionRelModel</a>::<dfn class="virtual decl def" id="_ZN24G4PairProductionRelModel16SetupForMaterialEPK20G4ParticleDefinitionPK10G4Materiald" title='G4PairProductionRelModel::SetupForMaterial' data-ref="_ZN24G4PairProductionRelModel16SetupForMaterialEPK20G4ParticleDefinitionPK10G4Materiald">SetupForMaterial</dfn>(<em>const</em> <a class="type" href="../../../../particles/management/include/G4ParticleDefinition.hh.html#G4ParticleDefinition" title='G4ParticleDefinition' data-ref="G4ParticleDefinition">G4ParticleDefinition</a>*,</td></tr>
+<tr><th id="326">326</th><td>                                                <em>const</em> <a class="type" href="../../../../materials/include/G4Material.hh.html#G4Material" title='G4Material' data-ref="G4Material">G4Material</a>* <dfn class="local col3 decl" id="63mat" title='mat' data-type='const G4Material *' data-ref="63mat">mat</dfn>, <a class="typedef" href="../../../../global/management/include/G4Types.hh.html#G4double" title='G4double' data-type='double' data-ref="G4double">G4double</a>)</td></tr>
+<tr><th id="327">327</th><td>{</td></tr>
+<tr><th id="328">328</th><td>  <a class="member" href="../include/G4PairProductionRelModel.hh.html#G4PairProductionRelModel::fLPMEnergy" title='G4PairProductionRelModel::fLPMEnergy' data-ref="G4PairProductionRelModel::fLPMEnergy">fLPMEnergy</a> = <a class="local col3 ref" href="#63mat" title='mat' data-ref="63mat">mat</a>-&gt;<a class="ref" href="../../../../materials/include/G4Material.hh.html#_ZNK10G4Material9GetRadlenEv" title='G4Material::GetRadlen' data-ref="_ZNK10G4Material9GetRadlenEv">GetRadlen</a>()*<a class="member" href="../include/G4PairProductionRelModel.hh.html#G4PairProductionRelModel::gLPMconstant" title='G4PairProductionRelModel::gLPMconstant' data-ref="G4PairProductionRelModel::gLPMconstant">gLPMconstant</a>;</td></tr>
+<tr><th id="329">329</th><td>}</td></tr>
+<tr><th id="330">330</th><td></td></tr>
+<tr><th id="331">331</th><td><em>void</em></td></tr>
+<tr><th id="332">332</th><td><a class="type" href="../include/G4PairProductionRelModel.hh.html#G4PairProductionRelModel" title='G4PairProductionRelModel' data-ref="G4PairProductionRelModel">G4PairProductionRelModel</a>::<span class='error' title="variable has incomplete type &apos;void&apos;"><dfn class="tu decl def" id="G4PairProductionRelModel::SampleSecondaries" title='G4PairProductionRelModel::SampleSecondaries' data-type='void' data-ref="G4PairProductionRelModel::SampleSecondaries">SampleSecondaries</dfn></span>(<span class='error' title="use of undeclared identifier &apos;std&apos;">std</span>::vector&lt;<span class='error' title="&apos;G4DynamicParticle&apos; does not refer to a value">G4DynamicParticle</span>*<span class='error' title="expected expression">&gt;</span>* <span class='error' title="use of undeclared identifier &apos;fvect&apos;">fvect</span>,</td></tr>
+<tr><th id="333">333</th><td>                                            <span class='error' title="expected expression"><em>const</em></span> G4MaterialCutsCouple* couple,</td></tr>
+<tr><th id="334">334</th><td>                                            <span class='error' title="expected expression"><em>const</em></span> G4DynamicParticle* aDynamicGamma,</td></tr>
+<tr><th id="335">335</th><td>                                            <span class='error' title="unexpected type name &apos;G4double&apos;: expected expression">G4double</span>,</td></tr>
+<tr><th id="336">336</th><td>                                            <span class='error' title="unexpected type name &apos;G4double&apos;: expected expression">G4double</span>)<span class='error' title="expected &apos;;&apos; after top level declarator"></span></td></tr>
+<tr><th id="337">337</th><td><i>// The secondaries e+e- energies are sampled using the Bethe - Heitler</i></td></tr>
+<tr><th id="338">338</th><td><i>// cross sections with Coulomb correction.</i></td></tr>
+<tr><th id="339">339</th><td><i>// A modified version of the random number techniques of Butcher &amp; Messel</i></td></tr>
+<tr><th id="340">340</th><td><i>// is used (Nuc Phys 20(1960),15).</i></td></tr>
+<tr><th id="341">341</th><td><i>//</i></td></tr>
+<tr><th id="342">342</th><td><i>// GEANT4 internal units.</i></td></tr>
+<tr><th id="343">343</th><td><i>//</i></td></tr>
+<tr><th id="344">344</th><td><i>// Note 1 : Effects due to the breakdown of the Born approximation at</i></td></tr>
+<tr><th id="345">345</th><td><i>//          low energy are ignored.</i></td></tr>
+<tr><th id="346">346</th><td><i>// Note 2 : The differential cross section implicitly takes account of</i></td></tr>
+<tr><th id="347">347</th><td><i>//          pair creation in both nuclear and atomic electron fields.</i></td></tr>
+<tr><th id="348">348</th><td><i>//          However triplet prodution is not generated.</i></td></tr>
+<tr><th id="349">349</th><td>{</td></tr>
+<tr><th id="350">350</th><td>  <em>const</em> G4Material* mat         = couple-&gt;GetMaterial();</td></tr>
+<tr><th id="351">351</th><td>  <em>const</em> G4double    gammaEnergy = aDynamicGamma-&gt;GetKineticEnergy();</td></tr>
+<tr><th id="352">352</th><td>  <em>const</em> G4double    eps0        = CLHEP::electron_mass_c2/gammaEnergy ;</td></tr>
+<tr><th id="353">353</th><td>  <i>//</i></td></tr>
+<tr><th id="354">354</th><td><i>  // check kinematical limit: gamma energy(Eg) must be at least 2 e- rest mass</i></td></tr>
+<tr><th id="355">355</th><td><i>  // (but the model should be used at higher energies above 100 MeV)</i></td></tr>
+<tr><th id="356">356</th><td>  <b>if</b> (eps0 &gt; <var>0.5</var>) { <b>return</b>; }</td></tr>
+<tr><th id="357">357</th><td>  <i>// </i></td></tr>
+<tr><th id="358">358</th><td><i>  // select target atom of the material</i></td></tr>
+<tr><th id="359">359</th><td>  <em>const</em> G4Element* anElement = SelectRandomAtom(couple, fTheGamma, gammaEnergy);</td></tr>
+<tr><th id="360">360</th><td>  CLHEP::HepRandomEngine* rndmEngine = <a class="macro" href="../../../../global/HEPRandom/include/Randomize.hh.html#50" title="CLHEP::HepRandom" data-ref="_M/G4Random">G4Random</a>::getTheEngine();</td></tr>
+<tr><th id="361">361</th><td>  <i>//</i></td></tr>
+<tr><th id="362">362</th><td><i>  // 'eps' is the total energy transferred to one of the e-/e+ pair in initial</i></td></tr>
+<tr><th id="363">363</th><td><i>  // gamma energy units Eg. Since the corresponding DCS is symmetric on eps=0.5,</i></td></tr>
+<tr><th id="364">364</th><td><i>  // the kinematical limits for eps0=mc^2/Eg &lt;= eps &lt;= 0.5 </i></td></tr>
+<tr><th id="365">365</th><td><i>  //</i></td></tr>
+<tr><th id="366">366</th><td><i>  // The Coulomb factor for the target element (Z) (Eg&gt;50 MeV is assumed)</i></td></tr>
+<tr><th id="367">367</th><td><i>  // F(Z) = 8*ln(Z)/3 + 8*fc(Z)</i></td></tr>
+<tr><th id="368">368</th><td><i>  //</i></td></tr>
+<tr><th id="369">369</th><td><i>  // The screening variable 'delta(eps)' = 136*Z^{-1/3}*eps0/[eps(1-eps)]</i></td></tr>
+<tr><th id="370">370</th><td><i>  // Due to the Coulomb correction, the DCS can go below zero even at </i></td></tr>
+<tr><th id="371">371</th><td><i>  // kinematicaly allowed eps &gt; eps0 values. In order to exclude this eps </i></td></tr>
+<tr><th id="372">372</th><td><i>  // range with negative DCS, the minimum eps value will be set to eps_min = </i></td></tr>
+<tr><th id="373">373</th><td><i>  // max[eps0, epsp] with epsp is the solution of SF(delta(epsp)) - F(Z)/2 = 0 </i></td></tr>
+<tr><th id="374">374</th><td><i>  // with SF being the screening function (SF1=SF2 at high value of delta). </i></td></tr>
+<tr><th id="375">375</th><td><i>  // The solution is epsp = 0.5 - 0.5*sqrt[ 1 - 4*136*Z^{-1/3}eps0/deltap] </i></td></tr>
+<tr><th id="376">376</th><td><i>  // with deltap = Exp[(42.038-F(Z))/8.29]-0.958. So the limits are:</i></td></tr>
+<tr><th id="377">377</th><td><i>  // - when eps=eps_max = 0.5            =&gt; delta_min = 136*Z^{-1/3}*eps0/4</i></td></tr>
+<tr><th id="378">378</th><td><i>  // - epsp = 0.5 - 0.5*sqrt[ 1 - delta_min/deltap]</i></td></tr>
+<tr><th id="379">379</th><td><i>  // - and eps_min = max[eps0, epsp]     </i></td></tr>
+<tr><th id="380">380</th><td>  <em>const</em> G4int    iZet        = std::min(gMaxZet, anElement-&gt;GetZasInt());   </td></tr>
+<tr><th id="381">381</th><td>  <em>const</em> G4double deltaFactor = gElementData[iZet]-&gt;fDeltaFactor*eps0;</td></tr>
+<tr><th id="382">382</th><td>  <em>const</em> G4double deltaMin    = <var>4.</var>*deltaFactor;</td></tr>
+<tr><th id="383">383</th><td>  <em>const</em> G4double deltaMax    = gElementData[iZet]-&gt;fDeltaMax;</td></tr>
+<tr><th id="384">384</th><td>  <i>// compute the limits of eps</i></td></tr>
+<tr><th id="385">385</th><td>  <em>const</em> G4double epsp        = <var>0.5</var> - <var>0.5</var>*std::sqrt(<var>1.</var> - deltaMin/deltaMax) ;</td></tr>
+<tr><th id="386">386</th><td>  <em>const</em> G4double epsMin      = std::max(eps0,epsp);</td></tr>
+<tr><th id="387">387</th><td>  <em>const</em> G4double epsRange    = <var>0.5</var> - epsMin;</td></tr>
+<tr><th id="388">388</th><td>  <em>const</em> G4double   FZ        = <var>8.</var>*(gElementData[iZet]-&gt;fLogZ13 + </td></tr>
+<tr><th id="389">389</th><td>                                   gElementData[iZet]-&gt;fCoulomb); </td></tr>
+<tr><th id="390">390</th><td>  <i>//</i></td></tr>
+<tr><th id="391">391</th><td><i>  // sample the energy rate (eps) of the created electron (or positron)</i></td></tr>
+<tr><th id="392">392</th><td>  G4double F10, F20;</td></tr>
+<tr><th id="393">393</th><td>  ScreenFunction12(deltaMin, F10, F20); </td></tr>
+<tr><th id="394">394</th><td>  F10 -= FZ;</td></tr>
+<tr><th id="395">395</th><td>  F20 -= FZ; </td></tr>
+<tr><th id="396">396</th><td>  <em>const</em> G4double NormF1   = std::max(F10 * epsRange * epsRange, <var>0.</var>); </td></tr>
+<tr><th id="397">397</th><td>  <em>const</em> G4double NormF2   = std::max(<var>1.5</var> * F20                , <var>0.</var>);</td></tr>
+<tr><th id="398">398</th><td>  <em>const</em> G4double NormCond = NormF1/(NormF1 + NormF2); </td></tr>
+<tr><th id="399">399</th><td>  <i>// check if LPM correction is active</i></td></tr>
+<tr><th id="400">400</th><td>  <em>const</em> G4bool isLPM = (fIsUseLPMCorrection &amp;&amp; gammaEnergy&gt;gEgLPMActivation);</td></tr>
+<tr><th id="401">401</th><td>  fLPMEnergy = mat-&gt;GetRadlen()*gLPMconstant;</td></tr>
+<tr><th id="402">402</th><td>  <i>// we will need 3 uniform random number for each trial of sampling </i></td></tr>
+<tr><th id="403">403</th><td>  G4double rndmv[<var>3</var>];</td></tr>
+<tr><th id="404">404</th><td>  G4double greject = <var>0.</var>;</td></tr>
+<tr><th id="405">405</th><td>  G4double eps;</td></tr>
+<tr><th id="406">406</th><td>  <b>do</b> {</td></tr>
+<tr><th id="407">407</th><td>    rndmEngine-&gt;flatArray(<var>3</var>, rndmv);</td></tr>
+<tr><th id="408">408</th><td>    <b>if</b> (NormCond &gt; rndmv[<var>0</var>]) {</td></tr>
+<tr><th id="409">409</th><td>      eps = <var>0.5</var> - epsRange * fG4Calc-&gt;A13(rndmv[<var>1</var>]);</td></tr>
+<tr><th id="410">410</th><td>      <em>const</em> G4double delta = deltaFactor/(eps*(<var>1.</var>-eps));</td></tr>
+<tr><th id="411">411</th><td>      <b>if</b> (isLPM) {</td></tr>
+<tr><th id="412">412</th><td>        G4double lpmXiS, lpmGS, lpmPhiS, phi1, phi2;</td></tr>
+<tr><th id="413">413</th><td>        ComputePhi12(delta, phi1, phi2);</td></tr>
+<tr><th id="414">414</th><td>        ComputeLPMfunctions(lpmXiS, lpmGS, lpmPhiS, eps, gammaEnergy, iZet); </td></tr>
+<tr><th id="415">415</th><td>        greject = lpmXiS*((<var>2.</var>*lpmPhiS+lpmGS)*phi1-lpmGS*phi2-lpmPhiS*FZ)/F10;</td></tr>
+<tr><th id="416">416</th><td>      } <b>else</b> {</td></tr>
+<tr><th id="417">417</th><td>        greject = (ScreenFunction1(delta)-FZ)/F10;</td></tr>
+<tr><th id="418">418</th><td>      }</td></tr>
+<tr><th id="419">419</th><td>    } <b>else</b> {</td></tr>
+<tr><th id="420">420</th><td>      eps = epsMin + epsRange*rndmv[<var>1</var>];</td></tr>
+<tr><th id="421">421</th><td>      <em>const</em> G4double delta = deltaFactor/(eps*(<var>1.</var>-eps));</td></tr>
+<tr><th id="422">422</th><td>      <b>if</b> (isLPM) {</td></tr>
+<tr><th id="423">423</th><td>        G4double lpmXiS, lpmGS, lpmPhiS, phi1, phi2;</td></tr>
+<tr><th id="424">424</th><td>        ComputePhi12(delta, phi1, phi2);</td></tr>
+<tr><th id="425">425</th><td>        ComputeLPMfunctions(lpmXiS, lpmGS, lpmPhiS, eps, gammaEnergy, iZet); </td></tr>
+<tr><th id="426">426</th><td>        greject = lpmXiS*( (lpmPhiS+<var>0.5</var>*lpmGS)*phi1 + <var>0.5</var>*lpmGS*phi2 </td></tr>
+<tr><th id="427">427</th><td>                           -<var>0.5</var>*(lpmGS+lpmPhiS)*FZ )/F20;</td></tr>
+<tr><th id="428">428</th><td>      } <b>else</b> {</td></tr>
+<tr><th id="429">429</th><td>        greject = (ScreenFunction2(delta)-FZ)/F20;</td></tr>
+<tr><th id="430">430</th><td>      }</td></tr>
+<tr><th id="431">431</th><td>    }</td></tr>
+<tr><th id="432">432</th><td>    <i>// Loop checking, 03-Aug-2015, Vladimir Ivanchenko</i></td></tr>
+<tr><th id="433">433</th><td>  } <b>while</b> (greject &lt; rndmv[<var>2</var>]);</td></tr>
+<tr><th id="434">434</th><td>  <i>//  end of eps sampling</i></td></tr>
+<tr><th id="435">435</th><td><i>  //</i></td></tr>
+<tr><th id="436">436</th><td><i>  // select charges randomly</i></td></tr>
+<tr><th id="437">437</th><td>  G4double eTotEnergy, pTotEnergy;</td></tr>
+<tr><th id="438">438</th><td>  <b>if</b> (rndmEngine-&gt;flat() &gt; <var>0.5</var>) {</td></tr>
+<tr><th id="439">439</th><td>    eTotEnergy = (<var>1.</var>-eps)*gammaEnergy;</td></tr>
+<tr><th id="440">440</th><td>    pTotEnergy = eps*gammaEnergy;</td></tr>
+<tr><th id="441">441</th><td>  } <b>else</b> {</td></tr>
+<tr><th id="442">442</th><td>    pTotEnergy = (<var>1.</var>-eps)*gammaEnergy;</td></tr>
+<tr><th id="443">443</th><td>    eTotEnergy = eps*gammaEnergy;</td></tr>
+<tr><th id="444">444</th><td>  }</td></tr>
+<tr><th id="445">445</th><td>  <i>//</i></td></tr>
+<tr><th id="446">446</th><td><i>  // sample pair kinematics</i></td></tr>
+<tr><th id="447">447</th><td><i>  // </i></td></tr>
+<tr><th id="448">448</th><td>  <em>const</em> G4double eKinEnergy = std::max(<var>0.</var>,eTotEnergy - CLHEP::electron_mass_c2);</td></tr>
+<tr><th id="449">449</th><td>  <em>const</em> G4double pKinEnergy = std::max(<var>0.</var>,pTotEnergy - CLHEP::electron_mass_c2);</td></tr>
+<tr><th id="450">450</th><td>  <i>//</i></td></tr>
+<tr><th id="451">451</th><td>  G4ThreeVector eDirection, pDirection;</td></tr>
+<tr><th id="452">452</th><td>  <i>//</i></td></tr>
+<tr><th id="453">453</th><td>  GetAngularDistribution()-&gt;SamplePairDirections(aDynamicGamma, </td></tr>
+<tr><th id="454">454</th><td>						 eKinEnergy, pKinEnergy,</td></tr>
+<tr><th id="455">455</th><td>                                                 eDirection, pDirection);</td></tr>
+<tr><th id="456">456</th><td>  <i>// create G4DynamicParticle object for the particle1</i></td></tr>
+<tr><th id="457">457</th><td>  G4DynamicParticle* aParticle1= <b>new</b> G4DynamicParticle(</td></tr>
+<tr><th id="458">458</th><td>                     fTheElectron,eDirection,eKinEnergy);</td></tr>
+<tr><th id="459">459</th><td></td></tr>
+<tr><th id="460">460</th><td>  <i>// create G4DynamicParticle object for the particle2</i></td></tr>
+<tr><th id="461">461</th><td>  G4DynamicParticle* aParticle2= <b>new</b> G4DynamicParticle(</td></tr>
+<tr><th id="462">462</th><td>                     fThePositron,pDirection,pKinEnergy);</td></tr>
+<tr><th id="463">463</th><td>  <i>// Fill output vector</i></td></tr>
+<tr><th id="464">464</th><td>  fvect-&gt;push_back(aParticle1);</td></tr>
+<tr><th id="465">465</th><td>  fvect-&gt;push_back(aParticle2);</td></tr>
+<tr><th id="466">466</th><td>  <i>// kill incident photon</i></td></tr>
+<tr><th id="467">467</th><td>  fParticleChange-&gt;SetProposedKineticEnergy(<var>0.</var>);</td></tr>
+<tr><th id="468">468</th><td>  fParticleChange-&gt;ProposeTrackStatus(fStopAndKill);</td></tr>
+<tr><th id="469">469</th><td>}</td></tr>
+<tr><th id="470">470</th><td></td></tr>
+<tr><th id="471">471</th><td><i>// should be called only by the master and at initialisation</i></td></tr>
+<tr><th id="472">472</th><td><em>void</em> G4PairProductionRelModel::InitialiseElementData() </td></tr>
+<tr><th id="473">473</th><td>{</td></tr>
+<tr><th id="474">474</th><td>  G4int size = gElementData.size();</td></tr>
+<tr><th id="475">475</th><td>  <b>if</b> (size &lt; gMaxZet+<var>1</var>) {</td></tr>
+<tr><th id="476">476</th><td>    gElementData.resize(gMaxZet+<var>1</var>, <b>nullptr</b>);</td></tr>
+<tr><th id="477">477</th><td>  }</td></tr>
+<tr><th id="478">478</th><td>  <i>// create for all elements that are in the detector</i></td></tr>
+<tr><th id="479">479</th><td>  <em>const</em> G4ElementTable* elemTable = G4Element::GetElementTable();</td></tr>
+<tr><th id="480">480</th><td>  size_t numElems = (*elemTable).size();</td></tr>
+<tr><th id="481">481</th><td>  <b>for</b> (size_t ie = <var>0</var>; ie &lt; numElems; ++ie) {</td></tr>
+<tr><th id="482">482</th><td>    <em>const</em> G4Element* elem = (*elemTable)[ie];</td></tr>
+<tr><th id="483">483</th><td>    <em>const</em> G4int        iz = std::min(gMaxZet, elem-&gt;GetZasInt());</td></tr>
+<tr><th id="484">484</th><td>    <b>if</b> (!gElementData[iz]) { <i>// create it if doesn't exist yet</i></td></tr>
+<tr><th id="485">485</th><td>      <em>const</em> G4double logZ13 = elem-&gt;GetIonisation()-&gt;GetlogZ3();</td></tr>
+<tr><th id="486">486</th><td>      <em>const</em> G4double Z13    = elem-&gt;GetIonisation()-&gt;GetZ3();</td></tr>
+<tr><th id="487">487</th><td>      <em>const</em> G4double fc     = elem-&gt;GetfCoulomb(); </td></tr>
+<tr><th id="488">488</th><td>      <em>const</em> G4double FZ     = <var>8.</var>*(logZ13 + fc);</td></tr>
+<tr><th id="489">489</th><td>      G4double       Fel;</td></tr>
+<tr><th id="490">490</th><td>      G4double       Finel;</td></tr>
+<tr><th id="491">491</th><td>      <b>if</b> (iz&lt;<var>5</var>) {  <i>// use data from Dirac-Fock atomic model</i></td></tr>
+<tr><th id="492">492</th><td>        Fel   = gFelLowZet[iz];</td></tr>
+<tr><th id="493">493</th><td>        Finel = gFinelLowZet[iz];</td></tr>
+<tr><th id="494">494</th><td>      } <b>else</b> {     <i>// use the results of the Thomas-Fermi-Moliere model </i></td></tr>
+<tr><th id="495">495</th><td>        Fel   = G4Log(<var>184.</var>)  -    logZ13;</td></tr>
+<tr><th id="496">496</th><td>        Finel = G4Log(<var>1194.</var>) - <var>2.</var>*logZ13;</td></tr>
+<tr><th id="497">497</th><td>      }</td></tr>
+<tr><th id="498">498</th><td>      ElementData* elD     = <b>new</b> ElementData(); </td></tr>
+<tr><th id="499">499</th><td>      elD-&gt;fLogZ13         = logZ13;</td></tr>
+<tr><th id="500">500</th><td>      elD-&gt;fCoulomb        = fc;</td></tr>
+<tr><th id="501">501</th><td>      elD-&gt;fLradEl         = Fel;</td></tr>
+<tr><th id="502">502</th><td>      elD-&gt;fDeltaFactor    = <var>136.</var>/Z13;</td></tr>
+<tr><th id="503">503</th><td>      elD-&gt;fDeltaMax       = G4Exp((<var>42.038</var> - FZ)/<var>8.29</var>) - <var>0.958</var>;</td></tr>
+<tr><th id="504">504</th><td>      elD-&gt;fEtaValue       = Finel/(Fel-fc);</td></tr>
+<tr><th id="505">505</th><td>      elD-&gt;fLPMVarS1Cond   = std::sqrt(<var>2.</var>)*Z13*Z13/(<var>184.</var>*<var>184.</var>);</td></tr>
+<tr><th id="506">506</th><td>      elD-&gt;fLPMILVarS1Cond = <var>1.</var>/G4Log(elD-&gt;fLPMVarS1Cond);</td></tr>
+<tr><th id="507">507</th><td>      gElementData[iz]   = elD;</td></tr>
+<tr><th id="508">508</th><td>    }</td></tr>
+<tr><th id="509">509</th><td>  }</td></tr>
+<tr><th id="510">510</th><td>}</td></tr>
+<tr><th id="511">511</th><td></td></tr>
+<tr><th id="512">512</th><td><i>// s goes up to 2 with ds = 0.01 be default </i></td></tr>
+<tr><th id="513">513</th><td><em>void</em> G4PairProductionRelModel::InitLPMFunctions() {</td></tr>
+<tr><th id="514">514</th><td>  <b>if</b> (!gLPMFuncs.fIsInitialized) {</td></tr>
+<tr><th id="515">515</th><td>    <em>const</em> G4int num = gLPMFuncs.fSLimit*gLPMFuncs.fISDelta+<var>1</var>;</td></tr>
+<tr><th id="516">516</th><td>    gLPMFuncs.fLPMFuncG.resize(num);</td></tr>
+<tr><th id="517">517</th><td>    gLPMFuncs.fLPMFuncPhi.resize(num);</td></tr>
+<tr><th id="518">518</th><td>    <b>for</b> (G4int i=<var>0</var>; i&lt;num; ++i) {</td></tr>
+<tr><th id="519">519</th><td>      <em>const</em> G4double sval = i/gLPMFuncs.fISDelta;</td></tr>
+<tr><th id="520">520</th><td>      ComputeLPMGsPhis(gLPMFuncs.fLPMFuncG[i],gLPMFuncs.fLPMFuncPhi[i],sval);</td></tr>
+<tr><th id="521">521</th><td>    }</td></tr>
+<tr><th id="522">522</th><td>    gLPMFuncs.fIsInitialized = <b>true</b>;</td></tr>
+<tr><th id="523">523</th><td>  }</td></tr>
+<tr><th id="524">524</th><td>}</td></tr>
+<tr><th id="525">525</th><td></td></tr>
+<tr><th id="526">526</th><td><i>// used only at initialisation time</i></td></tr>
+<tr><th id="527">527</th><td><em>void</em> G4PairProductionRelModel::ComputeLPMGsPhis(G4double &amp;funcGS, G4double &amp;funcPhiS, <em>const</em> G4double varShat) {</td></tr>
+<tr><th id="528">528</th><td>  <b>if</b> (varShat &lt; <var>0.01</var>) {</td></tr>
+<tr><th id="529">529</th><td>    funcPhiS = <var>6.0</var>*varShat*(<var>1.0</var>-CLHEP::pi*varShat);</td></tr>
+<tr><th id="530">530</th><td>    funcGS   = <var>12.0</var>*varShat-<var>2.0</var>*funcPhiS;</td></tr>
+<tr><th id="531">531</th><td>  } <b>else</b> {</td></tr>
+<tr><th id="532">532</th><td>    <em>const</em> G4double varShat2 = varShat*varShat;</td></tr>
+<tr><th id="533">533</th><td>    <em>const</em> G4double varShat3 = varShat*varShat2;</td></tr>
+<tr><th id="534">534</th><td>    <em>const</em> G4double varShat4 = varShat2*varShat2;</td></tr>
+<tr><th id="535">535</th><td>    <b>if</b> (varShat &lt; <var>0.415827397755</var>) { <i>// Stanev ap.: for \psi(s) and compute G(s)</i></td></tr>
+<tr><th id="536">536</th><td>      funcPhiS = <var>1.0</var>-G4Exp( -<var>6.0</var>*varShat*(<var>1.0</var>+varShat*(<var>3.0</var>-CLHEP::pi)) </td></tr>
+<tr><th id="537">537</th><td>                           + varShat3/(<var>0.623</var>+<var>0.796</var>*varShat+<var>0.658</var>*varShat2));</td></tr>
+<tr><th id="538">538</th><td>      <i>// 1-\exp \left\{-4s-\frac{8s^2}{1+3.936s+4.97s^2-0.05s^3+7.5s^4} \right\}</i></td></tr>
+<tr><th id="539">539</th><td>      <em>const</em> G4double funcPsiS = <var>1.0</var>-G4Exp( -<var>4.0</var>*varShat - <var>8.0</var>*varShat2/(<var>1.0</var> </td></tr>
+<tr><th id="540">540</th><td>                     + <var>3.936</var>*varShat+<var>4.97</var>*varShat2-<var>0.05</var>*varShat3+<var>7.5</var>*varShat4));</td></tr>
+<tr><th id="541">541</th><td>      <i>// G(s) = 3 \psi(s) - 2 \phi(s)</i></td></tr>
+<tr><th id="542">542</th><td>      funcGS = <var>3.0</var>*funcPsiS - <var>2.0</var>*funcPhiS;</td></tr>
+<tr><th id="543">543</th><td>    } <b>else</b> <b>if</b> (varShat &lt; <var>1.55</var>) {</td></tr>
+<tr><th id="544">544</th><td>      funcPhiS = <var>1.0</var>-G4Exp( -<var>6.0</var>*varShat*(<var>1.0</var>+varShat*(<var>3.0</var>-CLHEP::pi)) </td></tr>
+<tr><th id="545">545</th><td>                           + varShat3/(<var>0.623</var>+<var>0.796</var>*varShat+<var>0.658</var>*varShat2));</td></tr>
+<tr><th id="546">546</th><td>      <em>const</em> G4double dum0  = -<var>0.16072300849123999</var>+<var>3.7550300067531581</var>*varShat</td></tr>
+<tr><th id="547">547</th><td>                             -<var>1.7981383069010097</var> *varShat2</td></tr>
+<tr><th id="548">548</th><td>                             +<var>0.67282686077812381</var>*varShat3</td></tr>
+<tr><th id="549">549</th><td>                             -<var>0.1207722909879257</var> *varShat4;</td></tr>
+<tr><th id="550">550</th><td>      funcGS = std::tanh(dum0);</td></tr>
+<tr><th id="551">551</th><td>    } <b>else</b> {</td></tr>
+<tr><th id="552">552</th><td>      funcPhiS = <var>1.0</var>-<var>0.01190476</var>/varShat4;</td></tr>
+<tr><th id="553">553</th><td>      <b>if</b> (varShat &lt; <var>1.9156</var>) {</td></tr>
+<tr><th id="554">554</th><td>        <em>const</em> G4double dum0 = -<var>0.16072300849123999</var>+<var>3.7550300067531581</var>*varShat</td></tr>
+<tr><th id="555">555</th><td>                              -<var>1.7981383069010097</var> *varShat2</td></tr>
+<tr><th id="556">556</th><td>                              +<var>0.67282686077812381</var>*varShat3</td></tr>
+<tr><th id="557">557</th><td>                              -<var>0.1207722909879257</var> *varShat4;</td></tr>
+<tr><th id="558">558</th><td>        funcGS = std::tanh(dum0);</td></tr>
+<tr><th id="559">559</th><td>      } <b>else</b> {</td></tr>
+<tr><th id="560">560</th><td>        funcGS   = <var>1.0</var>-<var>0.0230655</var>/varShat4;</td></tr>
+<tr><th id="561">561</th><td>      }</td></tr>
+<tr><th id="562">562</th><td>    }</td></tr>
+<tr><th id="563">563</th><td>  }</td></tr>
+<tr><th id="564">564</th><td>}</td></tr>
+<tr><th id="565">565</th><td></td></tr>
+<tr><th id="566">566</th><td><i>// used at run-time to get some pre-computed LPM function values</i></td></tr>
+<tr><th id="567">567</th><td><em>void</em> G4PairProductionRelModel::GetLPMFunctions(G4double &amp;lpmGs, </td></tr>
+<tr><th id="568">568</th><td>                                               G4double &amp;lpmPhis, </td></tr>
+<tr><th id="569">569</th><td>                                               <em>const</em> G4double sval) {</td></tr>
+<tr><th id="570">570</th><td>  <b>if</b> (sval &lt; gLPMFuncs.fSLimit) {</td></tr>
+<tr><th id="571">571</th><td>    G4double     val = sval*gLPMFuncs.fISDelta;</td></tr>
+<tr><th id="572">572</th><td>    <em>const</em> G4int ilow = (G4int)val;</td></tr>
+<tr><th id="573">573</th><td>    val    -= ilow;</td></tr>
+<tr><th id="574">574</th><td>    lpmGs   =  (gLPMFuncs.fLPMFuncG[ilow+<var>1</var>]-gLPMFuncs.fLPMFuncG[ilow])*val </td></tr>
+<tr><th id="575">575</th><td>             + gLPMFuncs.fLPMFuncG[ilow];</td></tr>
+<tr><th id="576">576</th><td>    lpmPhis =  (gLPMFuncs.fLPMFuncPhi[ilow+<var>1</var>]-gLPMFuncs.fLPMFuncPhi[ilow])*val </td></tr>
+<tr><th id="577">577</th><td>             + gLPMFuncs.fLPMFuncPhi[ilow];</td></tr>
+<tr><th id="578">578</th><td>  } <b>else</b> {</td></tr>
+<tr><th id="579">579</th><td>    G4double ss = sval*sval;</td></tr>
+<tr><th id="580">580</th><td>    ss *= ss;</td></tr>
+<tr><th id="581">581</th><td>    lpmPhis = <var>1.0</var>-<var>0.01190476</var>/ss;</td></tr>
+<tr><th id="582">582</th><td>    lpmGs   = <var>1.0</var>-<var>0.0230655</var>/ss;</td></tr>
+<tr><th id="583">583</th><td>  }</td></tr>
+<tr><th id="584">584</th><td>}</td></tr>
+<tr><th id="585">585</th><td></td></tr>
+<tr><th id="586">586</th><td><em>void</em> G4PairProductionRelModel::ComputeLPMfunctions(G4double &amp;funcXiS, </td></tr>
+<tr><th id="587">587</th><td>                 G4double &amp;funcGS, G4double &amp;funcPhiS, <em>const</em> G4double eps, </td></tr>
+<tr><th id="588">588</th><td>                 <em>const</em> G4double egamma, <em>const</em> G4int izet)</td></tr>
+<tr><th id="589">589</th><td>{</td></tr>
+<tr><th id="590">590</th><td>  <i>//  1. y = E_+/E_{\gamma} with E_+ being the total energy transfered </i></td></tr>
+<tr><th id="591">591</th><td><i>  //                        to one of the e-/e+ pair</i></td></tr>
+<tr><th id="592">592</th><td><i>  //  s' = \sqrt{ \frac{1}{8} \frac{1}{y(1-y)} \frac{E^{KL}_{LPM}}{E_{\gamma}} }</i></td></tr>
+<tr><th id="593">593</th><td>  <em>const</em> G4double varSprime = std::sqrt(<var>0.125</var>*fLPMEnergy/(eps*egamma*(<var>1.0</var>-eps)));</td></tr>
+<tr><th id="594">594</th><td>  <em>const</em> G4double condition = gElementData[izet]-&gt;fLPMVarS1Cond;</td></tr>
+<tr><th id="595">595</th><td>  funcXiS = <var>2.0</var>;</td></tr>
+<tr><th id="596">596</th><td>  <b>if</b> (varSprime &gt; <var>1.0</var>) {</td></tr>
+<tr><th id="597">597</th><td>    funcXiS = <var>1.0</var>;</td></tr>
+<tr><th id="598">598</th><td>  } <b>else</b> <b>if</b> (varSprime &gt; condition) {</td></tr>
+<tr><th id="599">599</th><td>    <em>const</em> G4double dum = gElementData[izet]-&gt;fLPMILVarS1Cond;</td></tr>
+<tr><th id="600">600</th><td>    <em>const</em> G4double funcHSprime = G4Log(varSprime)*dum;</td></tr>
+<tr><th id="601">601</th><td>    funcXiS =  <var>1.0</var> + funcHSprime </td></tr>
+<tr><th id="602">602</th><td>             - <var>0.08</var>*(<var>1.0</var>-funcHSprime)*funcHSprime*(<var>2.0</var>-funcHSprime)*dum;</td></tr>
+<tr><th id="603">603</th><td>  }</td></tr>
+<tr><th id="604">604</th><td>  <i>//  2. s=\frac{s'}{\sqrt{\xi(s')}}</i></td></tr>
+<tr><th id="605">605</th><td>  <em>const</em> G4double varShat = varSprime / std::sqrt(funcXiS);</td></tr>
+<tr><th id="606">606</th><td>  GetLPMFunctions(funcGS, funcPhiS, varShat);</td></tr>
+<tr><th id="607">607</th><td>  <i>// MAKE SURE SUPPRESSION IS SMALLER THAN 1: due to Migdal's approximation on xi</i></td></tr>
+<tr><th id="608">608</th><td>  <b>if</b> (funcXiS * funcPhiS &gt; <var>1.</var> || varShat &gt; <var>0.57</var>) {</td></tr>
+<tr><th id="609">609</th><td>    funcXiS = <var>1.</var> / funcPhiS;</td></tr>
+<tr><th id="610">610</th><td>  }</td></tr>
+<tr><th id="611">611</th><td>}</td></tr>
+<tr><th id="612">612</th><td></td></tr>
+<tr><th id="613">613</th><td></td></tr>
+</table><hr/><p id='footer'>
+Generated on <em>2019-Aug-28</em> from project codebrowser<br />Powered by <a href='https://woboq.com'><img alt='Woboq' src='https://code.woboq.org/woboq-16.png' width='41' height='16' /></a> <a href='https://code.woboq.org'>Code Browser</a> 2.1
+<br/>Generator usage only permitted with license.</p>
+</div></body></html>

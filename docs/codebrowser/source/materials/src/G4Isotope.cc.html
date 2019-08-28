@@ -1,0 +1,231 @@
+<!doctype html>
+<html>
+<head>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"><title>G4Isotope.cc source code [codebrowser/source/materials/src/G4Isotope.cc] - Woboq Code Browser</title>
+<link rel="stylesheet" href="../../../../../data/qtcreator.css" title="QtCreator"/>
+<link rel="alternate stylesheet" href="../../../../../data/kdevelop.css" title="KDevelop"/>
+<script type="text/javascript" src="../../../../../data/jquery/jquery.min.js"></script>
+<script type="text/javascript" src="../../../../../data/jquery/jquery-ui.min.js"></script>
+<script>var file = 'codebrowser/source/materials/src/G4Isotope.cc'; var root_path = '../../../..'; var data_path = '../../../../../data';</script>
+<script src='../../../../../data/codebrowser.js'></script>
+</head>
+<body><div id='header'><h1 id='breadcrumb'><span>Browse the source code of </span><a href='../../..'>codebrowser</a>/<a href='../..'>source</a>/<a href='..'>materials</a>/<a href='./'>src</a>/<a href='G4Isotope.cc.html'>G4Isotope.cc</a></h1></div>
+<hr/><div id='content'><table class="code">
+<tr><th id="1">1</th><td><i>//</i></td></tr>
+<tr><th id="2">2</th><td><i>// ********************************************************************</i></td></tr>
+<tr><th id="3">3</th><td><i>// * License and Disclaimer                                           *</i></td></tr>
+<tr><th id="4">4</th><td><i>// *                                                                  *</i></td></tr>
+<tr><th id="5">5</th><td><i>// * The  Geant4 software  is  copyright of the Copyright Holders  of *</i></td></tr>
+<tr><th id="6">6</th><td><i>// * the Geant4 Collaboration.  It is provided  under  the terms  and *</i></td></tr>
+<tr><th id="7">7</th><td><i>// * conditions of the Geant4 Software License,  included in the file *</i></td></tr>
+<tr><th id="8">8</th><td><i>// * LICENSE and available at  <a href="http://cern.ch/geant4/license">http://cern.ch/geant4/license</a> .  These *</i></td></tr>
+<tr><th id="9">9</th><td><i>// * include a list of copyright holders.                             *</i></td></tr>
+<tr><th id="10">10</th><td><i>// *                                                                  *</i></td></tr>
+<tr><th id="11">11</th><td><i>// * Neither the authors of this software system, nor their employing *</i></td></tr>
+<tr><th id="12">12</th><td><i>// * institutes,nor the agencies providing financial support for this *</i></td></tr>
+<tr><th id="13">13</th><td><i>// * work  make  any representation or  warranty, express or implied, *</i></td></tr>
+<tr><th id="14">14</th><td><i>// * regarding  this  software system or assume any liability for its *</i></td></tr>
+<tr><th id="15">15</th><td><i>// * use.  Please see the license in the file  LICENSE  and URL above *</i></td></tr>
+<tr><th id="16">16</th><td><i>// * for the full disclaimer and the limitation of liability.         *</i></td></tr>
+<tr><th id="17">17</th><td><i>// *                                                                  *</i></td></tr>
+<tr><th id="18">18</th><td><i>// * This  code  implementation is the result of  the  scientific and *</i></td></tr>
+<tr><th id="19">19</th><td><i>// * technical work of the GEANT4 collaboration.                      *</i></td></tr>
+<tr><th id="20">20</th><td><i>// * By using,  copying,  modifying or  distributing the software (or *</i></td></tr>
+<tr><th id="21">21</th><td><i>// * any work based  on the software)  you  agree  to acknowledge its *</i></td></tr>
+<tr><th id="22">22</th><td><i>// * use  in  resulting  scientific  publications,  and indicate your *</i></td></tr>
+<tr><th id="23">23</th><td><i>// * acceptance of all terms of the Geant4 Software license.          *</i></td></tr>
+<tr><th id="24">24</th><td><i>// ********************************************************************</i></td></tr>
+<tr><th id="25">25</th><td><i>//</i></td></tr>
+<tr><th id="26">26</th><td><i>//</i></td></tr>
+<tr><th id="27">27</th><td><i>//</i></td></tr>
+<tr><th id="28">28</th><td><i>//....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......</i></td></tr>
+<tr><th id="29">29</th><td><i></i></td></tr>
+<tr><th id="30">30</th><td><i>// 26.06.96: Code uses operators (+=, *=, ++, -&gt; etc.) correctly, P. Urban</i></td></tr>
+<tr><th id="31">31</th><td><i>// 29.01.97: Forbidden to create Isotope with Z&lt;1 or N&lt;Z, M.Maire</i></td></tr>
+<tr><th id="32">32</th><td><i>// 03.05.01: flux.precision(prec) at begin/end of operator&lt;&lt;</i></td></tr>
+<tr><th id="33">33</th><td><i>// 17.07.01: migration to STL. M. Verderi.</i></td></tr>
+<tr><th id="34">34</th><td><i>// 13.09.01: suppression of the data member fIndexInTable</i></td></tr>
+<tr><th id="35">35</th><td><i>// 14.09.01: fCountUse: nb of elements which use this isotope </i></td></tr>
+<tr><th id="36">36</th><td><i>// 26.02.02: fIndexInTable renewed</i></td></tr>
+<tr><th id="37">37</th><td><i>// 17.10.06: if fA is not defined in the constructor, it is computed from</i></td></tr>
+<tr><th id="38">38</th><td><i>//           NistManager v.Ivanchenko</i></td></tr>
+<tr><th id="39">39</th><td><i>// 25.10.11: new scheme for G4Exception  (mma)</i></td></tr>
+<tr><th id="40">40</th><td><i></i></td></tr>
+<tr><th id="41">41</th><td><i>//....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......</i></td></tr>
+<tr><th id="42">42</th><td></td></tr>
+<tr><th id="43">43</th><td><u>#include <span class='error' title="&apos;iomanip&apos; file not found">&lt;</span>iomanip&gt;</u></td></tr>
+<tr><th id="44">44</th><td></td></tr>
+<tr><th id="45">45</th><td><u>#include <a href="../include/G4Isotope.hh.html">"G4Isotope.hh"</a></u></td></tr>
+<tr><th id="46">46</th><td><u>#include <a href="../include/G4NistManager.hh.html">"G4NistManager.hh"</a></u></td></tr>
+<tr><th id="47">47</th><td><u>#include <a href="../../global/management/include/G4PhysicalConstants.hh.html">"G4PhysicalConstants.hh"</a></u></td></tr>
+<tr><th id="48">48</th><td><u>#include <a href="../../global/management/include/G4SystemOfUnits.hh.html">"G4SystemOfUnits.hh"</a></u></td></tr>
+<tr><th id="49">49</th><td></td></tr>
+<tr><th id="50">50</th><td><i  data-doc="G4Isotope::theIsotopeTable">//....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......</i></td></tr>
+<tr><th id="51">51</th><td></td></tr>
+<tr><th id="52">52</th><td><span class='error' title="unknown type name &apos;G4IsotopeTable&apos;">G4IsotopeTable</span> <a class="type" href="../include/G4Isotope.hh.html#G4Isotope" title='G4Isotope' data-ref="G4Isotope">G4Isotope</a>::<dfn class="tu decl def" id="G4Isotope::theIsotopeTable" title='G4Isotope::theIsotopeTable' data-type='int' data-ref="G4Isotope::theIsotopeTable">theIsotopeTable</dfn>;</td></tr>
+<tr><th id="53">53</th><td></td></tr>
+<tr><th id="54">54</th><td><i>//....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......</i></td></tr>
+<tr><th id="55">55</th><td><i></i></td></tr>
+<tr><th id="56">56</th><td><i>// Create an isotope</i></td></tr>
+<tr><th id="57">57</th><td><i>//</i></td></tr>
+<tr><th id="58">58</th><td><a class="type" href="../include/G4Isotope.hh.html#G4Isotope" title='G4Isotope' data-ref="G4Isotope">G4Isotope</a>::<dfn class="decl def" id="_ZN9G4IsotopeC1ERK8G4Stringiidi" title='G4Isotope::G4Isotope' data-ref="_ZN9G4IsotopeC1ERK8G4Stringiidi">G4Isotope</dfn>(<em>const</em> <a class="type" href="../../global/management/include/G4String.hh.html#G4String" title='G4String' data-ref="G4String">G4String</a>&amp; <dfn class="local col1 decl" id="1Name" title='Name' data-type='const G4String &amp;' data-ref="1Name">Name</dfn>,<a class="typedef" href="../../global/management/include/G4Types.hh.html#G4int" title='G4int' data-type='int' data-ref="G4int">G4int</a> <dfn class="local col2 decl" id="2Z" title='Z' data-type='G4int' data-ref="2Z">Z</dfn>,<a class="typedef" href="../../global/management/include/G4Types.hh.html#G4int" title='G4int' data-type='int' data-ref="G4int">G4int</a> <dfn class="local col3 decl" id="3N" title='N' data-type='G4int' data-ref="3N">N</dfn>,<a class="typedef" href="../../global/management/include/G4Types.hh.html#G4double" title='G4double' data-type='double' data-ref="G4double">G4double</a> <dfn class="local col4 decl" id="4A" title='A' data-type='G4double' data-ref="4A">A</dfn>,<a class="typedef" href="../../global/management/include/G4Types.hh.html#G4int" title='G4int' data-type='int' data-ref="G4int">G4int</a> <dfn class="local col5 decl" id="5il" title='il' data-type='G4int' data-ref="5il">il</dfn>)</td></tr>
+<tr><th id="59">59</th><td>  : <a class="member" href="../include/G4Isotope.hh.html#G4Isotope::fName" title='G4Isotope::fName' data-ref="G4Isotope::fName">fName</a><a class="ref" href="../../global/management/include/G4String.hh.html#_ZN8G4StringC1ERKS_" title='G4String::G4String' data-ref="_ZN8G4StringC1ERKS_">(</a><a class="local col1 ref" href="#1Name" title='Name' data-ref="1Name">Name</a>), <a class="member" href="../include/G4Isotope.hh.html#G4Isotope::fZ" title='G4Isotope::fZ' data-ref="G4Isotope::fZ">fZ</a>(<a class="local col2 ref" href="#2Z" title='Z' data-ref="2Z">Z</a>), <a class="member" href="../include/G4Isotope.hh.html#G4Isotope::fN" title='G4Isotope::fN' data-ref="G4Isotope::fN">fN</a>(<a class="local col3 ref" href="#3N" title='N' data-ref="3N">N</a>), <a class="member" href="../include/G4Isotope.hh.html#G4Isotope::fA" title='G4Isotope::fA' data-ref="G4Isotope::fA">fA</a>(<a class="local col4 ref" href="#4A" title='A' data-ref="4A">A</a>), <a class="member" href="../include/G4Isotope.hh.html#G4Isotope::fm" title='G4Isotope::fm' data-ref="G4Isotope::fm">fm</a>(<a class="local col5 ref" href="#5il" title='il' data-ref="5il">il</a>)</td></tr>
+<tr><th id="60">60</th><td>{</td></tr>
+<tr><th id="61">61</th><td>  <b>if</b> (<a class="local col2 ref" href="#2Z" title='Z' data-ref="2Z">Z</a>&lt;<var>1</var>) { </td></tr>
+<tr><th id="62">62</th><td>    <a class="typedef" href="../../global/management/include/G4Exception.hh.html#G4ExceptionDescription" title='G4ExceptionDescription' data-type='int' data-ref="G4ExceptionDescription">G4ExceptionDescription</a> <dfn class="local col6 decl" id="6ed" title='ed' data-type='G4ExceptionDescription' data-ref="6ed">ed</dfn>;</td></tr>
+<tr><th id="63">63</th><td>    ed <span class='error' title="invalid operands to binary expression (&apos;G4ExceptionDescription&apos; (aka &apos;int&apos;) and &apos;const char *&apos;)">&lt;&lt;</span> <q>"Wrong Isotope "</q> &lt;&lt; Name &lt;&lt; <q>" Z= "</q> &lt;&lt; Z &lt;&lt; <a class="macro" href="../../global/management/include/G4ios.hh.html#60" title="std::endl" data-ref="_M/G4endl">G4endl</a>;</td></tr>
+<tr><th id="64">64</th><td>    <a class="ref" href="../../global/management/include/G4Exception.hh.html#_Z11G4ExceptionPKcS0_19G4ExceptionSeverityRi" title='G4Exception' data-ref="_Z11G4ExceptionPKcS0_19G4ExceptionSeverityRi">G4Exception</a> (<q>"G4Isotope::G4Isotope()"</q>, <q>"mat001"</q>, <a class="enum" href="../../global/management/include/G4ExceptionSeverity.hh.html#G4ExceptionSeverity::FatalException" title='G4ExceptionSeverity::FatalException' data-ref="G4ExceptionSeverity::FatalException">FatalException</a>, <span class='refarg'><a class="local col6 ref" href="#6ed" title='ed' data-ref="6ed">ed</a></span>);</td></tr>
+<tr><th id="65">65</th><td>  }</td></tr>
+<tr><th id="66">66</th><td>  <b>if</b> (<a class="local col3 ref" href="#3N" title='N' data-ref="3N">N</a>&lt;<a class="local col2 ref" href="#2Z" title='Z' data-ref="2Z">Z</a>) {</td></tr>
+<tr><th id="67">67</th><td>    <a class="typedef" href="../../global/management/include/G4Exception.hh.html#G4ExceptionDescription" title='G4ExceptionDescription' data-type='int' data-ref="G4ExceptionDescription">G4ExceptionDescription</a> <dfn class="local col7 decl" id="7ed" title='ed' data-type='G4ExceptionDescription' data-ref="7ed">ed</dfn>;</td></tr>
+<tr><th id="68">68</th><td>    ed <span class='error' title="invalid operands to binary expression (&apos;G4ExceptionDescription&apos; (aka &apos;int&apos;) and &apos;const char *&apos;)">&lt;&lt;</span> <q>"Wrong Isotope "</q> &lt;&lt; Name &lt;&lt; <q>" Z= "</q> &lt;&lt; Z &lt;&lt; <q>" &gt; N= "</q> &lt;&lt; N &lt;&lt; <a class="macro" href="../../global/management/include/G4ios.hh.html#60" title="std::endl" data-ref="_M/G4endl">G4endl</a>;</td></tr>
+<tr><th id="69">69</th><td>    <a class="ref" href="../../global/management/include/G4Exception.hh.html#_Z11G4ExceptionPKcS0_19G4ExceptionSeverityRi" title='G4Exception' data-ref="_Z11G4ExceptionPKcS0_19G4ExceptionSeverityRi">G4Exception</a> (<q>"G4Isotope::G4Isotope()"</q>, <q>"mat002"</q>, <a class="enum" href="../../global/management/include/G4ExceptionSeverity.hh.html#G4ExceptionSeverity::FatalException" title='G4ExceptionSeverity::FatalException' data-ref="G4ExceptionSeverity::FatalException">FatalException</a>, <span class='refarg'><a class="local col7 ref" href="#7ed" title='ed' data-ref="7ed">ed</a></span>);</td></tr>
+<tr><th id="70">70</th><td>  }</td></tr>
+<tr><th id="71">71</th><td>  <b>if</b> (<a class="local col4 ref" href="#4A" title='A' data-ref="4A">A</a>&lt;=<var>0.0</var>) {</td></tr>
+<tr><th id="72">72</th><td>    <a class="member" href="../include/G4Isotope.hh.html#G4Isotope::fA" title='G4Isotope::fA' data-ref="G4Isotope::fA">fA</a> = (<a class="type" href="../include/G4NistManager.hh.html#G4NistManager" title='G4NistManager' data-ref="G4NistManager">G4NistManager</a>::<a class="ref" href="../include/G4NistManager.hh.html#_ZN13G4NistManager8InstanceEv" title='G4NistManager::Instance' data-ref="_ZN13G4NistManager8InstanceEv">Instance</a>()-&gt;<a class="ref" href="../include/G4NistManager.hh.html#_ZNK13G4NistManager13GetAtomicMassEii" title='G4NistManager::GetAtomicMass' data-ref="_ZNK13G4NistManager13GetAtomicMassEii">GetAtomicMass</a>(<a class="local col2 ref" href="#2Z" title='Z' data-ref="2Z">Z</a>,<a class="local col3 ref" href="#3N" title='N' data-ref="3N">N</a>))</td></tr>
+<tr><th id="73">73</th><td>      *<span class="namespace">CLHEP::</span><a class="ref" href="../../externals/clhep/include/CLHEP/Units/SystemOfUnits.h.html#CLHEP::g" title='CLHEP::g' data-ref="CLHEP::g">g</a>/(<span class="namespace">CLHEP::</span><a class="ref" href="../../externals/clhep/include/CLHEP/Units/SystemOfUnits.h.html#CLHEP::mole" title='CLHEP::mole' data-ref="CLHEP::mole">mole</a>*<span class="namespace">CLHEP::</span><a class="ref" href="../../externals/clhep/include/CLHEP/Units/PhysicalConstants.h.html#CLHEP::amu_c2" title='CLHEP::amu_c2' data-ref="CLHEP::amu_c2">amu_c2</a>);  </td></tr>
+<tr><th id="74">74</th><td>  }</td></tr>
+<tr><th id="75">75</th><td>  theIsotopeTable.push_back(<b>this</b>);</td></tr>
+<tr><th id="76">76</th><td>  fIndexInTable = theIsotopeTable.size() - <var>1</var>;</td></tr>
+<tr><th id="77">77</th><td>}</td></tr>
+<tr><th id="78">78</th><td></td></tr>
+<tr><th id="79">79</th><td><i>//....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......</i></td></tr>
+<tr><th id="80">80</th><td><i></i></td></tr>
+<tr><th id="81">81</th><td><i>// Fake default constructor - sets only member data and allocates memory</i></td></tr>
+<tr><th id="82">82</th><td><i>//                            for usage restricted to object persistency</i></td></tr>
+<tr><th id="83">83</th><td></td></tr>
+<tr><th id="84">84</th><td><a class="type" href="../include/G4Isotope.hh.html#G4Isotope" title='G4Isotope' data-ref="G4Isotope">G4Isotope</a>::<dfn class="decl def" id="_ZN9G4IsotopeC1ER8__void__" title='G4Isotope::G4Isotope' data-ref="_ZN9G4IsotopeC1ER8__void__">G4Isotope</dfn>(<a class="type" href="../../global/management/include/G4Types.hh.html#__void__" title='__void__' data-ref="__void__">__void__</a>&amp;)</td></tr>
+<tr><th id="85">85</th><td>  : <a class="member" href="../include/G4Isotope.hh.html#G4Isotope::fZ" title='G4Isotope::fZ' data-ref="G4Isotope::fZ">fZ</a>(<var>0</var>), <a class="member" href="../include/G4Isotope.hh.html#G4Isotope::fN" title='G4Isotope::fN' data-ref="G4Isotope::fN">fN</a>(<var>0</var>), <a class="member" href="../include/G4Isotope.hh.html#G4Isotope::fA" title='G4Isotope::fA' data-ref="G4Isotope::fA">fA</a>(<var>0</var>), <a class="member" href="../include/G4Isotope.hh.html#G4Isotope::fm" title='G4Isotope::fm' data-ref="G4Isotope::fm">fm</a>(<var>0</var>), fIndexInTable(<var>0</var>)</td></tr>
+<tr><th id="86">86</th><td>{</td></tr>
+<tr><th id="87">87</th><td>}</td></tr>
+<tr><th id="88">88</th><td></td></tr>
+<tr><th id="89">89</th><td><i>//....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......</i></td></tr>
+<tr><th id="90">90</th><td></td></tr>
+<tr><th id="91">91</th><td>G4Isotope::<span class='error' title="exception specification in declaration does not match previous declaration">~</span>G4Isotope()</td></tr>
+<tr><th id="92">92</th><td>{</td></tr>
+<tr><th id="93">93</th><td>  theIsotopeTable[fIndexInTable] = <b>nullptr</b>;</td></tr>
+<tr><th id="94">94</th><td>}  </td></tr>
+<tr><th id="95">95</th><td></td></tr>
+<tr><th id="96">96</th><td><i>//....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......</i></td></tr>
+<tr><th id="97">97</th><td></td></tr>
+<tr><th id="98">98</th><td><a class="type" href="../include/G4Isotope.hh.html#G4Isotope" title='G4Isotope' data-ref="G4Isotope">G4Isotope</a>::<dfn class="decl def" id="_ZN9G4IsotopeC1ERS_" title='G4Isotope::G4Isotope' data-ref="_ZN9G4IsotopeC1ERS_">G4Isotope</dfn>(<a class="type" href="../include/G4Isotope.hh.html#G4Isotope" title='G4Isotope' data-ref="G4Isotope">G4Isotope</a>&amp; <dfn class="local col8 decl" id="8right" title='right' data-type='G4Isotope &amp;' data-ref="8right">right</dfn>)</td></tr>
+<tr><th id="99">99</th><td>{</td></tr>
+<tr><th id="100">100</th><td>  *<b>this</b> <a class="member" href="#_ZN9G4IsotopeaSERKS_" title='G4Isotope::operator=' data-ref="_ZN9G4IsotopeaSERKS_">=</a> <a class="local col8 ref" href="#8right" title='right' data-ref="8right">right</a>;</td></tr>
+<tr><th id="101">101</th><td>  </td></tr>
+<tr><th id="102">102</th><td>  <i>//insert this new isotope in table</i></td></tr>
+<tr><th id="103">103</th><td>  theIsotopeTable.push_back(<b>this</b>);</td></tr>
+<tr><th id="104">104</th><td>  fIndexInTable = theIsotopeTable.size() - <var>1</var>;</td></tr>
+<tr><th id="105">105</th><td>}</td></tr>
+<tr><th id="106">106</th><td></td></tr>
+<tr><th id="107">107</th><td><i>//....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......</i></td></tr>
+<tr><th id="108">108</th><td></td></tr>
+<tr><th id="109">109</th><td><a class="type" href="../include/G4Isotope.hh.html#G4Isotope" title='G4Isotope' data-ref="G4Isotope">G4Isotope</a> &amp; <a class="type" href="../include/G4Isotope.hh.html#G4Isotope" title='G4Isotope' data-ref="G4Isotope">G4Isotope</a>::<dfn class="decl def" id="_ZN9G4IsotopeaSERKS_" title='G4Isotope::operator=' data-ref="_ZN9G4IsotopeaSERKS_"><b>operator</b>=</dfn>(<em>const</em> <a class="type" href="../include/G4Isotope.hh.html#G4Isotope" title='G4Isotope' data-ref="G4Isotope">G4Isotope</a>&amp; <dfn class="local col9 decl" id="9right" title='right' data-type='const G4Isotope &amp;' data-ref="9right">right</dfn>)</td></tr>
+<tr><th id="110">110</th><td>{</td></tr>
+<tr><th id="111">111</th><td>  <b>if</b> (<b>this</b> != &amp;<a class="local col9 ref" href="#9right" title='right' data-ref="9right">right</a>)</td></tr>
+<tr><th id="112">112</th><td>  {</td></tr>
+<tr><th id="113">113</th><td>    <a class="member" href="../include/G4Isotope.hh.html#G4Isotope::fName" title='G4Isotope::fName' data-ref="G4Isotope::fName">fName</a> <a class="ref" href="../../global/management/include/G4String.hh.html#_ZN8G4StringaSERKS_" title='G4String::operator=' data-ref="_ZN8G4StringaSERKS_">=</a> <a class="local col9 ref" href="#9right" title='right' data-ref="9right">right</a>.<a class="member" href="../include/G4Isotope.hh.html#G4Isotope::fName" title='G4Isotope::fName' data-ref="G4Isotope::fName">fName</a>;</td></tr>
+<tr><th id="114">114</th><td>    <a class="member" href="../include/G4Isotope.hh.html#G4Isotope::fZ" title='G4Isotope::fZ' data-ref="G4Isotope::fZ">fZ</a> = <a class="local col9 ref" href="#9right" title='right' data-ref="9right">right</a>.<a class="member" href="../include/G4Isotope.hh.html#G4Isotope::fZ" title='G4Isotope::fZ' data-ref="G4Isotope::fZ">fZ</a>;</td></tr>
+<tr><th id="115">115</th><td>    <a class="member" href="../include/G4Isotope.hh.html#G4Isotope::fN" title='G4Isotope::fN' data-ref="G4Isotope::fN">fN</a> = <a class="local col9 ref" href="#9right" title='right' data-ref="9right">right</a>.<a class="member" href="../include/G4Isotope.hh.html#G4Isotope::fN" title='G4Isotope::fN' data-ref="G4Isotope::fN">fN</a>;</td></tr>
+<tr><th id="116">116</th><td>    <a class="member" href="../include/G4Isotope.hh.html#G4Isotope::fA" title='G4Isotope::fA' data-ref="G4Isotope::fA">fA</a> = <a class="local col9 ref" href="#9right" title='right' data-ref="9right">right</a>.<a class="member" href="../include/G4Isotope.hh.html#G4Isotope::fA" title='G4Isotope::fA' data-ref="G4Isotope::fA">fA</a>;</td></tr>
+<tr><th id="117">117</th><td>    <a class="member" href="../include/G4Isotope.hh.html#G4Isotope::fm" title='G4Isotope::fm' data-ref="G4Isotope::fm">fm</a> = <a class="local col9 ref" href="#9right" title='right' data-ref="9right">right</a>.<a class="member" href="../include/G4Isotope.hh.html#G4Isotope::fm" title='G4Isotope::fm' data-ref="G4Isotope::fm">fm</a>;    </td></tr>
+<tr><th id="118">118</th><td>  }</td></tr>
+<tr><th id="119">119</th><td>  <b>return</b> *<b>this</b>;</td></tr>
+<tr><th id="120">120</th><td>}</td></tr>
+<tr><th id="121">121</th><td></td></tr>
+<tr><th id="122">122</th><td><i>//....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......</i></td></tr>
+<tr><th id="123">123</th><td></td></tr>
+<tr><th id="124">124</th><td><a class="typedef" href="../../global/management/include/G4Types.hh.html#G4bool" title='G4bool' data-type='bool' data-ref="G4bool">G4bool</a> <a class="type" href="../include/G4Isotope.hh.html#G4Isotope" title='G4Isotope' data-ref="G4Isotope">G4Isotope</a>::<dfn class="decl def" id="_ZNK9G4IsotopeeqERKS_" title='G4Isotope::operator==' data-ref="_ZNK9G4IsotopeeqERKS_"><b>operator</b>==</dfn>(<em>const</em> <a class="type" href="../include/G4Isotope.hh.html#G4Isotope" title='G4Isotope' data-ref="G4Isotope">G4Isotope</a> &amp;<dfn class="local col0 decl" id="10right" title='right' data-type='const G4Isotope &amp;' data-ref="10right">right</dfn>) <em>const</em></td></tr>
+<tr><th id="125">125</th><td>{</td></tr>
+<tr><th id="126">126</th><td>  <b>return</b> (<b>this</b> == (<a class="type" href="../include/G4Isotope.hh.html#G4Isotope" title='G4Isotope' data-ref="G4Isotope">G4Isotope</a> *) &amp;<a class="local col0 ref" href="#10right" title='right' data-ref="10right">right</a>);</td></tr>
+<tr><th id="127">127</th><td>}</td></tr>
+<tr><th id="128">128</th><td></td></tr>
+<tr><th id="129">129</th><td><i>//....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......</i></td></tr>
+<tr><th id="130">130</th><td></td></tr>
+<tr><th id="131">131</th><td><a class="typedef" href="../../global/management/include/G4Types.hh.html#G4bool" title='G4bool' data-type='bool' data-ref="G4bool">G4bool</a> <a class="type" href="../include/G4Isotope.hh.html#G4Isotope" title='G4Isotope' data-ref="G4Isotope">G4Isotope</a>::<dfn class="decl def" id="_ZNK9G4IsotopeneERKS_" title='G4Isotope::operator!=' data-ref="_ZNK9G4IsotopeneERKS_"><b>operator</b>!=</dfn>(<em>const</em> <a class="type" href="../include/G4Isotope.hh.html#G4Isotope" title='G4Isotope' data-ref="G4Isotope">G4Isotope</a> &amp;<dfn class="local col1 decl" id="11right" title='right' data-type='const G4Isotope &amp;' data-ref="11right">right</dfn>) <em>const</em></td></tr>
+<tr><th id="132">132</th><td>{</td></tr>
+<tr><th id="133">133</th><td>  <b>return</b> (<b>this</b> != (<a class="type" href="../include/G4Isotope.hh.html#G4Isotope" title='G4Isotope' data-ref="G4Isotope">G4Isotope</a> *) &amp;<a class="local col1 ref" href="#11right" title='right' data-ref="11right">right</a>);</td></tr>
+<tr><th id="134">134</th><td>}</td></tr>
+<tr><th id="135">135</th><td></td></tr>
+<tr><th id="136">136</th><td><i>//....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......</i></td></tr>
+<tr><th id="137">137</th><td></td></tr>
+<tr><th id="138">138</th><td><span class='error' title="use of undeclared identifier &apos;std&apos;">std</span>::ostream&amp; <b>operator</b>&lt;&lt;(<span class='error' title="use of undeclared identifier &apos;std&apos;">std</span>::ostream&amp; flux, <em>const</em> G4Isotope* isotope)</td></tr>
+<tr><th id="139">139</th><td>{</td></tr>
+<tr><th id="140">140</th><td>  <span class='error' title="use of undeclared identifier &apos;std&apos;">std</span>::ios::fmtflags mode = flux.flags();</td></tr>
+<tr><th id="141">141</th><td>  flux.setf(<span class='error' title="use of undeclared identifier &apos;std&apos;">std</span>::ios::fixed,<span class='error' title="use of undeclared identifier &apos;std&apos;">std</span>::ios::floatfield);</td></tr>
+<tr><th id="142">142</th><td>  G4long prec = flux.precision(<var>3</var>);</td></tr>
+<tr><th id="143">143</th><td>    </td></tr>
+<tr><th id="144">144</th><td>  flux</td></tr>
+<tr><th id="145">145</th><td>    &lt;&lt; <q>" Isotope: "</q> &lt;&lt; <span class='error' title="use of undeclared identifier &apos;std&apos;">std</span>::setw(<var>5</var>) &lt;&lt; isotope-&gt;fName </td></tr>
+<tr><th id="146">146</th><td>    &lt;&lt; <q>"   Z = "</q> &lt;&lt; <span class='error' title="use of undeclared identifier &apos;std&apos;">std</span>::setw(<var>2</var>)    &lt;&lt; isotope-&gt;fZ </td></tr>
+<tr><th id="147">147</th><td>    &lt;&lt; <q>"   N = "</q> &lt;&lt; <span class='error' title="use of undeclared identifier &apos;std&apos;">std</span>::setw(<var>3</var>)    &lt;&lt; isotope-&gt;fN</td></tr>
+<tr><th id="148">148</th><td>    &lt;&lt; <q>"   A = "</q> &lt;&lt; <span class='error' title="use of undeclared identifier &apos;std&apos;">std</span>::setw(<var>6</var>) &lt;&lt; <span class='error' title="use of undeclared identifier &apos;std&apos;">std</span>::setprecision(<var>2</var>) </td></tr>
+<tr><th id="149">149</th><td>    &lt;&lt; (isotope-&gt;fA)/(g/mole) &lt;&lt; <q>" g/mole"</q>;</td></tr>
+<tr><th id="150">150</th><td></td></tr>
+<tr><th id="151">151</th><td>  flux.precision(prec);       </td></tr>
+<tr><th id="152">152</th><td>  flux.setf(mode,<span class='error' title="use of undeclared identifier &apos;std&apos;">std</span>::ios::floatfield);       </td></tr>
+<tr><th id="153">153</th><td>  <b>return</b> flux;</td></tr>
+<tr><th id="154">154</th><td>}</td></tr>
+<tr><th id="155">155</th><td></td></tr>
+<tr><th id="156">156</th><td><i>//....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......</i></td></tr>
+<tr><th id="157">157</th><td></td></tr>
+<tr><th id="158">158</th><td><span class='error' title="use of undeclared identifier &apos;std&apos;">std</span>::ostream&amp; <b>operator</b>&lt;&lt;(<span class='error' title="use of undeclared identifier &apos;std&apos;">std</span>::ostream&amp; flux, <em>const</em> G4Isotope&amp; isotope)</td></tr>
+<tr><th id="159">159</th><td>{</td></tr>
+<tr><th id="160">160</th><td>  flux &lt;&lt; &amp;isotope;        </td></tr>
+<tr><th id="161">161</th><td>  <b>return</b> flux;</td></tr>
+<tr><th id="162">162</th><td>}</td></tr>
+<tr><th id="163">163</th><td></td></tr>
+<tr><th id="164">164</th><td><i>//....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......</i></td></tr>
+<tr><th id="165">165</th><td>     </td></tr>
+<tr><th id="166">166</th><td><span class='error' title="use of undeclared identifier &apos;std&apos;">std</span>::ostream&amp; <b>operator</b>&lt;&lt;(<span class='error' title="use of undeclared identifier &apos;std&apos;">std</span>::ostream&amp; flux, <span class='error' title="unknown type name &apos;G4IsotopeTable&apos;">G4IsotopeTable</span> IsotopeTable)</td></tr>
+<tr><th id="167">167</th><td>{</td></tr>
+<tr><th id="168">168</th><td> <i>//Dump info for all known isotopes</i></td></tr>
+<tr><th id="169">169</th><td>   flux </td></tr>
+<tr><th id="170">170</th><td>     &lt;&lt; <q>"\n***** Table : Nb of isotopes = "</q> &lt;&lt; IsotopeTable.size() </td></tr>
+<tr><th id="171">171</th><td>     &lt;&lt; <q>" *****\n"</q> &lt;&lt; <a class="macro" href="../../global/management/include/G4ios.hh.html#60" title="std::endl" data-ref="_M/G4endl">G4endl</a>;</td></tr>
+<tr><th id="172">172</th><td>        </td></tr>
+<tr><th id="173">173</th><td>   <b>for</b> (<span class='error' title="unknown type name &apos;size_t&apos;">size_t</span> i=<var>0</var>; i&lt;IsotopeTable.size(); i++)</td></tr>
+<tr><th id="174">174</th><td>     flux &lt;&lt; IsotopeTable[i] &lt;&lt; <a class="macro" href="../../global/management/include/G4ios.hh.html#60" title="std::endl" data-ref="_M/G4endl">G4endl</a>;</td></tr>
+<tr><th id="175">175</th><td></td></tr>
+<tr><th id="176">176</th><td>   <b>return</b> flux;</td></tr>
+<tr><th id="177">177</th><td>}</td></tr>
+<tr><th id="178">178</th><td>      </td></tr>
+<tr><th id="179">179</th><td><i>//....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......</i></td></tr>
+<tr><th id="180">180</th><td></td></tr>
+<tr><th id="181">181</th><td><em>const</em> <span class='error' title="unknown type name &apos;G4IsotopeTable&apos;">G4IsotopeTable</span>* G4Isotope::GetIsotopeTable()</td></tr>
+<tr><th id="182">182</th><td>{</td></tr>
+<tr><th id="183">183</th><td>  <b>return</b> &amp;theIsotopeTable;</td></tr>
+<tr><th id="184">184</th><td>}</td></tr>
+<tr><th id="185">185</th><td></td></tr>
+<tr><th id="186">186</th><td><i>//....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......</i></td></tr>
+<tr><th id="187">187</th><td></td></tr>
+<tr><th id="188">188</th><td><span class='error' title="unknown type name &apos;size_t&apos;">size_t</span> G4Isotope::GetNumberOfIsotopes()</td></tr>
+<tr><th id="189">189</th><td>{</td></tr>
+<tr><th id="190">190</th><td>  <b>return</b> theIsotopeTable.size();</td></tr>
+<tr><th id="191">191</th><td>}</td></tr>
+<tr><th id="192">192</th><td></td></tr>
+<tr><th id="193">193</th><td><i>//....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......</i></td></tr>
+<tr><th id="194">194</th><td></td></tr>
+<tr><th id="195">195</th><td><a class="type" href="../include/G4Isotope.hh.html#G4Isotope" title='G4Isotope' data-ref="G4Isotope">G4Isotope</a>* <a class="type" href="../include/G4Isotope.hh.html#G4Isotope" title='G4Isotope' data-ref="G4Isotope">G4Isotope</a>::<dfn class="decl def" id="_ZN9G4Isotope10GetIsotopeERK8G4Stringb" title='G4Isotope::GetIsotope' data-ref="_ZN9G4Isotope10GetIsotopeERK8G4Stringb">GetIsotope</dfn>(<em>const</em> <a class="type" href="../../global/management/include/G4String.hh.html#G4String" title='G4String' data-ref="G4String">G4String</a>&amp; <dfn class="local col2 decl" id="12isotopeName" title='isotopeName' data-type='const G4String &amp;' data-ref="12isotopeName">isotopeName</dfn>, <a class="typedef" href="../../global/management/include/G4Types.hh.html#G4bool" title='G4bool' data-type='bool' data-ref="G4bool">G4bool</a> <dfn class="local col3 decl" id="13warning" title='warning' data-type='G4bool' data-ref="13warning">warning</dfn>)</td></tr>
+<tr><th id="196">196</th><td>{  </td></tr>
+<tr><th id="197">197</th><td>  <i>// search the isotope by its name </i></td></tr>
+<tr><th id="198">198</th><td>  <b>for</b> (<span class='error' title="unknown type name &apos;size_t&apos;">size_t</span> <dfn class="local col4 decl" id="14J" title='J' data-type='int' data-ref="14J">J</dfn>=<var>0</var> ; J&lt;theIsotopeTable.size() ; J++)</td></tr>
+<tr><th id="199">199</th><td>   {</td></tr>
+<tr><th id="200">200</th><td>     <b>if</b> (theIsotopeTable[J]-&gt;GetName() == isotopeName)</td></tr>
+<tr><th id="201">201</th><td>       { <b>return</b> theIsotopeTable[J]; }</td></tr>
+<tr><th id="202">202</th><td>   }</td></tr>
+<tr><th id="203">203</th><td>   </td></tr>
+<tr><th id="204">204</th><td>  <i>// the isotope does not exist in the table</i></td></tr>
+<tr><th id="205">205</th><td>  <b>if</b> (<a class="local col3 ref" href="#13warning" title='warning' data-ref="13warning">warning</a>) {</td></tr>
+<tr><th id="206">206</th><td>    <a class="macro" href="../../global/management/include/G4ios.hh.html#46" title="(*_G4cout_p())" data-ref="_M/G4cout">G4cout</a> <span class='error' title="invalid operands to binary expression (&apos;int&apos; and &apos;const char *&apos;)">&lt;&lt;</span> <q>"\n---&gt; warning from G4Isotope::GetIsotope(). The isotope: "</q></td></tr>
+<tr><th id="207">207</th><td>	   &lt;&lt; isotopeName &lt;&lt; <q>" does not exist in the table. Return NULL pointer."</q></td></tr>
+<tr><th id="208">208</th><td>	   &lt;&lt; <a class="macro" href="../../global/management/include/G4ios.hh.html#60" title="std::endl" data-ref="_M/G4endl">G4endl</a>;</td></tr>
+<tr><th id="209">209</th><td>  }     </td></tr>
+<tr><th id="210">210</th><td>  <b>return</b> <var>0</var>;          </td></tr>
+<tr><th id="211">211</th><td>}</td></tr>
+<tr><th id="212">212</th><td></td></tr>
+<tr><th id="213">213</th><td><i>//....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......</i></td></tr>
+<tr><th id="214">214</th><td></td></tr>
+</table><hr/><p id='footer'>
+Generated on <em>2019-Aug-28</em> from project codebrowser<br />Powered by <a href='https://woboq.com'><img alt='Woboq' src='https://code.woboq.org/woboq-16.png' width='41' height='16' /></a> <a href='https://code.woboq.org'>Code Browser</a> 2.1
+<br/>Generator usage only permitted with license.</p>
+</div></body></html>

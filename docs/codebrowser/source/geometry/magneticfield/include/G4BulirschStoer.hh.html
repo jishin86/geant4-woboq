@@ -1,0 +1,153 @@
+<!doctype html>
+<html>
+<head>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"><title>G4BulirschStoer.hh source code [codebrowser/source/geometry/magneticfield/include/G4BulirschStoer.hh] - Woboq Code Browser</title>
+<meta name="woboq:interestingDefinitions" content="G4BulirschStoer "/>
+<link rel="stylesheet" href="../../../../../../data/qtcreator.css" title="QtCreator"/>
+<link rel="alternate stylesheet" href="../../../../../../data/kdevelop.css" title="KDevelop"/>
+<script type="text/javascript" src="../../../../../../data/jquery/jquery.min.js"></script>
+<script type="text/javascript" src="../../../../../../data/jquery/jquery-ui.min.js"></script>
+<script>var file = 'codebrowser/source/geometry/magneticfield/include/G4BulirschStoer.hh'; var root_path = '../../../../..'; var data_path = '../../../../../../data';</script>
+<script src='../../../../../../data/codebrowser.js'></script>
+</head>
+<body><div id='header'><h1 id='breadcrumb'><span>Browse the source code of </span><a href='../../../..'>codebrowser</a>/<a href='../../..'>source</a>/<a href='../..'>geometry</a>/<a href='..'>magneticfield</a>/<a href='./'>include</a>/<a href='G4BulirschStoer.hh.html'>G4BulirschStoer.hh</a></h1></div>
+<hr/><div id='content'><table class="code">
+<tr><th id="1">1</th><td><i>// ********************************************************************</i></td></tr>
+<tr><th id="2">2</th><td><i>// * License and Disclaimer                                           *</i></td></tr>
+<tr><th id="3">3</th><td><i>// *                                                                  *</i></td></tr>
+<tr><th id="4">4</th><td><i>// * The  Geant4 software  is  copyright of the Copyright Holders  of *</i></td></tr>
+<tr><th id="5">5</th><td><i>// * the Geant4 Collaboration.  It is provided  under  the terms  and *</i></td></tr>
+<tr><th id="6">6</th><td><i>// * conditions of the Geant4 Software License,  included in the file *</i></td></tr>
+<tr><th id="7">7</th><td><i>// * LICENSE and available at  <a href="http://cern.ch/geant4/license">http://cern.ch/geant4/license</a> .  These *</i></td></tr>
+<tr><th id="8">8</th><td><i>// * include a list of copyright holders.                             *</i></td></tr>
+<tr><th id="9">9</th><td><i>// *                                                                  *</i></td></tr>
+<tr><th id="10">10</th><td><i>// * Neither the authors of this software system, nor their employing *</i></td></tr>
+<tr><th id="11">11</th><td><i>// * institutes,nor the agencies providing financial support for this *</i></td></tr>
+<tr><th id="12">12</th><td><i>// * work  make  any representation or  warranty, express or implied, *</i></td></tr>
+<tr><th id="13">13</th><td><i>// * regarding  this  software system or assume any liability for its *</i></td></tr>
+<tr><th id="14">14</th><td><i>// * use.  Please see the license in the file  LICENSE  and URL above *</i></td></tr>
+<tr><th id="15">15</th><td><i>// * for the full disclaimer and the limitation of liability.         *</i></td></tr>
+<tr><th id="16">16</th><td><i>// *                                                                  *</i></td></tr>
+<tr><th id="17">17</th><td><i>// * This  code  implementation is the result of  the  scientific and *</i></td></tr>
+<tr><th id="18">18</th><td><i>// * technical work of the GEANT4 collaboration.                      *</i></td></tr>
+<tr><th id="19">19</th><td><i>// * By using,  copying,  modifying or  distributing the software (or *</i></td></tr>
+<tr><th id="20">20</th><td><i>// * any work based  on the software)  you  agree  to acknowledge its *</i></td></tr>
+<tr><th id="21">21</th><td><i>// * use  in  resulting  scientific  publications,  and indicate your *</i></td></tr>
+<tr><th id="22">22</th><td><i>// * acceptance of all terms of the Geant4 Software license.          *</i></td></tr>
+<tr><th id="23">23</th><td><i>// ********************************************************************</i></td></tr>
+<tr><th id="24">24</th><td><i>//</i></td></tr>
+<tr><th id="25">25</th><td><i>//</i></td></tr>
+<tr><th id="26">26</th><td><i>//</i></td></tr>
+<tr><th id="27">27</th><td><i>// Description:</i></td></tr>
+<tr><th id="28">28</th><td><i>// G4BulirschStoer class implementation by Dmitry Sorokin</i></td></tr>
+<tr><th id="29">29</th><td><i>// Implementation is based on bulirsch_stoer.hpp from boost</i></td></tr>
+<tr><th id="30">30</th><td><i>//</i></td></tr>
+<tr><th id="31">31</th><td><i>// The Bulirsch-Stoer is a controlled driver that adjusts both step size</i></td></tr>
+<tr><th id="32">32</th><td><i>// and order of the method. The algorithm uses the modified midpoint and</i></td></tr>
+<tr><th id="33">33</th><td><i>// a polynomial extrapolation compute the solution.</i></td></tr>
+<tr><th id="34">34</th><td><i></i></td></tr>
+<tr><th id="35">35</th><td><i>//    Implementation by Dmitry Sorokin - GSoC 2016</i></td></tr>
+<tr><th id="36">36</th><td><i>//       Work supported by Google as part of Google Summer of Code 2016.</i></td></tr>
+<tr><th id="37">37</th><td><i>//    Supervision / code review: John Apostolakis</i></td></tr>
+<tr><th id="38">38</th><td><i>//</i></td></tr>
+<tr><th id="39">39</th><td><i>///////////////////////////////////////////////////////////////////////////////</i></td></tr>
+<tr><th id="40">40</th><td></td></tr>
+<tr><th id="41">41</th><td><u>#<span data-ppcond="41">ifndef</span> <span class="macro" data-ref="_M/G4BULIRSCH_STOER_HH">G4BULIRSCH_STOER_HH</span></u></td></tr>
+<tr><th id="42">42</th><td><u>#define <dfn class="macro" id="_M/G4BULIRSCH_STOER_HH" data-ref="_M/G4BULIRSCH_STOER_HH">G4BULIRSCH_STOER_HH</dfn></u></td></tr>
+<tr><th id="43">43</th><td></td></tr>
+<tr><th id="44">44</th><td><u>#include <a href="G4ModifiedMidpoint.hh.html">"G4ModifiedMidpoint.hh"</a></u></td></tr>
+<tr><th id="45">45</th><td></td></tr>
+<tr><th id="46">46</th><td><u>#include <a href="G4FieldTrack.hh.html">"G4FieldTrack.hh"</a></u></td></tr>
+<tr><th id="47">47</th><td></td></tr>
+<tr><th id="48">48</th><td><b>class</b> <dfn class="type def" id="G4BulirschStoer" title='G4BulirschStoer' data-ref="G4BulirschStoer">G4BulirschStoer</dfn></td></tr>
+<tr><th id="49">49</th><td>{</td></tr>
+<tr><th id="50">50</th><td>  <b>public</b>:</td></tr>
+<tr><th id="51">51</th><td></td></tr>
+<tr><th id="52">52</th><td>    <b>enum</b> <b>class</b> <dfn class="type def" id="G4BulirschStoer::step_result" title='G4BulirschStoer::step_result' data-ref="G4BulirschStoer::step_result">step_result</dfn></td></tr>
+<tr><th id="53">53</th><td>    {</td></tr>
+<tr><th id="54">54</th><td>      <dfn class="enum" id="G4BulirschStoer::step_result::success" title='G4BulirschStoer::step_result::success' data-ref="G4BulirschStoer::step_result::success">success</dfn>,</td></tr>
+<tr><th id="55">55</th><td>      <dfn class="enum" id="G4BulirschStoer::step_result::fail" title='G4BulirschStoer::step_result::fail' data-ref="G4BulirschStoer::step_result::fail">fail</dfn></td></tr>
+<tr><th id="56">56</th><td>    };</td></tr>
+<tr><th id="57">57</th><td></td></tr>
+<tr><th id="58">58</th><td>    <a class="decl" href="../src/G4BulirschStoer.cc.html#_ZN15G4BulirschStoerC1EP18G4EquationOfMotionidd" title='G4BulirschStoer::G4BulirschStoer' data-ref="_ZN15G4BulirschStoerC1EP18G4EquationOfMotionidd" id="_ZN15G4BulirschStoerC1EP18G4EquationOfMotionidd">G4BulirschStoer</a>( <a class="type" href="G4EquationOfMotion.hh.html#G4EquationOfMotion" title='G4EquationOfMotion' data-ref="G4EquationOfMotion">G4EquationOfMotion</a>* <dfn class="local col0 decl" id="20equation" title='equation' data-type='G4EquationOfMotion *' data-ref="20equation">equation</dfn>, <a class="typedef" href="../../../global/management/include/G4Types.hh.html#G4int" title='G4int' data-type='int' data-ref="G4int">G4int</a> <dfn class="local col1 decl" id="21nvar" title='nvar' data-type='G4int' data-ref="21nvar">nvar</dfn>,</td></tr>
+<tr><th id="59">59</th><td>                     <a class="typedef" href="../../../global/management/include/G4Types.hh.html#G4double" title='G4double' data-type='double' data-ref="G4double">G4double</a> <dfn class="local col2 decl" id="22eps_rel" title='eps_rel' data-type='G4double' data-ref="22eps_rel">eps_rel</dfn>, <a class="typedef" href="../../../global/management/include/G4Types.hh.html#G4double" title='G4double' data-type='double' data-ref="G4double">G4double</a> <dfn class="local col3 decl" id="23max_dt" title='max_dt' data-type='G4double' data-ref="23max_dt">max_dt</dfn> = <a class="macro" href="../../../global/management/include/templates.hh.html#82" title="std::numeric_limits&lt;double&gt;::max()" data-ref="_M/DBL_MAX">DBL_MAX</a>);</td></tr>
+<tr><th id="60">60</th><td></td></tr>
+<tr><th id="61">61</th><td>    <b>inline</b> <em>void</em> <a class="decl" href="G4BulirschStoer.icc.html#_ZN15G4BulirschStoer10set_max_dtEd" title='G4BulirschStoer::set_max_dt' data-ref="_ZN15G4BulirschStoer10set_max_dtEd" id="_ZN15G4BulirschStoer10set_max_dtEd">set_max_dt</a>(<a class="typedef" href="../../../global/management/include/G4Types.hh.html#G4double" title='G4double' data-type='double' data-ref="G4double">G4double</a> <dfn class="local col4 decl" id="24max_dt" title='max_dt' data-type='G4double' data-ref="24max_dt">max_dt</dfn>);</td></tr>
+<tr><th id="62">62</th><td>    <b>inline</b> <em>void</em> <a class="decl" href="G4BulirschStoer.icc.html#_ZN15G4BulirschStoer22set_max_relative_errorEd" title='G4BulirschStoer::set_max_relative_error' data-ref="_ZN15G4BulirschStoer22set_max_relative_errorEd" id="_ZN15G4BulirschStoer22set_max_relative_errorEd">set_max_relative_error</a>(<a class="typedef" href="../../../global/management/include/G4Types.hh.html#G4double" title='G4double' data-type='double' data-ref="G4double">G4double</a> <dfn class="local col5 decl" id="25eps_rel" title='eps_rel' data-type='G4double' data-ref="25eps_rel">eps_rel</dfn>);</td></tr>
+<tr><th id="63">63</th><td></td></tr>
+<tr><th id="64">64</th><td>    <i>// Stepper method</i></td></tr>
+<tr><th id="65">65</th><td><i>    //</i></td></tr>
+<tr><th id="66">66</th><td>    <a class="type" href="#G4BulirschStoer::step_result" title='G4BulirschStoer::step_result' data-ref="G4BulirschStoer::step_result">step_result</a> <a class="decl" href="../src/G4BulirschStoer.cc.html#_ZN15G4BulirschStoer8try_stepEPKdS1_RdPdS2_" title='G4BulirschStoer::try_step' data-ref="_ZN15G4BulirschStoer8try_stepEPKdS1_RdPdS2_" id="_ZN15G4BulirschStoer8try_stepEPKdS1_RdPdS2_">try_step</a>(<em>const</em> <a class="typedef" href="../../../global/management/include/G4Types.hh.html#G4double" title='G4double' data-type='double' data-ref="G4double">G4double</a> <dfn class="local col6 decl" id="26in" title='in' data-type='const G4double *' data-ref="26in">in</dfn>[], <em>const</em> <a class="typedef" href="../../../global/management/include/G4Types.hh.html#G4double" title='G4double' data-type='double' data-ref="G4double">G4double</a> <dfn class="local col7 decl" id="27dxdt" title='dxdt' data-type='const G4double *' data-ref="27dxdt">dxdt</dfn>[],</td></tr>
+<tr><th id="67">67</th><td>                         <a class="typedef" href="../../../global/management/include/G4Types.hh.html#G4double" title='G4double' data-type='double' data-ref="G4double">G4double</a>&amp; <dfn class="local col8 decl" id="28t" title='t' data-type='G4double &amp;' data-ref="28t">t</dfn>, <a class="typedef" href="../../../global/management/include/G4Types.hh.html#G4double" title='G4double' data-type='double' data-ref="G4double">G4double</a> <dfn class="local col9 decl" id="29out" title='out' data-type='G4double *' data-ref="29out">out</dfn>[], <a class="typedef" href="../../../global/management/include/G4Types.hh.html#G4double" title='G4double' data-type='double' data-ref="G4double">G4double</a>&amp; <dfn class="local col0 decl" id="30dt" title='dt' data-type='G4double &amp;' data-ref="30dt">dt</dfn>);</td></tr>
+<tr><th id="68">68</th><td></td></tr>
+<tr><th id="69">69</th><td>    <i>// Reset the internal state of the stepper</i></td></tr>
+<tr><th id="70">70</th><td><i>    //</i></td></tr>
+<tr><th id="71">71</th><td>    <em>void</em> <a class="decl" href="../src/G4BulirschStoer.cc.html#_ZN15G4BulirschStoer5resetEv" title='G4BulirschStoer::reset' data-ref="_ZN15G4BulirschStoer5resetEv" id="_ZN15G4BulirschStoer5resetEv">reset</a>();</td></tr>
+<tr><th id="72">72</th><td></td></tr>
+<tr><th id="73">73</th><td>    <b>inline</b> <em>void</em> <a class="decl" href="G4BulirschStoer.icc.html#_ZN15G4BulirschStoer19SetEquationOfMotionEP18G4EquationOfMotion" title='G4BulirschStoer::SetEquationOfMotion' data-ref="_ZN15G4BulirschStoer19SetEquationOfMotionEP18G4EquationOfMotion" id="_ZN15G4BulirschStoer19SetEquationOfMotionEP18G4EquationOfMotion">SetEquationOfMotion</a>(<a class="type" href="G4EquationOfMotion.hh.html#G4EquationOfMotion" title='G4EquationOfMotion' data-ref="G4EquationOfMotion">G4EquationOfMotion</a>* <dfn class="local col1 decl" id="31equation" title='equation' data-type='G4EquationOfMotion *' data-ref="31equation">equation</dfn>);</td></tr>
+<tr><th id="74">74</th><td>    <b>inline</b> <a class="type" href="G4EquationOfMotion.hh.html#G4EquationOfMotion" title='G4EquationOfMotion' data-ref="G4EquationOfMotion">G4EquationOfMotion</a>* <a class="decl" href="G4BulirschStoer.icc.html#_ZN15G4BulirschStoer19GetEquationOfMotionEv" title='G4BulirschStoer::GetEquationOfMotion' data-ref="_ZN15G4BulirschStoer19GetEquationOfMotionEv" id="_ZN15G4BulirschStoer19GetEquationOfMotionEv">GetEquationOfMotion</a>();</td></tr>
+<tr><th id="75">75</th><td></td></tr>
+<tr><th id="76">76</th><td>    <b>inline</b> <a class="typedef" href="../../../global/management/include/G4Types.hh.html#G4int" title='G4int' data-type='int' data-ref="G4int">G4int</a> <a class="decl" href="G4BulirschStoer.icc.html#_ZNK15G4BulirschStoer20GetNumberOfVariablesEv" title='G4BulirschStoer::GetNumberOfVariables' data-ref="_ZNK15G4BulirschStoer20GetNumberOfVariablesEv" id="_ZNK15G4BulirschStoer20GetNumberOfVariablesEv">GetNumberOfVariables</a>() <em>const</em>;</td></tr>
+<tr><th id="77">77</th><td></td></tr>
+<tr><th id="78">78</th><td>  <b>private</b>:</td></tr>
+<tr><th id="79">79</th><td></td></tr>
+<tr><th id="80">80</th><td>    <em>const</em> <em>static</em> <a class="typedef" href="../../../global/management/include/G4Types.hh.html#G4int" title='G4int' data-type='int' data-ref="G4int">G4int</a> <dfn class="decl" id="G4BulirschStoer::m_k_max" title='G4BulirschStoer::m_k_max' data-ref="G4BulirschStoer::m_k_max">m_k_max</dfn> = <var>8</var>;</td></tr>
+<tr><th id="81">81</th><td></td></tr>
+<tr><th id="82">82</th><td>    <em>void</em> <dfn class="decl" id="_ZN15G4BulirschStoer11extrapolateEiPd" title='G4BulirschStoer::extrapolate' data-ref="_ZN15G4BulirschStoer11extrapolateEiPd">extrapolate</dfn>(<span class='error' title="unknown type name &apos;size_t&apos;">size_t</span> <dfn class="local col2 decl" id="32k" title='k' data-type='int' data-ref="32k">k</dfn>, <a class="typedef" href="../../../global/management/include/G4Types.hh.html#G4double" title='G4double' data-type='double' data-ref="G4double">G4double</a> <dfn class="local col3 decl" id="33xest" title='xest' data-type='G4double *' data-ref="33xest">xest</dfn>[]);</td></tr>
+<tr><th id="83">83</th><td>    <a class="typedef" href="../../../global/management/include/G4Types.hh.html#G4double" title='G4double' data-type='double' data-ref="G4double">G4double</a> <dfn class="decl" id="_ZNK15G4BulirschStoer10calc_h_optEddi" title='G4BulirschStoer::calc_h_opt' data-ref="_ZNK15G4BulirschStoer10calc_h_optEddi">calc_h_opt</dfn>(<a class="typedef" href="../../../global/management/include/G4Types.hh.html#G4double" title='G4double' data-type='double' data-ref="G4double">G4double</a> <dfn class="local col4 decl" id="34h" title='h' data-type='G4double' data-ref="34h">h</dfn>, <a class="typedef" href="../../../global/management/include/G4Types.hh.html#G4double" title='G4double' data-type='double' data-ref="G4double">G4double</a> <dfn class="local col5 decl" id="35error" title='error' data-type='G4double' data-ref="35error">error</dfn>, <span class='error' title="unknown type name &apos;size_t&apos;">size_t</span> <dfn class="local col6 decl" id="36k" title='k' data-type='int' data-ref="36k">k</dfn>) <em>const</em>;</td></tr>
+<tr><th id="84">84</th><td></td></tr>
+<tr><th id="85">85</th><td>    <a class="typedef" href="../../../global/management/include/G4Types.hh.html#G4bool" title='G4bool' data-type='bool' data-ref="G4bool">G4bool</a> <dfn class="decl" id="_ZN15G4BulirschStoer9set_k_optEiRd" title='G4BulirschStoer::set_k_opt' data-ref="_ZN15G4BulirschStoer9set_k_optEiRd">set_k_opt</dfn>(<span class='error' title="unknown type name &apos;size_t&apos;">size_t</span> <dfn class="local col7 decl" id="37k" title='k' data-type='int' data-ref="37k">k</dfn>, <a class="typedef" href="../../../global/management/include/G4Types.hh.html#G4double" title='G4double' data-type='double' data-ref="G4double">G4double</a>&amp; <dfn class="local col8 decl" id="38dt" title='dt' data-type='G4double &amp;' data-ref="38dt">dt</dfn>);</td></tr>
+<tr><th id="86">86</th><td>    <a class="typedef" href="../../../global/management/include/G4Types.hh.html#G4bool" title='G4bool' data-type='bool' data-ref="G4bool">G4bool</a> <a class="decl" href="../src/G4BulirschStoer.cc.html#_ZNK15G4BulirschStoer21in_convergence_windowEi" title='G4BulirschStoer::in_convergence_window' data-ref="_ZNK15G4BulirschStoer21in_convergence_windowEi" id="_ZNK15G4BulirschStoer21in_convergence_windowEi">in_convergence_window</a>(<a class="typedef" href="../../../global/management/include/G4Types.hh.html#G4int" title='G4int' data-type='int' data-ref="G4int">G4int</a> <dfn class="local col9 decl" id="39k" title='k' data-type='G4int' data-ref="39k">k</dfn>) <em>const</em>;</td></tr>
+<tr><th id="87">87</th><td>    <a class="typedef" href="../../../global/management/include/G4Types.hh.html#G4bool" title='G4bool' data-type='bool' data-ref="G4bool">G4bool</a> <a class="decl" href="../src/G4BulirschStoer.cc.html#_ZNK15G4BulirschStoer13should_rejectEdi" title='G4BulirschStoer::should_reject' data-ref="_ZNK15G4BulirschStoer13should_rejectEdi" id="_ZNK15G4BulirschStoer13should_rejectEdi">should_reject</a>(<a class="typedef" href="../../../global/management/include/G4Types.hh.html#G4double" title='G4double' data-type='double' data-ref="G4double">G4double</a> <dfn class="local col0 decl" id="40error" title='error' data-type='G4double' data-ref="40error">error</dfn>, <a class="typedef" href="../../../global/management/include/G4Types.hh.html#G4int" title='G4int' data-type='int' data-ref="G4int">G4int</a> <dfn class="local col1 decl" id="41k" title='k' data-type='G4int' data-ref="41k">k</dfn>) <em>const</em>;</td></tr>
+<tr><th id="88">88</th><td></td></tr>
+<tr><th id="89">89</th><td>    <i>// Number of vars to be integrated</i></td></tr>
+<tr><th id="90">90</th><td>    <a class="typedef" href="../../../global/management/include/G4Types.hh.html#G4int" title='G4int' data-type='int' data-ref="G4int">G4int</a> <dfn class="decl" id="G4BulirschStoer::fnvar" title='G4BulirschStoer::fnvar' data-ref="G4BulirschStoer::fnvar">fnvar</dfn>;</td></tr>
+<tr><th id="91">91</th><td></td></tr>
+<tr><th id="92">92</th><td>    <i>// Relative tolerance</i></td></tr>
+<tr><th id="93">93</th><td>    <a class="typedef" href="../../../global/management/include/G4Types.hh.html#G4double" title='G4double' data-type='double' data-ref="G4double">G4double</a> <dfn class="decl" id="G4BulirschStoer::m_eps_rel" title='G4BulirschStoer::m_eps_rel' data-ref="G4BulirschStoer::m_eps_rel">m_eps_rel</dfn>;</td></tr>
+<tr><th id="94">94</th><td></td></tr>
+<tr><th id="95">95</th><td>    <i>// Modified midpoint algorithm</i></td></tr>
+<tr><th id="96">96</th><td>    <a class="type" href="G4ModifiedMidpoint.hh.html#G4ModifiedMidpoint" title='G4ModifiedMidpoint' data-ref="G4ModifiedMidpoint">G4ModifiedMidpoint</a> <dfn class="decl" id="G4BulirschStoer::m_midpoint" title='G4BulirschStoer::m_midpoint' data-ref="G4BulirschStoer::m_midpoint">m_midpoint</dfn>;</td></tr>
+<tr><th id="97">97</th><td></td></tr>
+<tr><th id="98">98</th><td>    <a class="typedef" href="../../../global/management/include/G4Types.hh.html#G4bool" title='G4bool' data-type='bool' data-ref="G4bool">G4bool</a> <dfn class="decl" id="G4BulirschStoer::m_last_step_rejected" title='G4BulirschStoer::m_last_step_rejected' data-ref="G4BulirschStoer::m_last_step_rejected">m_last_step_rejected</dfn>;</td></tr>
+<tr><th id="99">99</th><td>    <a class="typedef" href="../../../global/management/include/G4Types.hh.html#G4bool" title='G4bool' data-type='bool' data-ref="G4bool">G4bool</a> <dfn class="decl" id="G4BulirschStoer::m_first" title='G4BulirschStoer::m_first' data-ref="G4BulirschStoer::m_first">m_first</dfn>;</td></tr>
+<tr><th id="100">100</th><td></td></tr>
+<tr><th id="101">101</th><td>    <a class="typedef" href="../../../global/management/include/G4Types.hh.html#G4double" title='G4double' data-type='double' data-ref="G4double">G4double</a> <dfn class="decl" id="G4BulirschStoer::m_dt_last" title='G4BulirschStoer::m_dt_last' data-ref="G4BulirschStoer::m_dt_last">m_dt_last</dfn>;</td></tr>
+<tr><th id="102">102</th><td>    <i>// G4double m_t_last;</i></td></tr>
+<tr><th id="103">103</th><td><i></i></td></tr>
+<tr><th id="104">104</th><td><i>    // Max allowed time step</i></td></tr>
+<tr><th id="105">105</th><td>    <a class="typedef" href="../../../global/management/include/G4Types.hh.html#G4double" title='G4double' data-type='double' data-ref="G4double">G4double</a> <dfn class="decl" id="G4BulirschStoer::m_max_dt" title='G4BulirschStoer::m_max_dt' data-ref="G4BulirschStoer::m_max_dt">m_max_dt</dfn>;</td></tr>
+<tr><th id="106">106</th><td></td></tr>
+<tr><th id="107">107</th><td>    <a class="typedef" href="../../../global/management/include/G4Types.hh.html#G4int" title='G4int' data-type='int' data-ref="G4int">G4int</a> <dfn class="decl" id="G4BulirschStoer::m_current_k_opt" title='G4BulirschStoer::m_current_k_opt' data-ref="G4BulirschStoer::m_current_k_opt">m_current_k_opt</dfn>;</td></tr>
+<tr><th id="108">108</th><td></td></tr>
+<tr><th id="109">109</th><td>    <i>// G4double m_xnew[G4FieldTrack::ncompSVEC];</i></td></tr>
+<tr><th id="110">110</th><td>    <a class="typedef" href="../../../global/management/include/G4Types.hh.html#G4double" title='G4double' data-type='double' data-ref="G4double">G4double</a> <dfn class="decl" id="G4BulirschStoer::m_err" title='G4BulirschStoer::m_err' data-ref="G4BulirschStoer::m_err">m_err</dfn>[<a class="type" href="G4FieldTrack.hh.html#G4FieldTrack" title='G4FieldTrack' data-ref="G4FieldTrack">G4FieldTrack</a>::<a class="enum" href="G4FieldTrack.hh.html#G4FieldTrack::ncompSVEC" title='G4FieldTrack::ncompSVEC' data-ref="G4FieldTrack::ncompSVEC">ncompSVEC</a>];</td></tr>
+<tr><th id="111">111</th><td>    <i>// G4double m_dxdt[G4FieldTrack::ncompSVEC];</i></td></tr>
+<tr><th id="112">112</th><td><i></i></td></tr>
+<tr><th id="113">113</th><td><i>    // Stores the successive interval counts</i></td></tr>
+<tr><th id="114">114</th><td>    <a class="typedef" href="../../../global/management/include/G4Types.hh.html#G4int" title='G4int' data-type='int' data-ref="G4int">G4int</a> <dfn class="decl" id="G4BulirschStoer::m_interval_sequence" title='G4BulirschStoer::m_interval_sequence' data-ref="G4BulirschStoer::m_interval_sequence">m_interval_sequence</dfn>[<a class="ref" href="#G4BulirschStoer::m_k_max" title='G4BulirschStoer::m_k_max' data-ref="G4BulirschStoer::m_k_max">m_k_max</a>+<var>1</var>];</td></tr>
+<tr><th id="115">115</th><td></td></tr>
+<tr><th id="116">116</th><td>    <i>// Extrapolation coeffs (Neville’s algorithm)</i></td></tr>
+<tr><th id="117">117</th><td>    <a class="typedef" href="../../../global/management/include/G4Types.hh.html#G4double" title='G4double' data-type='double' data-ref="G4double">G4double</a> <dfn class="decl" id="G4BulirschStoer::m_coeff" title='G4BulirschStoer::m_coeff' data-ref="G4BulirschStoer::m_coeff">m_coeff</dfn>[<a class="ref" href="#G4BulirschStoer::m_k_max" title='G4BulirschStoer::m_k_max' data-ref="G4BulirschStoer::m_k_max">m_k_max</a>+<var>1</var>][<a class="ref" href="#G4BulirschStoer::m_k_max" title='G4BulirschStoer::m_k_max' data-ref="G4BulirschStoer::m_k_max">m_k_max</a>];</td></tr>
+<tr><th id="118">118</th><td></td></tr>
+<tr><th id="119">119</th><td>    <i>// Costs for interval count</i></td></tr>
+<tr><th id="120">120</th><td>    <a class="typedef" href="../../../global/management/include/G4Types.hh.html#G4int" title='G4int' data-type='int' data-ref="G4int">G4int</a> <dfn class="decl" id="G4BulirschStoer::m_cost" title='G4BulirschStoer::m_cost' data-ref="G4BulirschStoer::m_cost">m_cost</dfn>[<a class="ref" href="#G4BulirschStoer::m_k_max" title='G4BulirschStoer::m_k_max' data-ref="G4BulirschStoer::m_k_max">m_k_max</a>+<var>1</var>];</td></tr>
+<tr><th id="121">121</th><td></td></tr>
+<tr><th id="122">122</th><td>    <i>// Sequence of states for extrapolation</i></td></tr>
+<tr><th id="123">123</th><td>    <a class="typedef" href="../../../global/management/include/G4Types.hh.html#G4double" title='G4double' data-type='double' data-ref="G4double">G4double</a> <dfn class="decl" id="G4BulirschStoer::m_table" title='G4BulirschStoer::m_table' data-ref="G4BulirschStoer::m_table">m_table</dfn>[<a class="ref" href="#G4BulirschStoer::m_k_max" title='G4BulirschStoer::m_k_max' data-ref="G4BulirschStoer::m_k_max">m_k_max</a>][<a class="type" href="G4FieldTrack.hh.html#G4FieldTrack" title='G4FieldTrack' data-ref="G4FieldTrack">G4FieldTrack</a>::<a class="enum" href="G4FieldTrack.hh.html#G4FieldTrack::ncompSVEC" title='G4FieldTrack::ncompSVEC' data-ref="G4FieldTrack::ncompSVEC">ncompSVEC</a>];</td></tr>
+<tr><th id="124">124</th><td></td></tr>
+<tr><th id="125">125</th><td>    <i>// Optimal step size</i></td></tr>
+<tr><th id="126">126</th><td>    <a class="typedef" href="../../../global/management/include/G4Types.hh.html#G4double" title='G4double' data-type='double' data-ref="G4double">G4double</a> <dfn class="decl" id="G4BulirschStoer::h_opt" title='G4BulirschStoer::h_opt' data-ref="G4BulirschStoer::h_opt">h_opt</dfn>[<a class="ref" href="#G4BulirschStoer::m_k_max" title='G4BulirschStoer::m_k_max' data-ref="G4BulirschStoer::m_k_max">m_k_max</a>+<var>1</var>];</td></tr>
+<tr><th id="127">127</th><td></td></tr>
+<tr><th id="128">128</th><td>    <i>// Work per unit step</i></td></tr>
+<tr><th id="129">129</th><td>    <a class="typedef" href="../../../global/management/include/G4Types.hh.html#G4double" title='G4double' data-type='double' data-ref="G4double">G4double</a> <dfn class="decl" id="G4BulirschStoer::work" title='G4BulirschStoer::work' data-ref="G4BulirschStoer::work">work</dfn>[<a class="ref" href="#G4BulirschStoer::m_k_max" title='G4BulirschStoer::m_k_max' data-ref="G4BulirschStoer::m_k_max">m_k_max</a>+<var>1</var>];</td></tr>
+<tr><th id="130">130</th><td>};</td></tr>
+<tr><th id="131">131</th><td></td></tr>
+<tr><th id="132">132</th><td><u>#include <a href="G4BulirschStoer.icc.html">"G4BulirschStoer.icc"</a></u></td></tr>
+<tr><th id="133">133</th><td></td></tr>
+<tr><th id="134">134</th><td><u>#<span data-ppcond="41">endif</span></u></td></tr>
+<tr><th id="135">135</th><td></td></tr>
+</table><hr/><p id='footer'>
+Generated while processing <a href='../src/G4BulirschStoer.cc.html'>codebrowser/source/geometry/magneticfield/src/G4BulirschStoer.cc</a><br/>Generated on <em>2019-Aug-28</em> from project codebrowser<br />Powered by <a href='https://woboq.com'><img alt='Woboq' src='https://code.woboq.org/woboq-16.png' width='41' height='16' /></a> <a href='https://code.woboq.org'>Code Browser</a> 2.1
+<br/>Generator usage only permitted with license.</p>
+</div></body></html>

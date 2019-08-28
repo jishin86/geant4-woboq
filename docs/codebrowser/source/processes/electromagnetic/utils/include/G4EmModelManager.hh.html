@@ -1,0 +1,322 @@
+<!doctype html>
+<html>
+<head>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"><title>G4EmModelManager.hh source code [codebrowser/source/processes/electromagnetic/utils/include/G4EmModelManager.hh] - Woboq Code Browser</title>
+<meta name="woboq:interestingDefinitions" content="G4EmModelManager,G4RegionModels "/>
+<link rel="stylesheet" href="../../../../../../../data/qtcreator.css" title="QtCreator"/>
+<link rel="alternate stylesheet" href="../../../../../../../data/kdevelop.css" title="KDevelop"/>
+<script type="text/javascript" src="../../../../../../../data/jquery/jquery.min.js"></script>
+<script type="text/javascript" src="../../../../../../../data/jquery/jquery-ui.min.js"></script>
+<script>var file = 'codebrowser/source/processes/electromagnetic/utils/include/G4EmModelManager.hh'; var root_path = '../../../../../..'; var data_path = '../../../../../../../data';</script>
+<script src='../../../../../../../data/codebrowser.js'></script>
+</head>
+<body><div id='header'><h1 id='breadcrumb'><span>Browse the source code of </span><a href='../../../../..'>codebrowser</a>/<a href='../../../..'>source</a>/<a href='../../..'>processes</a>/<a href='../..'>electromagnetic</a>/<a href='..'>utils</a>/<a href='./'>include</a>/<a href='G4EmModelManager.hh.html'>G4EmModelManager.hh</a></h1></div>
+<hr/><div id='content'><table class="code">
+<tr><th id="1">1</th><td><i>//</i></td></tr>
+<tr><th id="2">2</th><td><i>// ********************************************************************</i></td></tr>
+<tr><th id="3">3</th><td><i>// * License and Disclaimer                                           *</i></td></tr>
+<tr><th id="4">4</th><td><i>// *                                                                  *</i></td></tr>
+<tr><th id="5">5</th><td><i>// * The  Geant4 software  is  copyright of the Copyright Holders  of *</i></td></tr>
+<tr><th id="6">6</th><td><i>// * the Geant4 Collaboration.  It is provided  under  the terms  and *</i></td></tr>
+<tr><th id="7">7</th><td><i>// * conditions of the Geant4 Software License,  included in the file *</i></td></tr>
+<tr><th id="8">8</th><td><i>// * LICENSE and available at  <a href="http://cern.ch/geant4/license">http://cern.ch/geant4/license</a> .  These *</i></td></tr>
+<tr><th id="9">9</th><td><i>// * include a list of copyright holders.                             *</i></td></tr>
+<tr><th id="10">10</th><td><i>// *                                                                  *</i></td></tr>
+<tr><th id="11">11</th><td><i>// * Neither the authors of this software system, nor their employing *</i></td></tr>
+<tr><th id="12">12</th><td><i>// * institutes,nor the agencies providing financial support for this *</i></td></tr>
+<tr><th id="13">13</th><td><i>// * work  make  any representation or  warranty, express or implied, *</i></td></tr>
+<tr><th id="14">14</th><td><i>// * regarding  this  software system or assume any liability for its *</i></td></tr>
+<tr><th id="15">15</th><td><i>// * use.  Please see the license in the file  LICENSE  and URL above *</i></td></tr>
+<tr><th id="16">16</th><td><i>// * for the full disclaimer and the limitation of liability.         *</i></td></tr>
+<tr><th id="17">17</th><td><i>// *                                                                  *</i></td></tr>
+<tr><th id="18">18</th><td><i>// * This  code  implementation is the result of  the  scientific and *</i></td></tr>
+<tr><th id="19">19</th><td><i>// * technical work of the GEANT4 collaboration.                      *</i></td></tr>
+<tr><th id="20">20</th><td><i>// * By using,  copying,  modifying or  distributing the software (or *</i></td></tr>
+<tr><th id="21">21</th><td><i>// * any work based  on the software)  you  agree  to acknowledge its *</i></td></tr>
+<tr><th id="22">22</th><td><i>// * use  in  resulting  scientific  publications,  and indicate your *</i></td></tr>
+<tr><th id="23">23</th><td><i>// * acceptance of all terms of the Geant4 Software license.          *</i></td></tr>
+<tr><th id="24">24</th><td><i>// ********************************************************************</i></td></tr>
+<tr><th id="25">25</th><td><i>//</i></td></tr>
+<tr><th id="26">26</th><td><i>//</i></td></tr>
+<tr><th id="27">27</th><td><i>// -------------------------------------------------------------------</i></td></tr>
+<tr><th id="28">28</th><td><i>//</i></td></tr>
+<tr><th id="29">29</th><td><i>// GEANT4 Class header file</i></td></tr>
+<tr><th id="30">30</th><td><i>//</i></td></tr>
+<tr><th id="31">31</th><td><i>// File name:     G4EmModelManager</i></td></tr>
+<tr><th id="32">32</th><td><i>//</i></td></tr>
+<tr><th id="33">33</th><td><i>// Author:        Vladimir Ivanchenko</i></td></tr>
+<tr><th id="34">34</th><td><i>//</i></td></tr>
+<tr><th id="35">35</th><td><i>// Creation date: 07.05.2002</i></td></tr>
+<tr><th id="36">36</th><td><i>//</i></td></tr>
+<tr><th id="37">37</th><td><i>// Modifications:</i></td></tr>
+<tr><th id="38">38</th><td><i>//</i></td></tr>
+<tr><th id="39">39</th><td><i>// 03-12-02 V.Ivanchenko fix a bug in model selection</i></td></tr>
+<tr><th id="40">40</th><td><i>// 20-01-03 Migrade to cut per region (V.Ivanchenko)</i></td></tr>
+<tr><th id="41">41</th><td><i>// 27-01-03 Make models region aware (V.Ivanchenko)</i></td></tr>
+<tr><th id="42">42</th><td><i>// 13-02-03 The set of models is defined for region (V.Ivanchenko)</i></td></tr>
+<tr><th id="43">43</th><td><i>// 26-03-03 Add GetDEDXDispersion (V.Ivanchenko)</i></td></tr>
+<tr><th id="44">44</th><td><i>// 13-04-03 Add startFromNull (V.Ivanchenko)</i></td></tr>
+<tr><th id="45">45</th><td><i>// 13-05-03 Add calculation of precise range (V.Ivanchenko)</i></td></tr>
+<tr><th id="46">46</th><td><i>// 21-07-03 Add UpdateEmModel method (V.Ivanchenko)</i></td></tr>
+<tr><th id="47">47</th><td><i>// 03-11-03 Substitute STL vector for G4RegionModels (V.Ivanchenko)</i></td></tr>
+<tr><th id="48">48</th><td><i>// 11-04-05 Remove access to fluctuation models (V.Ivanchenko)</i></td></tr>
+<tr><th id="49">49</th><td><i>// 10-01-06 PreciseRange -&gt; CSDARange (V.Ivantchenko)</i></td></tr>
+<tr><th id="50">50</th><td><i>// 20-01-06 Introduce G4EmTableType and reducing number of methods (VI)</i></td></tr>
+<tr><th id="51">51</th><td><i>// 13-05-06 Add GetModel by index method (VI)</i></td></tr>
+<tr><th id="52">52</th><td><i>// 15-03-07 Add maxCutInRange (V.Ivanchenko)</i></td></tr>
+<tr><th id="53">53</th><td><i>// 08-04-08 Simplify Select method for only one G4RegionModel (VI)</i></td></tr>
+<tr><th id="54">54</th><td><i>// 03-08-09 Removed unused members and simplify model search if only one</i></td></tr>
+<tr><th id="55">55</th><td><i>//          model is used (VI)</i></td></tr>
+<tr><th id="56">56</th><td><i>// 14-07-11 Use pointer to the vector of cuts and not local copy (VI)</i></td></tr>
+<tr><th id="57">57</th><td><i>//</i></td></tr>
+<tr><th id="58">58</th><td><i>// Class Description:</i></td></tr>
+<tr><th id="59">59</th><td><i>//</i></td></tr>
+<tr><th id="60">60</th><td><i>// It is the unified energy loss process it calculates the continuous</i></td></tr>
+<tr><th id="61">61</th><td><i>// energy loss for charged particles using a set of Energy Loss</i></td></tr>
+<tr><th id="62">62</th><td><i>// models valid for different energy regions. There are a possibility</i></td></tr>
+<tr><th id="63">63</th><td><i>// to create and access to dE/dx and range tables, or to calculate</i></td></tr>
+<tr><th id="64">64</th><td><i>// that information on fly.</i></td></tr>
+<tr><th id="65">65</th><td><i></i></td></tr>
+<tr><th id="66">66</th><td><i>// -------------------------------------------------------------------</i></td></tr>
+<tr><th id="67">67</th><td><i>//</i></td></tr>
+<tr><th id="68">68</th><td></td></tr>
+<tr><th id="69">69</th><td></td></tr>
+<tr><th id="70">70</th><td><u>#<span data-ppcond="70">ifndef</span> <span class="macro" data-ref="_M/G4EmModelManager_h">G4EmModelManager_h</span></u></td></tr>
+<tr><th id="71">71</th><td><u>#define <dfn class="macro" id="_M/G4EmModelManager_h" data-ref="_M/G4EmModelManager_h">G4EmModelManager_h</dfn> 1</u></td></tr>
+<tr><th id="72">72</th><td></td></tr>
+<tr><th id="73">73</th><td><i>//....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo....</i></td></tr>
+<tr><th id="74">74</th><td></td></tr>
+<tr><th id="75">75</th><td><u>#include <a href="../../../../global/management/include/globals.hh.html">"globals.hh"</a></u></td></tr>
+<tr><th id="76">76</th><td><u>#include <a href="../../../../global/management/include/G4DataVector.hh.html">"G4DataVector.hh"</a></u></td></tr>
+<tr><th id="77">77</th><td><u>#include <a href="G4EmTableType.hh.html">"G4EmTableType.hh"</a></u></td></tr>
+<tr><th id="78">78</th><td><u>#include <a href="G4EmProcessSubType.hh.html">"G4EmProcessSubType.hh"</a></u></td></tr>
+<tr><th id="79">79</th><td><u>#include <a href="../../../../geometry/management/include/G4Region.hh.html">"G4Region.hh"</a></u></td></tr>
+<tr><th id="80">80</th><td></td></tr>
+<tr><th id="81">81</th><td><b>class</b> <dfn class="type def" id="G4RegionModels" title='G4RegionModels' data-ref="G4RegionModels">G4RegionModels</dfn></td></tr>
+<tr><th id="82">82</th><td>{</td></tr>
+<tr><th id="83">83</th><td></td></tr>
+<tr><th id="84">84</th><td><b>friend</b> <b>class</b> <a class="type" href="#G4EmModelManager" title='G4EmModelManager' data-ref="G4EmModelManager">G4EmModelManager</a>;</td></tr>
+<tr><th id="85">85</th><td></td></tr>
+<tr><th id="86">86</th><td><b>private</b>:</td></tr>
+<tr><th id="87">87</th><td></td></tr>
+<tr><th id="88">88</th><td>  <dfn class="decl" id="_ZN14G4RegionModelsC1Eii" title='G4RegionModels::G4RegionModels' data-ref="_ZN14G4RegionModelsC1Eii">G4RegionModels</dfn>(<a class="typedef" href="../../../../global/management/include/G4Types.hh.html#G4int" title='G4int' data-type='int' data-ref="G4int">G4int</a> <dfn class="local col9 decl" id="139nMod" title='nMod' data-type='G4int' data-ref="139nMod">nMod</dfn>, <span class='error' title="use of undeclared identifier &apos;std&apos;">std</span>::vector<span class='error' title="expected &apos;)&apos;">&lt;</span>G4int&gt;&amp; indx, </td></tr>
+<tr><th id="89">89</th><td>                 G4DataVector&amp; lowE, <em>const</em> G4Region* reg);</td></tr>
+<tr><th id="90">90</th><td></td></tr>
+<tr><th id="91">91</th><td>  <dfn class="decl" id="_ZN14G4RegionModelsD1Ev" title='G4RegionModels::~G4RegionModels' data-ref="_ZN14G4RegionModelsD1Ev">~G4RegionModels</dfn>();</td></tr>
+<tr><th id="92">92</th><td></td></tr>
+<tr><th id="93">93</th><td>  <b>inline</b> <a class="typedef" href="../../../../global/management/include/G4Types.hh.html#G4int" title='G4int' data-type='int' data-ref="G4int">G4int</a> <dfn class="decl def" id="_ZNK14G4RegionModels11SelectIndexEd" title='G4RegionModels::SelectIndex' data-ref="_ZNK14G4RegionModels11SelectIndexEd">SelectIndex</dfn>(<a class="typedef" href="../../../../global/management/include/G4Types.hh.html#G4double" title='G4double' data-type='double' data-ref="G4double">G4double</a> <dfn class="local col0 decl" id="140e" title='e' data-type='G4double' data-ref="140e">e</dfn>) <em>const</em> {</td></tr>
+<tr><th id="94">94</th><td>    <a class="typedef" href="../../../../global/management/include/G4Types.hh.html#G4int" title='G4int' data-type='int' data-ref="G4int">G4int</a> <dfn class="local col1 decl" id="141idx" title='idx' data-type='G4int' data-ref="141idx">idx</dfn> = <var>0</var>;</td></tr>
+<tr><th id="95">95</th><td>    <b>if</b> (<a class="member" href="#G4RegionModels::nModelsForRegion" title='G4RegionModels::nModelsForRegion' data-ref="G4RegionModels::nModelsForRegion">nModelsForRegion</a>&gt;<var>1</var>) {</td></tr>
+<tr><th id="96">96</th><td>      <a class="local col1 ref" href="#141idx" title='idx' data-ref="141idx">idx</a> = <a class="member" href="#G4RegionModels::nModelsForRegion" title='G4RegionModels::nModelsForRegion' data-ref="G4RegionModels::nModelsForRegion">nModelsForRegion</a>;</td></tr>
+<tr><th id="97">97</th><td>      <i>// Loop checking, 03-Aug-2015, Vladimir Ivanchenko</i></td></tr>
+<tr><th id="98">98</th><td>      <b>do</b> {--<a class="local col1 ref" href="#141idx" title='idx' data-ref="141idx">idx</a>;} <b>while</b> (<a class="local col1 ref" href="#141idx" title='idx' data-ref="141idx">idx</a> &gt; <var>0</var> &amp;&amp; <a class="local col0 ref" href="#140e" title='e' data-ref="140e">e</a> &lt;= <a class="member" href="#G4RegionModels::lowKineticEnergy" title='G4RegionModels::lowKineticEnergy' data-ref="G4RegionModels::lowKineticEnergy">lowKineticEnergy</a>[<a class="local col1 ref" href="#141idx" title='idx' data-ref="141idx">idx</a>]);</td></tr>
+<tr><th id="99">99</th><td>    }</td></tr>
+<tr><th id="100">100</th><td>    <b>return</b> <a class="member" href="#G4RegionModels::theListOfModelIndexes" title='G4RegionModels::theListOfModelIndexes' data-ref="G4RegionModels::theListOfModelIndexes">theListOfModelIndexes</a>[<a class="local col1 ref" href="#141idx" title='idx' data-ref="141idx">idx</a>];</td></tr>
+<tr><th id="101">101</th><td>  };</td></tr>
+<tr><th id="102">102</th><td></td></tr>
+<tr><th id="103">103</th><td>  <b>inline</b> <a class="typedef" href="../../../../global/management/include/G4Types.hh.html#G4int" title='G4int' data-type='int' data-ref="G4int">G4int</a> <dfn class="decl def" id="_ZNK14G4RegionModels10ModelIndexEi" title='G4RegionModels::ModelIndex' data-ref="_ZNK14G4RegionModels10ModelIndexEi">ModelIndex</dfn>(<a class="typedef" href="../../../../global/management/include/G4Types.hh.html#G4int" title='G4int' data-type='int' data-ref="G4int">G4int</a> <dfn class="local col2 decl" id="142n" title='n' data-type='G4int' data-ref="142n">n</dfn>) <em>const</em> {</td></tr>
+<tr><th id="104">104</th><td>    <b>return</b> <a class="member" href="#G4RegionModels::theListOfModelIndexes" title='G4RegionModels::theListOfModelIndexes' data-ref="G4RegionModels::theListOfModelIndexes">theListOfModelIndexes</a>[<a class="local col2 ref" href="#142n" title='n' data-ref="142n">n</a>];</td></tr>
+<tr><th id="105">105</th><td>  };</td></tr>
+<tr><th id="106">106</th><td></td></tr>
+<tr><th id="107">107</th><td>  <b>inline</b> <a class="typedef" href="../../../../global/management/include/G4Types.hh.html#G4int" title='G4int' data-type='int' data-ref="G4int">G4int</a> <dfn class="decl def" id="_ZNK14G4RegionModels14NumberOfModelsEv" title='G4RegionModels::NumberOfModels' data-ref="_ZNK14G4RegionModels14NumberOfModelsEv">NumberOfModels</dfn>() <em>const</em> {</td></tr>
+<tr><th id="108">108</th><td>    <b>return</b> <a class="member" href="#G4RegionModels::nModelsForRegion" title='G4RegionModels::nModelsForRegion' data-ref="G4RegionModels::nModelsForRegion">nModelsForRegion</a>;</td></tr>
+<tr><th id="109">109</th><td>  };</td></tr>
+<tr><th id="110">110</th><td></td></tr>
+<tr><th id="111">111</th><td>  <b>inline</b> <a class="typedef" href="../../../../global/management/include/G4Types.hh.html#G4double" title='G4double' data-type='double' data-ref="G4double">G4double</a> <dfn class="decl def" id="_ZNK14G4RegionModels13LowEdgeEnergyEi" title='G4RegionModels::LowEdgeEnergy' data-ref="_ZNK14G4RegionModels13LowEdgeEnergyEi">LowEdgeEnergy</dfn>(<a class="typedef" href="../../../../global/management/include/G4Types.hh.html#G4int" title='G4int' data-type='int' data-ref="G4int">G4int</a> <dfn class="local col3 decl" id="143n" title='n' data-type='G4int' data-ref="143n">n</dfn>) <em>const</em> {</td></tr>
+<tr><th id="112">112</th><td>    <b>return</b> <a class="member" href="#G4RegionModels::lowKineticEnergy" title='G4RegionModels::lowKineticEnergy' data-ref="G4RegionModels::lowKineticEnergy">lowKineticEnergy</a>[<a class="local col3 ref" href="#143n" title='n' data-ref="143n">n</a>];</td></tr>
+<tr><th id="113">113</th><td>  };</td></tr>
+<tr><th id="114">114</th><td></td></tr>
+<tr><th id="115">115</th><td>  <b>inline</b> <em>const</em> <a class="type" href="../../../../geometry/management/include/G4Region.hh.html#G4Region" title='G4Region' data-ref="G4Region">G4Region</a>* <dfn class="decl def" id="_ZNK14G4RegionModels6RegionEv" title='G4RegionModels::Region' data-ref="_ZNK14G4RegionModels6RegionEv">Region</dfn>() <em>const</em> {</td></tr>
+<tr><th id="116">116</th><td>    <b>return</b> <a class="member" href="#G4RegionModels::theRegion" title='G4RegionModels::theRegion' data-ref="G4RegionModels::theRegion">theRegion</a>;</td></tr>
+<tr><th id="117">117</th><td>  };</td></tr>
+<tr><th id="118">118</th><td></td></tr>
+<tr><th id="119">119</th><td>  <dfn class="decl def" id="_ZN14G4RegionModelsC1ERS_" title='G4RegionModels::G4RegionModels' data-ref="_ZN14G4RegionModelsC1ERS_">G4RegionModels</dfn>(<a class="type" href="#G4RegionModels" title='G4RegionModels' data-ref="G4RegionModels">G4RegionModels</a> &amp;) = <b>delete</b>;</td></tr>
+<tr><th id="120">120</th><td>  <a class="type" href="#G4RegionModels" title='G4RegionModels' data-ref="G4RegionModels">G4RegionModels</a> &amp; <dfn class="decl def" id="_ZN14G4RegionModelsaSERKS_" title='G4RegionModels::operator=' data-ref="_ZN14G4RegionModelsaSERKS_"><b>operator</b>=</dfn>(<em>const</em> <a class="type" href="#G4RegionModels" title='G4RegionModels' data-ref="G4RegionModels">G4RegionModels</a> &amp;<dfn class="local col4 decl" id="144right" title='right' data-type='const G4RegionModels &amp;' data-ref="144right">right</dfn>) = <b>delete</b>;</td></tr>
+<tr><th id="121">121</th><td></td></tr>
+<tr><th id="122">122</th><td>  <em>const</em> <a class="type" href="../../../../geometry/management/include/G4Region.hh.html#G4Region" title='G4Region' data-ref="G4Region">G4Region</a>*    <dfn class="decl" id="G4RegionModels::theRegion" title='G4RegionModels::theRegion' data-ref="G4RegionModels::theRegion">theRegion</dfn>;</td></tr>
+<tr><th id="123">123</th><td>  <a class="typedef" href="../../../../global/management/include/G4Types.hh.html#G4int" title='G4int' data-type='int' data-ref="G4int">G4int</a>              <dfn class="decl" id="G4RegionModels::nModelsForRegion" title='G4RegionModels::nModelsForRegion' data-ref="G4RegionModels::nModelsForRegion">nModelsForRegion</dfn>;</td></tr>
+<tr><th id="124">124</th><td>  <a class="typedef" href="../../../../global/management/include/G4Types.hh.html#G4int" title='G4int' data-type='int' data-ref="G4int">G4int</a>*             <dfn class="decl" id="G4RegionModels::theListOfModelIndexes" title='G4RegionModels::theListOfModelIndexes' data-ref="G4RegionModels::theListOfModelIndexes">theListOfModelIndexes</dfn>;</td></tr>
+<tr><th id="125">125</th><td>  <a class="typedef" href="../../../../global/management/include/G4Types.hh.html#G4double" title='G4double' data-type='double' data-ref="G4double">G4double</a>*          <dfn class="decl" id="G4RegionModels::lowKineticEnergy" title='G4RegionModels::lowKineticEnergy' data-ref="G4RegionModels::lowKineticEnergy">lowKineticEnergy</dfn>;</td></tr>
+<tr><th id="126">126</th><td></td></tr>
+<tr><th id="127">127</th><td>};</td></tr>
+<tr><th id="128">128</th><td></td></tr>
+<tr><th id="129">129</th><td><u>#include <a href="G4VEmModel.hh.html">"G4VEmModel.hh"</a></u></td></tr>
+<tr><th id="130">130</th><td><u>#include <a href="G4VEmFluctuationModel.hh.html">"G4VEmFluctuationModel.hh"</a></u></td></tr>
+<tr><th id="131">131</th><td><u>#include <a href="../../../../particles/management/include/G4DynamicParticle.hh.html">"G4DynamicParticle.hh"</a></u></td></tr>
+<tr><th id="132">132</th><td><u>#include <span class='error' title="&apos;iostream&apos; file not found">&lt;</span>iostream&gt;</u></td></tr>
+<tr><th id="133">133</th><td></td></tr>
+<tr><th id="134">134</th><td><b>class</b> G4Region;</td></tr>
+<tr><th id="135">135</th><td><b>class</b> <a class="type" href="../../../../particles/management/include/G4ParticleDefinition.hh.html#G4ParticleDefinition" title='G4ParticleDefinition' data-ref="G4ParticleDefinition" id="G4ParticleDefinition">G4ParticleDefinition</a>;</td></tr>
+<tr><th id="136">136</th><td><b>class</b> <a class="type" href="../../../../global/management/include/G4PhysicsVector.hh.html#G4PhysicsVector" title='G4PhysicsVector' data-ref="G4PhysicsVector" id="G4PhysicsVector">G4PhysicsVector</a>;</td></tr>
+<tr><th id="137">137</th><td><b>class</b> <a class="type" href="../../../cuts/include/G4MaterialCutsCouple.hh.html#G4MaterialCutsCouple" title='G4MaterialCutsCouple' data-ref="G4MaterialCutsCouple" id="G4MaterialCutsCouple">G4MaterialCutsCouple</a>;</td></tr>
+<tr><th id="138">138</th><td></td></tr>
+<tr><th id="139">139</th><td><i>//....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo....</i></td></tr>
+<tr><th id="140">140</th><td></td></tr>
+<tr><th id="141">141</th><td><b>class</b> <dfn class="type def" id="G4EmModelManager" title='G4EmModelManager' data-ref="G4EmModelManager">G4EmModelManager</dfn></td></tr>
+<tr><th id="142">142</th><td>{</td></tr>
+<tr><th id="143">143</th><td><b>public</b>:</td></tr>
+<tr><th id="144">144</th><td></td></tr>
+<tr><th id="145">145</th><td>  <dfn class="decl" id="_ZN16G4EmModelManagerC1Ev" title='G4EmModelManager::G4EmModelManager' data-ref="_ZN16G4EmModelManagerC1Ev">G4EmModelManager</dfn>();</td></tr>
+<tr><th id="146">146</th><td></td></tr>
+<tr><th id="147">147</th><td>  <dfn class="decl" id="_ZN16G4EmModelManagerD1Ev" title='G4EmModelManager::~G4EmModelManager' data-ref="_ZN16G4EmModelManagerD1Ev">~G4EmModelManager</dfn>();</td></tr>
+<tr><th id="148">148</th><td></td></tr>
+<tr><th id="149">149</th><td>  <em>void</em> <dfn class="decl" id="_ZN16G4EmModelManager5ClearEv" title='G4EmModelManager::Clear' data-ref="_ZN16G4EmModelManager5ClearEv">Clear</dfn>();</td></tr>
+<tr><th id="150">150</th><td></td></tr>
+<tr><th id="151">151</th><td>  <em>const</em> <a class="type" href="../../../../global/management/include/G4DataVector.hh.html#G4DataVector" title='G4DataVector' data-ref="G4DataVector">G4DataVector</a>* <dfn class="decl" id="_ZN16G4EmModelManager10InitialiseEPK20G4ParticleDefinitionS2_di" title='G4EmModelManager::Initialise' data-ref="_ZN16G4EmModelManager10InitialiseEPK20G4ParticleDefinitionS2_di">Initialise</dfn>(<em>const</em> <a class="type" href="../../../../particles/management/include/G4ParticleDefinition.hh.html#G4ParticleDefinition" title='G4ParticleDefinition' data-ref="G4ParticleDefinition">G4ParticleDefinition</a>* <dfn class="local col2 decl" id="282part" title='part' data-type='const G4ParticleDefinition *' data-ref="282part">part</dfn>,</td></tr>
+<tr><th id="152">152</th><td>                                 <em>const</em> <a class="type" href="../../../../particles/management/include/G4ParticleDefinition.hh.html#G4ParticleDefinition" title='G4ParticleDefinition' data-ref="G4ParticleDefinition">G4ParticleDefinition</a>* <dfn class="local col3 decl" id="283secPart" title='secPart' data-type='const G4ParticleDefinition *' data-ref="283secPart">secPart</dfn>,</td></tr>
+<tr><th id="153">153</th><td>                                 <a class="typedef" href="../../../../global/management/include/G4Types.hh.html#G4double" title='G4double' data-type='double' data-ref="G4double">G4double</a> <dfn class="local col4 decl" id="284minSubRange" title='minSubRange' data-type='G4double' data-ref="284minSubRange">minSubRange</dfn>,</td></tr>
+<tr><th id="154">154</th><td>                                 <a class="typedef" href="../../../../global/management/include/G4Types.hh.html#G4int" title='G4int' data-type='int' data-ref="G4int">G4int</a> <dfn class="local col5 decl" id="285verb" title='verb' data-type='G4int' data-ref="285verb">verb</dfn>);</td></tr>
+<tr><th id="155">155</th><td></td></tr>
+<tr><th id="156">156</th><td>  <em>void</em> <dfn class="decl" id="_ZN16G4EmModelManager14FillDEDXVectorEP15G4PhysicsVectorPK20G4MaterialCutsCouple13G4EmTableType" title='G4EmModelManager::FillDEDXVector' data-ref="_ZN16G4EmModelManager14FillDEDXVectorEP15G4PhysicsVectorPK20G4MaterialCutsCouple13G4EmTableType">FillDEDXVector</dfn>(<a class="type" href="../../../../global/management/include/G4PhysicsVector.hh.html#G4PhysicsVector" title='G4PhysicsVector' data-ref="G4PhysicsVector">G4PhysicsVector</a>*, <em>const</em> <a class="type" href="../../../cuts/include/G4MaterialCutsCouple.hh.html#G4MaterialCutsCouple" title='G4MaterialCutsCouple' data-ref="G4MaterialCutsCouple">G4MaterialCutsCouple</a>*, </td></tr>
+<tr><th id="157">157</th><td>                      <a class="type" href="G4EmTableType.hh.html#G4EmTableType" title='G4EmTableType' data-ref="G4EmTableType">G4EmTableType</a> <dfn class="local col6 decl" id="286t" title='t' data-type='G4EmTableType' data-ref="286t">t</dfn> = <a class="enum" href="G4EmTableType.hh.html#G4EmTableType::fRestricted" title='G4EmTableType::fRestricted' data-ref="G4EmTableType::fRestricted">fRestricted</a>);</td></tr>
+<tr><th id="158">158</th><td></td></tr>
+<tr><th id="159">159</th><td>  <em>void</em> <dfn class="decl" id="_ZN16G4EmModelManager16FillLambdaVectorEP15G4PhysicsVectorPK20G4MaterialCutsCoupleb13G4EmTableType" title='G4EmModelManager::FillLambdaVector' data-ref="_ZN16G4EmModelManager16FillLambdaVectorEP15G4PhysicsVectorPK20G4MaterialCutsCoupleb13G4EmTableType">FillLambdaVector</dfn>(<a class="type" href="../../../../global/management/include/G4PhysicsVector.hh.html#G4PhysicsVector" title='G4PhysicsVector' data-ref="G4PhysicsVector">G4PhysicsVector</a>*, <em>const</em> <a class="type" href="../../../cuts/include/G4MaterialCutsCouple.hh.html#G4MaterialCutsCouple" title='G4MaterialCutsCouple' data-ref="G4MaterialCutsCouple">G4MaterialCutsCouple</a>*, </td></tr>
+<tr><th id="160">160</th><td>                        <a class="typedef" href="../../../../global/management/include/G4Types.hh.html#G4bool" title='G4bool' data-type='bool' data-ref="G4bool">G4bool</a> <dfn class="local col7 decl" id="287startFromNull" title='startFromNull' data-type='G4bool' data-ref="287startFromNull">startFromNull</dfn> = <b>true</b>, </td></tr>
+<tr><th id="161">161</th><td>                        <a class="type" href="G4EmTableType.hh.html#G4EmTableType" title='G4EmTableType' data-ref="G4EmTableType">G4EmTableType</a> <dfn class="local col8 decl" id="288t" title='t' data-type='G4EmTableType' data-ref="288t">t</dfn> = <a class="enum" href="G4EmTableType.hh.html#G4EmTableType::fRestricted" title='G4EmTableType::fRestricted' data-ref="G4EmTableType::fRestricted">fRestricted</a>);</td></tr>
+<tr><th id="162">162</th><td></td></tr>
+<tr><th id="163">163</th><td>  <em>void</em> <dfn class="decl" id="_ZN16G4EmModelManager10AddEmModelEiP10G4VEmModelP21G4VEmFluctuationModelPK8G4Region" title='G4EmModelManager::AddEmModel' data-ref="_ZN16G4EmModelManager10AddEmModelEiP10G4VEmModelP21G4VEmFluctuationModelPK8G4Region">AddEmModel</dfn>(<a class="typedef" href="../../../../global/management/include/G4Types.hh.html#G4int" title='G4int' data-type='int' data-ref="G4int">G4int</a>, <a class="type" href="G4VEmModel.hh.html#G4VEmModel" title='G4VEmModel' data-ref="G4VEmModel">G4VEmModel</a>*, <a class="type" href="G4VEmFluctuationModel.hh.html#G4VEmFluctuationModel" title='G4VEmFluctuationModel' data-ref="G4VEmFluctuationModel">G4VEmFluctuationModel</a>*, <em>const</em> <a class="type" href="../../../../geometry/management/include/G4Region.hh.html#G4Region" title='G4Region' data-ref="G4Region">G4Region</a>*); </td></tr>
+<tr><th id="164">164</th><td></td></tr>
+<tr><th id="165">165</th><td>  <em>void</em> <dfn class="decl" id="_ZN16G4EmModelManager13UpdateEmModelERK8G4Stringdd" title='G4EmModelManager::UpdateEmModel' data-ref="_ZN16G4EmModelManager13UpdateEmModelERK8G4Stringdd">UpdateEmModel</dfn>(<em>const</em> <a class="type" href="../../../../global/management/include/G4String.hh.html#G4String" title='G4String' data-ref="G4String">G4String</a>&amp; <dfn class="local col9 decl" id="289model_name" title='model_name' data-type='const G4String &amp;' data-ref="289model_name">model_name</dfn>, <a class="typedef" href="../../../../global/management/include/G4Types.hh.html#G4double" title='G4double' data-type='double' data-ref="G4double">G4double</a> <dfn class="local col0 decl" id="290emin" title='emin' data-type='G4double' data-ref="290emin">emin</dfn>, <a class="typedef" href="../../../../global/management/include/G4Types.hh.html#G4double" title='G4double' data-type='double' data-ref="G4double">G4double</a> <dfn class="local col1 decl" id="291emax" title='emax' data-type='G4double' data-ref="291emax">emax</dfn>);</td></tr>
+<tr><th id="166">166</th><td></td></tr>
+<tr><th id="167">167</th><td>  <i>// Get model pointer from the model list</i></td></tr>
+<tr><th id="168">168</th><td>  <a class="type" href="G4VEmModel.hh.html#G4VEmModel" title='G4VEmModel' data-ref="G4VEmModel">G4VEmModel</a>* <dfn class="decl" id="_ZN16G4EmModelManager8GetModelEib" title='G4EmModelManager::GetModel' data-ref="_ZN16G4EmModelManager8GetModelEib">GetModel</dfn>(<a class="typedef" href="../../../../global/management/include/G4Types.hh.html#G4int" title='G4int' data-type='int' data-ref="G4int">G4int</a> <dfn class="local col2 decl" id="292idx" title='idx' data-type='G4int' data-ref="292idx">idx</dfn>, <a class="typedef" href="../../../../global/management/include/G4Types.hh.html#G4bool" title='G4bool' data-type='bool' data-ref="G4bool">G4bool</a> <dfn class="local col3 decl" id="293ver" title='ver' data-type='G4bool' data-ref="293ver">ver</dfn> = <b>false</b>);</td></tr>
+<tr><th id="169">169</th><td></td></tr>
+<tr><th id="170">170</th><td>  <i>// Get model pointer from the model list for a given material cuts couple</i></td></tr>
+<tr><th id="171">171</th><td><i>  // no check on material cuts couple index</i></td></tr>
+<tr><th id="172">172</th><td>  <a class="type" href="G4VEmModel.hh.html#G4VEmModel" title='G4VEmModel' data-ref="G4VEmModel">G4VEmModel</a>* <dfn class="decl" id="_ZN16G4EmModelManager14GetRegionModelEii" title='G4EmModelManager::GetRegionModel' data-ref="_ZN16G4EmModelManager14GetRegionModelEii">GetRegionModel</dfn>(<a class="typedef" href="../../../../global/management/include/G4Types.hh.html#G4int" title='G4int' data-type='int' data-ref="G4int">G4int</a> <dfn class="local col4 decl" id="294idx" title='idx' data-type='G4int' data-ref="294idx">idx</dfn>, size_t <dfn class="local col5 decl" id="295index_couple" title='index_couple' data-type='int' data-ref="295index_couple">index_couple</dfn>);</td></tr>
+<tr><th id="173">173</th><td></td></tr>
+<tr><th id="174">174</th><td>  <i>// total number of models for material cut couples</i></td></tr>
+<tr><th id="175">175</th><td><i>  // no check on material cuts couple index</i></td></tr>
+<tr><th id="176">176</th><td>  <a class="typedef" href="../../../../global/management/include/G4Types.hh.html#G4int" title='G4int' data-type='int' data-ref="G4int">G4int</a> <dfn class="decl" id="_ZNK16G4EmModelManager20NumberOfRegionModelsEi" title='G4EmModelManager::NumberOfRegionModels' data-ref="_ZNK16G4EmModelManager20NumberOfRegionModelsEi">NumberOfRegionModels</dfn>(size_t <dfn class="local col6 decl" id="296index_couple" title='index_couple' data-type='int' data-ref="296index_couple">index_couple</dfn>) <em>const</em>;</td></tr>
+<tr><th id="177">177</th><td></td></tr>
+<tr><th id="178">178</th><td>  <i>// Automatic documentation</i></td></tr>
+<tr><th id="179">179</th><td>  <em>void</em> <dfn class="decl" id="_ZN16G4EmModelManager13DumpModelListERii" title='G4EmModelManager::DumpModelList' data-ref="_ZN16G4EmModelManager13DumpModelListERii">DumpModelList</dfn>(std::ostream&amp; <dfn class="local col7 decl" id="297out" title='out' data-type='int &amp;' data-ref="297out">out</dfn>, <a class="typedef" href="../../../../global/management/include/G4Types.hh.html#G4int" title='G4int' data-type='int' data-ref="G4int">G4int</a> <dfn class="local col8 decl" id="298verb" title='verb' data-type='G4int' data-ref="298verb">verb</dfn>);</td></tr>
+<tr><th id="180">180</th><td></td></tr>
+<tr><th id="181">181</th><td>  <i>// Select model for given material cuts couple index</i></td></tr>
+<tr><th id="182">182</th><td>  <b>inline</b> <a class="type" href="G4VEmModel.hh.html#G4VEmModel" title='G4VEmModel' data-ref="G4VEmModel">G4VEmModel</a>* <dfn class="decl" id="_ZN16G4EmModelManager11SelectModelERdRi" title='G4EmModelManager::SelectModel' data-ref="_ZN16G4EmModelManager11SelectModelERdRi">SelectModel</dfn>(<a class="typedef" href="../../../../global/management/include/G4Types.hh.html#G4double" title='G4double' data-type='double' data-ref="G4double">G4double</a>&amp; <dfn class="local col9 decl" id="299energy" title='energy' data-type='G4double &amp;' data-ref="299energy">energy</dfn>, size_t&amp; <dfn class="local col0 decl" id="300index" title='index' data-type='int &amp;' data-ref="300index">index</dfn>);</td></tr>
+<tr><th id="183">183</th><td></td></tr>
+<tr><th id="184">184</th><td>  <i>// Access to cuts</i></td></tr>
+<tr><th id="185">185</th><td>  <b>inline</b> <em>const</em> <a class="type" href="../../../../global/management/include/G4DataVector.hh.html#G4DataVector" title='G4DataVector' data-ref="G4DataVector">G4DataVector</a>* <a class="decl" href="#_ZNK16G4EmModelManager4CutsEv" title='G4EmModelManager::Cuts' data-ref="_ZNK16G4EmModelManager4CutsEv">Cuts</a>() <em>const</em>;</td></tr>
+<tr><th id="186">186</th><td>  <b>inline</b> <em>const</em> <a class="type" href="../../../../global/management/include/G4DataVector.hh.html#G4DataVector" title='G4DataVector' data-ref="G4DataVector">G4DataVector</a>* <a class="decl" href="#_ZNK16G4EmModelManager9SubCutoffEv" title='G4EmModelManager::SubCutoff' data-ref="_ZNK16G4EmModelManager9SubCutoffEv">SubCutoff</a>() <em>const</em>;</td></tr>
+<tr><th id="187">187</th><td></td></tr>
+<tr><th id="188">188</th><td>  <i>// Set flag of fluorescence</i></td></tr>
+<tr><th id="189">189</th><td>  <b>inline</b> <em>void</em> <a class="decl" href="#_ZN16G4EmModelManager11SetFluoFlagEb" title='G4EmModelManager::SetFluoFlag' data-ref="_ZN16G4EmModelManager11SetFluoFlagEb">SetFluoFlag</a>(<a class="typedef" href="../../../../global/management/include/G4Types.hh.html#G4bool" title='G4bool' data-type='bool' data-ref="G4bool">G4bool</a> <dfn class="local col1 decl" id="301val" title='val' data-type='G4bool' data-ref="301val">val</dfn>);</td></tr>
+<tr><th id="190">190</th><td></td></tr>
+<tr><th id="191">191</th><td>  <i>// total number of models</i></td></tr>
+<tr><th id="192">192</th><td>  <b>inline</b> <a class="typedef" href="../../../../global/management/include/G4Types.hh.html#G4int" title='G4int' data-type='int' data-ref="G4int">G4int</a> <a class="decl" href="#_ZNK16G4EmModelManager14NumberOfModelsEv" title='G4EmModelManager::NumberOfModels' data-ref="_ZNK16G4EmModelManager14NumberOfModelsEv">NumberOfModels</a>() <em>const</em>;</td></tr>
+<tr><th id="193">193</th><td></td></tr>
+<tr><th id="194">194</th><td><b>private</b>:</td></tr>
+<tr><th id="195">195</th><td></td></tr>
+<tr><th id="196">196</th><td>  <b>inline</b> <a class="typedef" href="../../../../global/management/include/G4Types.hh.html#G4double" title='G4double' data-type='double' data-ref="G4double">G4double</a> <a class="decl" href="#_ZN16G4EmModelManager11ComputeDEDXEP10G4VEmModelPK20G4MaterialCutsCoupleddd" title='G4EmModelManager::ComputeDEDX' data-ref="_ZN16G4EmModelManager11ComputeDEDXEP10G4VEmModelPK20G4MaterialCutsCoupleddd">ComputeDEDX</a>(<a class="type" href="G4VEmModel.hh.html#G4VEmModel" title='G4VEmModel' data-ref="G4VEmModel">G4VEmModel</a>* <dfn class="local col2 decl" id="302model" title='model' data-type='G4VEmModel *' data-ref="302model">model</dfn>,</td></tr>
+<tr><th id="197">197</th><td>                              <em>const</em> <a class="type" href="../../../cuts/include/G4MaterialCutsCouple.hh.html#G4MaterialCutsCouple" title='G4MaterialCutsCouple' data-ref="G4MaterialCutsCouple">G4MaterialCutsCouple</a>*,</td></tr>
+<tr><th id="198">198</th><td>                              <a class="typedef" href="../../../../global/management/include/G4Types.hh.html#G4double" title='G4double' data-type='double' data-ref="G4double">G4double</a> <dfn class="local col3 decl" id="303kinEnergy" title='kinEnergy' data-type='G4double' data-ref="303kinEnergy">kinEnergy</dfn>,</td></tr>
+<tr><th id="199">199</th><td>                              <a class="typedef" href="../../../../global/management/include/G4Types.hh.html#G4double" title='G4double' data-type='double' data-ref="G4double">G4double</a> <dfn class="local col4 decl" id="304cutEnergy" title='cutEnergy' data-type='G4double' data-ref="304cutEnergy">cutEnergy</dfn>,</td></tr>
+<tr><th id="200">200</th><td>                              <a class="typedef" href="../../../../global/management/include/G4Types.hh.html#G4double" title='G4double' data-type='double' data-ref="G4double">G4double</a> <dfn class="local col5 decl" id="305minEnergy" title='minEnergy' data-type='G4double' data-ref="305minEnergy">minEnergy</dfn>);</td></tr>
+<tr><th id="201">201</th><td></td></tr>
+<tr><th id="202">202</th><td>  <i>// hide  assignment operator</i></td></tr>
+<tr><th id="203">203</th><td></td></tr>
+<tr><th id="204">204</th><td>  <dfn class="decl def" id="_ZN16G4EmModelManagerC1ERS_" title='G4EmModelManager::G4EmModelManager' data-ref="_ZN16G4EmModelManagerC1ERS_">G4EmModelManager</dfn>(<a class="type" href="#G4EmModelManager" title='G4EmModelManager' data-ref="G4EmModelManager">G4EmModelManager</a> &amp;) = <b>delete</b>;</td></tr>
+<tr><th id="205">205</th><td>  <a class="type" href="#G4EmModelManager" title='G4EmModelManager' data-ref="G4EmModelManager">G4EmModelManager</a> &amp; <dfn class="decl def" id="_ZN16G4EmModelManageraSERKS_" title='G4EmModelManager::operator=' data-ref="_ZN16G4EmModelManageraSERKS_"><b>operator</b>=</dfn>(<em>const</em> <a class="type" href="#G4EmModelManager" title='G4EmModelManager' data-ref="G4EmModelManager">G4EmModelManager</a> &amp;<dfn class="local col6 decl" id="306right" title='right' data-type='const G4EmModelManager &amp;' data-ref="306right">right</dfn>) = <b>delete</b>;</td></tr>
+<tr><th id="206">206</th><td></td></tr>
+<tr><th id="207">207</th><td><i>// =====================================================================</i></td></tr>
+<tr><th id="208">208</th><td></td></tr>
+<tr><th id="209">209</th><td><b>private</b>:</td></tr>
+<tr><th id="210">210</th><td></td></tr>
+<tr><th id="211">211</th><td>  <em>const</em> <a class="type" href="../../../../global/management/include/G4DataVector.hh.html#G4DataVector" title='G4DataVector' data-ref="G4DataVector">G4DataVector</a>*    <dfn class="decl" id="G4EmModelManager::theCuts" title='G4EmModelManager::theCuts' data-ref="G4EmModelManager::theCuts">theCuts</dfn>;</td></tr>
+<tr><th id="212">212</th><td>  <a class="type" href="../../../../global/management/include/G4DataVector.hh.html#G4DataVector" title='G4DataVector' data-ref="G4DataVector">G4DataVector</a>*          <dfn class="decl" id="G4EmModelManager::theCutsNew" title='G4EmModelManager::theCutsNew' data-ref="G4EmModelManager::theCutsNew">theCutsNew</dfn>;</td></tr>
+<tr><th id="213">213</th><td>  <a class="type" href="../../../../global/management/include/G4DataVector.hh.html#G4DataVector" title='G4DataVector' data-ref="G4DataVector">G4DataVector</a>*          <dfn class="decl" id="G4EmModelManager::theSubCuts" title='G4EmModelManager::theSubCuts' data-ref="G4EmModelManager::theSubCuts">theSubCuts</dfn>;</td></tr>
+<tr><th id="214">214</th><td></td></tr>
+<tr><th id="215">215</th><td>  std::vector&lt;G4VEmModel*&gt;                models;</td></tr>
+<tr><th id="216">216</th><td>  std::vector&lt;G4VEmFluctuationModel*&gt;     flucModels;</td></tr>
+<tr><th id="217">217</th><td>  std::vector&lt;<em>const</em> G4Region*&gt;            regions;</td></tr>
+<tr><th id="218">218</th><td>  std::vector&lt;G4int&gt;                      orderOfModels;</td></tr>
+<tr><th id="219">219</th><td>  std::vector&lt;G4int&gt;                      isUsed;</td></tr>
+<tr><th id="220">220</th><td></td></tr>
+<tr><th id="221">221</th><td>  <a class="typedef" href="../../../../global/management/include/G4Types.hh.html#G4int" title='G4int' data-type='int' data-ref="G4int">G4int</a>                       <dfn class="decl" id="G4EmModelManager::nEmModels" title='G4EmModelManager::nEmModels' data-ref="G4EmModelManager::nEmModels">nEmModels</dfn>;</td></tr>
+<tr><th id="222">222</th><td>  <a class="typedef" href="../../../../global/management/include/G4Types.hh.html#G4int" title='G4int' data-type='int' data-ref="G4int">G4int</a>                       <dfn class="decl" id="G4EmModelManager::nRegions" title='G4EmModelManager::nRegions' data-ref="G4EmModelManager::nRegions">nRegions</dfn>;</td></tr>
+<tr><th id="223">223</th><td></td></tr>
+<tr><th id="224">224</th><td>  std::vector&lt;G4int&gt;            idxOfRegionModels;</td></tr>
+<tr><th id="225">225</th><td>  std::vector&lt;G4RegionModels*&gt;  setOfRegionModels;</td></tr>
+<tr><th id="226">226</th><td></td></tr>
+<tr><th id="227">227</th><td>  <a class="typedef" href="../../../../global/management/include/G4Types.hh.html#G4double" title='G4double' data-type='double' data-ref="G4double">G4double</a>                    <dfn class="decl" id="G4EmModelManager::maxSubCutInRange" title='G4EmModelManager::maxSubCutInRange' data-ref="G4EmModelManager::maxSubCutInRange">maxSubCutInRange</dfn>;</td></tr>
+<tr><th id="228">228</th><td></td></tr>
+<tr><th id="229">229</th><td>  <em>const</em> <a class="type" href="../../../../particles/management/include/G4ParticleDefinition.hh.html#G4ParticleDefinition" title='G4ParticleDefinition' data-ref="G4ParticleDefinition">G4ParticleDefinition</a>* <dfn class="decl" id="G4EmModelManager::particle" title='G4EmModelManager::particle' data-ref="G4EmModelManager::particle">particle</dfn>;</td></tr>
+<tr><th id="230">230</th><td></td></tr>
+<tr><th id="231">231</th><td>  <a class="typedef" href="../../../../global/management/include/G4Types.hh.html#G4int" title='G4int' data-type='int' data-ref="G4int">G4int</a>                       <dfn class="decl" id="G4EmModelManager::verboseLevel" title='G4EmModelManager::verboseLevel' data-ref="G4EmModelManager::verboseLevel">verboseLevel</dfn>;</td></tr>
+<tr><th id="232">232</th><td>  <a class="typedef" href="../../../../global/management/include/G4Types.hh.html#G4bool" title='G4bool' data-type='bool' data-ref="G4bool">G4bool</a>                      <dfn class="decl" id="G4EmModelManager::severalModels" title='G4EmModelManager::severalModels' data-ref="G4EmModelManager::severalModels">severalModels</dfn>;</td></tr>
+<tr><th id="233">233</th><td>  <a class="typedef" href="../../../../global/management/include/G4Types.hh.html#G4bool" title='G4bool' data-type='bool' data-ref="G4bool">G4bool</a>                      <dfn class="decl" id="G4EmModelManager::fluoFlag" title='G4EmModelManager::fluoFlag' data-ref="G4EmModelManager::fluoFlag">fluoFlag</dfn>;</td></tr>
+<tr><th id="234">234</th><td></td></tr>
+<tr><th id="235">235</th><td>  <i>// may be changed in run time</i></td></tr>
+<tr><th id="236">236</th><td>  <a class="type" href="#G4RegionModels" title='G4RegionModels' data-ref="G4RegionModels">G4RegionModels</a>*             <dfn class="decl" id="G4EmModelManager::currRegionModel" title='G4EmModelManager::currRegionModel' data-ref="G4EmModelManager::currRegionModel">currRegionModel</dfn>;</td></tr>
+<tr><th id="237">237</th><td>  <a class="type" href="G4VEmModel.hh.html#G4VEmModel" title='G4VEmModel' data-ref="G4VEmModel">G4VEmModel</a>*                 <dfn class="decl" id="G4EmModelManager::currModel" title='G4EmModelManager::currModel' data-ref="G4EmModelManager::currModel">currModel</dfn>;</td></tr>
+<tr><th id="238">238</th><td>};</td></tr>
+<tr><th id="239">239</th><td></td></tr>
+<tr><th id="240">240</th><td><i>//....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo....</i></td></tr>
+<tr><th id="241">241</th><td><i>//....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo....</i></td></tr>
+<tr><th id="242">242</th><td></td></tr>
+<tr><th id="243">243</th><td><b>inline</b> G4VEmModel* G4EmModelManager::SelectModel(G4double&amp; kinEnergy, </td></tr>
+<tr><th id="244">244</th><td>                                                 <span class='error' title="unknown type name &apos;size_t&apos;">size_t</span>&amp; index)</td></tr>
+<tr><th id="245">245</th><td>{</td></tr>
+<tr><th id="246">246</th><td>  <b>if</b>(severalModels) {</td></tr>
+<tr><th id="247">247</th><td>    <b>if</b>(nRegions &gt; <var>1</var>) {</td></tr>
+<tr><th id="248">248</th><td>      currRegionModel = <span class='error' title="use of undeclared identifier &apos;setOfRegionModels&apos;">setOfRegionModels</span>[<span class='error' title="use of undeclared identifier &apos;idxOfRegionModels&apos;">idxOfRegionModels</span>[index]];</td></tr>
+<tr><th id="249">249</th><td>    }</td></tr>
+<tr><th id="250">250</th><td>    currModel = <span class='error' title="use of undeclared identifier &apos;models&apos;">models</span>[currRegionModel-&gt;SelectIndex(kinEnergy)];</td></tr>
+<tr><th id="251">251</th><td>  }</td></tr>
+<tr><th id="252">252</th><td>  <b>return</b> currModel;</td></tr>
+<tr><th id="253">253</th><td>}</td></tr>
+<tr><th id="254">254</th><td></td></tr>
+<tr><th id="255">255</th><td><i>//....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo....</i></td></tr>
+<tr><th id="256">256</th><td></td></tr>
+<tr><th id="257">257</th><td><b>inline</b> <em>const</em> <a class="type" href="../../../../global/management/include/G4DataVector.hh.html#G4DataVector" title='G4DataVector' data-ref="G4DataVector">G4DataVector</a>* <a class="type" href="#G4EmModelManager" title='G4EmModelManager' data-ref="G4EmModelManager">G4EmModelManager</a>::<dfn class="decl def" id="_ZNK16G4EmModelManager4CutsEv" title='G4EmModelManager::Cuts' data-ref="_ZNK16G4EmModelManager4CutsEv">Cuts</dfn>() <em>const</em></td></tr>
+<tr><th id="258">258</th><td>{</td></tr>
+<tr><th id="259">259</th><td>  <b>return</b> <a class="member" href="#G4EmModelManager::theCuts" title='G4EmModelManager::theCuts' data-ref="G4EmModelManager::theCuts">theCuts</a>;</td></tr>
+<tr><th id="260">260</th><td>}</td></tr>
+<tr><th id="261">261</th><td></td></tr>
+<tr><th id="262">262</th><td><i>//....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo....</i></td></tr>
+<tr><th id="263">263</th><td></td></tr>
+<tr><th id="264">264</th><td><b>inline</b> <em>const</em> <a class="type" href="../../../../global/management/include/G4DataVector.hh.html#G4DataVector" title='G4DataVector' data-ref="G4DataVector">G4DataVector</a>* <a class="type" href="#G4EmModelManager" title='G4EmModelManager' data-ref="G4EmModelManager">G4EmModelManager</a>::<dfn class="decl def" id="_ZNK16G4EmModelManager9SubCutoffEv" title='G4EmModelManager::SubCutoff' data-ref="_ZNK16G4EmModelManager9SubCutoffEv">SubCutoff</dfn>() <em>const</em></td></tr>
+<tr><th id="265">265</th><td>{</td></tr>
+<tr><th id="266">266</th><td>  <b>return</b> <a class="member" href="#G4EmModelManager::theSubCuts" title='G4EmModelManager::theSubCuts' data-ref="G4EmModelManager::theSubCuts">theSubCuts</a>;</td></tr>
+<tr><th id="267">267</th><td>}</td></tr>
+<tr><th id="268">268</th><td></td></tr>
+<tr><th id="269">269</th><td><i>//....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo....</i></td></tr>
+<tr><th id="270">270</th><td></td></tr>
+<tr><th id="271">271</th><td><b>inline</b> <em>void</em> <a class="type" href="#G4EmModelManager" title='G4EmModelManager' data-ref="G4EmModelManager">G4EmModelManager</a>::<dfn class="decl def" id="_ZN16G4EmModelManager11SetFluoFlagEb" title='G4EmModelManager::SetFluoFlag' data-ref="_ZN16G4EmModelManager11SetFluoFlagEb">SetFluoFlag</dfn>(<a class="typedef" href="../../../../global/management/include/G4Types.hh.html#G4bool" title='G4bool' data-type='bool' data-ref="G4bool">G4bool</a> <dfn class="local col7 decl" id="307val" title='val' data-type='G4bool' data-ref="307val">val</dfn>)</td></tr>
+<tr><th id="272">272</th><td>{</td></tr>
+<tr><th id="273">273</th><td>  <a class="member" href="#G4EmModelManager::fluoFlag" title='G4EmModelManager::fluoFlag' data-ref="G4EmModelManager::fluoFlag">fluoFlag</a> = <a class="local col7 ref" href="#307val" title='val' data-ref="307val">val</a>;</td></tr>
+<tr><th id="274">274</th><td>}</td></tr>
+<tr><th id="275">275</th><td></td></tr>
+<tr><th id="276">276</th><td><i>//....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo....</i></td></tr>
+<tr><th id="277">277</th><td></td></tr>
+<tr><th id="278">278</th><td><b>inline</b> <a class="typedef" href="../../../../global/management/include/G4Types.hh.html#G4int" title='G4int' data-type='int' data-ref="G4int">G4int</a> <a class="type" href="#G4EmModelManager" title='G4EmModelManager' data-ref="G4EmModelManager">G4EmModelManager</a>::<dfn class="decl def" id="_ZNK16G4EmModelManager14NumberOfModelsEv" title='G4EmModelManager::NumberOfModels' data-ref="_ZNK16G4EmModelManager14NumberOfModelsEv">NumberOfModels</dfn>() <em>const</em></td></tr>
+<tr><th id="279">279</th><td>{</td></tr>
+<tr><th id="280">280</th><td>  <b>return</b> <a class="member" href="#G4EmModelManager::nEmModels" title='G4EmModelManager::nEmModels' data-ref="G4EmModelManager::nEmModels">nEmModels</a>;</td></tr>
+<tr><th id="281">281</th><td>}</td></tr>
+<tr><th id="282">282</th><td></td></tr>
+<tr><th id="283">283</th><td><i>//....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo....</i></td></tr>
+<tr><th id="284">284</th><td></td></tr>
+<tr><th id="285">285</th><td><b>inline</b> <a class="typedef" href="../../../../global/management/include/G4Types.hh.html#G4double" title='G4double' data-type='double' data-ref="G4double">G4double</a> </td></tr>
+<tr><th id="286">286</th><td><a class="type" href="#G4EmModelManager" title='G4EmModelManager' data-ref="G4EmModelManager">G4EmModelManager</a>::<dfn class="decl def" id="_ZN16G4EmModelManager11ComputeDEDXEP10G4VEmModelPK20G4MaterialCutsCoupleddd" title='G4EmModelManager::ComputeDEDX' data-ref="_ZN16G4EmModelManager11ComputeDEDXEP10G4VEmModelPK20G4MaterialCutsCoupleddd">ComputeDEDX</dfn>(<a class="type" href="G4VEmModel.hh.html#G4VEmModel" title='G4VEmModel' data-ref="G4VEmModel">G4VEmModel</a>* <dfn class="local col8 decl" id="308model" title='model' data-type='G4VEmModel *' data-ref="308model">model</dfn>,</td></tr>
+<tr><th id="287">287</th><td>                              <em>const</em> <a class="type" href="../../../cuts/include/G4MaterialCutsCouple.hh.html#G4MaterialCutsCouple" title='G4MaterialCutsCouple' data-ref="G4MaterialCutsCouple">G4MaterialCutsCouple</a>* <dfn class="local col9 decl" id="309couple" title='couple' data-type='const G4MaterialCutsCouple *' data-ref="309couple">couple</dfn>,</td></tr>
+<tr><th id="288">288</th><td>                              <a class="typedef" href="../../../../global/management/include/G4Types.hh.html#G4double" title='G4double' data-type='double' data-ref="G4double">G4double</a> <dfn class="local col0 decl" id="310e" title='e' data-type='G4double' data-ref="310e">e</dfn>,</td></tr>
+<tr><th id="289">289</th><td>                              <a class="typedef" href="../../../../global/management/include/G4Types.hh.html#G4double" title='G4double' data-type='double' data-ref="G4double">G4double</a> <dfn class="local col1 decl" id="311cut" title='cut' data-type='G4double' data-ref="311cut">cut</dfn>,</td></tr>
+<tr><th id="290">290</th><td>                              <a class="typedef" href="../../../../global/management/include/G4Types.hh.html#G4double" title='G4double' data-type='double' data-ref="G4double">G4double</a> <dfn class="local col2 decl" id="312emin" title='emin' data-type='G4double' data-ref="312emin">emin</dfn>)</td></tr>
+<tr><th id="291">291</th><td>{</td></tr>
+<tr><th id="292">292</th><td>  <a class="typedef" href="../../../../global/management/include/G4Types.hh.html#G4double" title='G4double' data-type='double' data-ref="G4double">G4double</a> <dfn class="local col3 decl" id="313dedx" title='dedx' data-type='G4double' data-ref="313dedx">dedx</dfn> = <var>0.0</var>;</td></tr>
+<tr><th id="293">293</th><td>  <b>if</b>(<a class="local col8 ref" href="#308model" title='model' data-ref="308model">model</a> &amp;&amp; <a class="local col1 ref" href="#311cut" title='cut' data-ref="311cut">cut</a> &gt; <a class="local col2 ref" href="#312emin" title='emin' data-ref="312emin">emin</a>) {</td></tr>
+<tr><th id="294">294</th><td>    <a class="local col3 ref" href="#313dedx" title='dedx' data-ref="313dedx">dedx</a> = <a class="local col8 ref" href="#308model" title='model' data-ref="308model">model</a>-&gt;<a class="virtual ref" href="G4VEmModel.hh.html#_ZN10G4VEmModel11ComputeDEDXEPK20G4MaterialCutsCouplePK20G4ParticleDefinitiondd" title='G4VEmModel::ComputeDEDX' data-ref="_ZN10G4VEmModel11ComputeDEDXEPK20G4MaterialCutsCouplePK20G4ParticleDefinitiondd">ComputeDEDX</a>(<a class="local col9 ref" href="#309couple" title='couple' data-ref="309couple">couple</a>,<a class="member" href="#G4EmModelManager::particle" title='G4EmModelManager::particle' data-ref="G4EmModelManager::particle">particle</a>,<a class="local col0 ref" href="#310e" title='e' data-ref="310e">e</a>,<a class="local col1 ref" href="#311cut" title='cut' data-ref="311cut">cut</a>); </td></tr>
+<tr><th id="295">295</th><td>    <b>if</b>(<a class="local col2 ref" href="#312emin" title='emin' data-ref="312emin">emin</a> &gt; <var>0.0</var>) {<a class="local col3 ref" href="#313dedx" title='dedx' data-ref="313dedx">dedx</a> -= <a class="local col8 ref" href="#308model" title='model' data-ref="308model">model</a>-&gt;<a class="virtual ref" href="G4VEmModel.hh.html#_ZN10G4VEmModel11ComputeDEDXEPK20G4MaterialCutsCouplePK20G4ParticleDefinitiondd" title='G4VEmModel::ComputeDEDX' data-ref="_ZN10G4VEmModel11ComputeDEDXEPK20G4MaterialCutsCouplePK20G4ParticleDefinitiondd">ComputeDEDX</a>(<a class="local col9 ref" href="#309couple" title='couple' data-ref="309couple">couple</a>,<a class="member" href="#G4EmModelManager::particle" title='G4EmModelManager::particle' data-ref="G4EmModelManager::particle">particle</a>,<a class="local col0 ref" href="#310e" title='e' data-ref="310e">e</a>,<a class="local col2 ref" href="#312emin" title='emin' data-ref="312emin">emin</a>);} </td></tr>
+<tr><th id="296">296</th><td>  }</td></tr>
+<tr><th id="297">297</th><td>  <b>return</b> <a class="local col3 ref" href="#313dedx" title='dedx' data-ref="313dedx">dedx</a>;</td></tr>
+<tr><th id="298">298</th><td>}</td></tr>
+<tr><th id="299">299</th><td></td></tr>
+<tr><th id="300">300</th><td><i>//....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo....</i></td></tr>
+<tr><th id="301">301</th><td></td></tr>
+<tr><th id="302">302</th><td><u>#<span data-ppcond="70">endif</span></u></td></tr>
+<tr><th id="303">303</th><td></td></tr>
+<tr><th id="304">304</th><td></td></tr>
+</table><hr/><p id='footer'>
+Generated while processing <a href='../../../../error_propagation/src/G4ErrorPhysicsList.cc.html'>codebrowser/source/error_propagation/src/G4ErrorPhysicsList.cc</a><br/>Generated on <em>2019-Aug-28</em> from project codebrowser<br />Powered by <a href='https://woboq.com'><img alt='Woboq' src='https://code.woboq.org/woboq-16.png' width='41' height='16' /></a> <a href='https://code.woboq.org'>Code Browser</a> 2.1
+<br/>Generator usage only permitted with license.</p>
+</div></body></html>

@@ -1,0 +1,136 @@
+<!doctype html>
+<html>
+<head>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"><title>Ranlux64Engine.h source code [codebrowser/source/externals/clhep/include/CLHEP/Random/Ranlux64Engine.h] - Woboq Code Browser</title>
+<meta name="woboq:interestingDefinitions" content="CLHEP::Ranlux64Engine "/>
+<link rel="stylesheet" href="../../../../../../../../data/qtcreator.css" title="QtCreator"/>
+<link rel="alternate stylesheet" href="../../../../../../../../data/kdevelop.css" title="KDevelop"/>
+<script type="text/javascript" src="../../../../../../../../data/jquery/jquery.min.js"></script>
+<script type="text/javascript" src="../../../../../../../../data/jquery/jquery-ui.min.js"></script>
+<script>var file = 'codebrowser/source/externals/clhep/include/CLHEP/Random/Ranlux64Engine.h'; var root_path = '../../../../../../..'; var data_path = '../../../../../../../../data';</script>
+<script src='../../../../../../../../data/codebrowser.js'></script>
+</head>
+<body><div id='header'><h1 id='breadcrumb'><span>Browse the source code of </span><a href='../../../../../..'>codebrowser</a>/<a href='../../../../..'>source</a>/<a href='../../../..'>externals</a>/<a href='../../..'>clhep</a>/<a href='../..'>include</a>/<a href='..'>CLHEP</a>/<a href='./'>Random</a>/<a href='Ranlux64Engine.h.html'>Ranlux64Engine.h</a></h1></div>
+<hr/><div id='content'><table class="code">
+<tr><th id="1">1</th><td><i>// -*- C++ -*-</i></td></tr>
+<tr><th id="2">2</th><td><i>//</i></td></tr>
+<tr><th id="3">3</th><td><i>// -----------------------------------------------------------------------</i></td></tr>
+<tr><th id="4">4</th><td><i>//                             HEP Random</i></td></tr>
+<tr><th id="5">5</th><td><i>//                        --- Ranlux64Engine ---</i></td></tr>
+<tr><th id="6">6</th><td><i>//                          class header file</i></td></tr>
+<tr><th id="7">7</th><td><i>// -----------------------------------------------------------------------</i></td></tr>
+<tr><th id="8">8</th><td><i>// The algorithm for this random engine has been taken from the notes of </i></td></tr>
+<tr><th id="9">9</th><td><i>// a double-precision ranlux implementation by Martin Luscher, dated </i></td></tr>
+<tr><th id="10">10</th><td><i>// November 1997.</i></td></tr>
+<tr><th id="11">11</th><td><i>//</i></td></tr>
+<tr><th id="12">12</th><td><i>// Like the previous ranlux generator, this one also has "luxury" levels,</i></td></tr>
+<tr><th id="13">13</th><td><i>// determining how many pseudo-random numbers are discarded for every </i></td></tr>
+<tr><th id="14">14</th><td><i>// twelve values used. Three levels are given, with the note that Luscher</i></td></tr>
+<tr><th id="15">15</th><td><i>// himself advocates only the highest two levels for this engine.</i></td></tr>
+<tr><th id="16">16</th><td><i>//  level 0  (p=109):              Throw away 109 values for every 12 used</i></td></tr>
+<tr><th id="17">17</th><td><i>//  level 1  (p=202):   (default)  Throw away 202 values for every 12 used</i></td></tr>
+<tr><th id="18">18</th><td><i>//  level 2  (p=397):              Throw away 397 values for every 12 used</i></td></tr>
+<tr><th id="19">19</th><td><i>//</i></td></tr>
+<tr><th id="20">20</th><td><i>// The initialization is carried out using a Multiplicative Congruential</i></td></tr>
+<tr><th id="21">21</th><td><i>// generator using formula constants of L'Ecuyer as described in "F.James,</i></td></tr>
+<tr><th id="22">22</th><td><i>// Comp. Phys. Comm. 60 (1990) 329-344".</i></td></tr>
+<tr><th id="23">23</th><td><i>// =======================================================================</i></td></tr>
+<tr><th id="24">24</th><td><i>// Ken Smith      - Created Initial draft: 14th Jul 1998</i></td></tr>
+<tr><th id="25">25</th><td><i>//                - Added conversion operators:  6th Aug 1998</i></td></tr>
+<tr><th id="26">26</th><td><i>// Mark Fischler</i></td></tr>
+<tr><th id="27">27</th><td><i>// 9/9/98	  - Added update() routine to allow computation of many at once</i></td></tr>
+<tr><th id="28">28</th><td><i>//		  - Replaced algorithm with jone exactly matching Luscher:</i></td></tr>
+<tr><th id="29">29</th><td><i>//			48-bits generated</i></td></tr>
+<tr><th id="30">30</th><td><i>//			skip n-12 instead of n numbers</i></td></tr>
+<tr><th id="31">31</th><td><i>//		  - Corrected protection agains overflow</i></td></tr>
+<tr><th id="32">32</th><td><i>// 12/8/04        - Methods for instance save/restore     </i></td></tr>
+<tr><th id="33">33</th><td><i>// 12/27/04       - methods for anonymous save/restore 12/27/04    </i></td></tr>
+<tr><th id="34">34</th><td><i>//</i></td></tr>
+<tr><th id="35">35</th><td><i>// =======================================================================</i></td></tr>
+<tr><th id="36">36</th><td></td></tr>
+<tr><th id="37">37</th><td><u>#<span data-ppcond="37">ifndef</span> <span class="macro" data-ref="_M/Ranlux64Engine_h">Ranlux64Engine_h</span></u></td></tr>
+<tr><th id="38">38</th><td><u>#define <dfn class="macro" id="_M/Ranlux64Engine_h" data-ref="_M/Ranlux64Engine_h">Ranlux64Engine_h</dfn></u></td></tr>
+<tr><th id="39">39</th><td></td></tr>
+<tr><th id="40">40</th><td><u>#include <a href="RandomEngine.h.html">"CLHEP/Random/RandomEngine.h"</a></u></td></tr>
+<tr><th id="41">41</th><td></td></tr>
+<tr><th id="42">42</th><td><b>namespace</b> <span class="namespace">CLHEP</span> {</td></tr>
+<tr><th id="43">43</th><td></td></tr>
+<tr><th id="44">44</th><td><i class="doc">/**</i></td></tr>
+<tr><th id="45">45</th><td><i class="doc"> * <span class="command">@author</span></i></td></tr>
+<tr><th id="46">46</th><td><i class="doc"> * <span class="command">@ingroup</span> <span class="verb">random</span></i></td></tr>
+<tr><th id="47">47</th><td><i class="doc"> */</i></td></tr>
+<tr><th id="48">48</th><td><b>class</b> <dfn class="type def" id="CLHEP::Ranlux64Engine" title='CLHEP::Ranlux64Engine' data-ref="CLHEP::Ranlux64Engine">Ranlux64Engine</dfn> : <b>public</b> <a class="type" href="RandomEngine.h.html#CLHEP::HepRandomEngine" title='CLHEP::HepRandomEngine' data-ref="CLHEP::HepRandomEngine">HepRandomEngine</a> {</td></tr>
+<tr><th id="49">49</th><td></td></tr>
+<tr><th id="50">50</th><td><b>public</b>:</td></tr>
+<tr><th id="51">51</th><td></td></tr>
+<tr><th id="52">52</th><td>  <dfn class="decl" id="_ZN5CLHEP14Ranlux64EngineC1ERi" title='CLHEP::Ranlux64Engine::Ranlux64Engine' data-ref="_ZN5CLHEP14Ranlux64EngineC1ERi">Ranlux64Engine</dfn>( <span class='error' title="use of undeclared identifier &apos;std&apos;">std</span>::istream&amp; <dfn class="local col4 decl" id="314is" title='is' data-type='int &amp;' data-ref="314is">is</dfn> );</td></tr>
+<tr><th id="53">53</th><td>  <dfn class="decl" id="_ZN5CLHEP14Ranlux64EngineC1Ev" title='CLHEP::Ranlux64Engine::Ranlux64Engine' data-ref="_ZN5CLHEP14Ranlux64EngineC1Ev">Ranlux64Engine</dfn>();</td></tr>
+<tr><th id="54">54</th><td>  <dfn class="decl" id="_ZN5CLHEP14Ranlux64EngineC1Eli" title='CLHEP::Ranlux64Engine::Ranlux64Engine' data-ref="_ZN5CLHEP14Ranlux64EngineC1Eli">Ranlux64Engine</dfn>( <em>long</em> <dfn class="local col5 decl" id="315seed" title='seed' data-type='long' data-ref="315seed">seed</dfn>, <em>int</em> <dfn class="local col6 decl" id="316lux" title='lux' data-type='int' data-ref="316lux">lux</dfn> = <var>1</var> );</td></tr>
+<tr><th id="55">55</th><td>  <dfn class="decl" id="_ZN5CLHEP14Ranlux64EngineC1Eiii" title='CLHEP::Ranlux64Engine::Ranlux64Engine' data-ref="_ZN5CLHEP14Ranlux64EngineC1Eiii">Ranlux64Engine</dfn>( <em>int</em> <dfn class="local col7 decl" id="317rowIndex" title='rowIndex' data-type='int' data-ref="317rowIndex">rowIndex</dfn>, <em>int</em> <dfn class="local col8 decl" id="318colIndex" title='colIndex' data-type='int' data-ref="318colIndex">colIndex</dfn>, <em>int</em> <dfn class="local col9 decl" id="319lux" title='lux' data-type='int' data-ref="319lux">lux</dfn> );</td></tr>
+<tr><th id="56">56</th><td>  <b>virtual</b> <dfn class="virtual decl" id="_ZN5CLHEP14Ranlux64EngineD1Ev" title='CLHEP::Ranlux64Engine::~Ranlux64Engine' data-ref="_ZN5CLHEP14Ranlux64EngineD1Ev">~Ranlux64Engine</dfn>();</td></tr>
+<tr><th id="57">57</th><td>  <i>// Constructors and destructor</i></td></tr>
+<tr><th id="58">58</th><td></td></tr>
+<tr><th id="59">59</th><td>  <em>double</em> <dfn class="virtual decl" id="_ZN5CLHEP14Ranlux64Engine4flatEv" title='CLHEP::Ranlux64Engine::flat' data-ref="_ZN5CLHEP14Ranlux64Engine4flatEv">flat</dfn>();</td></tr>
+<tr><th id="60">60</th><td>  <i>// It returns a pseudo random number between 0 and 1,</i></td></tr>
+<tr><th id="61">61</th><td><i>  // excluding the end points.</i></td></tr>
+<tr><th id="62">62</th><td></td></tr>
+<tr><th id="63">63</th><td>  <em>void</em> <dfn class="virtual decl" id="_ZN5CLHEP14Ranlux64Engine9flatArrayEiPd" title='CLHEP::Ranlux64Engine::flatArray' data-ref="_ZN5CLHEP14Ranlux64Engine9flatArrayEiPd">flatArray</dfn> (<em>const</em> <em>int</em> <dfn class="local col0 decl" id="320size" title='size' data-type='const int' data-ref="320size">size</dfn>, <em>double</em>* <dfn class="local col1 decl" id="321vect" title='vect' data-type='double *' data-ref="321vect">vect</dfn>);</td></tr>
+<tr><th id="64">64</th><td>  <i>// Fills the array "vect" of specified size with flat random values.</i></td></tr>
+<tr><th id="65">65</th><td></td></tr>
+<tr><th id="66">66</th><td>  <em>void</em> <dfn class="virtual decl" id="_ZN5CLHEP14Ranlux64Engine7setSeedEli" title='CLHEP::Ranlux64Engine::setSeed' data-ref="_ZN5CLHEP14Ranlux64Engine7setSeedEli">setSeed</dfn>(<em>long</em> <dfn class="local col2 decl" id="322seed" title='seed' data-type='long' data-ref="322seed">seed</dfn>, <em>int</em> <dfn class="local col3 decl" id="323lux" title='lux' data-type='int' data-ref="323lux">lux</dfn>=<var>1</var>);</td></tr>
+<tr><th id="67">67</th><td>  <i>// Sets the state of the algorithm according to seed.</i></td></tr>
+<tr><th id="68">68</th><td></td></tr>
+<tr><th id="69">69</th><td>  <em>void</em> <dfn class="virtual decl" id="_ZN5CLHEP14Ranlux64Engine8setSeedsEPKli" title='CLHEP::Ranlux64Engine::setSeeds' data-ref="_ZN5CLHEP14Ranlux64Engine8setSeedsEPKli">setSeeds</dfn>(<em>const</em> <em>long</em> * <dfn class="local col4 decl" id="324seeds" title='seeds' data-type='const long *' data-ref="324seeds">seeds</dfn>, <em>int</em> <dfn class="local col5 decl" id="325lux" title='lux' data-type='int' data-ref="325lux">lux</dfn>=<var>1</var>);</td></tr>
+<tr><th id="70">70</th><td>  <i>// Sets the state of the algorithm according to the zero terminated</i></td></tr>
+<tr><th id="71">71</th><td><i>  // array of seeds.  Only the first seed is used.</i></td></tr>
+<tr><th id="72">72</th><td></td></tr>
+<tr><th id="73">73</th><td>  <em>void</em> <dfn class="virtual decl" id="_ZNK5CLHEP14Ranlux64Engine10saveStatusEPKc" title='CLHEP::Ranlux64Engine::saveStatus' data-ref="_ZNK5CLHEP14Ranlux64Engine10saveStatusEPKc">saveStatus</dfn>( <em>const</em> <em>char</em> <dfn class="local col6 decl" id="326filename" title='filename' data-type='const char *' data-ref="326filename">filename</dfn>[] = <q>"Ranlux64.conf"</q> ) <em>const</em>;</td></tr>
+<tr><th id="74">74</th><td>  <i>// Saves in named file the current engine status.</i></td></tr>
+<tr><th id="75">75</th><td></td></tr>
+<tr><th id="76">76</th><td>  <em>void</em> <dfn class="virtual decl" id="_ZN5CLHEP14Ranlux64Engine13restoreStatusEPKc" title='CLHEP::Ranlux64Engine::restoreStatus' data-ref="_ZN5CLHEP14Ranlux64Engine13restoreStatusEPKc">restoreStatus</dfn>( <em>const</em> <em>char</em> <dfn class="local col7 decl" id="327filename" title='filename' data-type='const char *' data-ref="327filename">filename</dfn>[] = <q>"Ranlux64.conf"</q> );</td></tr>
+<tr><th id="77">77</th><td>  <i>// Reads from named file the last saved engine status and restores it.</i></td></tr>
+<tr><th id="78">78</th><td></td></tr>
+<tr><th id="79">79</th><td>  <em>void</em> <dfn class="virtual decl" id="_ZNK5CLHEP14Ranlux64Engine10showStatusEv" title='CLHEP::Ranlux64Engine::showStatus' data-ref="_ZNK5CLHEP14Ranlux64Engine10showStatusEv">showStatus</dfn>() <em>const</em>;</td></tr>
+<tr><th id="80">80</th><td>  <i>// Dumps the engine status on the screen.</i></td></tr>
+<tr><th id="81">81</th><td></td></tr>
+<tr><th id="82">82</th><td>  <em>int</em> <dfn class="decl def" id="_ZNK5CLHEP14Ranlux64Engine9getLuxuryEv" title='CLHEP::Ranlux64Engine::getLuxury' data-ref="_ZNK5CLHEP14Ranlux64Engine9getLuxuryEv">getLuxury</dfn>() <em>const</em> { <b>return</b> <a class="member" href="#CLHEP::Ranlux64Engine::luxury" title='CLHEP::Ranlux64Engine::luxury' data-ref="CLHEP::Ranlux64Engine::luxury">luxury</a>; }</td></tr>
+<tr><th id="83">83</th><td>  <i>// Gets the luxury level.</i></td></tr>
+<tr><th id="84">84</th><td></td></tr>
+<tr><th id="85">85</th><td>  <b>virtual</b> <span class='error' title="use of undeclared identifier &apos;std&apos;">std</span>::ostream &amp; <dfn class="decl" id="_ZNK5CLHEP14Ranlux64Engine3putERi" title='CLHEP::Ranlux64Engine::put' data-ref="_ZNK5CLHEP14Ranlux64Engine3putERi">put</dfn> (<span class='error' title="use of undeclared identifier &apos;std&apos;">std</span>::ostream &amp; os) <em>const</em>;</td></tr>
+<tr><th id="86">86</th><td>  <b>virtual</b> <span class='error' title="use of undeclared identifier &apos;std&apos;">std</span>::istream &amp; <dfn class="decl" id="_ZN5CLHEP14Ranlux64Engine3getERi" title='CLHEP::Ranlux64Engine::get' data-ref="_ZN5CLHEP14Ranlux64Engine3getERi">get</dfn> (<span class='error' title="use of undeclared identifier &apos;std&apos;">std</span>::istream &amp; is);</td></tr>
+<tr><th id="87">87</th><td>  <em>static</em>  <span class='error' title="use of undeclared identifier &apos;std&apos;">std</span>::string <dfn class="decl" id="_ZN5CLHEP14Ranlux64Engine8beginTagEv" title='CLHEP::Ranlux64Engine::beginTag' data-ref="_ZN5CLHEP14Ranlux64Engine8beginTagEv">beginTag</dfn> ( );</td></tr>
+<tr><th id="88">88</th><td>  <b>virtual</b> <span class='error' title="use of undeclared identifier &apos;std&apos;">std</span>::istream &amp; <dfn class="decl" id="_ZN5CLHEP14Ranlux64Engine8getStateERi" title='CLHEP::Ranlux64Engine::getState' data-ref="_ZN5CLHEP14Ranlux64Engine8getStateERi">getState</dfn> ( <span class='error' title="use of undeclared identifier &apos;std&apos;">std</span>::istream &amp; is );</td></tr>
+<tr><th id="89">89</th><td></td></tr>
+<tr><th id="90">90</th><td>  <span class='error' title="use of undeclared identifier &apos;std&apos;">std</span>::string <dfn class="decl" id="_ZNK5CLHEP14Ranlux64Engine4nameEv" title='CLHEP::Ranlux64Engine::name' data-ref="_ZNK5CLHEP14Ranlux64Engine4nameEv">name</dfn>() <em>const</em>;</td></tr>
+<tr><th id="91">91</th><td>  <em>static</em> <span class='error' title="use of undeclared identifier &apos;std&apos;">std</span>::string <dfn class="decl def" id="_ZN5CLHEP14Ranlux64Engine10engineNameEv" title='CLHEP::Ranlux64Engine::engineName' data-ref="_ZN5CLHEP14Ranlux64Engine10engineNameEv">engineName</dfn>() {<b>return</b> <span class='error' title="cannot initialize return object of type &apos;int&apos; with an lvalue of type &apos;const char [15]&apos;"><q>"Ranlux64Engine"</q></span>;}</td></tr>
+<tr><th id="92">92</th><td></td></tr>
+<tr><th id="93">93</th><td>  <span class='error' title="use of undeclared identifier &apos;std&apos;">std</span>::vector<span class='error' title="expected member name or &apos;;&apos; after declaration specifiers">&lt;</span><em>unsigned</em> <em>long</em>&gt; put () <em>const</em>;</td></tr>
+<tr><th id="94">94</th><td>  <em>bool</em> get (<em>const</em> <span class='error' title="use of undeclared identifier &apos;std&apos;">std</span>::vector<span class='error' title="expected &apos;)&apos;">&lt;</span><em>unsigned</em> <em>long</em>&gt; &amp; v);</td></tr>
+<tr><th id="95">95</th><td>  <em>bool</em> getState (<em>const</em> <span class='error' title="use of undeclared identifier &apos;std&apos;">std</span>::vector<span class='error' title="expected &apos;)&apos;">&lt;</span><em>unsigned</em> <em>long</em>&gt; &amp; v);</td></tr>
+<tr><th id="96">96</th><td>  </td></tr>
+<tr><th id="97">97</th><td>  <em>static</em> <em>const</em> <em>unsigned</em> <em>int</em> <dfn class="decl" id="CLHEP::Ranlux64Engine::VECTOR_STATE_SIZE" title='CLHEP::Ranlux64Engine::VECTOR_STATE_SIZE' data-ref="CLHEP::Ranlux64Engine::VECTOR_STATE_SIZE">VECTOR_STATE_SIZE</dfn> = <var>30</var>;</td></tr>
+<tr><th id="98">98</th><td>  </td></tr>
+<tr><th id="99">99</th><td><b>private</b>:</td></tr>
+<tr><th id="100">100</th><td></td></tr>
+<tr><th id="101">101</th><td>  <em>void</em> <dfn class="decl" id="_ZN5CLHEP14Ranlux64Engine6updateEv" title='CLHEP::Ranlux64Engine::update' data-ref="_ZN5CLHEP14Ranlux64Engine6updateEv">update</dfn>();</td></tr>
+<tr><th id="102">102</th><td>  <em>void</em> <dfn class="decl" id="_ZN5CLHEP14Ranlux64Engine7advanceEi" title='CLHEP::Ranlux64Engine::advance' data-ref="_ZN5CLHEP14Ranlux64Engine7advanceEi">advance</dfn>(<em>int</em> <dfn class="local col8 decl" id="328dozens" title='dozens' data-type='int' data-ref="328dozens">dozens</dfn>);</td></tr>
+<tr><th id="103">103</th><td></td></tr>
+<tr><th id="104">104</th><td>  <em>int</em> <dfn class="decl" id="CLHEP::Ranlux64Engine::pDiscard" title='CLHEP::Ranlux64Engine::pDiscard' data-ref="CLHEP::Ranlux64Engine::pDiscard">pDiscard</dfn>;     <i>// separate sequence by p-r = p-12 discarded elements</i></td></tr>
+<tr><th id="105">105</th><td>  <em>int</em> <dfn class="decl" id="CLHEP::Ranlux64Engine::pDozens" title='CLHEP::Ranlux64Engine::pDozens' data-ref="CLHEP::Ranlux64Engine::pDozens">pDozens</dfn>;      <i>// pDiscard / 12;</i></td></tr>
+<tr><th id="106">106</th><td>  <em>int</em> <dfn class="decl" id="CLHEP::Ranlux64Engine::endIters" title='CLHEP::Ranlux64Engine::endIters' data-ref="CLHEP::Ranlux64Engine::endIters">endIters</dfn>;     <i>// pDiscard % 12;</i></td></tr>
+<tr><th id="107">107</th><td>  <em>int</em> <dfn class="decl" id="CLHEP::Ranlux64Engine::luxury" title='CLHEP::Ranlux64Engine::luxury' data-ref="CLHEP::Ranlux64Engine::luxury">luxury</dfn>;</td></tr>
+<tr><th id="108">108</th><td></td></tr>
+<tr><th id="109">109</th><td>  <em>int</em> <dfn class="decl" id="CLHEP::Ranlux64Engine::index" title='CLHEP::Ranlux64Engine::index' data-ref="CLHEP::Ranlux64Engine::index">index</dfn>;</td></tr>
+<tr><th id="110">110</th><td>  <em>double</em> <dfn class="decl" id="CLHEP::Ranlux64Engine::randoms" title='CLHEP::Ranlux64Engine::randoms' data-ref="CLHEP::Ranlux64Engine::randoms">randoms</dfn>[<var>12</var>]; <i>// randoms [i] is the x[n-i] of Luscher's note</i></td></tr>
+<tr><th id="111">111</th><td>  <em>double</em> <dfn class="decl" id="CLHEP::Ranlux64Engine::carry" title='CLHEP::Ranlux64Engine::carry' data-ref="CLHEP::Ranlux64Engine::carry">carry</dfn>;</td></tr>
+<tr><th id="112">112</th><td></td></tr>
+<tr><th id="113">113</th><td>}; <i>// Ranlux64Engine</i></td></tr>
+<tr><th id="114">114</th><td></td></tr>
+<tr><th id="115">115</th><td>}  <i>// namespace CLHEP</i></td></tr>
+<tr><th id="116">116</th><td></td></tr>
+<tr><th id="117">117</th><td><u>#<span data-ppcond="37">endif</span> // Ranlux64Engine_h</u></td></tr>
+<tr><th id="118">118</th><td></td></tr>
+</table><hr/><p id='footer'>
+Generated while processing <a href='../../../../../error_propagation/src/G4ErrorMagFieldLimitProcess.cc.html'>codebrowser/source/error_propagation/src/G4ErrorMagFieldLimitProcess.cc</a><br/>Generated on <em>2019-Aug-28</em> from project codebrowser<br />Powered by <a href='https://woboq.com'><img alt='Woboq' src='https://code.woboq.org/woboq-16.png' width='41' height='16' /></a> <a href='https://code.woboq.org'>Code Browser</a> 2.1
+<br/>Generator usage only permitted with license.</p>
+</div></body></html>

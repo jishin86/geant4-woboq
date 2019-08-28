@@ -1,0 +1,364 @@
+<!doctype html>
+<html>
+<head>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"><title>G4LivermoreIonisationModel.cc source code [codebrowser/source/processes/electromagnetic/lowenergy/src/G4LivermoreIonisationModel.cc] - Woboq Code Browser</title>
+<link rel="stylesheet" href="../../../../../../../data/qtcreator.css" title="QtCreator"/>
+<link rel="alternate stylesheet" href="../../../../../../../data/kdevelop.css" title="KDevelop"/>
+<script type="text/javascript" src="../../../../../../../data/jquery/jquery.min.js"></script>
+<script type="text/javascript" src="../../../../../../../data/jquery/jquery-ui.min.js"></script>
+<script>var file = 'codebrowser/source/processes/electromagnetic/lowenergy/src/G4LivermoreIonisationModel.cc'; var root_path = '../../../../../..'; var data_path = '../../../../../../../data';</script>
+<script src='../../../../../../../data/codebrowser.js'></script>
+</head>
+<body><div id='header'><h1 id='breadcrumb'><span>Browse the source code of </span><a href='../../../../..'>codebrowser</a>/<a href='../../../..'>source</a>/<a href='../../..'>processes</a>/<a href='../..'>electromagnetic</a>/<a href='..'>lowenergy</a>/<a href='./'>src</a>/<a href='G4LivermoreIonisationModel.cc.html'>G4LivermoreIonisationModel.cc</a></h1></div>
+<hr/><div id='content'><table class="code">
+<tr><th id="1">1</th><td><i>//</i></td></tr>
+<tr><th id="2">2</th><td><i>// ********************************************************************</i></td></tr>
+<tr><th id="3">3</th><td><i>// * License and Disclaimer                                           *</i></td></tr>
+<tr><th id="4">4</th><td><i>// *                                                                  *</i></td></tr>
+<tr><th id="5">5</th><td><i>// * The  Geant4 software  is  copyright of the Copyright Holders  of *</i></td></tr>
+<tr><th id="6">6</th><td><i>// * the Geant4 Collaboration.  It is provided  under  the terms  and *</i></td></tr>
+<tr><th id="7">7</th><td><i>// * conditions of the Geant4 Software License,  included in the file *</i></td></tr>
+<tr><th id="8">8</th><td><i>// * LICENSE and available at  <a href="http://cern.ch/geant4/license">http://cern.ch/geant4/license</a> .  These *</i></td></tr>
+<tr><th id="9">9</th><td><i>// * include a list of copyright holders.                             *</i></td></tr>
+<tr><th id="10">10</th><td><i>// *                                                                  *</i></td></tr>
+<tr><th id="11">11</th><td><i>// * Neither the authors of this software system, nor their employing *</i></td></tr>
+<tr><th id="12">12</th><td><i>// * institutes,nor the agencies providing financial support for this *</i></td></tr>
+<tr><th id="13">13</th><td><i>// * work  make  any representation or  warranty, express or implied, *</i></td></tr>
+<tr><th id="14">14</th><td><i>// * regarding  this  software system or assume any liability for its *</i></td></tr>
+<tr><th id="15">15</th><td><i>// * use.  Please see the license in the file  LICENSE  and URL above *</i></td></tr>
+<tr><th id="16">16</th><td><i>// * for the full disclaimer and the limitation of liability.         *</i></td></tr>
+<tr><th id="17">17</th><td><i>// *                                                                  *</i></td></tr>
+<tr><th id="18">18</th><td><i>// * This  code  implementation is the result of  the  scientific and *</i></td></tr>
+<tr><th id="19">19</th><td><i>// * technical work of the GEANT4 collaboration.                      *</i></td></tr>
+<tr><th id="20">20</th><td><i>// * By using,  copying,  modifying or  distributing the software (or *</i></td></tr>
+<tr><th id="21">21</th><td><i>// * any work based  on the software)  you  agree  to acknowledge its *</i></td></tr>
+<tr><th id="22">22</th><td><i>// * use  in  resulting  scientific  publications,  and indicate your *</i></td></tr>
+<tr><th id="23">23</th><td><i>// * acceptance of all terms of the Geant4 Software license.          *</i></td></tr>
+<tr><th id="24">24</th><td><i>// ********************************************************************</i></td></tr>
+<tr><th id="25">25</th><td><i>//</i></td></tr>
+<tr><th id="26">26</th><td><i>//</i></td></tr>
+<tr><th id="27">27</th><td><i>// Author: Luciano Pandola</i></td></tr>
+<tr><th id="28">28</th><td><i>//         on base of G4LowEnergyIonisation developed by A.Forti and V.Ivanchenko</i></td></tr>
+<tr><th id="29">29</th><td><i>//</i></td></tr>
+<tr><th id="30">30</th><td><i>// History:</i></td></tr>
+<tr><th id="31">31</th><td><i>// --------</i></td></tr>
+<tr><th id="32">32</th><td><i>// 12 Jan 2009   L Pandola    Migration from process to model </i></td></tr>
+<tr><th id="33">33</th><td><i>// 03 Mar 2009   L Pandola    Bug fix (release memory in the destructor)</i></td></tr>
+<tr><th id="34">34</th><td><i>// 15 Apr 2009   V Ivanchenko Cleanup initialisation and generation of secondaries:</i></td></tr>
+<tr><th id="35">35</th><td><i>//                  - apply internal high-energy limit only in constructor </i></td></tr>
+<tr><th id="36">36</th><td><i>//                  - do not apply low-energy limit (default is 0)</i></td></tr>
+<tr><th id="37">37</th><td><i>//                  - simplify sampling of deexcitation by using cut in energy</i></td></tr>
+<tr><th id="38">38</th><td><i>//                  - set activation of Auger "false"</i></td></tr>
+<tr><th id="39">39</th><td><i>//                  - remove initialisation of element selectors</i></td></tr>
+<tr><th id="40">40</th><td><i>// 19 May 2009   L Pandola    Explicitely set to zero pointers deleted in </i></td></tr>
+<tr><th id="41">41</th><td><i>//                            Initialise(), since they might be checked later on</i></td></tr>
+<tr><th id="42">42</th><td><i>// 23 Oct 2009   L Pandola</i></td></tr>
+<tr><th id="43">43</th><td><i>//                  - atomic deexcitation managed via G4VEmModel::DeexcitationFlag() is</i></td></tr>
+<tr><th id="44">44</th><td><i>//                    set as "true" (default would be false)</i></td></tr>
+<tr><th id="45">45</th><td><i>// 12 Oct 2010   L Pandola</i></td></tr>
+<tr><th id="46">46</th><td><i>//                  - add debugging information about energy in </i></td></tr>
+<tr><th id="47">47</th><td><i>//                    SampleDeexcitationAlongStep()</i></td></tr>
+<tr><th id="48">48</th><td><i>//                  - generate fluorescence SampleDeexcitationAlongStep() only above </i></td></tr>
+<tr><th id="49">49</th><td><i>//                    the cuts.</i></td></tr>
+<tr><th id="50">50</th><td><i>// 01 Jun 2011   V Ivanchenko general cleanup - all old deexcitation code removed</i></td></tr>
+<tr><th id="51">51</th><td><i>//</i></td></tr>
+<tr><th id="52">52</th><td></td></tr>
+<tr><th id="53">53</th><td><u>#include <a href="../include/G4LivermoreIonisationModel.hh.html">"G4LivermoreIonisationModel.hh"</a></u></td></tr>
+<tr><th id="54">54</th><td><u>#include <a href="../../../../global/management/include/G4PhysicalConstants.hh.html">"G4PhysicalConstants.hh"</a></u></td></tr>
+<tr><th id="55">55</th><td><u>#include <a href="../../../../global/management/include/G4SystemOfUnits.hh.html">"G4SystemOfUnits.hh"</a></u></td></tr>
+<tr><th id="56">56</th><td><u>#include <a href="../../../../particles/management/include/G4ParticleDefinition.hh.html">"G4ParticleDefinition.hh"</a></u></td></tr>
+<tr><th id="57">57</th><td><u>#include <a href="../../../cuts/include/G4MaterialCutsCouple.hh.html">"G4MaterialCutsCouple.hh"</a></u></td></tr>
+<tr><th id="58">58</th><td><u>#include <a href="../../../cuts/include/G4ProductionCutsTable.hh.html">"G4ProductionCutsTable.hh"</a></u></td></tr>
+<tr><th id="59">59</th><td><u>#include <a href="../../../../particles/management/include/G4DynamicParticle.hh.html">"G4DynamicParticle.hh"</a></u></td></tr>
+<tr><th id="60">60</th><td><u>#include <a href="../../../../materials/include/G4Element.hh.html">"G4Element.hh"</a></u></td></tr>
+<tr><th id="61">61</th><td><u>#include <a href="../../../../track/include/G4ParticleChangeForLoss.hh.html">"G4ParticleChangeForLoss.hh"</a></u></td></tr>
+<tr><th id="62">62</th><td><u>#include <a href="../../../../particles/leptons/include/G4Electron.hh.html">"G4Electron.hh"</a></u></td></tr>
+<tr><th id="63">63</th><td><u>#include <a href="../include/G4CrossSectionHandler.hh.html">"G4CrossSectionHandler.hh"</a></u></td></tr>
+<tr><th id="64">64</th><td><u>#include <a href="../include/G4VEMDataSet.hh.html">"G4VEMDataSet.hh"</a></u></td></tr>
+<tr><th id="65">65</th><td><u>#include <a href="../include/G4eIonisationCrossSectionHandler.hh.html">"G4eIonisationCrossSectionHandler.hh"</a></u></td></tr>
+<tr><th id="66">66</th><td><u>#include <a href="../include/G4eIonisationSpectrum.hh.html">"G4eIonisationSpectrum.hh"</a></u></td></tr>
+<tr><th id="67">67</th><td><u>#include <a href="../include/G4VEnergySpectrum.hh.html">"G4VEnergySpectrum.hh"</a></u></td></tr>
+<tr><th id="68">68</th><td><u>#include <a href="../include/G4SemiLogInterpolation.hh.html">"G4SemiLogInterpolation.hh"</a></u></td></tr>
+<tr><th id="69">69</th><td><u>#include <a href="../include/G4AtomicTransitionManager.hh.html">"G4AtomicTransitionManager.hh"</a></u></td></tr>
+<tr><th id="70">70</th><td><u>#include <a href="../../utils/include/G4AtomicShell.hh.html">"G4AtomicShell.hh"</a></u></td></tr>
+<tr><th id="71">71</th><td><u>#include <a href="../../standard/include/G4DeltaAngle.hh.html">"G4DeltaAngle.hh"</a></u></td></tr>
+<tr><th id="72">72</th><td></td></tr>
+<tr><th id="73">73</th><td><i>//....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo....</i></td></tr>
+<tr><th id="74">74</th><td></td></tr>
+<tr><th id="75">75</th><td></td></tr>
+<tr><th id="76">76</th><td><a class="type" href="../include/G4LivermoreIonisationModel.hh.html#G4LivermoreIonisationModel" title='G4LivermoreIonisationModel' data-ref="G4LivermoreIonisationModel">G4LivermoreIonisationModel</a>::<dfn class="decl def" id="_ZN26G4LivermoreIonisationModelC1EPK20G4ParticleDefinitionRK8G4String" title='G4LivermoreIonisationModel::G4LivermoreIonisationModel' data-ref="_ZN26G4LivermoreIonisationModelC1EPK20G4ParticleDefinitionRK8G4String">G4LivermoreIonisationModel</dfn>(<em>const</em> <a class="type" href="../../../../particles/management/include/G4ParticleDefinition.hh.html#G4ParticleDefinition" title='G4ParticleDefinition' data-ref="G4ParticleDefinition">G4ParticleDefinition</a>*,</td></tr>
+<tr><th id="77">77</th><td>						       <em>const</em> <a class="type" href="../../../../global/management/include/G4String.hh.html#G4String" title='G4String' data-ref="G4String">G4String</a>&amp; <dfn class="local col6 decl" id="56nam" title='nam' data-type='const G4String &amp;' data-ref="56nam">nam</dfn>) : </td></tr>
+<tr><th id="78">78</th><td>  <a class="type" href="../../utils/include/G4VEmModel.hh.html#G4VEmModel" title='G4VEmModel' data-ref="G4VEmModel">G4VEmModel</a><a class="ref" href="../../utils/include/G4VEmModel.hh.html#_ZN10G4VEmModelC1ERK8G4String" title='G4VEmModel::G4VEmModel' data-ref="_ZN10G4VEmModelC1ERK8G4String">(</a><a class="local col6 ref" href="#56nam" title='nam' data-ref="56nam">nam</a>), <a class="member" href="../include/G4LivermoreIonisationModel.hh.html#G4LivermoreIonisationModel::fParticleChange" title='G4LivermoreIonisationModel::fParticleChange' data-ref="G4LivermoreIonisationModel::fParticleChange">fParticleChange</a>(<var>0</var>), </td></tr>
+<tr><th id="79">79</th><td>  <a class="member" href="../include/G4LivermoreIonisationModel.hh.html#G4LivermoreIonisationModel::isInitialised" title='G4LivermoreIonisationModel::isInitialised' data-ref="G4LivermoreIonisationModel::isInitialised">isInitialised</a>(<b>false</b>),</td></tr>
+<tr><th id="80">80</th><td>  crossSectionHandler(<var>0</var>), <a class="member" href="../include/G4LivermoreIonisationModel.hh.html#G4LivermoreIonisationModel::energySpectrum" title='G4LivermoreIonisationModel::energySpectrum' data-ref="G4LivermoreIonisationModel::energySpectrum">energySpectrum</a>(<var>0</var>)</td></tr>
+<tr><th id="81">81</th><td>{</td></tr>
+<tr><th id="82">82</th><td>  <a class="member" href="../include/G4LivermoreIonisationModel.hh.html#G4LivermoreIonisationModel::fIntrinsicLowEnergyLimit" title='G4LivermoreIonisationModel::fIntrinsicLowEnergyLimit' data-ref="G4LivermoreIonisationModel::fIntrinsicLowEnergyLimit">fIntrinsicLowEnergyLimit</a> = <var>12.</var>*<a class="ref" href="../../../../externals/clhep/include/CLHEP/Units/SystemOfUnits.h.html#CLHEP::eV" title='CLHEP::eV' data-ref="CLHEP::eV">eV</a>;</td></tr>
+<tr><th id="83">83</th><td>  <a class="member" href="../include/G4LivermoreIonisationModel.hh.html#G4LivermoreIonisationModel::fIntrinsicHighEnergyLimit" title='G4LivermoreIonisationModel::fIntrinsicHighEnergyLimit' data-ref="G4LivermoreIonisationModel::fIntrinsicHighEnergyLimit">fIntrinsicHighEnergyLimit</a> = <var>100.0</var>*<a class="ref" href="../../../../externals/clhep/include/CLHEP/Units/SystemOfUnits.h.html#CLHEP::GeV" title='CLHEP::GeV' data-ref="CLHEP::GeV">GeV</a>;</td></tr>
+<tr><th id="84">84</th><td></td></tr>
+<tr><th id="85">85</th><td>  <a class="member" href="../include/G4LivermoreIonisationModel.hh.html#G4LivermoreIonisationModel::verboseLevel" title='G4LivermoreIonisationModel::verboseLevel' data-ref="G4LivermoreIonisationModel::verboseLevel">verboseLevel</a> = <var>0</var>;</td></tr>
+<tr><th id="86">86</th><td>  <span class='error' title="cannot initialize object parameter of type &apos;G4VEmModel&apos; with an expression of type &apos;G4LivermoreIonisationModel&apos;">SetAngularDistribution</span>(<b>new</b> G4DeltaAngle());</td></tr>
+<tr><th id="87">87</th><td></td></tr>
+<tr><th id="88">88</th><td>  <a class="member" href="../include/G4LivermoreIonisationModel.hh.html#G4LivermoreIonisationModel::transitionManager" title='G4LivermoreIonisationModel::transitionManager' data-ref="G4LivermoreIonisationModel::transitionManager">transitionManager</a> = <a class="type" href="../include/G4AtomicTransitionManager.hh.html#G4AtomicTransitionManager" title='G4AtomicTransitionManager' data-ref="G4AtomicTransitionManager">G4AtomicTransitionManager</a>::<a class="ref" href="../include/G4AtomicTransitionManager.hh.html#_ZN25G4AtomicTransitionManager8InstanceEv" title='G4AtomicTransitionManager::Instance' data-ref="_ZN25G4AtomicTransitionManager8InstanceEv">Instance</a>();</td></tr>
+<tr><th id="89">89</th><td>}</td></tr>
+<tr><th id="90">90</th><td></td></tr>
+<tr><th id="91">91</th><td><i>//....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo....</i></td></tr>
+<tr><th id="92">92</th><td></td></tr>
+<tr><th id="93">93</th><td>G4LivermoreIonisationModel::<span class='error' title="exception specification in declaration does not match previous declaration">~</span>G4LivermoreIonisationModel()</td></tr>
+<tr><th id="94">94</th><td>{</td></tr>
+<tr><th id="95">95</th><td>  <b>delete</b> energySpectrum;</td></tr>
+<tr><th id="96">96</th><td>  <b>delete</b> crossSectionHandler;</td></tr>
+<tr><th id="97">97</th><td>}</td></tr>
+<tr><th id="98">98</th><td></td></tr>
+<tr><th id="99">99</th><td><i>//....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo....</i></td></tr>
+<tr><th id="100">100</th><td></td></tr>
+<tr><th id="101">101</th><td><em>void</em> <a class="type" href="../include/G4LivermoreIonisationModel.hh.html#G4LivermoreIonisationModel" title='G4LivermoreIonisationModel' data-ref="G4LivermoreIonisationModel">G4LivermoreIonisationModel</a>::<dfn class="virtual decl def" id="_ZN26G4LivermoreIonisationModel10InitialiseEPK20G4ParticleDefinitionRK12G4DataVector" title='G4LivermoreIonisationModel::Initialise' data-ref="_ZN26G4LivermoreIonisationModel10InitialiseEPK20G4ParticleDefinitionRK12G4DataVector">Initialise</dfn>(<em>const</em> <a class="type" href="../../../../particles/management/include/G4ParticleDefinition.hh.html#G4ParticleDefinition" title='G4ParticleDefinition' data-ref="G4ParticleDefinition">G4ParticleDefinition</a>* <dfn class="local col7 decl" id="57particle" title='particle' data-type='const G4ParticleDefinition *' data-ref="57particle">particle</dfn>,</td></tr>
+<tr><th id="102">102</th><td>					    <em>const</em> <a class="type" href="../../../../global/management/include/G4DataVector.hh.html#G4DataVector" title='G4DataVector' data-ref="G4DataVector">G4DataVector</a>&amp; <dfn class="local col8 decl" id="58cuts" title='cuts' data-type='const G4DataVector &amp;' data-ref="58cuts">cuts</dfn>)</td></tr>
+<tr><th id="103">103</th><td>{</td></tr>
+<tr><th id="104">104</th><td>  <i>//Check that the Livermore Ionisation is NOT attached to e+</i></td></tr>
+<tr><th id="105">105</th><td>  <b>if</b> (<a class="local col7 ref" href="#57particle" title='particle' data-ref="57particle">particle</a> != <a class="type" href="../../../../particles/leptons/include/G4Electron.hh.html#G4Electron" title='G4Electron' data-ref="G4Electron">G4Electron</a>::<a class="ref" href="../../../../particles/leptons/include/G4Electron.hh.html#_ZN10G4Electron8ElectronEv" title='G4Electron::Electron' data-ref="_ZN10G4Electron8ElectronEv">Electron</a>())</td></tr>
+<tr><th id="106">106</th><td>    {</td></tr>
+<tr><th id="107">107</th><td>      <a class="ref" href="../../../../global/management/include/G4Exception.hh.html#_Z11G4ExceptionPKcS0_19G4ExceptionSeverityS0_" title='G4Exception' data-ref="_Z11G4ExceptionPKcS0_19G4ExceptionSeverityS0_">G4Exception</a>(<q>"G4LivermoreIonisationModel::Initialise"</q>,</td></tr>
+<tr><th id="108">108</th><td>		  <q>"em0002"</q>,<a class="enum" href="../../../../global/management/include/G4ExceptionSeverity.hh.html#G4ExceptionSeverity::FatalException" title='G4ExceptionSeverity::FatalException' data-ref="G4ExceptionSeverity::FatalException">FatalException</a>,</td></tr>
+<tr><th id="109">109</th><td>		  <q>"Livermore Ionisation Model is applicable only to electrons"</q>);</td></tr>
+<tr><th id="110">110</th><td>    }</td></tr>
+<tr><th id="111">111</th><td></td></tr>
+<tr><th id="112">112</th><td>  <a class="member" href="../include/G4LivermoreIonisationModel.hh.html#G4LivermoreIonisationModel::transitionManager" title='G4LivermoreIonisationModel::transitionManager' data-ref="G4LivermoreIonisationModel::transitionManager">transitionManager</a>-&gt;<a class="ref" href="../include/G4AtomicTransitionManager.hh.html#_ZN25G4AtomicTransitionManager10InitialiseEv" title='G4AtomicTransitionManager::Initialise' data-ref="_ZN25G4AtomicTransitionManager10InitialiseEv">Initialise</a>();</td></tr>
+<tr><th id="113">113</th><td></td></tr>
+<tr><th id="114">114</th><td>  <i>//Read energy spectrum</i></td></tr>
+<tr><th id="115">115</th><td>  <b>if</b> (<a class="member" href="../include/G4LivermoreIonisationModel.hh.html#G4LivermoreIonisationModel::energySpectrum" title='G4LivermoreIonisationModel::energySpectrum' data-ref="G4LivermoreIonisationModel::energySpectrum">energySpectrum</a>) </td></tr>
+<tr><th id="116">116</th><td>    {</td></tr>
+<tr><th id="117">117</th><td>      <b>delete</b> <a class="member" href="../include/G4LivermoreIonisationModel.hh.html#G4LivermoreIonisationModel::energySpectrum" title='G4LivermoreIonisationModel::energySpectrum' data-ref="G4LivermoreIonisationModel::energySpectrum">energySpectrum</a>;</td></tr>
+<tr><th id="118">118</th><td>      <a class="member" href="../include/G4LivermoreIonisationModel.hh.html#G4LivermoreIonisationModel::energySpectrum" title='G4LivermoreIonisationModel::energySpectrum' data-ref="G4LivermoreIonisationModel::energySpectrum">energySpectrum</a> = <var>0</var>;</td></tr>
+<tr><th id="119">119</th><td>    }</td></tr>
+<tr><th id="120">120</th><td>  <a class="member" href="../include/G4LivermoreIonisationModel.hh.html#G4LivermoreIonisationModel::energySpectrum" title='G4LivermoreIonisationModel::energySpectrum' data-ref="G4LivermoreIonisationModel::energySpectrum">energySpectrum</a> = <b>new</b> <a class="type" href="../include/G4eIonisationSpectrum.hh.html#G4eIonisationSpectrum" title='G4eIonisationSpectrum' data-ref="G4eIonisationSpectrum">G4eIonisationSpectrum</a><a class="ref" href="../include/G4eIonisationSpectrum.hh.html#_ZN21G4eIonisationSpectrumC1Ev" title='G4eIonisationSpectrum::G4eIonisationSpectrum' data-ref="_ZN21G4eIonisationSpectrumC1Ev">(</a>);</td></tr>
+<tr><th id="121">121</th><td>  <b>if</b> (verboseLevel &gt; <var>3</var>)</td></tr>
+<tr><th id="122">122</th><td>    <a class="macro" href="../../../../global/management/include/G4ios.hh.html#46" title="(*_G4cout_p())" data-ref="_M/G4cout">G4cout</a> <span class='error' title="invalid operands to binary expression (&apos;int&apos; and &apos;const char *&apos;)">&lt;&lt;</span> <q>"G4VEnergySpectrum is initialized"</q> &lt;&lt; <a class="macro" href="../../../../global/management/include/G4ios.hh.html#60" title="std::endl" data-ref="_M/G4endl">G4endl</a>;</td></tr>
+<tr><th id="123">123</th><td></td></tr>
+<tr><th id="124">124</th><td>  <i>//Initialize cross section handler</i></td></tr>
+<tr><th id="125">125</th><td>  <b>if</b> (crossSectionHandler) </td></tr>
+<tr><th id="126">126</th><td>    {</td></tr>
+<tr><th id="127">127</th><td>      <b>delete</b> crossSectionHandler;</td></tr>
+<tr><th id="128">128</th><td>      crossSectionHandler = <var>0</var>;</td></tr>
+<tr><th id="129">129</th><td>    }</td></tr>
+<tr><th id="130">130</th><td></td></tr>
+<tr><th id="131">131</th><td>  <em>const</em> <span class='error' title="unknown type name &apos;size_t&apos;">size_t</span> <dfn class="local col9 decl" id="59nbins" title='nbins' data-type='const int' data-ref="59nbins">nbins</dfn> = <var>20</var>;</td></tr>
+<tr><th id="132">132</th><td>  <a class="typedef" href="../../../../global/management/include/G4Types.hh.html#G4double" title='G4double' data-type='double' data-ref="G4double">G4double</a> <dfn class="local col0 decl" id="60emin" title='emin' data-type='G4double' data-ref="60emin">emin</dfn> = <span class='error' title="cannot initialize object parameter of type &apos;const G4VEmModel&apos; with an expression of type &apos;G4LivermoreIonisationModel&apos;">LowEnergyLimit</span>();</td></tr>
+<tr><th id="133">133</th><td>  <a class="typedef" href="../../../../global/management/include/G4Types.hh.html#G4double" title='G4double' data-type='double' data-ref="G4double">G4double</a> <dfn class="local col1 decl" id="61emax" title='emax' data-type='G4double' data-ref="61emax">emax</dfn> = <span class='error' title="cannot initialize object parameter of type &apos;const G4VEmModel&apos; with an expression of type &apos;G4LivermoreIonisationModel&apos;">HighEnergyLimit</span>();</td></tr>
+<tr><th id="134">134</th><td>  <a class="typedef" href="../../../../global/management/include/G4Types.hh.html#G4int" title='G4int' data-type='int' data-ref="G4int">G4int</a> <dfn class="local col2 decl" id="62ndec" title='ndec' data-type='G4int' data-ref="62ndec">ndec</dfn> = G4int(<span class='error' title="use of undeclared identifier &apos;std&apos;">std</span>::log10(emax/emin) + <var>0.5</var>);</td></tr>
+<tr><th id="135">135</th><td>  <b>if</b>(<a class="local col2 ref" href="#62ndec" title='ndec' data-ref="62ndec">ndec</a> &lt;= <var>0</var>) { <a class="local col2 ref" href="#62ndec" title='ndec' data-ref="62ndec">ndec</a> = <var>1</var>; }</td></tr>
+<tr><th id="136">136</th><td></td></tr>
+<tr><th id="137">137</th><td>  <a class="type" href="../include/G4VDataSetAlgorithm.hh.html#G4VDataSetAlgorithm" title='G4VDataSetAlgorithm' data-ref="G4VDataSetAlgorithm">G4VDataSetAlgorithm</a>* <dfn class="local col3 decl" id="63interpolation" title='interpolation' data-type='G4VDataSetAlgorithm *' data-ref="63interpolation">interpolation</dfn> = <b>new</b> <a class="type" href="../include/G4SemiLogInterpolation.hh.html#G4SemiLogInterpolation" title='G4SemiLogInterpolation' data-ref="G4SemiLogInterpolation">G4SemiLogInterpolation</a><a class="ref" href="../include/G4SemiLogInterpolation.hh.html#_ZN22G4SemiLogInterpolationC1Ev" title='G4SemiLogInterpolation::G4SemiLogInterpolation' data-ref="_ZN22G4SemiLogInterpolationC1Ev">(</a>);</td></tr>
+<tr><th id="138">138</th><td>  crossSectionHandler = </td></tr>
+<tr><th id="139">139</th><td>    <b>new</b> G4eIonisationCrossSectionHandler(energySpectrum,interpolation,</td></tr>
+<tr><th id="140">140</th><td>					 emin,emax,nbins*ndec);</td></tr>
+<tr><th id="141">141</th><td>  crossSectionHandler-&gt;Clear();</td></tr>
+<tr><th id="142">142</th><td>  crossSectionHandler-&gt;LoadShellData(<q>"ioni/ion-ss-cs-"</q>);</td></tr>
+<tr><th id="143">143</th><td>  <i>//This is used to retrieve cross section values later on</i></td></tr>
+<tr><th id="144">144</th><td>  <a class="type" href="../include/G4VEMDataSet.hh.html#G4VEMDataSet" title='G4VEMDataSet' data-ref="G4VEMDataSet">G4VEMDataSet</a>* <dfn class="local col4 decl" id="64emdata" title='emdata' data-type='G4VEMDataSet *' data-ref="64emdata">emdata</dfn> = </td></tr>
+<tr><th id="145">145</th><td>    crossSectionHandler-&gt;BuildMeanFreePathForMaterials(&amp;cuts);</td></tr>
+<tr><th id="146">146</th><td>  <i>//The method BuildMeanFreePathForMaterials() is required here only to force </i></td></tr>
+<tr><th id="147">147</th><td><i>  //the building of an internal table: the output pointer can be deleted</i></td></tr>
+<tr><th id="148">148</th><td>  <b>delete</b> <a class="local col4 ref" href="#64emdata" title='emdata' data-ref="64emdata">emdata</a>;  </td></tr>
+<tr><th id="149">149</th><td></td></tr>
+<tr><th id="150">150</th><td>  <b>if</b> (<a class="member" href="../include/G4LivermoreIonisationModel.hh.html#G4LivermoreIonisationModel::verboseLevel" title='G4LivermoreIonisationModel::verboseLevel' data-ref="G4LivermoreIonisationModel::verboseLevel">verboseLevel</a> &gt; <var>0</var>)</td></tr>
+<tr><th id="151">151</th><td>    {</td></tr>
+<tr><th id="152">152</th><td>      <a class="macro" href="../../../../global/management/include/G4ios.hh.html#46" title="(*_G4cout_p())" data-ref="_M/G4cout">G4cout</a> <span class='error' title="invalid operands to binary expression (&apos;int&apos; and &apos;const char *&apos;)">&lt;&lt;</span> <q>"Livermore Ionisation model is initialized "</q> &lt;&lt; <a class="macro" href="../../../../global/management/include/G4ios.hh.html#60" title="std::endl" data-ref="_M/G4endl">G4endl</a></td></tr>
+<tr><th id="153">153</th><td>	     &lt;&lt; <q>"Energy range: "</q></td></tr>
+<tr><th id="154">154</th><td>	     &lt;&lt; <span class='error' title="cannot initialize object parameter of type &apos;const G4VEmModel&apos; with an expression of type &apos;G4LivermoreIonisationModel&apos;">LowEnergyLimit</span>() / keV &lt;&lt; <q>" keV - "</q></td></tr>
+<tr><th id="155">155</th><td>	     &lt;&lt; <span class='error' title="cannot initialize object parameter of type &apos;const G4VEmModel&apos; with an expression of type &apos;G4LivermoreIonisationModel&apos;">HighEnergyLimit</span>() / GeV &lt;&lt; <q>" GeV"</q></td></tr>
+<tr><th id="156">156</th><td>	     &lt;&lt; <a class="macro" href="../../../../global/management/include/G4ios.hh.html#60" title="std::endl" data-ref="_M/G4endl">G4endl</a>;</td></tr>
+<tr><th id="157">157</th><td>    }</td></tr>
+<tr><th id="158">158</th><td></td></tr>
+<tr><th id="159">159</th><td>  <b>if</b> (<a class="member" href="../include/G4LivermoreIonisationModel.hh.html#G4LivermoreIonisationModel::verboseLevel" title='G4LivermoreIonisationModel::verboseLevel' data-ref="G4LivermoreIonisationModel::verboseLevel">verboseLevel</a> &gt; <var>3</var>)</td></tr>
+<tr><th id="160">160</th><td>    {</td></tr>
+<tr><th id="161">161</th><td>      <a class="macro" href="../../../../global/management/include/G4ios.hh.html#46" title="(*_G4cout_p())" data-ref="_M/G4cout">G4cout</a> <span class='error' title="invalid operands to binary expression (&apos;int&apos; and &apos;const char *&apos;)">&lt;&lt;</span> <q>"Cross section data: "</q> &lt;&lt; <a class="macro" href="../../../../global/management/include/G4ios.hh.html#60" title="std::endl" data-ref="_M/G4endl">G4endl</a>; </td></tr>
+<tr><th id="162">162</th><td>      crossSectionHandler-&gt;PrintData();</td></tr>
+<tr><th id="163">163</th><td>      <a class="macro" href="../../../../global/management/include/G4ios.hh.html#46" title="(*_G4cout_p())" data-ref="_M/G4cout">G4cout</a> <span class='error' title="invalid operands to binary expression (&apos;int&apos; and &apos;const char *&apos;)">&lt;&lt;</span> <q>"Parameters: "</q> &lt;&lt; <a class="macro" href="../../../../global/management/include/G4ios.hh.html#60" title="std::endl" data-ref="_M/G4endl">G4endl</a>;</td></tr>
+<tr><th id="164">164</th><td>      <a class="member" href="../include/G4LivermoreIonisationModel.hh.html#G4LivermoreIonisationModel::energySpectrum" title='G4LivermoreIonisationModel::energySpectrum' data-ref="G4LivermoreIonisationModel::energySpectrum">energySpectrum</a>-&gt;<a class="virtual ref" href="../include/G4VEnergySpectrum.hh.html#_ZNK17G4VEnergySpectrum9PrintDataEv" title='G4VEnergySpectrum::PrintData' data-ref="_ZNK17G4VEnergySpectrum9PrintDataEv">PrintData</a>();</td></tr>
+<tr><th id="165">165</th><td>    }</td></tr>
+<tr><th id="166">166</th><td></td></tr>
+<tr><th id="167">167</th><td>  <b>if</b>(<a class="member" href="../include/G4LivermoreIonisationModel.hh.html#G4LivermoreIonisationModel::isInitialised" title='G4LivermoreIonisationModel::isInitialised' data-ref="G4LivermoreIonisationModel::isInitialised">isInitialised</a>) { <b>return</b>; }</td></tr>
+<tr><th id="168">168</th><td>  fParticleChange = <span class='error' title="cannot initialize object parameter of type &apos;G4VEmModel&apos; with an expression of type &apos;G4LivermoreIonisationModel&apos;">GetParticleChangeForLoss</span>();</td></tr>
+<tr><th id="169">169</th><td>  <a class="member" href="../include/G4LivermoreIonisationModel.hh.html#G4LivermoreIonisationModel::isInitialised" title='G4LivermoreIonisationModel::isInitialised' data-ref="G4LivermoreIonisationModel::isInitialised">isInitialised</a> = <b>true</b>; </td></tr>
+<tr><th id="170">170</th><td>}</td></tr>
+<tr><th id="171">171</th><td></td></tr>
+<tr><th id="172">172</th><td><i>//....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo....</i></td></tr>
+<tr><th id="173">173</th><td></td></tr>
+<tr><th id="174">174</th><td><a class="typedef" href="../../../../global/management/include/G4Types.hh.html#G4double" title='G4double' data-type='double' data-ref="G4double">G4double</a> </td></tr>
+<tr><th id="175">175</th><td><a class="type" href="../include/G4LivermoreIonisationModel.hh.html#G4LivermoreIonisationModel" title='G4LivermoreIonisationModel' data-ref="G4LivermoreIonisationModel">G4LivermoreIonisationModel</a>::<dfn class="virtual decl def" id="_ZN26G4LivermoreIonisationModel26ComputeCrossSectionPerAtomEPK20G4ParticleDefinitionddddd" title='G4LivermoreIonisationModel::ComputeCrossSectionPerAtom' data-ref="_ZN26G4LivermoreIonisationModel26ComputeCrossSectionPerAtomEPK20G4ParticleDefinitionddddd">ComputeCrossSectionPerAtom</dfn>(</td></tr>
+<tr><th id="176">176</th><td>                            <em>const</em> <a class="type" href="../../../../particles/management/include/G4ParticleDefinition.hh.html#G4ParticleDefinition" title='G4ParticleDefinition' data-ref="G4ParticleDefinition">G4ParticleDefinition</a>*,</td></tr>
+<tr><th id="177">177</th><td>			    <a class="typedef" href="../../../../global/management/include/G4Types.hh.html#G4double" title='G4double' data-type='double' data-ref="G4double">G4double</a> <dfn class="local col5 decl" id="65energy" title='energy' data-type='G4double' data-ref="65energy">energy</dfn>,</td></tr>
+<tr><th id="178">178</th><td>			    <a class="typedef" href="../../../../global/management/include/G4Types.hh.html#G4double" title='G4double' data-type='double' data-ref="G4double">G4double</a> <dfn class="local col6 decl" id="66Z" title='Z' data-type='G4double' data-ref="66Z">Z</dfn>, <a class="typedef" href="../../../../global/management/include/G4Types.hh.html#G4double" title='G4double' data-type='double' data-ref="G4double">G4double</a>,</td></tr>
+<tr><th id="179">179</th><td>			    <a class="typedef" href="../../../../global/management/include/G4Types.hh.html#G4double" title='G4double' data-type='double' data-ref="G4double">G4double</a> <dfn class="local col7 decl" id="67cutEnergy" title='cutEnergy' data-type='G4double' data-ref="67cutEnergy">cutEnergy</dfn>, </td></tr>
+<tr><th id="180">180</th><td>			    <a class="typedef" href="../../../../global/management/include/G4Types.hh.html#G4double" title='G4double' data-type='double' data-ref="G4double">G4double</a>)</td></tr>
+<tr><th id="181">181</th><td>{</td></tr>
+<tr><th id="182">182</th><td>  <a class="typedef" href="../../../../global/management/include/G4Types.hh.html#G4int" title='G4int' data-type='int' data-ref="G4int">G4int</a> <dfn class="local col8 decl" id="68iZ" title='iZ' data-type='G4int' data-ref="68iZ">iZ</dfn> = (<a class="typedef" href="../../../../global/management/include/G4Types.hh.html#G4int" title='G4int' data-type='int' data-ref="G4int">G4int</a>) <a class="local col6 ref" href="#66Z" title='Z' data-ref="66Z">Z</a>;</td></tr>
+<tr><th id="183">183</th><td>  <b>if</b> (!crossSectionHandler)</td></tr>
+<tr><th id="184">184</th><td>    {</td></tr>
+<tr><th id="185">185</th><td>      <a class="ref" href="../../../../global/management/include/G4Exception.hh.html#_Z11G4ExceptionPKcS0_19G4ExceptionSeverityS0_" title='G4Exception' data-ref="_Z11G4ExceptionPKcS0_19G4ExceptionSeverityS0_">G4Exception</a>(<q>"G4LivermoreIonisationModel::ComputeCrossSectionPerAtom"</q>,</td></tr>
+<tr><th id="186">186</th><td>		  <q>"em1007"</q>,<a class="enum" href="../../../../global/management/include/G4ExceptionSeverity.hh.html#G4ExceptionSeverity::FatalException" title='G4ExceptionSeverity::FatalException' data-ref="G4ExceptionSeverity::FatalException">FatalException</a>,</td></tr>
+<tr><th id="187">187</th><td>		  <q>"The cross section handler is not correctly initialized"</q>);</td></tr>
+<tr><th id="188">188</th><td>      <b>return</b> <var>0</var>;</td></tr>
+<tr><th id="189">189</th><td>    }</td></tr>
+<tr><th id="190">190</th><td>  </td></tr>
+<tr><th id="191">191</th><td>  <i>//The cut is already included in the crossSectionHandler</i></td></tr>
+<tr><th id="192">192</th><td>  <a class="typedef" href="../../../../global/management/include/G4Types.hh.html#G4double" title='G4double' data-type='double' data-ref="G4double">G4double</a> <dfn class="local col9 decl" id="69cs" title='cs' data-type='G4double' data-ref="69cs">cs</dfn> = </td></tr>
+<tr><th id="193">193</th><td>    crossSectionHandler-&gt;GetCrossSectionAboveThresholdForElement(energy,</td></tr>
+<tr><th id="194">194</th><td>								 cutEnergy,</td></tr>
+<tr><th id="195">195</th><td>								 iZ);</td></tr>
+<tr><th id="196">196</th><td></td></tr>
+<tr><th id="197">197</th><td>  <b>if</b> (<a class="member" href="../include/G4LivermoreIonisationModel.hh.html#G4LivermoreIonisationModel::verboseLevel" title='G4LivermoreIonisationModel::verboseLevel' data-ref="G4LivermoreIonisationModel::verboseLevel">verboseLevel</a> &gt; <var>1</var>)</td></tr>
+<tr><th id="198">198</th><td>    {</td></tr>
+<tr><th id="199">199</th><td>      <a class="macro" href="../../../../global/management/include/G4ios.hh.html#46" title="(*_G4cout_p())" data-ref="_M/G4cout">G4cout</a> <span class='error' title="invalid operands to binary expression (&apos;int&apos; and &apos;const char *&apos;)">&lt;&lt;</span> <q>"G4LivermoreIonisationModel "</q> &lt;&lt; <a class="macro" href="../../../../global/management/include/G4ios.hh.html#60" title="std::endl" data-ref="_M/G4endl">G4endl</a>;</td></tr>
+<tr><th id="200">200</th><td>      <a class="macro" href="../../../../global/management/include/G4ios.hh.html#46" title="(*_G4cout_p())" data-ref="_M/G4cout">G4cout</a> <span class='error' title="invalid operands to binary expression (&apos;int&apos; and &apos;const char *&apos;)">&lt;&lt;</span> <q>"Cross section for delta emission &gt; "</q> </td></tr>
+<tr><th id="201">201</th><td>	     &lt;&lt; cutEnergy/keV &lt;&lt; <q>" keV at "</q> </td></tr>
+<tr><th id="202">202</th><td>	     &lt;&lt; energy/keV &lt;&lt; <q>" keV and Z = "</q> &lt;&lt; iZ &lt;&lt; <q>" --&gt; "</q> </td></tr>
+<tr><th id="203">203</th><td>	     &lt;&lt; cs/barn &lt;&lt; <q>" barn"</q> &lt;&lt; <a class="macro" href="../../../../global/management/include/G4ios.hh.html#60" title="std::endl" data-ref="_M/G4endl">G4endl</a>;</td></tr>
+<tr><th id="204">204</th><td>    }</td></tr>
+<tr><th id="205">205</th><td>  <b>return</b> <a class="local col9 ref" href="#69cs" title='cs' data-ref="69cs">cs</a>;</td></tr>
+<tr><th id="206">206</th><td>}</td></tr>
+<tr><th id="207">207</th><td></td></tr>
+<tr><th id="208">208</th><td></td></tr>
+<tr><th id="209">209</th><td><i>//....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo....</i></td></tr>
+<tr><th id="210">210</th><td></td></tr>
+<tr><th id="211">211</th><td><a class="typedef" href="../../../../global/management/include/G4Types.hh.html#G4double" title='G4double' data-type='double' data-ref="G4double">G4double</a> </td></tr>
+<tr><th id="212">212</th><td><a class="type" href="../include/G4LivermoreIonisationModel.hh.html#G4LivermoreIonisationModel" title='G4LivermoreIonisationModel' data-ref="G4LivermoreIonisationModel">G4LivermoreIonisationModel</a>::<dfn class="virtual decl def" id="_ZN26G4LivermoreIonisationModel20ComputeDEDXPerVolumeEPK10G4MaterialPK20G4ParticleDefinitiondd" title='G4LivermoreIonisationModel::ComputeDEDXPerVolume' data-ref="_ZN26G4LivermoreIonisationModel20ComputeDEDXPerVolumeEPK10G4MaterialPK20G4ParticleDefinitiondd">ComputeDEDXPerVolume</dfn>(<em>const</em> <a class="type" href="../../../../materials/include/G4Material.hh.html#G4Material" title='G4Material' data-ref="G4Material">G4Material</a>* <dfn class="local col0 decl" id="70material" title='material' data-type='const G4Material *' data-ref="70material">material</dfn>,</td></tr>
+<tr><th id="213">213</th><td>						 <em>const</em> <a class="type" href="../../../../particles/management/include/G4ParticleDefinition.hh.html#G4ParticleDefinition" title='G4ParticleDefinition' data-ref="G4ParticleDefinition">G4ParticleDefinition</a>*,</td></tr>
+<tr><th id="214">214</th><td>						 <a class="typedef" href="../../../../global/management/include/G4Types.hh.html#G4double" title='G4double' data-type='double' data-ref="G4double">G4double</a> <dfn class="local col1 decl" id="71kineticEnergy" title='kineticEnergy' data-type='G4double' data-ref="71kineticEnergy">kineticEnergy</dfn>,</td></tr>
+<tr><th id="215">215</th><td>						 <a class="typedef" href="../../../../global/management/include/G4Types.hh.html#G4double" title='G4double' data-type='double' data-ref="G4double">G4double</a> <dfn class="local col2 decl" id="72cutEnergy" title='cutEnergy' data-type='G4double' data-ref="72cutEnergy">cutEnergy</dfn>)</td></tr>
+<tr><th id="216">216</th><td>{</td></tr>
+<tr><th id="217">217</th><td>  <a class="typedef" href="../../../../global/management/include/G4Types.hh.html#G4double" title='G4double' data-type='double' data-ref="G4double">G4double</a> <dfn class="local col3 decl" id="73sPower" title='sPower' data-type='G4double' data-ref="73sPower">sPower</dfn> = <var>0.0</var>;</td></tr>
+<tr><th id="218">218</th><td></td></tr>
+<tr><th id="219">219</th><td>  <em>const</em> <span class='error' title="unknown type name &apos;G4ElementVector&apos;">G4ElementVector</span>* <dfn class="local col4 decl" id="74theElementVector" title='theElementVector' data-type='const int *' data-ref="74theElementVector">theElementVector</dfn> = material-&gt;GetElementVector();</td></tr>
+<tr><th id="220">220</th><td>  <span class='error' title="unknown type name &apos;size_t&apos;">size_t</span> <dfn class="local col5 decl" id="75NumberOfElements" title='NumberOfElements' data-type='int' data-ref="75NumberOfElements">NumberOfElements</dfn> = material-&gt;GetNumberOfElements() ;</td></tr>
+<tr><th id="221">221</th><td>  <em>const</em> <a class="typedef" href="../../../../global/management/include/G4Types.hh.html#G4double" title='G4double' data-type='double' data-ref="G4double">G4double</a>* <dfn class="local col6 decl" id="76theAtomicNumDensityVector" title='theAtomicNumDensityVector' data-type='const G4double *' data-ref="76theAtomicNumDensityVector">theAtomicNumDensityVector</dfn> =</td></tr>
+<tr><th id="222">222</th><td>                    <a class="local col0 ref" href="#70material" title='material' data-ref="70material">material</a>-&gt;<a class="ref" href="../../../../materials/include/G4Material.hh.html#_ZNK10G4Material25GetAtomicNumDensityVectorEv" title='G4Material::GetAtomicNumDensityVector' data-ref="_ZNK10G4Material25GetAtomicNumDensityVectorEv">GetAtomicNumDensityVector</a>();</td></tr>
+<tr><th id="223">223</th><td></td></tr>
+<tr><th id="224">224</th><td>  <i>// loop for elements in the material</i></td></tr>
+<tr><th id="225">225</th><td>  <b>for</b> (<span class='error' title="unknown type name &apos;size_t&apos;">size_t</span> <dfn class="local col7 decl" id="77iel" title='iel' data-type='int' data-ref="77iel">iel</dfn>=<var>0</var>; iel&lt;NumberOfElements; iel++ ) </td></tr>
+<tr><th id="226">226</th><td>    {</td></tr>
+<tr><th id="227">227</th><td>      <a class="typedef" href="../../../../global/management/include/G4Types.hh.html#G4int" title='G4int' data-type='int' data-ref="G4int">G4int</a> <dfn class="local col8 decl" id="78iZ" title='iZ' data-type='G4int' data-ref="78iZ">iZ</dfn> = (G4int)((*theElementVector)[iel]-&gt;GetZ());</td></tr>
+<tr><th id="228">228</th><td>      <a class="typedef" href="../../../../global/management/include/G4Types.hh.html#G4int" title='G4int' data-type='int' data-ref="G4int">G4int</a> <dfn class="local col9 decl" id="79nShells" title='nShells' data-type='G4int' data-ref="79nShells">nShells</dfn> = <a class="member" href="../include/G4LivermoreIonisationModel.hh.html#G4LivermoreIonisationModel::transitionManager" title='G4LivermoreIonisationModel::transitionManager' data-ref="G4LivermoreIonisationModel::transitionManager">transitionManager</a>-&gt;<a class="ref" href="../include/G4AtomicTransitionManager.hh.html#_ZNK25G4AtomicTransitionManager14NumberOfShellsEi" title='G4AtomicTransitionManager::NumberOfShells' data-ref="_ZNK25G4AtomicTransitionManager14NumberOfShellsEi">NumberOfShells</a>(<a class="local col8 ref" href="#78iZ" title='iZ' data-ref="78iZ">iZ</a>);</td></tr>
+<tr><th id="229">229</th><td>      <b>for</b> (<a class="typedef" href="../../../../global/management/include/G4Types.hh.html#G4int" title='G4int' data-type='int' data-ref="G4int">G4int</a> <dfn class="local col0 decl" id="80n" title='n' data-type='G4int' data-ref="80n">n</dfn>=<var>0</var>; <a class="local col0 ref" href="#80n" title='n' data-ref="80n">n</a>&lt;<a class="local col9 ref" href="#79nShells" title='nShells' data-ref="79nShells">nShells</a>; <a class="local col0 ref" href="#80n" title='n' data-ref="80n">n</a>++) </td></tr>
+<tr><th id="230">230</th><td>	{</td></tr>
+<tr><th id="231">231</th><td>	  <a class="typedef" href="../../../../global/management/include/G4Types.hh.html#G4double" title='G4double' data-type='double' data-ref="G4double">G4double</a> <dfn class="local col1 decl" id="81e" title='e' data-type='G4double' data-ref="81e">e</dfn> = <a class="member" href="../include/G4LivermoreIonisationModel.hh.html#G4LivermoreIonisationModel::energySpectrum" title='G4LivermoreIonisationModel::energySpectrum' data-ref="G4LivermoreIonisationModel::energySpectrum">energySpectrum</a>-&gt;<a class="virtual ref" href="../include/G4VEnergySpectrum.hh.html#_ZNK17G4VEnergySpectrum13AverageEnergyEidddiPK20G4ParticleDefinition" title='G4VEnergySpectrum::AverageEnergy' data-ref="_ZNK17G4VEnergySpectrum13AverageEnergyEidddiPK20G4ParticleDefinition">AverageEnergy</a>(<a class="local col8 ref" href="#78iZ" title='iZ' data-ref="78iZ">iZ</a>, <var>0.0</var>,<a class="local col2 ref" href="#72cutEnergy" title='cutEnergy' data-ref="72cutEnergy">cutEnergy</a>,</td></tr>
+<tr><th id="232">232</th><td>						     <a class="local col1 ref" href="#71kineticEnergy" title='kineticEnergy' data-ref="71kineticEnergy">kineticEnergy</a>, <a class="local col0 ref" href="#80n" title='n' data-ref="80n">n</a>);</td></tr>
+<tr><th id="233">233</th><td>	  <a class="typedef" href="../../../../global/management/include/G4Types.hh.html#G4double" title='G4double' data-type='double' data-ref="G4double">G4double</a> <dfn class="local col2 decl" id="82cs" title='cs' data-type='G4double' data-ref="82cs">cs</dfn>= crossSectionHandler-&gt;FindValue(iZ,kineticEnergy, n);</td></tr>
+<tr><th id="234">234</th><td>	  sPower   += e * cs * theAtomicNumDensityVector[iel];</td></tr>
+<tr><th id="235">235</th><td>	}</td></tr>
+<tr><th id="236">236</th><td>      <a class="typedef" href="../../../../global/management/include/G4Types.hh.html#G4double" title='G4double' data-type='double' data-ref="G4double">G4double</a> <dfn class="local col3 decl" id="83esp" title='esp' data-type='G4double' data-ref="83esp">esp</dfn> = <a class="member" href="../include/G4LivermoreIonisationModel.hh.html#G4LivermoreIonisationModel::energySpectrum" title='G4LivermoreIonisationModel::energySpectrum' data-ref="G4LivermoreIonisationModel::energySpectrum">energySpectrum</a>-&gt;<a class="virtual ref" href="../include/G4VEnergySpectrum.hh.html#_ZNK17G4VEnergySpectrum10ExcitationEid" title='G4VEnergySpectrum::Excitation' data-ref="_ZNK17G4VEnergySpectrum10ExcitationEid">Excitation</a>(<a class="local col8 ref" href="#78iZ" title='iZ' data-ref="78iZ">iZ</a>,<a class="local col1 ref" href="#71kineticEnergy" title='kineticEnergy' data-ref="71kineticEnergy">kineticEnergy</a>);</td></tr>
+<tr><th id="237">237</th><td>      sPower   += esp * theAtomicNumDensityVector[iel];</td></tr>
+<tr><th id="238">238</th><td>    }</td></tr>
+<tr><th id="239">239</th><td></td></tr>
+<tr><th id="240">240</th><td>  <b>if</b> (<a class="member" href="../include/G4LivermoreIonisationModel.hh.html#G4LivermoreIonisationModel::verboseLevel" title='G4LivermoreIonisationModel::verboseLevel' data-ref="G4LivermoreIonisationModel::verboseLevel">verboseLevel</a> &gt; <var>2</var>)</td></tr>
+<tr><th id="241">241</th><td>    {</td></tr>
+<tr><th id="242">242</th><td>      <a class="macro" href="../../../../global/management/include/G4ios.hh.html#46" title="(*_G4cout_p())" data-ref="_M/G4cout">G4cout</a> <span class='error' title="invalid operands to binary expression (&apos;int&apos; and &apos;const char *&apos;)">&lt;&lt;</span> <q>"G4LivermoreIonisationModel "</q> &lt;&lt; <a class="macro" href="../../../../global/management/include/G4ios.hh.html#60" title="std::endl" data-ref="_M/G4endl">G4endl</a>;</td></tr>
+<tr><th id="243">243</th><td>      <a class="macro" href="../../../../global/management/include/G4ios.hh.html#46" title="(*_G4cout_p())" data-ref="_M/G4cout">G4cout</a> <span class='error' title="invalid operands to binary expression (&apos;int&apos; and &apos;const char *&apos;)">&lt;&lt;</span> <q>"Stopping power &lt; "</q> &lt;&lt; cutEnergy/keV </td></tr>
+<tr><th id="244">244</th><td>	     &lt;&lt; <q>" keV at "</q> &lt;&lt; kineticEnergy/keV &lt;&lt; <q>" keV = "</q> </td></tr>
+<tr><th id="245">245</th><td>	     &lt;&lt; sPower/(keV/mm) &lt;&lt; <q>" keV/mm"</q> &lt;&lt; <a class="macro" href="../../../../global/management/include/G4ios.hh.html#60" title="std::endl" data-ref="_M/G4endl">G4endl</a>;</td></tr>
+<tr><th id="246">246</th><td>    }</td></tr>
+<tr><th id="247">247</th><td>  </td></tr>
+<tr><th id="248">248</th><td>  <b>return</b> <a class="local col3 ref" href="#73sPower" title='sPower' data-ref="73sPower">sPower</a>;</td></tr>
+<tr><th id="249">249</th><td>}</td></tr>
+<tr><th id="250">250</th><td></td></tr>
+<tr><th id="251">251</th><td><i  data-doc="G4LivermoreIonisationModel::SampleSecondaries">//....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo....</i></td></tr>
+<tr><th id="252">252</th><td></td></tr>
+<tr><th id="253">253</th><td><em>void</em> <a class="type" href="../include/G4LivermoreIonisationModel.hh.html#G4LivermoreIonisationModel" title='G4LivermoreIonisationModel' data-ref="G4LivermoreIonisationModel">G4LivermoreIonisationModel</a>::<span class='error' title="variable has incomplete type &apos;void&apos;"><dfn class="tu decl def" id="G4LivermoreIonisationModel::SampleSecondaries" title='G4LivermoreIonisationModel::SampleSecondaries' data-type='void' data-ref="G4LivermoreIonisationModel::SampleSecondaries">SampleSecondaries</dfn></span>(</td></tr>
+<tr><th id="254">254</th><td>                                 <span class='error' title="use of undeclared identifier &apos;std&apos;">std</span>::vector&lt;<span class='error' title="&apos;G4DynamicParticle&apos; does not refer to a value">G4DynamicParticle</span>*<span class='error' title="expected expression">&gt;</span>* <span class='error' title="use of undeclared identifier &apos;fvect&apos;">fvect</span>,</td></tr>
+<tr><th id="255">255</th><td>				 <span class='error' title="expected expression"><em>const</em></span> G4MaterialCutsCouple* couple,</td></tr>
+<tr><th id="256">256</th><td>				 <span class='error' title="expected expression"><em>const</em></span> G4DynamicParticle* aDynamicParticle,</td></tr>
+<tr><th id="257">257</th><td>				 <span class='error' title="unexpected type name &apos;G4double&apos;: expected expression">G4double</span> cutE,</td></tr>
+<tr><th id="258">258</th><td>				 <span class='error' title="unexpected type name &apos;G4double&apos;: expected expression">G4double</span> maxE)<span class='error' title="expected &apos;;&apos; after top level declarator"></span></td></tr>
+<tr><th id="259">259</th><td>{</td></tr>
+<tr><th id="260">260</th><td>  </td></tr>
+<tr><th id="261">261</th><td>  G4double kineticEnergy = aDynamicParticle-&gt;GetKineticEnergy();</td></tr>
+<tr><th id="262">262</th><td></td></tr>
+<tr><th id="263">263</th><td>  <b>if</b> (kineticEnergy &lt;= fIntrinsicLowEnergyLimit)</td></tr>
+<tr><th id="264">264</th><td>    {</td></tr>
+<tr><th id="265">265</th><td>      fParticleChange-&gt;SetProposedKineticEnergy(<var>0.</var>);</td></tr>
+<tr><th id="266">266</th><td>      fParticleChange-&gt;ProposeLocalEnergyDeposit(kineticEnergy);</td></tr>
+<tr><th id="267">267</th><td>      <b>return</b>;</td></tr>
+<tr><th id="268">268</th><td>    }</td></tr>
+<tr><th id="269">269</th><td></td></tr>
+<tr><th id="270">270</th><td>   <i>// Select atom and shell</i></td></tr>
+<tr><th id="271">271</th><td>  G4int Z = crossSectionHandler-&gt;SelectRandomAtom(couple, kineticEnergy);</td></tr>
+<tr><th id="272">272</th><td>  G4int shellIndex = crossSectionHandler-&gt;SelectRandomShell(Z, kineticEnergy);</td></tr>
+<tr><th id="273">273</th><td>  <em>const</em> G4AtomicShell* shell = transitionManager-&gt;Shell(Z,shellIndex);</td></tr>
+<tr><th id="274">274</th><td>  G4double bindingEnergy = shell-&gt;BindingEnergy();</td></tr>
+<tr><th id="275">275</th><td></td></tr>
+<tr><th id="276">276</th><td>  <i>// Sample delta energy using energy interval for delta-electrons </i></td></tr>
+<tr><th id="277">277</th><td>  G4double energyMax = </td></tr>
+<tr><th id="278">278</th><td>    std::min(maxE,energySpectrum-&gt;MaxEnergyOfSecondaries(kineticEnergy));</td></tr>
+<tr><th id="279">279</th><td>  G4double energyDelta = energySpectrum-&gt;SampleEnergy(Z, cutE, energyMax,</td></tr>
+<tr><th id="280">280</th><td>						      kineticEnergy, shellIndex);</td></tr>
+<tr><th id="281">281</th><td></td></tr>
+<tr><th id="282">282</th><td>  <b>if</b> (energyDelta == <var>0.</var>) <i>//nothing happens</i></td></tr>
+<tr><th id="283">283</th><td>    { <b>return</b>; }</td></tr>
+<tr><th id="284">284</th><td></td></tr>
+<tr><th id="285">285</th><td>  <em>const</em> G4ParticleDefinition* electron = G4Electron::Electron();</td></tr>
+<tr><th id="286">286</th><td>  G4DynamicParticle* delta = <b>new</b> G4DynamicParticle(electron, </td></tr>
+<tr><th id="287">287</th><td>    GetAngularDistribution()-&gt;SampleDirectionForShell(aDynamicParticle, energyDelta,</td></tr>
+<tr><th id="288">288</th><td>						      Z, shellIndex,</td></tr>
+<tr><th id="289">289</th><td>                                                      couple-&gt;GetMaterial()),</td></tr>
+<tr><th id="290">290</th><td>                                                      energyDelta);</td></tr>
+<tr><th id="291">291</th><td></td></tr>
+<tr><th id="292">292</th><td>  fvect-&gt;push_back(delta);</td></tr>
+<tr><th id="293">293</th><td></td></tr>
+<tr><th id="294">294</th><td>  <i>// Change kinematics of primary particle</i></td></tr>
+<tr><th id="295">295</th><td>  G4ThreeVector direction = aDynamicParticle-&gt;GetMomentumDirection();</td></tr>
+<tr><th id="296">296</th><td>  G4double totalMomentum = std::sqrt(kineticEnergy*(kineticEnergy + <var>2</var>*electron_mass_c2));</td></tr>
+<tr><th id="297">297</th><td></td></tr>
+<tr><th id="298">298</th><td>  G4ThreeVector finalP = totalMomentum*direction - delta-&gt;GetMomentum();</td></tr>
+<tr><th id="299">299</th><td>  finalP               = finalP.unit();</td></tr>
+<tr><th id="300">300</th><td></td></tr>
+<tr><th id="301">301</th><td>  <i>//This is the amount of energy available for fluorescence</i></td></tr>
+<tr><th id="302">302</th><td>  G4double theEnergyDeposit = bindingEnergy;</td></tr>
+<tr><th id="303">303</th><td></td></tr>
+<tr><th id="304">304</th><td>  <i>// fill ParticleChange</i></td></tr>
+<tr><th id="305">305</th><td><i>  // changed energy and momentum of the actual particle</i></td></tr>
+<tr><th id="306">306</th><td>  G4double finalKinEnergy = kineticEnergy - energyDelta - theEnergyDeposit;</td></tr>
+<tr><th id="307">307</th><td>  <b>if</b>(finalKinEnergy &lt; <var>0.0</var>) </td></tr>
+<tr><th id="308">308</th><td>    {</td></tr>
+<tr><th id="309">309</th><td>      theEnergyDeposit += finalKinEnergy;</td></tr>
+<tr><th id="310">310</th><td>      finalKinEnergy    = <var>0.0</var>;</td></tr>
+<tr><th id="311">311</th><td>    } </td></tr>
+<tr><th id="312">312</th><td>  <b>else</b> </td></tr>
+<tr><th id="313">313</th><td>    {</td></tr>
+<tr><th id="314">314</th><td>      fParticleChange-&gt;ProposeMomentumDirection(finalP);</td></tr>
+<tr><th id="315">315</th><td>    }</td></tr>
+<tr><th id="316">316</th><td>  fParticleChange-&gt;SetProposedKineticEnergy(finalKinEnergy);</td></tr>
+<tr><th id="317">317</th><td></td></tr>
+<tr><th id="318">318</th><td>  <b>if</b> (theEnergyDeposit &lt; <var>0</var>)</td></tr>
+<tr><th id="319">319</th><td>    {</td></tr>
+<tr><th id="320">320</th><td>      <a class="macro" href="../../../../global/management/include/G4ios.hh.html#46" title="(*_G4cout_p())" data-ref="_M/G4cout">G4cout</a> &lt;&lt;  <q>"G4LivermoreIonisationModel: Negative energy deposit: "</q></td></tr>
+<tr><th id="321">321</th><td>	     &lt;&lt; theEnergyDeposit/eV &lt;&lt; <q>" eV"</q> &lt;&lt; <a class="macro" href="../../../../global/management/include/G4ios.hh.html#60" title="std::endl" data-ref="_M/G4endl">G4endl</a>;</td></tr>
+<tr><th id="322">322</th><td>      theEnergyDeposit = <var>0.0</var>;</td></tr>
+<tr><th id="323">323</th><td>    }</td></tr>
+<tr><th id="324">324</th><td></td></tr>
+<tr><th id="325">325</th><td>  <i>//Assign local energy deposit</i></td></tr>
+<tr><th id="326">326</th><td>  fParticleChange-&gt;ProposeLocalEnergyDeposit(theEnergyDeposit);</td></tr>
+<tr><th id="327">327</th><td></td></tr>
+<tr><th id="328">328</th><td>  <b>if</b> (verboseLevel &gt; <var>1</var>)</td></tr>
+<tr><th id="329">329</th><td>    {</td></tr>
+<tr><th id="330">330</th><td>      <a class="macro" href="../../../../global/management/include/G4ios.hh.html#46" title="(*_G4cout_p())" data-ref="_M/G4cout">G4cout</a> &lt;&lt; <q>"-----------------------------------------------------------"</q> &lt;&lt; <a class="macro" href="../../../../global/management/include/G4ios.hh.html#60" title="std::endl" data-ref="_M/G4endl">G4endl</a>;</td></tr>
+<tr><th id="331">331</th><td>      <a class="macro" href="../../../../global/management/include/G4ios.hh.html#46" title="(*_G4cout_p())" data-ref="_M/G4cout">G4cout</a> &lt;&lt; <q>"Energy balance from G4LivermoreIonisation"</q> &lt;&lt; <a class="macro" href="../../../../global/management/include/G4ios.hh.html#60" title="std::endl" data-ref="_M/G4endl">G4endl</a>;</td></tr>
+<tr><th id="332">332</th><td>      <a class="macro" href="../../../../global/management/include/G4ios.hh.html#46" title="(*_G4cout_p())" data-ref="_M/G4cout">G4cout</a> &lt;&lt; <q>"Incoming primary energy: "</q> &lt;&lt; kineticEnergy/keV &lt;&lt; <q>" keV"</q> &lt;&lt; <a class="macro" href="../../../../global/management/include/G4ios.hh.html#60" title="std::endl" data-ref="_M/G4endl">G4endl</a>;</td></tr>
+<tr><th id="333">333</th><td>      <a class="macro" href="../../../../global/management/include/G4ios.hh.html#46" title="(*_G4cout_p())" data-ref="_M/G4cout">G4cout</a> &lt;&lt; <q>"-----------------------------------------------------------"</q> &lt;&lt; <a class="macro" href="../../../../global/management/include/G4ios.hh.html#60" title="std::endl" data-ref="_M/G4endl">G4endl</a>;</td></tr>
+<tr><th id="334">334</th><td>      <a class="macro" href="../../../../global/management/include/G4ios.hh.html#46" title="(*_G4cout_p())" data-ref="_M/G4cout">G4cout</a> &lt;&lt; <q>"Outgoing primary energy: "</q> &lt;&lt; finalKinEnergy/keV &lt;&lt; <q>" keV"</q> &lt;&lt; <a class="macro" href="../../../../global/management/include/G4ios.hh.html#60" title="std::endl" data-ref="_M/G4endl">G4endl</a>;</td></tr>
+<tr><th id="335">335</th><td>      <a class="macro" href="../../../../global/management/include/G4ios.hh.html#46" title="(*_G4cout_p())" data-ref="_M/G4cout">G4cout</a> &lt;&lt; <q>"Delta ray "</q> &lt;&lt; energyDelta/keV &lt;&lt; <q>" keV"</q> &lt;&lt; <a class="macro" href="../../../../global/management/include/G4ios.hh.html#60" title="std::endl" data-ref="_M/G4endl">G4endl</a>;</td></tr>
+<tr><th id="336">336</th><td>      <a class="macro" href="../../../../global/management/include/G4ios.hh.html#46" title="(*_G4cout_p())" data-ref="_M/G4cout">G4cout</a> &lt;&lt; <q>"Fluorescence: "</q> &lt;&lt; (bindingEnergy-theEnergyDeposit)/keV &lt;&lt; <q>" keV"</q> &lt;&lt; <a class="macro" href="../../../../global/management/include/G4ios.hh.html#60" title="std::endl" data-ref="_M/G4endl">G4endl</a>;</td></tr>
+<tr><th id="337">337</th><td>      <a class="macro" href="../../../../global/management/include/G4ios.hh.html#46" title="(*_G4cout_p())" data-ref="_M/G4cout">G4cout</a> &lt;&lt; <q>"Local energy deposit "</q> &lt;&lt; theEnergyDeposit/keV &lt;&lt; <q>" keV"</q> &lt;&lt; <a class="macro" href="../../../../global/management/include/G4ios.hh.html#60" title="std::endl" data-ref="_M/G4endl">G4endl</a>;</td></tr>
+<tr><th id="338">338</th><td>      <a class="macro" href="../../../../global/management/include/G4ios.hh.html#46" title="(*_G4cout_p())" data-ref="_M/G4cout">G4cout</a> &lt;&lt; <q>"Total final state: "</q> &lt;&lt; (finalKinEnergy+energyDelta+bindingEnergy)</td></tr>
+<tr><th id="339">339</th><td>					  &lt;&lt; <q>" keV"</q> &lt;&lt; <a class="macro" href="../../../../global/management/include/G4ios.hh.html#60" title="std::endl" data-ref="_M/G4endl">G4endl</a>;</td></tr>
+<tr><th id="340">340</th><td>      <a class="macro" href="../../../../global/management/include/G4ios.hh.html#46" title="(*_G4cout_p())" data-ref="_M/G4cout">G4cout</a> &lt;&lt; <q>"-----------------------------------------------------------"</q> &lt;&lt; <a class="macro" href="../../../../global/management/include/G4ios.hh.html#60" title="std::endl" data-ref="_M/G4endl">G4endl</a>;</td></tr>
+<tr><th id="341">341</th><td>    }</td></tr>
+<tr><th id="342">342</th><td>  <b>return</b>;</td></tr>
+<tr><th id="343">343</th><td>}</td></tr>
+<tr><th id="344">344</th><td></td></tr>
+<tr><th id="345">345</th><td><i>//....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo....</i></td></tr>
+<tr><th id="346">346</th><td></td></tr>
+<tr><th id="347">347</th><td></td></tr>
+</table><hr/><p id='footer'>
+Generated on <em>2019-Aug-28</em> from project codebrowser<br />Powered by <a href='https://woboq.com'><img alt='Woboq' src='https://code.woboq.org/woboq-16.png' width='41' height='16' /></a> <a href='https://code.woboq.org'>Code Browser</a> 2.1
+<br/>Generator usage only permitted with license.</p>
+</div></body></html>

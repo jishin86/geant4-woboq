@@ -1,0 +1,977 @@
+<!doctype html>
+<html>
+<head>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"><title>G4PenelopeComptonModel.cc source code [codebrowser/source/processes/electromagnetic/lowenergy/src/G4PenelopeComptonModel.cc] - Woboq Code Browser</title>
+<link rel="stylesheet" href="../../../../../../../data/qtcreator.css" title="QtCreator"/>
+<link rel="alternate stylesheet" href="../../../../../../../data/kdevelop.css" title="KDevelop"/>
+<script type="text/javascript" src="../../../../../../../data/jquery/jquery.min.js"></script>
+<script type="text/javascript" src="../../../../../../../data/jquery/jquery-ui.min.js"></script>
+<script>var file = 'codebrowser/source/processes/electromagnetic/lowenergy/src/G4PenelopeComptonModel.cc'; var root_path = '../../../../../..'; var data_path = '../../../../../../../data';</script>
+<script src='../../../../../../../data/codebrowser.js'></script>
+</head>
+<body><div id='header'><h1 id='breadcrumb'><span>Browse the source code of </span><a href='../../../../..'>codebrowser</a>/<a href='../../../..'>source</a>/<a href='../../..'>processes</a>/<a href='../..'>electromagnetic</a>/<a href='..'>lowenergy</a>/<a href='./'>src</a>/<a href='G4PenelopeComptonModel.cc.html'>G4PenelopeComptonModel.cc</a></h1></div>
+<hr/><div id='content'><table class="code">
+<tr><th id="1">1</th><td><i>//</i></td></tr>
+<tr><th id="2">2</th><td><i>// ********************************************************************</i></td></tr>
+<tr><th id="3">3</th><td><i>// * License and Disclaimer                                           *</i></td></tr>
+<tr><th id="4">4</th><td><i>// *                                                                  *</i></td></tr>
+<tr><th id="5">5</th><td><i>// * The  Geant4 software  is  copyright of the Copyright Holders  of *</i></td></tr>
+<tr><th id="6">6</th><td><i>// * the Geant4 Collaboration.  It is provided  under  the terms  and *</i></td></tr>
+<tr><th id="7">7</th><td><i>// * conditions of the Geant4 Software License,  included in the file *</i></td></tr>
+<tr><th id="8">8</th><td><i>// * LICENSE and available at  <a href="http://cern.ch/geant4/license">http://cern.ch/geant4/license</a> .  These *</i></td></tr>
+<tr><th id="9">9</th><td><i>// * include a list of copyright holders.                             *</i></td></tr>
+<tr><th id="10">10</th><td><i>// *                                                                  *</i></td></tr>
+<tr><th id="11">11</th><td><i>// * Neither the authors of this software system, nor their employing *</i></td></tr>
+<tr><th id="12">12</th><td><i>// * institutes,nor the agencies providing financial support for this *</i></td></tr>
+<tr><th id="13">13</th><td><i>// * work  make  any representation or  warranty, express or implied, *</i></td></tr>
+<tr><th id="14">14</th><td><i>// * regarding  this  software system or assume any liability for its *</i></td></tr>
+<tr><th id="15">15</th><td><i>// * use.  Please see the license in the file  LICENSE  and URL above *</i></td></tr>
+<tr><th id="16">16</th><td><i>// * for the full disclaimer and the limitation of liability.         *</i></td></tr>
+<tr><th id="17">17</th><td><i>// *                                                                  *</i></td></tr>
+<tr><th id="18">18</th><td><i>// * This  code  implementation is the result of  the  scientific and *</i></td></tr>
+<tr><th id="19">19</th><td><i>// * technical work of the GEANT4 collaboration.                      *</i></td></tr>
+<tr><th id="20">20</th><td><i>// * By using,  copying,  modifying or  distributing the software (or *</i></td></tr>
+<tr><th id="21">21</th><td><i>// * any work based  on the software)  you  agree  to acknowledge its *</i></td></tr>
+<tr><th id="22">22</th><td><i>// * use  in  resulting  scientific  publications,  and indicate your *</i></td></tr>
+<tr><th id="23">23</th><td><i>// * acceptance of all terms of the Geant4 Software license.          *</i></td></tr>
+<tr><th id="24">24</th><td><i>// ********************************************************************</i></td></tr>
+<tr><th id="25">25</th><td><i>//</i></td></tr>
+<tr><th id="26">26</th><td><i>//</i></td></tr>
+<tr><th id="27">27</th><td><i>// Author: Luciano Pandola</i></td></tr>
+<tr><th id="28">28</th><td><i>//</i></td></tr>
+<tr><th id="29">29</th><td><i>// History:</i></td></tr>
+<tr><th id="30">30</th><td><i>// --------</i></td></tr>
+<tr><th id="31">31</th><td><i>// 15 Feb 2010   L Pandola  Implementation</i></td></tr>
+<tr><th id="32">32</th><td><i>// 18 Mar 2010   L Pandola  Removed GetAtomsPerMolecule(), now demanded</i></td></tr>
+<tr><th id="33">33</th><td><i>//                            to G4PenelopeOscillatorManager</i></td></tr>
+<tr><th id="34">34</th><td><i>// 01 Feb 2011   L Pandola  Suppress fake energy-violation warning when Auger is</i></td></tr>
+<tr><th id="35">35</th><td><i>//                            active.</i></td></tr>
+<tr><th id="36">36</th><td><i>//                          Make sure that fluorescence/Auger is generated only</i></td></tr>
+<tr><th id="37">37</th><td><i>//                            if above threshold</i></td></tr>
+<tr><th id="38">38</th><td><i>// 24 May 2011   L Pandola  Renamed (make v2008 as default Penelope)</i></td></tr>
+<tr><th id="39">39</th><td><i>// 10 Jun 2011   L Pandola  Migrate atomic deexcitation interface</i></td></tr>
+<tr><th id="40">40</th><td><i>// 09 Oct 2013   L Pandola  Migration to MT</i></td></tr>
+<tr><th id="41">41</th><td><i>//</i></td></tr>
+<tr><th id="42">42</th><td><u>#include <a href="../include/G4PenelopeComptonModel.hh.html">"G4PenelopeComptonModel.hh"</a></u></td></tr>
+<tr><th id="43">43</th><td><u>#include <a href="../../../../global/management/include/G4PhysicalConstants.hh.html">"G4PhysicalConstants.hh"</a></u></td></tr>
+<tr><th id="44">44</th><td><u>#include <a href="../../../../global/management/include/G4SystemOfUnits.hh.html">"G4SystemOfUnits.hh"</a></u></td></tr>
+<tr><th id="45">45</th><td><u>#include <a href="../../../../particles/management/include/G4ParticleDefinition.hh.html">"G4ParticleDefinition.hh"</a></u></td></tr>
+<tr><th id="46">46</th><td><u>#include <a href="../../../cuts/include/G4MaterialCutsCouple.hh.html">"G4MaterialCutsCouple.hh"</a></u></td></tr>
+<tr><th id="47">47</th><td><u>#include <a href="../../../../particles/management/include/G4DynamicParticle.hh.html">"G4DynamicParticle.hh"</a></u></td></tr>
+<tr><th id="48">48</th><td><u>#include <a href="../include/G4VEMDataSet.hh.html">"G4VEMDataSet.hh"</a></u></td></tr>
+<tr><th id="49">49</th><td><u>#include <a href="../../../../global/management/include/G4PhysicsTable.hh.html">"G4PhysicsTable.hh"</a></u></td></tr>
+<tr><th id="50">50</th><td><u>#include <a href="../../../../global/management/include/G4PhysicsLogVector.hh.html">"G4PhysicsLogVector.hh"</a></u></td></tr>
+<tr><th id="51">51</th><td><u>#include <a href="../include/G4AtomicTransitionManager.hh.html">"G4AtomicTransitionManager.hh"</a></u></td></tr>
+<tr><th id="52">52</th><td><u>#include <a href="../../utils/include/G4AtomicShell.hh.html">"G4AtomicShell.hh"</a></u></td></tr>
+<tr><th id="53">53</th><td><u>#include <a href="../../../../particles/bosons/include/G4Gamma.hh.html">"G4Gamma.hh"</a></u></td></tr>
+<tr><th id="54">54</th><td><u>#include <a href="../../../../particles/leptons/include/G4Electron.hh.html">"G4Electron.hh"</a></u></td></tr>
+<tr><th id="55">55</th><td><u>#include <a href="../include/G4PenelopeOscillatorManager.hh.html">"G4PenelopeOscillatorManager.hh"</a></u></td></tr>
+<tr><th id="56">56</th><td><u>#include <a href="../include/G4PenelopeOscillator.hh.html">"G4PenelopeOscillator.hh"</a></u></td></tr>
+<tr><th id="57">57</th><td><u>#include <a href="../../utils/include/G4LossTableManager.hh.html">"G4LossTableManager.hh"</a></u></td></tr>
+<tr><th id="58">58</th><td><u>#include <a href="../../../../global/management/include/G4Exp.hh.html">"G4Exp.hh"</a></u></td></tr>
+<tr><th id="59">59</th><td></td></tr>
+<tr><th id="60">60</th><td><i>//....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo....</i></td></tr>
+<tr><th id="61">61</th><td></td></tr>
+<tr><th id="62">62</th><td></td></tr>
+<tr><th id="63">63</th><td><a class="type" href="../include/G4PenelopeComptonModel.hh.html#G4PenelopeComptonModel" title='G4PenelopeComptonModel' data-ref="G4PenelopeComptonModel">G4PenelopeComptonModel</a>::<dfn class="decl def" id="_ZN22G4PenelopeComptonModelC1EPK20G4ParticleDefinitionRK8G4String" title='G4PenelopeComptonModel::G4PenelopeComptonModel' data-ref="_ZN22G4PenelopeComptonModelC1EPK20G4ParticleDefinitionRK8G4String">G4PenelopeComptonModel</dfn>(<em>const</em> <a class="type" href="../../../../particles/management/include/G4ParticleDefinition.hh.html#G4ParticleDefinition" title='G4ParticleDefinition' data-ref="G4ParticleDefinition">G4ParticleDefinition</a>* <dfn class="local col1 decl" id="1part" title='part' data-type='const G4ParticleDefinition *' data-ref="1part">part</dfn>,</td></tr>
+<tr><th id="64">64</th><td>					       <em>const</em> <a class="type" href="../../../../global/management/include/G4String.hh.html#G4String" title='G4String' data-ref="G4String">G4String</a>&amp; <dfn class="local col2 decl" id="2nam" title='nam' data-type='const G4String &amp;' data-ref="2nam">nam</dfn>)</td></tr>
+<tr><th id="65">65</th><td>  :<a class="type" href="../../utils/include/G4VEmModel.hh.html#G4VEmModel" title='G4VEmModel' data-ref="G4VEmModel">G4VEmModel</a><a class="ref" href="../../utils/include/G4VEmModel.hh.html#_ZN10G4VEmModelC1ERK8G4String" title='G4VEmModel::G4VEmModel' data-ref="_ZN10G4VEmModelC1ERK8G4String">(</a><a class="local col2 ref" href="#2nam" title='nam' data-ref="2nam">nam</a>),<a class="member" href="../include/G4PenelopeComptonModel.hh.html#G4PenelopeComptonModel::fParticleChange" title='G4PenelopeComptonModel::fParticleChange' data-ref="G4PenelopeComptonModel::fParticleChange">fParticleChange</a>(<var>0</var>),<a class="member" href="../include/G4PenelopeComptonModel.hh.html#G4PenelopeComptonModel::fParticle" title='G4PenelopeComptonModel::fParticle' data-ref="G4PenelopeComptonModel::fParticle">fParticle</a>(<var>0</var>),</td></tr>
+<tr><th id="66">66</th><td>   <a class="member" href="../include/G4PenelopeComptonModel.hh.html#G4PenelopeComptonModel::isInitialised" title='G4PenelopeComptonModel::isInitialised' data-ref="G4PenelopeComptonModel::isInitialised">isInitialised</a>(<b>false</b>),<a class="member" href="../include/G4PenelopeComptonModel.hh.html#G4PenelopeComptonModel::fAtomDeexcitation" title='G4PenelopeComptonModel::fAtomDeexcitation' data-ref="G4PenelopeComptonModel::fAtomDeexcitation">fAtomDeexcitation</a>(<var>0</var>),</td></tr>
+<tr><th id="67">67</th><td>   <a class="member" href="../include/G4PenelopeComptonModel.hh.html#G4PenelopeComptonModel::oscManager" title='G4PenelopeComptonModel::oscManager' data-ref="G4PenelopeComptonModel::oscManager">oscManager</a>(<var>0</var>)</td></tr>
+<tr><th id="68">68</th><td>{</td></tr>
+<tr><th id="69">69</th><td>  <a class="member" href="../include/G4PenelopeComptonModel.hh.html#G4PenelopeComptonModel::fIntrinsicLowEnergyLimit" title='G4PenelopeComptonModel::fIntrinsicLowEnergyLimit' data-ref="G4PenelopeComptonModel::fIntrinsicLowEnergyLimit">fIntrinsicLowEnergyLimit</a> = <var>100.0</var>*<a class="ref" href="../../../../externals/clhep/include/CLHEP/Units/SystemOfUnits.h.html#CLHEP::eV" title='CLHEP::eV' data-ref="CLHEP::eV">eV</a>;</td></tr>
+<tr><th id="70">70</th><td>  <a class="member" href="../include/G4PenelopeComptonModel.hh.html#G4PenelopeComptonModel::fIntrinsicHighEnergyLimit" title='G4PenelopeComptonModel::fIntrinsicHighEnergyLimit' data-ref="G4PenelopeComptonModel::fIntrinsicHighEnergyLimit">fIntrinsicHighEnergyLimit</a> = <var>100.0</var>*<a class="ref" href="../../../../externals/clhep/include/CLHEP/Units/SystemOfUnits.h.html#CLHEP::GeV" title='CLHEP::GeV' data-ref="CLHEP::GeV">GeV</a>;</td></tr>
+<tr><th id="71">71</th><td>  <span class='error' title="cannot initialize object parameter of type &apos;G4VEmModel&apos; with an expression of type &apos;G4PenelopeComptonModel&apos;">SetHighEnergyLimit</span>(fIntrinsicHighEnergyLimit);</td></tr>
+<tr><th id="72">72</th><td>  <i>//</i></td></tr>
+<tr><th id="73">73</th><td>  <a class="member" href="../include/G4PenelopeComptonModel.hh.html#G4PenelopeComptonModel::oscManager" title='G4PenelopeComptonModel::oscManager' data-ref="G4PenelopeComptonModel::oscManager">oscManager</a> = <a class="type" href="../include/G4PenelopeOscillatorManager.hh.html#G4PenelopeOscillatorManager" title='G4PenelopeOscillatorManager' data-ref="G4PenelopeOscillatorManager">G4PenelopeOscillatorManager</a>::<a class="ref" href="../include/G4PenelopeOscillatorManager.hh.html#_ZN27G4PenelopeOscillatorManager20GetOscillatorManagerEv" title='G4PenelopeOscillatorManager::GetOscillatorManager' data-ref="_ZN27G4PenelopeOscillatorManager20GetOscillatorManagerEv">GetOscillatorManager</a>();</td></tr>
+<tr><th id="74">74</th><td></td></tr>
+<tr><th id="75">75</th><td>  <b>if</b> (<a class="local col1 ref" href="#1part" title='part' data-ref="1part">part</a>)</td></tr>
+<tr><th id="76">76</th><td>    <a class="member" href="../include/G4PenelopeComptonModel.hh.html#_ZN22G4PenelopeComptonModel11SetParticleEPK20G4ParticleDefinition" title='G4PenelopeComptonModel::SetParticle' data-ref="_ZN22G4PenelopeComptonModel11SetParticleEPK20G4ParticleDefinition">SetParticle</a>(<a class="local col1 ref" href="#1part" title='part' data-ref="1part">part</a>);</td></tr>
+<tr><th id="77">77</th><td></td></tr>
+<tr><th id="78">78</th><td>  <a class="member" href="../include/G4PenelopeComptonModel.hh.html#G4PenelopeComptonModel::verboseLevel" title='G4PenelopeComptonModel::verboseLevel' data-ref="G4PenelopeComptonModel::verboseLevel">verboseLevel</a>= <var>0</var>;</td></tr>
+<tr><th id="79">79</th><td>  <i>// Verbosity scale:</i></td></tr>
+<tr><th id="80">80</th><td><i>  // 0 = nothing</i></td></tr>
+<tr><th id="81">81</th><td><i>  // 1 = warning for energy non-conservation</i></td></tr>
+<tr><th id="82">82</th><td><i>  // 2 = details of energy budget</i></td></tr>
+<tr><th id="83">83</th><td><i>  // 3 = calculation of cross sections, file openings, sampling of atoms</i></td></tr>
+<tr><th id="84">84</th><td><i>  // 4 = entering in methods</i></td></tr>
+<tr><th id="85">85</th><td><i></i></td></tr>
+<tr><th id="86">86</th><td><i>  //Mark this model as "applicable" for atomic deexcitation</i></td></tr>
+<tr><th id="87">87</th><td>  <span class='error' title="cannot initialize object parameter of type &apos;G4VEmModel&apos; with an expression of type &apos;G4PenelopeComptonModel&apos;">SetDeexcitationFlag</span>(<b>true</b>);</td></tr>
+<tr><th id="88">88</th><td></td></tr>
+<tr><th id="89">89</th><td>  <a class="member" href="../include/G4PenelopeComptonModel.hh.html#G4PenelopeComptonModel::fTransitionManager" title='G4PenelopeComptonModel::fTransitionManager' data-ref="G4PenelopeComptonModel::fTransitionManager">fTransitionManager</a> = <a class="type" href="../include/G4AtomicTransitionManager.hh.html#G4AtomicTransitionManager" title='G4AtomicTransitionManager' data-ref="G4AtomicTransitionManager">G4AtomicTransitionManager</a>::<a class="ref" href="../include/G4AtomicTransitionManager.hh.html#_ZN25G4AtomicTransitionManager8InstanceEv" title='G4AtomicTransitionManager::Instance' data-ref="_ZN25G4AtomicTransitionManager8InstanceEv">Instance</a>();</td></tr>
+<tr><th id="90">90</th><td>}</td></tr>
+<tr><th id="91">91</th><td></td></tr>
+<tr><th id="92">92</th><td><i>//....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo....</i></td></tr>
+<tr><th id="93">93</th><td></td></tr>
+<tr><th id="94">94</th><td>G4PenelopeComptonModel::<span class='error' title="exception specification in declaration does not match previous declaration">~</span>G4PenelopeComptonModel()</td></tr>
+<tr><th id="95">95</th><td>{;}</td></tr>
+<tr><th id="96">96</th><td></td></tr>
+<tr><th id="97">97</th><td><i>//....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo....</i></td></tr>
+<tr><th id="98">98</th><td></td></tr>
+<tr><th id="99">99</th><td><em>void</em> <a class="type" href="../include/G4PenelopeComptonModel.hh.html#G4PenelopeComptonModel" title='G4PenelopeComptonModel' data-ref="G4PenelopeComptonModel">G4PenelopeComptonModel</a>::<dfn class="virtual decl def" id="_ZN22G4PenelopeComptonModel10InitialiseEPK20G4ParticleDefinitionRK12G4DataVector" title='G4PenelopeComptonModel::Initialise' data-ref="_ZN22G4PenelopeComptonModel10InitialiseEPK20G4ParticleDefinitionRK12G4DataVector">Initialise</dfn>(<em>const</em> <a class="type" href="../../../../particles/management/include/G4ParticleDefinition.hh.html#G4ParticleDefinition" title='G4ParticleDefinition' data-ref="G4ParticleDefinition">G4ParticleDefinition</a>* <dfn class="local col3 decl" id="3part" title='part' data-type='const G4ParticleDefinition *' data-ref="3part">part</dfn>,</td></tr>
+<tr><th id="100">100</th><td>					  <em>const</em> <a class="type" href="../../../../global/management/include/G4DataVector.hh.html#G4DataVector" title='G4DataVector' data-ref="G4DataVector">G4DataVector</a>&amp;)</td></tr>
+<tr><th id="101">101</th><td>{</td></tr>
+<tr><th id="102">102</th><td>  <b>if</b> (verboseLevel &gt; <var>3</var>)</td></tr>
+<tr><th id="103">103</th><td>    <a class="macro" href="../../../../global/management/include/G4ios.hh.html#46" title="(*_G4cout_p())" data-ref="_M/G4cout">G4cout</a> <span class='error' title="invalid operands to binary expression (&apos;int&apos; and &apos;const char *&apos;)">&lt;&lt;</span> <q>"Calling G4PenelopeComptonModel::Initialise()"</q> &lt;&lt; <a class="macro" href="../../../../global/management/include/G4ios.hh.html#60" title="std::endl" data-ref="_M/G4endl">G4endl</a>;</td></tr>
+<tr><th id="104">104</th><td></td></tr>
+<tr><th id="105">105</th><td>  <a class="member" href="../include/G4PenelopeComptonModel.hh.html#G4PenelopeComptonModel::fAtomDeexcitation" title='G4PenelopeComptonModel::fAtomDeexcitation' data-ref="G4PenelopeComptonModel::fAtomDeexcitation">fAtomDeexcitation</a> = <a class="type" href="../../utils/include/G4LossTableManager.hh.html#G4LossTableManager" title='G4LossTableManager' data-ref="G4LossTableManager">G4LossTableManager</a>::<a class="ref" href="../../utils/include/G4LossTableManager.hh.html#_ZN18G4LossTableManager8InstanceEv" title='G4LossTableManager::Instance' data-ref="_ZN18G4LossTableManager8InstanceEv">Instance</a>()-&gt;<a class="ref" href="../../utils/include/G4LossTableManager.hh.html#_ZN18G4LossTableManager16AtomDeexcitationEv" title='G4LossTableManager::AtomDeexcitation' data-ref="_ZN18G4LossTableManager16AtomDeexcitationEv">AtomDeexcitation</a>();</td></tr>
+<tr><th id="106">106</th><td>  <i>//Issue warning if the AtomicDeexcitation has not been declared</i></td></tr>
+<tr><th id="107">107</th><td>  <b>if</b> (!<a class="member" href="../include/G4PenelopeComptonModel.hh.html#G4PenelopeComptonModel::fAtomDeexcitation" title='G4PenelopeComptonModel::fAtomDeexcitation' data-ref="G4PenelopeComptonModel::fAtomDeexcitation">fAtomDeexcitation</a>)</td></tr>
+<tr><th id="108">108</th><td>    {</td></tr>
+<tr><th id="109">109</th><td>      <a class="macro" href="../../../../global/management/include/G4ios.hh.html#46" title="(*_G4cout_p())" data-ref="_M/G4cout">G4cout</a> &lt;&lt; <a class="macro" href="../../../../global/management/include/G4ios.hh.html#60" title="std::endl" data-ref="_M/G4endl">G4endl</a>;</td></tr>
+<tr><th id="110">110</th><td>      <a class="macro" href="../../../../global/management/include/G4ios.hh.html#46" title="(*_G4cout_p())" data-ref="_M/G4cout">G4cout</a> <span class='error' title="invalid operands to binary expression (&apos;int&apos; and &apos;const char *&apos;)">&lt;&lt;</span> <q>"WARNING from G4PenelopeComptonModel "</q> &lt;&lt; <a class="macro" href="../../../../global/management/include/G4ios.hh.html#60" title="std::endl" data-ref="_M/G4endl">G4endl</a>;</td></tr>
+<tr><th id="111">111</th><td>      <a class="macro" href="../../../../global/management/include/G4ios.hh.html#46" title="(*_G4cout_p())" data-ref="_M/G4cout">G4cout</a> <span class='error' title="invalid operands to binary expression (&apos;int&apos; and &apos;const char *&apos;)">&lt;&lt;</span> <q>"Atomic de-excitation module is not instantiated, so there will not be "</q>;</td></tr>
+<tr><th id="112">112</th><td>      <a class="macro" href="../../../../global/management/include/G4ios.hh.html#46" title="(*_G4cout_p())" data-ref="_M/G4cout">G4cout</a> <span class='error' title="invalid operands to binary expression (&apos;int&apos; and &apos;const char *&apos;)">&lt;&lt;</span> <q>"any fluorescence/Auger emission."</q> &lt;&lt; <a class="macro" href="../../../../global/management/include/G4ios.hh.html#60" title="std::endl" data-ref="_M/G4endl">G4endl</a>;</td></tr>
+<tr><th id="113">113</th><td>      <a class="macro" href="../../../../global/management/include/G4ios.hh.html#46" title="(*_G4cout_p())" data-ref="_M/G4cout">G4cout</a> <span class='error' title="invalid operands to binary expression (&apos;int&apos; and &apos;const char *&apos;)">&lt;&lt;</span> <q>"Please make sure this is intended"</q> &lt;&lt; <a class="macro" href="../../../../global/management/include/G4ios.hh.html#60" title="std::endl" data-ref="_M/G4endl">G4endl</a>;</td></tr>
+<tr><th id="114">114</th><td>    }</td></tr>
+<tr><th id="115">115</th><td></td></tr>
+<tr><th id="116">116</th><td>  <a class="member" href="../include/G4PenelopeComptonModel.hh.html#_ZN22G4PenelopeComptonModel11SetParticleEPK20G4ParticleDefinition" title='G4PenelopeComptonModel::SetParticle' data-ref="_ZN22G4PenelopeComptonModel11SetParticleEPK20G4ParticleDefinition">SetParticle</a>(<a class="local col3 ref" href="#3part" title='part' data-ref="3part">part</a>);</td></tr>
+<tr><th id="117">117</th><td></td></tr>
+<tr><th id="118">118</th><td>  <b>if</b> (<span class='error' title="cannot initialize object parameter of type &apos;const G4VEmModel&apos; with an expression of type &apos;G4PenelopeComptonModel&apos;">IsMaster</span>() &amp;&amp; part == fParticle)</td></tr>
+<tr><th id="119">119</th><td>    {</td></tr>
+<tr><th id="120">120</th><td></td></tr>
+<tr><th id="121">121</th><td>      <b>if</b> (<a class="member" href="../include/G4PenelopeComptonModel.hh.html#G4PenelopeComptonModel::verboseLevel" title='G4PenelopeComptonModel::verboseLevel' data-ref="G4PenelopeComptonModel::verboseLevel">verboseLevel</a> &gt; <var>0</var>)</td></tr>
+<tr><th id="122">122</th><td>	{</td></tr>
+<tr><th id="123">123</th><td>	  <a class="macro" href="../../../../global/management/include/G4ios.hh.html#46" title="(*_G4cout_p())" data-ref="_M/G4cout">G4cout</a> <span class='error' title="invalid operands to binary expression (&apos;int&apos; and &apos;const char *&apos;)">&lt;&lt;</span> <q>"Penelope Compton model v2008 is initialized "</q> &lt;&lt; <a class="macro" href="../../../../global/management/include/G4ios.hh.html#60" title="std::endl" data-ref="_M/G4endl">G4endl</a></td></tr>
+<tr><th id="124">124</th><td>		 &lt;&lt; <q>"Energy range: "</q></td></tr>
+<tr><th id="125">125</th><td>		 &lt;&lt; <span class='error' title="cannot initialize object parameter of type &apos;const G4VEmModel&apos; with an expression of type &apos;G4PenelopeComptonModel&apos;">LowEnergyLimit</span>() / keV &lt;&lt; <q>" keV - "</q></td></tr>
+<tr><th id="126">126</th><td>		 &lt;&lt; <span class='error' title="cannot initialize object parameter of type &apos;const G4VEmModel&apos; with an expression of type &apos;G4PenelopeComptonModel&apos;">HighEnergyLimit</span>() / GeV &lt;&lt; <q>" GeV"</q>;</td></tr>
+<tr><th id="127">127</th><td>	}</td></tr>
+<tr><th id="128">128</th><td>      <i>//Issue a warning, if the model is going to be used down to a</i></td></tr>
+<tr><th id="129">129</th><td><i>      //energy which is outside the validity of the model itself</i></td></tr>
+<tr><th id="130">130</th><td>      <b>if</b> (<span class='error' title="cannot initialize object parameter of type &apos;const G4VEmModel&apos; with an expression of type &apos;G4PenelopeComptonModel&apos;">LowEnergyLimit</span>() &lt; fIntrinsicLowEnergyLimit)</td></tr>
+<tr><th id="131">131</th><td>	{</td></tr>
+<tr><th id="132">132</th><td>	  <a class="typedef" href="../../../../global/management/include/G4Exception.hh.html#G4ExceptionDescription" title='G4ExceptionDescription' data-type='int' data-ref="G4ExceptionDescription">G4ExceptionDescription</a> <dfn class="local col4 decl" id="4ed" title='ed' data-type='G4ExceptionDescription' data-ref="4ed">ed</dfn>;</td></tr>
+<tr><th id="133">133</th><td>	  ed <span class='error' title="invalid operands to binary expression (&apos;G4ExceptionDescription&apos; (aka &apos;int&apos;) and &apos;const char *&apos;)">&lt;&lt;</span> <q>"Using the Penelope Compton model outside its intrinsic validity range. "</q></td></tr>
+<tr><th id="134">134</th><td>	     &lt;&lt; <a class="macro" href="../../../../global/management/include/G4ios.hh.html#60" title="std::endl" data-ref="_M/G4endl">G4endl</a>;</td></tr>
+<tr><th id="135">135</th><td>	  ed <span class='error' title="invalid operands to binary expression (&apos;G4ExceptionDescription&apos; (aka &apos;int&apos;) and &apos;const char *&apos;)">&lt;&lt;</span> <q>"-&gt; LowEnergyLimit() in process = "</q> &lt;&lt; <span class='error' title="cannot initialize object parameter of type &apos;const G4VEmModel&apos; with an expression of type &apos;G4PenelopeComptonModel&apos;">LowEnergyLimit</span>()/keV &lt;&lt; <q>"keV "</q> &lt;&lt; <a class="macro" href="../../../../global/management/include/G4ios.hh.html#60" title="std::endl" data-ref="_M/G4endl">G4endl</a>;</td></tr>
+<tr><th id="136">136</th><td>	  ed <span class='error' title="invalid operands to binary expression (&apos;G4ExceptionDescription&apos; (aka &apos;int&apos;) and &apos;const char *&apos;)">&lt;&lt;</span> <q>"-&gt; Instrinsic low-energy limit = "</q> &lt;&lt; fIntrinsicLowEnergyLimit/keV &lt;&lt; <q>"keV "</q></td></tr>
+<tr><th id="137">137</th><td>	     &lt;&lt; <a class="macro" href="../../../../global/management/include/G4ios.hh.html#60" title="std::endl" data-ref="_M/G4endl">G4endl</a>;</td></tr>
+<tr><th id="138">138</th><td>	  ed <span class='error' title="invalid operands to binary expression (&apos;G4ExceptionDescription&apos; (aka &apos;int&apos;) and &apos;const char *&apos;)">&lt;&lt;</span> <q>"Result of the simulation have to be taken with care"</q> &lt;&lt; <a class="macro" href="../../../../global/management/include/G4ios.hh.html#60" title="std::endl" data-ref="_M/G4endl">G4endl</a>;</td></tr>
+<tr><th id="139">139</th><td>	  <a class="ref" href="../../../../global/management/include/G4Exception.hh.html#_Z11G4ExceptionPKcS0_19G4ExceptionSeverityRi" title='G4Exception' data-ref="_Z11G4ExceptionPKcS0_19G4ExceptionSeverityRi">G4Exception</a>(<q>"G4PenelopeComptonModel::Initialise()"</q>,</td></tr>
+<tr><th id="140">140</th><td>		      <q>"em2100"</q>,<a class="enum" href="../../../../global/management/include/G4ExceptionSeverity.hh.html#G4ExceptionSeverity::JustWarning" title='G4ExceptionSeverity::JustWarning' data-ref="G4ExceptionSeverity::JustWarning">JustWarning</a>,<span class='refarg'><a class="local col4 ref" href="#4ed" title='ed' data-ref="4ed">ed</a></span>);</td></tr>
+<tr><th id="141">141</th><td>	}</td></tr>
+<tr><th id="142">142</th><td>    }</td></tr>
+<tr><th id="143">143</th><td></td></tr>
+<tr><th id="144">144</th><td>  <b>if</b>(<a class="member" href="../include/G4PenelopeComptonModel.hh.html#G4PenelopeComptonModel::isInitialised" title='G4PenelopeComptonModel::isInitialised' data-ref="G4PenelopeComptonModel::isInitialised">isInitialised</a>) <b>return</b>;</td></tr>
+<tr><th id="145">145</th><td>  fParticleChange = <span class='error' title="cannot initialize object parameter of type &apos;G4VEmModel&apos; with an expression of type &apos;G4PenelopeComptonModel&apos;">GetParticleChangeForGamma</span>();</td></tr>
+<tr><th id="146">146</th><td>  <a class="member" href="../include/G4PenelopeComptonModel.hh.html#G4PenelopeComptonModel::isInitialised" title='G4PenelopeComptonModel::isInitialised' data-ref="G4PenelopeComptonModel::isInitialised">isInitialised</a> = <b>true</b>;</td></tr>
+<tr><th id="147">147</th><td></td></tr>
+<tr><th id="148">148</th><td>}</td></tr>
+<tr><th id="149">149</th><td></td></tr>
+<tr><th id="150">150</th><td><i>//....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo....</i></td></tr>
+<tr><th id="151">151</th><td></td></tr>
+<tr><th id="152">152</th><td><em>void</em> <a class="type" href="../include/G4PenelopeComptonModel.hh.html#G4PenelopeComptonModel" title='G4PenelopeComptonModel' data-ref="G4PenelopeComptonModel">G4PenelopeComptonModel</a>::<dfn class="virtual decl def" id="_ZN22G4PenelopeComptonModel15InitialiseLocalEPK20G4ParticleDefinitionP10G4VEmModel" title='G4PenelopeComptonModel::InitialiseLocal' data-ref="_ZN22G4PenelopeComptonModel15InitialiseLocalEPK20G4ParticleDefinitionP10G4VEmModel">InitialiseLocal</dfn>(<em>const</em> <a class="type" href="../../../../particles/management/include/G4ParticleDefinition.hh.html#G4ParticleDefinition" title='G4ParticleDefinition' data-ref="G4ParticleDefinition">G4ParticleDefinition</a>* <dfn class="local col5 decl" id="5part" title='part' data-type='const G4ParticleDefinition *' data-ref="5part">part</dfn>,</td></tr>
+<tr><th id="153">153</th><td>                                                     <a class="type" href="../../utils/include/G4VEmModel.hh.html#G4VEmModel" title='G4VEmModel' data-ref="G4VEmModel">G4VEmModel</a> *<dfn class="local col6 decl" id="6masterModel" title='masterModel' data-type='G4VEmModel *' data-ref="6masterModel">masterModel</dfn>)</td></tr>
+<tr><th id="154">154</th><td>{</td></tr>
+<tr><th id="155">155</th><td>  <b>if</b> (verboseLevel &gt; <var>3</var>)</td></tr>
+<tr><th id="156">156</th><td>    <a class="macro" href="../../../../global/management/include/G4ios.hh.html#46" title="(*_G4cout_p())" data-ref="_M/G4cout">G4cout</a> <span class='error' title="invalid operands to binary expression (&apos;int&apos; and &apos;const char *&apos;)">&lt;&lt;</span> <q>"Calling  G4PenelopeComptonModel::InitialiseLocal()"</q> &lt;&lt; <a class="macro" href="../../../../global/management/include/G4ios.hh.html#60" title="std::endl" data-ref="_M/G4endl">G4endl</a>;</td></tr>
+<tr><th id="157">157</th><td></td></tr>
+<tr><th id="158">158</th><td>  <i>//</i></td></tr>
+<tr><th id="159">159</th><td><i>  //Check that particle matches: one might have multiple master models (e.g.</i></td></tr>
+<tr><th id="160">160</th><td><i>  //for e+ and e-).</i></td></tr>
+<tr><th id="161">161</th><td><i>  //</i></td></tr>
+<tr><th id="162">162</th><td>  <b>if</b> (<a class="local col5 ref" href="#5part" title='part' data-ref="5part">part</a> == <a class="member" href="../include/G4PenelopeComptonModel.hh.html#G4PenelopeComptonModel::fParticle" title='G4PenelopeComptonModel::fParticle' data-ref="G4PenelopeComptonModel::fParticle">fParticle</a>)</td></tr>
+<tr><th id="163">163</th><td>    {</td></tr>
+<tr><th id="164">164</th><td>      <i>//Get the const table pointers from the master to the workers</i></td></tr>
+<tr><th id="165">165</th><td>      <em>const</em> <a class="type" href="../include/G4PenelopeComptonModel.hh.html#G4PenelopeComptonModel" title='G4PenelopeComptonModel' data-ref="G4PenelopeComptonModel">G4PenelopeComptonModel</a>* <dfn class="local col7 decl" id="7theModel" title='theModel' data-type='const G4PenelopeComptonModel *' data-ref="7theModel">theModel</dfn> =</td></tr>
+<tr><th id="166">166</th><td>        <b>static_cast</b>&lt;<a class="type" href="../include/G4PenelopeComptonModel.hh.html#G4PenelopeComptonModel" title='G4PenelopeComptonModel' data-ref="G4PenelopeComptonModel">G4PenelopeComptonModel</a>*&gt; (<a class="local col6 ref" href="#6masterModel" title='masterModel' data-ref="6masterModel">masterModel</a>);</td></tr>
+<tr><th id="167">167</th><td></td></tr>
+<tr><th id="168">168</th><td>      <i>//Same verbosity for all workers, as the master</i></td></tr>
+<tr><th id="169">169</th><td>      <a class="member" href="../include/G4PenelopeComptonModel.hh.html#G4PenelopeComptonModel::verboseLevel" title='G4PenelopeComptonModel::verboseLevel' data-ref="G4PenelopeComptonModel::verboseLevel">verboseLevel</a> = <a class="local col7 ref" href="#7theModel" title='theModel' data-ref="7theModel">theModel</a>-&gt;<a class="member" href="../include/G4PenelopeComptonModel.hh.html#G4PenelopeComptonModel::verboseLevel" title='G4PenelopeComptonModel::verboseLevel' data-ref="G4PenelopeComptonModel::verboseLevel">verboseLevel</a>;</td></tr>
+<tr><th id="170">170</th><td>    }</td></tr>
+<tr><th id="171">171</th><td></td></tr>
+<tr><th id="172">172</th><td>  <b>return</b>;</td></tr>
+<tr><th id="173">173</th><td>}</td></tr>
+<tr><th id="174">174</th><td></td></tr>
+<tr><th id="175">175</th><td></td></tr>
+<tr><th id="176">176</th><td><i>//....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo....</i></td></tr>
+<tr><th id="177">177</th><td></td></tr>
+<tr><th id="178">178</th><td><a class="typedef" href="../../../../global/management/include/G4Types.hh.html#G4double" title='G4double' data-type='double' data-ref="G4double">G4double</a> <a class="type" href="../include/G4PenelopeComptonModel.hh.html#G4PenelopeComptonModel" title='G4PenelopeComptonModel' data-ref="G4PenelopeComptonModel">G4PenelopeComptonModel</a>::<dfn class="virtual decl def" id="_ZN22G4PenelopeComptonModel21CrossSectionPerVolumeEPK10G4MaterialPK20G4ParticleDefinitionddd" title='G4PenelopeComptonModel::CrossSectionPerVolume' data-ref="_ZN22G4PenelopeComptonModel21CrossSectionPerVolumeEPK10G4MaterialPK20G4ParticleDefinitionddd">CrossSectionPerVolume</dfn>(<em>const</em> <a class="type" href="../../../../materials/include/G4Material.hh.html#G4Material" title='G4Material' data-ref="G4Material">G4Material</a>* <dfn class="local col8 decl" id="8material" title='material' data-type='const G4Material *' data-ref="8material">material</dfn>,</td></tr>
+<tr><th id="179">179</th><td>                                               <em>const</em> <a class="type" href="../../../../particles/management/include/G4ParticleDefinition.hh.html#G4ParticleDefinition" title='G4ParticleDefinition' data-ref="G4ParticleDefinition">G4ParticleDefinition</a>* <dfn class="local col9 decl" id="9p" title='p' data-type='const G4ParticleDefinition *' data-ref="9p">p</dfn>,</td></tr>
+<tr><th id="180">180</th><td>                                               <a class="typedef" href="../../../../global/management/include/G4Types.hh.html#G4double" title='G4double' data-type='double' data-ref="G4double">G4double</a> <dfn class="local col0 decl" id="10energy" title='energy' data-type='G4double' data-ref="10energy">energy</dfn>,</td></tr>
+<tr><th id="181">181</th><td>                                               <a class="typedef" href="../../../../global/management/include/G4Types.hh.html#G4double" title='G4double' data-type='double' data-ref="G4double">G4double</a>,</td></tr>
+<tr><th id="182">182</th><td>                                               <a class="typedef" href="../../../../global/management/include/G4Types.hh.html#G4double" title='G4double' data-type='double' data-ref="G4double">G4double</a>)</td></tr>
+<tr><th id="183">183</th><td>{</td></tr>
+<tr><th id="184">184</th><td>  <i>// Penelope model v2008 to calculate the Compton scattering cross section:</i></td></tr>
+<tr><th id="185">185</th><td><i>  // D. Brusa et al., Nucl. Instrum. Meth. A 379 (1996) 167</i></td></tr>
+<tr><th id="186">186</th><td><i>  //</i></td></tr>
+<tr><th id="187">187</th><td><i>  // The cross section for Compton scattering is calculated according to the Klein-Nishina</i></td></tr>
+<tr><th id="188">188</th><td><i>  // formula for energy &gt; 5 MeV.</i></td></tr>
+<tr><th id="189">189</th><td><i>  // For E &lt; 5 MeV it is used a parametrization for the differential cross-section dSigma/dOmega,</i></td></tr>
+<tr><th id="190">190</th><td><i>  // which is integrated numerically in cos(theta), G4PenelopeComptonModel::DifferentialCrossSection().</i></td></tr>
+<tr><th id="191">191</th><td><i>  // The parametrization includes the J(p)</i></td></tr>
+<tr><th id="192">192</th><td><i>  // distribution profiles for the atomic shells, that are tabulated from Hartree-Fock calculations</i></td></tr>
+<tr><th id="193">193</th><td><i>  // from F. Biggs et al., At. Data Nucl. Data Tables 16 (1975) 201</i></td></tr>
+<tr><th id="194">194</th><td><i>  //</i></td></tr>
+<tr><th id="195">195</th><td>  <b>if</b> (verboseLevel &gt; <var>3</var>)</td></tr>
+<tr><th id="196">196</th><td>    <a class="macro" href="../../../../global/management/include/G4ios.hh.html#46" title="(*_G4cout_p())" data-ref="_M/G4cout">G4cout</a> <span class='error' title="invalid operands to binary expression (&apos;int&apos; and &apos;const char *&apos;)">&lt;&lt;</span> <q>"Calling CrossSectionPerVolume() of G4PenelopeComptonModel"</q> &lt;&lt; <a class="macro" href="../../../../global/management/include/G4ios.hh.html#60" title="std::endl" data-ref="_M/G4endl">G4endl</a>;</td></tr>
+<tr><th id="197">197</th><td>  <span class='error' title="cannot initialize object parameter of type &apos;G4VEmModel&apos; with an expression of type &apos;G4PenelopeComptonModel&apos;">SetupForMaterial</span>(p, material, energy);</td></tr>
+<tr><th id="198">198</th><td></td></tr>
+<tr><th id="199">199</th><td></td></tr>
+<tr><th id="200">200</th><td>  <a class="typedef" href="../../../../global/management/include/G4Types.hh.html#G4double" title='G4double' data-type='double' data-ref="G4double">G4double</a> <dfn class="local col1 decl" id="11cs" title='cs' data-type='G4double' data-ref="11cs">cs</dfn> = <var>0</var>;</td></tr>
+<tr><th id="201">201</th><td>  <i>//Force null cross-section if below the low-energy edge of the table</i></td></tr>
+<tr><th id="202">202</th><td>  <b>if</b> (energy &lt; <span class='error' title="cannot initialize object parameter of type &apos;const G4VEmModel&apos; with an expression of type &apos;G4PenelopeComptonModel&apos;">LowEnergyLimit</span>())</td></tr>
+<tr><th id="203">203</th><td>    <b>return</b> <a class="local col1 ref" href="#11cs" title='cs' data-ref="11cs">cs</a>;</td></tr>
+<tr><th id="204">204</th><td></td></tr>
+<tr><th id="205">205</th><td>  <i>//Retrieve the oscillator table for this material</i></td></tr>
+<tr><th id="206">206</th><td>  <span class='error' title="unknown type name &apos;G4PenelopeOscillatorTable&apos;">G4PenelopeOscillatorTable</span>* <dfn class="local col2 decl" id="12theTable" title='theTable' data-type='int *' data-ref="12theTable">theTable</dfn> = oscManager-&gt;GetOscillatorTableCompton(material);</td></tr>
+<tr><th id="207">207</th><td></td></tr>
+<tr><th id="208">208</th><td>  <b>if</b> (<a class="local col0 ref" href="#10energy" title='energy' data-ref="10energy">energy</a> &lt; <var>5</var>*<a class="ref" href="../../../../externals/clhep/include/CLHEP/Units/SystemOfUnits.h.html#CLHEP::MeV" title='CLHEP::MeV' data-ref="CLHEP::MeV">MeV</a>) <i>//explicit calculation for E &lt; 5 MeV</i></td></tr>
+<tr><th id="209">209</th><td>    {</td></tr>
+<tr><th id="210">210</th><td>      <span class='error' title="unknown type name &apos;size_t&apos;">size_t</span> <dfn class="local col3 decl" id="13numberOfOscillators" title='numberOfOscillators' data-type='int' data-ref="13numberOfOscillators">numberOfOscillators</dfn> = theTable-&gt;size();</td></tr>
+<tr><th id="211">211</th><td>      <b>for</b> (<span class='error' title="unknown type name &apos;size_t&apos;">size_t</span> <dfn class="local col4 decl" id="14i" title='i' data-type='int' data-ref="14i">i</dfn>=<var>0</var>;i&lt;numberOfOscillators;i++)</td></tr>
+<tr><th id="212">212</th><td>	{</td></tr>
+<tr><th id="213">213</th><td>	  <a class="type" href="../include/G4PenelopeOscillator.hh.html#G4PenelopeOscillator" title='G4PenelopeOscillator' data-ref="G4PenelopeOscillator">G4PenelopeOscillator</a>* <dfn class="local col5 decl" id="15theOsc" title='theOsc' data-type='G4PenelopeOscillator *' data-ref="15theOsc">theOsc</dfn> = (*theTable)[i];</td></tr>
+<tr><th id="214">214</th><td>	  <i>//sum contributions coming from each oscillator</i></td></tr>
+<tr><th id="215">215</th><td>	  <a class="local col1 ref" href="#11cs" title='cs' data-ref="11cs">cs</a> += <a class="member" href="../include/G4PenelopeComptonModel.hh.html#_ZN22G4PenelopeComptonModel27OscillatorTotalCrossSectionEdP20G4PenelopeOscillator" title='G4PenelopeComptonModel::OscillatorTotalCrossSection' data-ref="_ZN22G4PenelopeComptonModel27OscillatorTotalCrossSectionEdP20G4PenelopeOscillator">OscillatorTotalCrossSection</a>(<a class="local col0 ref" href="#10energy" title='energy' data-ref="10energy">energy</a>,<a class="local col5 ref" href="#15theOsc" title='theOsc' data-ref="15theOsc">theOsc</a>);</td></tr>
+<tr><th id="216">216</th><td>	}</td></tr>
+<tr><th id="217">217</th><td>    }</td></tr>
+<tr><th id="218">218</th><td>  <b>else</b> <i>//use Klein-Nishina for E&gt;5 MeV</i></td></tr>
+<tr><th id="219">219</th><td>    <a class="local col1 ref" href="#11cs" title='cs' data-ref="11cs">cs</a> = <a class="member" href="../include/G4PenelopeComptonModel.hh.html#_ZN22G4PenelopeComptonModel24KleinNishinaCrossSectionEdPK10G4Material" title='G4PenelopeComptonModel::KleinNishinaCrossSection' data-ref="_ZN22G4PenelopeComptonModel24KleinNishinaCrossSectionEdPK10G4Material">KleinNishinaCrossSection</a>(<a class="local col0 ref" href="#10energy" title='energy' data-ref="10energy">energy</a>,<a class="local col8 ref" href="#8material" title='material' data-ref="8material">material</a>);</td></tr>
+<tr><th id="220">220</th><td></td></tr>
+<tr><th id="221">221</th><td>  <i>//cross sections are in units of pi*classic_electr_radius^2</i></td></tr>
+<tr><th id="222">222</th><td>  <a class="local col1 ref" href="#11cs" title='cs' data-ref="11cs">cs</a> *= <a class="ref" href="../../../../externals/clhep/include/CLHEP/Units/SystemOfUnits.h.html#CLHEP::pi" title='CLHEP::pi' data-ref="CLHEP::pi">pi</a>*<a class="ref" href="../../../../externals/clhep/include/CLHEP/Units/PhysicalConstants.h.html#CLHEP::classic_electr_radius" title='CLHEP::classic_electr_radius' data-ref="CLHEP::classic_electr_radius">classic_electr_radius</a>*<a class="ref" href="../../../../externals/clhep/include/CLHEP/Units/PhysicalConstants.h.html#CLHEP::classic_electr_radius" title='CLHEP::classic_electr_radius' data-ref="CLHEP::classic_electr_radius">classic_electr_radius</a>;</td></tr>
+<tr><th id="223">223</th><td></td></tr>
+<tr><th id="224">224</th><td>  <i>//Now, cs is the cross section *per molecule*, let's calculate the</i></td></tr>
+<tr><th id="225">225</th><td><i>  //cross section per volume</i></td></tr>
+<tr><th id="226">226</th><td></td></tr>
+<tr><th id="227">227</th><td>  <a class="typedef" href="../../../../global/management/include/G4Types.hh.html#G4double" title='G4double' data-type='double' data-ref="G4double">G4double</a> <dfn class="local col6 decl" id="16atomDensity" title='atomDensity' data-type='G4double' data-ref="16atomDensity">atomDensity</dfn> = <a class="local col8 ref" href="#8material" title='material' data-ref="8material">material</a>-&gt;<a class="ref" href="../../../../materials/include/G4Material.hh.html#_ZNK10G4Material24GetTotNbOfAtomsPerVolumeEv" title='G4Material::GetTotNbOfAtomsPerVolume' data-ref="_ZNK10G4Material24GetTotNbOfAtomsPerVolumeEv">GetTotNbOfAtomsPerVolume</a>();</td></tr>
+<tr><th id="228">228</th><td>  <a class="typedef" href="../../../../global/management/include/G4Types.hh.html#G4double" title='G4double' data-type='double' data-ref="G4double">G4double</a> <dfn class="local col7 decl" id="17atPerMol" title='atPerMol' data-type='G4double' data-ref="17atPerMol">atPerMol</dfn> =  <a class="member" href="../include/G4PenelopeComptonModel.hh.html#G4PenelopeComptonModel::oscManager" title='G4PenelopeComptonModel::oscManager' data-ref="G4PenelopeComptonModel::oscManager">oscManager</a>-&gt;<a class="ref" href="../include/G4PenelopeOscillatorManager.hh.html#_ZN27G4PenelopeOscillatorManager19GetAtomsPerMoleculeEPK10G4Material" title='G4PenelopeOscillatorManager::GetAtomsPerMolecule' data-ref="_ZN27G4PenelopeOscillatorManager19GetAtomsPerMoleculeEPK10G4Material">GetAtomsPerMolecule</a>(<a class="local col8 ref" href="#8material" title='material' data-ref="8material">material</a>);</td></tr>
+<tr><th id="229">229</th><td></td></tr>
+<tr><th id="230">230</th><td>  <b>if</b> (verboseLevel &gt; <var>3</var>)</td></tr>
+<tr><th id="231">231</th><td>    <a class="macro" href="../../../../global/management/include/G4ios.hh.html#46" title="(*_G4cout_p())" data-ref="_M/G4cout">G4cout</a> <span class='error' title="invalid operands to binary expression (&apos;int&apos; and &apos;const char *&apos;)">&lt;&lt;</span> <q>"Material "</q> &lt;&lt; material-&gt;GetName() &lt;&lt; <q>" has "</q> &lt;&lt; atPerMol &lt;&lt;</td></tr>
+<tr><th id="232">232</th><td>      <q>"atoms per molecule"</q> &lt;&lt; <a class="macro" href="../../../../global/management/include/G4ios.hh.html#60" title="std::endl" data-ref="_M/G4endl">G4endl</a>;</td></tr>
+<tr><th id="233">233</th><td></td></tr>
+<tr><th id="234">234</th><td>  <a class="typedef" href="../../../../global/management/include/G4Types.hh.html#G4double" title='G4double' data-type='double' data-ref="G4double">G4double</a> <dfn class="local col8 decl" id="18moleculeDensity" title='moleculeDensity' data-type='G4double' data-ref="18moleculeDensity">moleculeDensity</dfn> = <var>0.</var>;</td></tr>
+<tr><th id="235">235</th><td></td></tr>
+<tr><th id="236">236</th><td>  <b>if</b> (<a class="local col7 ref" href="#17atPerMol" title='atPerMol' data-ref="17atPerMol">atPerMol</a>)</td></tr>
+<tr><th id="237">237</th><td>    <a class="local col8 ref" href="#18moleculeDensity" title='moleculeDensity' data-ref="18moleculeDensity">moleculeDensity</a> = <a class="local col6 ref" href="#16atomDensity" title='atomDensity' data-ref="16atomDensity">atomDensity</a>/<a class="local col7 ref" href="#17atPerMol" title='atPerMol' data-ref="17atPerMol">atPerMol</a>;</td></tr>
+<tr><th id="238">238</th><td></td></tr>
+<tr><th id="239">239</th><td>  <a class="typedef" href="../../../../global/management/include/G4Types.hh.html#G4double" title='G4double' data-type='double' data-ref="G4double">G4double</a> <dfn class="local col9 decl" id="19csvolume" title='csvolume' data-type='G4double' data-ref="19csvolume">csvolume</dfn> = <a class="local col1 ref" href="#11cs" title='cs' data-ref="11cs">cs</a>*<a class="local col8 ref" href="#18moleculeDensity" title='moleculeDensity' data-ref="18moleculeDensity">moleculeDensity</a>;</td></tr>
+<tr><th id="240">240</th><td></td></tr>
+<tr><th id="241">241</th><td>  <b>if</b> (verboseLevel &gt; <var>2</var>)</td></tr>
+<tr><th id="242">242</th><td>    <a class="macro" href="../../../../global/management/include/G4ios.hh.html#46" title="(*_G4cout_p())" data-ref="_M/G4cout">G4cout</a> <span class='error' title="invalid operands to binary expression (&apos;int&apos; and &apos;const char *&apos;)">&lt;&lt;</span> <q>"Compton mean free path at "</q> &lt;&lt; energy/keV &lt;&lt; <q>" keV for material "</q> &lt;&lt;</td></tr>
+<tr><th id="243">243</th><td>            material-&gt;GetName() &lt;&lt; <q>" = "</q> &lt;&lt; (<var>1.</var>/csvolume)/mm &lt;&lt; <q>" mm"</q> &lt;&lt; <a class="macro" href="../../../../global/management/include/G4ios.hh.html#60" title="std::endl" data-ref="_M/G4endl">G4endl</a>;</td></tr>
+<tr><th id="244">244</th><td>  <b>return</b> <a class="local col9 ref" href="#19csvolume" title='csvolume' data-ref="19csvolume">csvolume</a>;</td></tr>
+<tr><th id="245">245</th><td>}</td></tr>
+<tr><th id="246">246</th><td></td></tr>
+<tr><th id="247">247</th><td><i>//....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo....</i></td></tr>
+<tr><th id="248">248</th><td><i></i></td></tr>
+<tr><th id="249">249</th><td><i>//This is a dummy method. Never inkoved by the tracking, it just issues</i></td></tr>
+<tr><th id="250">250</th><td><i>//a warning if one tries to get Cross Sections per Atom via the</i></td></tr>
+<tr><th id="251">251</th><td><i>//G4EmCalculator.</i></td></tr>
+<tr><th id="252">252</th><td><a class="typedef" href="../../../../global/management/include/G4Types.hh.html#G4double" title='G4double' data-type='double' data-ref="G4double">G4double</a> <a class="type" href="../include/G4PenelopeComptonModel.hh.html#G4PenelopeComptonModel" title='G4PenelopeComptonModel' data-ref="G4PenelopeComptonModel">G4PenelopeComptonModel</a>::<dfn class="virtual decl def" id="_ZN22G4PenelopeComptonModel26ComputeCrossSectionPerAtomEPK20G4ParticleDefinitionddddd" title='G4PenelopeComptonModel::ComputeCrossSectionPerAtom' data-ref="_ZN22G4PenelopeComptonModel26ComputeCrossSectionPerAtomEPK20G4ParticleDefinitionddddd">ComputeCrossSectionPerAtom</dfn>(<em>const</em> <a class="type" href="../../../../particles/management/include/G4ParticleDefinition.hh.html#G4ParticleDefinition" title='G4ParticleDefinition' data-ref="G4ParticleDefinition">G4ParticleDefinition</a>*,</td></tr>
+<tr><th id="253">253</th><td>                                                             <a class="typedef" href="../../../../global/management/include/G4Types.hh.html#G4double" title='G4double' data-type='double' data-ref="G4double">G4double</a>,</td></tr>
+<tr><th id="254">254</th><td>                                                             <a class="typedef" href="../../../../global/management/include/G4Types.hh.html#G4double" title='G4double' data-type='double' data-ref="G4double">G4double</a>,</td></tr>
+<tr><th id="255">255</th><td>                                                             <a class="typedef" href="../../../../global/management/include/G4Types.hh.html#G4double" title='G4double' data-type='double' data-ref="G4double">G4double</a>,</td></tr>
+<tr><th id="256">256</th><td>                                                             <a class="typedef" href="../../../../global/management/include/G4Types.hh.html#G4double" title='G4double' data-type='double' data-ref="G4double">G4double</a>,</td></tr>
+<tr><th id="257">257</th><td>                                                             <a class="typedef" href="../../../../global/management/include/G4Types.hh.html#G4double" title='G4double' data-type='double' data-ref="G4double">G4double</a>)</td></tr>
+<tr><th id="258">258</th><td>{</td></tr>
+<tr><th id="259">259</th><td>  <a class="macro" href="../../../../global/management/include/G4ios.hh.html#46" title="(*_G4cout_p())" data-ref="_M/G4cout">G4cout</a> <span class='error' title="invalid operands to binary expression (&apos;int&apos; and &apos;const char *&apos;)">&lt;&lt;</span> <q>"*** G4PenelopeComptonModel -- WARNING ***"</q> &lt;&lt; <a class="macro" href="../../../../global/management/include/G4ios.hh.html#60" title="std::endl" data-ref="_M/G4endl">G4endl</a>;</td></tr>
+<tr><th id="260">260</th><td>  <a class="macro" href="../../../../global/management/include/G4ios.hh.html#46" title="(*_G4cout_p())" data-ref="_M/G4cout">G4cout</a> <span class='error' title="invalid operands to binary expression (&apos;int&apos; and &apos;const char *&apos;)">&lt;&lt;</span> <q>"Penelope Compton model v2008 does not calculate cross section _per atom_ "</q> &lt;&lt; <a class="macro" href="../../../../global/management/include/G4ios.hh.html#60" title="std::endl" data-ref="_M/G4endl">G4endl</a>;</td></tr>
+<tr><th id="261">261</th><td>  <a class="macro" href="../../../../global/management/include/G4ios.hh.html#46" title="(*_G4cout_p())" data-ref="_M/G4cout">G4cout</a> <span class='error' title="invalid operands to binary expression (&apos;int&apos; and &apos;const char *&apos;)">&lt;&lt;</span> <q>"so the result is always zero. For physics values, please invoke "</q> &lt;&lt; <a class="macro" href="../../../../global/management/include/G4ios.hh.html#60" title="std::endl" data-ref="_M/G4endl">G4endl</a>;</td></tr>
+<tr><th id="262">262</th><td>  <a class="macro" href="../../../../global/management/include/G4ios.hh.html#46" title="(*_G4cout_p())" data-ref="_M/G4cout">G4cout</a> <span class='error' title="invalid operands to binary expression (&apos;int&apos; and &apos;const char *&apos;)">&lt;&lt;</span> <q>"GetCrossSectionPerVolume() or GetMeanFreePath() via the G4EmCalculator"</q> &lt;&lt; <a class="macro" href="../../../../global/management/include/G4ios.hh.html#60" title="std::endl" data-ref="_M/G4endl">G4endl</a>;</td></tr>
+<tr><th id="263">263</th><td>  <b>return</b> <var>0</var>;</td></tr>
+<tr><th id="264">264</th><td>}</td></tr>
+<tr><th id="265">265</th><td></td></tr>
+<tr><th id="266">266</th><td><i  data-doc="G4PenelopeComptonModel::SampleSecondaries">//....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo....</i></td></tr>
+<tr><th id="267">267</th><td></td></tr>
+<tr><th id="268">268</th><td><em>void</em> <a class="type" href="../include/G4PenelopeComptonModel.hh.html#G4PenelopeComptonModel" title='G4PenelopeComptonModel' data-ref="G4PenelopeComptonModel">G4PenelopeComptonModel</a>::<span class='error' title="variable has incomplete type &apos;void&apos;"><dfn class="tu decl def" id="G4PenelopeComptonModel::SampleSecondaries" title='G4PenelopeComptonModel::SampleSecondaries' data-type='void' data-ref="G4PenelopeComptonModel::SampleSecondaries">SampleSecondaries</dfn></span>(<span class='error' title="use of undeclared identifier &apos;std&apos;">std</span>::vector&lt;<span class='error' title="&apos;G4DynamicParticle&apos; does not refer to a value">G4DynamicParticle</span>*<span class='error' title="expected expression">&gt;</span>* <span class='error' title="use of undeclared identifier &apos;fvect&apos;">fvect</span>,</td></tr>
+<tr><th id="269">269</th><td>					       <span class='error' title="expected expression"><em>const</em></span> G4MaterialCutsCouple* couple,</td></tr>
+<tr><th id="270">270</th><td>					      <span class='error' title="expected expression"><em>const</em></span> G4DynamicParticle* aDynamicGamma,</td></tr>
+<tr><th id="271">271</th><td>					      <span class='error' title="unexpected type name &apos;G4double&apos;: expected expression">G4double</span>,</td></tr>
+<tr><th id="272">272</th><td>					      <span class='error' title="unexpected type name &apos;G4double&apos;: expected expression">G4double</span>)<span class='error' title="expected &apos;;&apos; after top level declarator"></span></td></tr>
+<tr><th id="273">273</th><td>{</td></tr>
+<tr><th id="274">274</th><td></td></tr>
+<tr><th id="275">275</th><td>  <i>// Penelope model v2008 to sample the Compton scattering final state.</i></td></tr>
+<tr><th id="276">276</th><td><i>  // D. Brusa et al., Nucl. Instrum. Meth. A 379 (1996) 167</i></td></tr>
+<tr><th id="277">277</th><td><i>  // The model determines also the original shell from which the electron is expelled,</i></td></tr>
+<tr><th id="278">278</th><td><i>  // in order to produce fluorescence de-excitation (from G4DeexcitationManager)</i></td></tr>
+<tr><th id="279">279</th><td><i>  //</i></td></tr>
+<tr><th id="280">280</th><td><i>  // The final state for Compton scattering is calculated according to the Klein-Nishina</i></td></tr>
+<tr><th id="281">281</th><td><i>  // formula for energy &gt; 5 MeV. In this case, the Doppler broadening is negligible and</i></td></tr>
+<tr><th id="282">282</th><td><i>  // one can assume that the target electron is at rest.</i></td></tr>
+<tr><th id="283">283</th><td><i>  // For E &lt; 5 MeV it is used the parametrization for the differential cross-section dSigma/dOmega,</i></td></tr>
+<tr><th id="284">284</th><td><i>  // to sample the scattering angle and the energy of the emerging electron, which is</i></td></tr>
+<tr><th id="285">285</th><td><i>  // G4PenelopeComptonModel::DifferentialCrossSection(). The rejection method is</i></td></tr>
+<tr><th id="286">286</th><td><i>  // used to sample cos(theta). The efficiency increases monotonically with photon energy and is</i></td></tr>
+<tr><th id="287">287</th><td><i>  // nearly independent on the Z; typical values are 35%, 80% and 95% for 1 keV, 1 MeV and 10 MeV,</i></td></tr>
+<tr><th id="288">288</th><td><i>  // respectively.</i></td></tr>
+<tr><th id="289">289</th><td><i>  // The parametrization includes the J(p) distribution profiles for the atomic shells, that are</i></td></tr>
+<tr><th id="290">290</th><td><i>  // tabulated</i></td></tr>
+<tr><th id="291">291</th><td><i>  // from Hartree-Fock calculations from F. Biggs et al., At. Data Nucl. Data Tables 16 (1975) 201.</i></td></tr>
+<tr><th id="292">292</th><td><i>  // Doppler broadening is included.</i></td></tr>
+<tr><th id="293">293</th><td><i>  //</i></td></tr>
+<tr><th id="294">294</th><td></td></tr>
+<tr><th id="295">295</th><td>  <b>if</b> (verboseLevel &gt; <var>3</var>)</td></tr>
+<tr><th id="296">296</th><td>    <a class="macro" href="../../../../global/management/include/G4ios.hh.html#46" title="(*_G4cout_p())" data-ref="_M/G4cout">G4cout</a> &lt;&lt; <q>"Calling SampleSecondaries() of G4PenelopeComptonModel"</q> &lt;&lt; <a class="macro" href="../../../../global/management/include/G4ios.hh.html#60" title="std::endl" data-ref="_M/G4endl">G4endl</a>;</td></tr>
+<tr><th id="297">297</th><td></td></tr>
+<tr><th id="298">298</th><td>  G4double photonEnergy0 = aDynamicGamma-&gt;GetKineticEnergy();</td></tr>
+<tr><th id="299">299</th><td></td></tr>
+<tr><th id="300">300</th><td>  <i>// do nothing below the threshold</i></td></tr>
+<tr><th id="301">301</th><td><i>  // should never get here because the XS is zero below the limit</i></td></tr>
+<tr><th id="302">302</th><td>  <b>if</b>(photonEnergy0 &lt; LowEnergyLimit())</td></tr>
+<tr><th id="303">303</th><td>    <b>return</b>;</td></tr>
+<tr><th id="304">304</th><td></td></tr>
+<tr><th id="305">305</th><td>  G4ParticleMomentum photonDirection0 = aDynamicGamma-&gt;GetMomentumDirection();</td></tr>
+<tr><th id="306">306</th><td>  <em>const</em> G4Material* material = couple-&gt;GetMaterial();</td></tr>
+<tr><th id="307">307</th><td></td></tr>
+<tr><th id="308">308</th><td>  G4PenelopeOscillatorTable* theTable = oscManager-&gt;GetOscillatorTableCompton(material);</td></tr>
+<tr><th id="309">309</th><td></td></tr>
+<tr><th id="310">310</th><td>  <em>const</em> G4int nmax = <var>64</var>;</td></tr>
+<tr><th id="311">311</th><td>  G4double rn[nmax]={<var>0.0</var>};</td></tr>
+<tr><th id="312">312</th><td>  G4double pac[nmax]={<var>0.0</var>};</td></tr>
+<tr><th id="313">313</th><td></td></tr>
+<tr><th id="314">314</th><td>  G4double S=<var>0.0</var>;</td></tr>
+<tr><th id="315">315</th><td>  G4double epsilon = <var>0.0</var>;</td></tr>
+<tr><th id="316">316</th><td>  G4double cosTheta = <var>1.0</var>;</td></tr>
+<tr><th id="317">317</th><td>  G4double hartreeFunc = <var>0.0</var>;</td></tr>
+<tr><th id="318">318</th><td>  G4double oscStren = <var>0.0</var>;</td></tr>
+<tr><th id="319">319</th><td>  size_t numberOfOscillators = theTable-&gt;size();</td></tr>
+<tr><th id="320">320</th><td>  size_t targetOscillator = <var>0</var>;</td></tr>
+<tr><th id="321">321</th><td>  G4double ionEnergy = <var>0.0</var>*eV;</td></tr>
+<tr><th id="322">322</th><td></td></tr>
+<tr><th id="323">323</th><td>  G4double ek = photonEnergy0/electron_mass_c2;</td></tr>
+<tr><th id="324">324</th><td>  G4double ek2 = <var>2.</var>*ek+<var>1.0</var>;</td></tr>
+<tr><th id="325">325</th><td>  G4double eks = ek*ek;</td></tr>
+<tr><th id="326">326</th><td>  G4double ek1 = eks-ek2-<var>1.0</var>;</td></tr>
+<tr><th id="327">327</th><td></td></tr>
+<tr><th id="328">328</th><td>  G4double taumin = <var>1.0</var>/ek2;</td></tr>
+<tr><th id="329">329</th><td>  G4double a1 = std::log(ek2);</td></tr>
+<tr><th id="330">330</th><td>  G4double a2 = a1+<var>2.0</var>*ek*(<var>1.0</var>+ek)/(ek2*ek2);</td></tr>
+<tr><th id="331">331</th><td></td></tr>
+<tr><th id="332">332</th><td>  G4double TST = <var>0</var>;</td></tr>
+<tr><th id="333">333</th><td>  G4double tau = <var>0.</var>;</td></tr>
+<tr><th id="334">334</th><td></td></tr>
+<tr><th id="335">335</th><td>  <i>//If the incoming photon is above 5 MeV, the quicker approach based on the</i></td></tr>
+<tr><th id="336">336</th><td><i>  //pure Klein-Nishina formula is used</i></td></tr>
+<tr><th id="337">337</th><td>  <b>if</b> (photonEnergy0 &gt; <var>5</var>*MeV)</td></tr>
+<tr><th id="338">338</th><td>    {</td></tr>
+<tr><th id="339">339</th><td>      <b>do</b>{</td></tr>
+<tr><th id="340">340</th><td>	<b>do</b>{</td></tr>
+<tr><th id="341">341</th><td>	  <b>if</b> ((a2*<a class="macro" href="../../../../global/HEPRandom/include/Randomize.hh.html#52" title="CLHEP::HepRandom::getTheEngine()-&gt;flat()" data-ref="_M/G4UniformRand">G4UniformRand</a>()) &lt; a1)</td></tr>
+<tr><th id="342">342</th><td>	    tau = std::pow(taumin,<a class="macro" href="../../../../global/HEPRandom/include/Randomize.hh.html#52" title="CLHEP::HepRandom::getTheEngine()-&gt;flat()" data-ref="_M/G4UniformRand">G4UniformRand</a>());</td></tr>
+<tr><th id="343">343</th><td>	  <b>else</b></td></tr>
+<tr><th id="344">344</th><td>	    tau = std::sqrt(<var>1.0</var>+<a class="macro" href="../../../../global/HEPRandom/include/Randomize.hh.html#52" title="CLHEP::HepRandom::getTheEngine()-&gt;flat()" data-ref="_M/G4UniformRand">G4UniformRand</a>()*(taumin*taumin-<var>1.0</var>));</td></tr>
+<tr><th id="345">345</th><td>	  <i>//rejection function</i></td></tr>
+<tr><th id="346">346</th><td>	  TST = (<var>1.0</var>+tau*(ek1+tau*(ek2+tau*eks)))/(eks*tau*(<var>1.0</var>+tau*tau));</td></tr>
+<tr><th id="347">347</th><td>	}<b>while</b> (<a class="macro" href="../../../../global/HEPRandom/include/Randomize.hh.html#52" title="CLHEP::HepRandom::getTheEngine()-&gt;flat()" data-ref="_M/G4UniformRand">G4UniformRand</a>()&gt; TST);</td></tr>
+<tr><th id="348">348</th><td>	epsilon=tau;</td></tr>
+<tr><th id="349">349</th><td>	cosTheta = <var>1.0</var> - (<var>1.0</var>-tau)/(ek*tau);</td></tr>
+<tr><th id="350">350</th><td></td></tr>
+<tr><th id="351">351</th><td>	<i>//Target shell electrons</i></td></tr>
+<tr><th id="352">352</th><td>	TST = oscManager-&gt;GetTotalZ(material)*<a class="macro" href="../../../../global/HEPRandom/include/Randomize.hh.html#52" title="CLHEP::HepRandom::getTheEngine()-&gt;flat()" data-ref="_M/G4UniformRand">G4UniformRand</a>();</td></tr>
+<tr><th id="353">353</th><td>	targetOscillator = numberOfOscillators-<var>1</var>; <i>//last level</i></td></tr>
+<tr><th id="354">354</th><td>	S=<var>0.0</var>;</td></tr>
+<tr><th id="355">355</th><td>	G4bool levelFound = <b>false</b>;</td></tr>
+<tr><th id="356">356</th><td>	<b>for</b> (size_t j=<var>0</var>;j&lt;numberOfOscillators &amp;&amp; !levelFound; j++)</td></tr>
+<tr><th id="357">357</th><td>	  {</td></tr>
+<tr><th id="358">358</th><td>	    S += (*theTable)[j]-&gt;GetOscillatorStrength();</td></tr>
+<tr><th id="359">359</th><td>	    <b>if</b> (S &gt; TST)</td></tr>
+<tr><th id="360">360</th><td>	      {</td></tr>
+<tr><th id="361">361</th><td>		targetOscillator = j;</td></tr>
+<tr><th id="362">362</th><td>		levelFound = <b>true</b>;</td></tr>
+<tr><th id="363">363</th><td>	      }</td></tr>
+<tr><th id="364">364</th><td>	  }</td></tr>
+<tr><th id="365">365</th><td>	<i>//check whether the level is valid</i></td></tr>
+<tr><th id="366">366</th><td>	ionEnergy = (*theTable)[targetOscillator]-&gt;GetIonisationEnergy();</td></tr>
+<tr><th id="367">367</th><td>      }<b>while</b>((epsilon*photonEnergy0-photonEnergy0+ionEnergy) &gt;<var>0</var>);</td></tr>
+<tr><th id="368">368</th><td>    }</td></tr>
+<tr><th id="369">369</th><td>  <b>else</b> <i>//photonEnergy0 &lt; 5 MeV</i></td></tr>
+<tr><th id="370">370</th><td>    {</td></tr>
+<tr><th id="371">371</th><td>      <i>//Incoherent scattering function for theta=PI</i></td></tr>
+<tr><th id="372">372</th><td>      G4double s0=<var>0.0</var>;</td></tr>
+<tr><th id="373">373</th><td>      G4double pzomc=<var>0.0</var>;</td></tr>
+<tr><th id="374">374</th><td>      G4double rni=<var>0.0</var>;</td></tr>
+<tr><th id="375">375</th><td>      G4double aux=<var>0.0</var>;</td></tr>
+<tr><th id="376">376</th><td>      <b>for</b> (size_t i=<var>0</var>;i&lt;numberOfOscillators;i++)</td></tr>
+<tr><th id="377">377</th><td>	{</td></tr>
+<tr><th id="378">378</th><td>	  ionEnergy = (*theTable)[i]-&gt;GetIonisationEnergy();</td></tr>
+<tr><th id="379">379</th><td>	  <b>if</b> (photonEnergy0 &gt; ionEnergy)</td></tr>
+<tr><th id="380">380</th><td>	    {</td></tr>
+<tr><th id="381">381</th><td>	      G4double aux2 = photonEnergy0*(photonEnergy0-ionEnergy)*<var>2.0</var>;</td></tr>
+<tr><th id="382">382</th><td>	      hartreeFunc = (*theTable)[i]-&gt;GetHartreeFactor();</td></tr>
+<tr><th id="383">383</th><td>	      oscStren = (*theTable)[i]-&gt;GetOscillatorStrength();</td></tr>
+<tr><th id="384">384</th><td>	      pzomc = hartreeFunc*(aux2-electron_mass_c2*ionEnergy)/</td></tr>
+<tr><th id="385">385</th><td>		(electron_mass_c2*std::sqrt(<var>2.0</var>*aux2+ionEnergy*ionEnergy));</td></tr>
+<tr><th id="386">386</th><td>	      <b>if</b> (pzomc &gt; <var>0</var>)</td></tr>
+<tr><th id="387">387</th><td>		rni = <var>1.0</var>-<var>0.5</var>*G4Exp(<var>0.5</var>-(std::sqrt(<var>0.5</var>)+std::sqrt(<var>2.0</var>)*pzomc)*</td></tr>
+<tr><th id="388">388</th><td>				       (std::sqrt(<var>0.5</var>)+std::sqrt(<var>2.0</var>)*pzomc));</td></tr>
+<tr><th id="389">389</th><td>	      <b>else</b></td></tr>
+<tr><th id="390">390</th><td>		rni = <var>0.5</var>*G4Exp(<var>0.5</var>-(std::sqrt(<var>0.5</var>)-std::sqrt(<var>2.0</var>)*pzomc)*</td></tr>
+<tr><th id="391">391</th><td>				   (std::sqrt(<var>0.5</var>)-std::sqrt(<var>2.0</var>)*pzomc));</td></tr>
+<tr><th id="392">392</th><td>	      s0 += oscStren*rni;</td></tr>
+<tr><th id="393">393</th><td>	    }</td></tr>
+<tr><th id="394">394</th><td>	}</td></tr>
+<tr><th id="395">395</th><td>      <i>//Sampling tau</i></td></tr>
+<tr><th id="396">396</th><td>      G4double cdt1 = <var>0.</var>;</td></tr>
+<tr><th id="397">397</th><td>      <b>do</b></td></tr>
+<tr><th id="398">398</th><td>	{</td></tr>
+<tr><th id="399">399</th><td>	  <b>if</b> ((<a class="macro" href="../../../../global/HEPRandom/include/Randomize.hh.html#52" title="CLHEP::HepRandom::getTheEngine()-&gt;flat()" data-ref="_M/G4UniformRand">G4UniformRand</a>()*a2) &lt; a1)</td></tr>
+<tr><th id="400">400</th><td>	    tau = std::pow(taumin,<a class="macro" href="../../../../global/HEPRandom/include/Randomize.hh.html#52" title="CLHEP::HepRandom::getTheEngine()-&gt;flat()" data-ref="_M/G4UniformRand">G4UniformRand</a>());</td></tr>
+<tr><th id="401">401</th><td>	  <b>else</b></td></tr>
+<tr><th id="402">402</th><td>	    tau = std::sqrt(<var>1.0</var>+<a class="macro" href="../../../../global/HEPRandom/include/Randomize.hh.html#52" title="CLHEP::HepRandom::getTheEngine()-&gt;flat()" data-ref="_M/G4UniformRand">G4UniformRand</a>()*(taumin*taumin-<var>1.0</var>));</td></tr>
+<tr><th id="403">403</th><td>	  cdt1 = (<var>1.0</var>-tau)/(ek*tau);</td></tr>
+<tr><th id="404">404</th><td>	  <i>//Incoherent scattering function</i></td></tr>
+<tr><th id="405">405</th><td>	  S = <var>0.</var>;</td></tr>
+<tr><th id="406">406</th><td>	  <b>for</b> (size_t i=<var>0</var>;i&lt;numberOfOscillators;i++)</td></tr>
+<tr><th id="407">407</th><td>	    {</td></tr>
+<tr><th id="408">408</th><td>	      ionEnergy = (*theTable)[i]-&gt;GetIonisationEnergy();</td></tr>
+<tr><th id="409">409</th><td>	      <b>if</b> (photonEnergy0 &gt; ionEnergy) <i>//sum only on excitable levels</i></td></tr>
+<tr><th id="410">410</th><td>		{</td></tr>
+<tr><th id="411">411</th><td>		  aux = photonEnergy0*(photonEnergy0-ionEnergy)*cdt1;</td></tr>
+<tr><th id="412">412</th><td>		  hartreeFunc = (*theTable)[i]-&gt;GetHartreeFactor();</td></tr>
+<tr><th id="413">413</th><td>		  oscStren = (*theTable)[i]-&gt;GetOscillatorStrength();</td></tr>
+<tr><th id="414">414</th><td>		  pzomc = hartreeFunc*(aux-electron_mass_c2*ionEnergy)/</td></tr>
+<tr><th id="415">415</th><td>		    (electron_mass_c2*std::sqrt(<var>2.0</var>*aux+ionEnergy*ionEnergy));</td></tr>
+<tr><th id="416">416</th><td>		  <b>if</b> (pzomc &gt; <var>0</var>)</td></tr>
+<tr><th id="417">417</th><td>		    rn[i] = <var>1.0</var>-<var>0.5</var>*G4Exp(<var>0.5</var>-(std::sqrt(<var>0.5</var>)+std::sqrt(<var>2.0</var>)*pzomc)*</td></tr>
+<tr><th id="418">418</th><td>					     (std::sqrt(<var>0.5</var>)+std::sqrt(<var>2.0</var>)*pzomc));</td></tr>
+<tr><th id="419">419</th><td>		  <b>else</b></td></tr>
+<tr><th id="420">420</th><td>		    rn[i] = <var>0.5</var>*G4Exp(<var>0.5</var>-(std::sqrt(<var>0.5</var>)-std::sqrt(<var>2.0</var>)*pzomc)*</td></tr>
+<tr><th id="421">421</th><td>					 (std::sqrt(<var>0.5</var>)-std::sqrt(<var>2.0</var>)*pzomc));</td></tr>
+<tr><th id="422">422</th><td>		  S += oscStren*rn[i];</td></tr>
+<tr><th id="423">423</th><td>		  pac[i] = S;</td></tr>
+<tr><th id="424">424</th><td>		}</td></tr>
+<tr><th id="425">425</th><td>	      <b>else</b></td></tr>
+<tr><th id="426">426</th><td>		pac[i] = S-<var>1e-6</var>;</td></tr>
+<tr><th id="427">427</th><td>	    }</td></tr>
+<tr><th id="428">428</th><td>	  <i>//Rejection function</i></td></tr>
+<tr><th id="429">429</th><td>	  TST = S*(<var>1.0</var>+tau*(ek1+tau*(ek2+tau*eks)))/(eks*tau*(<var>1.0</var>+tau*tau));</td></tr>
+<tr><th id="430">430</th><td>	}<b>while</b> ((<a class="macro" href="../../../../global/HEPRandom/include/Randomize.hh.html#52" title="CLHEP::HepRandom::getTheEngine()-&gt;flat()" data-ref="_M/G4UniformRand">G4UniformRand</a>()*s0) &gt; TST);</td></tr>
+<tr><th id="431">431</th><td></td></tr>
+<tr><th id="432">432</th><td>      cosTheta = <var>1.0</var> - cdt1;</td></tr>
+<tr><th id="433">433</th><td>      G4double fpzmax=<var>0.0</var>,fpz=<var>0.0</var>;</td></tr>
+<tr><th id="434">434</th><td>      G4double A=<var>0.0</var>;</td></tr>
+<tr><th id="435">435</th><td>      <i>//Target electron shell</i></td></tr>
+<tr><th id="436">436</th><td>      <b>do</b></td></tr>
+<tr><th id="437">437</th><td>	{</td></tr>
+<tr><th id="438">438</th><td>	  <b>do</b></td></tr>
+<tr><th id="439">439</th><td>	    {</td></tr>
+<tr><th id="440">440</th><td>	      TST = S*<a class="macro" href="../../../../global/HEPRandom/include/Randomize.hh.html#52" title="CLHEP::HepRandom::getTheEngine()-&gt;flat()" data-ref="_M/G4UniformRand">G4UniformRand</a>();</td></tr>
+<tr><th id="441">441</th><td>	      targetOscillator = numberOfOscillators-<var>1</var>; <i>//last level</i></td></tr>
+<tr><th id="442">442</th><td>	      G4bool levelFound = <b>false</b>;</td></tr>
+<tr><th id="443">443</th><td>	      <b>for</b> (size_t i=<var>0</var>;i&lt;numberOfOscillators &amp;&amp; !levelFound;i++)</td></tr>
+<tr><th id="444">444</th><td>		{</td></tr>
+<tr><th id="445">445</th><td>		  <b>if</b> (pac[i]&gt;TST)</td></tr>
+<tr><th id="446">446</th><td>		    {</td></tr>
+<tr><th id="447">447</th><td>		      targetOscillator = i;</td></tr>
+<tr><th id="448">448</th><td>		      levelFound = <b>true</b>;</td></tr>
+<tr><th id="449">449</th><td>		    }</td></tr>
+<tr><th id="450">450</th><td>		}</td></tr>
+<tr><th id="451">451</th><td>	      A = <a class="macro" href="../../../../global/HEPRandom/include/Randomize.hh.html#52" title="CLHEP::HepRandom::getTheEngine()-&gt;flat()" data-ref="_M/G4UniformRand">G4UniformRand</a>()*rn[targetOscillator];</td></tr>
+<tr><th id="452">452</th><td>	      hartreeFunc = (*theTable)[targetOscillator]-&gt;GetHartreeFactor();</td></tr>
+<tr><th id="453">453</th><td>	      oscStren = (*theTable)[targetOscillator]-&gt;GetOscillatorStrength();</td></tr>
+<tr><th id="454">454</th><td>	      <b>if</b> (A &lt; <var>0.5</var>)</td></tr>
+<tr><th id="455">455</th><td>		pzomc = (std::sqrt(<var>0.5</var>)-std::sqrt(<var>0.5</var>-std::log(<var>2.0</var>*A)))/</td></tr>
+<tr><th id="456">456</th><td>		  (std::sqrt(<var>2.0</var>)*hartreeFunc);</td></tr>
+<tr><th id="457">457</th><td>	      <b>else</b></td></tr>
+<tr><th id="458">458</th><td>		pzomc = (std::sqrt(<var>0.5</var>-std::log(<var>2.0</var>-<var>2.0</var>*A))-std::sqrt(<var>0.5</var>))/</td></tr>
+<tr><th id="459">459</th><td>		  (std::sqrt(<var>2.0</var>)*hartreeFunc);</td></tr>
+<tr><th id="460">460</th><td>	    } <b>while</b> (pzomc &lt; -<var>1</var>);</td></tr>
+<tr><th id="461">461</th><td></td></tr>
+<tr><th id="462">462</th><td>	  <i>// F(EP) rejection</i></td></tr>
+<tr><th id="463">463</th><td>	  G4double XQC = <var>1.0</var>+tau*(tau-<var>2.0</var>*cosTheta);</td></tr>
+<tr><th id="464">464</th><td>	  G4double AF = std::sqrt(XQC)*(<var>1.0</var>+tau*(tau-cosTheta)/XQC);</td></tr>
+<tr><th id="465">465</th><td>	  <b>if</b> (AF &gt; <var>0</var>)</td></tr>
+<tr><th id="466">466</th><td>	    fpzmax = <var>1.0</var>+AF*<var>0.2</var>;</td></tr>
+<tr><th id="467">467</th><td>	  <b>else</b></td></tr>
+<tr><th id="468">468</th><td>	    fpzmax = <var>1.0</var>-AF*<var>0.2</var>;</td></tr>
+<tr><th id="469">469</th><td>	  fpz = <var>1.0</var>+AF*std::max(std::min(pzomc,<var>0.2</var>),-<var>0.2</var>);</td></tr>
+<tr><th id="470">470</th><td>	}<b>while</b> ((fpzmax*<a class="macro" href="../../../../global/HEPRandom/include/Randomize.hh.html#52" title="CLHEP::HepRandom::getTheEngine()-&gt;flat()" data-ref="_M/G4UniformRand">G4UniformRand</a>())&gt;fpz);</td></tr>
+<tr><th id="471">471</th><td></td></tr>
+<tr><th id="472">472</th><td>      <i>//Energy of the scattered photon</i></td></tr>
+<tr><th id="473">473</th><td>      G4double T = pzomc*pzomc;</td></tr>
+<tr><th id="474">474</th><td>      G4double b1 = <var>1.0</var>-T*tau*tau;</td></tr>
+<tr><th id="475">475</th><td>      G4double b2 = <var>1.0</var>-T*tau*cosTheta;</td></tr>
+<tr><th id="476">476</th><td>      <b>if</b> (pzomc &gt; <var>0.0</var>)</td></tr>
+<tr><th id="477">477</th><td>	epsilon = (tau/b1)*(b2+std::sqrt(std::abs(b2*b2-b1*(<var>1.0</var>-T))));</td></tr>
+<tr><th id="478">478</th><td>      <b>else</b></td></tr>
+<tr><th id="479">479</th><td>	epsilon = (tau/b1)*(b2-std::sqrt(std::abs(b2*b2-b1*(<var>1.0</var>-T))));</td></tr>
+<tr><th id="480">480</th><td>    } <i>//energy &lt; 5 MeV</i></td></tr>
+<tr><th id="481">481</th><td></td></tr>
+<tr><th id="482">482</th><td>  <i>//Ok, the kinematics has been calculated.</i></td></tr>
+<tr><th id="483">483</th><td>  G4double sinTheta = std::sqrt(<var>1</var>-cosTheta*cosTheta);</td></tr>
+<tr><th id="484">484</th><td>  G4double phi = twopi * <a class="macro" href="../../../../global/HEPRandom/include/Randomize.hh.html#52" title="CLHEP::HepRandom::getTheEngine()-&gt;flat()" data-ref="_M/G4UniformRand">G4UniformRand</a>() ;</td></tr>
+<tr><th id="485">485</th><td>  G4double dirx = sinTheta * std::cos(phi);</td></tr>
+<tr><th id="486">486</th><td>  G4double diry = sinTheta * std::sin(phi);</td></tr>
+<tr><th id="487">487</th><td>  G4double dirz = cosTheta ;</td></tr>
+<tr><th id="488">488</th><td></td></tr>
+<tr><th id="489">489</th><td>  <i>// Update G4VParticleChange for the scattered photon</i></td></tr>
+<tr><th id="490">490</th><td>  G4ThreeVector photonDirection1(dirx,diry,dirz);</td></tr>
+<tr><th id="491">491</th><td>  photonDirection1.rotateUz(photonDirection0);</td></tr>
+<tr><th id="492">492</th><td>  fParticleChange-&gt;ProposeMomentumDirection(photonDirection1) ;</td></tr>
+<tr><th id="493">493</th><td></td></tr>
+<tr><th id="494">494</th><td>  G4double photonEnergy1 = epsilon * photonEnergy0;</td></tr>
+<tr><th id="495">495</th><td></td></tr>
+<tr><th id="496">496</th><td>  <b>if</b> (photonEnergy1 &gt; <var>0.</var>)</td></tr>
+<tr><th id="497">497</th><td>    fParticleChange-&gt;SetProposedKineticEnergy(photonEnergy1) ;</td></tr>
+<tr><th id="498">498</th><td>  <b>else</b></td></tr>
+<tr><th id="499">499</th><td>  {</td></tr>
+<tr><th id="500">500</th><td>    fParticleChange-&gt;SetProposedKineticEnergy(<var>0.</var>) ;</td></tr>
+<tr><th id="501">501</th><td>    fParticleChange-&gt;ProposeTrackStatus(fStopAndKill);</td></tr>
+<tr><th id="502">502</th><td>  }</td></tr>
+<tr><th id="503">503</th><td></td></tr>
+<tr><th id="504">504</th><td>  <i>//Create scattered electron</i></td></tr>
+<tr><th id="505">505</th><td>  G4double diffEnergy = photonEnergy0*(<var>1</var>-epsilon);</td></tr>
+<tr><th id="506">506</th><td>  ionEnergy = (*theTable)[targetOscillator]-&gt;GetIonisationEnergy();</td></tr>
+<tr><th id="507">507</th><td></td></tr>
+<tr><th id="508">508</th><td>  G4double Q2 =</td></tr>
+<tr><th id="509">509</th><td>    photonEnergy0*photonEnergy0+photonEnergy1*(photonEnergy1-<var>2.0</var>*photonEnergy0*cosTheta);</td></tr>
+<tr><th id="510">510</th><td>  G4double cosThetaE = <var>0.</var>; <i>//scattering angle for the electron</i></td></tr>
+<tr><th id="511">511</th><td></td></tr>
+<tr><th id="512">512</th><td>  <b>if</b> (Q2 &gt; <var>1.0e-12</var>)</td></tr>
+<tr><th id="513">513</th><td>    cosThetaE = (photonEnergy0-photonEnergy1*cosTheta)/std::sqrt(Q2);</td></tr>
+<tr><th id="514">514</th><td>  <b>else</b></td></tr>
+<tr><th id="515">515</th><td>    cosThetaE = <var>1.0</var>;</td></tr>
+<tr><th id="516">516</th><td>  G4double sinThetaE = std::sqrt(<var>1</var>-cosThetaE*cosThetaE);</td></tr>
+<tr><th id="517">517</th><td></td></tr>
+<tr><th id="518">518</th><td>  <i>//Now, try to handle fluorescence</i></td></tr>
+<tr><th id="519">519</th><td><i>  //Notice: merged levels are indicated with Z=0 and flag=30</i></td></tr>
+<tr><th id="520">520</th><td>  G4int shFlag = (*theTable)[targetOscillator]-&gt;GetShellFlag();</td></tr>
+<tr><th id="521">521</th><td>  G4int Z = (G4int) (*theTable)[targetOscillator]-&gt;GetParentZ();</td></tr>
+<tr><th id="522">522</th><td></td></tr>
+<tr><th id="523">523</th><td>  <i>//initialize here, then check photons created by Atomic-Deexcitation, and the final state e-</i></td></tr>
+<tr><th id="524">524</th><td>  G4double bindingEnergy = <var>0.</var>*eV;</td></tr>
+<tr><th id="525">525</th><td>  <em>const</em> G4AtomicShell* shell = <var>0</var>;</td></tr>
+<tr><th id="526">526</th><td></td></tr>
+<tr><th id="527">527</th><td>  <i>//Real level</i></td></tr>
+<tr><th id="528">528</th><td>  <b>if</b> (Z &gt; <var>0</var> &amp;&amp; shFlag&lt;<var>30</var>)</td></tr>
+<tr><th id="529">529</th><td>    {</td></tr>
+<tr><th id="530">530</th><td>      shell = fTransitionManager-&gt;Shell(Z,shFlag-<var>1</var>);</td></tr>
+<tr><th id="531">531</th><td>      bindingEnergy = shell-&gt;BindingEnergy();</td></tr>
+<tr><th id="532">532</th><td>    }</td></tr>
+<tr><th id="533">533</th><td></td></tr>
+<tr><th id="534">534</th><td>  G4double ionEnergyInPenelopeDatabase = ionEnergy;</td></tr>
+<tr><th id="535">535</th><td>  <i>//protection against energy non-conservation</i></td></tr>
+<tr><th id="536">536</th><td>  ionEnergy = std::max(bindingEnergy,ionEnergyInPenelopeDatabase);</td></tr>
+<tr><th id="537">537</th><td></td></tr>
+<tr><th id="538">538</th><td>  <i>//subtract the excitation energy. If not emitted by fluorescence</i></td></tr>
+<tr><th id="539">539</th><td><i>  //the ionization energy is deposited as local energy deposition</i></td></tr>
+<tr><th id="540">540</th><td>  G4double eKineticEnergy = diffEnergy - ionEnergy;</td></tr>
+<tr><th id="541">541</th><td>  G4double localEnergyDeposit = ionEnergy;</td></tr>
+<tr><th id="542">542</th><td>  G4double energyInFluorescence = <var>0.</var>; <i>//testing purposes only</i></td></tr>
+<tr><th id="543">543</th><td>  G4double energyInAuger = <var>0</var>; <i>//testing purposes</i></td></tr>
+<tr><th id="544">544</th><td></td></tr>
+<tr><th id="545">545</th><td>  <b>if</b> (eKineticEnergy &lt; <var>0</var>)</td></tr>
+<tr><th id="546">546</th><td>    {</td></tr>
+<tr><th id="547">547</th><td>      <i>//It means that there was some problem/mismatch between the two databases.</i></td></tr>
+<tr><th id="548">548</th><td><i>      //Try to make it work</i></td></tr>
+<tr><th id="549">549</th><td><i>      //In this case available Energy (diffEnergy) &lt; ionEnergy</i></td></tr>
+<tr><th id="550">550</th><td><i>      //Full residual energy is deposited locally</i></td></tr>
+<tr><th id="551">551</th><td>      localEnergyDeposit = diffEnergy;</td></tr>
+<tr><th id="552">552</th><td>      eKineticEnergy = <var>0.0</var>;</td></tr>
+<tr><th id="553">553</th><td>    }</td></tr>
+<tr><th id="554">554</th><td></td></tr>
+<tr><th id="555">555</th><td>  <i>//the local energy deposit is what remains: part of this may be spent for fluorescence.</i></td></tr>
+<tr><th id="556">556</th><td><i>  //Notice: shell might be nullptr (invalid!) if shFlag=30. Must be protected</i></td></tr>
+<tr><th id="557">557</th><td><i>  //Now, take care of fluorescence, if required</i></td></tr>
+<tr><th id="558">558</th><td>  <b>if</b> (fAtomDeexcitation &amp;&amp; shell)</td></tr>
+<tr><th id="559">559</th><td>    {</td></tr>
+<tr><th id="560">560</th><td>      G4int index = couple-&gt;GetIndex();</td></tr>
+<tr><th id="561">561</th><td>      <b>if</b> (fAtomDeexcitation-&gt;CheckDeexcitationActiveRegion(index))</td></tr>
+<tr><th id="562">562</th><td>	{</td></tr>
+<tr><th id="563">563</th><td>	  size_t nBefore = fvect-&gt;size();</td></tr>
+<tr><th id="564">564</th><td>	  fAtomDeexcitation-&gt;GenerateParticles(fvect,shell,Z,index);</td></tr>
+<tr><th id="565">565</th><td>	  size_t nAfter = fvect-&gt;size();</td></tr>
+<tr><th id="566">566</th><td></td></tr>
+<tr><th id="567">567</th><td>	  <b>if</b> (nAfter &gt; nBefore) <i>//actual production of fluorescence</i></td></tr>
+<tr><th id="568">568</th><td>	    {</td></tr>
+<tr><th id="569">569</th><td>	      <b>for</b> (size_t j=nBefore;j&lt;nAfter;j++) <i>//loop on products</i></td></tr>
+<tr><th id="570">570</th><td>		{</td></tr>
+<tr><th id="571">571</th><td>		  G4double itsEnergy = ((*fvect)[j])-&gt;GetKineticEnergy();</td></tr>
+<tr><th id="572">572</th><td>		  <b>if</b> (itsEnergy &lt; localEnergyDeposit) <i>// valid secondary, generate it</i></td></tr>
+<tr><th id="573">573</th><td>		    {</td></tr>
+<tr><th id="574">574</th><td>		      localEnergyDeposit -= itsEnergy;</td></tr>
+<tr><th id="575">575</th><td>		      <b>if</b> (((*fvect)[j])-&gt;GetParticleDefinition() == G4Gamma::Definition())</td></tr>
+<tr><th id="576">576</th><td>			energyInFluorescence += itsEnergy;</td></tr>
+<tr><th id="577">577</th><td>		      <b>else</b> <b>if</b> (((*fvect)[j])-&gt;GetParticleDefinition() == </td></tr>
+<tr><th id="578">578</th><td>			       G4Electron::Definition())</td></tr>
+<tr><th id="579">579</th><td>			energyInAuger += itsEnergy;</td></tr>
+<tr><th id="580">580</th><td>		    }</td></tr>
+<tr><th id="581">581</th><td>		  <b>else</b> <i>//invalid secondary: takes more than the available energy: delete it</i></td></tr>
+<tr><th id="582">582</th><td>		    {</td></tr>
+<tr><th id="583">583</th><td>		      <b>delete</b> (*fvect)[j];</td></tr>
+<tr><th id="584">584</th><td>		      (*fvect)[j] = <b>nullptr</b>;</td></tr>
+<tr><th id="585">585</th><td>		    }</td></tr>
+<tr><th id="586">586</th><td>		}</td></tr>
+<tr><th id="587">587</th><td>	    }</td></tr>
+<tr><th id="588">588</th><td>	  </td></tr>
+<tr><th id="589">589</th><td>	}</td></tr>
+<tr><th id="590">590</th><td>    }</td></tr>
+<tr><th id="591">591</th><td></td></tr>
+<tr><th id="592">592</th><td></td></tr>
+<tr><th id="593">593</th><td>  <i>/*</i></td></tr>
+<tr><th id="594">594</th><td><i>  if(DeexcitationFlag() &amp;&amp; Z &gt; 5 &amp;&amp; shellId&gt;0) {</i></td></tr>
+<tr><th id="595">595</th><td><i></i></td></tr>
+<tr><th id="596">596</th><td><i>    const G4ProductionCutsTable* theCoupleTable=</i></td></tr>
+<tr><th id="597">597</th><td><i>      G4ProductionCutsTable::GetProductionCutsTable();</i></td></tr>
+<tr><th id="598">598</th><td><i></i></td></tr>
+<tr><th id="599">599</th><td><i>    size_t index = couple-&gt;GetIndex();</i></td></tr>
+<tr><th id="600">600</th><td><i>    G4double cutg = (*(theCoupleTable-&gt;GetEnergyCutsVector(0)))[index];</i></td></tr>
+<tr><th id="601">601</th><td><i>    G4double cute = (*(theCoupleTable-&gt;GetEnergyCutsVector(1)))[index];</i></td></tr>
+<tr><th id="602">602</th><td><i></i></td></tr>
+<tr><th id="603">603</th><td><i>    // Generation of fluorescence</i></td></tr>
+<tr><th id="604">604</th><td><i>    // Data in EADL are available only for Z &gt; 5</i></td></tr>
+<tr><th id="605">605</th><td><i>    // Protection to avoid generating photons in the unphysical case of</i></td></tr>
+<tr><th id="606">606</th><td><i>    // shell binding energy &gt; photon energy</i></td></tr>
+<tr><th id="607">607</th><td><i>    if (localEnergyDeposit &gt; cutg || localEnergyDeposit &gt; cute)</i></td></tr>
+<tr><th id="608">608</th><td><i>      {</i></td></tr>
+<tr><th id="609">609</th><td><i>	G4DynamicParticle* aPhoton;</i></td></tr>
+<tr><th id="610">610</th><td><i>	deexcitationManager.SetCutForSecondaryPhotons(cutg);</i></td></tr>
+<tr><th id="611">611</th><td><i>	deexcitationManager.SetCutForAugerElectrons(cute);</i></td></tr>
+<tr><th id="612">612</th><td><i></i></td></tr>
+<tr><th id="613">613</th><td><i>	photonVector = deexcitationManager.GenerateParticles(Z,shellId);</i></td></tr>
+<tr><th id="614">614</th><td><i>	if(photonVector)</i></td></tr>
+<tr><th id="615">615</th><td><i>	  {</i></td></tr>
+<tr><th id="616">616</th><td><i>	    size_t nPhotons = photonVector-&gt;size();</i></td></tr>
+<tr><th id="617">617</th><td><i>	    for (size_t k=0; k&lt;nPhotons; k++)</i></td></tr>
+<tr><th id="618">618</th><td><i>	      {</i></td></tr>
+<tr><th id="619">619</th><td><i>		aPhoton = (*photonVector)[k];</i></td></tr>
+<tr><th id="620">620</th><td><i>		if (aPhoton)</i></td></tr>
+<tr><th id="621">621</th><td><i>		  {</i></td></tr>
+<tr><th id="622">622</th><td><i>		    G4double itsEnergy = aPhoton-&gt;GetKineticEnergy();</i></td></tr>
+<tr><th id="623">623</th><td><i>		    G4bool keepIt = false;</i></td></tr>
+<tr><th id="624">624</th><td><i>		    if (itsEnergy &lt;= localEnergyDeposit)</i></td></tr>
+<tr><th id="625">625</th><td><i>		      {</i></td></tr>
+<tr><th id="626">626</th><td><i>			//check if good!</i></td></tr>
+<tr><th id="627">627</th><td><i>			if(aPhoton-&gt;GetDefinition() == G4Gamma::Gamma()</i></td></tr>
+<tr><th id="628">628</th><td><i>			   &amp;&amp; itsEnergy &gt;= cutg)</i></td></tr>
+<tr><th id="629">629</th><td><i>			  {</i></td></tr>
+<tr><th id="630">630</th><td><i>			    keepIt = true;</i></td></tr>
+<tr><th id="631">631</th><td><i>			    energyInFluorescence += itsEnergy;</i></td></tr>
+<tr><th id="632">632</th><td><i>			  }</i></td></tr>
+<tr><th id="633">633</th><td><i>			if (aPhoton-&gt;GetDefinition() == G4Electron::Electron() &amp;&amp;</i></td></tr>
+<tr><th id="634">634</th><td><i>			    itsEnergy &gt;= cute)</i></td></tr>
+<tr><th id="635">635</th><td><i>			  {</i></td></tr>
+<tr><th id="636">636</th><td><i>			    energyInAuger += itsEnergy;</i></td></tr>
+<tr><th id="637">637</th><td><i>			    keepIt = true;</i></td></tr>
+<tr><th id="638">638</th><td><i>			  }</i></td></tr>
+<tr><th id="639">639</th><td><i>		      }</i></td></tr>
+<tr><th id="640">640</th><td><i>		    //good secondary, register it</i></td></tr>
+<tr><th id="641">641</th><td><i>		    if (keepIt)</i></td></tr>
+<tr><th id="642">642</th><td><i>		      {</i></td></tr>
+<tr><th id="643">643</th><td><i>			localEnergyDeposit -= itsEnergy;</i></td></tr>
+<tr><th id="644">644</th><td><i>			fvect-&gt;push_back(aPhoton);</i></td></tr>
+<tr><th id="645">645</th><td><i>		      }</i></td></tr>
+<tr><th id="646">646</th><td><i>		    else</i></td></tr>
+<tr><th id="647">647</th><td><i>		      {</i></td></tr>
+<tr><th id="648">648</th><td><i>			delete aPhoton;</i></td></tr>
+<tr><th id="649">649</th><td><i>			(*photonVector)[k] = 0;</i></td></tr>
+<tr><th id="650">650</th><td><i>		      }</i></td></tr>
+<tr><th id="651">651</th><td><i>		  }</i></td></tr>
+<tr><th id="652">652</th><td><i>	      }</i></td></tr>
+<tr><th id="653">653</th><td><i>	    delete photonVector;</i></td></tr>
+<tr><th id="654">654</th><td><i>	  }</i></td></tr>
+<tr><th id="655">655</th><td><i>      }</i></td></tr>
+<tr><th id="656">656</th><td><i>  }</i></td></tr>
+<tr><th id="657">657</th><td><i>  */</i></td></tr>
+<tr><th id="658">658</th><td><i></i></td></tr>
+<tr><th id="659">659</th><td><i></i></td></tr>
+<tr><th id="660">660</th><td><i>  //Always produce explicitely the electron</i></td></tr>
+<tr><th id="661">661</th><td>  G4DynamicParticle* electron = <var>0</var>;</td></tr>
+<tr><th id="662">662</th><td></td></tr>
+<tr><th id="663">663</th><td>  G4double xEl = sinThetaE * std::cos(phi+pi);</td></tr>
+<tr><th id="664">664</th><td>  G4double yEl = sinThetaE * std::sin(phi+pi);</td></tr>
+<tr><th id="665">665</th><td>  G4double zEl = cosThetaE;</td></tr>
+<tr><th id="666">666</th><td>  G4ThreeVector eDirection(xEl,yEl,zEl); <i>//electron direction</i></td></tr>
+<tr><th id="667">667</th><td>  eDirection.rotateUz(photonDirection0);</td></tr>
+<tr><th id="668">668</th><td>  electron = <b>new</b> G4DynamicParticle (G4Electron::Electron(),</td></tr>
+<tr><th id="669">669</th><td>				    eDirection,eKineticEnergy) ;</td></tr>
+<tr><th id="670">670</th><td>  fvect-&gt;push_back(electron);</td></tr>
+<tr><th id="671">671</th><td></td></tr>
+<tr><th id="672">672</th><td></td></tr>
+<tr><th id="673">673</th><td>  <b>if</b> (localEnergyDeposit &lt; <var>0</var>) <i>//Should not be: issue a G4Exception (warning)</i></td></tr>
+<tr><th id="674">674</th><td>    {</td></tr>
+<tr><th id="675">675</th><td>      G4Exception(<q>"G4PenelopeComptonModel::SampleSecondaries()"</q>,</td></tr>
+<tr><th id="676">676</th><td>		   <q>"em2099"</q>,JustWarning,<q>"WARNING: Negative local energy deposit"</q>);</td></tr>
+<tr><th id="677">677</th><td>      localEnergyDeposit=<var>0.</var>;</td></tr>
+<tr><th id="678">678</th><td>    }</td></tr>
+<tr><th id="679">679</th><td>  fParticleChange-&gt;ProposeLocalEnergyDeposit(localEnergyDeposit);</td></tr>
+<tr><th id="680">680</th><td></td></tr>
+<tr><th id="681">681</th><td>  G4double electronEnergy = <var>0.</var>;</td></tr>
+<tr><th id="682">682</th><td>  <b>if</b> (electron)</td></tr>
+<tr><th id="683">683</th><td>    electronEnergy = eKineticEnergy;</td></tr>
+<tr><th id="684">684</th><td>  <b>if</b> (verboseLevel &gt; <var>1</var>)</td></tr>
+<tr><th id="685">685</th><td>    {</td></tr>
+<tr><th id="686">686</th><td>      <a class="macro" href="../../../../global/management/include/G4ios.hh.html#46" title="(*_G4cout_p())" data-ref="_M/G4cout">G4cout</a> &lt;&lt; <q>"-----------------------------------------------------------"</q> &lt;&lt; <a class="macro" href="../../../../global/management/include/G4ios.hh.html#60" title="std::endl" data-ref="_M/G4endl">G4endl</a>;</td></tr>
+<tr><th id="687">687</th><td>      <a class="macro" href="../../../../global/management/include/G4ios.hh.html#46" title="(*_G4cout_p())" data-ref="_M/G4cout">G4cout</a> &lt;&lt; <q>"Energy balance from G4PenelopeCompton"</q> &lt;&lt; <a class="macro" href="../../../../global/management/include/G4ios.hh.html#60" title="std::endl" data-ref="_M/G4endl">G4endl</a>;</td></tr>
+<tr><th id="688">688</th><td>      <a class="macro" href="../../../../global/management/include/G4ios.hh.html#46" title="(*_G4cout_p())" data-ref="_M/G4cout">G4cout</a> &lt;&lt; <q>"Incoming photon energy: "</q> &lt;&lt; photonEnergy0/keV &lt;&lt; <q>" keV"</q> &lt;&lt; <a class="macro" href="../../../../global/management/include/G4ios.hh.html#60" title="std::endl" data-ref="_M/G4endl">G4endl</a>;</td></tr>
+<tr><th id="689">689</th><td>      <a class="macro" href="../../../../global/management/include/G4ios.hh.html#46" title="(*_G4cout_p())" data-ref="_M/G4cout">G4cout</a> &lt;&lt; <q>"-----------------------------------------------------------"</q> &lt;&lt; <a class="macro" href="../../../../global/management/include/G4ios.hh.html#60" title="std::endl" data-ref="_M/G4endl">G4endl</a>;</td></tr>
+<tr><th id="690">690</th><td>      <a class="macro" href="../../../../global/management/include/G4ios.hh.html#46" title="(*_G4cout_p())" data-ref="_M/G4cout">G4cout</a> &lt;&lt; <q>"Scattered photon: "</q> &lt;&lt; photonEnergy1/keV &lt;&lt; <q>" keV"</q> &lt;&lt; <a class="macro" href="../../../../global/management/include/G4ios.hh.html#60" title="std::endl" data-ref="_M/G4endl">G4endl</a>;</td></tr>
+<tr><th id="691">691</th><td>      <a class="macro" href="../../../../global/management/include/G4ios.hh.html#46" title="(*_G4cout_p())" data-ref="_M/G4cout">G4cout</a> &lt;&lt; <q>"Scattered electron "</q> &lt;&lt; electronEnergy/keV &lt;&lt; <q>" keV"</q> &lt;&lt; <a class="macro" href="../../../../global/management/include/G4ios.hh.html#60" title="std::endl" data-ref="_M/G4endl">G4endl</a>;</td></tr>
+<tr><th id="692">692</th><td>      <b>if</b> (energyInFluorescence)</td></tr>
+<tr><th id="693">693</th><td>	<a class="macro" href="../../../../global/management/include/G4ios.hh.html#46" title="(*_G4cout_p())" data-ref="_M/G4cout">G4cout</a> &lt;&lt; <q>"Fluorescence x-rays: "</q> &lt;&lt; energyInFluorescence/keV &lt;&lt; <q>" keV"</q> &lt;&lt; <a class="macro" href="../../../../global/management/include/G4ios.hh.html#60" title="std::endl" data-ref="_M/G4endl">G4endl</a>;</td></tr>
+<tr><th id="694">694</th><td>      <b>if</b> (energyInAuger)</td></tr>
+<tr><th id="695">695</th><td>	<a class="macro" href="../../../../global/management/include/G4ios.hh.html#46" title="(*_G4cout_p())" data-ref="_M/G4cout">G4cout</a> &lt;&lt; <q>"Auger electrons: "</q> &lt;&lt; energyInAuger/keV &lt;&lt; <q>" keV"</q> &lt;&lt; <a class="macro" href="../../../../global/management/include/G4ios.hh.html#60" title="std::endl" data-ref="_M/G4endl">G4endl</a>;</td></tr>
+<tr><th id="696">696</th><td>      <a class="macro" href="../../../../global/management/include/G4ios.hh.html#46" title="(*_G4cout_p())" data-ref="_M/G4cout">G4cout</a> &lt;&lt; <q>"Local energy deposit "</q> &lt;&lt; localEnergyDeposit/keV &lt;&lt; <q>" keV"</q> &lt;&lt; <a class="macro" href="../../../../global/management/include/G4ios.hh.html#60" title="std::endl" data-ref="_M/G4endl">G4endl</a>;</td></tr>
+<tr><th id="697">697</th><td>      <a class="macro" href="../../../../global/management/include/G4ios.hh.html#46" title="(*_G4cout_p())" data-ref="_M/G4cout">G4cout</a> &lt;&lt; <q>"Total final state: "</q> &lt;&lt; (photonEnergy1+electronEnergy+energyInFluorescence+</td></tr>
+<tr><th id="698">698</th><td>					  localEnergyDeposit+energyInAuger)/keV &lt;&lt;</td></tr>
+<tr><th id="699">699</th><td>	<q>" keV"</q> &lt;&lt; <a class="macro" href="../../../../global/management/include/G4ios.hh.html#60" title="std::endl" data-ref="_M/G4endl">G4endl</a>;</td></tr>
+<tr><th id="700">700</th><td>      <a class="macro" href="../../../../global/management/include/G4ios.hh.html#46" title="(*_G4cout_p())" data-ref="_M/G4cout">G4cout</a> &lt;&lt; <q>"-----------------------------------------------------------"</q> &lt;&lt; <a class="macro" href="../../../../global/management/include/G4ios.hh.html#60" title="std::endl" data-ref="_M/G4endl">G4endl</a>;</td></tr>
+<tr><th id="701">701</th><td>    }</td></tr>
+<tr><th id="702">702</th><td>  <b>if</b> (verboseLevel &gt; <var>0</var>)</td></tr>
+<tr><th id="703">703</th><td>    {</td></tr>
+<tr><th id="704">704</th><td>      G4double energyDiff = std::fabs(photonEnergy1+</td></tr>
+<tr><th id="705">705</th><td>				      electronEnergy+energyInFluorescence+</td></tr>
+<tr><th id="706">706</th><td>				      localEnergyDeposit+energyInAuger-photonEnergy0);</td></tr>
+<tr><th id="707">707</th><td>      <b>if</b> (energyDiff &gt; <var>0.05</var>*keV)</td></tr>
+<tr><th id="708">708</th><td>	<a class="macro" href="../../../../global/management/include/G4ios.hh.html#46" title="(*_G4cout_p())" data-ref="_M/G4cout">G4cout</a> &lt;&lt; <q>"Warning from G4PenelopeCompton: problem with energy conservation: "</q> &lt;&lt;</td></tr>
+<tr><th id="709">709</th><td>	  (photonEnergy1+electronEnergy+energyInFluorescence+energyInAuger+localEnergyDeposit)/keV &lt;&lt;</td></tr>
+<tr><th id="710">710</th><td>	  <q>" keV (final) vs. "</q> &lt;&lt;</td></tr>
+<tr><th id="711">711</th><td>	  photonEnergy0/keV &lt;&lt; <q>" keV (initial)"</q> &lt;&lt; <a class="macro" href="../../../../global/management/include/G4ios.hh.html#60" title="std::endl" data-ref="_M/G4endl">G4endl</a>;</td></tr>
+<tr><th id="712">712</th><td>    }</td></tr>
+<tr><th id="713">713</th><td>}</td></tr>
+<tr><th id="714">714</th><td></td></tr>
+<tr><th id="715">715</th><td><i>//....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo....</i></td></tr>
+<tr><th id="716">716</th><td></td></tr>
+<tr><th id="717">717</th><td>G4double G4PenelopeComptonModel::DifferentialCrossSection(G4double cosTheta,G4double energy,</td></tr>
+<tr><th id="718">718</th><td>							    G4PenelopeOscillator* osc)</td></tr>
+<tr><th id="719">719</th><td>{</td></tr>
+<tr><th id="720">720</th><td>  <i>//</i></td></tr>
+<tr><th id="721">721</th><td><i>  // Penelope model v2008. Single differential cross section *per electron*</i></td></tr>
+<tr><th id="722">722</th><td><i>  // for photon Compton scattering by</i></td></tr>
+<tr><th id="723">723</th><td><i>  // electrons in the given atomic oscillator, differential in the direction of the</i></td></tr>
+<tr><th id="724">724</th><td><i>  // scattering photon. This is in units of pi*classic_electr_radius**2</i></td></tr>
+<tr><th id="725">725</th><td><i>  //</i></td></tr>
+<tr><th id="726">726</th><td><i>  // D. Brusa et al., Nucl. Instrum. Meth. A 379 (1996) 167</i></td></tr>
+<tr><th id="727">727</th><td><i>  // The parametrization includes the J(p) distribution profiles for the atomic shells,</i></td></tr>
+<tr><th id="728">728</th><td><i>  // that are tabulated from Hartree-Fock calculations</i></td></tr>
+<tr><th id="729">729</th><td><i>  // from F. Biggs et al., At. Data Nucl. Data Tables 16 (1975) 201</i></td></tr>
+<tr><th id="730">730</th><td><i>  //</i></td></tr>
+<tr><th id="731">731</th><td>  G4double ionEnergy = osc-&gt;GetIonisationEnergy();</td></tr>
+<tr><th id="732">732</th><td>  G4double harFunc = osc-&gt;GetHartreeFactor();</td></tr>
+<tr><th id="733">733</th><td></td></tr>
+<tr><th id="734">734</th><td>  <em>static</em> <em>const</em> G4double k2 = std::sqrt(<var>2.</var>);</td></tr>
+<tr><th id="735">735</th><td>  <em>static</em> <em>const</em> G4double k1 = <var>1.</var>/k2;</td></tr>
+<tr><th id="736">736</th><td></td></tr>
+<tr><th id="737">737</th><td>  <b>if</b> (energy &lt; ionEnergy)</td></tr>
+<tr><th id="738">738</th><td>    <b>return</b> <var>0</var>;</td></tr>
+<tr><th id="739">739</th><td></td></tr>
+<tr><th id="740">740</th><td>  <i>//energy of the Compton line</i></td></tr>
+<tr><th id="741">741</th><td>  G4double cdt1 = <var>1.0</var>-cosTheta;</td></tr>
+<tr><th id="742">742</th><td>  G4double EOEC = <var>1.0</var>+(energy/electron_mass_c2)*cdt1;</td></tr>
+<tr><th id="743">743</th><td>  G4double ECOE = <var>1.0</var>/EOEC;</td></tr>
+<tr><th id="744">744</th><td></td></tr>
+<tr><th id="745">745</th><td>  <i>//Incoherent scattering function (analytical profile)</i></td></tr>
+<tr><th id="746">746</th><td>  G4double aux = energy*(energy-ionEnergy)*cdt1;</td></tr>
+<tr><th id="747">747</th><td>  G4double Pzimax =</td></tr>
+<tr><th id="748">748</th><td>    (aux - electron_mass_c2*ionEnergy)/(electron_mass_c2*std::sqrt(<var>2</var>*aux+ionEnergy*ionEnergy));</td></tr>
+<tr><th id="749">749</th><td>  G4double sia = <var>0.0</var>;</td></tr>
+<tr><th id="750">750</th><td>  G4double x = harFunc*Pzimax;</td></tr>
+<tr><th id="751">751</th><td>  <b>if</b> (x &gt; <var>0</var>)</td></tr>
+<tr><th id="752">752</th><td>    sia = <var>1.0</var>-<var>0.5</var>*G4Exp(<var>0.5</var>-(k1+k2*x)*(k1+k2*x));</td></tr>
+<tr><th id="753">753</th><td>  <b>else</b></td></tr>
+<tr><th id="754">754</th><td>    sia = <var>0.5</var>*G4Exp(<var>0.5</var>-(k1-k2*x)*(k1-k2*x));</td></tr>
+<tr><th id="755">755</th><td></td></tr>
+<tr><th id="756">756</th><td>  <i>//1st order correction, integral of Pz times the Compton profile.</i></td></tr>
+<tr><th id="757">757</th><td><i>  //Calculated approximately using a free-electron gas profile</i></td></tr>
+<tr><th id="758">758</th><td>  G4double pf = <var>3.0</var>/(<var>4.0</var>*harFunc);</td></tr>
+<tr><th id="759">759</th><td>  <b>if</b> (std::fabs(Pzimax) &lt; pf)</td></tr>
+<tr><th id="760">760</th><td>    {</td></tr>
+<tr><th id="761">761</th><td>      G4double QCOE2 = <var>1.0</var>+ECOE*ECOE-<var>2.0</var>*ECOE*cosTheta;</td></tr>
+<tr><th id="762">762</th><td>      G4double p2 = Pzimax*Pzimax;</td></tr>
+<tr><th id="763">763</th><td>      G4double dspz = std::sqrt(QCOE2)*</td></tr>
+<tr><th id="764">764</th><td>	(<var>1.0</var>+ECOE*(ECOE-cosTheta)/QCOE2)*harFunc</td></tr>
+<tr><th id="765">765</th><td>	*<var>0.25</var>*(<var>2</var>*p2-(p2*p2)/(pf*pf)-(pf*pf));</td></tr>
+<tr><th id="766">766</th><td>      sia += std::max(dspz,-<var>1.0</var>*sia);</td></tr>
+<tr><th id="767">767</th><td>    }</td></tr>
+<tr><th id="768">768</th><td></td></tr>
+<tr><th id="769">769</th><td>  G4double XKN = EOEC+ECOE-<var>1.0</var>+cosTheta*cosTheta;</td></tr>
+<tr><th id="770">770</th><td></td></tr>
+<tr><th id="771">771</th><td>  <i>//Differential cross section (per electron, in units of pi*classic_electr_radius**2)</i></td></tr>
+<tr><th id="772">772</th><td>  G4double diffCS = ECOE*ECOE*XKN*sia;</td></tr>
+<tr><th id="773">773</th><td></td></tr>
+<tr><th id="774">774</th><td>  <b>return</b> diffCS;</td></tr>
+<tr><th id="775">775</th><td>}</td></tr>
+<tr><th id="776">776</th><td></td></tr>
+<tr><th id="777">777</th><td><i>//....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo....</i></td></tr>
+<tr><th id="778">778</th><td></td></tr>
+<tr><th id="779">779</th><td>G4double G4PenelopeComptonModel::OscillatorTotalCrossSection(G4double energy,G4PenelopeOscillator* osc)</td></tr>
+<tr><th id="780">780</th><td>{</td></tr>
+<tr><th id="781">781</th><td>  <i>//Total cross section (integrated) for the given oscillator in units of</i></td></tr>
+<tr><th id="782">782</th><td><i>  //pi*classic_electr_radius^2</i></td></tr>
+<tr><th id="783">783</th><td><i></i></td></tr>
+<tr><th id="784">784</th><td><i>  //Integrate differential cross section for each oscillator</i></td></tr>
+<tr><th id="785">785</th><td>  G4double stre = osc-&gt;GetOscillatorStrength();</td></tr>
+<tr><th id="786">786</th><td></td></tr>
+<tr><th id="787">787</th><td>  <i>// here one uses the  using the 20-point</i></td></tr>
+<tr><th id="788">788</th><td><i>  // Gauss quadrature method with an adaptive bipartition scheme</i></td></tr>
+<tr><th id="789">789</th><td>  <em>const</em> G4int npoints=<var>10</var>;</td></tr>
+<tr><th id="790">790</th><td>  <em>const</em> G4int ncallsmax=<var>20000</var>;</td></tr>
+<tr><th id="791">791</th><td>  <em>const</em> G4int nst=<var>256</var>;</td></tr>
+<tr><th id="792">792</th><td>  <em>static</em> <em>const</em> G4double Abscissas[<var>10</var>] = {<var>7.652651133497334e-02</var>,<var>2.2778585114164508e-01</var>,<var>3.7370608871541956e-01</var>,</td></tr>
+<tr><th id="793">793</th><td>				  <var>5.1086700195082710e-01</var>,<var>6.3605368072651503e-01</var>,<var>7.4633190646015079e-01</var>,</td></tr>
+<tr><th id="794">794</th><td>				  <var>8.3911697182221882e-01</var>,<var>9.1223442825132591e-01</var>,<var>9.6397192727791379e-01</var>,</td></tr>
+<tr><th id="795">795</th><td>				  <var>9.9312859918509492e-01</var>};</td></tr>
+<tr><th id="796">796</th><td>  <em>static</em> <em>const</em> G4double Weights[<var>10</var>] = {<var>1.5275338713072585e-01</var>,<var>1.4917298647260375e-01</var>,<var>1.4209610931838205e-01</var>,</td></tr>
+<tr><th id="797">797</th><td>				<var>1.3168863844917663e-01</var>,<var>1.1819453196151842e-01</var>,<var>1.0193011981724044e-01</var>,</td></tr>
+<tr><th id="798">798</th><td>				<var>8.3276741576704749e-02</var>,<var>6.2672048334109064e-02</var>,<var>4.0601429800386941e-02</var>,</td></tr>
+<tr><th id="799">799</th><td>				<var>1.7614007139152118e-02</var>};</td></tr>
+<tr><th id="800">800</th><td></td></tr>
+<tr><th id="801">801</th><td>  G4double MaxError = <var>1e-5</var>;</td></tr>
+<tr><th id="802">802</th><td>  <i>//Error control</i></td></tr>
+<tr><th id="803">803</th><td>  G4double Ctol = std::min(std::max(MaxError,<var>1e-13</var>),<var>1e-02</var>);</td></tr>
+<tr><th id="804">804</th><td>  G4double Ptol = <var>0.01</var>*Ctol;</td></tr>
+<tr><th id="805">805</th><td>  G4double Err=<var>1e35</var>;</td></tr>
+<tr><th id="806">806</th><td></td></tr>
+<tr><th id="807">807</th><td>  <i>//Gauss integration from -1 to 1</i></td></tr>
+<tr><th id="808">808</th><td>  G4double LowPoint = -<var>1.0</var>;</td></tr>
+<tr><th id="809">809</th><td>  G4double HighPoint = <var>1.0</var>;</td></tr>
+<tr><th id="810">810</th><td></td></tr>
+<tr><th id="811">811</th><td>  G4double h=HighPoint-LowPoint;</td></tr>
+<tr><th id="812">812</th><td>  G4double sumga=<var>0.0</var>;</td></tr>
+<tr><th id="813">813</th><td>  G4double a=<var>0.5</var>*(HighPoint-LowPoint);</td></tr>
+<tr><th id="814">814</th><td>  G4double b=<var>0.5</var>*(HighPoint+LowPoint);</td></tr>
+<tr><th id="815">815</th><td>  G4double c=a*Abscissas[<var>0</var>];</td></tr>
+<tr><th id="816">816</th><td>  G4double d= Weights[<var>0</var>]*</td></tr>
+<tr><th id="817">817</th><td>    (DifferentialCrossSection(b+c,energy,osc)+DifferentialCrossSection(b-c,energy,osc));</td></tr>
+<tr><th id="818">818</th><td>  <b>for</b> (G4int i=<var>2</var>;i&lt;=npoints;i++)</td></tr>
+<tr><th id="819">819</th><td>    {</td></tr>
+<tr><th id="820">820</th><td>      c=a*Abscissas[i-<var>1</var>];</td></tr>
+<tr><th id="821">821</th><td>      d += Weights[i-<var>1</var>]*</td></tr>
+<tr><th id="822">822</th><td>	(DifferentialCrossSection(b+c,energy,osc)+DifferentialCrossSection(b-c,energy,osc));</td></tr>
+<tr><th id="823">823</th><td>    }</td></tr>
+<tr><th id="824">824</th><td>  G4int icall = <var>2</var>*npoints;</td></tr>
+<tr><th id="825">825</th><td>  G4int LH=<var>1</var>;</td></tr>
+<tr><th id="826">826</th><td>  G4double S[nst],x[nst],sn[nst],xrn[nst];</td></tr>
+<tr><th id="827">827</th><td>  S[<var>0</var>]=d*a;</td></tr>
+<tr><th id="828">828</th><td>  x[<var>0</var>]=LowPoint;</td></tr>
+<tr><th id="829">829</th><td></td></tr>
+<tr><th id="830">830</th><td>  G4bool loopAgain = <b>true</b>;</td></tr>
+<tr><th id="831">831</th><td></td></tr>
+<tr><th id="832">832</th><td>  <i>//Adaptive bipartition scheme</i></td></tr>
+<tr><th id="833">833</th><td>  <b>do</b>{</td></tr>
+<tr><th id="834">834</th><td>    G4double h0=h;</td></tr>
+<tr><th id="835">835</th><td>    h=<var>0.5</var>*h; <i>//bipartition</i></td></tr>
+<tr><th id="836">836</th><td>    G4double sumr=<var>0</var>;</td></tr>
+<tr><th id="837">837</th><td>    G4int LHN=<var>0</var>;</td></tr>
+<tr><th id="838">838</th><td>    G4double si,xa,xb,xc;</td></tr>
+<tr><th id="839">839</th><td>    <b>for</b> (G4int i=<var>1</var>;i&lt;=LH;i++){</td></tr>
+<tr><th id="840">840</th><td>      si=S[i-<var>1</var>];</td></tr>
+<tr><th id="841">841</th><td>      xa=x[i-<var>1</var>];</td></tr>
+<tr><th id="842">842</th><td>      xb=xa+h;</td></tr>
+<tr><th id="843">843</th><td>      xc=xa+h0;</td></tr>
+<tr><th id="844">844</th><td>      a=<var>0.5</var>*(xb-xa);</td></tr>
+<tr><th id="845">845</th><td>      b=<var>0.5</var>*(xb+xa);</td></tr>
+<tr><th id="846">846</th><td>      c=a*Abscissas[<var>0</var>];</td></tr>
+<tr><th id="847">847</th><td>      G4double dLocal = Weights[<var>0</var>]*</td></tr>
+<tr><th id="848">848</th><td>	(DifferentialCrossSection(b+c,energy,osc)+DifferentialCrossSection(b-c,energy,osc));</td></tr>
+<tr><th id="849">849</th><td></td></tr>
+<tr><th id="850">850</th><td>      <b>for</b> (G4int j=<var>1</var>;j&lt;npoints;j++)</td></tr>
+<tr><th id="851">851</th><td>	{</td></tr>
+<tr><th id="852">852</th><td>	  c=a*Abscissas[j];</td></tr>
+<tr><th id="853">853</th><td>	  dLocal += Weights[j]*</td></tr>
+<tr><th id="854">854</th><td>	    (DifferentialCrossSection(b+c,energy,osc)+DifferentialCrossSection(b-c,energy,osc));</td></tr>
+<tr><th id="855">855</th><td>	}</td></tr>
+<tr><th id="856">856</th><td>      G4double s1=dLocal*a;</td></tr>
+<tr><th id="857">857</th><td>      a=<var>0.5</var>*(xc-xb);</td></tr>
+<tr><th id="858">858</th><td>      b=<var>0.5</var>*(xc+xb);</td></tr>
+<tr><th id="859">859</th><td>      c=a*Abscissas[<var>0</var>];</td></tr>
+<tr><th id="860">860</th><td>      dLocal=Weights[<var>0</var>]*</td></tr>
+<tr><th id="861">861</th><td>	(DifferentialCrossSection(b+c,energy,osc)+DifferentialCrossSection(b-c,energy,osc));</td></tr>
+<tr><th id="862">862</th><td></td></tr>
+<tr><th id="863">863</th><td>      <b>for</b> (G4int j=<var>1</var>;j&lt;npoints;j++)</td></tr>
+<tr><th id="864">864</th><td>	{</td></tr>
+<tr><th id="865">865</th><td>	  c=a*Abscissas[j];</td></tr>
+<tr><th id="866">866</th><td>	  dLocal += Weights[j]*</td></tr>
+<tr><th id="867">867</th><td>	    (DifferentialCrossSection(b+c,energy,osc)+DifferentialCrossSection(b-c,energy,osc));</td></tr>
+<tr><th id="868">868</th><td>	}</td></tr>
+<tr><th id="869">869</th><td>      G4double s2=dLocal*a;</td></tr>
+<tr><th id="870">870</th><td>      icall=icall+<var>4</var>*npoints;</td></tr>
+<tr><th id="871">871</th><td>      G4double s12=s1+s2;</td></tr>
+<tr><th id="872">872</th><td>      <b>if</b> (std::abs(s12-si)&lt;std::max(Ptol*std::abs(s12),<var>1e-35</var>))</td></tr>
+<tr><th id="873">873</th><td>	sumga += s12;</td></tr>
+<tr><th id="874">874</th><td>      <b>else</b></td></tr>
+<tr><th id="875">875</th><td>	{</td></tr>
+<tr><th id="876">876</th><td>	  sumr += s12;</td></tr>
+<tr><th id="877">877</th><td>	  LHN += <var>2</var>;</td></tr>
+<tr><th id="878">878</th><td>	  sn[LHN-<var>1</var>]=s2;</td></tr>
+<tr><th id="879">879</th><td>	  xrn[LHN-<var>1</var>]=xb;</td></tr>
+<tr><th id="880">880</th><td>	  sn[LHN-<var>2</var>]=s1;</td></tr>
+<tr><th id="881">881</th><td>	  xrn[LHN-<var>2</var>]=xa;</td></tr>
+<tr><th id="882">882</th><td>	}</td></tr>
+<tr><th id="883">883</th><td></td></tr>
+<tr><th id="884">884</th><td>      <b>if</b> (icall&gt;ncallsmax || LHN&gt;nst)</td></tr>
+<tr><th id="885">885</th><td>	{</td></tr>
+<tr><th id="886">886</th><td>	  <a class="macro" href="../../../../global/management/include/G4ios.hh.html#46" title="(*_G4cout_p())" data-ref="_M/G4cout">G4cout</a> &lt;&lt; <q>"G4PenelopeComptonModel: "</q> &lt;&lt; <a class="macro" href="../../../../global/management/include/G4ios.hh.html#60" title="std::endl" data-ref="_M/G4endl">G4endl</a>;</td></tr>
+<tr><th id="887">887</th><td>	  <a class="macro" href="../../../../global/management/include/G4ios.hh.html#46" title="(*_G4cout_p())" data-ref="_M/G4cout">G4cout</a> &lt;&lt; <q>"LowPoint: "</q> &lt;&lt; LowPoint &lt;&lt; <q>", High Point: "</q> &lt;&lt; HighPoint &lt;&lt; <a class="macro" href="../../../../global/management/include/G4ios.hh.html#60" title="std::endl" data-ref="_M/G4endl">G4endl</a>;</td></tr>
+<tr><th id="888">888</th><td>	  <a class="macro" href="../../../../global/management/include/G4ios.hh.html#46" title="(*_G4cout_p())" data-ref="_M/G4cout">G4cout</a> &lt;&lt; <q>"Tolerance: "</q> &lt;&lt; MaxError &lt;&lt; <a class="macro" href="../../../../global/management/include/G4ios.hh.html#60" title="std::endl" data-ref="_M/G4endl">G4endl</a>;</td></tr>
+<tr><th id="889">889</th><td>	  <a class="macro" href="../../../../global/management/include/G4ios.hh.html#46" title="(*_G4cout_p())" data-ref="_M/G4cout">G4cout</a> &lt;&lt; <q>"Calls: "</q> &lt;&lt; icall &lt;&lt; <q>", Integral: "</q> &lt;&lt; sumga &lt;&lt; <q>", Error: "</q> &lt;&lt; Err &lt;&lt; <a class="macro" href="../../../../global/management/include/G4ios.hh.html#60" title="std::endl" data-ref="_M/G4endl">G4endl</a>;</td></tr>
+<tr><th id="890">890</th><td>	  <a class="macro" href="../../../../global/management/include/G4ios.hh.html#46" title="(*_G4cout_p())" data-ref="_M/G4cout">G4cout</a> &lt;&lt; <q>"Number of open subintervals: "</q> &lt;&lt; LHN &lt;&lt; <a class="macro" href="../../../../global/management/include/G4ios.hh.html#60" title="std::endl" data-ref="_M/G4endl">G4endl</a>;</td></tr>
+<tr><th id="891">891</th><td>	  <a class="macro" href="../../../../global/management/include/G4ios.hh.html#46" title="(*_G4cout_p())" data-ref="_M/G4cout">G4cout</a> &lt;&lt; <q>"WARNING: the required accuracy has not been attained"</q> &lt;&lt; <a class="macro" href="../../../../global/management/include/G4ios.hh.html#60" title="std::endl" data-ref="_M/G4endl">G4endl</a>;</td></tr>
+<tr><th id="892">892</th><td>	  loopAgain = <b>false</b>;</td></tr>
+<tr><th id="893">893</th><td>	}</td></tr>
+<tr><th id="894">894</th><td>    }</td></tr>
+<tr><th id="895">895</th><td>    Err=std::abs(sumr)/std::max(std::abs(sumr+sumga),<var>1e-35</var>);</td></tr>
+<tr><th id="896">896</th><td>    <b>if</b> (Err &lt; Ctol || LHN == <var>0</var>)</td></tr>
+<tr><th id="897">897</th><td>      loopAgain = <b>false</b>; <i>//end of cycle</i></td></tr>
+<tr><th id="898">898</th><td>    LH=LHN;</td></tr>
+<tr><th id="899">899</th><td>    <b>for</b> (G4int i=<var>0</var>;i&lt;LH;i++)</td></tr>
+<tr><th id="900">900</th><td>      {</td></tr>
+<tr><th id="901">901</th><td>	S[i]=sn[i];</td></tr>
+<tr><th id="902">902</th><td>	x[i]=xrn[i];</td></tr>
+<tr><th id="903">903</th><td>      }</td></tr>
+<tr><th id="904">904</th><td>  }<b>while</b>(Ctol &lt; <var>1.0</var> &amp;&amp; loopAgain);</td></tr>
+<tr><th id="905">905</th><td></td></tr>
+<tr><th id="906">906</th><td></td></tr>
+<tr><th id="907">907</th><td>  G4double xs = stre*sumga;</td></tr>
+<tr><th id="908">908</th><td></td></tr>
+<tr><th id="909">909</th><td>  <b>return</b> xs;</td></tr>
+<tr><th id="910">910</th><td>}</td></tr>
+<tr><th id="911">911</th><td></td></tr>
+<tr><th id="912">912</th><td><i>//....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo....</i></td></tr>
+<tr><th id="913">913</th><td></td></tr>
+<tr><th id="914">914</th><td>G4double G4PenelopeComptonModel::KleinNishinaCrossSection(G4double energy,</td></tr>
+<tr><th id="915">915</th><td>						   <em>const</em> G4Material* material)</td></tr>
+<tr><th id="916">916</th><td>{</td></tr>
+<tr><th id="917">917</th><td>  <i>// use Klein-Nishina formula</i></td></tr>
+<tr><th id="918">918</th><td><i>  // total cross section in units of pi*classic_electr_radius^2</i></td></tr>
+<tr><th id="919">919</th><td></td></tr>
+<tr><th id="920">920</th><td>  G4double cs = <var>0</var>;</td></tr>
+<tr><th id="921">921</th><td></td></tr>
+<tr><th id="922">922</th><td>  G4double ek =energy/electron_mass_c2;</td></tr>
+<tr><th id="923">923</th><td>  G4double eks = ek*ek;</td></tr>
+<tr><th id="924">924</th><td>  G4double ek2 = <var>1.0</var>+ek+ek;</td></tr>
+<tr><th id="925">925</th><td>  G4double ek1 = eks-ek2-<var>1.0</var>;</td></tr>
+<tr><th id="926">926</th><td></td></tr>
+<tr><th id="927">927</th><td>  G4double t0 = <var>1.0</var>/ek2;</td></tr>
+<tr><th id="928">928</th><td>  G4double csl = <var>0.5</var>*eks*t0*t0+ek2*t0+ek1*std::log(t0)-(<var>1.0</var>/t0);</td></tr>
+<tr><th id="929">929</th><td></td></tr>
+<tr><th id="930">930</th><td>  G4PenelopeOscillatorTable* theTable = oscManager-&gt;GetOscillatorTableCompton(material);</td></tr>
+<tr><th id="931">931</th><td></td></tr>
+<tr><th id="932">932</th><td>  <b>for</b> (size_t i=<var>0</var>;i&lt;theTable-&gt;size();i++)</td></tr>
+<tr><th id="933">933</th><td>    {</td></tr>
+<tr><th id="934">934</th><td>      G4PenelopeOscillator* theOsc = (*theTable)[i];</td></tr>
+<tr><th id="935">935</th><td>      G4double ionEnergy = theOsc-&gt;GetIonisationEnergy();</td></tr>
+<tr><th id="936">936</th><td>      G4double tau=(energy-ionEnergy)/energy;</td></tr>
+<tr><th id="937">937</th><td>      <b>if</b> (tau &gt; t0)</td></tr>
+<tr><th id="938">938</th><td>	{</td></tr>
+<tr><th id="939">939</th><td>	  G4double csu = <var>0.5</var>*eks*tau*tau+ek2*tau+ek1*std::log(tau)-(<var>1.0</var>/tau);</td></tr>
+<tr><th id="940">940</th><td>	  G4double stre = theOsc-&gt;GetOscillatorStrength();</td></tr>
+<tr><th id="941">941</th><td></td></tr>
+<tr><th id="942">942</th><td>	  cs += stre*(csu-csl);</td></tr>
+<tr><th id="943">943</th><td>	}</td></tr>
+<tr><th id="944">944</th><td>    }</td></tr>
+<tr><th id="945">945</th><td></td></tr>
+<tr><th id="946">946</th><td>  cs /= (ek*eks);</td></tr>
+<tr><th id="947">947</th><td></td></tr>
+<tr><th id="948">948</th><td>  <b>return</b> cs;</td></tr>
+<tr><th id="949">949</th><td></td></tr>
+<tr><th id="950">950</th><td>}</td></tr>
+<tr><th id="951">951</th><td></td></tr>
+<tr><th id="952">952</th><td><i>//....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo...</i></td></tr>
+<tr><th id="953">953</th><td></td></tr>
+<tr><th id="954">954</th><td><em>void</em> G4PenelopeComptonModel::SetParticle(<em>const</em> G4ParticleDefinition* p)</td></tr>
+<tr><th id="955">955</th><td>{</td></tr>
+<tr><th id="956">956</th><td>  <b>if</b>(!fParticle) {</td></tr>
+<tr><th id="957">957</th><td>    fParticle = p;</td></tr>
+<tr><th id="958">958</th><td>  }</td></tr>
+<tr><th id="959">959</th><td>}</td></tr>
+<tr><th id="960">960</th><td></td></tr>
+</table><hr/><p id='footer'>
+Generated on <em>2019-Aug-28</em> from project codebrowser<br />Powered by <a href='https://woboq.com'><img alt='Woboq' src='https://code.woboq.org/woboq-16.png' width='41' height='16' /></a> <a href='https://code.woboq.org'>Code Browser</a> 2.1
+<br/>Generator usage only permitted with license.</p>
+</div></body></html>

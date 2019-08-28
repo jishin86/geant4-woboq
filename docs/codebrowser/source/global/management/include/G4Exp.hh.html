@@ -1,0 +1,291 @@
+<!doctype html>
+<html>
+<head>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"><title>G4Exp.hh source code [codebrowser/source/global/management/include/G4Exp.hh] - Woboq Code Browser</title>
+<meta name="woboq:interestingDefinitions" content="G4ExpConsts::ieee754 "/>
+<link rel="stylesheet" href="../../../../../../data/qtcreator.css" title="QtCreator"/>
+<link rel="alternate stylesheet" href="../../../../../../data/kdevelop.css" title="KDevelop"/>
+<script type="text/javascript" src="../../../../../../data/jquery/jquery.min.js"></script>
+<script type="text/javascript" src="../../../../../../data/jquery/jquery-ui.min.js"></script>
+<script>var file = 'codebrowser/source/global/management/include/G4Exp.hh'; var root_path = '../../../../..'; var data_path = '../../../../../../data';</script>
+<script src='../../../../../../data/codebrowser.js'></script>
+</head>
+<body><div id='header'><h1 id='breadcrumb'><span>Browse the source code of </span><a href='../../../..'>codebrowser</a>/<a href='../../..'>source</a>/<a href='../..'>global</a>/<a href='..'>management</a>/<a href='./'>include</a>/<a href='G4Exp.hh.html'>G4Exp.hh</a></h1></div>
+<hr/><div id='content'><table class="code">
+<tr><th id="1">1</th><td><i>//</i></td></tr>
+<tr><th id="2">2</th><td><i>// ********************************************************************</i></td></tr>
+<tr><th id="3">3</th><td><i>// * License and Disclaimer                                           *</i></td></tr>
+<tr><th id="4">4</th><td><i>// *                                                                  *</i></td></tr>
+<tr><th id="5">5</th><td><i>// * The  Geant4 software  is  copyright of the Copyright Holders  of *</i></td></tr>
+<tr><th id="6">6</th><td><i>// * the Geant4 Collaboration.  It is provided  under  the terms  and *</i></td></tr>
+<tr><th id="7">7</th><td><i>// * conditions of the Geant4 Software License,  included in the file *</i></td></tr>
+<tr><th id="8">8</th><td><i>// * LICENSE and available at  <a href="http://cern.ch/geant4/license">http://cern.ch/geant4/license</a> .  These *</i></td></tr>
+<tr><th id="9">9</th><td><i>// * include a list of copyright holders.                             *</i></td></tr>
+<tr><th id="10">10</th><td><i>// *                                                                  *</i></td></tr>
+<tr><th id="11">11</th><td><i>// * Neither the authors of this software system, nor their employing *</i></td></tr>
+<tr><th id="12">12</th><td><i>// * institutes,nor the agencies providing financial support for this *</i></td></tr>
+<tr><th id="13">13</th><td><i>// * work  make  any representation or  warranty, express or implied, *</i></td></tr>
+<tr><th id="14">14</th><td><i>// * regarding  this  software system or assume any liability for its *</i></td></tr>
+<tr><th id="15">15</th><td><i>// * use.  Please see the license in the file  LICENSE  and URL above *</i></td></tr>
+<tr><th id="16">16</th><td><i>// * for the full disclaimer and the limitation of liability.         *</i></td></tr>
+<tr><th id="17">17</th><td><i>// *                                                                  *</i></td></tr>
+<tr><th id="18">18</th><td><i>// * This  code  implementation is the result of  the  scientific and *</i></td></tr>
+<tr><th id="19">19</th><td><i>// * technical work of the GEANT4 collaboration.                      *</i></td></tr>
+<tr><th id="20">20</th><td><i>// * By using,  copying,  modifying or  distributing the software (or *</i></td></tr>
+<tr><th id="21">21</th><td><i>// * any work based  on the software)  you  agree  to acknowledge its *</i></td></tr>
+<tr><th id="22">22</th><td><i>// * use  in  resulting  scientific  publications,  and indicate your *</i></td></tr>
+<tr><th id="23">23</th><td><i>// * acceptance of all terms of the Geant4 Software license.          *</i></td></tr>
+<tr><th id="24">24</th><td><i>// ********************************************************************</i></td></tr>
+<tr><th id="25">25</th><td><i>//</i></td></tr>
+<tr><th id="26">26</th><td><i>//</i></td></tr>
+<tr><th id="27">27</th><td><i>//</i></td></tr>
+<tr><th id="28">28</th><td><i>// </i></td></tr>
+<tr><th id="29">29</th><td><i>// --------------------------------------------------------------------</i></td></tr>
+<tr><th id="30">30</th><td><i>//</i></td></tr>
+<tr><th id="31">31</th><td><i>// Class Description:</i></td></tr>
+<tr><th id="32">32</th><td><i>//</i></td></tr>
+<tr><th id="33">33</th><td><i>// The basic idea is to exploit Pade polynomials.</i></td></tr>
+<tr><th id="34">34</th><td><i>// A lot of ideas were inspired by the cephes math library</i></td></tr>
+<tr><th id="35">35</th><td><i>// (by Stephen L. Moshier moshier@na-net.ornl.gov) as well as actual code. </i></td></tr>
+<tr><th id="36">36</th><td><i>// The Cephes library can be found here:  <a href="http://www.netlib.org/cephes/">http://www.netlib.org/cephes/</a></i></td></tr>
+<tr><th id="37">37</th><td><i>// Code and algorithms for G4Exp have been extracted and adapted for Geant4</i></td></tr>
+<tr><th id="38">38</th><td><i>// from the original implementation in the VDT mathematical library</i></td></tr>
+<tr><th id="39">39</th><td><i>// (<a href="https://svnweb.cern.ch/trac/vdt),">https://svnweb.cern.ch/trac/vdt),</a> version 0.3.7.</i></td></tr>
+<tr><th id="40">40</th><td><i></i></td></tr>
+<tr><th id="41">41</th><td><i>// Original implementation created on: Jun 23, 2012</i></td></tr>
+<tr><th id="42">42</th><td><i>//      Author: Danilo Piparo, Thomas Hauth, Vincenzo Innocente</i></td></tr>
+<tr><th id="43">43</th><td><i>//</i></td></tr>
+<tr><th id="44">44</th><td><i>// --------------------------------------------------------------------</i></td></tr>
+<tr><th id="45">45</th><td><i>/* </i></td></tr>
+<tr><th id="46">46</th><td><i> * VDT is free software: you can redistribute it and/or modify</i></td></tr>
+<tr><th id="47">47</th><td><i> * it under the terms of the GNU Lesser Public License as published by</i></td></tr>
+<tr><th id="48">48</th><td><i> * the Free Software Foundation, either version 3 of the License, or</i></td></tr>
+<tr><th id="49">49</th><td><i> * (at your option) any later version.</i></td></tr>
+<tr><th id="50">50</th><td><i> * </i></td></tr>
+<tr><th id="51">51</th><td><i> * This program is distributed in the hope that it will be useful,</i></td></tr>
+<tr><th id="52">52</th><td><i> * but WITHOUT ANY WARRANTY; without even the implied warranty of</i></td></tr>
+<tr><th id="53">53</th><td><i> * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the</i></td></tr>
+<tr><th id="54">54</th><td><i> * GNU Lesser Public License for more details.</i></td></tr>
+<tr><th id="55">55</th><td><i> * </i></td></tr>
+<tr><th id="56">56</th><td><i> * You should have received a copy of the GNU Lesser Public License</i></td></tr>
+<tr><th id="57">57</th><td><i> * along with this program.  If not, see &lt;<a href="http://www.gnu.org/licenses/">http://www.gnu.org/licenses/</a>&gt;.</i></td></tr>
+<tr><th id="58">58</th><td><i> */</i></td></tr>
+<tr><th id="59">59</th><td><i>// --------------------------------------------------------------------</i></td></tr>
+<tr><th id="60">60</th><td><u>#<span data-ppcond="60">ifndef</span> <span class="macro" data-ref="_M/G4Exp_h">G4Exp_h</span></u></td></tr>
+<tr><th id="61">61</th><td><u>#define <dfn class="macro" id="_M/G4Exp_h" data-ref="_M/G4Exp_h">G4Exp_h</dfn> 1</u></td></tr>
+<tr><th id="62">62</th><td></td></tr>
+<tr><th id="63">63</th><td><u>#<span data-ppcond="63">ifdef</span> <span class="macro" data-ref="_M/WIN32">WIN32</span></u></td></tr>
+<tr><th id="64">64</th><td></td></tr>
+<tr><th id="65">65</th><td>  <u>#define G4Exp std::exp</u></td></tr>
+<tr><th id="66">66</th><td></td></tr>
+<tr><th id="67">67</th><td><u>#<span data-ppcond="63">else</span></u></td></tr>
+<tr><th id="68">68</th><td></td></tr>
+<tr><th id="69">69</th><td><u>#include <span class='error' title="&apos;limits&apos; file not found">&lt;</span>limits&gt;</u></td></tr>
+<tr><th id="70">70</th><td><u>#include &lt;stdint.h&gt;</u></td></tr>
+<tr><th id="71">71</th><td><u>#include <a href="G4Types.hh.html">"G4Types.hh"</a></u></td></tr>
+<tr><th id="72">72</th><td></td></tr>
+<tr><th id="73">73</th><td><b>namespace</b> <span class="namespace">G4ExpConsts</span></td></tr>
+<tr><th id="74">74</th><td>{  </td></tr>
+<tr><th id="75">75</th><td>  <em>const</em> <a class="typedef" href="G4Types.hh.html#G4double" title='G4double' data-type='double' data-ref="G4double">G4double</a> <dfn class="decl def" id="G4ExpConsts::EXP_LIMIT" title='G4ExpConsts::EXP_LIMIT' data-ref="G4ExpConsts::EXP_LIMIT">EXP_LIMIT</dfn> = <var>708</var>;</td></tr>
+<tr><th id="76">76</th><td></td></tr>
+<tr><th id="77">77</th><td>  <em>const</em> <a class="typedef" href="G4Types.hh.html#G4double" title='G4double' data-type='double' data-ref="G4double">G4double</a> <dfn class="decl def" id="G4ExpConsts::PX1exp" title='G4ExpConsts::PX1exp' data-ref="G4ExpConsts::PX1exp">PX1exp</dfn> = <var>1.26177193074810590878E-4</var>;</td></tr>
+<tr><th id="78">78</th><td>  <em>const</em> <a class="typedef" href="G4Types.hh.html#G4double" title='G4double' data-type='double' data-ref="G4double">G4double</a> <dfn class="decl def" id="G4ExpConsts::PX2exp" title='G4ExpConsts::PX2exp' data-ref="G4ExpConsts::PX2exp">PX2exp</dfn> = <var>3.02994407707441961300E-2</var>;</td></tr>
+<tr><th id="79">79</th><td>  <em>const</em> <a class="typedef" href="G4Types.hh.html#G4double" title='G4double' data-type='double' data-ref="G4double">G4double</a> <dfn class="decl def" id="G4ExpConsts::PX3exp" title='G4ExpConsts::PX3exp' data-ref="G4ExpConsts::PX3exp">PX3exp</dfn> = <var>9.99999999999999999910E-1</var>;</td></tr>
+<tr><th id="80">80</th><td>  <em>const</em> <a class="typedef" href="G4Types.hh.html#G4double" title='G4double' data-type='double' data-ref="G4double">G4double</a> <dfn class="decl def" id="G4ExpConsts::QX1exp" title='G4ExpConsts::QX1exp' data-ref="G4ExpConsts::QX1exp">QX1exp</dfn> = <var>3.00198505138664455042E-6</var>;</td></tr>
+<tr><th id="81">81</th><td>  <em>const</em> <a class="typedef" href="G4Types.hh.html#G4double" title='G4double' data-type='double' data-ref="G4double">G4double</a> <dfn class="decl def" id="G4ExpConsts::QX2exp" title='G4ExpConsts::QX2exp' data-ref="G4ExpConsts::QX2exp">QX2exp</dfn> = <var>2.52448340349684104192E-3</var>;</td></tr>
+<tr><th id="82">82</th><td>  <em>const</em> <a class="typedef" href="G4Types.hh.html#G4double" title='G4double' data-type='double' data-ref="G4double">G4double</a> <dfn class="decl def" id="G4ExpConsts::QX3exp" title='G4ExpConsts::QX3exp' data-ref="G4ExpConsts::QX3exp">QX3exp</dfn> = <var>2.27265548208155028766E-1</var>;</td></tr>
+<tr><th id="83">83</th><td>  <em>const</em> <a class="typedef" href="G4Types.hh.html#G4double" title='G4double' data-type='double' data-ref="G4double">G4double</a> <dfn class="decl def" id="G4ExpConsts::QX4exp" title='G4ExpConsts::QX4exp' data-ref="G4ExpConsts::QX4exp">QX4exp</dfn> = <var>2.00000000000000000009E0</var>;</td></tr>
+<tr><th id="84">84</th><td></td></tr>
+<tr><th id="85">85</th><td>  <em>const</em> <a class="typedef" href="G4Types.hh.html#G4double" title='G4double' data-type='double' data-ref="G4double">G4double</a> <dfn class="decl def" id="G4ExpConsts::LOG2E" title='G4ExpConsts::LOG2E' data-ref="G4ExpConsts::LOG2E">LOG2E</dfn> = <var>1.4426950408889634073599</var>; <i>// 1/log(2)</i></td></tr>
+<tr><th id="86">86</th><td></td></tr>
+<tr><th id="87">87</th><td>  <em>const</em> <a class="typedef" href="G4Types.hh.html#G4float" title='G4float' data-type='float' data-ref="G4float">G4float</a> <dfn class="decl def" id="G4ExpConsts::MAXLOGF" title='G4ExpConsts::MAXLOGF' data-ref="G4ExpConsts::MAXLOGF">MAXLOGF</dfn> = <var>88.72283905206835f</var>;</td></tr>
+<tr><th id="88">88</th><td>  <em>const</em> <a class="typedef" href="G4Types.hh.html#G4float" title='G4float' data-type='float' data-ref="G4float">G4float</a> <dfn class="decl def" id="G4ExpConsts::MINLOGF" title='G4ExpConsts::MINLOGF' data-ref="G4ExpConsts::MINLOGF">MINLOGF</dfn> = -<var>88.f</var>;</td></tr>
+<tr><th id="89">89</th><td></td></tr>
+<tr><th id="90">90</th><td>  <em>const</em> <a class="typedef" href="G4Types.hh.html#G4float" title='G4float' data-type='float' data-ref="G4float">G4float</a> <dfn class="decl def" id="G4ExpConsts::C1F" title='G4ExpConsts::C1F' data-ref="G4ExpConsts::C1F">C1F</dfn> =   <var>0.693359375f</var>;</td></tr>
+<tr><th id="91">91</th><td>  <em>const</em> <a class="typedef" href="G4Types.hh.html#G4float" title='G4float' data-type='float' data-ref="G4float">G4float</a> <dfn class="decl def" id="G4ExpConsts::C2F" title='G4ExpConsts::C2F' data-ref="G4ExpConsts::C2F">C2F</dfn> =  -<var>2.12194440e-4f</var>;</td></tr>
+<tr><th id="92">92</th><td></td></tr>
+<tr><th id="93">93</th><td>  <em>const</em> <a class="typedef" href="G4Types.hh.html#G4float" title='G4float' data-type='float' data-ref="G4float">G4float</a> <dfn class="decl def" id="G4ExpConsts::PX1expf" title='G4ExpConsts::PX1expf' data-ref="G4ExpConsts::PX1expf">PX1expf</dfn> = <var>1.9875691500E-4f</var>;</td></tr>
+<tr><th id="94">94</th><td>  <em>const</em> <a class="typedef" href="G4Types.hh.html#G4float" title='G4float' data-type='float' data-ref="G4float">G4float</a> <dfn class="decl def" id="G4ExpConsts::PX2expf" title='G4ExpConsts::PX2expf' data-ref="G4ExpConsts::PX2expf">PX2expf</dfn> =<var>1.3981999507E-3f</var>;</td></tr>
+<tr><th id="95">95</th><td>  <em>const</em> <a class="typedef" href="G4Types.hh.html#G4float" title='G4float' data-type='float' data-ref="G4float">G4float</a> <dfn class="decl def" id="G4ExpConsts::PX3expf" title='G4ExpConsts::PX3expf' data-ref="G4ExpConsts::PX3expf">PX3expf</dfn> =<var>8.3334519073E-3f</var>;</td></tr>
+<tr><th id="96">96</th><td>  <em>const</em> <a class="typedef" href="G4Types.hh.html#G4float" title='G4float' data-type='float' data-ref="G4float">G4float</a> <dfn class="decl def" id="G4ExpConsts::PX4expf" title='G4ExpConsts::PX4expf' data-ref="G4ExpConsts::PX4expf">PX4expf</dfn> =<var>4.1665795894E-2f</var>;</td></tr>
+<tr><th id="97">97</th><td>  <em>const</em> <a class="typedef" href="G4Types.hh.html#G4float" title='G4float' data-type='float' data-ref="G4float">G4float</a> <dfn class="decl def" id="G4ExpConsts::PX5expf" title='G4ExpConsts::PX5expf' data-ref="G4ExpConsts::PX5expf">PX5expf</dfn> =<var>1.6666665459E-1f</var>;</td></tr>
+<tr><th id="98">98</th><td>  <em>const</em> <a class="typedef" href="G4Types.hh.html#G4float" title='G4float' data-type='float' data-ref="G4float">G4float</a> <dfn class="decl def" id="G4ExpConsts::PX6expf" title='G4ExpConsts::PX6expf' data-ref="G4ExpConsts::PX6expf">PX6expf</dfn> =<var>5.0000001201E-1f</var>;</td></tr>
+<tr><th id="99">99</th><td></td></tr>
+<tr><th id="100">100</th><td>  <em>const</em> <a class="typedef" href="G4Types.hh.html#G4float" title='G4float' data-type='float' data-ref="G4float">G4float</a> <dfn class="decl def" id="G4ExpConsts::LOG2EF" title='G4ExpConsts::LOG2EF' data-ref="G4ExpConsts::LOG2EF">LOG2EF</dfn> = <var>1.44269504088896341f</var>;</td></tr>
+<tr><th id="101">101</th><td></td></tr>
+<tr><th id="102">102</th><td>  <i>//----------------------------------------------------------------------------</i></td></tr>
+<tr><th id="103">103</th><td><i>  // Used to switch between different type of interpretations of the data</i></td></tr>
+<tr><th id="104">104</th><td><i>  // (64 bits)</i></td></tr>
+<tr><th id="105">105</th><td><i>  //</i></td></tr>
+<tr><th id="106">106</th><td>  <b>union</b> <dfn class="type def" id="G4ExpConsts::ieee754" title='G4ExpConsts::ieee754' data-ref="G4ExpConsts::ieee754">ieee754</dfn></td></tr>
+<tr><th id="107">107</th><td>  {</td></tr>
+<tr><th id="108">108</th><td>	<dfn class="decl def" id="_ZN11G4ExpConsts7ieee754C1Ev" title='G4ExpConsts::ieee754::ieee754' data-ref="_ZN11G4ExpConsts7ieee754C1Ev">ieee754</dfn> () {};</td></tr>
+<tr><th id="109">109</th><td>	<dfn class="decl def" id="_ZN11G4ExpConsts7ieee754C1Ed" title='G4ExpConsts::ieee754::ieee754' data-ref="_ZN11G4ExpConsts7ieee754C1Ed">ieee754</dfn> (<a class="typedef" href="G4Types.hh.html#G4double" title='G4double' data-type='double' data-ref="G4double">G4double</a> <dfn class="local col5 decl" id="1135thed" title='thed' data-type='G4double' data-ref="1135thed">thed</dfn>) {<a class="member" href="#G4ExpConsts::ieee754::d" title='G4ExpConsts::ieee754::d' data-ref="G4ExpConsts::ieee754::d">d</a>=<a class="local col5 ref" href="#1135thed" title='thed' data-ref="1135thed">thed</a>;};</td></tr>
+<tr><th id="110">110</th><td>	<dfn class="decl def" id="_ZN11G4ExpConsts7ieee754C1Em" title='G4ExpConsts::ieee754::ieee754' data-ref="_ZN11G4ExpConsts7ieee754C1Em">ieee754</dfn> (<span class='typedef' title='uint64_t' data-type='unsigned long' data-ref="uint64_t">uint64_t</span> <dfn class="local col6 decl" id="1136thell" title='thell' data-type='uint64_t' data-ref="1136thell">thell</dfn>) {<a class="member" href="#G4ExpConsts::ieee754::ll" title='G4ExpConsts::ieee754::ll' data-ref="G4ExpConsts::ieee754::ll">ll</a>=<a class="local col6 ref" href="#1136thell" title='thell' data-ref="1136thell">thell</a>;};</td></tr>
+<tr><th id="111">111</th><td>	<dfn class="decl def" id="_ZN11G4ExpConsts7ieee754C1Ef" title='G4ExpConsts::ieee754::ieee754' data-ref="_ZN11G4ExpConsts7ieee754C1Ef">ieee754</dfn> (<a class="typedef" href="G4Types.hh.html#G4float" title='G4float' data-type='float' data-ref="G4float">G4float</a> <dfn class="local col7 decl" id="1137thef" title='thef' data-type='G4float' data-ref="1137thef">thef</dfn>) {<a class="member" href="#G4ExpConsts::ieee754::f" title='G4ExpConsts::ieee754::f' data-ref="G4ExpConsts::ieee754::f">f</a>[<var>0</var>]=<a class="local col7 ref" href="#1137thef" title='thef' data-ref="1137thef">thef</a>;};</td></tr>
+<tr><th id="112">112</th><td>	<dfn class="decl def" id="_ZN11G4ExpConsts7ieee754C1Ej" title='G4ExpConsts::ieee754::ieee754' data-ref="_ZN11G4ExpConsts7ieee754C1Ej">ieee754</dfn> (<span class='typedef' title='uint32_t' data-type='unsigned int' data-ref="uint32_t">uint32_t</span> <dfn class="local col8 decl" id="1138thei" title='thei' data-type='uint32_t' data-ref="1138thei">thei</dfn>) {<a class="member" href="#G4ExpConsts::ieee754::i" title='G4ExpConsts::ieee754::i' data-ref="G4ExpConsts::ieee754::i">i</a>[<var>0</var>]=<a class="local col8 ref" href="#1138thei" title='thei' data-ref="1138thei">thei</a>;};</td></tr>
+<tr><th id="113">113</th><td>    <a class="typedef" href="G4Types.hh.html#G4double" title='G4double' data-type='double' data-ref="G4double">G4double</a> <dfn class="decl" id="G4ExpConsts::ieee754::d" title='G4ExpConsts::ieee754::d' data-ref="G4ExpConsts::ieee754::d">d</dfn>;</td></tr>
+<tr><th id="114">114</th><td>    <a class="typedef" href="G4Types.hh.html#G4float" title='G4float' data-type='float' data-ref="G4float">G4float</a> <dfn class="decl" id="G4ExpConsts::ieee754::f" title='G4ExpConsts::ieee754::f' data-ref="G4ExpConsts::ieee754::f">f</dfn>[<var>2</var>];</td></tr>
+<tr><th id="115">115</th><td>    <span class='typedef' title='uint32_t' data-type='unsigned int' data-ref="uint32_t">uint32_t</span> <dfn class="decl" id="G4ExpConsts::ieee754::i" title='G4ExpConsts::ieee754::i' data-ref="G4ExpConsts::ieee754::i">i</dfn>[<var>2</var>];</td></tr>
+<tr><th id="116">116</th><td>    <span class='typedef' title='uint64_t' data-type='unsigned long' data-ref="uint64_t">uint64_t</span> <dfn class="decl" id="G4ExpConsts::ieee754::ll" title='G4ExpConsts::ieee754::ll' data-ref="G4ExpConsts::ieee754::ll">ll</dfn>;</td></tr>
+<tr><th id="117">117</th><td>    <span class='typedef' title='uint16_t' data-type='unsigned short' data-ref="uint16_t">uint16_t</span> <dfn class="decl" id="G4ExpConsts::ieee754::s" title='G4ExpConsts::ieee754::s' data-ref="G4ExpConsts::ieee754::s">s</dfn>[<var>4</var>];</td></tr>
+<tr><th id="118">118</th><td>  };</td></tr>
+<tr><th id="119">119</th><td></td></tr>
+<tr><th id="120">120</th><td>  <i>//----------------------------------------------------------------------------</i></td></tr>
+<tr><th id="121">121</th><td><i>  // Converts an unsigned long long to a double</i></td></tr>
+<tr><th id="122">122</th><td><i>  //</i></td></tr>
+<tr><th id="123">123</th><td>  <b>inline</b> <a class="typedef" href="G4Types.hh.html#G4double" title='G4double' data-type='double' data-ref="G4double">G4double</a> <dfn class="decl def" id="_ZN11G4ExpConsts9uint642dpEm" title='G4ExpConsts::uint642dp' data-ref="_ZN11G4ExpConsts9uint642dpEm">uint642dp</dfn>(<span class='typedef' title='uint64_t' data-type='unsigned long' data-ref="uint64_t">uint64_t</span> <dfn class="local col9 decl" id="1139ll" title='ll' data-type='uint64_t' data-ref="1139ll">ll</dfn>)</td></tr>
+<tr><th id="124">124</th><td>  {</td></tr>
+<tr><th id="125">125</th><td>    <a class="type" href="#G4ExpConsts::ieee754" title='G4ExpConsts::ieee754' data-ref="G4ExpConsts::ieee754">ieee754</a> <a class="ref fake" href="#_ZN11G4ExpConsts7ieee754C1Ev" title='G4ExpConsts::ieee754::ieee754' data-ref="_ZN11G4ExpConsts7ieee754C1Ev"></a><dfn class="local col0 decl" id="1140tmp" title='tmp' data-type='G4ExpConsts::ieee754' data-ref="1140tmp">tmp</dfn>;</td></tr>
+<tr><th id="126">126</th><td>    <a class="local col0 ref" href="#1140tmp" title='tmp' data-ref="1140tmp">tmp</a>.<a class="ref" href="#G4ExpConsts::ieee754::ll" title='G4ExpConsts::ieee754::ll' data-ref="G4ExpConsts::ieee754::ll">ll</a>=<a class="local col9 ref" href="#1139ll" title='ll' data-ref="1139ll">ll</a>;</td></tr>
+<tr><th id="127">127</th><td>    <b>return</b> <a class="local col0 ref" href="#1140tmp" title='tmp' data-ref="1140tmp">tmp</a>.<a class="ref" href="#G4ExpConsts::ieee754::d" title='G4ExpConsts::ieee754::d' data-ref="G4ExpConsts::ieee754::d">d</a>;</td></tr>
+<tr><th id="128">128</th><td>  }</td></tr>
+<tr><th id="129">129</th><td></td></tr>
+<tr><th id="130">130</th><td>  <i>//----------------------------------------------------------------------------</i></td></tr>
+<tr><th id="131">131</th><td><i>  // Converts an int to a float</i></td></tr>
+<tr><th id="132">132</th><td><i>  //</i></td></tr>
+<tr><th id="133">133</th><td>  <b>inline</b> <a class="typedef" href="G4Types.hh.html#G4float" title='G4float' data-type='float' data-ref="G4float">G4float</a> <dfn class="decl def" id="_ZN11G4ExpConsts9uint322spEi" title='G4ExpConsts::uint322sp' data-ref="_ZN11G4ExpConsts9uint322spEi">uint322sp</dfn>(<a class="typedef" href="G4Types.hh.html#G4int" title='G4int' data-type='int' data-ref="G4int">G4int</a> <dfn class="local col1 decl" id="1141x" title='x' data-type='G4int' data-ref="1141x">x</dfn>)</td></tr>
+<tr><th id="134">134</th><td>  {</td></tr>
+<tr><th id="135">135</th><td>    <a class="type" href="#G4ExpConsts::ieee754" title='G4ExpConsts::ieee754' data-ref="G4ExpConsts::ieee754">ieee754</a> <a class="ref fake" href="#_ZN11G4ExpConsts7ieee754C1Ev" title='G4ExpConsts::ieee754::ieee754' data-ref="_ZN11G4ExpConsts7ieee754C1Ev"></a><dfn class="local col2 decl" id="1142tmp" title='tmp' data-type='G4ExpConsts::ieee754' data-ref="1142tmp">tmp</dfn>;</td></tr>
+<tr><th id="136">136</th><td>    <a class="local col2 ref" href="#1142tmp" title='tmp' data-ref="1142tmp">tmp</a>.<a class="ref" href="#G4ExpConsts::ieee754::i" title='G4ExpConsts::ieee754::i' data-ref="G4ExpConsts::ieee754::i">i</a>[<var>0</var>]=<a class="local col1 ref" href="#1141x" title='x' data-ref="1141x">x</a>;</td></tr>
+<tr><th id="137">137</th><td>    <b>return</b> <a class="local col2 ref" href="#1142tmp" title='tmp' data-ref="1142tmp">tmp</a>.<a class="ref" href="#G4ExpConsts::ieee754::f" title='G4ExpConsts::ieee754::f' data-ref="G4ExpConsts::ieee754::f">f</a>[<var>0</var>];</td></tr>
+<tr><th id="138">138</th><td>  }</td></tr>
+<tr><th id="139">139</th><td></td></tr>
+<tr><th id="140">140</th><td>  <i>//----------------------------------------------------------------------------</i></td></tr>
+<tr><th id="141">141</th><td><i>  // Converts a float to an int</i></td></tr>
+<tr><th id="142">142</th><td><i>  //</i></td></tr>
+<tr><th id="143">143</th><td>  <b>inline</b> <span class='typedef' title='uint32_t' data-type='unsigned int' data-ref="uint32_t">uint32_t</span> <dfn class="decl def" id="_ZN11G4ExpConsts9sp2uint32Ef" title='G4ExpConsts::sp2uint32' data-ref="_ZN11G4ExpConsts9sp2uint32Ef">sp2uint32</dfn>(<a class="typedef" href="G4Types.hh.html#G4float" title='G4float' data-type='float' data-ref="G4float">G4float</a> <dfn class="local col3 decl" id="1143x" title='x' data-type='G4float' data-ref="1143x">x</dfn>)</td></tr>
+<tr><th id="144">144</th><td>  {</td></tr>
+<tr><th id="145">145</th><td>    <a class="type" href="#G4ExpConsts::ieee754" title='G4ExpConsts::ieee754' data-ref="G4ExpConsts::ieee754">ieee754</a> <a class="ref fake" href="#_ZN11G4ExpConsts7ieee754C1Ev" title='G4ExpConsts::ieee754::ieee754' data-ref="_ZN11G4ExpConsts7ieee754C1Ev"></a><dfn class="local col4 decl" id="1144tmp" title='tmp' data-type='G4ExpConsts::ieee754' data-ref="1144tmp">tmp</dfn>;</td></tr>
+<tr><th id="146">146</th><td>    <a class="local col4 ref" href="#1144tmp" title='tmp' data-ref="1144tmp">tmp</a>.<a class="ref" href="#G4ExpConsts::ieee754::f" title='G4ExpConsts::ieee754::f' data-ref="G4ExpConsts::ieee754::f">f</a>[<var>0</var>]=<a class="local col3 ref" href="#1143x" title='x' data-ref="1143x">x</a>;</td></tr>
+<tr><th id="147">147</th><td>    <b>return</b> <a class="local col4 ref" href="#1144tmp" title='tmp' data-ref="1144tmp">tmp</a>.<a class="ref" href="#G4ExpConsts::ieee754::i" title='G4ExpConsts::ieee754::i' data-ref="G4ExpConsts::ieee754::i">i</a>[<var>0</var>];</td></tr>
+<tr><th id="148">148</th><td>  }</td></tr>
+<tr><th id="149">149</th><td></td></tr>
+<tr><th id="150">150</th><td>  <i>//----------------------------------------------------------------------------</i></td></tr>
+<tr><th id="151">151</th><td>  <i class="doc">/**</i></td></tr>
+<tr><th id="152">152</th><td><i class="doc">   * A vectorisable floor implementation, not only triggered by fast-math.</i></td></tr>
+<tr><th id="153">153</th><td><i class="doc">   * These functions do not distinguish between -0.0 and 0.0, so are not IEC6509 </i></td></tr>
+<tr><th id="154">154</th><td><i class="doc">   * compliant for argument -0.0</i></td></tr>
+<tr><th id="155">155</th><td><i class="doc">  **/</i> </td></tr>
+<tr><th id="156">156</th><td>  <b>inline</b> <a class="typedef" href="G4Types.hh.html#G4double" title='G4double' data-type='double' data-ref="G4double">G4double</a> <dfn class="decl def" id="_ZN11G4ExpConsts7fpfloorEd" title='G4ExpConsts::fpfloor' data-ref="_ZN11G4ExpConsts7fpfloorEd">fpfloor</dfn>(<em>const</em> <a class="typedef" href="G4Types.hh.html#G4double" title='G4double' data-type='double' data-ref="G4double">G4double</a> <dfn class="local col5 decl" id="1145x" title='x' data-type='const G4double' data-ref="1145x">x</dfn>)</td></tr>
+<tr><th id="157">157</th><td>  {</td></tr>
+<tr><th id="158">158</th><td>    <i>// no problem since exp is defined between -708 and 708. Int is enough for it!</i></td></tr>
+<tr><th id="159">159</th><td>    <span class='typedef' title='int32_t' data-type='int' data-ref="int32_t">int32_t</span> <dfn class="local col6 decl" id="1146ret" title='ret' data-type='int32_t' data-ref="1146ret">ret</dfn> = <span class='typedef' title='int32_t' data-type='int' data-ref="int32_t">int32_t</span> (<a class="local col5 ref" href="#1145x" title='x' data-ref="1145x">x</a>);</td></tr>
+<tr><th id="160">160</th><td>    <a class="local col6 ref" href="#1146ret" title='ret' data-ref="1146ret">ret</a>-=(<a class="ref" href="#_ZN11G4ExpConsts9sp2uint32Ef" title='G4ExpConsts::sp2uint32' data-ref="_ZN11G4ExpConsts9sp2uint32Ef">sp2uint32</a>(<a class="local col5 ref" href="#1145x" title='x' data-ref="1145x">x</a>)&gt;&gt;<var>31</var>);  </td></tr>
+<tr><th id="161">161</th><td>    <b>return</b> <a class="local col6 ref" href="#1146ret" title='ret' data-ref="1146ret">ret</a>;</td></tr>
+<tr><th id="162">162</th><td>  }</td></tr>
+<tr><th id="163">163</th><td></td></tr>
+<tr><th id="164">164</th><td>  <i>//----------------------------------------------------------------------------</i></td></tr>
+<tr><th id="165">165</th><td>  <i class="doc">/**</i></td></tr>
+<tr><th id="166">166</th><td><i class="doc">   * A vectorisable floor implementation, not only triggered by fast-math.</i></td></tr>
+<tr><th id="167">167</th><td><i class="doc">   * These functions do not distinguish between -0.0 and 0.0, so are not IEC6509 </i></td></tr>
+<tr><th id="168">168</th><td><i class="doc">   * compliant for argument -0.0</i></td></tr>
+<tr><th id="169">169</th><td><i class="doc">  **/</i> </td></tr>
+<tr><th id="170">170</th><td>  <b>inline</b> <a class="typedef" href="G4Types.hh.html#G4float" title='G4float' data-type='float' data-ref="G4float">G4float</a> <dfn class="decl def" id="_ZN11G4ExpConsts7fpfloorEf" title='G4ExpConsts::fpfloor' data-ref="_ZN11G4ExpConsts7fpfloorEf">fpfloor</dfn>(<em>const</em> <a class="typedef" href="G4Types.hh.html#G4float" title='G4float' data-type='float' data-ref="G4float">G4float</a> <dfn class="local col7 decl" id="1147x" title='x' data-type='const G4float' data-ref="1147x">x</dfn>)</td></tr>
+<tr><th id="171">171</th><td>  {</td></tr>
+<tr><th id="172">172</th><td>    <span class='typedef' title='int32_t' data-type='int' data-ref="int32_t">int32_t</span> <dfn class="local col8 decl" id="1148ret" title='ret' data-type='int32_t' data-ref="1148ret">ret</dfn> = <span class='typedef' title='int32_t' data-type='int' data-ref="int32_t">int32_t</span> (<a class="local col7 ref" href="#1147x" title='x' data-ref="1147x">x</a>);</td></tr>
+<tr><th id="173">173</th><td>    <a class="local col8 ref" href="#1148ret" title='ret' data-ref="1148ret">ret</a>-=(<a class="ref" href="#_ZN11G4ExpConsts9sp2uint32Ef" title='G4ExpConsts::sp2uint32' data-ref="_ZN11G4ExpConsts9sp2uint32Ef">sp2uint32</a>(<a class="local col7 ref" href="#1147x" title='x' data-ref="1147x">x</a>)&gt;&gt;<var>31</var>);  </td></tr>
+<tr><th id="174">174</th><td>    <b>return</b> <a class="local col8 ref" href="#1148ret" title='ret' data-ref="1148ret">ret</a>;</td></tr>
+<tr><th id="175">175</th><td>  }</td></tr>
+<tr><th id="176">176</th><td>}</td></tr>
+<tr><th id="177">177</th><td></td></tr>
+<tr><th id="178">178</th><td><i>// Exp double precision --------------------------------------------------------</i></td></tr>
+<tr><th id="179">179</th><td><i></i></td></tr>
+<tr><th id="180">180</th><td><i></i></td></tr>
+<tr><th id="181">181</th><td><i>/// Exponential Function double precision</i></td></tr>
+<tr><th id="182">182</th><td><b>inline</b> <a class="typedef" href="G4Types.hh.html#G4double" title='G4double' data-type='double' data-ref="G4double">G4double</a> <dfn class="decl def" id="_Z5G4Expd" title='G4Exp' data-ref="_Z5G4Expd">G4Exp</dfn>(<a class="typedef" href="G4Types.hh.html#G4double" title='G4double' data-type='double' data-ref="G4double">G4double</a> <dfn class="local col9 decl" id="1149initial_x" title='initial_x' data-type='G4double' data-ref="1149initial_x">initial_x</dfn>)</td></tr>
+<tr><th id="183">183</th><td>{</td></tr>
+<tr><th id="184">184</th><td>    <a class="typedef" href="G4Types.hh.html#G4double" title='G4double' data-type='double' data-ref="G4double">G4double</a> <dfn class="local col0 decl" id="1150x" title='x' data-type='G4double' data-ref="1150x">x</dfn> = <a class="local col9 ref" href="#1149initial_x" title='initial_x' data-ref="1149initial_x">initial_x</a>;</td></tr>
+<tr><th id="185">185</th><td>    <a class="typedef" href="G4Types.hh.html#G4double" title='G4double' data-type='double' data-ref="G4double">G4double</a> <dfn class="local col1 decl" id="1151px" title='px' data-type='G4double' data-ref="1151px">px</dfn>=<span class="namespace">G4ExpConsts::</span><a class="ref" href="#_ZN11G4ExpConsts7fpfloorEd" title='G4ExpConsts::fpfloor' data-ref="_ZN11G4ExpConsts7fpfloorEd">fpfloor</a>(<span class="namespace">G4ExpConsts::</span><a class="ref" href="#G4ExpConsts::LOG2E" title='G4ExpConsts::LOG2E' data-ref="G4ExpConsts::LOG2E">LOG2E</a> * <a class="local col0 ref" href="#1150x" title='x' data-ref="1150x">x</a> +<var>0.5</var>);</td></tr>
+<tr><th id="186">186</th><td> </td></tr>
+<tr><th id="187">187</th><td>    <em>const</em> <span class='typedef' title='int32_t' data-type='int' data-ref="int32_t">int32_t</span> <dfn class="local col2 decl" id="1152n" title='n' data-type='const int32_t' data-ref="1152n">n</dfn> = <span class='typedef' title='int32_t' data-type='int' data-ref="int32_t">int32_t</span>(<a class="local col1 ref" href="#1151px" title='px' data-ref="1151px">px</a>);</td></tr>
+<tr><th id="188">188</th><td></td></tr>
+<tr><th id="189">189</th><td>    <a class="local col0 ref" href="#1150x" title='x' data-ref="1150x">x</a> -= <a class="local col1 ref" href="#1151px" title='px' data-ref="1151px">px</a> * <var>6.93145751953125E-1</var>;</td></tr>
+<tr><th id="190">190</th><td>    <a class="local col0 ref" href="#1150x" title='x' data-ref="1150x">x</a> -= <a class="local col1 ref" href="#1151px" title='px' data-ref="1151px">px</a> * <var>1.42860682030941723212E-6</var>;</td></tr>
+<tr><th id="191">191</th><td></td></tr>
+<tr><th id="192">192</th><td>    <em>const</em> <a class="typedef" href="G4Types.hh.html#G4double" title='G4double' data-type='double' data-ref="G4double">G4double</a> <dfn class="local col3 decl" id="1153xx" title='xx' data-type='const G4double' data-ref="1153xx">xx</dfn> = <a class="local col0 ref" href="#1150x" title='x' data-ref="1150x">x</a> * <a class="local col0 ref" href="#1150x" title='x' data-ref="1150x">x</a>;</td></tr>
+<tr><th id="193">193</th><td></td></tr>
+<tr><th id="194">194</th><td>    <i>// px = x * P(x**2).</i></td></tr>
+<tr><th id="195">195</th><td>    <a class="local col1 ref" href="#1151px" title='px' data-ref="1151px">px</a> = <span class="namespace">G4ExpConsts::</span><a class="ref" href="#G4ExpConsts::PX1exp" title='G4ExpConsts::PX1exp' data-ref="G4ExpConsts::PX1exp">PX1exp</a>;</td></tr>
+<tr><th id="196">196</th><td>    <a class="local col1 ref" href="#1151px" title='px' data-ref="1151px">px</a> *= <a class="local col3 ref" href="#1153xx" title='xx' data-ref="1153xx">xx</a>;</td></tr>
+<tr><th id="197">197</th><td>    <a class="local col1 ref" href="#1151px" title='px' data-ref="1151px">px</a> += <span class="namespace">G4ExpConsts::</span><a class="ref" href="#G4ExpConsts::PX2exp" title='G4ExpConsts::PX2exp' data-ref="G4ExpConsts::PX2exp">PX2exp</a>;</td></tr>
+<tr><th id="198">198</th><td>    <a class="local col1 ref" href="#1151px" title='px' data-ref="1151px">px</a> *= <a class="local col3 ref" href="#1153xx" title='xx' data-ref="1153xx">xx</a>;</td></tr>
+<tr><th id="199">199</th><td>    <a class="local col1 ref" href="#1151px" title='px' data-ref="1151px">px</a> += <span class="namespace">G4ExpConsts::</span><a class="ref" href="#G4ExpConsts::PX3exp" title='G4ExpConsts::PX3exp' data-ref="G4ExpConsts::PX3exp">PX3exp</a>;</td></tr>
+<tr><th id="200">200</th><td>    <a class="local col1 ref" href="#1151px" title='px' data-ref="1151px">px</a> *= <a class="local col0 ref" href="#1150x" title='x' data-ref="1150x">x</a>;</td></tr>
+<tr><th id="201">201</th><td></td></tr>
+<tr><th id="202">202</th><td>    <i>// Evaluate Q(x**2).</i></td></tr>
+<tr><th id="203">203</th><td>    <a class="typedef" href="G4Types.hh.html#G4double" title='G4double' data-type='double' data-ref="G4double">G4double</a> <dfn class="local col4 decl" id="1154qx" title='qx' data-type='G4double' data-ref="1154qx">qx</dfn> = <span class="namespace">G4ExpConsts::</span><a class="ref" href="#G4ExpConsts::QX1exp" title='G4ExpConsts::QX1exp' data-ref="G4ExpConsts::QX1exp">QX1exp</a>;</td></tr>
+<tr><th id="204">204</th><td>    <a class="local col4 ref" href="#1154qx" title='qx' data-ref="1154qx">qx</a> *= <a class="local col3 ref" href="#1153xx" title='xx' data-ref="1153xx">xx</a>;</td></tr>
+<tr><th id="205">205</th><td>    <a class="local col4 ref" href="#1154qx" title='qx' data-ref="1154qx">qx</a> += <span class="namespace">G4ExpConsts::</span><a class="ref" href="#G4ExpConsts::QX2exp" title='G4ExpConsts::QX2exp' data-ref="G4ExpConsts::QX2exp">QX2exp</a>;</td></tr>
+<tr><th id="206">206</th><td>    <a class="local col4 ref" href="#1154qx" title='qx' data-ref="1154qx">qx</a> *= <a class="local col3 ref" href="#1153xx" title='xx' data-ref="1153xx">xx</a>;</td></tr>
+<tr><th id="207">207</th><td>    <a class="local col4 ref" href="#1154qx" title='qx' data-ref="1154qx">qx</a> += <span class="namespace">G4ExpConsts::</span><a class="ref" href="#G4ExpConsts::QX3exp" title='G4ExpConsts::QX3exp' data-ref="G4ExpConsts::QX3exp">QX3exp</a>;</td></tr>
+<tr><th id="208">208</th><td>    <a class="local col4 ref" href="#1154qx" title='qx' data-ref="1154qx">qx</a> *= <a class="local col3 ref" href="#1153xx" title='xx' data-ref="1153xx">xx</a>;</td></tr>
+<tr><th id="209">209</th><td>    <a class="local col4 ref" href="#1154qx" title='qx' data-ref="1154qx">qx</a> += <span class="namespace">G4ExpConsts::</span><a class="ref" href="#G4ExpConsts::QX4exp" title='G4ExpConsts::QX4exp' data-ref="G4ExpConsts::QX4exp">QX4exp</a>;</td></tr>
+<tr><th id="210">210</th><td></td></tr>
+<tr><th id="211">211</th><td>    <i>// e**x = 1 + 2x P(x**2)/( Q(x**2) - P(x**2) )</i></td></tr>
+<tr><th id="212">212</th><td>    <a class="local col0 ref" href="#1150x" title='x' data-ref="1150x">x</a> = <a class="local col1 ref" href="#1151px" title='px' data-ref="1151px">px</a> / (<a class="local col4 ref" href="#1154qx" title='qx' data-ref="1154qx">qx</a> - <a class="local col1 ref" href="#1151px" title='px' data-ref="1151px">px</a>);</td></tr>
+<tr><th id="213">213</th><td>    <a class="local col0 ref" href="#1150x" title='x' data-ref="1150x">x</a> = <var>1.0</var> + <var>2.0</var> * <a class="local col0 ref" href="#1150x" title='x' data-ref="1150x">x</a>;</td></tr>
+<tr><th id="214">214</th><td></td></tr>
+<tr><th id="215">215</th><td>    <i>// Build 2^n in double.</i></td></tr>
+<tr><th id="216">216</th><td>    <a class="local col0 ref" href="#1150x" title='x' data-ref="1150x">x</a> *= <span class="namespace">G4ExpConsts::</span><a class="ref" href="#_ZN11G4ExpConsts9uint642dpEm" title='G4ExpConsts::uint642dp' data-ref="_ZN11G4ExpConsts9uint642dpEm">uint642dp</a>(( ((<span class='typedef' title='uint64_t' data-type='unsigned long' data-ref="uint64_t">uint64_t</span>)<a class="local col2 ref" href="#1152n" title='n' data-ref="1152n">n</a>) +<var>1023</var>)&lt;&lt;<var>52</var>);</td></tr>
+<tr><th id="217">217</th><td></td></tr>
+<tr><th id="218">218</th><td>    <b>if</b> (initial_x &gt; G4ExpConsts::EXP_LIMIT)</td></tr>
+<tr><th id="219">219</th><td>            x = <span class='error' title="use of undeclared identifier &apos;std&apos;">std</span>::numeric_limits&lt;<span class='error' title="unexpected type name &apos;G4double&apos;: expected expression">G4double</span>&gt;::<span class='error' title="no member named &apos;infinity&apos; in the global namespace">infinity</span>();</td></tr>
+<tr><th id="220">220</th><td>    <b>if</b> (<a class="local col9 ref" href="#1149initial_x" title='initial_x' data-ref="1149initial_x">initial_x</a> &lt; -<span class="namespace">G4ExpConsts::</span><a class="ref" href="#G4ExpConsts::EXP_LIMIT" title='G4ExpConsts::EXP_LIMIT' data-ref="G4ExpConsts::EXP_LIMIT">EXP_LIMIT</a>)</td></tr>
+<tr><th id="221">221</th><td>            <a class="local col0 ref" href="#1150x" title='x' data-ref="1150x">x</a> = <var>0.</var>;</td></tr>
+<tr><th id="222">222</th><td></td></tr>
+<tr><th id="223">223</th><td>    <b>return</b> <a class="local col0 ref" href="#1150x" title='x' data-ref="1150x">x</a>;</td></tr>
+<tr><th id="224">224</th><td>}</td></tr>
+<tr><th id="225">225</th><td></td></tr>
+<tr><th id="226">226</th><td><i>// Exp single precision --------------------------------------------------------</i></td></tr>
+<tr><th id="227">227</th><td><i></i></td></tr>
+<tr><th id="228">228</th><td><i>/// Exponential Function single precision</i></td></tr>
+<tr><th id="229">229</th><td><b>inline</b> <a class="typedef" href="G4Types.hh.html#G4float" title='G4float' data-type='float' data-ref="G4float">G4float</a> <dfn class="decl def" id="_Z6G4Expff" title='G4Expf' data-ref="_Z6G4Expff">G4Expf</dfn>(<a class="typedef" href="G4Types.hh.html#G4float" title='G4float' data-type='float' data-ref="G4float">G4float</a> <dfn class="local col5 decl" id="1155initial_x" title='initial_x' data-type='G4float' data-ref="1155initial_x">initial_x</dfn>)</td></tr>
+<tr><th id="230">230</th><td>{</td></tr>
+<tr><th id="231">231</th><td>    <a class="typedef" href="G4Types.hh.html#G4float" title='G4float' data-type='float' data-ref="G4float">G4float</a> <dfn class="local col6 decl" id="1156x" title='x' data-type='G4float' data-ref="1156x">x</dfn> = <a class="local col5 ref" href="#1155initial_x" title='initial_x' data-ref="1155initial_x">initial_x</a>;</td></tr>
+<tr><th id="232">232</th><td></td></tr>
+<tr><th id="233">233</th><td>    <a class="typedef" href="G4Types.hh.html#G4float" title='G4float' data-type='float' data-ref="G4float">G4float</a> <dfn class="local col7 decl" id="1157z" title='z' data-type='G4float' data-ref="1157z">z</dfn> = <span class="namespace">G4ExpConsts::</span><a class="ref" href="#_ZN11G4ExpConsts7fpfloorEf" title='G4ExpConsts::fpfloor' data-ref="_ZN11G4ExpConsts7fpfloorEf">fpfloor</a>( <span class="namespace">G4ExpConsts::</span><a class="ref" href="#G4ExpConsts::LOG2EF" title='G4ExpConsts::LOG2EF' data-ref="G4ExpConsts::LOG2EF">LOG2EF</a> * <a class="local col6 ref" href="#1156x" title='x' data-ref="1156x">x</a> +<var>0.5f</var> ); <i>/* std::floor() truncates toward -infinity. */</i></td></tr>
+<tr><th id="234">234</th><td></td></tr>
+<tr><th id="235">235</th><td>    <a class="local col6 ref" href="#1156x" title='x' data-ref="1156x">x</a> -= <a class="local col7 ref" href="#1157z" title='z' data-ref="1157z">z</a> * <span class="namespace">G4ExpConsts::</span><a class="ref" href="#G4ExpConsts::C1F" title='G4ExpConsts::C1F' data-ref="G4ExpConsts::C1F">C1F</a>;</td></tr>
+<tr><th id="236">236</th><td>    <a class="local col6 ref" href="#1156x" title='x' data-ref="1156x">x</a> -= <a class="local col7 ref" href="#1157z" title='z' data-ref="1157z">z</a> * <span class="namespace">G4ExpConsts::</span><a class="ref" href="#G4ExpConsts::C2F" title='G4ExpConsts::C2F' data-ref="G4ExpConsts::C2F">C2F</a>;</td></tr>
+<tr><th id="237">237</th><td>    <em>const</em> <span class='typedef' title='int32_t' data-type='int' data-ref="int32_t">int32_t</span> <dfn class="local col8 decl" id="1158n" title='n' data-type='const int32_t' data-ref="1158n">n</dfn> = <span class='typedef' title='int32_t' data-type='int' data-ref="int32_t">int32_t</span> ( <a class="local col7 ref" href="#1157z" title='z' data-ref="1157z">z</a> );</td></tr>
+<tr><th id="238">238</th><td></td></tr>
+<tr><th id="239">239</th><td>    <em>const</em> <a class="typedef" href="G4Types.hh.html#G4float" title='G4float' data-type='float' data-ref="G4float">G4float</a> <dfn class="local col9 decl" id="1159x2" title='x2' data-type='const G4float' data-ref="1159x2">x2</dfn> = <a class="local col6 ref" href="#1156x" title='x' data-ref="1156x">x</a> * <a class="local col6 ref" href="#1156x" title='x' data-ref="1156x">x</a>;</td></tr>
+<tr><th id="240">240</th><td></td></tr>
+<tr><th id="241">241</th><td>    <a class="local col7 ref" href="#1157z" title='z' data-ref="1157z">z</a> = <a class="local col6 ref" href="#1156x" title='x' data-ref="1156x">x</a>*<span class="namespace">G4ExpConsts::</span><a class="ref" href="#G4ExpConsts::PX1expf" title='G4ExpConsts::PX1expf' data-ref="G4ExpConsts::PX1expf">PX1expf</a>;</td></tr>
+<tr><th id="242">242</th><td>    <a class="local col7 ref" href="#1157z" title='z' data-ref="1157z">z</a> += <span class="namespace">G4ExpConsts::</span><a class="ref" href="#G4ExpConsts::PX2expf" title='G4ExpConsts::PX2expf' data-ref="G4ExpConsts::PX2expf">PX2expf</a>;</td></tr>
+<tr><th id="243">243</th><td>    <a class="local col7 ref" href="#1157z" title='z' data-ref="1157z">z</a> *= <a class="local col6 ref" href="#1156x" title='x' data-ref="1156x">x</a>;</td></tr>
+<tr><th id="244">244</th><td>    <a class="local col7 ref" href="#1157z" title='z' data-ref="1157z">z</a> += <span class="namespace">G4ExpConsts::</span><a class="ref" href="#G4ExpConsts::PX3expf" title='G4ExpConsts::PX3expf' data-ref="G4ExpConsts::PX3expf">PX3expf</a>;</td></tr>
+<tr><th id="245">245</th><td>    <a class="local col7 ref" href="#1157z" title='z' data-ref="1157z">z</a> *= <a class="local col6 ref" href="#1156x" title='x' data-ref="1156x">x</a>;</td></tr>
+<tr><th id="246">246</th><td>    <a class="local col7 ref" href="#1157z" title='z' data-ref="1157z">z</a> += <span class="namespace">G4ExpConsts::</span><a class="ref" href="#G4ExpConsts::PX4expf" title='G4ExpConsts::PX4expf' data-ref="G4ExpConsts::PX4expf">PX4expf</a>;</td></tr>
+<tr><th id="247">247</th><td>    <a class="local col7 ref" href="#1157z" title='z' data-ref="1157z">z</a> *= <a class="local col6 ref" href="#1156x" title='x' data-ref="1156x">x</a>;</td></tr>
+<tr><th id="248">248</th><td>    <a class="local col7 ref" href="#1157z" title='z' data-ref="1157z">z</a> += <span class="namespace">G4ExpConsts::</span><a class="ref" href="#G4ExpConsts::PX5expf" title='G4ExpConsts::PX5expf' data-ref="G4ExpConsts::PX5expf">PX5expf</a>;</td></tr>
+<tr><th id="249">249</th><td>    <a class="local col7 ref" href="#1157z" title='z' data-ref="1157z">z</a> *= <a class="local col6 ref" href="#1156x" title='x' data-ref="1156x">x</a>;</td></tr>
+<tr><th id="250">250</th><td>    <a class="local col7 ref" href="#1157z" title='z' data-ref="1157z">z</a> += <span class="namespace">G4ExpConsts::</span><a class="ref" href="#G4ExpConsts::PX6expf" title='G4ExpConsts::PX6expf' data-ref="G4ExpConsts::PX6expf">PX6expf</a>;</td></tr>
+<tr><th id="251">251</th><td>    <a class="local col7 ref" href="#1157z" title='z' data-ref="1157z">z</a> *= <a class="local col9 ref" href="#1159x2" title='x2' data-ref="1159x2">x2</a>;</td></tr>
+<tr><th id="252">252</th><td>    <a class="local col7 ref" href="#1157z" title='z' data-ref="1157z">z</a> += <a class="local col6 ref" href="#1156x" title='x' data-ref="1156x">x</a> + <var>1.0f</var>;</td></tr>
+<tr><th id="253">253</th><td></td></tr>
+<tr><th id="254">254</th><td>    <i>/* multiply by power of 2 */</i></td></tr>
+<tr><th id="255">255</th><td>    <a class="local col7 ref" href="#1157z" title='z' data-ref="1157z">z</a> *=  <span class="namespace">G4ExpConsts::</span><a class="ref" href="#_ZN11G4ExpConsts9uint322spEi" title='G4ExpConsts::uint322sp' data-ref="_ZN11G4ExpConsts9uint322spEi">uint322sp</a>((<a class="local col8 ref" href="#1158n" title='n' data-ref="1158n">n</a>+<var>0x7f</var>)&lt;&lt;<var>23</var>);</td></tr>
+<tr><th id="256">256</th><td></td></tr>
+<tr><th id="257">257</th><td>    <b>if</b> (initial_x &gt; G4ExpConsts::MAXLOGF) z=<span class='error' title="use of undeclared identifier &apos;std&apos;">std</span>::numeric_limits&lt;<span class='error' title="unexpected type name &apos;G4float&apos;: expected expression">G4float</span>&gt;::<span class='error' title="no member named &apos;infinity&apos; in the global namespace">infinity</span>();</td></tr>
+<tr><th id="258">258</th><td>    <b>if</b> (<a class="local col5 ref" href="#1155initial_x" title='initial_x' data-ref="1155initial_x">initial_x</a> &lt; <span class="namespace">G4ExpConsts::</span><a class="ref" href="#G4ExpConsts::MINLOGF" title='G4ExpConsts::MINLOGF' data-ref="G4ExpConsts::MINLOGF">MINLOGF</a>) <a class="local col7 ref" href="#1157z" title='z' data-ref="1157z">z</a>=<var>0.f</var>;</td></tr>
+<tr><th id="259">259</th><td></td></tr>
+<tr><th id="260">260</th><td>    <b>return</b> <a class="local col7 ref" href="#1157z" title='z' data-ref="1157z">z</a>;</td></tr>
+<tr><th id="261">261</th><td>}</td></tr>
+<tr><th id="262">262</th><td></td></tr>
+<tr><th id="263">263</th><td><i>//------------------------------------------------------------------------------</i></td></tr>
+<tr><th id="264">264</th><td></td></tr>
+<tr><th id="265">265</th><td><em>void</em> <dfn class="decl" id="_Z4expvjPKdPd" title='expv' data-ref="_Z4expvjPKdPd">expv</dfn>(<em>const</em> <span class='typedef' title='uint32_t' data-type='unsigned int' data-ref="uint32_t">uint32_t</span> <dfn class="local col0 decl" id="1160size" title='size' data-type='const uint32_t' data-ref="1160size">size</dfn>, <a class="typedef" href="G4Types.hh.html#G4double" title='G4double' data-type='double' data-ref="G4double">G4double</a> <em>const</em> * <b>__restrict__</b> <dfn class="local col1 decl" id="1161iarray" title='iarray' data-type='const G4double *__restrict' data-ref="1161iarray">iarray</dfn>, <a class="typedef" href="G4Types.hh.html#G4double" title='G4double' data-type='double' data-ref="G4double">G4double</a>* <b>__restrict__</b> <dfn class="local col2 decl" id="1162oarray" title='oarray' data-type='G4double *__restrict' data-ref="1162oarray">oarray</dfn>);</td></tr>
+<tr><th id="266">266</th><td><em>void</em> <dfn class="decl" id="_Z6G4ExpvjPKdPd" title='G4Expv' data-ref="_Z6G4ExpvjPKdPd">G4Expv</dfn>(<em>const</em> <span class='typedef' title='uint32_t' data-type='unsigned int' data-ref="uint32_t">uint32_t</span> <dfn class="local col3 decl" id="1163size" title='size' data-type='const uint32_t' data-ref="1163size">size</dfn>, <a class="typedef" href="G4Types.hh.html#G4double" title='G4double' data-type='double' data-ref="G4double">G4double</a> <em>const</em> * <b>__restrict__</b> <dfn class="local col4 decl" id="1164iarray" title='iarray' data-type='const G4double *__restrict' data-ref="1164iarray">iarray</dfn>, <a class="typedef" href="G4Types.hh.html#G4double" title='G4double' data-type='double' data-ref="G4double">G4double</a>* <b>__restrict__</b> <dfn class="local col5 decl" id="1165oarray" title='oarray' data-type='G4double *__restrict' data-ref="1165oarray">oarray</dfn>);</td></tr>
+<tr><th id="267">267</th><td><em>void</em> <dfn class="decl" id="_Z5expfvjPKfPf" title='expfv' data-ref="_Z5expfvjPKfPf">expfv</dfn>(<em>const</em> <span class='typedef' title='uint32_t' data-type='unsigned int' data-ref="uint32_t">uint32_t</span> <dfn class="local col6 decl" id="1166size" title='size' data-type='const uint32_t' data-ref="1166size">size</dfn>, <a class="typedef" href="G4Types.hh.html#G4float" title='G4float' data-type='float' data-ref="G4float">G4float</a> <em>const</em> * <b>__restrict__</b> <dfn class="local col7 decl" id="1167iarray" title='iarray' data-type='const G4float *__restrict' data-ref="1167iarray">iarray</dfn>, <a class="typedef" href="G4Types.hh.html#G4float" title='G4float' data-type='float' data-ref="G4float">G4float</a>* <b>__restrict__</b> <dfn class="local col8 decl" id="1168oarray" title='oarray' data-type='G4float *__restrict' data-ref="1168oarray">oarray</dfn>);</td></tr>
+<tr><th id="268">268</th><td><em>void</em> <dfn class="decl" id="_Z7G4ExpfvjPKfPf" title='G4Expfv' data-ref="_Z7G4ExpfvjPKfPf">G4Expfv</dfn>(<em>const</em> <span class='typedef' title='uint32_t' data-type='unsigned int' data-ref="uint32_t">uint32_t</span> <dfn class="local col9 decl" id="1169size" title='size' data-type='const uint32_t' data-ref="1169size">size</dfn>, <a class="typedef" href="G4Types.hh.html#G4float" title='G4float' data-type='float' data-ref="G4float">G4float</a> <em>const</em> * <b>__restrict__</b> <dfn class="local col0 decl" id="1170iarray" title='iarray' data-type='const G4float *__restrict' data-ref="1170iarray">iarray</dfn>, <a class="typedef" href="G4Types.hh.html#G4float" title='G4float' data-type='float' data-ref="G4float">G4float</a>* <b>__restrict__</b> <dfn class="local col1 decl" id="1171oarray" title='oarray' data-type='G4float *__restrict' data-ref="1171oarray">oarray</dfn>);</td></tr>
+<tr><th id="269">269</th><td></td></tr>
+<tr><th id="270">270</th><td><u>#<span data-ppcond="63">endif</span> /* WIN32 */</u></td></tr>
+<tr><th id="271">271</th><td></td></tr>
+<tr><th id="272">272</th><td><u>#<span data-ppcond="60">endif</span></u></td></tr>
+<tr><th id="273">273</th><td></td></tr>
+</table><hr/><p id='footer'>
+Generated while processing <a href='../../../digits_hits/detector/src/G4CellScoreComposer.cc.html'>codebrowser/source/digits_hits/detector/src/G4CellScoreComposer.cc</a><br/>Generated on <em>2019-Aug-28</em> from project codebrowser<br />Powered by <a href='https://woboq.com'><img alt='Woboq' src='https://code.woboq.org/woboq-16.png' width='41' height='16' /></a> <a href='https://code.woboq.org'>Code Browser</a> 2.1
+<br/>Generator usage only permitted with license.</p>
+</div></body></html>

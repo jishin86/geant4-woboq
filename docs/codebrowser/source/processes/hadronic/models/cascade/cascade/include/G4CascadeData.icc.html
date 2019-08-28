@@ -1,0 +1,179 @@
+<!doctype html>
+<html>
+<head>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"><title>G4CascadeData.icc source code [codebrowser/source/processes/hadronic/models/cascade/cascade/include/G4CascadeData.icc] - Woboq Code Browser</title>
+<link rel="stylesheet" href="../../../../../../../../../data/qtcreator.css" title="QtCreator"/>
+<link rel="alternate stylesheet" href="../../../../../../../../../data/kdevelop.css" title="KDevelop"/>
+<script type="text/javascript" src="../../../../../../../../../data/jquery/jquery.min.js"></script>
+<script type="text/javascript" src="../../../../../../../../../data/jquery/jquery-ui.min.js"></script>
+<script>var file = 'codebrowser/source/processes/hadronic/models/cascade/cascade/include/G4CascadeData.icc'; var root_path = '../../../../../../../..'; var data_path = '../../../../../../../../../data';</script>
+<script src='../../../../../../../../../data/codebrowser.js'></script>
+</head>
+<body><div id='header'><h1 id='breadcrumb'><span>Browse the source code of </span><a href='../../../../../../..'>codebrowser</a>/<a href='../../../../../..'>source</a>/<a href='../../../../..'>processes</a>/<a href='../../../..'>hadronic</a>/<a href='../../..'>models</a>/<a href='../..'>cascade</a>/<a href='..'>cascade</a>/<a href='./'>include</a>/<a href='G4CascadeData.icc.html'>G4CascadeData.icc</a></h1></div>
+<hr/><div id='content'><table class="code">
+<tr><th id="1">1</th><td><i>//</i></td></tr>
+<tr><th id="2">2</th><td><i>// ********************************************************************</i></td></tr>
+<tr><th id="3">3</th><td><i>// * License and Disclaimer                                           *</i></td></tr>
+<tr><th id="4">4</th><td><i>// *                                                                  *</i></td></tr>
+<tr><th id="5">5</th><td><i>// * The  Geant4 software  is  copyright of the Copyright Holders  of *</i></td></tr>
+<tr><th id="6">6</th><td><i>// * the Geant4 Collaboration.  It is provided  under  the terms  and *</i></td></tr>
+<tr><th id="7">7</th><td><i>// * conditions of the Geant4 Software License,  included in the file *</i></td></tr>
+<tr><th id="8">8</th><td><i>// * LICENSE and available at  <a href="http://cern.ch/geant4/license">http://cern.ch/geant4/license</a> .  These *</i></td></tr>
+<tr><th id="9">9</th><td><i>// * include a list of copyright holders.                             *</i></td></tr>
+<tr><th id="10">10</th><td><i>// *                                                                  *</i></td></tr>
+<tr><th id="11">11</th><td><i>// * Neither the authors of this software system, nor their employing *</i></td></tr>
+<tr><th id="12">12</th><td><i>// * institutes,nor the agencies providing financial support for this *</i></td></tr>
+<tr><th id="13">13</th><td><i>// * work  make  any representation or  warranty, express or implied, *</i></td></tr>
+<tr><th id="14">14</th><td><i>// * regarding  this  software system or assume any liability for its *</i></td></tr>
+<tr><th id="15">15</th><td><i>// * use.  Please see the license in the file  LICENSE  and URL above *</i></td></tr>
+<tr><th id="16">16</th><td><i>// * for the full disclaimer and the limitation of liability.         *</i></td></tr>
+<tr><th id="17">17</th><td><i>// *                                                                  *</i></td></tr>
+<tr><th id="18">18</th><td><i>// * This  code  implementation is the result of  the  scientific and *</i></td></tr>
+<tr><th id="19">19</th><td><i>// * technical work of the GEANT4 collaboration.                      *</i></td></tr>
+<tr><th id="20">20</th><td><i>// * By using,  copying,  modifying or  distributing the software (or *</i></td></tr>
+<tr><th id="21">21</th><td><i>// * any work based  on the software)  you  agree  to acknowledge its *</i></td></tr>
+<tr><th id="22">22</th><td><i>// * use  in  resulting  scientific  publications,  and indicate your *</i></td></tr>
+<tr><th id="23">23</th><td><i>// * acceptance of all terms of the Geant4 Software license.          *</i></td></tr>
+<tr><th id="24">24</th><td><i>// ********************************************************************</i></td></tr>
+<tr><th id="25">25</th><td><i>//</i></td></tr>
+<tr><th id="26">26</th><td><i>//</i></td></tr>
+<tr><th id="27">27</th><td><i>// 20100803  M. Kelsey -- Move implementations to this .icc file.  Use name</i></td></tr>
+<tr><th id="28">28</th><td><i>//		string to report output</i></td></tr>
+<tr><th id="29">29</th><td><i>// 20110718  M. Kelsey -- Add inelastic cross-section sum to deal with</i></td></tr>
+<tr><th id="30">30</th><td><i>//		suppressing elastic scattering off free nucleons (hydrogen)</i></td></tr>
+<tr><th id="31">31</th><td><i>// 20110719  M. Kelsey -- Add ctor argument for two-body initial state</i></td></tr>
+<tr><th id="32">32</th><td><i>// 20110725  M. Kelsey -- Save initial state as data member</i></td></tr>
+<tr><th id="33">33</th><td><i>// 20110728  M. Kelsey -- Fix Coverity #22954, recursive #include.</i></td></tr>
+<tr><th id="34">34</th><td><i>// 20110923  M. Kelsey -- Add optional ostream&amp; argument to print() fns,</i></td></tr>
+<tr><th id="35">35</th><td><i>//		drop all "inline" keywords</i></td></tr>
+<tr><th id="36">36</th><td><i>// 20120608  M. Kelsey -- Fix variable-name "shadowing" compiler warnings.</i></td></tr>
+<tr><th id="37">37</th><td><i>// 20130627  M. Kelsey -- Use new function to print particle name strings.</i></td></tr>
+<tr><th id="38">38</th><td></td></tr>
+<tr><th id="39">39</th><td><u>#<span data-ppcond="39">ifndef</span> <span class="macro" data-ref="_M/G4_CASCADE_DATA_ICC">G4_CASCADE_DATA_ICC</span></u></td></tr>
+<tr><th id="40">40</th><td><u>#define <dfn class="macro" id="_M/G4_CASCADE_DATA_ICC" data-ref="_M/G4_CASCADE_DATA_ICC">G4_CASCADE_DATA_ICC</dfn></u></td></tr>
+<tr><th id="41">41</th><td></td></tr>
+<tr><th id="42">42</th><td><u>#include <a href="G4InuclParticleNames.hh.html">"G4InuclParticleNames.hh"</a></u></td></tr>
+<tr><th id="43">43</th><td><u>#include <span class='error' title="&apos;iostream&apos; file not found">&lt;</span>iostream&gt;</u></td></tr>
+<tr><th id="44">44</th><td><u>#include &lt;iomanip&gt;</u></td></tr>
+<tr><th id="45">45</th><td></td></tr>
+<tr><th id="46">46</th><td></td></tr>
+<tr><th id="47">47</th><td><i>// Fill cumulative cross-section arrays from input data</i></td></tr>
+<tr><th id="48">48</th><td><b>template</b> &lt;<em>int</em> NE,<em>int</em> N2,<em>int</em> N3,<em>int</em> N4,<em>int</em> N5,<em>int</em> N6,<em>int</em> N7,<em>int</em> N8,<em>int</em> N9&gt;</td></tr>
+<tr><th id="49">49</th><td><em>void</em> <a class="type" href="G4CascadeData.hh.html#G4CascadeData" title='G4CascadeData' data-ref="G4CascadeData">G4CascadeData</a>&lt;<a class="tu ref" href="#NE" title='NE' data-ref="NE">NE</a>,<a class="tu ref" href="#N2" title='N2' data-ref="N2">N2</a>,<a class="tu ref" href="#N3" title='N3' data-ref="N3">N3</a>,<a class="tu ref" href="#N4" title='N4' data-ref="N4">N4</a>,<a class="tu ref" href="#N5" title='N5' data-ref="N5">N5</a>,<a class="tu ref" href="#N6" title='N6' data-ref="N6">N6</a>,<a class="tu ref" href="#N7" title='N7' data-ref="N7">N7</a>,<a class="tu ref" href="#N8" title='N8' data-ref="N8">N8</a>,<a class="tu ref" href="#N9" title='N9' data-ref="N9">N9</a>&gt;::<dfn class="decl def" id="_ZN13G4CascadeData10initializeEv" title='G4CascadeData::initialize' data-ref="_ZN13G4CascadeData10initializeEv">initialize</dfn>() {</td></tr>
+<tr><th id="50">50</th><td>  <i>// Initialize index offsets for cross-section array (can't do globally)</i></td></tr>
+<tr><th id="51">51</th><td>  <a class="member" href="G4CascadeData.hh.html#G4CascadeData::index" title='G4CascadeData::index' data-ref="G4CascadeData::index">index</a>[<var>0</var>] = <var>0</var>;   <a class="member" href="G4CascadeData.hh.html#G4CascadeData::index" title='G4CascadeData::index' data-ref="G4CascadeData::index">index</a>[<var>1</var>] = <a class="enum" href="G4CascadeData.hh.html#G4CascadeData::N02" title='G4CascadeData::N02' data-ref="G4CascadeData::N02">N02</a>; <a class="member" href="G4CascadeData.hh.html#G4CascadeData::index" title='G4CascadeData::index' data-ref="G4CascadeData::index">index</a>[<var>2</var>] = <a class="enum" href="G4CascadeData.hh.html#G4CascadeData::N23" title='G4CascadeData::N23' data-ref="G4CascadeData::N23">N23</a>; <a class="member" href="G4CascadeData.hh.html#G4CascadeData::index" title='G4CascadeData::index' data-ref="G4CascadeData::index">index</a>[<var>3</var>] = <a class="enum" href="G4CascadeData.hh.html#G4CascadeData::N24" title='G4CascadeData::N24' data-ref="G4CascadeData::N24">N24</a>;</td></tr>
+<tr><th id="52">52</th><td>  <a class="member" href="G4CascadeData.hh.html#G4CascadeData::index" title='G4CascadeData::index' data-ref="G4CascadeData::index">index</a>[<var>4</var>] = <a class="enum" href="G4CascadeData.hh.html#G4CascadeData::N25" title='G4CascadeData::N25' data-ref="G4CascadeData::N25">N25</a>; <a class="member" href="G4CascadeData.hh.html#G4CascadeData::index" title='G4CascadeData::index' data-ref="G4CascadeData::index">index</a>[<var>5</var>] = <a class="enum" href="G4CascadeData.hh.html#G4CascadeData::N26" title='G4CascadeData::N26' data-ref="G4CascadeData::N26">N26</a>; <a class="member" href="G4CascadeData.hh.html#G4CascadeData::index" title='G4CascadeData::index' data-ref="G4CascadeData::index">index</a>[<var>6</var>] = <a class="enum" href="G4CascadeData.hh.html#G4CascadeData::N27" title='G4CascadeData::N27' data-ref="G4CascadeData::N27">N27</a>; <a class="member" href="G4CascadeData.hh.html#G4CascadeData::index" title='G4CascadeData::index' data-ref="G4CascadeData::index">index</a>[<var>7</var>] = <a class="enum" href="G4CascadeData.hh.html#G4CascadeData::N28" title='G4CascadeData::N28' data-ref="G4CascadeData::N28">N28</a>;</td></tr>
+<tr><th id="53">53</th><td>  <a class="member" href="G4CascadeData.hh.html#G4CascadeData::index" title='G4CascadeData::index' data-ref="G4CascadeData::index">index</a>[<var>8</var>] = <a class="enum" href="G4CascadeData.hh.html#G4CascadeData::N29" title='G4CascadeData::N29' data-ref="G4CascadeData::N29">N29</a>;</td></tr>
+<tr><th id="54">54</th><td></td></tr>
+<tr><th id="55">55</th><td>  <i>// Initialize multiplicity array</i></td></tr>
+<tr><th id="56">56</th><td>  <b>for</b> (<a class="typedef" href="../../../../../../global/management/include/G4Types.hh.html#G4int" title='G4int' data-type='int' data-ref="G4int">G4int</a> <dfn class="local col2 decl" id="102im" title='im' data-type='G4int' data-ref="102im">im</dfn> = <var>0</var>; <a class="local col2 ref" href="#102im" title='im' data-ref="102im">im</a> &lt; <a class="enum" href="G4CascadeData.hh.html#G4CascadeData::NM" title='G4CascadeData::NM' data-ref="G4CascadeData::NM">NM</a>; <a class="local col2 ref" href="#102im" title='im' data-ref="102im">im</a>++) {</td></tr>
+<tr><th id="57">57</th><td>    <a class="typedef" href="../../../../../../global/management/include/G4Types.hh.html#G4int" title='G4int' data-type='int' data-ref="G4int">G4int</a> <dfn class="local col3 decl" id="103start" title='start' data-type='G4int' data-ref="103start">start</dfn> = <a class="member" href="G4CascadeData.hh.html#G4CascadeData::index" title='G4CascadeData::index' data-ref="G4CascadeData::index">index</a>[<a class="local col2 ref" href="#102im" title='im' data-ref="102im">im</a>];</td></tr>
+<tr><th id="58">58</th><td>    <a class="typedef" href="../../../../../../global/management/include/G4Types.hh.html#G4int" title='G4int' data-type='int' data-ref="G4int">G4int</a> <dfn class="local col4 decl" id="104stop" title='stop' data-type='G4int' data-ref="104stop">stop</dfn> = <a class="member" href="G4CascadeData.hh.html#G4CascadeData::index" title='G4CascadeData::index' data-ref="G4CascadeData::index">index</a>[<a class="local col2 ref" href="#102im" title='im' data-ref="102im">im</a>+<var>1</var>];</td></tr>
+<tr><th id="59">59</th><td>    <b>for</b> (<a class="typedef" href="../../../../../../global/management/include/G4Types.hh.html#G4int" title='G4int' data-type='int' data-ref="G4int">G4int</a> <dfn class="local col5 decl" id="105k" title='k' data-type='G4int' data-ref="105k">k</dfn> = <var>0</var>; <a class="local col5 ref" href="#105k" title='k' data-ref="105k">k</a> &lt; <a class="tu ref" href="#NE" title='NE' data-use='r' data-ref="NE">NE</a>; <a class="local col5 ref" href="#105k" title='k' data-ref="105k">k</a>++) {</td></tr>
+<tr><th id="60">60</th><td>      <a class="member" href="G4CascadeData.hh.html#G4CascadeData::multiplicities" title='G4CascadeData::multiplicities' data-ref="G4CascadeData::multiplicities">multiplicities</a>[<a class="local col2 ref" href="#102im" title='im' data-ref="102im">im</a>][<a class="local col5 ref" href="#105k" title='k' data-ref="105k">k</a>] = <var>0.0</var>;</td></tr>
+<tr><th id="61">61</th><td>      <b>for</b> (<a class="typedef" href="../../../../../../global/management/include/G4Types.hh.html#G4int" title='G4int' data-type='int' data-ref="G4int">G4int</a> <dfn class="local col6 decl" id="106i" title='i' data-type='G4int' data-ref="106i">i</dfn> = <a class="local col3 ref" href="#103start" title='start' data-ref="103start">start</a>; <a class="local col6 ref" href="#106i" title='i' data-ref="106i">i</a> &lt; <a class="local col4 ref" href="#104stop" title='stop' data-ref="104stop">stop</a>; <a class="local col6 ref" href="#106i" title='i' data-ref="106i">i</a>++) {</td></tr>
+<tr><th id="62">62</th><td> 	<a class="member" href="G4CascadeData.hh.html#G4CascadeData::multiplicities" title='G4CascadeData::multiplicities' data-ref="G4CascadeData::multiplicities">multiplicities</a>[<a class="local col2 ref" href="#102im" title='im' data-ref="102im">im</a>][<a class="local col5 ref" href="#105k" title='k' data-ref="105k">k</a>] += <a class="member" href="G4CascadeData.hh.html#G4CascadeData::crossSections" title='G4CascadeData::crossSections' data-ref="G4CascadeData::crossSections">crossSections</a>[<a class="local col6 ref" href="#106i" title='i' data-ref="106i">i</a>][<a class="local col5 ref" href="#105k" title='k' data-ref="105k">k</a>];</td></tr>
+<tr><th id="63">63</th><td>      }</td></tr>
+<tr><th id="64">64</th><td>    }</td></tr>
+<tr><th id="65">65</th><td>  }</td></tr>
+<tr><th id="66">66</th><td></td></tr>
+<tr><th id="67">67</th><td>  <i>// Initialize total cross section arrays</i></td></tr>
+<tr><th id="68">68</th><td>  <b>for</b> (<a class="typedef" href="../../../../../../global/management/include/G4Types.hh.html#G4int" title='G4int' data-type='int' data-ref="G4int">G4int</a> <dfn class="local col7 decl" id="107k" title='k' data-type='G4int' data-ref="107k">k</dfn> = <var>0</var>; <a class="local col7 ref" href="#107k" title='k' data-ref="107k">k</a> &lt; <a class="tu ref" href="#NE" title='NE' data-use='r' data-ref="NE">NE</a>; <a class="local col7 ref" href="#107k" title='k' data-ref="107k">k</a>++) {</td></tr>
+<tr><th id="69">69</th><td>    <a class="member" href="G4CascadeData.hh.html#G4CascadeData::sum" title='G4CascadeData::sum' data-ref="G4CascadeData::sum">sum</a>[<a class="local col7 ref" href="#107k" title='k' data-ref="107k">k</a>] = <var>0.0</var>;</td></tr>
+<tr><th id="70">70</th><td>    <b>for</b> (<a class="typedef" href="../../../../../../global/management/include/G4Types.hh.html#G4int" title='G4int' data-type='int' data-ref="G4int">G4int</a> <dfn class="local col8 decl" id="108im" title='im' data-type='G4int' data-ref="108im">im</dfn> = <var>0</var>; <a class="local col8 ref" href="#108im" title='im' data-ref="108im">im</a> &lt; <a class="enum" href="G4CascadeData.hh.html#G4CascadeData::NM" title='G4CascadeData::NM' data-ref="G4CascadeData::NM">NM</a>; <a class="local col8 ref" href="#108im" title='im' data-ref="108im">im</a>++) {</td></tr>
+<tr><th id="71">71</th><td>      <a class="member" href="G4CascadeData.hh.html#G4CascadeData::sum" title='G4CascadeData::sum' data-ref="G4CascadeData::sum">sum</a>[<a class="local col7 ref" href="#107k" title='k' data-ref="107k">k</a>] += <a class="member" href="G4CascadeData.hh.html#G4CascadeData::multiplicities" title='G4CascadeData::multiplicities' data-ref="G4CascadeData::multiplicities">multiplicities</a>[<a class="local col8 ref" href="#108im" title='im' data-ref="108im">im</a>][<a class="local col7 ref" href="#107k" title='k' data-ref="107k">k</a>];</td></tr>
+<tr><th id="72">72</th><td>    }</td></tr>
+<tr><th id="73">73</th><td>  }</td></tr>
+<tr><th id="74">74</th><td></td></tr>
+<tr><th id="75">75</th><td>  <i>// Identify elastic scattering channel and subtract from inclusive</i></td></tr>
+<tr><th id="76">76</th><td>  <a class="typedef" href="../../../../../../global/management/include/G4Types.hh.html#G4int" title='G4int' data-type='int' data-ref="G4int">G4int</a> <dfn class="local col9 decl" id="109i2b" title='i2b' data-type='G4int' data-ref="109i2b">i2b</dfn> = <var>0</var>;</td></tr>
+<tr><th id="77">77</th><td>  <b>for</b> (<a class="local col9 ref" href="#109i2b" title='i2b' data-ref="109i2b">i2b</a>=<a class="member" href="G4CascadeData.hh.html#G4CascadeData::index" title='G4CascadeData::index' data-ref="G4CascadeData::index">index</a>[<var>0</var>]; <a class="local col9 ref" href="#109i2b" title='i2b' data-ref="109i2b">i2b</a>&lt;<a class="member" href="G4CascadeData.hh.html#G4CascadeData::index" title='G4CascadeData::index' data-ref="G4CascadeData::index">index</a>[<var>1</var>]; <a class="local col9 ref" href="#109i2b" title='i2b' data-ref="109i2b">i2b</a>++) {</td></tr>
+<tr><th id="78">78</th><td>    <b>if</b> (<a class="member" href="G4CascadeData.hh.html#G4CascadeData::x2bfs" title='G4CascadeData::x2bfs' data-ref="G4CascadeData::x2bfs">x2bfs</a>[<a class="local col9 ref" href="#109i2b" title='i2b' data-ref="109i2b">i2b</a>][<var>0</var>]*<a class="member" href="G4CascadeData.hh.html#G4CascadeData::x2bfs" title='G4CascadeData::x2bfs' data-ref="G4CascadeData::x2bfs">x2bfs</a>[<a class="local col9 ref" href="#109i2b" title='i2b' data-ref="109i2b">i2b</a>][<var>1</var>] == <a class="member" href="G4CascadeData.hh.html#G4CascadeData::initialState" title='G4CascadeData::initialState' data-ref="G4CascadeData::initialState">initialState</a>) <b>break</b>;	<i>// Found it</i></td></tr>
+<tr><th id="79">79</th><td>  }</td></tr>
+<tr><th id="80">80</th><td></td></tr>
+<tr><th id="81">81</th><td>  <b>for</b> (<a class="typedef" href="../../../../../../global/management/include/G4Types.hh.html#G4int" title='G4int' data-type='int' data-ref="G4int">G4int</a> <dfn class="local col0 decl" id="110k" title='k' data-type='G4int' data-ref="110k">k</dfn> = <var>0</var>; <a class="local col0 ref" href="#110k" title='k' data-ref="110k">k</a> &lt; <a class="tu ref" href="#NE" title='NE' data-use='r' data-ref="NE">NE</a>; <a class="local col0 ref" href="#110k" title='k' data-ref="110k">k</a>++) {</td></tr>
+<tr><th id="82">82</th><td>    <b>if</b> (<a class="local col9 ref" href="#109i2b" title='i2b' data-ref="109i2b">i2b</a>&lt;<a class="member" href="G4CascadeData.hh.html#G4CascadeData::index" title='G4CascadeData::index' data-ref="G4CascadeData::index">index</a>[<var>1</var>]) <a class="member" href="G4CascadeData.hh.html#G4CascadeData::inelastic" title='G4CascadeData::inelastic' data-ref="G4CascadeData::inelastic">inelastic</a>[<a class="local col0 ref" href="#110k" title='k' data-ref="110k">k</a>] = <a class="member" href="G4CascadeData.hh.html#G4CascadeData::tot" title='G4CascadeData::tot' data-ref="G4CascadeData::tot">tot</a>[<a class="local col0 ref" href="#110k" title='k' data-ref="110k">k</a>] - <a class="member" href="G4CascadeData.hh.html#G4CascadeData::crossSections" title='G4CascadeData::crossSections' data-ref="G4CascadeData::crossSections">crossSections</a>[<a class="local col9 ref" href="#109i2b" title='i2b' data-ref="109i2b">i2b</a>][<a class="local col0 ref" href="#110k" title='k' data-ref="110k">k</a>];</td></tr>
+<tr><th id="83">83</th><td>    <b>else</b> <a class="member" href="G4CascadeData.hh.html#G4CascadeData::inelastic" title='G4CascadeData::inelastic' data-ref="G4CascadeData::inelastic">inelastic</a>[<a class="local col0 ref" href="#110k" title='k' data-ref="110k">k</a>] = <a class="member" href="G4CascadeData.hh.html#G4CascadeData::tot" title='G4CascadeData::tot' data-ref="G4CascadeData::tot">tot</a>[<a class="local col0 ref" href="#110k" title='k' data-ref="110k">k</a>];		<i>// FIXME:  No elastic channel in table!</i></td></tr>
+<tr><th id="84">84</th><td>  }</td></tr>
+<tr><th id="85">85</th><td>}</td></tr>
+<tr><th id="86">86</th><td></td></tr>
+<tr><th id="87">87</th><td></td></tr>
+<tr><th id="88">88</th><td><i>// Dump complete final state tables, all multiplicities</i></td></tr>
+<tr><th id="89">89</th><td><b>template</b> &lt;<em>int</em> NE,<em>int</em> N2,<em>int</em> N3,<em>int</em> N4,<em>int</em> N5,<em>int</em> N6,<em>int</em> N7,<em>int</em> N8,<em>int</em> N9&gt;</td></tr>
+<tr><th id="90">90</th><td><em>void</em> G4CascadeData&lt;NE,N2,N3,N4,N5,N6,N7,N8,N9&gt;::print(<span class='error' title="use of undeclared identifier &apos;std&apos;">std</span>::ostream&amp; os) <em>const</em> {</td></tr>
+<tr><th id="91">91</th><td>  os &lt;&lt; <q>"\n "</q> &lt;&lt; name &lt;&lt; <q>" Total cross section:"</q> &lt;&lt; <a class="macro" href="../../../../../../global/management/include/G4ios.hh.html#60" title="std::endl" data-ref="_M/G4endl">G4endl</a>;</td></tr>
+<tr><th id="92">92</th><td>  printXsec(tot, os);</td></tr>
+<tr><th id="93">93</th><td>  os &lt;&lt; <q>"\n Summed cross section:"</q> &lt;&lt; <a class="macro" href="../../../../../../global/management/include/G4ios.hh.html#60" title="std::endl" data-ref="_M/G4endl">G4endl</a>;</td></tr>
+<tr><th id="94">94</th><td>  printXsec(sum, os);</td></tr>
+<tr><th id="95">95</th><td>  os &lt;&lt; <q>"\n Inelastic cross section:"</q> &lt;&lt; <a class="macro" href="../../../../../../global/management/include/G4ios.hh.html#60" title="std::endl" data-ref="_M/G4endl">G4endl</a>;</td></tr>
+<tr><th id="96">96</th><td>  printXsec(inelastic, os);</td></tr>
+<tr><th id="97">97</th><td>  os &lt;&lt; <q>"\n Individual channel cross sections"</q> &lt;&lt; <a class="macro" href="../../../../../../global/management/include/G4ios.hh.html#60" title="std::endl" data-ref="_M/G4endl">G4endl</a>;</td></tr>
+<tr><th id="98">98</th><td>  </td></tr>
+<tr><th id="99">99</th><td>  <b>for</b> (<em>int</em> im=<var>2</var>; im&lt;NM+<var>2</var>; im++) print(im, os);</td></tr>
+<tr><th id="100">100</th><td>  <b>return</b>;</td></tr>
+<tr><th id="101">101</th><td>}</td></tr>
+<tr><th id="102">102</th><td></td></tr>
+<tr><th id="103">103</th><td><i>// Dump tables for specified multiplicity</i></td></tr>
+<tr><th id="104">104</th><td><b>template</b> &lt;<em>int</em> NE,<em>int</em> N2,<em>int</em> N3,<em>int</em> N4,<em>int</em> N5,<em>int</em> N6,<em>int</em> N7,<em>int</em> N8,<em>int</em> N9&gt;</td></tr>
+<tr><th id="105">105</th><td><em>void</em> G4CascadeData&lt;NE,N2,N3,N4,N5,N6,N7,N8,N9&gt;::</td></tr>
+<tr><th id="106">106</th><td>print(G4int mult, <span class='error' title="use of undeclared identifier &apos;std&apos;">std</span>::ostream&amp; os) <em>const</em> {</td></tr>
+<tr><th id="107">107</th><td>  <b>if</b> (mult &lt; <var>0</var>) {		<i>// Old interface used mult == -1 for all</i></td></tr>
+<tr><th id="108">108</th><td>    print(os);</td></tr>
+<tr><th id="109">109</th><td>    <b>return</b>;</td></tr>
+<tr><th id="110">110</th><td>  }</td></tr>
+<tr><th id="111">111</th><td></td></tr>
+<tr><th id="112">112</th><td>  G4int im = mult-<var>2</var>;		<i>// Convert multiplicity to array index</i></td></tr>
+<tr><th id="113">113</th><td></td></tr>
+<tr><th id="114">114</th><td>  G4int start = index[im];</td></tr>
+<tr><th id="115">115</th><td>  G4int stop = index[im+<var>1</var>];</td></tr>
+<tr><th id="116">116</th><td>  os &lt;&lt; <q>"\n Mulitplicity "</q> &lt;&lt; mult &lt;&lt; <q>" (indices "</q> &lt;&lt; start &lt;&lt; <q>" to "</q></td></tr>
+<tr><th id="117">117</th><td>	 &lt;&lt; stop-<var>1</var> &lt;&lt; <q>") summed cross section:"</q> &lt;&lt; <a class="macro" href="../../../../../../global/management/include/G4ios.hh.html#60" title="std::endl" data-ref="_M/G4endl">G4endl</a>;</td></tr>
+<tr><th id="118">118</th><td></td></tr>
+<tr><th id="119">119</th><td>  printXsec(multiplicities[im], os);</td></tr>
+<tr><th id="120">120</th><td>  </td></tr>
+<tr><th id="121">121</th><td>  <b>for</b> (G4int i=start; i&lt;stop; i++) {</td></tr>
+<tr><th id="122">122</th><td>    G4int ichan=i-start;</td></tr>
+<tr><th id="123">123</th><td>    os &lt;&lt; <q>"\n final state x"</q> &lt;&lt; mult &lt;&lt; <q>"bfs["</q> &lt;&lt; ichan &lt;&lt; <q>"] : "</q>;</td></tr>
+<tr><th id="124">124</th><td>    <b>for</b> (G4int fsi=<var>0</var>; fsi&lt;mult; fsi++) {</td></tr>
+<tr><th id="125">125</th><td>      <b>switch</b> (mult) {</td></tr>
+<tr><th id="126">126</th><td>      <b>case</b> <var>2</var>: os &lt;&lt; <q>" "</q> &lt;&lt; G4InuclParticleNames::nameShort(x2bfs[ichan][fsi]);</td></tr>
+<tr><th id="127">127</th><td>	<b>break</b>;</td></tr>
+<tr><th id="128">128</th><td>      <b>case</b> <var>3</var>: os &lt;&lt; <q>" "</q> &lt;&lt; G4InuclParticleNames::nameShort(x3bfs[ichan][fsi]);</td></tr>
+<tr><th id="129">129</th><td>	<b>break</b>;</td></tr>
+<tr><th id="130">130</th><td>      <b>case</b> <var>4</var>: os &lt;&lt; <q>" "</q> &lt;&lt; G4InuclParticleNames::nameShort(x4bfs[ichan][fsi]);</td></tr>
+<tr><th id="131">131</th><td>	<b>break</b>;</td></tr>
+<tr><th id="132">132</th><td>      <b>case</b> <var>5</var>: os &lt;&lt; <q>" "</q> &lt;&lt; G4InuclParticleNames::nameShort(x5bfs[ichan][fsi]);</td></tr>
+<tr><th id="133">133</th><td>	<b>break</b>;</td></tr>
+<tr><th id="134">134</th><td>      <b>case</b> <var>6</var>: os &lt;&lt; <q>" "</q> &lt;&lt; G4InuclParticleNames::nameShort(x6bfs[ichan][fsi]);</td></tr>
+<tr><th id="135">135</th><td>	<b>break</b>;</td></tr>
+<tr><th id="136">136</th><td>      <b>case</b> <var>7</var>: os &lt;&lt; <q>" "</q> &lt;&lt; G4InuclParticleNames::nameShort(x7bfs[ichan][fsi]);</td></tr>
+<tr><th id="137">137</th><td>	<b>break</b>;</td></tr>
+<tr><th id="138">138</th><td>      <b>case</b> <var>8</var>: os &lt;&lt; <q>" "</q> &lt;&lt; G4InuclParticleNames::nameShort(x8bfs[ichan][fsi]);</td></tr>
+<tr><th id="139">139</th><td>	<b>break</b>;</td></tr>
+<tr><th id="140">140</th><td>      <b>case</b> <var>9</var>: os &lt;&lt; <q>" "</q> &lt;&lt; G4InuclParticleNames::nameShort(x9bfs[ichan][fsi]);</td></tr>
+<tr><th id="141">141</th><td>	<b>break</b>;</td></tr>
+<tr><th id="142">142</th><td>      <b>default</b>: ;</td></tr>
+<tr><th id="143">143</th><td>      }</td></tr>
+<tr><th id="144">144</th><td>    }</td></tr>
+<tr><th id="145">145</th><td>    os &lt;&lt; <q>" -- cross section ["</q> &lt;&lt; i &lt;&lt; <q>"]:"</q> &lt;&lt; <a class="macro" href="../../../../../../global/management/include/G4ios.hh.html#60" title="std::endl" data-ref="_M/G4endl">G4endl</a>;</td></tr>
+<tr><th id="146">146</th><td>    printXsec(crossSections[i], os);</td></tr>
+<tr><th id="147">147</th><td>  }</td></tr>
+<tr><th id="148">148</th><td>}</td></tr>
+<tr><th id="149">149</th><td></td></tr>
+<tr><th id="150">150</th><td><i>// Dump individual cross-section table, two lines of 12 values</i></td></tr>
+<tr><th id="151">151</th><td><b>template</b> &lt;<em>int</em> NE,<em>int</em> N2,<em>int</em> N3,<em>int</em> N4,<em>int</em> N5,<em>int</em> N6,<em>int</em> N7,<em>int</em> N8,<em>int</em> N9&gt;</td></tr>
+<tr><th id="152">152</th><td><em>void</em> G4CascadeData&lt;NE,N2,N3,N4,N5,N6,N7,N8,N9&gt;::</td></tr>
+<tr><th id="153">153</th><td>printXsec(<em>const</em> G4double (&amp;xsec)[NE], <span class='error' title="use of undeclared identifier &apos;std&apos;">std</span>::ostream&amp; os) <em>const</em> {</td></tr>
+<tr><th id="154">154</th><td>  <b>for</b> (G4int k=<var>0</var>; k&lt;NE; k++) {</td></tr>
+<tr><th id="155">155</th><td>    os &lt;&lt; <q>" "</q> &lt;&lt; <span class='error' title="use of undeclared identifier &apos;std&apos;">std</span>::setw(<var>6</var>) &lt;&lt; xsec[k];</td></tr>
+<tr><th id="156">156</th><td>    <b>if</b> ((k+<var>1</var>)%<var>10</var> == <var>0</var>) os &lt;&lt; <a class="macro" href="../../../../../../global/management/include/G4ios.hh.html#60" title="std::endl" data-ref="_M/G4endl">G4endl</a>;</td></tr>
+<tr><th id="157">157</th><td>  }</td></tr>
+<tr><th id="158">158</th><td>  os &lt;&lt; <a class="macro" href="../../../../../../global/management/include/G4ios.hh.html#60" title="std::endl" data-ref="_M/G4endl">G4endl</a>;</td></tr>
+<tr><th id="159">159</th><td>}</td></tr>
+<tr><th id="160">160</th><td></td></tr>
+<tr><th id="161">161</th><td><u>#<span data-ppcond="39">endif</span>	/* G4_CASCADE_DATA_ICC */</u></td></tr>
+<tr><th id="162">162</th><td></td></tr>
+</table><hr/><p id='footer'>
+Generated while processing <a href='../src/G4CascadeChannelTables.cc.html'>codebrowser/source/processes/hadronic/models/cascade/cascade/src/G4CascadeChannelTables.cc</a><br/>Generated on <em>2019-Aug-28</em> from project codebrowser<br />Powered by <a href='https://woboq.com'><img alt='Woboq' src='https://code.woboq.org/woboq-16.png' width='41' height='16' /></a> <a href='https://code.woboq.org'>Code Browser</a> 2.1
+<br/>Generator usage only permitted with license.</p>
+</div></body></html>

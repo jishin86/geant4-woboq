@@ -1,0 +1,221 @@
+<!doctype html>
+<html>
+<head>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"><title>tessmono source code [codebrowser/source/analysis/g4tools/include/tools/glutess/tessmono] - Woboq Code Browser</title>
+<link rel="stylesheet" href="../../../../../../../../data/qtcreator.css" title="QtCreator"/>
+<link rel="alternate stylesheet" href="../../../../../../../../data/kdevelop.css" title="KDevelop"/>
+<script type="text/javascript" src="../../../../../../../../data/jquery/jquery.min.js"></script>
+<script type="text/javascript" src="../../../../../../../../data/jquery/jquery-ui.min.js"></script>
+<script>var file = 'codebrowser/source/analysis/g4tools/include/tools/glutess/tessmono'; var root_path = '../../../../../../..'; var data_path = '../../../../../../../../data';</script>
+<script src='../../../../../../../../data/codebrowser.js'></script>
+</head>
+<body><div id='header'><h1 id='breadcrumb'><span>Browse the source code of </span><a href='../../../../../..'>codebrowser</a>/<a href='../../../../..'>source</a>/<a href='../../../..'>analysis</a>/<a href='../../..'>g4tools</a>/<a href='../..'>include</a>/<a href='..'>tools</a>/<a href='./'>glutess</a>/<a href='tessmono.html'>tessmono</a></h1></div>
+<hr/><div id='content'><table class="code">
+<tr><th id="1">1</th><td><i>// see license file for original license.</i></td></tr>
+<tr><th id="2">2</th><td></td></tr>
+<tr><th id="3">3</th><td><u>#<span data-ppcond="3">ifndef</span> <span class="macro" data-ref="_M/tools_glutess_tessmono">tools_glutess_tessmono</span></u></td></tr>
+<tr><th id="4">4</th><td><u>#define <dfn class="macro" id="_M/tools_glutess_tessmono" data-ref="_M/tools_glutess_tessmono">tools_glutess_tessmono</dfn></u></td></tr>
+<tr><th id="5">5</th><td></td></tr>
+<tr><th id="6">6</th><td><i>/* __gl_meshTessellateMonoRegion( face ) tessellates a monotone region</i></td></tr>
+<tr><th id="7">7</th><td><i> * (what else would it do??)  The region must consist of a single</i></td></tr>
+<tr><th id="8">8</th><td><i> * loop of half-edges (see mesh.h) oriented CCW.  "Monotone" in this</i></td></tr>
+<tr><th id="9">9</th><td><i> * case means that any vertical line intersects the interior of the</i></td></tr>
+<tr><th id="10">10</th><td><i> * region in a single interval.  </i></td></tr>
+<tr><th id="11">11</th><td><i> *</i></td></tr>
+<tr><th id="12">12</th><td><i> * Tessellation consists of adding interior edges (actually pairs of</i></td></tr>
+<tr><th id="13">13</th><td><i> * half-edges), to split the region into non-overlapping triangles.</i></td></tr>
+<tr><th id="14">14</th><td><i> *</i></td></tr>
+<tr><th id="15">15</th><td><i> * __gl_meshTessellateInterior( mesh ) tessellates each region of</i></td></tr>
+<tr><th id="16">16</th><td><i> * the mesh which is marked "inside" the polygon.  Each such region</i></td></tr>
+<tr><th id="17">17</th><td><i> * must be monotone.</i></td></tr>
+<tr><th id="18">18</th><td><i> *</i></td></tr>
+<tr><th id="19">19</th><td><i> * __gl_meshDiscardExterior( mesh ) zaps (ie. sets to NULL) all faces</i></td></tr>
+<tr><th id="20">20</th><td><i> * which are not marked "inside" the polygon.  Since further mesh operations</i></td></tr>
+<tr><th id="21">21</th><td><i> * on NULL faces are not allowed, the main purpose is to clean up the</i></td></tr>
+<tr><th id="22">22</th><td><i> * mesh so that exterior loops are not represented in the data structure.</i></td></tr>
+<tr><th id="23">23</th><td><i> *</i></td></tr>
+<tr><th id="24">24</th><td><i> * __gl_meshSetWindingNumber( mesh, value, keepOnlyBoundary ) resets the</i></td></tr>
+<tr><th id="25">25</th><td><i> * winding numbers on all edges so that regions marked "inside" the</i></td></tr>
+<tr><th id="26">26</th><td><i> * polygon have a winding number of "value", and regions outside</i></td></tr>
+<tr><th id="27">27</th><td><i> * have a winding number of 0.</i></td></tr>
+<tr><th id="28">28</th><td><i> *</i></td></tr>
+<tr><th id="29">29</th><td><i> * If keepOnlyBoundary is GLU_TRUE, it also deletes all edges which do not</i></td></tr>
+<tr><th id="30">30</th><td><i> * separate an interior region from an exterior one.</i></td></tr>
+<tr><th id="31">31</th><td><i> */</i></td></tr>
+<tr><th id="32">32</th><td><i></i></td></tr>
+<tr><th id="33">33</th><td><i>//int __gl_meshTessellateMonoRegion( GLUface *face );</i></td></tr>
+<tr><th id="34">34</th><td><i>//int __gl_meshTessellateInterior( GLUmesh *mesh );</i></td></tr>
+<tr><th id="35">35</th><td><i>//void __gl_meshDiscardExterior( GLUmesh *mesh );</i></td></tr>
+<tr><th id="36">36</th><td><i>//int __gl_meshSetWindingNumber( GLUmesh *mesh, int value,</i></td></tr>
+<tr><th id="37">37</th><td><i>//			        GLUboolean keepOnlyBoundary );</i></td></tr>
+<tr><th id="38">38</th><td><i></i></td></tr>
+<tr><th id="39">39</th><td><i>////////////////////////////////////////////////////////</i></td></tr>
+<tr><th id="40">40</th><td><i>/// inlined C code : ///////////////////////////////////</i></td></tr>
+<tr><th id="41">41</th><td><i>////////////////////////////////////////////////////////</i></td></tr>
+<tr><th id="42">42</th><td><u>#include <a href="geom.html">"geom"</a></u></td></tr>
+<tr><th id="43">43</th><td><u>#include <a href="mesh.html">"mesh"</a></u></td></tr>
+<tr><th id="44">44</th><td></td></tr>
+<tr><th id="45">45</th><td><i>/* __gl_meshTessellateMonoRegion( face ) tessellates a monotone region</i></td></tr>
+<tr><th id="46">46</th><td><i> * (what else would it do??)  The region must consist of a single</i></td></tr>
+<tr><th id="47">47</th><td><i> * loop of half-edges (see mesh.h) oriented CCW.  "Monotone" in this</i></td></tr>
+<tr><th id="48">48</th><td><i> * case means that any vertical line intersects the interior of the</i></td></tr>
+<tr><th id="49">49</th><td><i> * region in a single interval.  </i></td></tr>
+<tr><th id="50">50</th><td><i> *</i></td></tr>
+<tr><th id="51">51</th><td><i> * Tessellation consists of adding interior edges (actually pairs of</i></td></tr>
+<tr><th id="52">52</th><td><i> * half-edges), to split the region into non-overlapping triangles.</i></td></tr>
+<tr><th id="53">53</th><td><i> *</i></td></tr>
+<tr><th id="54">54</th><td><i> * The basic idea is explained in Preparata and Shamos (which I don''t</i></td></tr>
+<tr><th id="55">55</th><td><i> * have handy right now), although their implementation is more</i></td></tr>
+<tr><th id="56">56</th><td><i> * complicated than this one.  The are two edge chains, an upper chain</i></td></tr>
+<tr><th id="57">57</th><td><i> * and a lower chain.  We process all vertices from both chains in order,</i></td></tr>
+<tr><th id="58">58</th><td><i> * from right to left.</i></td></tr>
+<tr><th id="59">59</th><td><i> *</i></td></tr>
+<tr><th id="60">60</th><td><i> * The algorithm ensures that the following invariant holds after each</i></td></tr>
+<tr><th id="61">61</th><td><i> * vertex is processed: the untessellated region consists of two</i></td></tr>
+<tr><th id="62">62</th><td><i> * chains, where one chain (say the upper) is a single edge, and</i></td></tr>
+<tr><th id="63">63</th><td><i> * the other chain is concave.  The left vertex of the single edge</i></td></tr>
+<tr><th id="64">64</th><td><i> * is always to the left of all vertices in the concave chain.</i></td></tr>
+<tr><th id="65">65</th><td><i> *</i></td></tr>
+<tr><th id="66">66</th><td><i> * Each step consists of adding the rightmost unprocessed vertex to one</i></td></tr>
+<tr><th id="67">67</th><td><i> * of the two chains, and forming a fan of triangles from the rightmost</i></td></tr>
+<tr><th id="68">68</th><td><i> * of two chain endpoints.  Determining whether we can add each triangle</i></td></tr>
+<tr><th id="69">69</th><td><i> * to the fan is a simple orientation test.  By making the fan as large</i></td></tr>
+<tr><th id="70">70</th><td><i> * as possible, we restore the invariant (check it yourself).</i></td></tr>
+<tr><th id="71">71</th><td><i> */</i></td></tr>
+<tr><th id="72">72</th><td><b>inline</b> <em>int</em> <a class="macro" href="rename.html#48" title="tools__gl_meshTessellateMonoRegion" data-ref="_M/__gl_meshTessellateMonoRegion">__gl_meshTessellateMonoRegion</a>( <a class="typedef" href="mesh.html#GLUface" title='GLUface' data-type='struct GLUface' data-ref="GLUface">GLUface</a> *<dfn class="local col2 decl" id="5052face" title='face' data-type='GLUface *' data-ref="5052face">face</dfn> )</td></tr>
+<tr><th id="73">73</th><td>{</td></tr>
+<tr><th id="74">74</th><td>  <a class="typedef" href="mesh.html#GLUhalfEdge" title='GLUhalfEdge' data-type='struct GLUhalfEdge' data-ref="GLUhalfEdge">GLUhalfEdge</a> *<dfn class="local col3 decl" id="5053up" title='up' data-type='GLUhalfEdge *' data-ref="5053up">up</dfn>, *<dfn class="local col4 decl" id="5054lo" title='lo' data-type='GLUhalfEdge *' data-ref="5054lo">lo</dfn>;</td></tr>
+<tr><th id="75">75</th><td></td></tr>
+<tr><th id="76">76</th><td>  <i>/* All edges are oriented CCW around the boundary of the region.</i></td></tr>
+<tr><th id="77">77</th><td><i>   * First, find the half-edge whose origin vertex is rightmost.</i></td></tr>
+<tr><th id="78">78</th><td><i>   * Since the sweep goes from left to right, face-&gt;anEdge should</i></td></tr>
+<tr><th id="79">79</th><td><i>   * be close to the edge we want.</i></td></tr>
+<tr><th id="80">80</th><td><i>   */</i></td></tr>
+<tr><th id="81">81</th><td>  <a class="local col3 ref" href="#5053up" title='up' data-ref="5053up">up</a> = <a class="local col2 ref" href="#5052face" title='face' data-ref="5052face">face</a>-&gt;<a class="ref" href="mesh.html#GLUface::anEdge" title='GLUface::anEdge' data-ref="GLUface::anEdge">anEdge</a>;</td></tr>
+<tr><th id="82">82</th><td>  <span class='error' title="use of undeclared identifier &apos;assert&apos;">assert</span>( up-&gt;Lnext != up &amp;&amp; up-&gt;Lnext-&gt;Lnext != up );</td></tr>
+<tr><th id="83">83</th><td></td></tr>
+<tr><th id="84">84</th><td>  <b>for</b>( ; <a class="macro" href="geom.html#9" title="(((up-&gt;Sym-&gt;Org)-&gt;s &lt; (up-&gt;Org)-&gt;s) || ((up-&gt;Sym-&gt;Org)-&gt;s == (up-&gt;Org)-&gt;s &amp;&amp; (up-&gt;Sym-&gt;Org)-&gt;t &lt;= (up-&gt;Org)-&gt;t))" data-ref="_M/VertLeq">VertLeq</a>( <a class="local col3 ref" href="#5053up" title='up' data-ref="5053up">up</a>-&gt;<a class="macro" href="mesh.html#121" title="Sym-&gt;Org" data-ref="_M/Dst">Dst</a>, <a class="local col3 ref" href="#5053up" title='up' data-ref="5053up">up</a>-&gt;<a class="ref" href="mesh.html#GLUhalfEdge::Org" title='GLUhalfEdge::Org' data-ref="GLUhalfEdge::Org">Org</a> ); <a class="local col3 ref" href="#5053up" title='up' data-ref="5053up">up</a> = <a class="local col3 ref" href="#5053up" title='up' data-ref="5053up">up</a>-&gt;<a class="macro" href="mesh.html#124" title="Onext-&gt;Sym" data-ref="_M/Lprev">Lprev</a> )</td></tr>
+<tr><th id="85">85</th><td>    ;</td></tr>
+<tr><th id="86">86</th><td>  <b>for</b>( ; <a class="macro" href="geom.html#9" title="(((up-&gt;Org)-&gt;s &lt; (up-&gt;Sym-&gt;Org)-&gt;s) || ((up-&gt;Org)-&gt;s == (up-&gt;Sym-&gt;Org)-&gt;s &amp;&amp; (up-&gt;Org)-&gt;t &lt;= (up-&gt;Sym-&gt;Org)-&gt;t))" data-ref="_M/VertLeq">VertLeq</a>( <a class="local col3 ref" href="#5053up" title='up' data-ref="5053up">up</a>-&gt;<a class="ref" href="mesh.html#GLUhalfEdge::Org" title='GLUhalfEdge::Org' data-ref="GLUhalfEdge::Org">Org</a>, <a class="local col3 ref" href="#5053up" title='up' data-ref="5053up">up</a>-&gt;<a class="macro" href="mesh.html#121" title="Sym-&gt;Org" data-ref="_M/Dst">Dst</a> ); <a class="local col3 ref" href="#5053up" title='up' data-ref="5053up">up</a> = <a class="local col3 ref" href="#5053up" title='up' data-ref="5053up">up</a>-&gt;<a class="ref" href="mesh.html#GLUhalfEdge::Lnext" title='GLUhalfEdge::Lnext' data-ref="GLUhalfEdge::Lnext">Lnext</a> )</td></tr>
+<tr><th id="87">87</th><td>    ;</td></tr>
+<tr><th id="88">88</th><td>  <a class="local col4 ref" href="#5054lo" title='lo' data-ref="5054lo">lo</a> = <a class="local col3 ref" href="#5053up" title='up' data-ref="5053up">up</a>-&gt;<a class="macro" href="mesh.html#124" title="Onext-&gt;Sym" data-ref="_M/Lprev">Lprev</a>;</td></tr>
+<tr><th id="89">89</th><td></td></tr>
+<tr><th id="90">90</th><td>  <b>while</b>( <a class="local col3 ref" href="#5053up" title='up' data-ref="5053up">up</a>-&gt;<a class="ref" href="mesh.html#GLUhalfEdge::Lnext" title='GLUhalfEdge::Lnext' data-ref="GLUhalfEdge::Lnext">Lnext</a> != <a class="local col4 ref" href="#5054lo" title='lo' data-ref="5054lo">lo</a> ) {</td></tr>
+<tr><th id="91">91</th><td>    <b>if</b>( <a class="macro" href="geom.html#9" title="(((up-&gt;Sym-&gt;Org)-&gt;s &lt; (lo-&gt;Org)-&gt;s) || ((up-&gt;Sym-&gt;Org)-&gt;s == (lo-&gt;Org)-&gt;s &amp;&amp; (up-&gt;Sym-&gt;Org)-&gt;t &lt;= (lo-&gt;Org)-&gt;t))" data-ref="_M/VertLeq">VertLeq</a>( <a class="local col3 ref" href="#5053up" title='up' data-ref="5053up">up</a>-&gt;<a class="macro" href="mesh.html#121" title="Sym-&gt;Org" data-ref="_M/Dst">Dst</a>, <a class="local col4 ref" href="#5054lo" title='lo' data-ref="5054lo">lo</a>-&gt;<a class="ref" href="mesh.html#GLUhalfEdge::Org" title='GLUhalfEdge::Org' data-ref="GLUhalfEdge::Org">Org</a> )) {</td></tr>
+<tr><th id="92">92</th><td>      <i>/* up-&gt;Dst is on the left.  It is safe to form triangles from lo-&gt;Org.</i></td></tr>
+<tr><th id="93">93</th><td><i>       * The EdgeGoesLeft test guarantees progress even when some triangles</i></td></tr>
+<tr><th id="94">94</th><td><i>       * are CW, given that the upper and lower chains are truly monotone.</i></td></tr>
+<tr><th id="95">95</th><td><i>       */</i></td></tr>
+<tr><th id="96">96</th><td>      <b>while</b>( <a class="local col4 ref" href="#5054lo" title='lo' data-ref="5054lo">lo</a>-&gt;<a class="ref" href="mesh.html#GLUhalfEdge::Lnext" title='GLUhalfEdge::Lnext' data-ref="GLUhalfEdge::Lnext">Lnext</a> != <a class="local col3 ref" href="#5053up" title='up' data-ref="5053up">up</a> &amp;&amp; (<a class="macro" href="geom.html#22" title="((((lo-&gt;Lnext)-&gt;Sym-&gt;Org)-&gt;s &lt; ((lo-&gt;Lnext)-&gt;Org)-&gt;s) || (((lo-&gt;Lnext)-&gt;Sym-&gt;Org)-&gt;s == ((lo-&gt;Lnext)-&gt;Org)-&gt;s &amp;&amp; ((lo-&gt;Lnext)-&gt;Sym-&gt;Org)-&gt;t &lt;= ((lo-&gt;Lnext)-&gt;Org)-&gt;t))" data-ref="_M/EdgeGoesLeft">EdgeGoesLeft</a>( <a class="local col4 ref" href="#5054lo" title='lo' data-ref="5054lo">lo</a>-&gt;<a class="ref" href="mesh.html#GLUhalfEdge::Lnext" title='GLUhalfEdge::Lnext' data-ref="GLUhalfEdge::Lnext">Lnext</a> )</td></tr>
+<tr><th id="97">97</th><td>	     || <a class="macro" href="geom.html#12" title="tools__gl_edgeSign(lo-&gt;Org,lo-&gt;Sym-&gt;Org,lo-&gt;Lnext-&gt;Sym-&gt;Org)" data-ref="_M/EdgeSign">EdgeSign</a>( <a class="local col4 ref" href="#5054lo" title='lo' data-ref="5054lo">lo</a>-&gt;<a class="ref" href="mesh.html#GLUhalfEdge::Org" title='GLUhalfEdge::Org' data-ref="GLUhalfEdge::Org">Org</a>, <a class="local col4 ref" href="#5054lo" title='lo' data-ref="5054lo">lo</a>-&gt;<a class="macro" href="mesh.html#121" title="Sym-&gt;Org" data-ref="_M/Dst">Dst</a>, <a class="local col4 ref" href="#5054lo" title='lo' data-ref="5054lo">lo</a>-&gt;<a class="ref" href="mesh.html#GLUhalfEdge::Lnext" title='GLUhalfEdge::Lnext' data-ref="GLUhalfEdge::Lnext">Lnext</a>-&gt;<a class="macro" href="mesh.html#121" title="Sym-&gt;Org" data-ref="_M/Dst">Dst</a> ) &lt;= <var>0</var> )) {</td></tr>
+<tr><th id="98">98</th><td>	<a class="typedef" href="mesh.html#GLUhalfEdge" title='GLUhalfEdge' data-type='struct GLUhalfEdge' data-ref="GLUhalfEdge">GLUhalfEdge</a> *<dfn class="local col5 decl" id="5055tempHalfEdge" title='tempHalfEdge' data-type='GLUhalfEdge *' data-ref="5055tempHalfEdge">tempHalfEdge</dfn>= <a class="macro" href="rename.html#38" title="tools__gl_meshConnect" data-ref="_M/__gl_meshConnect">__gl_meshConnect</a>( <a class="local col4 ref" href="#5054lo" title='lo' data-ref="5054lo">lo</a>-&gt;<a class="ref" href="mesh.html#GLUhalfEdge::Lnext" title='GLUhalfEdge::Lnext' data-ref="GLUhalfEdge::Lnext">Lnext</a>, <a class="local col4 ref" href="#5054lo" title='lo' data-ref="5054lo">lo</a> );</td></tr>
+<tr><th id="99">99</th><td>	<b>if</b> (tempHalfEdge == <span class='error' title="use of undeclared identifier &apos;NULL&apos;">NULL</span>) <b>return</b> <var>0</var>;</td></tr>
+<tr><th id="100">100</th><td>	<a class="local col4 ref" href="#5054lo" title='lo' data-ref="5054lo">lo</a> = <a class="local col5 ref" href="#5055tempHalfEdge" title='tempHalfEdge' data-ref="5055tempHalfEdge">tempHalfEdge</a>-&gt;<a class="ref" href="mesh.html#GLUhalfEdge::Sym" title='GLUhalfEdge::Sym' data-ref="GLUhalfEdge::Sym">Sym</a>;</td></tr>
+<tr><th id="101">101</th><td>      }</td></tr>
+<tr><th id="102">102</th><td>      <a class="local col4 ref" href="#5054lo" title='lo' data-ref="5054lo">lo</a> = <a class="local col4 ref" href="#5054lo" title='lo' data-ref="5054lo">lo</a>-&gt;<a class="macro" href="mesh.html#124" title="Onext-&gt;Sym" data-ref="_M/Lprev">Lprev</a>;</td></tr>
+<tr><th id="103">103</th><td>    } <b>else</b> {</td></tr>
+<tr><th id="104">104</th><td>      <i>/* lo-&gt;Org is on the left.  We can make CCW triangles from up-&gt;Dst. */</i></td></tr>
+<tr><th id="105">105</th><td>      <b>while</b>( <a class="local col4 ref" href="#5054lo" title='lo' data-ref="5054lo">lo</a>-&gt;<a class="ref" href="mesh.html#GLUhalfEdge::Lnext" title='GLUhalfEdge::Lnext' data-ref="GLUhalfEdge::Lnext">Lnext</a> != <a class="local col3 ref" href="#5053up" title='up' data-ref="5053up">up</a> &amp;&amp; (<a class="macro" href="geom.html#23" title="((((up-&gt;Onext-&gt;Sym)-&gt;Org)-&gt;s &lt; ((up-&gt;Onext-&gt;Sym)-&gt;Sym-&gt;Org)-&gt;s) || (((up-&gt;Onext-&gt;Sym)-&gt;Org)-&gt;s == ((up-&gt;Onext-&gt;Sym)-&gt;Sym-&gt;Org)-&gt;s &amp;&amp; ((up-&gt;Onext-&gt;Sym)-&gt;Org)-&gt;t &lt;= ((up-&gt;Onext-&gt;Sym)-&gt;Sym-&gt;Org)-&gt;t))" data-ref="_M/EdgeGoesRight">EdgeGoesRight</a>( <a class="local col3 ref" href="#5053up" title='up' data-ref="5053up">up</a>-&gt;<a class="macro" href="mesh.html#124" title="Onext-&gt;Sym" data-ref="_M/Lprev">Lprev</a> )</td></tr>
+<tr><th id="106">106</th><td>	     || <a class="macro" href="geom.html#12" title="tools__gl_edgeSign(up-&gt;Sym-&gt;Org,up-&gt;Org,up-&gt;Onext-&gt;Sym-&gt;Org)" data-ref="_M/EdgeSign">EdgeSign</a>( <a class="local col3 ref" href="#5053up" title='up' data-ref="5053up">up</a>-&gt;<a class="macro" href="mesh.html#121" title="Sym-&gt;Org" data-ref="_M/Dst">Dst</a>, <a class="local col3 ref" href="#5053up" title='up' data-ref="5053up">up</a>-&gt;<a class="ref" href="mesh.html#GLUhalfEdge::Org" title='GLUhalfEdge::Org' data-ref="GLUhalfEdge::Org">Org</a>, <a class="local col3 ref" href="#5053up" title='up' data-ref="5053up">up</a>-&gt;<a class="macro" href="mesh.html#124" title="Onext-&gt;Sym" data-ref="_M/Lprev">Lprev</a>-&gt;<a class="ref" href="mesh.html#GLUhalfEdge::Org" title='GLUhalfEdge::Org' data-ref="GLUhalfEdge::Org">Org</a> ) &gt;= <var>0</var> )) {</td></tr>
+<tr><th id="107">107</th><td>	<a class="typedef" href="mesh.html#GLUhalfEdge" title='GLUhalfEdge' data-type='struct GLUhalfEdge' data-ref="GLUhalfEdge">GLUhalfEdge</a> *<dfn class="local col6 decl" id="5056tempHalfEdge" title='tempHalfEdge' data-type='GLUhalfEdge *' data-ref="5056tempHalfEdge">tempHalfEdge</dfn>= <a class="macro" href="rename.html#38" title="tools__gl_meshConnect" data-ref="_M/__gl_meshConnect">__gl_meshConnect</a>( <a class="local col3 ref" href="#5053up" title='up' data-ref="5053up">up</a>, <a class="local col3 ref" href="#5053up" title='up' data-ref="5053up">up</a>-&gt;<a class="macro" href="mesh.html#124" title="Onext-&gt;Sym" data-ref="_M/Lprev">Lprev</a> );</td></tr>
+<tr><th id="108">108</th><td>	<b>if</b> (tempHalfEdge == <span class='error' title="use of undeclared identifier &apos;NULL&apos;">NULL</span>) <b>return</b> <var>0</var>;</td></tr>
+<tr><th id="109">109</th><td>	<a class="local col3 ref" href="#5053up" title='up' data-ref="5053up">up</a> = <a class="local col6 ref" href="#5056tempHalfEdge" title='tempHalfEdge' data-ref="5056tempHalfEdge">tempHalfEdge</a>-&gt;<a class="ref" href="mesh.html#GLUhalfEdge::Sym" title='GLUhalfEdge::Sym' data-ref="GLUhalfEdge::Sym">Sym</a>;</td></tr>
+<tr><th id="110">110</th><td>      }</td></tr>
+<tr><th id="111">111</th><td>      <a class="local col3 ref" href="#5053up" title='up' data-ref="5053up">up</a> = <a class="local col3 ref" href="#5053up" title='up' data-ref="5053up">up</a>-&gt;<a class="ref" href="mesh.html#GLUhalfEdge::Lnext" title='GLUhalfEdge::Lnext' data-ref="GLUhalfEdge::Lnext">Lnext</a>;</td></tr>
+<tr><th id="112">112</th><td>    }</td></tr>
+<tr><th id="113">113</th><td>  }</td></tr>
+<tr><th id="114">114</th><td></td></tr>
+<tr><th id="115">115</th><td>  <i>/* Now lo-&gt;Org == up-&gt;Dst == the leftmost vertex.  The remaining region</i></td></tr>
+<tr><th id="116">116</th><td><i>   * can be tessellated in a fan from this leftmost vertex.</i></td></tr>
+<tr><th id="117">117</th><td><i>   */</i></td></tr>
+<tr><th id="118">118</th><td>  <span class='error' title="use of undeclared identifier &apos;assert&apos;">assert</span>( lo-&gt;Lnext != up );</td></tr>
+<tr><th id="119">119</th><td>  <b>while</b>( <a class="local col4 ref" href="#5054lo" title='lo' data-ref="5054lo">lo</a>-&gt;<a class="ref" href="mesh.html#GLUhalfEdge::Lnext" title='GLUhalfEdge::Lnext' data-ref="GLUhalfEdge::Lnext">Lnext</a>-&gt;<a class="ref" href="mesh.html#GLUhalfEdge::Lnext" title='GLUhalfEdge::Lnext' data-ref="GLUhalfEdge::Lnext">Lnext</a> != <a class="local col3 ref" href="#5053up" title='up' data-ref="5053up">up</a> ) {</td></tr>
+<tr><th id="120">120</th><td>    <a class="typedef" href="mesh.html#GLUhalfEdge" title='GLUhalfEdge' data-type='struct GLUhalfEdge' data-ref="GLUhalfEdge">GLUhalfEdge</a> *<dfn class="local col7 decl" id="5057tempHalfEdge" title='tempHalfEdge' data-type='GLUhalfEdge *' data-ref="5057tempHalfEdge">tempHalfEdge</dfn>= <a class="macro" href="rename.html#38" title="tools__gl_meshConnect" data-ref="_M/__gl_meshConnect">__gl_meshConnect</a>( <a class="local col4 ref" href="#5054lo" title='lo' data-ref="5054lo">lo</a>-&gt;<a class="ref" href="mesh.html#GLUhalfEdge::Lnext" title='GLUhalfEdge::Lnext' data-ref="GLUhalfEdge::Lnext">Lnext</a>, <a class="local col4 ref" href="#5054lo" title='lo' data-ref="5054lo">lo</a> );</td></tr>
+<tr><th id="121">121</th><td>    <b>if</b> (tempHalfEdge == <span class='error' title="use of undeclared identifier &apos;NULL&apos;">NULL</span>) <b>return</b> <var>0</var>;</td></tr>
+<tr><th id="122">122</th><td>    <a class="local col4 ref" href="#5054lo" title='lo' data-ref="5054lo">lo</a> = <a class="local col7 ref" href="#5057tempHalfEdge" title='tempHalfEdge' data-ref="5057tempHalfEdge">tempHalfEdge</a>-&gt;<a class="ref" href="mesh.html#GLUhalfEdge::Sym" title='GLUhalfEdge::Sym' data-ref="GLUhalfEdge::Sym">Sym</a>;</td></tr>
+<tr><th id="123">123</th><td>  }</td></tr>
+<tr><th id="124">124</th><td></td></tr>
+<tr><th id="125">125</th><td>  <b>return</b> <var>1</var>;</td></tr>
+<tr><th id="126">126</th><td>}</td></tr>
+<tr><th id="127">127</th><td></td></tr>
+<tr><th id="128">128</th><td></td></tr>
+<tr><th id="129">129</th><td><i>/* __gl_meshTessellateInterior( mesh ) tessellates each region of</i></td></tr>
+<tr><th id="130">130</th><td><i> * the mesh which is marked "inside" the polygon.  Each such region</i></td></tr>
+<tr><th id="131">131</th><td><i> * must be monotone.</i></td></tr>
+<tr><th id="132">132</th><td><i> */</i></td></tr>
+<tr><th id="133">133</th><td><b>inline</b> <em>int</em> <a class="macro" href="rename.html#47" title="tools__gl_meshTessellateInterior" data-ref="_M/__gl_meshTessellateInterior">__gl_meshTessellateInterior</a>( <a class="typedef" href="mesh.html#GLUmesh" title='GLUmesh' data-type='struct GLUmesh' data-ref="GLUmesh">GLUmesh</a> *<dfn class="local col8 decl" id="5058mesh" title='mesh' data-type='GLUmesh *' data-ref="5058mesh">mesh</dfn> )</td></tr>
+<tr><th id="134">134</th><td>{</td></tr>
+<tr><th id="135">135</th><td>  <a class="typedef" href="mesh.html#GLUface" title='GLUface' data-type='struct GLUface' data-ref="GLUface">GLUface</a> *<dfn class="local col9 decl" id="5059f" title='f' data-type='GLUface *' data-ref="5059f">f</dfn>, *<dfn class="local col0 decl" id="5060next" title='next' data-type='GLUface *' data-ref="5060next">next</dfn>;</td></tr>
+<tr><th id="136">136</th><td></td></tr>
+<tr><th id="137">137</th><td>  <i>/*LINTED*/</i></td></tr>
+<tr><th id="138">138</th><td>  <b>for</b>( <a class="local col9 ref" href="#5059f" title='f' data-ref="5059f">f</a> = <a class="local col8 ref" href="#5058mesh" title='mesh' data-ref="5058mesh">mesh</a>-&gt;<a class="ref" href="mesh.html#GLUmesh::fHead" title='GLUmesh::fHead' data-ref="GLUmesh::fHead">fHead</a>.<a class="ref" href="mesh.html#GLUface::next" title='GLUface::next' data-ref="GLUface::next">next</a>; <a class="local col9 ref" href="#5059f" title='f' data-ref="5059f">f</a> != &amp;<a class="local col8 ref" href="#5058mesh" title='mesh' data-ref="5058mesh">mesh</a>-&gt;<a class="ref" href="mesh.html#GLUmesh::fHead" title='GLUmesh::fHead' data-ref="GLUmesh::fHead">fHead</a>; <a class="local col9 ref" href="#5059f" title='f' data-ref="5059f">f</a> = <a class="local col0 ref" href="#5060next" title='next' data-ref="5060next">next</a> ) {</td></tr>
+<tr><th id="139">139</th><td>    <i>/* Make sure we don''t try to tessellate the new triangles. */</i></td></tr>
+<tr><th id="140">140</th><td>    <a class="local col0 ref" href="#5060next" title='next' data-ref="5060next">next</a> = <a class="local col9 ref" href="#5059f" title='f' data-ref="5059f">f</a>-&gt;<a class="ref" href="mesh.html#GLUface::next" title='GLUface::next' data-ref="GLUface::next">next</a>;</td></tr>
+<tr><th id="141">141</th><td>    <b>if</b>( <a class="local col9 ref" href="#5059f" title='f' data-ref="5059f">f</a>-&gt;<a class="ref" href="mesh.html#GLUface::inside" title='GLUface::inside' data-ref="GLUface::inside">inside</a> ) {</td></tr>
+<tr><th id="142">142</th><td>      <b>if</b> ( !<a class="macro" href="rename.html#48" title="tools__gl_meshTessellateMonoRegion" data-ref="_M/__gl_meshTessellateMonoRegion">__gl_meshTessellateMonoRegion</a>( <a class="local col9 ref" href="#5059f" title='f' data-ref="5059f">f</a> ) ) <b>return</b> <var>0</var>;</td></tr>
+<tr><th id="143">143</th><td>    }</td></tr>
+<tr><th id="144">144</th><td>  }</td></tr>
+<tr><th id="145">145</th><td></td></tr>
+<tr><th id="146">146</th><td>  <b>return</b> <var>1</var>;</td></tr>
+<tr><th id="147">147</th><td>}</td></tr>
+<tr><th id="148">148</th><td></td></tr>
+<tr><th id="149">149</th><td></td></tr>
+<tr><th id="150">150</th><td><i>/* __gl_meshDiscardExterior( mesh ) zaps (ie. sets to NULL) all faces</i></td></tr>
+<tr><th id="151">151</th><td><i> * which are not marked "inside" the polygon.  Since further mesh operations</i></td></tr>
+<tr><th id="152">152</th><td><i> * on NULL faces are not allowed, the main purpose is to clean up the</i></td></tr>
+<tr><th id="153">153</th><td><i> * mesh so that exterior loops are not represented in the data structure.</i></td></tr>
+<tr><th id="154">154</th><td><i> */</i></td></tr>
+<tr><th id="155">155</th><td><b>inline</b> <em>void</em> <a class="macro" href="rename.html#41" title="tools__gl_meshDiscardExterior" data-ref="_M/__gl_meshDiscardExterior">__gl_meshDiscardExterior</a>( <a class="typedef" href="mesh.html#GLUmesh" title='GLUmesh' data-type='struct GLUmesh' data-ref="GLUmesh">GLUmesh</a> *<dfn class="local col1 decl" id="5061mesh" title='mesh' data-type='GLUmesh *' data-ref="5061mesh">mesh</dfn> )</td></tr>
+<tr><th id="156">156</th><td>{</td></tr>
+<tr><th id="157">157</th><td>  <a class="typedef" href="mesh.html#GLUface" title='GLUface' data-type='struct GLUface' data-ref="GLUface">GLUface</a> *<dfn class="local col2 decl" id="5062f" title='f' data-type='GLUface *' data-ref="5062f">f</dfn>, *<dfn class="local col3 decl" id="5063next" title='next' data-type='GLUface *' data-ref="5063next">next</dfn>;</td></tr>
+<tr><th id="158">158</th><td></td></tr>
+<tr><th id="159">159</th><td>  <i>/*LINTED*/</i></td></tr>
+<tr><th id="160">160</th><td>  <b>for</b>( <a class="local col2 ref" href="#5062f" title='f' data-ref="5062f">f</a> = <a class="local col1 ref" href="#5061mesh" title='mesh' data-ref="5061mesh">mesh</a>-&gt;<a class="ref" href="mesh.html#GLUmesh::fHead" title='GLUmesh::fHead' data-ref="GLUmesh::fHead">fHead</a>.<a class="ref" href="mesh.html#GLUface::next" title='GLUface::next' data-ref="GLUface::next">next</a>; <a class="local col2 ref" href="#5062f" title='f' data-ref="5062f">f</a> != &amp;<a class="local col1 ref" href="#5061mesh" title='mesh' data-ref="5061mesh">mesh</a>-&gt;<a class="ref" href="mesh.html#GLUmesh::fHead" title='GLUmesh::fHead' data-ref="GLUmesh::fHead">fHead</a>; <a class="local col2 ref" href="#5062f" title='f' data-ref="5062f">f</a> = <a class="local col3 ref" href="#5063next" title='next' data-ref="5063next">next</a> ) {</td></tr>
+<tr><th id="161">161</th><td>    <i>/* Since f will be destroyed, save its next pointer. */</i></td></tr>
+<tr><th id="162">162</th><td>    <a class="local col3 ref" href="#5063next" title='next' data-ref="5063next">next</a> = <a class="local col2 ref" href="#5062f" title='f' data-ref="5062f">f</a>-&gt;<a class="ref" href="mesh.html#GLUface::next" title='GLUface::next' data-ref="GLUface::next">next</a>;</td></tr>
+<tr><th id="163">163</th><td>    <b>if</b>( ! <a class="local col2 ref" href="#5062f" title='f' data-ref="5062f">f</a>-&gt;<a class="ref" href="mesh.html#GLUface::inside" title='GLUface::inside' data-ref="GLUface::inside">inside</a> ) {</td></tr>
+<tr><th id="164">164</th><td>      <a class="macro" href="rename.html#50" title="tools__gl_meshZapFace" data-ref="_M/__gl_meshZapFace">__gl_meshZapFace</a>( <a class="local col2 ref" href="#5062f" title='f' data-ref="5062f">f</a> );</td></tr>
+<tr><th id="165">165</th><td>    }</td></tr>
+<tr><th id="166">166</th><td>  }</td></tr>
+<tr><th id="167">167</th><td>}</td></tr>
+<tr><th id="168">168</th><td></td></tr>
+<tr><th id="169">169</th><td><i>//#define MARKED_FOR_DELETION	0x7fffffff</i></td></tr>
+<tr><th id="170">170</th><td></td></tr>
+<tr><th id="171">171</th><td><i>/* __gl_meshSetWindingNumber( mesh, value, keepOnlyBoundary ) resets the</i></td></tr>
+<tr><th id="172">172</th><td><i> * winding numbers on all edges so that regions marked "inside" the</i></td></tr>
+<tr><th id="173">173</th><td><i> * polygon have a winding number of "value", and regions outside</i></td></tr>
+<tr><th id="174">174</th><td><i> * have a winding number of 0.</i></td></tr>
+<tr><th id="175">175</th><td><i> *</i></td></tr>
+<tr><th id="176">176</th><td><i> * If keepOnlyBoundary is GLU_TRUE, it also deletes all edges which do not</i></td></tr>
+<tr><th id="177">177</th><td><i> * separate an interior region from an exterior one.</i></td></tr>
+<tr><th id="178">178</th><td><i> */</i></td></tr>
+<tr><th id="179">179</th><td><b>inline</b> <em>int</em> <a class="macro" href="rename.html#44" title="tools__gl_meshSetWindingNumber" data-ref="_M/__gl_meshSetWindingNumber">__gl_meshSetWindingNumber</a>( <a class="typedef" href="mesh.html#GLUmesh" title='GLUmesh' data-type='struct GLUmesh' data-ref="GLUmesh">GLUmesh</a> *<dfn class="local col4 decl" id="5064mesh" title='mesh' data-type='GLUmesh *' data-ref="5064mesh">mesh</dfn>, <em>int</em> <dfn class="local col5 decl" id="5065value" title='value' data-type='int' data-ref="5065value">value</dfn>,</td></tr>
+<tr><th id="180">180</th><td>			        <a class="typedef" href="_glu.html#GLUboolean" title='GLUboolean' data-type='unsigned char' data-ref="GLUboolean">GLUboolean</a> <dfn class="local col6 decl" id="5066keepOnlyBoundary" title='keepOnlyBoundary' data-type='GLUboolean' data-ref="5066keepOnlyBoundary">keepOnlyBoundary</dfn> )</td></tr>
+<tr><th id="181">181</th><td>{</td></tr>
+<tr><th id="182">182</th><td>  <a class="typedef" href="mesh.html#GLUhalfEdge" title='GLUhalfEdge' data-type='struct GLUhalfEdge' data-ref="GLUhalfEdge">GLUhalfEdge</a> *<dfn class="local col7 decl" id="5067e" title='e' data-type='GLUhalfEdge *' data-ref="5067e">e</dfn>, *<dfn class="local col8 decl" id="5068eNext" title='eNext' data-type='GLUhalfEdge *' data-ref="5068eNext">eNext</dfn>;</td></tr>
+<tr><th id="183">183</th><td></td></tr>
+<tr><th id="184">184</th><td>  <b>for</b>( <a class="local col7 ref" href="#5067e" title='e' data-ref="5067e">e</a> = <a class="local col4 ref" href="#5064mesh" title='mesh' data-ref="5064mesh">mesh</a>-&gt;<a class="ref" href="mesh.html#GLUmesh::eHead" title='GLUmesh::eHead' data-ref="GLUmesh::eHead">eHead</a>.<a class="ref" href="mesh.html#GLUhalfEdge::next" title='GLUhalfEdge::next' data-ref="GLUhalfEdge::next">next</a>; <a class="local col7 ref" href="#5067e" title='e' data-ref="5067e">e</a> != &amp;<a class="local col4 ref" href="#5064mesh" title='mesh' data-ref="5064mesh">mesh</a>-&gt;<a class="ref" href="mesh.html#GLUmesh::eHead" title='GLUmesh::eHead' data-ref="GLUmesh::eHead">eHead</a>; <a class="local col7 ref" href="#5067e" title='e' data-ref="5067e">e</a> = <a class="local col8 ref" href="#5068eNext" title='eNext' data-ref="5068eNext">eNext</a> ) {</td></tr>
+<tr><th id="185">185</th><td>    <a class="local col8 ref" href="#5068eNext" title='eNext' data-ref="5068eNext">eNext</a> = <a class="local col7 ref" href="#5067e" title='e' data-ref="5067e">e</a>-&gt;<a class="ref" href="mesh.html#GLUhalfEdge::next" title='GLUhalfEdge::next' data-ref="GLUhalfEdge::next">next</a>;</td></tr>
+<tr><th id="186">186</th><td>    <b>if</b>( <a class="local col7 ref" href="#5067e" title='e' data-ref="5067e">e</a>-&gt;<a class="macro" href="mesh.html#120" title="Sym-&gt;Lface" data-ref="_M/Rface">Rface</a>-&gt;<a class="ref" href="mesh.html#GLUface::inside" title='GLUface::inside' data-ref="GLUface::inside">inside</a> != <a class="local col7 ref" href="#5067e" title='e' data-ref="5067e">e</a>-&gt;<a class="ref" href="mesh.html#GLUhalfEdge::Lface" title='GLUhalfEdge::Lface' data-ref="GLUhalfEdge::Lface">Lface</a>-&gt;<a class="ref" href="mesh.html#GLUface::inside" title='GLUface::inside' data-ref="GLUface::inside">inside</a> ) {</td></tr>
+<tr><th id="187">187</th><td></td></tr>
+<tr><th id="188">188</th><td>      <i>/* This is a boundary edge (one side is interior, one is exterior). */</i></td></tr>
+<tr><th id="189">189</th><td>      <a class="local col7 ref" href="#5067e" title='e' data-ref="5067e">e</a>-&gt;<a class="ref" href="mesh.html#GLUhalfEdge::winding" title='GLUhalfEdge::winding' data-ref="GLUhalfEdge::winding">winding</a> = (<a class="local col7 ref" href="#5067e" title='e' data-ref="5067e">e</a>-&gt;<a class="ref" href="mesh.html#GLUhalfEdge::Lface" title='GLUhalfEdge::Lface' data-ref="GLUhalfEdge::Lface">Lface</a>-&gt;<a class="ref" href="mesh.html#GLUface::inside" title='GLUface::inside' data-ref="GLUface::inside">inside</a>) ? <a class="local col5 ref" href="#5065value" title='value' data-ref="5065value">value</a> : -<a class="local col5 ref" href="#5065value" title='value' data-ref="5065value">value</a>;</td></tr>
+<tr><th id="190">190</th><td>    } <b>else</b> {</td></tr>
+<tr><th id="191">191</th><td></td></tr>
+<tr><th id="192">192</th><td>      <i>/* Both regions are interior, or both are exterior. */</i></td></tr>
+<tr><th id="193">193</th><td>      <b>if</b>( ! <a class="local col6 ref" href="#5066keepOnlyBoundary" title='keepOnlyBoundary' data-ref="5066keepOnlyBoundary">keepOnlyBoundary</a> ) {</td></tr>
+<tr><th id="194">194</th><td>	<a class="local col7 ref" href="#5067e" title='e' data-ref="5067e">e</a>-&gt;<a class="ref" href="mesh.html#GLUhalfEdge::winding" title='GLUhalfEdge::winding' data-ref="GLUhalfEdge::winding">winding</a> = <var>0</var>;</td></tr>
+<tr><th id="195">195</th><td>      } <b>else</b> {</td></tr>
+<tr><th id="196">196</th><td>	<b>if</b> ( !<a class="macro" href="rename.html#39" title="tools__gl_meshDelete" data-ref="_M/__gl_meshDelete">__gl_meshDelete</a>( <a class="local col7 ref" href="#5067e" title='e' data-ref="5067e">e</a> ) ) <b>return</b> <var>0</var>;</td></tr>
+<tr><th id="197">197</th><td>      }</td></tr>
+<tr><th id="198">198</th><td>    }</td></tr>
+<tr><th id="199">199</th><td>  }</td></tr>
+<tr><th id="200">200</th><td>  <b>return</b> <var>1</var>;</td></tr>
+<tr><th id="201">201</th><td>}</td></tr>
+<tr><th id="202">202</th><td></td></tr>
+<tr><th id="203">203</th><td><u>#<span data-ppcond="3">endif</span></u></td></tr>
+<tr><th id="204">204</th><td></td></tr>
+</table><hr/><p id='footer'>
+Generated while processing <a href='../../../../hntools/src/G4ToolsAnalysisManager.cc.html'>codebrowser/source/analysis/hntools/src/G4ToolsAnalysisManager.cc</a><br/>Generated on <em>2019-Aug-28</em> from project codebrowser<br />Powered by <a href='https://woboq.com'><img alt='Woboq' src='https://code.woboq.org/woboq-16.png' width='41' height='16' /></a> <a href='https://code.woboq.org'>Code Browser</a> 2.1
+<br/>Generator usage only permitted with license.</p>
+</div></body></html>

@@ -1,0 +1,1178 @@
+<!doctype html>
+<html>
+<head>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"><title>G4Scheduler.cc source code [codebrowser/source/processes/electromagnetic/dna/management/src/G4Scheduler.cc] - Woboq Code Browser</title>
+<link rel="stylesheet" href="../../../../../../../../data/qtcreator.css" title="QtCreator"/>
+<link rel="alternate stylesheet" href="../../../../../../../../data/kdevelop.css" title="KDevelop"/>
+<script type="text/javascript" src="../../../../../../../../data/jquery/jquery.min.js"></script>
+<script type="text/javascript" src="../../../../../../../../data/jquery/jquery-ui.min.js"></script>
+<script>var file = 'codebrowser/source/processes/electromagnetic/dna/management/src/G4Scheduler.cc'; var root_path = '../../../../../../..'; var data_path = '../../../../../../../../data';</script>
+<script src='../../../../../../../../data/codebrowser.js'></script>
+</head>
+<body><div id='header'><h1 id='breadcrumb'><span>Browse the source code of </span><a href='../../../../../..'>codebrowser</a>/<a href='../../../../..'>source</a>/<a href='../../../..'>processes</a>/<a href='../../..'>electromagnetic</a>/<a href='../..'>dna</a>/<a href='..'>management</a>/<a href='./'>src</a>/<a href='G4Scheduler.cc.html'>G4Scheduler.cc</a></h1></div>
+<hr/><div id='content'><table class="code">
+<tr><th id="1">1</th><td><i>//</i></td></tr>
+<tr><th id="2">2</th><td><i>// ********************************************************************</i></td></tr>
+<tr><th id="3">3</th><td><i>// * License and Disclaimer                                           *</i></td></tr>
+<tr><th id="4">4</th><td><i>// *                                                                  *</i></td></tr>
+<tr><th id="5">5</th><td><i>// * The  Geant4 software  is  copyright of the Copyright Holders  of *</i></td></tr>
+<tr><th id="6">6</th><td><i>// * the Geant4 Collaboration.  It is provided  under  the terms  and *</i></td></tr>
+<tr><th id="7">7</th><td><i>// * conditions of the Geant4 Software License,  included in the file *</i></td></tr>
+<tr><th id="8">8</th><td><i>// * LICENSE and available at  <a href="http://cern.ch/geant4/license">http://cern.ch/geant4/license</a> .  These *</i></td></tr>
+<tr><th id="9">9</th><td><i>// * include a list of copyright holders.                             *</i></td></tr>
+<tr><th id="10">10</th><td><i>// *                                                                  *</i></td></tr>
+<tr><th id="11">11</th><td><i>// * Neither the authors of this software system, nor their employing *</i></td></tr>
+<tr><th id="12">12</th><td><i>// * institutes,nor the agencies providing financial support for this *</i></td></tr>
+<tr><th id="13">13</th><td><i>// * work  make  any representation or  warranty, express or implied, *</i></td></tr>
+<tr><th id="14">14</th><td><i>// * regarding  this  software system or assume any liability for its *</i></td></tr>
+<tr><th id="15">15</th><td><i>// * use.  Please see the license in the file  LICENSE  and URL above *</i></td></tr>
+<tr><th id="16">16</th><td><i>// * for the full disclaimer and the limitation of liability.         *</i></td></tr>
+<tr><th id="17">17</th><td><i>// *                                                                  *</i></td></tr>
+<tr><th id="18">18</th><td><i>// * This  code  implementation is the result of  the  scientific and *</i></td></tr>
+<tr><th id="19">19</th><td><i>// * technical work of the GEANT4 collaboration.                      *</i></td></tr>
+<tr><th id="20">20</th><td><i>// * By using,  copying,  modifying or  distributing the software (or *</i></td></tr>
+<tr><th id="21">21</th><td><i>// * any work based  on the software)  you  agree  to acknowledge its *</i></td></tr>
+<tr><th id="22">22</th><td><i>// * use  in  resulting  scientific  publications,  and indicate your *</i></td></tr>
+<tr><th id="23">23</th><td><i>// * acceptance of all terms of the Geant4 Software license.          *</i></td></tr>
+<tr><th id="24">24</th><td><i>// ********************************************************************</i></td></tr>
+<tr><th id="25">25</th><td><i>//</i></td></tr>
+<tr><th id="26">26</th><td><i>//</i></td></tr>
+<tr><th id="27">27</th><td><i>// Author: Mathieu Karamitros (kara (AT) cenbg . in2p3 . fr)</i></td></tr>
+<tr><th id="28">28</th><td><i>//</i></td></tr>
+<tr><th id="29">29</th><td><i>// History:</i></td></tr>
+<tr><th id="30">30</th><td><i>// -----------</i></td></tr>
+<tr><th id="31">31</th><td><i>// 10 Oct 2011 M.Karamitros created</i></td></tr>
+<tr><th id="32">32</th><td><i>//</i></td></tr>
+<tr><th id="33">33</th><td><i>// -------------------------------------------------------------------</i></td></tr>
+<tr><th id="34">34</th><td></td></tr>
+<tr><th id="35">35</th><td><u>#include <a href="../include/G4AllITFinder.hh.html">&lt;G4AllITFinder.hh&gt;</a></u></td></tr>
+<tr><th id="36">36</th><td><u>#include <a href="../include/G4Scheduler.hh.html">&lt;G4Scheduler.hh&gt;</a></u></td></tr>
+<tr><th id="37">37</th><td><u>#include <a href="../include/G4SchedulerMessenger.hh.html">&lt;G4SchedulerMessenger.hh&gt;</a></u></td></tr>
+<tr><th id="38">38</th><td></td></tr>
+<tr><th id="39">39</th><td><u>#include <a href="../../../../../global/management/include/G4SystemOfUnits.hh.html">"G4SystemOfUnits.hh"</a></u></td></tr>
+<tr><th id="40">40</th><td><u>#include <a href="../include/G4ITModelProcessor.hh.html">"G4ITModelProcessor.hh"</a></u></td></tr>
+<tr><th id="41">41</th><td><u>#include <a href="../include/G4ITStepProcessor.hh.html">"G4ITStepProcessor.hh"</a></u></td></tr>
+<tr><th id="42">42</th><td><u>#include <a href="../include/G4IT.hh.html">"G4IT.hh"</a></u></td></tr>
+<tr><th id="43">43</th><td><u>#include <a href="../include/G4ITReactionChange.hh.html">"G4ITReactionChange.hh"</a></u></td></tr>
+<tr><th id="44">44</th><td><u>#include <a href="../include/G4ITModelHandler.hh.html">"G4ITModelHandler.hh"</a></u></td></tr>
+<tr><th id="45">45</th><td><u>#include <a href="../include/G4VITStepModel.hh.html">"G4VITStepModel.hh"</a></u></td></tr>
+<tr><th id="46">46</th><td><u>#include <a href="../include/G4UserTimeStepAction.hh.html">"G4UserTimeStepAction.hh"</a></u></td></tr>
+<tr><th id="47">47</th><td><u>#include <a href="../include/G4ITTrackingManager.hh.html">"G4ITTrackingManager.hh"</a></u></td></tr>
+<tr><th id="48">48</th><td><u>#include <a href="../include/G4ITTrackingInteractivity.hh.html">"G4ITTrackingInteractivity.hh"</a></u></td></tr>
+<tr><th id="49">49</th><td><u>#include <a href="../include/G4TrackingInformation.hh.html">"G4TrackingInformation.hh"</a></u></td></tr>
+<tr><th id="50">50</th><td><u>#include <a href="../../../../../global/management/include/G4UnitsTable.hh.html">"G4UnitsTable.hh"</a></u></td></tr>
+<tr><th id="51">51</th><td><u>#include <a href="../include/G4ITStepStatus.hh.html">"G4ITStepStatus.hh"</a></u></td></tr>
+<tr><th id="52">52</th><td><u>#include <a href="../include/G4ITGun.hh.html">"G4ITGun.hh"</a></u></td></tr>
+<tr><th id="53">53</th><td><u>#include <a href="../../../../../global/management/include/G4StateManager.hh.html">"G4StateManager.hh"</a></u></td></tr>
+<tr><th id="54">54</th><td><u>#include <a href="../../../../../global/management/include/G4Timer.hh.html">"G4Timer.hh"</a></u></td></tr>
+<tr><th id="55">55</th><td><u>#include <a href="../include/G4IosFlagsSaver.hh.html">"G4IosFlagsSaver.hh"</a></u></td></tr>
+<tr><th id="56">56</th><td><u>#include &lt;sstream&gt;</u></td></tr>
+<tr><th id="57">57</th><td></td></tr>
+<tr><th id="58">58</th><td><i>//#include "G4Phenomenon.hh"</i></td></tr>
+<tr><th id="59">59</th><td><i>//#include "G4MIWorkspace.hh"</i></td></tr>
+<tr><th id="60">60</th><td><i></i></td></tr>
+<tr><th id="61">61</th><td><i>//#define DEBUG_MEM 1</i></td></tr>
+<tr><th id="62">62</th><td><u>#define <dfn class="macro" id="_M/DEBUG_MEM_STEPPING" data-ref="_M/DEBUG_MEM_STEPPING">DEBUG_MEM_STEPPING</dfn></u></td></tr>
+<tr><th id="63">63</th><td><u>#define <dfn class="macro" id="_M/DEBUG_MEM_DETAILED_STEPPING" data-ref="_M/DEBUG_MEM_DETAILED_STEPPING">DEBUG_MEM_DETAILED_STEPPING</dfn></u></td></tr>
+<tr><th id="64">64</th><td><i>//#define DEBUG_MEM_DOIT</i></td></tr>
+<tr><th id="65">65</th><td></td></tr>
+<tr><th id="66">66</th><td><u>#<span data-ppcond="66">ifdef</span> <span class="macro" data-ref="_M/DEBUG_MEM">DEBUG_MEM</span></u></td></tr>
+<tr><th id="67">67</th><td><u>#include "G4MemStat.hh"</u></td></tr>
+<tr><th id="68">68</th><td><b>using</b> <b>namespace</b> G4MemStat;</td></tr>
+<tr><th id="69">69</th><td><b>using</b> G4MemStat::MemStat;</td></tr>
+<tr><th id="70">70</th><td><u>#<span data-ppcond="66">endif</span></u></td></tr>
+<tr><th id="71">71</th><td></td></tr>
+<tr><th id="72">72</th><td><i>//COLOR FOR DEBUGING</i></td></tr>
+<tr><th id="73">73</th><td><i>//#define USE_COLOR 1</i></td></tr>
+<tr><th id="74">74</th><td></td></tr>
+<tr><th id="75">75</th><td><u>#<span data-ppcond="75">ifdef</span> <span class="macro" data-ref="_M/USE_COLOR">USE_COLOR</span></u></td></tr>
+<tr><th id="76">76</th><td><u>#define RED  "\033[0;31m"</u></td></tr>
+<tr><th id="77">77</th><td><u>#define LIGHT_RED  "\33[1;31m"</u></td></tr>
+<tr><th id="78">78</th><td><u>#define GREEN "\033[32;40m"</u></td></tr>
+<tr><th id="79">79</th><td><u>#define GREEN_ON_BLUE "\033[1;32;44m"</u></td></tr>
+<tr><th id="80">80</th><td><u>#define RESET_COLOR "\033[0m"</u></td></tr>
+<tr><th id="81">81</th><td><u>#<span data-ppcond="75">else</span></u></td></tr>
+<tr><th id="82">82</th><td><u>#define <dfn class="macro" id="_M/RED" data-ref="_M/RED">RED</dfn>  ""</u></td></tr>
+<tr><th id="83">83</th><td><u>#define <dfn class="macro" id="_M/LIGHT_RED" data-ref="_M/LIGHT_RED">LIGHT_RED</dfn>  ""</u></td></tr>
+<tr><th id="84">84</th><td><u>#define <dfn class="macro" id="_M/GREEN" data-ref="_M/GREEN">GREEN</dfn> ""</u></td></tr>
+<tr><th id="85">85</th><td><u>#define <dfn class="macro" id="_M/GREEN_ON_BLUE" data-ref="_M/GREEN_ON_BLUE">GREEN_ON_BLUE</dfn> ""</u></td></tr>
+<tr><th id="86">86</th><td><u>#define <dfn class="macro" id="_M/RESET_COLOR" data-ref="_M/RESET_COLOR">RESET_COLOR</dfn> ""</u></td></tr>
+<tr><th id="87">87</th><td><u>#<span data-ppcond="75">endif</span></u></td></tr>
+<tr><th id="88">88</th><td></td></tr>
+<tr><th id="89">89</th><td><b>using</b> <b>namespace</b> <span class="namespace">std</span>;</td></tr>
+<tr><th id="90">90</th><td></td></tr>
+<tr><th id="91">91</th><td><a class="macro" href="../../../../../global/management/include/tls.hh.html#39" title="thread_local" data-ref="_M/G4ThreadLocal">G4ThreadLocal</a> <a class="type" href="../include/G4Scheduler.hh.html#G4Scheduler" title='G4Scheduler' data-ref="G4Scheduler">G4Scheduler</a>* <a class="type" href="../include/G4Scheduler.hh.html#G4Scheduler" title='G4Scheduler' data-ref="G4Scheduler">G4Scheduler</a>::<dfn class="decl def" id="G4Scheduler::fgScheduler" title='G4Scheduler::fgScheduler' data-ref="G4Scheduler::fgScheduler">fgScheduler</dfn>(<var>0</var>);</td></tr>
+<tr><th id="92">92</th><td></td></tr>
+<tr><th id="93">93</th><td><b>template</b>&lt;<b>typename</b> T&gt;</td></tr>
+<tr><th id="94">94</th><td>  <b>inline</b> <em>bool</em> <dfn class="decl def" id="_Z5IsInfT_" title='IsInf' data-ref="_Z5IsInfT_">IsInf</dfn>(T <dfn class="local col5 decl" id="5value" title='value' data-type='T' data-ref="5value">value</dfn>)</td></tr>
+<tr><th id="95">95</th><td>  {</td></tr>
+<tr><th id="96">96</th><td>    <b>return</b> <span class='error' title="use of undeclared identifier &apos;std&apos;">std</span>::numeric_limits&lt;<span class='error' title="&apos;T&apos; does not refer to a value">T</span>&gt;::<span class='error' title="no member named &apos;has_infinity&apos; in the global namespace">has_infinity</span></td></tr>
+<tr><th id="97">97</th><td>        &amp;&amp; value == <span class='error' title="use of undeclared identifier &apos;std&apos;">std</span>::numeric_limits&lt;<span class='error' title="&apos;T&apos; does not refer to a value">T</span>&gt;::<span class='error' title="no member named &apos;infinity&apos; in the global namespace">infinity</span>();</td></tr>
+<tr><th id="98">98</th><td>  }</td></tr>
+<tr><th id="99">99</th><td><i>//_________________________________________________________________________</i></td></tr>
+<tr><th id="100">100</th><td></td></tr>
+<tr><th id="101">101</th><td><a class="type" href="../include/G4Scheduler.hh.html#G4Scheduler" title='G4Scheduler' data-ref="G4Scheduler">G4Scheduler</a>* <a class="type" href="../include/G4Scheduler.hh.html#G4Scheduler" title='G4Scheduler' data-ref="G4Scheduler">G4Scheduler</a>::<dfn class="decl def" id="_ZN11G4Scheduler8InstanceEv" title='G4Scheduler::Instance' data-ref="_ZN11G4Scheduler8InstanceEv">Instance</dfn>()</td></tr>
+<tr><th id="102">102</th><td>{</td></tr>
+<tr><th id="103">103</th><td>  <b>if</b>(<a class="member" href="../include/G4Scheduler.hh.html#G4Scheduler::fgScheduler" title='G4Scheduler::fgScheduler' data-ref="G4Scheduler::fgScheduler">fgScheduler</a> == <var>0</var>) <a class="member" href="../include/G4Scheduler.hh.html#G4Scheduler::fgScheduler" title='G4Scheduler::fgScheduler' data-ref="G4Scheduler::fgScheduler">fgScheduler</a> = <b>new</b> <a class="type" href="../include/G4Scheduler.hh.html#G4Scheduler" title='G4Scheduler' data-ref="G4Scheduler">G4Scheduler</a><a class="ref" href="#_ZN11G4SchedulerC1Ev" title='G4Scheduler::G4Scheduler' data-ref="_ZN11G4SchedulerC1Ev">(</a>);</td></tr>
+<tr><th id="104">104</th><td>  <b>return</b> <a class="member" href="../include/G4Scheduler.hh.html#G4Scheduler::fgScheduler" title='G4Scheduler::fgScheduler' data-ref="G4Scheduler::fgScheduler">fgScheduler</a>;</td></tr>
+<tr><th id="105">105</th><td>}</td></tr>
+<tr><th id="106">106</th><td><i>//_________________________________________________________________________</i></td></tr>
+<tr><th id="107">107</th><td></td></tr>
+<tr><th id="108">108</th><td><a class="typedef" href="../../../../../global/management/include/G4Types.hh.html#G4bool" title='G4bool' data-type='bool' data-ref="G4bool">G4bool</a> <a class="type" href="../include/G4Scheduler.hh.html#G4Scheduler" title='G4Scheduler' data-ref="G4Scheduler">G4Scheduler</a>::<dfn class="virtual decl def" id="_ZN11G4Scheduler6NotifyE18G4ApplicationState" title='G4Scheduler::Notify' data-ref="_ZN11G4Scheduler6NotifyE18G4ApplicationState">Notify</dfn>(<a class="type" href="../../../../../global/management/include/G4ApplicationState.hh.html#G4ApplicationState" title='G4ApplicationState' data-ref="G4ApplicationState">G4ApplicationState</a> <dfn class="local col6 decl" id="6requestedState" title='requestedState' data-type='G4ApplicationState' data-ref="6requestedState">requestedState</dfn>)</td></tr>
+<tr><th id="109">109</th><td>{</td></tr>
+<tr><th id="110">110</th><td>  <b>if</b>(<a class="local col6 ref" href="#6requestedState" title='requestedState' data-ref="6requestedState">requestedState</a> == <a class="enum" href="../../../../../global/management/include/G4ApplicationState.hh.html#G4ApplicationState::G4State_Quit" title='G4ApplicationState::G4State_Quit' data-ref="G4ApplicationState::G4State_Quit">G4State_Quit</a>)</td></tr>
+<tr><th id="111">111</th><td>  {</td></tr>
+<tr><th id="112">112</th><td>    <b>if</b>(<a class="member" href="../include/G4Scheduler.hh.html#G4Scheduler::fVerbose" title='G4Scheduler::fVerbose' data-ref="G4Scheduler::fVerbose">fVerbose</a> &gt;= <var>4</var>)</td></tr>
+<tr><th id="113">113</th><td>    {</td></tr>
+<tr><th id="114">114</th><td>      <a class="macro" href="../../../../../global/management/include/G4ios.hh.html#46" title="(*_G4cout_p())" data-ref="_M/G4cout">G4cout</a> <span class='error' title="invalid operands to binary expression (&apos;int&apos; and &apos;const char *&apos;)">&lt;&lt;</span> <q>"G4Scheduler received G4State_Quit"</q> &lt;&lt; <a class="macro" href="../../../../../global/management/include/G4ios.hh.html#60" title="std::endl" data-ref="_M/G4endl">G4endl</a>;</td></tr>
+<tr><th id="115">115</th><td>    }</td></tr>
+<tr><th id="116">116</th><td>    <a class="member" href="#_ZN11G4Scheduler5ClearEv" title='G4Scheduler::Clear' data-ref="_ZN11G4Scheduler5ClearEv">Clear</a>();</td></tr>
+<tr><th id="117">117</th><td>    <i>//DeleteInstance();</i></td></tr>
+<tr><th id="118">118</th><td>  }</td></tr>
+<tr><th id="119">119</th><td>  <b>return</b> <b>true</b>;</td></tr>
+<tr><th id="120">120</th><td>}</td></tr>
+<tr><th id="121">121</th><td><i>//_________________________________________________________________________</i></td></tr>
+<tr><th id="122">122</th><td></td></tr>
+<tr><th id="123">123</th><td><em>void</em> <a class="type" href="../include/G4Scheduler.hh.html#G4Scheduler" title='G4Scheduler' data-ref="G4Scheduler">G4Scheduler</a>::<dfn class="decl def" id="_ZN11G4Scheduler14DeleteInstanceEv" title='G4Scheduler::DeleteInstance' data-ref="_ZN11G4Scheduler14DeleteInstanceEv">DeleteInstance</dfn>()</td></tr>
+<tr><th id="124">124</th><td>{</td></tr>
+<tr><th id="125">125</th><td>  <b>if</b>(<a class="member" href="../include/G4Scheduler.hh.html#G4Scheduler::fgScheduler" title='G4Scheduler::fgScheduler' data-ref="G4Scheduler::fgScheduler">fgScheduler</a>)</td></tr>
+<tr><th id="126">126</th><td>  {</td></tr>
+<tr><th id="127">127</th><td>    <b>delete</b> <a class="member" href="../include/G4Scheduler.hh.html#G4Scheduler::fgScheduler" title='G4Scheduler::fgScheduler' data-ref="G4Scheduler::fgScheduler">fgScheduler</a>;</td></tr>
+<tr><th id="128">128</th><td>  }</td></tr>
+<tr><th id="129">129</th><td>}</td></tr>
+<tr><th id="130">130</th><td><i>//_________________________________________________________________________</i></td></tr>
+<tr><th id="131">131</th><td></td></tr>
+<tr><th id="132">132</th><td><a class="type" href="../include/G4Scheduler.hh.html#G4Scheduler" title='G4Scheduler' data-ref="G4Scheduler">G4Scheduler</a>::<dfn class="decl def" id="_ZN11G4SchedulerC1Ev" title='G4Scheduler::G4Scheduler' data-ref="_ZN11G4SchedulerC1Ev">G4Scheduler</dfn>() :</td></tr>
+<tr><th id="133">133</th><td>    <a class="type" href="../include/G4VScheduler.hh.html#G4VScheduler" title='G4VScheduler' data-ref="G4VScheduler">G4VScheduler</a><a class="ref" href="../include/G4VScheduler.hh.html#_ZN12G4VSchedulerC1Ev" title='G4VScheduler::G4VScheduler' data-ref="_ZN12G4VSchedulerC1Ev">(</a>), <a class="type" href="../../../../../global/management/include/G4VStateDependent.hh.html#G4VStateDependent" title='G4VStateDependent' data-ref="G4VStateDependent">G4VStateDependent</a><a class="ref" href="../../../../../global/management/include/G4VStateDependent.hh.html#_ZN17G4VStateDependentC1Eb" title='G4VStateDependent::G4VStateDependent' data-ref="_ZN17G4VStateDependentC1Eb">(</a>),</td></tr>
+<tr><th id="134">134</th><td>    <a class="member" href="../include/G4Scheduler.hh.html#G4Scheduler::fTrackContainer" title='G4Scheduler::fTrackContainer' data-ref="G4Scheduler::fTrackContainer">fTrackContainer</a>((<a class="type" href="../include/G4ITTrackHolder.hh.html#G4ITTrackHolder" title='G4ITTrackHolder' data-ref="G4ITTrackHolder">G4ITTrackHolder</a>&amp;) *<a class="type" href="../include/G4ITTrackHolder.hh.html#G4ITTrackHolder" title='G4ITTrackHolder' data-ref="G4ITTrackHolder">G4ITTrackHolder</a>::<a class="ref" href="../include/G4ITTrackHolder.hh.html#_ZN15G4ITTrackHolder8InstanceEv" title='G4ITTrackHolder::Instance' data-ref="_ZN15G4ITTrackHolder8InstanceEv">Instance</a>())</td></tr>
+<tr><th id="135">135</th><td>{</td></tr>
+<tr><th id="136">136</th><td>  <a class="member" href="#_ZN11G4Scheduler6CreateEv" title='G4Scheduler::Create' data-ref="_ZN11G4Scheduler6CreateEv">Create</a>();</td></tr>
+<tr><th id="137">137</th><td>}</td></tr>
+<tr><th id="138">138</th><td></td></tr>
+<tr><th id="139">139</th><td><em>void</em> <a class="type" href="../include/G4Scheduler.hh.html#G4Scheduler" title='G4Scheduler' data-ref="G4Scheduler">G4Scheduler</a>::<dfn class="decl def" id="_ZN11G4Scheduler6CreateEv" title='G4Scheduler::Create' data-ref="_ZN11G4Scheduler6CreateEv">Create</dfn>()</td></tr>
+<tr><th id="140">140</th><td>{</td></tr>
+<tr><th id="141">141</th><td>  <a class="member" href="../include/G4Scheduler.hh.html#G4Scheduler::fUseDefaultTimeSteps" title='G4Scheduler::fUseDefaultTimeSteps' data-ref="G4Scheduler::fUseDefaultTimeSteps">fUseDefaultTimeSteps</a> = <b>true</b>;</td></tr>
+<tr><th id="142">142</th><td>  <a class="member" href="../include/G4Scheduler.hh.html#G4Scheduler::fUserUpperTimeLimit" title='G4Scheduler::fUserUpperTimeLimit' data-ref="G4Scheduler::fUserUpperTimeLimit">fUserUpperTimeLimit</a> = -<var>1</var>;</td></tr>
+<tr><th id="143">143</th><td>  <a class="member" href="../include/G4Scheduler.hh.html#G4Scheduler::fpGun" title='G4Scheduler::fpGun' data-ref="G4Scheduler::fpGun">fpGun</a> = <var>0</var>;</td></tr>
+<tr><th id="144">144</th><td>  <a class="member" href="../include/G4Scheduler.hh.html#G4Scheduler::fContinue" title='G4Scheduler::fContinue' data-ref="G4Scheduler::fContinue">fContinue</a> = <b>true</b>;</td></tr>
+<tr><th id="145">145</th><td><i>//  fpMainList = 0;</i></td></tr>
+<tr><th id="146">146</th><td><i>//  fpWaitingList = 0;</i></td></tr>
+<tr><th id="147">147</th><td>  <a class="member" href="../include/G4Scheduler.hh.html#G4Scheduler::fpTrackingInteractivity" title='G4Scheduler::fpTrackingInteractivity' data-ref="G4Scheduler::fpTrackingInteractivity">fpTrackingInteractivity</a> = <var>0</var>;</td></tr>
+<tr><th id="148">148</th><td></td></tr>
+<tr><th id="149">149</th><td>  <a class="member" href="../include/G4Scheduler.hh.html#G4Scheduler::fITStepStatus" title='G4Scheduler::fITStepStatus' data-ref="G4Scheduler::fITStepStatus">fITStepStatus</a> = <a class="enum" href="../include/G4ITStepStatus.hh.html#G4ITStepStatus::eUndefined" title='G4ITStepStatus::eUndefined' data-ref="G4ITStepStatus::eUndefined">eUndefined</a>;</td></tr>
+<tr><th id="150">150</th><td></td></tr>
+<tr><th id="151">151</th><td>  <span class='error' title="use of undeclared identifier &apos;fpUserTimeSteps&apos;">fpUserTimeSteps</span> = <var>0</var>;</td></tr>
+<tr><th id="152">152</th><td></td></tr>
+<tr><th id="153">153</th><td>  fTimeStep = <a class="macro" href="../../../../../global/management/include/templates.hh.html#82" title="std::numeric_limits&lt;double&gt;::max()" data-ref="_M/DBL_MAX">DBL_MAX</a>;</td></tr>
+<tr><th id="154">154</th><td>  fTSTimeStep = <a class="macro" href="../../../../../global/management/include/templates.hh.html#82" title="std::numeric_limits&lt;double&gt;::max()" data-ref="_M/DBL_MAX">DBL_MAX</a>;</td></tr>
+<tr><th id="155">155</th><td>  fILTimeStep = <a class="macro" href="../../../../../global/management/include/templates.hh.html#82" title="std::numeric_limits&lt;double&gt;::max()" data-ref="_M/DBL_MAX">DBL_MAX</a>;</td></tr>
+<tr><th id="156">156</th><td>  fPreviousTimeStep = <a class="macro" href="../../../../../global/management/include/templates.hh.html#82" title="std::numeric_limits&lt;double&gt;::max()" data-ref="_M/DBL_MAX">DBL_MAX</a>;</td></tr>
+<tr><th id="157">157</th><td></td></tr>
+<tr><th id="158">158</th><td>  <a class="member" href="../include/G4Scheduler.hh.html#G4Scheduler::fZeroTimeCount" title='G4Scheduler::fZeroTimeCount' data-ref="G4Scheduler::fZeroTimeCount">fZeroTimeCount</a> = <var>0</var>;</td></tr>
+<tr><th id="159">159</th><td>  <a class="member" href="../include/G4Scheduler.hh.html#G4Scheduler::fMaxNZeroTimeStepsAllowed" title='G4Scheduler::fMaxNZeroTimeStepsAllowed' data-ref="G4Scheduler::fMaxNZeroTimeStepsAllowed">fMaxNZeroTimeStepsAllowed</a> = <var>10</var>;</td></tr>
+<tr><th id="160">160</th><td></td></tr>
+<tr><th id="161">161</th><td>  <a class="member" href="../include/G4Scheduler.hh.html#G4Scheduler::fStartTime" title='G4Scheduler::fStartTime' data-ref="G4Scheduler::fStartTime">fStartTime</a> = <var>0</var>;</td></tr>
+<tr><th id="162">162</th><td>  <a class="member" href="../include/G4Scheduler.hh.html#G4Scheduler::fTimeTolerance" title='G4Scheduler::fTimeTolerance' data-ref="G4Scheduler::fTimeTolerance">fTimeTolerance</a> = <var>1</var> * <a class="ref" href="../../../../../externals/clhep/include/CLHEP/Units/SystemOfUnits.h.html#CLHEP::picosecond" title='CLHEP::picosecond' data-ref="CLHEP::picosecond">picosecond</a>;</td></tr>
+<tr><th id="163">163</th><td>  <a class="member" href="../include/G4Scheduler.hh.html#G4Scheduler::fEndTime" title='G4Scheduler::fEndTime' data-ref="G4Scheduler::fEndTime">fEndTime</a> = <var>1</var> * <a class="ref" href="../../../../../externals/clhep/include/CLHEP/Units/SystemOfUnits.h.html#CLHEP::microsecond" title='CLHEP::microsecond' data-ref="CLHEP::microsecond">microsecond</a>;</td></tr>
+<tr><th id="164">164</th><td>  <a class="member" href="../include/G4Scheduler.hh.html#G4Scheduler::fGlobalTime" title='G4Scheduler::fGlobalTime' data-ref="G4Scheduler::fGlobalTime">fGlobalTime</a> = -<var>1</var>;</td></tr>
+<tr><th id="165">165</th><td>  <a class="member" href="../include/G4Scheduler.hh.html#G4Scheduler::fInteractionStep" title='G4Scheduler::fInteractionStep' data-ref="G4Scheduler::fInteractionStep">fInteractionStep</a> = <b>true</b>;</td></tr>
+<tr><th id="166">166</th><td>  <a class="member" href="../include/G4Scheduler.hh.html#G4Scheduler::fUsePreDefinedTimeSteps" title='G4Scheduler::fUsePreDefinedTimeSteps' data-ref="G4Scheduler::fUsePreDefinedTimeSteps">fUsePreDefinedTimeSteps</a> = <b>false</b>;</td></tr>
+<tr><th id="167">167</th><td></td></tr>
+<tr><th id="168">168</th><td>  <a class="member" href="../include/G4Scheduler.hh.html#G4Scheduler::fDefaultMinTimeStep" title='G4Scheduler::fDefaultMinTimeStep' data-ref="G4Scheduler::fDefaultMinTimeStep">fDefaultMinTimeStep</a> = <var>1</var> * <a class="ref" href="../../../../../externals/clhep/include/CLHEP/Units/SystemOfUnits.h.html#CLHEP::picosecond" title='CLHEP::picosecond' data-ref="CLHEP::picosecond">picosecond</a>;</td></tr>
+<tr><th id="169">169</th><td></td></tr>
+<tr><th id="170">170</th><td>  <a class="member" href="../include/G4Scheduler.hh.html#G4Scheduler::fpStepProcessor" title='G4Scheduler::fpStepProcessor' data-ref="G4Scheduler::fpStepProcessor">fpStepProcessor</a> = <var>0</var>;</td></tr>
+<tr><th id="171">171</th><td>  <a class="member" href="../include/G4Scheduler.hh.html#G4Scheduler::fpModelProcessor" title='G4Scheduler::fpModelProcessor' data-ref="G4Scheduler::fpModelProcessor">fpModelProcessor</a> = <var>0</var>;</td></tr>
+<tr><th id="172">172</th><td></td></tr>
+<tr><th id="173">173</th><td>  <a class="member" href="../include/G4Scheduler.hh.html#G4Scheduler::fNbSteps" title='G4Scheduler::fNbSteps' data-ref="G4Scheduler::fNbSteps">fNbSteps</a> = <var>0</var>;</td></tr>
+<tr><th id="174">174</th><td>  <a class="member" href="../include/G4Scheduler.hh.html#G4Scheduler::fMaxSteps" title='G4Scheduler::fMaxSteps' data-ref="G4Scheduler::fMaxSteps">fMaxSteps</a> = -<var>1</var>;</td></tr>
+<tr><th id="175">175</th><td></td></tr>
+<tr><th id="176">176</th><td>  <a class="member" href="../include/G4Scheduler.hh.html#G4Scheduler::fRunning" title='G4Scheduler::fRunning' data-ref="G4Scheduler::fRunning">fRunning</a> = <b>false</b>;</td></tr>
+<tr><th id="177">177</th><td>  <a class="member" href="../include/G4Scheduler.hh.html#G4Scheduler::fInitialized" title='G4Scheduler::fInitialized' data-ref="G4Scheduler::fInitialized">fInitialized</a> = <b>false</b>;</td></tr>
+<tr><th id="178">178</th><td></td></tr>
+<tr><th id="179">179</th><td>  <a class="member" href="../include/G4Scheduler.hh.html#G4Scheduler::fpUserTimeStepAction" title='G4Scheduler::fpUserTimeStepAction' data-ref="G4Scheduler::fpUserTimeStepAction">fpUserTimeStepAction</a> = <var>0</var>;</td></tr>
+<tr><th id="180">180</th><td>  <a class="member" href="../include/G4Scheduler.hh.html#G4Scheduler::fpModelHandler" title='G4Scheduler::fpModelHandler' data-ref="G4Scheduler::fpModelHandler">fpModelHandler</a> = <b>new</b> <a class="type" href="../include/G4ITModelHandler.hh.html#G4ITModelHandler" title='G4ITModelHandler' data-ref="G4ITModelHandler">G4ITModelHandler</a><a class="ref" href="../include/G4ITModelHandler.hh.html#_ZN16G4ITModelHandlerC1Ev" title='G4ITModelHandler::G4ITModelHandler' data-ref="_ZN16G4ITModelHandlerC1Ev">(</a>);</td></tr>
+<tr><th id="181">181</th><td>  <a class="member" href="../include/G4Scheduler.hh.html#G4Scheduler::fpTrackingManager" title='G4Scheduler::fpTrackingManager' data-ref="G4Scheduler::fpTrackingManager">fpTrackingManager</a> = <b>new</b> <a class="type" href="../include/G4ITTrackingManager.hh.html#G4ITTrackingManager" title='G4ITTrackingManager' data-ref="G4ITTrackingManager">G4ITTrackingManager</a><a class="ref" href="../include/G4ITTrackingManager.hh.html#_ZN19G4ITTrackingManagerC1Ev" title='G4ITTrackingManager::G4ITTrackingManager' data-ref="_ZN19G4ITTrackingManagerC1Ev">(</a>);</td></tr>
+<tr><th id="182">182</th><td></td></tr>
+<tr><th id="183">183</th><td>  <a class="member" href="../include/G4Scheduler.hh.html#G4Scheduler::fVerbose" title='G4Scheduler::fVerbose' data-ref="G4Scheduler::fVerbose">fVerbose</a> = <var>0</var>;</td></tr>
+<tr><th id="184">184</th><td>  <a class="member" href="../include/G4Scheduler.hh.html#G4Scheduler::fWhyDoYouStop" title='G4Scheduler::fWhyDoYouStop' data-ref="G4Scheduler::fWhyDoYouStop">fWhyDoYouStop</a> = <b>false</b>;</td></tr>
+<tr><th id="185">185</th><td>  <a class="member" href="../include/G4Scheduler.hh.html#G4Scheduler::fDefinedMinTimeStep" title='G4Scheduler::fDefinedMinTimeStep' data-ref="G4Scheduler::fDefinedMinTimeStep">fDefinedMinTimeStep</a> = -<var>1.</var>;</td></tr>
+<tr><th id="186">186</th><td>  <a class="member" href="../include/G4Scheduler.hh.html#G4Scheduler::fReachedUserTimeLimit" title='G4Scheduler::fReachedUserTimeLimit' data-ref="G4Scheduler::fReachedUserTimeLimit">fReachedUserTimeLimit</a> = <b>false</b>;</td></tr>
+<tr><th id="187">187</th><td>  <a class="member" href="../include/G4Scheduler.hh.html#G4Scheduler::fStopTime" title='G4Scheduler::fStopTime' data-ref="G4Scheduler::fStopTime">fStopTime</a> = -<var>1.</var>;</td></tr>
+<tr><th id="188">188</th><td>  <a class="member" href="../include/G4Scheduler.hh.html#G4Scheduler::fTmpGlobalTime" title='G4Scheduler::fTmpGlobalTime' data-ref="G4Scheduler::fTmpGlobalTime">fTmpGlobalTime</a> = -<var>1.</var>;</td></tr>
+<tr><th id="189">189</th><td></td></tr>
+<tr><th id="190">190</th><td>  <a class="member" href="../include/G4Scheduler.hh.html#G4Scheduler::fpMessenger" title='G4Scheduler::fpMessenger' data-ref="G4Scheduler::fpMessenger">fpMessenger</a> = <b>new</b> <a class="type" href="../include/G4SchedulerMessenger.hh.html#G4SchedulerMessenger" title='G4SchedulerMessenger' data-ref="G4SchedulerMessenger">G4SchedulerMessenger</a><a class="ref" href="../include/G4SchedulerMessenger.hh.html#_ZN20G4SchedulerMessengerC1EP11G4Scheduler" title='G4SchedulerMessenger::G4SchedulerMessenger' data-ref="_ZN20G4SchedulerMessengerC1EP11G4Scheduler">(</a><b>this</b>);</td></tr>
+<tr><th id="191">191</th><td></td></tr>
+<tr><th id="192">192</th><td>  <a class="member" href="../include/G4Scheduler.hh.html#G4Scheduler::fReactionSet" title='G4Scheduler::fReactionSet' data-ref="G4Scheduler::fReactionSet">fReactionSet</a> = <a class="type" href="../include/G4ITReaction.hh.html#G4ITReactionSet" title='G4ITReactionSet' data-ref="G4ITReactionSet">G4ITReactionSet</a>::<a class="ref" href="../include/G4ITReaction.hh.html#_ZN15G4ITReactionSet8InstanceEv" title='G4ITReactionSet::Instance' data-ref="_ZN15G4ITReactionSet8InstanceEv">Instance</a>();</td></tr>
+<tr><th id="193">193</th><td>  fMaxTimeStep = <a class="macro" href="../../../../../global/management/include/templates.hh.html#82" title="std::numeric_limits&lt;double&gt;::max()" data-ref="_M/DBL_MAX">DBL_MAX</a>;</td></tr>
+<tr><th id="194">194</th><td></td></tr>
+<tr><th id="195">195</th><td>  <a class="type" href="../include/G4ITType.hh.html#G4ITTypeManager" title='G4ITTypeManager' data-ref="G4ITTypeManager">G4ITTypeManager</a>::<a class="ref" href="../include/G4ITType.hh.html#_ZN15G4ITTypeManager8InstanceEv" title='G4ITTypeManager::Instance' data-ref="_ZN15G4ITTypeManager8InstanceEv">Instance</a>()-&gt;<a class="ref" href="../include/G4ITType.hh.html#_ZN15G4ITTypeManager16ReserveRessourceEv" title='G4ITTypeManager::ReserveRessource' data-ref="_ZN15G4ITTypeManager16ReserveRessourceEv">ReserveRessource</a>();</td></tr>
+<tr><th id="196">196</th><td>}</td></tr>
+<tr><th id="197">197</th><td></td></tr>
+<tr><th id="198">198</th><td><i>//_________________________________________________________________________</i></td></tr>
+<tr><th id="199">199</th><td></td></tr>
+<tr><th id="200">200</th><td><a class="type" href="../include/G4Scheduler.hh.html#G4Scheduler" title='G4Scheduler' data-ref="G4Scheduler">G4Scheduler</a>::<dfn class="virtual decl def" id="_ZN11G4SchedulerD1Ev" title='G4Scheduler::~G4Scheduler' data-ref="_ZN11G4SchedulerD1Ev">~G4Scheduler</dfn>()</td></tr>
+<tr><th id="201">201</th><td>{</td></tr>
+<tr><th id="202">202</th><td></td></tr>
+<tr><th id="203">203</th><td>  <b>if</b>(<a class="member" href="../include/G4Scheduler.hh.html#G4Scheduler::fpMessenger" title='G4Scheduler::fpMessenger' data-ref="G4Scheduler::fpMessenger">fpMessenger</a>) <i>// is used as a flag to know whether the manager was cleared</i></td></tr>
+<tr><th id="204">204</th><td>  {</td></tr>
+<tr><th id="205">205</th><td>    <a class="member" href="#_ZN11G4Scheduler5ClearEv" title='G4Scheduler::Clear' data-ref="_ZN11G4Scheduler5ClearEv">Clear</a>();</td></tr>
+<tr><th id="206">206</th><td>  }</td></tr>
+<tr><th id="207">207</th><td></td></tr>
+<tr><th id="208">208</th><td>  <a class="member" href="../include/G4Scheduler.hh.html#G4Scheduler::fgScheduler" title='G4Scheduler::fgScheduler' data-ref="G4Scheduler::fgScheduler">fgScheduler</a> = <var>0</var>;</td></tr>
+<tr><th id="209">209</th><td></td></tr>
+<tr><th id="210">210</th><td><i>//  if (fVerbose &gt;= 1)</i></td></tr>
+<tr><th id="211">211</th><td><i>//  {</i></td></tr>
+<tr><th id="212">212</th><td><i>//    G4cout &lt;&lt; "G4Scheduler is being deleted. Bye :) !" &lt;&lt; G4endl;</i></td></tr>
+<tr><th id="213">213</th><td><i>//  }</i></td></tr>
+<tr><th id="214">214</th><td>}</td></tr>
+<tr><th id="215">215</th><td></td></tr>
+<tr><th id="216">216</th><td><em>void</em> <a class="type" href="../include/G4Scheduler.hh.html#G4Scheduler" title='G4Scheduler' data-ref="G4Scheduler">G4Scheduler</a>::<dfn class="decl def" id="_ZN11G4Scheduler5ClearEv" title='G4Scheduler::Clear' data-ref="_ZN11G4Scheduler5ClearEv">Clear</dfn>()</td></tr>
+<tr><th id="217">217</th><td>{</td></tr>
+<tr><th id="218">218</th><td><i>//  if (fVerbose) G4cout &lt;&lt; "*** G4Scheduler is being cleared ***" &lt;&lt; G4endl;</i></td></tr>
+<tr><th id="219">219</th><td></td></tr>
+<tr><th id="220">220</th><td>  <b>if</b>(<a class="member" href="../include/G4Scheduler.hh.html#G4Scheduler::fpMessenger" title='G4Scheduler::fpMessenger' data-ref="G4Scheduler::fpMessenger">fpMessenger</a>)</td></tr>
+<tr><th id="221">221</th><td>  {</td></tr>
+<tr><th id="222">222</th><td>    <b>delete</b> <a class="member" href="../include/G4Scheduler.hh.html#G4Scheduler::fpMessenger" title='G4Scheduler::fpMessenger' data-ref="G4Scheduler::fpMessenger">fpMessenger</a>;</td></tr>
+<tr><th id="223">223</th><td>    <a class="member" href="../include/G4Scheduler.hh.html#G4Scheduler::fpMessenger" title='G4Scheduler::fpMessenger' data-ref="G4Scheduler::fpMessenger">fpMessenger</a> = <var>0</var>;</td></tr>
+<tr><th id="224">224</th><td>  }</td></tr>
+<tr><th id="225">225</th><td>  <b>if</b>(<a class="member" href="../include/G4Scheduler.hh.html#G4Scheduler::fpStepProcessor" title='G4Scheduler::fpStepProcessor' data-ref="G4Scheduler::fpStepProcessor">fpStepProcessor</a>)</td></tr>
+<tr><th id="226">226</th><td>  {</td></tr>
+<tr><th id="227">227</th><td>    <b>delete</b> <a class="member" href="../include/G4Scheduler.hh.html#G4Scheduler::fpStepProcessor" title='G4Scheduler::fpStepProcessor' data-ref="G4Scheduler::fpStepProcessor">fpStepProcessor</a>;</td></tr>
+<tr><th id="228">228</th><td>    <a class="member" href="../include/G4Scheduler.hh.html#G4Scheduler::fpStepProcessor" title='G4Scheduler::fpStepProcessor' data-ref="G4Scheduler::fpStepProcessor">fpStepProcessor</a> = <var>0</var>;</td></tr>
+<tr><th id="229">229</th><td>  }</td></tr>
+<tr><th id="230">230</th><td>  <b>if</b>(<a class="member" href="../include/G4Scheduler.hh.html#G4Scheduler::fpModelProcessor" title='G4Scheduler::fpModelProcessor' data-ref="G4Scheduler::fpModelProcessor">fpModelProcessor</a>)</td></tr>
+<tr><th id="231">231</th><td>  {</td></tr>
+<tr><th id="232">232</th><td>    <b>delete</b> <a class="member" href="../include/G4Scheduler.hh.html#G4Scheduler::fpModelProcessor" title='G4Scheduler::fpModelProcessor' data-ref="G4Scheduler::fpModelProcessor">fpModelProcessor</a>;</td></tr>
+<tr><th id="233">233</th><td>    <a class="member" href="../include/G4Scheduler.hh.html#G4Scheduler::fpModelProcessor" title='G4Scheduler::fpModelProcessor' data-ref="G4Scheduler::fpModelProcessor">fpModelProcessor</a> = <var>0</var>;</td></tr>
+<tr><th id="234">234</th><td>  }</td></tr>
+<tr><th id="235">235</th><td></td></tr>
+<tr><th id="236">236</th><td>  <a class="type" href="../include/G4ITType.hh.html#G4ITTypeManager" title='G4ITTypeManager' data-ref="G4ITTypeManager">G4ITTypeManager</a>::<a class="ref" href="../include/G4ITType.hh.html#_ZN15G4ITTypeManager8InstanceEv" title='G4ITTypeManager::Instance' data-ref="_ZN15G4ITTypeManager8InstanceEv">Instance</a>()-&gt;<a class="ref" href="../include/G4ITType.hh.html#_ZN15G4ITTypeManager16ReleaseRessourceEv" title='G4ITTypeManager::ReleaseRessource' data-ref="_ZN15G4ITTypeManager16ReleaseRessourceEv">ReleaseRessource</a>();</td></tr>
+<tr><th id="237">237</th><td>  <a class="member" href="#_ZN11G4Scheduler9ClearListEv" title='G4Scheduler::ClearList' data-ref="_ZN11G4Scheduler9ClearListEv">ClearList</a>();</td></tr>
+<tr><th id="238">238</th><td>  <b>if</b>(<a class="member" href="../include/G4Scheduler.hh.html#G4Scheduler::fpTrackingManager" title='G4Scheduler::fpTrackingManager' data-ref="G4Scheduler::fpTrackingManager">fpTrackingManager</a>)</td></tr>
+<tr><th id="239">239</th><td>  {</td></tr>
+<tr><th id="240">240</th><td>    <b>delete</b> <a class="member" href="../include/G4Scheduler.hh.html#G4Scheduler::fpTrackingManager" title='G4Scheduler::fpTrackingManager' data-ref="G4Scheduler::fpTrackingManager">fpTrackingManager</a>;</td></tr>
+<tr><th id="241">241</th><td>    <a class="member" href="../include/G4Scheduler.hh.html#G4Scheduler::fpTrackingManager" title='G4Scheduler::fpTrackingManager' data-ref="G4Scheduler::fpTrackingManager">fpTrackingManager</a> = <var>0</var>;</td></tr>
+<tr><th id="242">242</th><td>  }</td></tr>
+<tr><th id="243">243</th><td></td></tr>
+<tr><th id="244">244</th><td>  <b>if</b>(<a class="member" href="../include/G4Scheduler.hh.html#G4Scheduler::fReactionSet" title='G4Scheduler::fReactionSet' data-ref="G4Scheduler::fReactionSet">fReactionSet</a>)</td></tr>
+<tr><th id="245">245</th><td>  {</td></tr>
+<tr><th id="246">246</th><td>    <b>delete</b> <a class="member" href="../include/G4Scheduler.hh.html#G4Scheduler::fReactionSet" title='G4Scheduler::fReactionSet' data-ref="G4Scheduler::fReactionSet">fReactionSet</a>;</td></tr>
+<tr><th id="247">247</th><td>    <a class="member" href="../include/G4Scheduler.hh.html#G4Scheduler::fReactionSet" title='G4Scheduler::fReactionSet' data-ref="G4Scheduler::fReactionSet">fReactionSet</a> = <var>0</var>;</td></tr>
+<tr><th id="248">248</th><td>  }</td></tr>
+<tr><th id="249">249</th><td></td></tr>
+<tr><th id="250">250</th><td>  <b>if</b>(<a class="member" href="../include/G4Scheduler.hh.html#G4Scheduler::fpModelHandler" title='G4Scheduler::fpModelHandler' data-ref="G4Scheduler::fpModelHandler">fpModelHandler</a>)</td></tr>
+<tr><th id="251">251</th><td>  {</td></tr>
+<tr><th id="252">252</th><td>    <b>delete</b> <a class="member" href="../include/G4Scheduler.hh.html#G4Scheduler::fpModelHandler" title='G4Scheduler::fpModelHandler' data-ref="G4Scheduler::fpModelHandler">fpModelHandler</a>;</td></tr>
+<tr><th id="253">253</th><td>    <a class="member" href="../include/G4Scheduler.hh.html#G4Scheduler::fpModelHandler" title='G4Scheduler::fpModelHandler' data-ref="G4Scheduler::fpModelHandler">fpModelHandler</a> = <var>0</var>;</td></tr>
+<tr><th id="254">254</th><td>  }</td></tr>
+<tr><th id="255">255</th><td></td></tr>
+<tr><th id="256">256</th><td>   <i>//* DEBUG</i></td></tr>
+<tr><th id="257">257</th><td><i>   //* assert(G4StateManager::GetStateManager()-&gt;</i></td></tr>
+<tr><th id="258">258</th><td><i>   //* DeregisterDependent(this) == true);</i></td></tr>
+<tr><th id="259">259</th><td></td></tr>
+<tr><th id="260">260</th><td>}</td></tr>
+<tr><th id="261">261</th><td></td></tr>
+<tr><th id="262">262</th><td><i>//_________________________________________________________________________</i></td></tr>
+<tr><th id="263">263</th><td></td></tr>
+<tr><th id="264">264</th><td><em>void</em> <a class="type" href="../include/G4Scheduler.hh.html#G4Scheduler" title='G4Scheduler' data-ref="G4Scheduler">G4Scheduler</a>::<dfn class="decl def" id="_ZN11G4Scheduler9ClearListEv" title='G4Scheduler::ClearList' data-ref="_ZN11G4Scheduler9ClearListEv">ClearList</dfn>()</td></tr>
+<tr><th id="265">265</th><td>{</td></tr>
+<tr><th id="266">266</th><td><i>//  if (fNbTracks == 0) return;</i></td></tr>
+<tr><th id="267">267</th><td></td></tr>
+<tr><th id="268">268</th><td>  <a class="member" href="../include/G4Scheduler.hh.html#G4Scheduler::fTrackContainer" title='G4Scheduler::fTrackContainer' data-ref="G4Scheduler::fTrackContainer">fTrackContainer</a>.<a class="ref" href="../include/G4ITTrackHolder.hh.html#_ZN15G4ITTrackHolder5ClearEv" title='G4ITTrackHolder::Clear' data-ref="_ZN15G4ITTrackHolder5ClearEv">Clear</a>();</td></tr>
+<tr><th id="269">269</th><td></td></tr>
+<tr><th id="270">270</th><td>  <a class="type" href="../include/G4AllITFinder.hh.html#G4AllITFinder" title='G4AllITFinder' data-ref="G4AllITFinder">G4AllITFinder</a>::<a class="ref" href="../include/G4AllITFinder.hh.html#_ZN13G4AllITFinder14DeleteInstanceEv" title='G4AllITFinder::DeleteInstance' data-ref="_ZN13G4AllITFinder14DeleteInstanceEv">DeleteInstance</a>();</td></tr>
+<tr><th id="271">271</th><td>}</td></tr>
+<tr><th id="272">272</th><td></td></tr>
+<tr><th id="273">273</th><td><i>//_________________________________________________________________________</i></td></tr>
+<tr><th id="274">274</th><td><em>void</em> <a class="type" href="../include/G4Scheduler.hh.html#G4Scheduler" title='G4Scheduler' data-ref="G4Scheduler">G4Scheduler</a>::<dfn class="virtual decl def" id="_ZN11G4Scheduler13RegisterModelEP14G4VITStepModeld" title='G4Scheduler::RegisterModel' data-ref="_ZN11G4Scheduler13RegisterModelEP14G4VITStepModeld">RegisterModel</dfn>(<a class="type" href="../include/G4VITStepModel.hh.html#G4VITStepModel" title='G4VITStepModel' data-ref="G4VITStepModel">G4VITStepModel</a>* <dfn class="local col7 decl" id="7model" title='model' data-type='G4VITStepModel *' data-ref="7model">model</dfn>, <em>double</em> <dfn class="local col8 decl" id="8time" title='time' data-type='double' data-ref="8time">time</dfn>)</td></tr>
+<tr><th id="275">275</th><td>{</td></tr>
+<tr><th id="276">276</th><td>  <a class="member" href="../include/G4Scheduler.hh.html#G4Scheduler::fpModelHandler" title='G4Scheduler::fpModelHandler' data-ref="G4Scheduler::fpModelHandler">fpModelHandler</a>-&gt;<a class="ref" href="../include/G4ITModelHandler.hh.html#_ZN16G4ITModelHandler13RegisterModelEP14G4VITStepModeld" title='G4ITModelHandler::RegisterModel' data-ref="_ZN16G4ITModelHandler13RegisterModelEP14G4VITStepModeld">RegisterModel</a>(<a class="local col7 ref" href="#7model" title='model' data-ref="7model">model</a>, <a class="local col8 ref" href="#8time" title='time' data-ref="8time">time</a>);</td></tr>
+<tr><th id="277">277</th><td>}</td></tr>
+<tr><th id="278">278</th><td></td></tr>
+<tr><th id="279">279</th><td><i>//_________________________________________________________________________</i></td></tr>
+<tr><th id="280">280</th><td></td></tr>
+<tr><th id="281">281</th><td><em>void</em> <a class="type" href="../include/G4Scheduler.hh.html#G4Scheduler" title='G4Scheduler' data-ref="G4Scheduler">G4Scheduler</a>::<dfn class="virtual decl def" id="_ZN11G4Scheduler10InitializeEv" title='G4Scheduler::Initialize' data-ref="_ZN11G4Scheduler10InitializeEv">Initialize</dfn>()</td></tr>
+<tr><th id="282">282</th><td>{</td></tr>
+<tr><th id="283">283</th><td>  <b>if</b>(<a class="member" href="../include/G4Scheduler.hh.html#G4Scheduler::fpStepProcessor" title='G4Scheduler::fpStepProcessor' data-ref="G4Scheduler::fpStepProcessor">fpStepProcessor</a>)</td></tr>
+<tr><th id="284">284</th><td>  {</td></tr>
+<tr><th id="285">285</th><td>    <b>delete</b> <a class="member" href="../include/G4Scheduler.hh.html#G4Scheduler::fpStepProcessor" title='G4Scheduler::fpStepProcessor' data-ref="G4Scheduler::fpStepProcessor">fpStepProcessor</a>;</td></tr>
+<tr><th id="286">286</th><td>  }</td></tr>
+<tr><th id="287">287</th><td>  <b>if</b>(<a class="member" href="../include/G4Scheduler.hh.html#G4Scheduler::fpModelProcessor" title='G4Scheduler::fpModelProcessor' data-ref="G4Scheduler::fpModelProcessor">fpModelProcessor</a>)</td></tr>
+<tr><th id="288">288</th><td>  {</td></tr>
+<tr><th id="289">289</th><td>    <b>delete</b> <a class="member" href="../include/G4Scheduler.hh.html#G4Scheduler::fpModelProcessor" title='G4Scheduler::fpModelProcessor' data-ref="G4Scheduler::fpModelProcessor">fpModelProcessor</a>;</td></tr>
+<tr><th id="290">290</th><td>  }</td></tr>
+<tr><th id="291">291</th><td>  <i>// if(fpMasterModelProcessor)</i></td></tr>
+<tr><th id="292">292</th><td><i>  // {</i></td></tr>
+<tr><th id="293">293</th><td><i>  //     delete fpMasterModelProcessor;</i></td></tr>
+<tr><th id="294">294</th><td><i>  // }</i></td></tr>
+<tr><th id="295">295</th><td><i></i></td></tr>
+<tr><th id="296">296</th><td><i>  //______________________________________________________________</i></td></tr>
+<tr><th id="297">297</th><td></td></tr>
+<tr><th id="298">298</th><td>  <a class="member" href="../include/G4Scheduler.hh.html#G4Scheduler::fpModelProcessor" title='G4Scheduler::fpModelProcessor' data-ref="G4Scheduler::fpModelProcessor">fpModelProcessor</a> = <b>new</b> <a class="type" href="../include/G4ITModelProcessor.hh.html#G4ITModelProcessor" title='G4ITModelProcessor' data-ref="G4ITModelProcessor">G4ITModelProcessor</a><a class="ref" href="../include/G4ITModelProcessor.hh.html#_ZN18G4ITModelProcessorC1Ev" title='G4ITModelProcessor::G4ITModelProcessor' data-ref="_ZN18G4ITModelProcessorC1Ev">(</a>);</td></tr>
+<tr><th id="299">299</th><td>  <a class="member" href="../include/G4Scheduler.hh.html#G4Scheduler::fpModelProcessor" title='G4Scheduler::fpModelProcessor' data-ref="G4Scheduler::fpModelProcessor">fpModelProcessor</a>-&gt;<a class="ref" href="../include/G4ITModelProcessor.hh.html#_ZN18G4ITModelProcessor15SetModelHandlerEP16G4ITModelHandler" title='G4ITModelProcessor::SetModelHandler' data-ref="_ZN18G4ITModelProcessor15SetModelHandlerEP16G4ITModelHandler">SetModelHandler</a>(<a class="member" href="../include/G4Scheduler.hh.html#G4Scheduler::fpModelHandler" title='G4Scheduler::fpModelHandler' data-ref="G4Scheduler::fpModelHandler">fpModelHandler</a>);</td></tr>
+<tr><th id="300">300</th><td>  fpModelProcessor-&gt;<span class='error' title="no member named &apos;SetTrackingManager&apos; in &apos;G4ITModelProcessor&apos;">SetTrackingManager</span>(fpTrackingManager);</td></tr>
+<tr><th id="301">301</th><td></td></tr>
+<tr><th id="302">302</th><td>  <i>// fpMasterModelProcessor = new G4ITModelProcessor();</i></td></tr>
+<tr><th id="303">303</th><td><i>  // fpMasterModelProcessor-&gt;SetModelHandler(fpModelHandler);</i></td></tr>
+<tr><th id="304">304</th><td><i>  // fpModelProcessor      = fpMasterModelProcessor;</i></td></tr>
+<tr><th id="305">305</th><td><i></i></td></tr>
+<tr><th id="306">306</th><td><i>  //______________________________________________________________</i></td></tr>
+<tr><th id="307">307</th><td></td></tr>
+<tr><th id="308">308</th><td>  <a class="member" href="../include/G4Scheduler.hh.html#G4Scheduler::fpStepProcessor" title='G4Scheduler::fpStepProcessor' data-ref="G4Scheduler::fpStepProcessor">fpStepProcessor</a> = <b>new</b> <a class="type" href="../include/G4ITStepProcessor.hh.html#G4ITStepProcessor" title='G4ITStepProcessor' data-ref="G4ITStepProcessor">G4ITStepProcessor</a><a class="ref" href="../include/G4ITStepProcessor.hh.html#_ZN17G4ITStepProcessorC1Ev" title='G4ITStepProcessor::G4ITStepProcessor' data-ref="_ZN17G4ITStepProcessorC1Ev">(</a>);</td></tr>
+<tr><th id="309">309</th><td>  <a class="member" href="../include/G4Scheduler.hh.html#G4Scheduler::fpStepProcessor" title='G4Scheduler::fpStepProcessor' data-ref="G4Scheduler::fpStepProcessor">fpStepProcessor</a>-&gt;<a class="ref" href="../include/G4ITStepProcessor.hh.html#_ZN17G4ITStepProcessor18SetTrackingManagerEP19G4ITTrackingManager" title='G4ITStepProcessor::SetTrackingManager' data-ref="_ZN17G4ITStepProcessor18SetTrackingManagerEP19G4ITTrackingManager">SetTrackingManager</a>(<a class="member" href="../include/G4Scheduler.hh.html#G4Scheduler::fpTrackingManager" title='G4Scheduler::fpTrackingManager' data-ref="G4Scheduler::fpTrackingManager">fpTrackingManager</a>);</td></tr>
+<tr><th id="310">310</th><td></td></tr>
+<tr><th id="311">311</th><td>  <a class="member" href="../include/G4Scheduler.hh.html#G4Scheduler::fpTrackingManager" title='G4Scheduler::fpTrackingManager' data-ref="G4Scheduler::fpTrackingManager">fpTrackingManager</a>-&gt;<a class="ref" href="../include/G4ITTrackingManager.hh.html#_ZN19G4ITTrackingManager16SetInteractivityEP25G4ITTrackingInteractivity" title='G4ITTrackingManager::SetInteractivity' data-ref="_ZN19G4ITTrackingManager16SetInteractivityEP25G4ITTrackingInteractivity">SetInteractivity</a>(<a class="member" href="../include/G4Scheduler.hh.html#G4Scheduler::fpTrackingInteractivity" title='G4Scheduler::fpTrackingInteractivity' data-ref="G4Scheduler::fpTrackingInteractivity">fpTrackingInteractivity</a>);</td></tr>
+<tr><th id="312">312</th><td></td></tr>
+<tr><th id="313">313</th><td>  <i>// fpMasterStepProcessor = new G4ITStepProcessor();</i></td></tr>
+<tr><th id="314">314</th><td><i>  // fpMasterStepProcessor-&gt;SetTrackingManager(fpTrackingManager);</i></td></tr>
+<tr><th id="315">315</th><td><i>  // fpStepProcessor = fpMasterStepProcessor ;</i></td></tr>
+<tr><th id="316">316</th><td><i>  //______________________________________________________________</i></td></tr>
+<tr><th id="317">317</th><td></td></tr>
+<tr><th id="318">318</th><td>  <b>if</b>(<a class="member" href="../include/G4Scheduler.hh.html#G4Scheduler::fUsePreDefinedTimeSteps" title='G4Scheduler::fUsePreDefinedTimeSteps' data-ref="G4Scheduler::fUsePreDefinedTimeSteps">fUsePreDefinedTimeSteps</a>)</td></tr>
+<tr><th id="319">319</th><td>  {</td></tr>
+<tr><th id="320">320</th><td>    <b>if</b>(<span class='error' title="use of undeclared identifier &apos;fpUserTimeSteps&apos;">fpUserTimeSteps</span> == <var>0</var>) <i>// Extra checking, is it necessary ?</i></td></tr>
+<tr><th id="321">321</th><td>    {</td></tr>
+<tr><th id="322">322</th><td>      <a class="typedef" href="../../../../../global/management/include/G4Exception.hh.html#G4ExceptionDescription" title='G4ExceptionDescription' data-type='int' data-ref="G4ExceptionDescription">G4ExceptionDescription</a> <dfn class="local col9 decl" id="9exceptionDescription" title='exceptionDescription' data-type='G4ExceptionDescription' data-ref="9exceptionDescription">exceptionDescription</dfn>;</td></tr>
+<tr><th id="323">323</th><td>      exceptionDescription</td></tr>
+<tr><th id="324">324</th><td>          <span class='error' title="invalid operands to binary expression (&apos;G4ExceptionDescription&apos; (aka &apos;int&apos;) and &apos;const char *&apos;)">&lt;&lt;</span> <q>"You are asking to use user defined steps but you did not give any."</q>;</td></tr>
+<tr><th id="325">325</th><td>      <a class="ref" href="../../../../../global/management/include/G4Exception.hh.html#_Z11G4ExceptionPKcS0_19G4ExceptionSeverityRi" title='G4Exception' data-ref="_Z11G4ExceptionPKcS0_19G4ExceptionSeverityRi">G4Exception</a>(<q>"G4Scheduler::FindUserPreDefinedTimeStep"</q>,</td></tr>
+<tr><th id="326">326</th><td>                  <q>"Scheduler004"</q>,</td></tr>
+<tr><th id="327">327</th><td>                  <a class="enum" href="../../../../../global/management/include/G4ExceptionSeverity.hh.html#G4ExceptionSeverity::FatalErrorInArgument" title='G4ExceptionSeverity::FatalErrorInArgument' data-ref="G4ExceptionSeverity::FatalErrorInArgument">FatalErrorInArgument</a>,</td></tr>
+<tr><th id="328">328</th><td>                  <span class='refarg'><a class="local col9 ref" href="#9exceptionDescription" title='exceptionDescription' data-ref="9exceptionDescription">exceptionDescription</a></span>);</td></tr>
+<tr><th id="329">329</th><td>      <b>return</b>; <i>// makes coverity happy</i></td></tr>
+<tr><th id="330">330</th><td>    }</td></tr>
+<tr><th id="331">331</th><td>  }</td></tr>
+<tr><th id="332">332</th><td></td></tr>
+<tr><th id="333">333</th><td><i>//  if (fComputeTimeStep)</i></td></tr>
+<tr><th id="334">334</th><td><i>//  {</i></td></tr>
+<tr><th id="335">335</th><td><i>//    if (fpModelProcessor == 0)</i></td></tr>
+<tr><th id="336">336</th><td><i>//    {</i></td></tr>
+<tr><th id="337">337</th><td><i>//      G4ExceptionDescription exceptionDescription;</i></td></tr>
+<tr><th id="338">338</th><td><i>//      exceptionDescription</i></td></tr>
+<tr><th id="339">339</th><td><i>//          &lt;&lt; "There is no G4ITModelProcessor to handle IT reaction. ";</i></td></tr>
+<tr><th id="340">340</th><td><i>//      exceptionDescription</i></td></tr>
+<tr><th id="341">341</th><td><i>//          &lt;&lt; "You probably did not initialize the G4Scheduler. ";</i></td></tr>
+<tr><th id="342">342</th><td><i>//      exceptionDescription</i></td></tr>
+<tr><th id="343">343</th><td><i>//          &lt;&lt; "Just do G4Scheduler::Instance()-&gt;Initialize(); ";</i></td></tr>
+<tr><th id="344">344</th><td><i>//      exceptionDescription &lt;&lt; " but only after initializing the run manager.";</i></td></tr>
+<tr><th id="345">345</th><td><i>//      G4Exception("G4Scheduler::CalculateMinStep", "ITScheduler005",</i></td></tr>
+<tr><th id="346">346</th><td><i>//                  FatalErrorInArgument, exceptionDescription);</i></td></tr>
+<tr><th id="347">347</th><td><i>//      return; // makes coverity happy</i></td></tr>
+<tr><th id="348">348</th><td><i>//    }</i></td></tr>
+<tr><th id="349">349</th><td><i>//  }</i></td></tr>
+<tr><th id="350">350</th><td></td></tr>
+<tr><th id="351">351</th><td>  <a class="member" href="../include/G4Scheduler.hh.html#G4Scheduler::fInitialized" title='G4Scheduler::fInitialized' data-ref="G4Scheduler::fInitialized">fInitialized</a> = <b>true</b>;</td></tr>
+<tr><th id="352">352</th><td>}</td></tr>
+<tr><th id="353">353</th><td></td></tr>
+<tr><th id="354">354</th><td><i>//_________________________________________________________________________</i></td></tr>
+<tr><th id="355">355</th><td></td></tr>
+<tr><th id="356">356</th><td><em>void</em> <a class="type" href="../include/G4Scheduler.hh.html#G4Scheduler" title='G4Scheduler' data-ref="G4Scheduler">G4Scheduler</a>::<dfn class="virtual decl def" id="_ZN11G4Scheduler5ResetEv" title='G4Scheduler::Reset' data-ref="_ZN11G4Scheduler5ResetEv">Reset</dfn>()</td></tr>
+<tr><th id="357">357</th><td>{</td></tr>
+<tr><th id="358">358</th><td>  <a class="member" href="../include/G4Scheduler.hh.html#G4Scheduler::fStartTime" title='G4Scheduler::fStartTime' data-ref="G4Scheduler::fStartTime">fStartTime</a> = <var>0</var>;</td></tr>
+<tr><th id="359">359</th><td>  <a class="member" href="../include/G4Scheduler.hh.html#G4Scheduler::fUserUpperTimeLimit" title='G4Scheduler::fUserUpperTimeLimit' data-ref="G4Scheduler::fUserUpperTimeLimit">fUserUpperTimeLimit</a> = -<var>1</var>;</td></tr>
+<tr><th id="360">360</th><td>  fTimeStep = <a class="macro" href="../../../../../global/management/include/templates.hh.html#82" title="std::numeric_limits&lt;double&gt;::max()" data-ref="_M/DBL_MAX">DBL_MAX</a>;</td></tr>
+<tr><th id="361">361</th><td>  fTSTimeStep = <a class="macro" href="../../../../../global/management/include/templates.hh.html#82" title="std::numeric_limits&lt;double&gt;::max()" data-ref="_M/DBL_MAX">DBL_MAX</a>;</td></tr>
+<tr><th id="362">362</th><td>  fILTimeStep = <a class="macro" href="../../../../../global/management/include/templates.hh.html#82" title="std::numeric_limits&lt;double&gt;::max()" data-ref="_M/DBL_MAX">DBL_MAX</a>;</td></tr>
+<tr><th id="363">363</th><td>  fPreviousTimeStep = <a class="macro" href="../../../../../global/management/include/templates.hh.html#82" title="std::numeric_limits&lt;double&gt;::max()" data-ref="_M/DBL_MAX">DBL_MAX</a>;</td></tr>
+<tr><th id="364">364</th><td>  <a class="member" href="../include/G4Scheduler.hh.html#G4Scheduler::fGlobalTime" title='G4Scheduler::fGlobalTime' data-ref="G4Scheduler::fGlobalTime">fGlobalTime</a> = -<var>1</var>;</td></tr>
+<tr><th id="365">365</th><td>  <a class="member" href="../include/G4Scheduler.hh.html#G4Scheduler::fInteractionStep" title='G4Scheduler::fInteractionStep' data-ref="G4Scheduler::fInteractionStep">fInteractionStep</a> = <b>true</b>;</td></tr>
+<tr><th id="366">366</th><td>  <a class="member" href="../include/G4Scheduler.hh.html#G4Scheduler::fITStepStatus" title='G4Scheduler::fITStepStatus' data-ref="G4Scheduler::fITStepStatus">fITStepStatus</a> = <a class="enum" href="../include/G4ITStepStatus.hh.html#G4ITStepStatus::eUndefined" title='G4ITStepStatus::eUndefined' data-ref="G4ITStepStatus::eUndefined">eUndefined</a>;</td></tr>
+<tr><th id="367">367</th><td>  <a class="member" href="../include/G4Scheduler.hh.html#G4Scheduler::fZeroTimeCount" title='G4Scheduler::fZeroTimeCount' data-ref="G4Scheduler::fZeroTimeCount">fZeroTimeCount</a> = <var>0</var>;</td></tr>
+<tr><th id="368">368</th><td></td></tr>
+<tr><th id="369">369</th><td>  <a class="member" href="../include/G4Scheduler.hh.html#G4Scheduler::fNbSteps" title='G4Scheduler::fNbSteps' data-ref="G4Scheduler::fNbSteps">fNbSteps</a> = <var>0</var>;</td></tr>
+<tr><th id="370">370</th><td>  <a class="member" href="../include/G4Scheduler.hh.html#G4Scheduler::fContinue" title='G4Scheduler::fContinue' data-ref="G4Scheduler::fContinue">fContinue</a> = <b>true</b>;</td></tr>
+<tr><th id="371">371</th><td>  <i>// fReactingTracks.clear();</i></td></tr>
+<tr><th id="372">372</th><td>  <a class="member" href="../include/G4Scheduler.hh.html#G4Scheduler::fReactionSet" title='G4Scheduler::fReactionSet' data-ref="G4Scheduler::fReactionSet">fReactionSet</a>-&gt;<a class="ref" href="../include/G4ITReaction.hh.html#_ZN15G4ITReactionSet16CleanAllReactionEv" title='G4ITReactionSet::CleanAllReaction' data-ref="_ZN15G4ITReactionSet16CleanAllReactionEv">CleanAllReaction</a>();</td></tr>
+<tr><th id="373">373</th><td>}</td></tr>
+<tr><th id="374">374</th><td><i>//_________________________________________________________________________</i></td></tr>
+<tr><th id="375">375</th><td></td></tr>
+<tr><th id="376">376</th><td><em>void</em> <a class="type" href="../include/G4Scheduler.hh.html#G4Scheduler" title='G4Scheduler' data-ref="G4Scheduler">G4Scheduler</a>::<dfn class="virtual decl def" id="_ZN11G4Scheduler7ProcessEv" title='G4Scheduler::Process' data-ref="_ZN11G4Scheduler7ProcessEv">Process</dfn>()</td></tr>
+<tr><th id="377">377</th><td>{</td></tr>
+<tr><th id="378">378</th><td></td></tr>
+<tr><th id="379">379</th><td><u>#<span data-ppcond="379">ifdef</span> <span class="macro" data-ref="_M/G4VERBOSE">G4VERBOSE</span></u></td></tr>
+<tr><th id="380">380</th><td>  <b>if</b>(<a class="member" href="../include/G4Scheduler.hh.html#G4Scheduler::fVerbose" title='G4Scheduler::fVerbose' data-ref="G4Scheduler::fVerbose">fVerbose</a>)</td></tr>
+<tr><th id="381">381</th><td>  {</td></tr>
+<tr><th id="382">382</th><td>    <a class="macro" href="../../../../../global/management/include/G4ios.hh.html#46" title="(*_G4cout_p())" data-ref="_M/G4cout">G4cout</a> <span class='error' title="invalid operands to binary expression (&apos;int&apos; and &apos;const char *&apos;)">&lt;&lt;</span> <q>"*** G4Scheduler starts processing "</q> &lt;&lt; <a class="macro" href="../../../../../global/management/include/G4ios.hh.html#60" title="std::endl" data-ref="_M/G4endl">G4endl</a>;</td></tr>
+<tr><th id="383">383</th><td>    <b>if</b>(fVerbose &gt; <var>2</var>)</td></tr>
+<tr><th id="384">384</th><td>    <a class="macro" href="../../../../../global/management/include/G4ios.hh.html#46" title="(*_G4cout_p())" data-ref="_M/G4cout">G4cout</a> <span class='error' title="invalid operands to binary expression (&apos;int&apos; and &apos;const char *&apos;)">&lt;&lt;</span> <q>"___________________________________________"</q></td></tr>
+<tr><th id="385">385</th><td>    <q>"___________________________"</q> &lt;&lt; <a class="macro" href="../../../../../global/management/include/G4ios.hh.html#60" title="std::endl" data-ref="_M/G4endl">G4endl</a>;</td></tr>
+<tr><th id="386">386</th><td>  }</td></tr>
+<tr><th id="387">387</th><td><u>#<span data-ppcond="379">endif</span></u></td></tr>
+<tr><th id="388">388</th><td></td></tr>
+<tr><th id="389">389</th><td>  <b>if</b> (<a class="member" href="../include/G4Scheduler.hh.html#G4Scheduler::fInitialized" title='G4Scheduler::fInitialized' data-ref="G4Scheduler::fInitialized">fInitialized</a> == <b>false</b>) <a class="virtual member" href="#_ZN11G4Scheduler10InitializeEv" title='G4Scheduler::Initialize' data-ref="_ZN11G4Scheduler10InitializeEv">Initialize</a>();</td></tr>
+<tr><th id="390">390</th><td></td></tr>
+<tr><th id="391">391</th><td>  <i>// fpTrackingManager-&gt;Initialize();</i></td></tr>
+<tr><th id="392">392</th><td>  <a class="member" href="../include/G4Scheduler.hh.html#G4Scheduler::fpModelProcessor" title='G4Scheduler::fpModelProcessor' data-ref="G4Scheduler::fpModelProcessor">fpModelProcessor</a>-&gt;<a class="ref" href="../include/G4ITModelProcessor.hh.html#_ZN18G4ITModelProcessor10InitializeEv" title='G4ITModelProcessor::Initialize' data-ref="_ZN18G4ITModelProcessor10InitializeEv">Initialize</a>();</td></tr>
+<tr><th id="393">393</th><td>  <a class="member" href="../include/G4Scheduler.hh.html#G4Scheduler::fpStepProcessor" title='G4Scheduler::fpStepProcessor' data-ref="G4Scheduler::fpStepProcessor">fpStepProcessor</a>-&gt;<a class="virtual ref" href="../include/G4ITStepProcessor.hh.html#_ZN17G4ITStepProcessor10InitializeEv" title='G4ITStepProcessor::Initialize' data-ref="_ZN17G4ITStepProcessor10InitializeEv">Initialize</a>();</td></tr>
+<tr><th id="394">394</th><td></td></tr>
+<tr><th id="395">395</th><td>  <i>// TODO</i></td></tr>
+<tr><th id="396">396</th><td><i>  // fpMasterModelProcessor-&gt;Initialize();</i></td></tr>
+<tr><th id="397">397</th><td><i>  // fpMasterStepProcessor-&gt;Initialize();</i></td></tr>
+<tr><th id="398">398</th><td></td></tr>
+<tr><th id="399">399</th><td>  <b>if</b> (<a class="member" href="../include/G4Scheduler.hh.html#G4Scheduler::fpGun" title='G4Scheduler::fpGun' data-ref="G4Scheduler::fpGun">fpGun</a>) <a class="member" href="../include/G4Scheduler.hh.html#G4Scheduler::fpGun" title='G4Scheduler::fpGun' data-ref="G4Scheduler::fpGun">fpGun</a>-&gt;<a class="virtual ref" href="../include/G4ITGun.hh.html#_ZN7G4ITGun12DefineTracksEv" title='G4ITGun::DefineTracks' data-ref="_ZN7G4ITGun12DefineTracksEv">DefineTracks</a>();</td></tr>
+<tr><th id="400">400</th><td></td></tr>
+<tr><th id="401">401</th><td>  <b>if</b> (<a class="member" href="../include/G4Scheduler.hh.html#G4Scheduler::fpTrackingInteractivity" title='G4Scheduler::fpTrackingInteractivity' data-ref="G4Scheduler::fpTrackingInteractivity">fpTrackingInteractivity</a>) <a class="member" href="../include/G4Scheduler.hh.html#G4Scheduler::fpTrackingInteractivity" title='G4Scheduler::fpTrackingInteractivity' data-ref="G4Scheduler::fpTrackingInteractivity">fpTrackingInteractivity</a>-&gt;<a class="virtual ref" href="../include/G4ITTrackingInteractivity.hh.html#_ZN25G4ITTrackingInteractivity10InitializeEv" title='G4ITTrackingInteractivity::Initialize' data-ref="_ZN25G4ITTrackingInteractivity10InitializeEv">Initialize</a>();</td></tr>
+<tr><th id="402">402</th><td></td></tr>
+<tr><th id="403">403</th><td>  <i>// ___________________</i></td></tr>
+<tr><th id="404">404</th><td>  <a class="member" href="../include/G4Scheduler.hh.html#G4Scheduler::fRunning" title='G4Scheduler::fRunning' data-ref="G4Scheduler::fRunning">fRunning</a> = <b>true</b>;</td></tr>
+<tr><th id="405">405</th><td>  <a class="virtual member" href="#_ZN11G4Scheduler5ResetEv" title='G4Scheduler::Reset' data-ref="_ZN11G4Scheduler5ResetEv">Reset</a>();</td></tr>
+<tr><th id="406">406</th><td></td></tr>
+<tr><th id="407">407</th><td>  <b>if</b> (<a class="member" href="../include/G4Scheduler.hh.html#G4Scheduler::fpUserTimeStepAction" title='G4Scheduler::fpUserTimeStepAction' data-ref="G4Scheduler::fpUserTimeStepAction">fpUserTimeStepAction</a>) <a class="member" href="../include/G4Scheduler.hh.html#G4Scheduler::fpUserTimeStepAction" title='G4Scheduler::fpUserTimeStepAction' data-ref="G4Scheduler::fpUserTimeStepAction">fpUserTimeStepAction</a>-&gt;<a class="virtual ref" href="../include/G4UserTimeStepAction.hh.html#_ZN20G4UserTimeStepAction15StartProcessingEv" title='G4UserTimeStepAction::StartProcessing' data-ref="_ZN20G4UserTimeStepAction15StartProcessingEv">StartProcessing</a>();</td></tr>
+<tr><th id="408">408</th><td></td></tr>
+<tr><th id="409">409</th><td><u>#<span data-ppcond="409">ifdef</span> <span class="macro" data-ref="_M/G4VERBOSE">G4VERBOSE</span></u></td></tr>
+<tr><th id="410">410</th><td>  <a class="typedef" href="../../../../../global/management/include/G4Types.hh.html#G4bool" title='G4bool' data-type='bool' data-ref="G4bool">G4bool</a> <dfn class="local col0 decl" id="10trackFound" title='trackFound' data-type='G4bool' data-ref="10trackFound">trackFound</dfn> = <b>false</b>;</td></tr>
+<tr><th id="411">411</th><td>  <a class="type" href="../include/G4IosFlagsSaver.hh.html#G4IosFlagsSaver" title='G4IosFlagsSaver' data-ref="G4IosFlagsSaver">G4IosFlagsSaver</a> <span class='error' title="no matching constructor for initialization of &apos;G4IosFlagsSaver&apos;"><dfn class="local col1 decl" id="11iosfs" title='iosfs' data-type='G4IosFlagsSaver' data-ref="11iosfs">iosfs</dfn></span>(<a class="macro" href="../../../../../global/management/include/G4ios.hh.html#46" title="(*_G4cout_p())" data-ref="_M/G4cout">G4cout</a>);</td></tr>
+<tr><th id="412">412</th><td>  <a class="macro" href="../../../../../global/management/include/G4ios.hh.html#46" title="(*_G4cout_p())" data-ref="_M/G4cout">G4cout</a><span class='error' title="member reference base type &apos;int&apos; is not a structure or union">.</span>precision(<var>5</var>);</td></tr>
+<tr><th id="413">413</th><td><u>#<span data-ppcond="409">endif</span></u></td></tr>
+<tr><th id="414">414</th><td></td></tr>
+<tr><th id="415">415</th><td>  <i>//===========================================================================</i></td></tr>
+<tr><th id="416">416</th><td><i>  // By default, before the G4Scheduler is launched, the tracks are pushed to</i></td></tr>
+<tr><th id="417">417</th><td><i>  // the delayed lists</i></td></tr>
+<tr><th id="418">418</th><td><i>  //===========================================================================</i></td></tr>
+<tr><th id="419">419</th><td></td></tr>
+<tr><th id="420">420</th><td>  <b>if</b>(<a class="member" href="../include/G4Scheduler.hh.html#G4Scheduler::fTrackContainer" title='G4Scheduler::fTrackContainer' data-ref="G4Scheduler::fTrackContainer">fTrackContainer</a>.<a class="ref" href="../include/G4ITTrackHolder.hh.html#_ZN15G4ITTrackHolder18DelayListsNOTEmptyEv" title='G4ITTrackHolder::DelayListsNOTEmpty' data-ref="_ZN15G4ITTrackHolder18DelayListsNOTEmptyEv">DelayListsNOTEmpty</a>())</td></tr>
+<tr><th id="421">421</th><td>  {</td></tr>
+<tr><th id="422">422</th><td>    <a class="member" href="../include/G4Scheduler.hh.html#G4Scheduler::fStartTime" title='G4Scheduler::fStartTime' data-ref="G4Scheduler::fStartTime">fStartTime</a> = <a class="member" href="../include/G4Scheduler.hh.html#G4Scheduler::fTrackContainer" title='G4Scheduler::fTrackContainer' data-ref="G4Scheduler::fTrackContainer">fTrackContainer</a>.<a class="ref" href="../include/G4ITTrackHolder.hh.html#_ZN15G4ITTrackHolder11GetNextTimeEv" title='G4ITTrackHolder::GetNextTime' data-ref="_ZN15G4ITTrackHolder11GetNextTimeEv">GetNextTime</a>();</td></tr>
+<tr><th id="423">423</th><td><u>#<span data-ppcond="423">ifdef</span> <span class="macro" data-ref="_M/G4VERBOSE">G4VERBOSE</span></u></td></tr>
+<tr><th id="424">424</th><td>    <a class="local col0 ref" href="#10trackFound" title='trackFound' data-ref="10trackFound">trackFound</a> = <b>true</b>;</td></tr>
+<tr><th id="425">425</th><td>    <a class="type" href="../../../../../global/management/include/G4Timer.hh.html#G4Timer" title='G4Timer' data-ref="G4Timer">G4Timer</a> <a class="ref fake" href="../../../../../global/management/include/G4Timer.hh.html#_ZN7G4TimerC1Ev" title='G4Timer::G4Timer' data-ref="_ZN7G4TimerC1Ev"></a><dfn class="local col2 decl" id="12localtimer" title='localtimer' data-type='G4Timer' data-ref="12localtimer">localtimer</dfn>;</td></tr>
+<tr><th id="426">426</th><td>    <b>if</b>(<a class="member" href="../include/G4Scheduler.hh.html#G4Scheduler::fVerbose" title='G4Scheduler::fVerbose' data-ref="G4Scheduler::fVerbose">fVerbose</a>&gt;<var>1</var>)</td></tr>
+<tr><th id="427">427</th><td>    {</td></tr>
+<tr><th id="428">428</th><td>      <a class="local col2 ref" href="#12localtimer" title='localtimer' data-ref="12localtimer">localtimer</a>.<a class="ref" href="../../../../../global/management/include/G4Timer.hh.html#_ZN7G4Timer5StartEv" title='G4Timer::Start' data-ref="_ZN7G4Timer5StartEv">Start</a>();</td></tr>
+<tr><th id="429">429</th><td>    }</td></tr>
+<tr><th id="430">430</th><td><u>#<span data-ppcond="423">endif</span></u></td></tr>
+<tr><th id="431">431</th><td>    <a class="member" href="#_ZN11G4Scheduler17SynchronizeTracksEv" title='G4Scheduler::SynchronizeTracks' data-ref="_ZN11G4Scheduler17SynchronizeTracksEv">SynchronizeTracks</a>();</td></tr>
+<tr><th id="432">432</th><td><u>#<span data-ppcond="432">ifdef</span> <span class="macro" data-ref="_M/G4VERBOSE">G4VERBOSE</span></u></td></tr>
+<tr><th id="433">433</th><td>    <b>if</b>(<a class="member" href="../include/G4Scheduler.hh.html#G4Scheduler::fVerbose" title='G4Scheduler::fVerbose' data-ref="G4Scheduler::fVerbose">fVerbose</a>&gt;<var>1</var>)</td></tr>
+<tr><th id="434">434</th><td>    {</td></tr>
+<tr><th id="435">435</th><td>      <a class="local col2 ref" href="#12localtimer" title='localtimer' data-ref="12localtimer">localtimer</a>.<a class="ref" href="../../../../../global/management/include/G4Timer.hh.html#_ZN7G4Timer4StopEv" title='G4Timer::Stop' data-ref="_ZN7G4Timer4StopEv">Stop</a>();</td></tr>
+<tr><th id="436">436</th><td>      <a class="macro" href="../../../../../global/management/include/G4ios.hh.html#46" title="(*_G4cout_p())" data-ref="_M/G4cout">G4cout</a> <span class='error' title="invalid operands to binary expression (&apos;int&apos; and &apos;const char *&apos;)">&lt;&lt;</span> <q>"G4Scheduler: process time= "</q>&lt;&lt; localtimer &lt;&lt; <a class="macro" href="../../../../../global/management/include/G4ios.hh.html#60" title="std::endl" data-ref="_M/G4endl">G4endl</a>;</td></tr>
+<tr><th id="437">437</th><td>    }</td></tr>
+<tr><th id="438">438</th><td><u>#<span data-ppcond="432">endif</span></u></td></tr>
+<tr><th id="439">439</th><td>  }</td></tr>
+<tr><th id="440">440</th><td></td></tr>
+<tr><th id="441">441</th><td><i>//  //---------------------------------</i></td></tr>
+<tr><th id="442">442</th><td><i>//  // TODO: This could be removed ?</i></td></tr>
+<tr><th id="443">443</th><td><i>//  if(fTrackContainer.MainListsNOTEmpty()</i></td></tr>
+<tr><th id="444">444</th><td><i>//      &amp;&amp; (fMaxSteps == -1 ? true : fNbSteps &lt; fMaxSteps)</i></td></tr>
+<tr><th id="445">445</th><td><i>//      &amp;&amp; fGlobalTime &lt; fEndTime</i></td></tr>
+<tr><th id="446">446</th><td><i>//      &amp;&amp; fContinue == true)</i></td></tr>
+<tr><th id="447">447</th><td><i>//{</i></td></tr>
+<tr><th id="448">448</th><td><i>//#ifdef G4VERBOSE</i></td></tr>
+<tr><th id="449">449</th><td><i>//    trackFound = true;</i></td></tr>
+<tr><th id="450">450</th><td><i>//#endif</i></td></tr>
+<tr><th id="451">451</th><td><i>//    DoProcess();</i></td></tr>
+<tr><th id="452">452</th><td><i>//}</i></td></tr>
+<tr><th id="453">453</th><td><i>//  //---------------------------------</i></td></tr>
+<tr><th id="454">454</th><td></td></tr>
+<tr><th id="455">455</th><td><u>#<span data-ppcond="455">ifdef</span> <span class="macro" data-ref="_M/G4VERBOSE">G4VERBOSE</span></u></td></tr>
+<tr><th id="456">456</th><td>  <b>if</b>(<a class="member" href="../include/G4Scheduler.hh.html#G4Scheduler::fVerbose" title='G4Scheduler::fVerbose' data-ref="G4Scheduler::fVerbose">fVerbose</a>)</td></tr>
+<tr><th id="457">457</th><td>  {</td></tr>
+<tr><th id="458">458</th><td>    <b>if</b>(<a class="local col0 ref" href="#10trackFound" title='trackFound' data-ref="10trackFound">trackFound</a>)</td></tr>
+<tr><th id="459">459</th><td>    {</td></tr>
+<tr><th id="460">460</th><td>      <a class="macro" href="../../../../../global/management/include/G4ios.hh.html#46" title="(*_G4cout_p())" data-ref="_M/G4cout">G4cout</a> <span class='error' title="invalid operands to binary expression (&apos;int&apos; and &apos;const char *&apos;)">&lt;&lt;</span> <q>"*** G4Scheduler ends at time : "</q></td></tr>
+<tr><th id="461">461</th><td>      &lt;&lt; G4BestUnit(fGlobalTime,<q>"Time"</q>) &lt;&lt; <a class="macro" href="../../../../../global/management/include/G4ios.hh.html#60" title="std::endl" data-ref="_M/G4endl">G4endl</a>;</td></tr>
+<tr><th id="462">462</th><td>      <a class="macro" href="../../../../../global/management/include/G4ios.hh.html#46" title="(*_G4cout_p())" data-ref="_M/G4cout">G4cout</a> <span class='error' title="invalid operands to binary expression (&apos;int&apos; and &apos;const char *&apos;)">&lt;&lt;</span> <q>"___________________________________"</q> &lt;&lt; <a class="macro" href="../../../../../global/management/include/G4ios.hh.html#60" title="std::endl" data-ref="_M/G4endl">G4endl</a>;</td></tr>
+<tr><th id="463">463</th><td>    }</td></tr>
+<tr><th id="464">464</th><td>    <b>else</b></td></tr>
+<tr><th id="465">465</th><td>    {</td></tr>
+<tr><th id="466">466</th><td>      <a class="macro" href="../../../../../global/management/include/G4ios.hh.html#46" title="(*_G4cout_p())" data-ref="_M/G4cout">G4cout</a> <span class='error' title="invalid operands to binary expression (&apos;int&apos; and &apos;const char *&apos;)">&lt;&lt;</span> <q>"*** G4Scheduler did not start because no "</q></td></tr>
+<tr><th id="467">467</th><td>      <q>"track was found to be processed"</q>&lt;&lt; <a class="macro" href="../../../../../global/management/include/G4ios.hh.html#60" title="std::endl" data-ref="_M/G4endl">G4endl</a>;</td></tr>
+<tr><th id="468">468</th><td>      <a class="macro" href="../../../../../global/management/include/G4ios.hh.html#46" title="(*_G4cout_p())" data-ref="_M/G4cout">G4cout</a> <span class='error' title="invalid operands to binary expression (&apos;int&apos; and &apos;const char *&apos;)">&lt;&lt;</span> <q>"___________________________________"</q> &lt;&lt; <a class="macro" href="../../../../../global/management/include/G4ios.hh.html#60" title="std::endl" data-ref="_M/G4endl">G4endl</a>;</td></tr>
+<tr><th id="469">469</th><td>    }</td></tr>
+<tr><th id="470">470</th><td>  }</td></tr>
+<tr><th id="471">471</th><td><u>#<span data-ppcond="455">endif</span></u></td></tr>
+<tr><th id="472">472</th><td></td></tr>
+<tr><th id="473">473</th><td>  <a class="member" href="../include/G4Scheduler.hh.html#G4Scheduler::fRunning" title='G4Scheduler::fRunning' data-ref="G4Scheduler::fRunning">fRunning</a> = <b>false</b>;</td></tr>
+<tr><th id="474">474</th><td></td></tr>
+<tr><th id="475">475</th><td>  <b>if</b> (<a class="member" href="../include/G4Scheduler.hh.html#G4Scheduler::fpUserTimeStepAction" title='G4Scheduler::fpUserTimeStepAction' data-ref="G4Scheduler::fpUserTimeStepAction">fpUserTimeStepAction</a>) <a class="member" href="../include/G4Scheduler.hh.html#G4Scheduler::fpUserTimeStepAction" title='G4Scheduler::fpUserTimeStepAction' data-ref="G4Scheduler::fpUserTimeStepAction">fpUserTimeStepAction</a>-&gt;<a class="virtual ref" href="../include/G4UserTimeStepAction.hh.html#_ZN20G4UserTimeStepAction13EndProcessingEv" title='G4UserTimeStepAction::EndProcessing' data-ref="_ZN20G4UserTimeStepAction13EndProcessingEv">EndProcessing</a>();</td></tr>
+<tr><th id="476">476</th><td></td></tr>
+<tr><th id="477">477</th><td>  <i>// ___________________</i></td></tr>
+<tr><th id="478">478</th><td>  <a class="member" href="#_ZN11G4Scheduler11EndTrackingEv" title='G4Scheduler::EndTracking' data-ref="_ZN11G4Scheduler11EndTrackingEv">EndTracking</a>();</td></tr>
+<tr><th id="479">479</th><td>  <a class="member" href="#_ZN11G4Scheduler9ClearListEv" title='G4Scheduler::ClearList' data-ref="_ZN11G4Scheduler9ClearListEv">ClearList</a>();</td></tr>
+<tr><th id="480">480</th><td></td></tr>
+<tr><th id="481">481</th><td>  <a class="virtual member" href="#_ZN11G4Scheduler5ResetEv" title='G4Scheduler::Reset' data-ref="_ZN11G4Scheduler5ResetEv">Reset</a>();</td></tr>
+<tr><th id="482">482</th><td></td></tr>
+<tr><th id="483">483</th><td>  <b>if</b> (<a class="member" href="../include/G4Scheduler.hh.html#G4Scheduler::fpTrackingInteractivity" title='G4Scheduler::fpTrackingInteractivity' data-ref="G4Scheduler::fpTrackingInteractivity">fpTrackingInteractivity</a>) <a class="member" href="../include/G4Scheduler.hh.html#G4Scheduler::fpTrackingInteractivity" title='G4Scheduler::fpTrackingInteractivity' data-ref="G4Scheduler::fpTrackingInteractivity">fpTrackingInteractivity</a>-&gt;<a class="virtual ref" href="../include/G4ITTrackingInteractivity.hh.html#_ZN25G4ITTrackingInteractivity8FinalizeEv" title='G4ITTrackingInteractivity::Finalize' data-ref="_ZN25G4ITTrackingInteractivity8FinalizeEv">Finalize</a>();</td></tr>
+<tr><th id="484">484</th><td>}</td></tr>
+<tr><th id="485">485</th><td></td></tr>
+<tr><th id="486">486</th><td><i>//_________________________________________________________________________</i></td></tr>
+<tr><th id="487">487</th><td></td></tr>
+<tr><th id="488">488</th><td><em>double</em> <a class="type" href="../include/G4Scheduler.hh.html#G4Scheduler" title='G4Scheduler' data-ref="G4Scheduler">G4Scheduler</a>::<dfn class="decl def" id="_ZNK11G4Scheduler18GetNextWatchedTimeEv" title='G4Scheduler::GetNextWatchedTime' data-ref="_ZNK11G4Scheduler18GetNextWatchedTimeEv">GetNextWatchedTime</dfn>() <em>const</em></td></tr>
+<tr><th id="489">489</th><td>{</td></tr>
+<tr><th id="490">490</th><td>  <span class='error' title="use of undeclared identifier &apos;std&apos;">std</span>::set&lt;<em>double</em><span class='error' title="expected &apos;(&apos; for function-style cast or type construction">&gt;</span>::<span class='error' title="no member named &apos;const_iterator&apos; in the global namespace">const_iterator</span> up = fWatchedTimes.upper_bound(fGlobalTime);</td></tr>
+<tr><th id="491">491</th><td>  <b>if</b>(<span class='error' title="use of undeclared identifier &apos;up&apos;">up</span> == <span class='error' title="use of undeclared identifier &apos;fWatchedTimes&apos;">fWatchedTimes</span>.end()) <b>return</b> <a class="macro" href="../../../../../global/management/include/templates.hh.html#82" title="std::numeric_limits&lt;double&gt;::max()" data-ref="_M/DBL_MAX">DBL_MAX</a>;</td></tr>
+<tr><th id="492">492</th><td>  <b>return</b> *<span class='error' title="use of undeclared identifier &apos;up&apos;">up</span>;</td></tr>
+<tr><th id="493">493</th><td>}</td></tr>
+<tr><th id="494">494</th><td></td></tr>
+<tr><th id="495">495</th><td><i>//_________________________________________________________________________</i></td></tr>
+<tr><th id="496">496</th><td></td></tr>
+<tr><th id="497">497</th><td><em>void</em> <a class="type" href="../include/G4Scheduler.hh.html#G4Scheduler" title='G4Scheduler' data-ref="G4Scheduler">G4Scheduler</a>::<dfn class="decl def" id="_ZN11G4Scheduler17SynchronizeTracksEv" title='G4Scheduler::SynchronizeTracks' data-ref="_ZN11G4Scheduler17SynchronizeTracksEv">SynchronizeTracks</dfn>()</td></tr>
+<tr><th id="498">498</th><td>{</td></tr>
+<tr><th id="499">499</th><td><i>//  if(fTrackContainer.WaitingListsNOTEmpty())</i></td></tr>
+<tr><th id="500">500</th><td><i>//   {</i></td></tr>
+<tr><th id="501">501</th><td><i>//    G4ExceptionDescription exceptionDescription;</i></td></tr>
+<tr><th id="502">502</th><td><i>//    exceptionDescription</i></td></tr>
+<tr><th id="503">503</th><td><i>//        &lt;&lt; "There is a waiting track list (fpWaitingList != 0).";</i></td></tr>
+<tr><th id="504">504</th><td><i>//    exceptionDescription</i></td></tr>
+<tr><th id="505">505</th><td><i>//        &lt;&lt; " When G4Scheduler::SynchronizeTracks() is called, ";</i></td></tr>
+<tr><th id="506">506</th><td><i>//    exceptionDescription</i></td></tr>
+<tr><th id="507">507</th><td><i>//        &lt;&lt; "no more tracks should remain in the fpWaitingList.";</i></td></tr>
+<tr><th id="508">508</th><td><i>//    G4Exception("G4Scheduler::SynchronizeTracks", "ITScheduler002",</i></td></tr>
+<tr><th id="509">509</th><td><i>//                FatalErrorInArgument, exceptionDescription);</i></td></tr>
+<tr><th id="510">510</th><td><i>//  }</i></td></tr>
+<tr><th id="511">511</th><td><i></i></td></tr>
+<tr><th id="512">512</th><td><i>  // Backup main list and time feature</i></td></tr>
+<tr><th id="513">513</th><td><i>  // Reminder : the main list here, should</i></td></tr>
+<tr><th id="514">514</th><td><i>  // have the biggest global time</i></td></tr>
+<tr><th id="515">515</th><td><i>  //  fTrackContainer.MoveMainToWaitingList();</i></td></tr>
+<tr><th id="516">516</th><td><i>  // TODO: not yet supported</i></td></tr>
+<tr><th id="517">517</th><td></td></tr>
+<tr><th id="518">518</th><td>  <a class="member" href="../include/G4Scheduler.hh.html#G4Scheduler::fTmpGlobalTime" title='G4Scheduler::fTmpGlobalTime' data-ref="G4Scheduler::fTmpGlobalTime">fTmpGlobalTime</a> = <a class="member" href="../include/G4Scheduler.hh.html#G4Scheduler::fGlobalTime" title='G4Scheduler::fGlobalTime' data-ref="G4Scheduler::fGlobalTime">fGlobalTime</a>;</td></tr>
+<tr><th id="519">519</th><td>  <i>//fTmpEndTime = fEndTime;</i></td></tr>
+<tr><th id="520">520</th><td></td></tr>
+<tr><th id="521">521</th><td>  <a class="member" href="../include/G4Scheduler.hh.html#G4Scheduler::fGlobalTime" title='G4Scheduler::fGlobalTime' data-ref="G4Scheduler::fGlobalTime">fGlobalTime</a> = <a class="member" href="../include/G4Scheduler.hh.html#G4Scheduler::fTrackContainer" title='G4Scheduler::fTrackContainer' data-ref="G4Scheduler::fTrackContainer">fTrackContainer</a>.<a class="ref" href="../include/G4ITTrackHolder.hh.html#_ZN15G4ITTrackHolder11GetNextTimeEv" title='G4ITTrackHolder::GetNextTime' data-ref="_ZN15G4ITTrackHolder11GetNextTimeEv">GetNextTime</a>();</td></tr>
+<tr><th id="522">522</th><td>  <a class="typedef" href="../../../../../global/management/include/G4Types.hh.html#G4double" title='G4double' data-type='double' data-ref="G4double">G4double</a> <dfn class="local col3 decl" id="13tmpGlobalTime" title='tmpGlobalTime' data-type='G4double' data-ref="13tmpGlobalTime">tmpGlobalTime</dfn> = <a class="member" href="../include/G4Scheduler.hh.html#G4Scheduler::fGlobalTime" title='G4Scheduler::fGlobalTime' data-ref="G4Scheduler::fGlobalTime">fGlobalTime</a>;</td></tr>
+<tr><th id="523">523</th><td></td></tr>
+<tr><th id="524">524</th><td>  <em>double</em> <dfn class="local col4 decl" id="14nextWatchedTime" title='nextWatchedTime' data-type='double' data-ref="14nextWatchedTime">nextWatchedTime</dfn> = -<var>1</var>;</td></tr>
+<tr><th id="525">525</th><td>  <em>bool</em> <dfn class="local col5 decl" id="15carryOn" title='carryOn' data-type='bool' data-ref="15carryOn">carryOn</dfn> = <b>true</b>;</td></tr>
+<tr><th id="526">526</th><td></td></tr>
+<tr><th id="527">527</th><td>  <b>while</b>(<a class="member" href="../include/G4Scheduler.hh.html#G4Scheduler::fTrackContainer" title='G4Scheduler::fTrackContainer' data-ref="G4Scheduler::fTrackContainer">fTrackContainer</a>.<a class="ref" href="../include/G4ITTrackHolder.hh.html#_ZN15G4ITTrackHolder23MergeNextTimeToMainListERd" title='G4ITTrackHolder::MergeNextTimeToMainList' data-ref="_ZN15G4ITTrackHolder23MergeNextTimeToMainListERd">MergeNextTimeToMainList</a>(<span class='refarg'><a class="local col3 ref" href="#13tmpGlobalTime" title='tmpGlobalTime' data-ref="13tmpGlobalTime">tmpGlobalTime</a></span>) &amp;&amp; <a class="local col5 ref" href="#15carryOn" title='carryOn' data-ref="15carryOn">carryOn</a>)</td></tr>
+<tr><th id="528">528</th><td>  {</td></tr>
+<tr><th id="529">529</th><td><i>//    assert(tmpGlobalTime == fGlobalTime);</i></td></tr>
+<tr><th id="530">530</th><td>    fStopTime = <span class='error' title="use of undeclared identifier &apos;min&apos;">min</span>(fTrackContainer.GetNextTime(), fEndTime);</td></tr>
+<tr><th id="531">531</th><td>    <b>while</b>((<a class="local col4 ref" href="#14nextWatchedTime" title='nextWatchedTime' data-ref="14nextWatchedTime">nextWatchedTime</a> = <a class="member" href="#_ZNK11G4Scheduler18GetNextWatchedTimeEv" title='G4Scheduler::GetNextWatchedTime' data-ref="_ZNK11G4Scheduler18GetNextWatchedTimeEv">GetNextWatchedTime</a>()) &lt; <a class="member" href="../include/G4Scheduler.hh.html#G4Scheduler::fTrackContainer" title='G4Scheduler::fTrackContainer' data-ref="G4Scheduler::fTrackContainer">fTrackContainer</a>.<a class="ref" href="../include/G4ITTrackHolder.hh.html#_ZN15G4ITTrackHolder11GetNextTimeEv" title='G4ITTrackHolder::GetNextTime' data-ref="_ZN15G4ITTrackHolder11GetNextTimeEv">GetNextTime</a>()</td></tr>
+<tr><th id="532">532</th><td>        &amp;&amp; (<a class="local col5 ref" href="#15carryOn" title='carryOn' data-ref="15carryOn">carryOn</a> = <a class="member" href="#_ZN11G4Scheduler11CanICarryOnEv" title='G4Scheduler::CanICarryOn' data-ref="_ZN11G4Scheduler11CanICarryOnEv">CanICarryOn</a>()))</td></tr>
+<tr><th id="533">533</th><td>    {</td></tr>
+<tr><th id="534">534</th><td>      fStopTime = <span class='error' title="use of undeclared identifier &apos;min&apos;">min</span>(nextWatchedTime, fEndTime);</td></tr>
+<tr><th id="535">535</th><td>      <a class="member" href="#_ZN11G4Scheduler9DoProcessEv" title='G4Scheduler::DoProcess' data-ref="_ZN11G4Scheduler9DoProcessEv">DoProcess</a>();</td></tr>
+<tr><th id="536">536</th><td>    }</td></tr>
+<tr><th id="537">537</th><td></td></tr>
+<tr><th id="538">538</th><td>    <a class="local col5 ref" href="#15carryOn" title='carryOn' data-ref="15carryOn">carryOn</a> = <a class="member" href="#_ZN11G4Scheduler11CanICarryOnEv" title='G4Scheduler::CanICarryOn' data-ref="_ZN11G4Scheduler11CanICarryOnEv">CanICarryOn</a>();</td></tr>
+<tr><th id="539">539</th><td></td></tr>
+<tr><th id="540">540</th><td>    <b>if</b>(<a class="local col4 ref" href="#14nextWatchedTime" title='nextWatchedTime' data-ref="14nextWatchedTime">nextWatchedTime</a> &gt; <a class="member" href="../include/G4Scheduler.hh.html#G4Scheduler::fEndTime" title='G4Scheduler::fEndTime' data-ref="G4Scheduler::fEndTime">fEndTime</a> &amp;&amp; <a class="local col5 ref" href="#15carryOn" title='carryOn' data-ref="15carryOn">carryOn</a>)</td></tr>
+<tr><th id="541">541</th><td>    {</td></tr>
+<tr><th id="542">542</th><td>      fStopTime = <span class='error' title="use of undeclared identifier &apos;min&apos;">min</span>(fTrackContainer.GetNextTime(), fEndTime);</td></tr>
+<tr><th id="543">543</th><td>      <a class="member" href="#_ZN11G4Scheduler9DoProcessEv" title='G4Scheduler::DoProcess' data-ref="_ZN11G4Scheduler9DoProcessEv">DoProcess</a>();</td></tr>
+<tr><th id="544">544</th><td>    }</td></tr>
+<tr><th id="545">545</th><td>  }</td></tr>
+<tr><th id="546">546</th><td>}</td></tr>
+<tr><th id="547">547</th><td></td></tr>
+<tr><th id="548">548</th><td><i>//_________________________________________________________________________</i></td></tr>
+<tr><th id="549">549</th><td></td></tr>
+<tr><th id="550">550</th><td><em>bool</em> <a class="type" href="../include/G4Scheduler.hh.html#G4Scheduler" title='G4Scheduler' data-ref="G4Scheduler">G4Scheduler</a>::<dfn class="decl def" id="_ZN11G4Scheduler11CanICarryOnEv" title='G4Scheduler::CanICarryOn' data-ref="_ZN11G4Scheduler11CanICarryOnEv">CanICarryOn</dfn>()</td></tr>
+<tr><th id="551">551</th><td>{</td></tr>
+<tr><th id="552">552</th><td>  <b>return</b> <a class="member" href="../include/G4Scheduler.hh.html#G4Scheduler::fGlobalTime" title='G4Scheduler::fGlobalTime' data-ref="G4Scheduler::fGlobalTime">fGlobalTime</a> &lt; <a class="member" href="../include/G4Scheduler.hh.html#G4Scheduler::fEndTime" title='G4Scheduler::fEndTime' data-ref="G4Scheduler::fEndTime">fEndTime</a> &amp;&amp; (<a class="member" href="../include/G4Scheduler.hh.html#G4Scheduler::fMaxSteps" title='G4Scheduler::fMaxSteps' data-ref="G4Scheduler::fMaxSteps">fMaxSteps</a> == -<var>1</var> ? <b>true</b> : <a class="member" href="../include/G4Scheduler.hh.html#G4Scheduler::fNbSteps" title='G4Scheduler::fNbSteps' data-ref="G4Scheduler::fNbSteps">fNbSteps</a> &lt; <a class="member" href="../include/G4Scheduler.hh.html#G4Scheduler::fMaxSteps" title='G4Scheduler::fMaxSteps' data-ref="G4Scheduler::fMaxSteps">fMaxSteps</a>)</td></tr>
+<tr><th id="553">553</th><td>      &amp;&amp; <a class="member" href="../include/G4Scheduler.hh.html#G4Scheduler::fContinue" title='G4Scheduler::fContinue' data-ref="G4Scheduler::fContinue">fContinue</a> == <b>true</b>;</td></tr>
+<tr><th id="554">554</th><td>}</td></tr>
+<tr><th id="555">555</th><td></td></tr>
+<tr><th id="556">556</th><td><i>//_________________________________________________________________________</i></td></tr>
+<tr><th id="557">557</th><td></td></tr>
+<tr><th id="558">558</th><td><em>void</em> <a class="type" href="../include/G4Scheduler.hh.html#G4Scheduler" title='G4Scheduler' data-ref="G4Scheduler">G4Scheduler</a>::<dfn class="decl def" id="_ZN11G4Scheduler17PrintWhyDoYouStopEv" title='G4Scheduler::PrintWhyDoYouStop' data-ref="_ZN11G4Scheduler17PrintWhyDoYouStopEv">PrintWhyDoYouStop</dfn>()</td></tr>
+<tr><th id="559">559</th><td>{</td></tr>
+<tr><th id="560">560</th><td><u>#<span data-ppcond="560">ifdef</span> <span class="macro" data-ref="_M/G4VERBOSE">G4VERBOSE</span></u></td></tr>
+<tr><th id="561">561</th><td>  <b>if</b>(<a class="member" href="../include/G4Scheduler.hh.html#G4Scheduler::fWhyDoYouStop" title='G4Scheduler::fWhyDoYouStop' data-ref="G4Scheduler::fWhyDoYouStop">fWhyDoYouStop</a>)</td></tr>
+<tr><th id="562">562</th><td>  {</td></tr>
+<tr><th id="563">563</th><td>    <a class="macro" href="../../../../../global/management/include/G4ios.hh.html#46" title="(*_G4cout_p())" data-ref="_M/G4cout">G4cout</a> <span class='error' title="invalid operands to binary expression (&apos;int&apos; and &apos;const char *&apos;)">&lt;&lt;</span> <q>"G4Scheduler has reached a stage: it might be"</q></td></tr>
+<tr><th id="564">564</th><td>           <q>" a transition or the end"</q></td></tr>
+<tr><th id="565">565</th><td>           &lt;&lt; <a class="macro" href="../../../../../global/management/include/G4ios.hh.html#60" title="std::endl" data-ref="_M/G4endl">G4endl</a>;</td></tr>
+<tr><th id="566">566</th><td></td></tr>
+<tr><th id="567">567</th><td>    <a class="typedef" href="../../../../../global/management/include/G4Types.hh.html#G4bool" title='G4bool' data-type='bool' data-ref="G4bool">G4bool</a> <dfn class="local col6 decl" id="16normalStop" title='normalStop' data-type='G4bool' data-ref="16normalStop">normalStop</dfn> = <b>false</b>;</td></tr>
+<tr><th id="568">568</th><td></td></tr>
+<tr><th id="569">569</th><td>    <b>if</b>(<a class="member" href="../include/G4Scheduler.hh.html#G4Scheduler::fGlobalTime" title='G4Scheduler::fGlobalTime' data-ref="G4Scheduler::fGlobalTime">fGlobalTime</a> &gt;= <a class="member" href="../include/G4Scheduler.hh.html#G4Scheduler::fStopTime" title='G4Scheduler::fStopTime' data-ref="G4Scheduler::fStopTime">fStopTime</a>)</td></tr>
+<tr><th id="570">570</th><td>    {</td></tr>
+<tr><th id="571">571</th><td>      <a class="macro" href="../../../../../global/management/include/G4ios.hh.html#46" title="(*_G4cout_p())" data-ref="_M/G4cout">G4cout</a> <span class='error' title="invalid operands to binary expression (&apos;int&apos; and &apos;const char *&apos;)">&lt;&lt;</span> <q>"== G4Scheduler: I stop because I reached the stop time : "</q></td></tr>
+<tr><th id="572">572</th><td>      &lt;&lt; G4BestUnit(fStopTime,<q>"Time"</q>) &lt;&lt; <q>" =="</q>&lt;&lt; <a class="macro" href="../../../../../global/management/include/G4ios.hh.html#60" title="std::endl" data-ref="_M/G4endl">G4endl</a>;</td></tr>
+<tr><th id="573">573</th><td>      <a class="local col6 ref" href="#16normalStop" title='normalStop' data-ref="16normalStop">normalStop</a> = <b>true</b>;</td></tr>
+<tr><th id="574">574</th><td>    }</td></tr>
+<tr><th id="575">575</th><td>    <b>if</b>(<a class="member" href="../include/G4Scheduler.hh.html#G4Scheduler::fTrackContainer" title='G4Scheduler::fTrackContainer' data-ref="G4Scheduler::fTrackContainer">fTrackContainer</a>.<a class="ref" href="../include/G4ITTrackHolder.hh.html#_ZN15G4ITTrackHolder17MainListsNOTEmptyEv" title='G4ITTrackHolder::MainListsNOTEmpty' data-ref="_ZN15G4ITTrackHolder17MainListsNOTEmptyEv">MainListsNOTEmpty</a>() == <b>false</b>) <i>// is empty</i></td></tr>
+<tr><th id="576">576</th><td>    {</td></tr>
+<tr><th id="577">577</th><td>      <a class="macro" href="../../../../../global/management/include/G4ios.hh.html#46" title="(*_G4cout_p())" data-ref="_M/G4cout">G4cout</a> <span class='error' title="invalid operands to binary expression (&apos;int&apos; and &apos;const char *&apos;)">&lt;&lt;</span> <q>"G4Scheduler: I stop because the current main list of tracks "</q></td></tr>
+<tr><th id="578">578</th><td>      <q>"is empty"</q></td></tr>
+<tr><th id="579">579</th><td>      &lt;&lt; <a class="macro" href="../../../../../global/management/include/G4ios.hh.html#60" title="std::endl" data-ref="_M/G4endl">G4endl</a>;</td></tr>
+<tr><th id="580">580</th><td>      <a class="local col6 ref" href="#16normalStop" title='normalStop' data-ref="16normalStop">normalStop</a> = <b>true</b>;</td></tr>
+<tr><th id="581">581</th><td>    }</td></tr>
+<tr><th id="582">582</th><td>    <b>if</b>(<a class="member" href="../include/G4Scheduler.hh.html#G4Scheduler::fMaxSteps" title='G4Scheduler::fMaxSteps' data-ref="G4Scheduler::fMaxSteps">fMaxSteps</a> == -<var>1</var> ? <b>false</b> : <a class="member" href="../include/G4Scheduler.hh.html#G4Scheduler::fNbSteps" title='G4Scheduler::fNbSteps' data-ref="G4Scheduler::fNbSteps">fNbSteps</a> &gt;= <a class="member" href="../include/G4Scheduler.hh.html#G4Scheduler::fMaxSteps" title='G4Scheduler::fMaxSteps' data-ref="G4Scheduler::fMaxSteps">fMaxSteps</a>)</td></tr>
+<tr><th id="583">583</th><td>    {</td></tr>
+<tr><th id="584">584</th><td>      <a class="macro" href="../../../../../global/management/include/G4ios.hh.html#46" title="(*_G4cout_p())" data-ref="_M/G4cout">G4cout</a> <span class='error' title="invalid operands to binary expression (&apos;int&apos; and &apos;const char *&apos;)">&lt;&lt;</span> <q>"G4Scheduler: I stop because I reached the maximum allowed "</q></td></tr>
+<tr><th id="585">585</th><td>      <q>"number of steps="</q> &lt;&lt; fMaxSteps</td></tr>
+<tr><th id="586">586</th><td>      &lt;&lt; <a class="macro" href="../../../../../global/management/include/G4ios.hh.html#60" title="std::endl" data-ref="_M/G4endl">G4endl</a>;</td></tr>
+<tr><th id="587">587</th><td>      <a class="local col6 ref" href="#16normalStop" title='normalStop' data-ref="16normalStop">normalStop</a> = <b>true</b>;</td></tr>
+<tr><th id="588">588</th><td>    }</td></tr>
+<tr><th id="589">589</th><td>    <b>if</b>(<a class="member" href="../include/G4Scheduler.hh.html#G4Scheduler::fContinue" title='G4Scheduler::fContinue' data-ref="G4Scheduler::fContinue">fContinue</a> &amp;&amp; <a class="local col6 ref" href="#16normalStop" title='normalStop' data-ref="16normalStop">normalStop</a> == <b>false</b>)</td></tr>
+<tr><th id="590">590</th><td>    {</td></tr>
+<tr><th id="591">591</th><td>      <a class="macro" href="../../../../../global/management/include/G4ios.hh.html#46" title="(*_G4cout_p())" data-ref="_M/G4cout">G4cout</a> <span class='error' title="invalid operands to binary expression (&apos;int&apos; and &apos;const char *&apos;)">&lt;&lt;</span> <q>"G4Scheduler: It might be that I stop because "</q></td></tr>
+<tr><th id="592">592</th><td>      <q>"I have been told so. You may check "</q></td></tr>
+<tr><th id="593">593</th><td>      <q>"member fContinue and usage of the method G4Scheduler::Stop()."</q></td></tr>
+<tr><th id="594">594</th><td>      &lt;&lt; <a class="macro" href="../../../../../global/management/include/G4ios.hh.html#60" title="std::endl" data-ref="_M/G4endl">G4endl</a>;</td></tr>
+<tr><th id="595">595</th><td>    }</td></tr>
+<tr><th id="596">596</th><td>  }</td></tr>
+<tr><th id="597">597</th><td><u>#<span data-ppcond="560">endif</span></u></td></tr>
+<tr><th id="598">598</th><td>}</td></tr>
+<tr><th id="599">599</th><td></td></tr>
+<tr><th id="600">600</th><td><i>//_________________________________________________________________________</i></td></tr>
+<tr><th id="601">601</th><td></td></tr>
+<tr><th id="602">602</th><td><em>void</em> <a class="type" href="../include/G4Scheduler.hh.html#G4Scheduler" title='G4Scheduler' data-ref="G4Scheduler">G4Scheduler</a>::<dfn class="decl def" id="_ZN11G4Scheduler9DoProcessEv" title='G4Scheduler::DoProcess' data-ref="_ZN11G4Scheduler9DoProcessEv">DoProcess</dfn>()</td></tr>
+<tr><th id="603">603</th><td><i>// We split it from the Process() method to avoid repeating code in SynchronizeTracks</i></td></tr>
+<tr><th id="604">604</th><td>{</td></tr>
+<tr><th id="605">605</th><td>  <b>if</b>(<a class="member" href="../include/G4Scheduler.hh.html#G4Scheduler::fpUserTimeStepAction" title='G4Scheduler::fpUserTimeStepAction' data-ref="G4Scheduler::fpUserTimeStepAction">fpUserTimeStepAction</a>) <a class="member" href="../include/G4Scheduler.hh.html#G4Scheduler::fpUserTimeStepAction" title='G4Scheduler::fpUserTimeStepAction' data-ref="G4Scheduler::fpUserTimeStepAction">fpUserTimeStepAction</a>-&gt;<a class="virtual ref" href="../include/G4UserTimeStepAction.hh.html#_ZN20G4UserTimeStepAction8NewStageEv" title='G4UserTimeStepAction::NewStage' data-ref="_ZN20G4UserTimeStepAction8NewStageEv">NewStage</a>();</td></tr>
+<tr><th id="606">606</th><td></td></tr>
+<tr><th id="607">607</th><td><u>#<span data-ppcond="607">if</span> defined (<span class="macro" data-ref="_M/DEBUG_MEM">DEBUG_MEM</span>) &amp;&amp; defined (<a class="macro" href="#62" data-ref="_M/DEBUG_MEM_STEPPING">DEBUG_MEM_STEPPING</a>)</u></td></tr>
+<tr><th id="608">608</th><td>  MemStat mem_first, mem_second, mem_diff;</td></tr>
+<tr><th id="609">609</th><td><u>#<span data-ppcond="607">endif</span></u></td></tr>
+<tr><th id="610">610</th><td></td></tr>
+<tr><th id="611">611</th><td><u>#<span data-ppcond="611">if</span> defined (<span class="macro" data-ref="_M/DEBUG_MEM">DEBUG_MEM</span>) &amp;&amp; defined (<a class="macro" href="#62" data-ref="_M/DEBUG_MEM_STEPPING">DEBUG_MEM_STEPPING</a>)</u></td></tr>
+<tr><th id="612">612</th><td>  mem_first = MemoryUsage();</td></tr>
+<tr><th id="613">613</th><td><u>#<span data-ppcond="611">endif</span></u></td></tr>
+<tr><th id="614">614</th><td></td></tr>
+<tr><th id="615">615</th><td>  <b>while</b> (<a class="member" href="../include/G4Scheduler.hh.html#G4Scheduler::fGlobalTime" title='G4Scheduler::fGlobalTime' data-ref="G4Scheduler::fGlobalTime">fGlobalTime</a> &lt; <a class="member" href="../include/G4Scheduler.hh.html#G4Scheduler::fStopTime" title='G4Scheduler::fStopTime' data-ref="G4Scheduler::fStopTime">fStopTime</a></td></tr>
+<tr><th id="616">616</th><td>         &amp;&amp; <a class="member" href="../include/G4Scheduler.hh.html#G4Scheduler::fTrackContainer" title='G4Scheduler::fTrackContainer' data-ref="G4Scheduler::fTrackContainer">fTrackContainer</a>.<a class="ref" href="../include/G4ITTrackHolder.hh.html#_ZN15G4ITTrackHolder17MainListsNOTEmptyEv" title='G4ITTrackHolder::MainListsNOTEmpty' data-ref="_ZN15G4ITTrackHolder17MainListsNOTEmptyEv">MainListsNOTEmpty</a>()</td></tr>
+<tr><th id="617">617</th><td>         &amp;&amp; (<a class="member" href="../include/G4Scheduler.hh.html#G4Scheduler::fMaxSteps" title='G4Scheduler::fMaxSteps' data-ref="G4Scheduler::fMaxSteps">fMaxSteps</a> == -<var>1</var> ? <b>true</b> : <a class="member" href="../include/G4Scheduler.hh.html#G4Scheduler::fNbSteps" title='G4Scheduler::fNbSteps' data-ref="G4Scheduler::fNbSteps">fNbSteps</a> &lt; <a class="member" href="../include/G4Scheduler.hh.html#G4Scheduler::fMaxSteps" title='G4Scheduler::fMaxSteps' data-ref="G4Scheduler::fMaxSteps">fMaxSteps</a>)</td></tr>
+<tr><th id="618">618</th><td>         &amp;&amp; <a class="member" href="../include/G4Scheduler.hh.html#G4Scheduler::fContinue" title='G4Scheduler::fContinue' data-ref="G4Scheduler::fContinue">fContinue</a> == <b>true</b>)</td></tr>
+<tr><th id="619">619</th><td>  {</td></tr>
+<tr><th id="620">620</th><td><i>//    G4cout &lt;&lt; "Mainlist size : " &lt;&lt; fTrackContainer.GetMainList()-&gt;size()</i></td></tr>
+<tr><th id="621">621</th><td><i>//        &lt;&lt; G4endl;</i></td></tr>
+<tr><th id="622">622</th><td></td></tr>
+<tr><th id="623">623</th><td>    <a class="member" href="#_ZN11G4Scheduler8SteppingEv" title='G4Scheduler::Stepping' data-ref="_ZN11G4Scheduler8SteppingEv">Stepping</a>();</td></tr>
+<tr><th id="624">624</th><td></td></tr>
+<tr><th id="625">625</th><td><u>#<span data-ppcond="625">if</span> defined (<span class="macro" data-ref="_M/DEBUG_MEM">DEBUG_MEM</span>) &amp;&amp; defined (<a class="macro" href="#62" data-ref="_M/DEBUG_MEM_STEPPING">DEBUG_MEM_STEPPING</a>)</u></td></tr>
+<tr><th id="626">626</th><td>    mem_second = MemoryUsage();</td></tr>
+<tr><th id="627">627</th><td>    mem_diff = mem_second-mem_first;</td></tr>
+<tr><th id="628">628</th><td>    G4cout &lt;&lt; <q>"\t || MEM || After step "</q> &lt;&lt; fNbSteps &lt;&lt; <q>", diff is : "</q></td></tr>
+<tr><th id="629">629</th><td>    &lt;&lt; mem_diff &lt;&lt; G4endl;</td></tr>
+<tr><th id="630">630</th><td><u>#<span data-ppcond="625">endif</span></u></td></tr>
+<tr><th id="631">631</th><td>  }</td></tr>
+<tr><th id="632">632</th><td></td></tr>
+<tr><th id="633">633</th><td>  <a class="member" href="#_ZN11G4Scheduler17PrintWhyDoYouStopEv" title='G4Scheduler::PrintWhyDoYouStop' data-ref="_ZN11G4Scheduler17PrintWhyDoYouStopEv">PrintWhyDoYouStop</a>();</td></tr>
+<tr><th id="634">634</th><td></td></tr>
+<tr><th id="635">635</th><td><u>#<span data-ppcond="635">if</span> defined (<span class="macro" data-ref="_M/DEBUG_MEM">DEBUG_MEM</span>) &amp;&amp; defined (<a class="macro" href="#62" data-ref="_M/DEBUG_MEM_STEPPING">DEBUG_MEM_STEPPING</a>)</u></td></tr>
+<tr><th id="636">636</th><td>  mem_second = MemoryUsage();</td></tr>
+<tr><th id="637">637</th><td>  mem_diff = mem_second-mem_first;</td></tr>
+<tr><th id="638">638</th><td>  G4cout &lt;&lt; <q>"\t || MEM || After stepping, diff is : "</q> &lt;&lt; mem_diff &lt;&lt; G4endl;</td></tr>
+<tr><th id="639">639</th><td><u>#<span data-ppcond="635">endif</span></u></td></tr>
+<tr><th id="640">640</th><td></td></tr>
+<tr><th id="641">641</th><td><u>#<span data-ppcond="641">ifdef</span> <span class="macro" data-ref="_M/G4VERBOSE">G4VERBOSE</span></u></td></tr>
+<tr><th id="642">642</th><td>  <b>if</b>(fVerbose &gt; <var>2</var>)</td></tr>
+<tr><th id="643">643</th><td>    <a class="macro" href="../../../../../global/management/include/G4ios.hh.html#46" title="(*_G4cout_p())" data-ref="_M/G4cout">G4cout</a> <span class='error' title="invalid operands to binary expression (&apos;int&apos; and &apos;const char *&apos;)">&lt;&lt;</span> <q>"*** G4Scheduler has finished processing a track list at time : "</q></td></tr>
+<tr><th id="644">644</th><td>           &lt;&lt; G4BestUnit(fGlobalTime, <q>"Time"</q>) &lt;&lt; <a class="macro" href="../../../../../global/management/include/G4ios.hh.html#60" title="std::endl" data-ref="_M/G4endl">G4endl</a>;</td></tr>
+<tr><th id="645">645</th><td><u>#<span data-ppcond="641">endif</span></u></td></tr>
+<tr><th id="646">646</th><td>}</td></tr>
+<tr><th id="647">647</th><td><i>//_________________________________________________________________________</i></td></tr>
+<tr><th id="648">648</th><td></td></tr>
+<tr><th id="649">649</th><td><em>void</em> <a class="type" href="../include/G4Scheduler.hh.html#G4Scheduler" title='G4Scheduler' data-ref="G4Scheduler">G4Scheduler</a>::<dfn class="decl def" id="_ZN11G4Scheduler8SteppingEv" title='G4Scheduler::Stepping' data-ref="_ZN11G4Scheduler8SteppingEv">Stepping</dfn>()</td></tr>
+<tr><th id="650">650</th><td>{</td></tr>
+<tr><th id="651">651</th><td>  <a class="member" href="../include/G4Scheduler.hh.html#G4Scheduler::fTimeStep" title='G4Scheduler::fTimeStep' data-ref="G4Scheduler::fTimeStep">fTimeStep</a> = <a class="member" href="../include/G4Scheduler.hh.html#G4Scheduler::fMaxTimeStep" title='G4Scheduler::fMaxTimeStep' data-ref="G4Scheduler::fMaxTimeStep">fMaxTimeStep</a>;</td></tr>
+<tr><th id="652">652</th><td></td></tr>
+<tr><th id="653">653</th><td>  fTSTimeStep = <a class="macro" href="../../../../../global/management/include/templates.hh.html#82" title="std::numeric_limits&lt;double&gt;::max()" data-ref="_M/DBL_MAX">DBL_MAX</a>;</td></tr>
+<tr><th id="654">654</th><td>  fILTimeStep = <a class="macro" href="../../../../../global/management/include/templates.hh.html#82" title="std::numeric_limits&lt;double&gt;::max()" data-ref="_M/DBL_MAX">DBL_MAX</a>;</td></tr>
+<tr><th id="655">655</th><td></td></tr>
+<tr><th id="656">656</th><td>  <a class="member" href="../include/G4Scheduler.hh.html#G4Scheduler::fInteractionStep" title='G4Scheduler::fInteractionStep' data-ref="G4Scheduler::fInteractionStep">fInteractionStep</a> = <b>false</b>;</td></tr>
+<tr><th id="657">657</th><td>  <a class="member" href="../include/G4Scheduler.hh.html#G4Scheduler::fReachedUserTimeLimit" title='G4Scheduler::fReachedUserTimeLimit' data-ref="G4Scheduler::fReachedUserTimeLimit">fReachedUserTimeLimit</a> = <b>false</b>;</td></tr>
+<tr><th id="658">658</th><td></td></tr>
+<tr><th id="659">659</th><td>  <a class="member" href="../include/G4Scheduler.hh.html#G4Scheduler::fITStepStatus" title='G4Scheduler::fITStepStatus' data-ref="G4Scheduler::fITStepStatus">fITStepStatus</a> = <a class="enum" href="../include/G4ITStepStatus.hh.html#G4ITStepStatus::eUndefined" title='G4ITStepStatus::eUndefined' data-ref="G4ITStepStatus::eUndefined">eUndefined</a>;</td></tr>
+<tr><th id="660">660</th><td></td></tr>
+<tr><th id="661">661</th><td>  <i>// Start of step</i></td></tr>
+<tr><th id="662">662</th><td><u>#<span data-ppcond="662">ifdef</span> <span class="macro" data-ref="_M/G4VERBOSE">G4VERBOSE</span></u></td></tr>
+<tr><th id="663">663</th><td>  <b>if</b> (<a class="member" href="../include/G4Scheduler.hh.html#G4Scheduler::fVerbose" title='G4Scheduler::fVerbose' data-ref="G4Scheduler::fVerbose">fVerbose</a> &gt; <var>2</var>)</td></tr>
+<tr><th id="664">664</th><td>  {</td></tr>
+<tr><th id="665">665</th><td><u>#<span data-ppcond="665">ifdef</span> <span class="macro" data-ref="_M/USE_COLOR">USE_COLOR</span></u></td></tr>
+<tr><th id="666">666</th><td>    G4cout &lt;&lt; LIGHT_RED;</td></tr>
+<tr><th id="667">667</th><td><u>#<span data-ppcond="665">endif</span></u></td></tr>
+<tr><th id="668">668</th><td>    <a class="macro" href="../../../../../global/management/include/G4ios.hh.html#46" title="(*_G4cout_p())" data-ref="_M/G4cout">G4cout</a> <span class='error' title="invalid operands to binary expression (&apos;int&apos; and &apos;const char *&apos;)">&lt;&lt;</span> <q>"*** Start Of Step N°"</q> &lt;&lt; fNbSteps + <var>1</var> &lt;&lt; <q>" ***"</q> &lt;&lt; <a class="macro" href="../../../../../global/management/include/G4ios.hh.html#60" title="std::endl" data-ref="_M/G4endl">G4endl</a>;</td></tr>
+<tr><th id="669">669</th><td>    <a class="macro" href="../../../../../global/management/include/G4ios.hh.html#46" title="(*_G4cout_p())" data-ref="_M/G4cout">G4cout</a> <span class='error' title="invalid operands to binary expression (&apos;int&apos; and &apos;const char *&apos;)">&lt;&lt;</span> <q>"Current Global time : "</q> &lt;&lt; G4BestUnit(fGlobalTime, <q>"Time"</q>)</td></tr>
+<tr><th id="670">670</th><td>           &lt;&lt;<a class="macro" href="../../../../../global/management/include/G4ios.hh.html#60" title="std::endl" data-ref="_M/G4endl">G4endl</a>;</td></tr>
+<tr><th id="671">671</th><td><u>#<span data-ppcond="671">ifdef</span> <span class="macro" data-ref="_M/USE_COLOR">USE_COLOR</span></u></td></tr>
+<tr><th id="672">672</th><td>    G4cout &lt;&lt; RESET_COLOR;</td></tr>
+<tr><th id="673">673</th><td><u>#<span data-ppcond="671">endif</span></u></td></tr>
+<tr><th id="674">674</th><td>  }</td></tr>
+<tr><th id="675">675</th><td><u>#<span data-ppcond="662">endif</span></u></td></tr>
+<tr><th id="676">676</th><td></td></tr>
+<tr><th id="677">677</th><td><u>#<span data-ppcond="677">if</span> defined (<span class="macro" data-ref="_M/DEBUG_MEM">DEBUG_MEM</span>) &amp;&amp; defined (<a class="macro" href="#63" data-ref="_M/DEBUG_MEM_DETAILED_STEPPING">DEBUG_MEM_DETAILED_STEPPING</a>)</u></td></tr>
+<tr><th id="678">678</th><td>  MemStat mem_first, mem_second, mem_diff;</td></tr>
+<tr><th id="679">679</th><td><u>#<span data-ppcond="677">endif</span></u></td></tr>
+<tr><th id="680">680</th><td></td></tr>
+<tr><th id="681">681</th><td><u>#<span data-ppcond="681">if</span> defined (<span class="macro" data-ref="_M/DEBUG_MEM">DEBUG_MEM</span>) &amp;&amp; defined (<a class="macro" href="#63" data-ref="_M/DEBUG_MEM_DETAILED_STEPPING">DEBUG_MEM_DETAILED_STEPPING</a>)</u></td></tr>
+<tr><th id="682">682</th><td>  mem_first = MemoryUsage();</td></tr>
+<tr><th id="683">683</th><td><u>#<span data-ppcond="681">endif</span></u></td></tr>
+<tr><th id="684">684</th><td></td></tr>
+<tr><th id="685">685</th><td>  <a class="member" href="../include/G4Scheduler.hh.html#G4Scheduler::fDefinedMinTimeStep" title='G4Scheduler::fDefinedMinTimeStep' data-ref="G4Scheduler::fDefinedMinTimeStep">fDefinedMinTimeStep</a> = <a class="virtual member" href="#_ZNK11G4Scheduler19GetLimitingTimeStepEv" title='G4Scheduler::GetLimitingTimeStep' data-ref="_ZNK11G4Scheduler19GetLimitingTimeStepEv">GetLimitingTimeStep</a>();</td></tr>
+<tr><th id="686">686</th><td></td></tr>
+<tr><th id="687">687</th><td>  <b>if</b> (<a class="member" href="../include/G4Scheduler.hh.html#G4Scheduler::fUsePreDefinedTimeSteps" title='G4Scheduler::fUsePreDefinedTimeSteps' data-ref="G4Scheduler::fUsePreDefinedTimeSteps">fUsePreDefinedTimeSteps</a>)</td></tr>
+<tr><th id="688">688</th><td>  {</td></tr>
+<tr><th id="689">689</th><td><u>#<span data-ppcond="689">ifdef</span> <span class="macro" data-ref="_M/G4VERBOSE">G4VERBOSE</span></u></td></tr>
+<tr><th id="690">690</th><td>    <b>if</b> (<a class="member" href="../include/G4Scheduler.hh.html#G4Scheduler::fVerbose" title='G4Scheduler::fVerbose' data-ref="G4Scheduler::fVerbose">fVerbose</a> &gt; <var>2</var>)</td></tr>
+<tr><th id="691">691</th><td>    {</td></tr>
+<tr><th id="692">692</th><td><u>#<span data-ppcond="692">ifdef</span> <span class="macro" data-ref="_M/USE_COLOR">USE_COLOR</span></u></td></tr>
+<tr><th id="693">693</th><td>      G4cout &lt;&lt; LIGHT_RED;</td></tr>
+<tr><th id="694">694</th><td><u>#<span data-ppcond="692">endif</span></u></td></tr>
+<tr><th id="695">695</th><td>      <a class="macro" href="../../../../../global/management/include/G4ios.hh.html#46" title="(*_G4cout_p())" data-ref="_M/G4cout">G4cout</a> <span class='error' title="invalid operands to binary expression (&apos;int&apos; and &apos;const char *&apos;)">&lt;&lt;</span> <q>"*** At time : "</q> &lt;&lt; G4BestUnit(fGlobalTime, <q>"Time"</q>)</td></tr>
+<tr><th id="696">696</th><td>             &lt;&lt; <q>" the chosen user time step is : "</q></td></tr>
+<tr><th id="697">697</th><td>             &lt;&lt; G4BestUnit(fDefinedMinTimeStep, <q>"Time"</q>) &lt;&lt; <q>" ***"</q> &lt;&lt; <a class="macro" href="../../../../../global/management/include/G4ios.hh.html#60" title="std::endl" data-ref="_M/G4endl">G4endl</a>;</td></tr>
+<tr><th id="698">698</th><td><u>#<span data-ppcond="698">ifdef</span> <span class="macro" data-ref="_M/USE_COLOR">USE_COLOR</span></u></td></tr>
+<tr><th id="699">699</th><td>      G4cout &lt;&lt; RESET_COLOR;</td></tr>
+<tr><th id="700">700</th><td><u>#<span data-ppcond="698">endif</span></u></td></tr>
+<tr><th id="701">701</th><td>    }</td></tr>
+<tr><th id="702">702</th><td><u>#<span data-ppcond="689">endif</span></u></td></tr>
+<tr><th id="703">703</th><td>  }</td></tr>
+<tr><th id="704">704</th><td></td></tr>
+<tr><th id="705">705</th><td>  <b>if</b> (<a class="member" href="../include/G4Scheduler.hh.html#G4Scheduler::fpModelProcessor" title='G4Scheduler::fpModelProcessor' data-ref="G4Scheduler::fpModelProcessor">fpModelProcessor</a>-&gt;<a class="ref" href="../include/G4ITModelProcessor.hh.html#_ZN18G4ITModelProcessor18GetComputeTimeStepEv" title='G4ITModelProcessor::GetComputeTimeStep' data-ref="_ZN18G4ITModelProcessor18GetComputeTimeStepEv">GetComputeTimeStep</a>()) <i>// fComputeTimeStep)</i></td></tr>
+<tr><th id="706">706</th><td>  {</td></tr>
+<tr><th id="707">707</th><td>    <a class="member" href="../include/G4Scheduler.hh.html#G4Scheduler::fTSTimeStep" title='G4Scheduler::fTSTimeStep' data-ref="G4Scheduler::fTSTimeStep">fTSTimeStep</a> = <a class="member" href="../include/G4Scheduler.hh.html#G4Scheduler::fpModelProcessor" title='G4Scheduler::fpModelProcessor' data-ref="G4Scheduler::fpModelProcessor">fpModelProcessor</a>-&gt;<a class="ref" href="../include/G4ITModelProcessor.hh.html#_ZN18G4ITModelProcessor20CalculateMinTimeStepEdd" title='G4ITModelProcessor::CalculateMinTimeStep' data-ref="_ZN18G4ITModelProcessor20CalculateMinTimeStepEdd">CalculateMinTimeStep</a>(<a class="member" href="../include/G4Scheduler.hh.html#G4Scheduler::fGlobalTime" title='G4Scheduler::fGlobalTime' data-ref="G4Scheduler::fGlobalTime">fGlobalTime</a>,</td></tr>
+<tr><th id="708">708</th><td>                                                         <a class="member" href="../include/G4Scheduler.hh.html#G4Scheduler::fDefinedMinTimeStep" title='G4Scheduler::fDefinedMinTimeStep' data-ref="G4Scheduler::fDefinedMinTimeStep">fDefinedMinTimeStep</a>);</td></tr>
+<tr><th id="709">709</th><td>    <i>// =&gt; at least N (N = nb of tracks) loops</i></td></tr>
+<tr><th id="710">710</th><td>  }</td></tr>
+<tr><th id="711">711</th><td>  <b>else</b> <b>if</b>(<a class="member" href="../include/G4Scheduler.hh.html#G4Scheduler::fUseDefaultTimeSteps" title='G4Scheduler::fUseDefaultTimeSteps' data-ref="G4Scheduler::fUseDefaultTimeSteps">fUseDefaultTimeSteps</a>)</td></tr>
+<tr><th id="712">712</th><td>  {</td></tr>
+<tr><th id="713">713</th><td>    <a class="member" href="../include/G4Scheduler.hh.html#G4Scheduler::fTSTimeStep" title='G4Scheduler::fTSTimeStep' data-ref="G4Scheduler::fTSTimeStep">fTSTimeStep</a> = <a class="member" href="../include/G4Scheduler.hh.html#G4Scheduler::fDefinedMinTimeStep" title='G4Scheduler::fDefinedMinTimeStep' data-ref="G4Scheduler::fDefinedMinTimeStep">fDefinedMinTimeStep</a>;</td></tr>
+<tr><th id="714">714</th><td>  }</td></tr>
+<tr><th id="715">715</th><td></td></tr>
+<tr><th id="716">716</th><td><u>#<span data-ppcond="716">if</span> defined (<span class="macro" data-ref="_M/DEBUG_MEM">DEBUG_MEM</span>) &amp;&amp; defined (<a class="macro" href="#63" data-ref="_M/DEBUG_MEM_DETAILED_STEPPING">DEBUG_MEM_DETAILED_STEPPING</a>)</u></td></tr>
+<tr><th id="717">717</th><td>  mem_second = MemoryUsage();</td></tr>
+<tr><th id="718">718</th><td>  mem_diff = mem_second-mem_first;</td></tr>
+<tr><th id="719">719</th><td>  G4cout &lt;&lt; <q>"|| MEM || After computing TS, diff is : "</q> &lt;&lt; mem_diff &lt;&lt; G4endl;</td></tr>
+<tr><th id="720">720</th><td><u>#<span data-ppcond="716">endif</span></u></td></tr>
+<tr><th id="721">721</th><td></td></tr>
+<tr><th id="722">722</th><td><u>#<span data-ppcond="722">ifdef</span> <span class="macro" data-ref="_M/G4VERBOSE">G4VERBOSE</span></u></td></tr>
+<tr><th id="723">723</th><td>  <b>if</b> (<a class="member" href="../include/G4Scheduler.hh.html#G4Scheduler::fVerbose" title='G4Scheduler::fVerbose' data-ref="G4Scheduler::fVerbose">fVerbose</a> &gt; <var>2</var>)</td></tr>
+<tr><th id="724">724</th><td>  {</td></tr>
+<tr><th id="725">725</th><td><u>#<span data-ppcond="725">ifdef</span> <span class="macro" data-ref="_M/USE_COLOR">USE_COLOR</span></u></td></tr>
+<tr><th id="726">726</th><td>    G4cout &lt;&lt; LIGHT_RED;</td></tr>
+<tr><th id="727">727</th><td><u>#<span data-ppcond="725">endif</span></u></td></tr>
+<tr><th id="728">728</th><td>    <a class="macro" href="../../../../../global/management/include/G4ios.hh.html#46" title="(*_G4cout_p())" data-ref="_M/G4cout">G4cout</a> <span class='error' title="invalid operands to binary expression (&apos;int&apos; and &apos;const char *&apos;)">&lt;&lt;</span> <q>"*** Time stepper returned : "</q> &lt;&lt; G4BestUnit(fTSTimeStep, <q>"Time"</q>)</td></tr>
+<tr><th id="729">729</th><td>           &lt;&lt; <q>" ***"</q> &lt;&lt; <a class="macro" href="../../../../../global/management/include/G4ios.hh.html#60" title="std::endl" data-ref="_M/G4endl">G4endl</a>;</td></tr>
+<tr><th id="730">730</th><td><u>#<span data-ppcond="730">ifdef</span> <span class="macro" data-ref="_M/USE_COLOR">USE_COLOR</span></u></td></tr>
+<tr><th id="731">731</th><td>    G4cout &lt;&lt; RESET_COLOR;</td></tr>
+<tr><th id="732">732</th><td><u>#<span data-ppcond="730">endif</span></u></td></tr>
+<tr><th id="733">733</th><td>  }</td></tr>
+<tr><th id="734">734</th><td><u>#<span data-ppcond="722">endif</span></u></td></tr>
+<tr><th id="735">735</th><td></td></tr>
+<tr><th id="736">736</th><td><u>#<span data-ppcond="736">if</span> defined (<span class="macro" data-ref="_M/DEBUG_MEM">DEBUG_MEM</span>) &amp;&amp; defined (<a class="macro" href="#63" data-ref="_M/DEBUG_MEM_DETAILED_STEPPING">DEBUG_MEM_DETAILED_STEPPING</a>)</u></td></tr>
+<tr><th id="737">737</th><td>  mem_first = MemoryUsage();</td></tr>
+<tr><th id="738">738</th><td><u>#<span data-ppcond="736">endif</span></u></td></tr>
+<tr><th id="739">739</th><td></td></tr>
+<tr><th id="740">740</th><td>  <i>// Call IL even if fTSTimeStep == 0</i></td></tr>
+<tr><th id="741">741</th><td><i>  // if fILTimeStep == 0 give the priority to DoIt processes</i></td></tr>
+<tr><th id="742">742</th><td></td></tr>
+<tr><th id="743">743</th><td>  <a class="member" href="../include/G4Scheduler.hh.html#G4Scheduler::fILTimeStep" title='G4Scheduler::fILTimeStep' data-ref="G4Scheduler::fILTimeStep">fILTimeStep</a> =</td></tr>
+<tr><th id="744">744</th><td>    <a class="member" href="../include/G4Scheduler.hh.html#G4Scheduler::fpStepProcessor" title='G4Scheduler::fpStepProcessor' data-ref="G4Scheduler::fpStepProcessor">fpStepProcessor</a>-&gt;<a class="ref" href="../include/G4ITStepProcessor.hh.html#_ZN17G4ITStepProcessor24ComputeInteractionLengthEd" title='G4ITStepProcessor::ComputeInteractionLength' data-ref="_ZN17G4ITStepProcessor24ComputeInteractionLengthEd">ComputeInteractionLength</a>(<a class="member" href="../include/G4Scheduler.hh.html#G4Scheduler::fPreviousTimeStep" title='G4Scheduler::fPreviousTimeStep' data-ref="G4Scheduler::fPreviousTimeStep">fPreviousTimeStep</a>);</td></tr>
+<tr><th id="745">745</th><td>  <i>// =&gt; at least N loops</i></td></tr>
+<tr><th id="746">746</th><td><i>  // All process returns the physical step of interaction</i></td></tr>
+<tr><th id="747">747</th><td><i>  // The transportation process calculates the corresponding</i></td></tr>
+<tr><th id="748">748</th><td><i>  // time step</i></td></tr>
+<tr><th id="749">749</th><td></td></tr>
+<tr><th id="750">750</th><td><u>#<span data-ppcond="750">if</span> defined (<span class="macro" data-ref="_M/DEBUG_MEM">DEBUG_MEM</span>) &amp;&amp; defined (<a class="macro" href="#63" data-ref="_M/DEBUG_MEM_DETAILED_STEPPING">DEBUG_MEM_DETAILED_STEPPING</a>)</u></td></tr>
+<tr><th id="751">751</th><td>  mem_second = MemoryUsage();</td></tr>
+<tr><th id="752">752</th><td>  mem_diff = mem_second-mem_first;</td></tr>
+<tr><th id="753">753</th><td>  G4cout &lt;&lt; <q>"|| MEM || After IL, diff is : "</q> &lt;&lt; mem_diff &lt;&lt; G4endl;</td></tr>
+<tr><th id="754">754</th><td><u>#<span data-ppcond="750">endif</span></u></td></tr>
+<tr><th id="755">755</th><td></td></tr>
+<tr><th id="756">756</th><td><u>#<span data-ppcond="756">ifdef</span> <span class="macro" data-ref="_M/G4VERBOSE">G4VERBOSE</span></u></td></tr>
+<tr><th id="757">757</th><td>  <b>if</b> (<a class="member" href="../include/G4Scheduler.hh.html#G4Scheduler::fVerbose" title='G4Scheduler::fVerbose' data-ref="G4Scheduler::fVerbose">fVerbose</a> &gt; <var>2</var>)</td></tr>
+<tr><th id="758">758</th><td>  {</td></tr>
+<tr><th id="759">759</th><td><u>#<span data-ppcond="759">ifdef</span> <span class="macro" data-ref="_M/USE_COLOR">USE_COLOR</span></u></td></tr>
+<tr><th id="760">760</th><td>    G4cout &lt;&lt; LIGHT_RED;</td></tr>
+<tr><th id="761">761</th><td><u>#<span data-ppcond="759">endif</span></u></td></tr>
+<tr><th id="762">762</th><td>    <a class="macro" href="../../../../../global/management/include/G4ios.hh.html#46" title="(*_G4cout_p())" data-ref="_M/G4cout">G4cout</a> <span class='error' title="invalid operands to binary expression (&apos;int&apos; and &apos;const char *&apos;)">&lt;&lt;</span> <q>"*** The minimum time returned by the processes is : "</q></td></tr>
+<tr><th id="763">763</th><td>           &lt;&lt; G4BestUnit(fILTimeStep, <q>"Time"</q>) &lt;&lt; <q>" ***"</q> &lt;&lt; <a class="macro" href="../../../../../global/management/include/G4ios.hh.html#60" title="std::endl" data-ref="_M/G4endl">G4endl</a>;</td></tr>
+<tr><th id="764">764</th><td><u>#<span data-ppcond="764">ifdef</span> <span class="macro" data-ref="_M/USE_COLOR">USE_COLOR</span></u></td></tr>
+<tr><th id="765">765</th><td>    G4cout &lt;&lt; RESET_COLOR;</td></tr>
+<tr><th id="766">766</th><td><u>#<span data-ppcond="764">endif</span></u></td></tr>
+<tr><th id="767">767</th><td>  }</td></tr>
+<tr><th id="768">768</th><td><u>#<span data-ppcond="756">endif</span></u></td></tr>
+<tr><th id="769">769</th><td></td></tr>
+<tr><th id="770">770</th><td><u>#<span data-ppcond="770">if</span> defined (<span class="macro" data-ref="_M/DEBUG_MEM">DEBUG_MEM</span>) &amp;&amp; defined (<a class="macro" href="#63" data-ref="_M/DEBUG_MEM_DETAILED_STEPPING">DEBUG_MEM_DETAILED_STEPPING</a>)</u></td></tr>
+<tr><th id="771">771</th><td>  mem_first = MemoryUsage();</td></tr>
+<tr><th id="772">772</th><td><u>#<span data-ppcond="770">endif</span></u></td></tr>
+<tr><th id="773">773</th><td></td></tr>
+<tr><th id="774">774</th><td>  <b>if</b> (<a class="member" href="../include/G4Scheduler.hh.html#G4Scheduler::fILTimeStep" title='G4Scheduler::fILTimeStep' data-ref="G4Scheduler::fILTimeStep">fILTimeStep</a> &lt;= <a class="member" href="../include/G4Scheduler.hh.html#G4Scheduler::fTSTimeStep" title='G4Scheduler::fTSTimeStep' data-ref="G4Scheduler::fTSTimeStep">fTSTimeStep</a>)</td></tr>
+<tr><th id="775">775</th><td>    <i>// Give the priority to the IL</i></td></tr>
+<tr><th id="776">776</th><td>  {</td></tr>
+<tr><th id="777">777</th><td>    <a class="member" href="../include/G4Scheduler.hh.html#G4Scheduler::fInteractionStep" title='G4Scheduler::fInteractionStep' data-ref="G4Scheduler::fInteractionStep">fInteractionStep</a> = <b>true</b>;</td></tr>
+<tr><th id="778">778</th><td>    <a class="member" href="../include/G4Scheduler.hh.html#G4Scheduler::fReactionSet" title='G4Scheduler::fReactionSet' data-ref="G4Scheduler::fReactionSet">fReactionSet</a>-&gt;<a class="ref" href="../include/G4ITReaction.hh.html#_ZN15G4ITReactionSet16CleanAllReactionEv" title='G4ITReactionSet::CleanAllReaction' data-ref="_ZN15G4ITReactionSet16CleanAllReactionEv">CleanAllReaction</a>();</td></tr>
+<tr><th id="779">779</th><td>    <a class="member" href="../include/G4Scheduler.hh.html#G4Scheduler::fTimeStep" title='G4Scheduler::fTimeStep' data-ref="G4Scheduler::fTimeStep">fTimeStep</a> = <a class="member" href="../include/G4Scheduler.hh.html#G4Scheduler::fILTimeStep" title='G4Scheduler::fILTimeStep' data-ref="G4Scheduler::fILTimeStep">fILTimeStep</a>;</td></tr>
+<tr><th id="780">780</th><td>    <a class="member" href="../include/G4Scheduler.hh.html#G4Scheduler::fITStepStatus" title='G4Scheduler::fITStepStatus' data-ref="G4Scheduler::fITStepStatus">fITStepStatus</a> = <a class="enum" href="../include/G4ITStepStatus.hh.html#G4ITStepStatus::eInteractionWithMedium" title='G4ITStepStatus::eInteractionWithMedium' data-ref="G4ITStepStatus::eInteractionWithMedium">eInteractionWithMedium</a>;</td></tr>
+<tr><th id="781">781</th><td>    <a class="member" href="../include/G4Scheduler.hh.html#G4Scheduler::fpStepProcessor" title='G4Scheduler::fpStepProcessor' data-ref="G4Scheduler::fpStepProcessor">fpStepProcessor</a>-&gt;<a class="ref" href="../include/G4ITStepProcessor.hh.html#_ZN17G4ITStepProcessor20PrepareLeadingTracksEv" title='G4ITStepProcessor::PrepareLeadingTracks' data-ref="_ZN17G4ITStepProcessor20PrepareLeadingTracksEv">PrepareLeadingTracks</a>();</td></tr>
+<tr><th id="782">782</th><td>  }</td></tr>
+<tr><th id="783">783</th><td>  <b>else</b></td></tr>
+<tr><th id="784">784</th><td>  {</td></tr>
+<tr><th id="785">785</th><td>    <a class="member" href="../include/G4Scheduler.hh.html#G4Scheduler::fInteractionStep" title='G4Scheduler::fInteractionStep' data-ref="G4Scheduler::fInteractionStep">fInteractionStep</a> = <b>false</b>;</td></tr>
+<tr><th id="786">786</th><td>    <a class="member" href="../include/G4Scheduler.hh.html#G4Scheduler::fpStepProcessor" title='G4Scheduler::fpStepProcessor' data-ref="G4Scheduler::fpStepProcessor">fpStepProcessor</a>-&gt;<a class="ref" href="../include/G4ITStepProcessor.hh.html#_ZN17G4ITStepProcessor18ResetLeadingTracksEv" title='G4ITStepProcessor::ResetLeadingTracks' data-ref="_ZN17G4ITStepProcessor18ResetLeadingTracksEv">ResetLeadingTracks</a>();</td></tr>
+<tr><th id="787">787</th><td>    <a class="member" href="../include/G4Scheduler.hh.html#G4Scheduler::fTimeStep" title='G4Scheduler::fTimeStep' data-ref="G4Scheduler::fTimeStep">fTimeStep</a> = <a class="member" href="../include/G4Scheduler.hh.html#G4Scheduler::fTSTimeStep" title='G4Scheduler::fTSTimeStep' data-ref="G4Scheduler::fTSTimeStep">fTSTimeStep</a>;</td></tr>
+<tr><th id="788">788</th><td>    <a class="member" href="../include/G4Scheduler.hh.html#G4Scheduler::fITStepStatus" title='G4Scheduler::fITStepStatus' data-ref="G4Scheduler::fITStepStatus">fITStepStatus</a> = <a class="enum" href="../include/G4ITStepStatus.hh.html#G4ITStepStatus::eCollisionBetweenTracks" title='G4ITStepStatus::eCollisionBetweenTracks' data-ref="G4ITStepStatus::eCollisionBetweenTracks">eCollisionBetweenTracks</a>;</td></tr>
+<tr><th id="789">789</th><td>  }</td></tr>
+<tr><th id="790">790</th><td></td></tr>
+<tr><th id="791">791</th><td>  <b>if</b> (<a class="member" href="../include/G4Scheduler.hh.html#G4Scheduler::fGlobalTime" title='G4Scheduler::fGlobalTime' data-ref="G4Scheduler::fGlobalTime">fGlobalTime</a> + <a class="member" href="../include/G4Scheduler.hh.html#G4Scheduler::fTimeStep" title='G4Scheduler::fTimeStep' data-ref="G4Scheduler::fTimeStep">fTimeStep</a> &gt; <a class="member" href="../include/G4Scheduler.hh.html#G4Scheduler::fStopTime" title='G4Scheduler::fStopTime' data-ref="G4Scheduler::fStopTime">fStopTime</a>)</td></tr>
+<tr><th id="792">792</th><td>    <i>// This check is done at every time step</i></td></tr>
+<tr><th id="793">793</th><td>  {</td></tr>
+<tr><th id="794">794</th><td>    <a class="member" href="../include/G4Scheduler.hh.html#G4Scheduler::fTimeStep" title='G4Scheduler::fTimeStep' data-ref="G4Scheduler::fTimeStep">fTimeStep</a> = <a class="member" href="../include/G4Scheduler.hh.html#G4Scheduler::fStopTime" title='G4Scheduler::fStopTime' data-ref="G4Scheduler::fStopTime">fStopTime</a> - <a class="member" href="../include/G4Scheduler.hh.html#G4Scheduler::fGlobalTime" title='G4Scheduler::fGlobalTime' data-ref="G4Scheduler::fGlobalTime">fGlobalTime</a>;</td></tr>
+<tr><th id="795">795</th><td>    <a class="member" href="../include/G4Scheduler.hh.html#G4Scheduler::fITStepStatus" title='G4Scheduler::fITStepStatus' data-ref="G4Scheduler::fITStepStatus">fITStepStatus</a> = <a class="enum" href="../include/G4ITStepStatus.hh.html#G4ITStepStatus::eInteractionWithMedium" title='G4ITStepStatus::eInteractionWithMedium' data-ref="G4ITStepStatus::eInteractionWithMedium">eInteractionWithMedium</a>; <i>// ie: transportation</i></td></tr>
+<tr><th id="796">796</th><td>    <a class="member" href="../include/G4Scheduler.hh.html#G4Scheduler::fInteractionStep" title='G4Scheduler::fInteractionStep' data-ref="G4Scheduler::fInteractionStep">fInteractionStep</a> = <b>true</b>;</td></tr>
+<tr><th id="797">797</th><td>    <a class="member" href="../include/G4Scheduler.hh.html#G4Scheduler::fReactionSet" title='G4Scheduler::fReactionSet' data-ref="G4Scheduler::fReactionSet">fReactionSet</a>-&gt;<a class="ref" href="../include/G4ITReaction.hh.html#_ZN15G4ITReactionSet16CleanAllReactionEv" title='G4ITReactionSet::CleanAllReaction' data-ref="_ZN15G4ITReactionSet16CleanAllReactionEv">CleanAllReaction</a>();</td></tr>
+<tr><th id="798">798</th><td>    <a class="member" href="../include/G4Scheduler.hh.html#G4Scheduler::fpStepProcessor" title='G4Scheduler::fpStepProcessor' data-ref="G4Scheduler::fpStepProcessor">fpStepProcessor</a>-&gt;<a class="ref" href="../include/G4ITStepProcessor.hh.html#_ZN17G4ITStepProcessor18ResetLeadingTracksEv" title='G4ITStepProcessor::ResetLeadingTracks' data-ref="_ZN17G4ITStepProcessor18ResetLeadingTracksEv">ResetLeadingTracks</a>();</td></tr>
+<tr><th id="799">799</th><td>  }</td></tr>
+<tr><th id="800">800</th><td></td></tr>
+<tr><th id="801">801</th><td>  <b>if</b> (<a class="member" href="../include/G4Scheduler.hh.html#G4Scheduler::fTimeStep" title='G4Scheduler::fTimeStep' data-ref="G4Scheduler::fTimeStep">fTimeStep</a> == <var>0</var>) <i>// &lt; fTimeTolerance)</i></td></tr>
+<tr><th id="802">802</th><td>  {</td></tr>
+<tr><th id="803">803</th><td>    ++<a class="member" href="../include/G4Scheduler.hh.html#G4Scheduler::fZeroTimeCount" title='G4Scheduler::fZeroTimeCount' data-ref="G4Scheduler::fZeroTimeCount">fZeroTimeCount</a>;</td></tr>
+<tr><th id="804">804</th><td>    <b>if</b> (<a class="member" href="../include/G4Scheduler.hh.html#G4Scheduler::fZeroTimeCount" title='G4Scheduler::fZeroTimeCount' data-ref="G4Scheduler::fZeroTimeCount">fZeroTimeCount</a> &gt;= <a class="member" href="../include/G4Scheduler.hh.html#G4Scheduler::fMaxNZeroTimeStepsAllowed" title='G4Scheduler::fMaxNZeroTimeStepsAllowed' data-ref="G4Scheduler::fMaxNZeroTimeStepsAllowed">fMaxNZeroTimeStepsAllowed</a>)</td></tr>
+<tr><th id="805">805</th><td>    {</td></tr>
+<tr><th id="806">806</th><td>      <a class="typedef" href="../../../../../global/management/include/G4Exception.hh.html#G4ExceptionDescription" title='G4ExceptionDescription' data-type='int' data-ref="G4ExceptionDescription">G4ExceptionDescription</a> <dfn class="local col7 decl" id="17exceptionDescription" title='exceptionDescription' data-type='G4ExceptionDescription' data-ref="17exceptionDescription">exceptionDescription</dfn>;</td></tr>
+<tr><th id="807">807</th><td></td></tr>
+<tr><th id="808">808</th><td>      exceptionDescription <span class='error' title="invalid operands to binary expression (&apos;G4ExceptionDescription&apos; (aka &apos;int&apos;) and &apos;const char *&apos;)">&lt;&lt;</span> <q>"Too many zero time steps were detected. "</q>;</td></tr>
+<tr><th id="809">809</th><td>      exceptionDescription <span class='error' title="invalid operands to binary expression (&apos;G4ExceptionDescription&apos; (aka &apos;int&apos;) and &apos;const char *&apos;)">&lt;&lt;</span> <q>"The simulation is probably stuck. "</q>;</td></tr>
+<tr><th id="810">810</th><td>      exceptionDescription</td></tr>
+<tr><th id="811">811</th><td>          <span class='error' title="invalid operands to binary expression (&apos;G4ExceptionDescription&apos; (aka &apos;int&apos;) and &apos;const char *&apos;)">&lt;&lt;</span> <q>"The maximum number of zero time steps is currently : "</q></td></tr>
+<tr><th id="812">812</th><td>          &lt;&lt; fMaxNZeroTimeStepsAllowed;</td></tr>
+<tr><th id="813">813</th><td>      exceptionDescription <span class='error' title="invalid operands to binary expression (&apos;G4ExceptionDescription&apos; (aka &apos;int&apos;) and &apos;const char *&apos;)">&lt;&lt;</span> <q>"."</q>;</td></tr>
+<tr><th id="814">814</th><td></td></tr>
+<tr><th id="815">815</th><td>      <a class="ref" href="../../../../../global/management/include/G4Exception.hh.html#_Z11G4ExceptionPKcS0_19G4ExceptionSeverityRi" title='G4Exception' data-ref="_Z11G4ExceptionPKcS0_19G4ExceptionSeverityRi">G4Exception</a>(<q>"G4Scheduler::Stepping"</q>,</td></tr>
+<tr><th id="816">816</th><td>                  <q>"SchedulerNullTimeSteps"</q>,</td></tr>
+<tr><th id="817">817</th><td>                  <a class="enum" href="../../../../../global/management/include/G4ExceptionSeverity.hh.html#G4ExceptionSeverity::FatalErrorInArgument" title='G4ExceptionSeverity::FatalErrorInArgument' data-ref="G4ExceptionSeverity::FatalErrorInArgument">FatalErrorInArgument</a>,</td></tr>
+<tr><th id="818">818</th><td>                  <span class='refarg'><a class="local col7 ref" href="#17exceptionDescription" title='exceptionDescription' data-ref="17exceptionDescription">exceptionDescription</a></span>);</td></tr>
+<tr><th id="819">819</th><td>    }</td></tr>
+<tr><th id="820">820</th><td>  }</td></tr>
+<tr><th id="821">821</th><td>  <b>else</b></td></tr>
+<tr><th id="822">822</th><td>  {</td></tr>
+<tr><th id="823">823</th><td>    <a class="member" href="../include/G4Scheduler.hh.html#G4Scheduler::fZeroTimeCount" title='G4Scheduler::fZeroTimeCount' data-ref="G4Scheduler::fZeroTimeCount">fZeroTimeCount</a> = <var>0</var>;</td></tr>
+<tr><th id="824">824</th><td>  }</td></tr>
+<tr><th id="825">825</th><td></td></tr>
+<tr><th id="826">826</th><td>  fReachedUserTimeLimit =</td></tr>
+<tr><th id="827">827</th><td>      ((fTimeStep &lt;= fDefinedMinTimeStep) || ((fTimeStep &gt; fDefinedMinTimeStep)</td></tr>
+<tr><th id="828">828</th><td>          &amp;&amp; <span class='error' title="use of undeclared identifier &apos;fabs&apos;">fabs</span>(fTimeStep - fDefinedMinTimeStep) &lt; fTimeTolerance)) ?</td></tr>
+<tr><th id="829">829</th><td>          <b>true</b> : <b>false</b>;</td></tr>
+<tr><th id="830">830</th><td></td></tr>
+<tr><th id="831">831</th><td>  <b>if</b> (<a class="member" href="../include/G4Scheduler.hh.html#G4Scheduler::fpUserTimeStepAction" title='G4Scheduler::fpUserTimeStepAction' data-ref="G4Scheduler::fpUserTimeStepAction">fpUserTimeStepAction</a>) <a class="member" href="../include/G4Scheduler.hh.html#G4Scheduler::fpUserTimeStepAction" title='G4Scheduler::fpUserTimeStepAction' data-ref="G4Scheduler::fpUserTimeStepAction">fpUserTimeStepAction</a>-&gt;<a class="virtual ref" href="../include/G4UserTimeStepAction.hh.html#_ZN20G4UserTimeStepAction21UserPreTimeStepActionEv" title='G4UserTimeStepAction::UserPreTimeStepAction' data-ref="_ZN20G4UserTimeStepAction21UserPreTimeStepActionEv">UserPreTimeStepAction</a>();</td></tr>
+<tr><th id="832">832</th><td>  <i>// TODO: pre/post</i></td></tr>
+<tr><th id="833">833</th><td></td></tr>
+<tr><th id="834">834</th><td><u>#<span data-ppcond="834">if</span> defined (<span class="macro" data-ref="_M/DEBUG_MEM">DEBUG_MEM</span>) &amp;&amp; defined (<a class="macro" href="#63" data-ref="_M/DEBUG_MEM_DETAILED_STEPPING">DEBUG_MEM_DETAILED_STEPPING</a>)</u></td></tr>
+<tr><th id="835">835</th><td>  mem_second = MemoryUsage();</td></tr>
+<tr><th id="836">836</th><td>  mem_diff = mem_second-mem_first;</td></tr>
+<tr><th id="837">837</th><td>  G4cout &lt;&lt; <q>"|| MEM || After LeadingTracks and UserPreTimeStepAction: "</q></td></tr>
+<tr><th id="838">838</th><td>         &lt;&lt; mem_diff &lt;&lt; G4endl;</td></tr>
+<tr><th id="839">839</th><td><u>#<span data-ppcond="834">endif</span></u></td></tr>
+<tr><th id="840">840</th><td></td></tr>
+<tr><th id="841">841</th><td><u>#<span data-ppcond="841">if</span> defined (<span class="macro" data-ref="_M/DEBUG_MEM">DEBUG_MEM</span>) &amp;&amp; defined (<a class="macro" href="#63" data-ref="_M/DEBUG_MEM_DETAILED_STEPPING">DEBUG_MEM_DETAILED_STEPPING</a>)</u></td></tr>
+<tr><th id="842">842</th><td>  mem_first = MemoryUsage();</td></tr>
+<tr><th id="843">843</th><td><u>#<span data-ppcond="841">endif</span></u></td></tr>
+<tr><th id="844">844</th><td></td></tr>
+<tr><th id="845">845</th><td></td></tr>
+<tr><th id="846">846</th><td>  <a class="member" href="../include/G4Scheduler.hh.html#G4Scheduler::fGlobalTime" title='G4Scheduler::fGlobalTime' data-ref="G4Scheduler::fGlobalTime">fGlobalTime</a> += <a class="member" href="../include/G4Scheduler.hh.html#G4Scheduler::fTimeStep" title='G4Scheduler::fTimeStep' data-ref="G4Scheduler::fTimeStep">fTimeStep</a>;</td></tr>
+<tr><th id="847">847</th><td></td></tr>
+<tr><th id="848">848</th><td>  <i>// if fTSTimeStep &gt; 0 =&gt; still need to call the transportation process</i></td></tr>
+<tr><th id="849">849</th><td><i>  // if fILTimeStep &lt; fTSTimeStep =&gt; call only DoIt processes, no reactions</i></td></tr>
+<tr><th id="850">850</th><td><i>  // if fILTimeStep == fTSTimeStep =&gt; give the priority to the DoIt processes</i></td></tr>
+<tr><th id="851">851</th><td>  <b>if</b> (<a class="member" href="../include/G4Scheduler.hh.html#G4Scheduler::fTSTimeStep" title='G4Scheduler::fTSTimeStep' data-ref="G4Scheduler::fTSTimeStep">fTSTimeStep</a> &gt; <var>0</var> || <a class="member" href="../include/G4Scheduler.hh.html#G4Scheduler::fILTimeStep" title='G4Scheduler::fILTimeStep' data-ref="G4Scheduler::fILTimeStep">fILTimeStep</a> &lt;= <a class="member" href="../include/G4Scheduler.hh.html#G4Scheduler::fTSTimeStep" title='G4Scheduler::fTSTimeStep' data-ref="G4Scheduler::fTSTimeStep">fTSTimeStep</a>)</td></tr>
+<tr><th id="852">852</th><td>  {</td></tr>
+<tr><th id="853">853</th><td>    <i>//        G4cout &lt;&lt; "Will call DoIT" &lt;&lt; G4endl;</i></td></tr>
+<tr><th id="854">854</th><td>    <a class="member" href="../include/G4Scheduler.hh.html#G4Scheduler::fpStepProcessor" title='G4Scheduler::fpStepProcessor' data-ref="G4Scheduler::fpStepProcessor">fpStepProcessor</a>-&gt;<a class="ref" href="../include/G4ITStepProcessor.hh.html#_ZN17G4ITStepProcessor4DoItEd" title='G4ITStepProcessor::DoIt' data-ref="_ZN17G4ITStepProcessor4DoItEd">DoIt</a>(<a class="member" href="../include/G4Scheduler.hh.html#G4Scheduler::fTimeStep" title='G4Scheduler::fTimeStep' data-ref="G4Scheduler::fTimeStep">fTimeStep</a>);</td></tr>
+<tr><th id="855">855</th><td>    <i>//  fTrackContainer.MergeSecondariesWithMainList();</i></td></tr>
+<tr><th id="856">856</th><td><i>    //  fTrackContainer.KillTracks(); // remove ?</i></td></tr>
+<tr><th id="857">857</th><td>  }</td></tr>
+<tr><th id="858">858</th><td>  <i>// else</i></td></tr>
+<tr><th id="859">859</th><td><i>  // {</i></td></tr>
+<tr><th id="860">860</th><td><i>  //   G4cout &lt;&lt; "fTSTimeStep : " &lt;&lt; fTSTimeStep &lt;&lt; G4endl;</i></td></tr>
+<tr><th id="861">861</th><td><i>  //   G4cout &lt;&lt; "fILTimeStep : " &lt;&lt; fILTimeStep &lt;&lt; G4endl;</i></td></tr>
+<tr><th id="862">862</th><td><i>  // }</i></td></tr>
+<tr><th id="863">863</th><td></td></tr>
+<tr><th id="864">864</th><td><u>#<span data-ppcond="864">if</span> defined (<span class="macro" data-ref="_M/DEBUG_MEM">DEBUG_MEM</span>) &amp;&amp; defined (<a class="macro" href="#63" data-ref="_M/DEBUG_MEM_DETAILED_STEPPING">DEBUG_MEM_DETAILED_STEPPING</a>)</u></td></tr>
+<tr><th id="865">865</th><td>  mem_second = MemoryUsage();</td></tr>
+<tr><th id="866">866</th><td>  mem_diff = mem_second-mem_first;</td></tr>
+<tr><th id="867">867</th><td>  G4cout &lt;&lt; <q>"|| MEM || After DoIT, diff is : "</q> &lt;&lt; mem_diff &lt;&lt; G4endl;</td></tr>
+<tr><th id="868">868</th><td><u>#<span data-ppcond="864">endif</span></u></td></tr>
+<tr><th id="869">869</th><td></td></tr>
+<tr><th id="870">870</th><td><u>#<span data-ppcond="870">if</span> defined (<span class="macro" data-ref="_M/DEBUG_MEM">DEBUG_MEM</span>) &amp;&amp; defined (<a class="macro" href="#63" data-ref="_M/DEBUG_MEM_DETAILED_STEPPING">DEBUG_MEM_DETAILED_STEPPING</a>)</u></td></tr>
+<tr><th id="871">871</th><td>  mem_first = MemoryUsage();</td></tr>
+<tr><th id="872">872</th><td><u>#<span data-ppcond="870">endif</span></u></td></tr>
+<tr><th id="873">873</th><td></td></tr>
+<tr><th id="874">874</th><td>  <a class="member" href="../include/G4Scheduler.hh.html#G4Scheduler::fpModelProcessor" title='G4Scheduler::fpModelProcessor' data-ref="G4Scheduler::fpModelProcessor">fpModelProcessor</a>-&gt;<a class="ref" href="../include/G4ITModelProcessor.hh.html#_ZN18G4ITModelProcessor20ComputeTrackReactionE14G4ITStepStatusdddbdP20G4UserTimeStepActioni" title='G4ITModelProcessor::ComputeTrackReaction' data-ref="_ZN18G4ITModelProcessor20ComputeTrackReactionE14G4ITStepStatusdddbdP20G4UserTimeStepActioni">ComputeTrackReaction</a>(<a class="member" href="../include/G4Scheduler.hh.html#G4Scheduler::fITStepStatus" title='G4Scheduler::fITStepStatus' data-ref="G4Scheduler::fITStepStatus">fITStepStatus</a>,</td></tr>
+<tr><th id="875">875</th><td>                                         <a class="member" href="../include/G4Scheduler.hh.html#G4Scheduler::fGlobalTime" title='G4Scheduler::fGlobalTime' data-ref="G4Scheduler::fGlobalTime">fGlobalTime</a>,</td></tr>
+<tr><th id="876">876</th><td>                                         <a class="member" href="../include/G4Scheduler.hh.html#G4Scheduler::fTimeStep" title='G4Scheduler::fTimeStep' data-ref="G4Scheduler::fTimeStep">fTimeStep</a>,</td></tr>
+<tr><th id="877">877</th><td>                                         <a class="member" href="../include/G4Scheduler.hh.html#G4Scheduler::fPreviousTimeStep" title='G4Scheduler::fPreviousTimeStep' data-ref="G4Scheduler::fPreviousTimeStep">fPreviousTimeStep</a>,</td></tr>
+<tr><th id="878">878</th><td>                                         <a class="member" href="../include/G4Scheduler.hh.html#G4Scheduler::fReachedUserTimeLimit" title='G4Scheduler::fReachedUserTimeLimit' data-ref="G4Scheduler::fReachedUserTimeLimit">fReachedUserTimeLimit</a>,</td></tr>
+<tr><th id="879">879</th><td>                                         <a class="member" href="../include/G4Scheduler.hh.html#G4Scheduler::fTimeTolerance" title='G4Scheduler::fTimeTolerance' data-ref="G4Scheduler::fTimeTolerance">fTimeTolerance</a>,</td></tr>
+<tr><th id="880">880</th><td>                                         <a class="member" href="../include/G4Scheduler.hh.html#G4Scheduler::fpUserTimeStepAction" title='G4Scheduler::fpUserTimeStepAction' data-ref="G4Scheduler::fpUserTimeStepAction">fpUserTimeStepAction</a>,</td></tr>
+<tr><th id="881">881</th><td>                                         <a class="member" href="../include/G4Scheduler.hh.html#G4Scheduler::fVerbose" title='G4Scheduler::fVerbose' data-ref="G4Scheduler::fVerbose">fVerbose</a>);</td></tr>
+<tr><th id="882">882</th><td></td></tr>
+<tr><th id="883">883</th><td>  ++<a class="member" href="../include/G4Scheduler.hh.html#G4Scheduler::fNbSteps" title='G4Scheduler::fNbSteps' data-ref="G4Scheduler::fNbSteps">fNbSteps</a>;</td></tr>
+<tr><th id="884">884</th><td></td></tr>
+<tr><th id="885">885</th><td>  <b>if</b> (<a class="member" href="../include/G4Scheduler.hh.html#G4Scheduler::fpUserTimeStepAction" title='G4Scheduler::fpUserTimeStepAction' data-ref="G4Scheduler::fpUserTimeStepAction">fpUserTimeStepAction</a>)</td></tr>
+<tr><th id="886">886</th><td>  {</td></tr>
+<tr><th id="887">887</th><td>    <a class="member" href="../include/G4Scheduler.hh.html#G4Scheduler::fpUserTimeStepAction" title='G4Scheduler::fpUserTimeStepAction' data-ref="G4Scheduler::fpUserTimeStepAction">fpUserTimeStepAction</a>-&gt;<a class="virtual ref" href="../include/G4UserTimeStepAction.hh.html#_ZN20G4UserTimeStepAction22UserPostTimeStepActionEv" title='G4UserTimeStepAction::UserPostTimeStepAction' data-ref="_ZN20G4UserTimeStepAction22UserPostTimeStepActionEv">UserPostTimeStepAction</a>();</td></tr>
+<tr><th id="888">888</th><td>  }</td></tr>
+<tr><th id="889">889</th><td></td></tr>
+<tr><th id="890">890</th><td>  <a class="member" href="../include/G4Scheduler.hh.html#G4Scheduler::fPreviousTimeStep" title='G4Scheduler::fPreviousTimeStep' data-ref="G4Scheduler::fPreviousTimeStep">fPreviousTimeStep</a> = <a class="member" href="../include/G4Scheduler.hh.html#G4Scheduler::fTimeStep" title='G4Scheduler::fTimeStep' data-ref="G4Scheduler::fTimeStep">fTimeStep</a>;</td></tr>
+<tr><th id="891">891</th><td></td></tr>
+<tr><th id="892">892</th><td><u>#<span data-ppcond="892">if</span> defined (<span class="macro" data-ref="_M/DEBUG_MEM">DEBUG_MEM</span>) &amp;&amp; defined (<a class="macro" href="#63" data-ref="_M/DEBUG_MEM_DETAILED_STEPPING">DEBUG_MEM_DETAILED_STEPPING</a>)</u></td></tr>
+<tr><th id="893">893</th><td>  mem_second = MemoryUsage();</td></tr>
+<tr><th id="894">894</th><td>  mem_diff = mem_second-mem_first;</td></tr>
+<tr><th id="895">895</th><td>  G4cout &lt;&lt; <q>"|| MEM || After computing reactions + UserPostTimeStepAction, "</q></td></tr>
+<tr><th id="896">896</th><td>  <q>"diff is : "</q> &lt;&lt; mem_diff &lt;&lt; G4endl;</td></tr>
+<tr><th id="897">897</th><td><u>#<span data-ppcond="892">endif</span></u></td></tr>
+<tr><th id="898">898</th><td></td></tr>
+<tr><th id="899">899</th><td>  <i>// End of step</i></td></tr>
+<tr><th id="900">900</th><td><u>#<span data-ppcond="900">ifdef</span> <span class="macro" data-ref="_M/G4VERBOSE">G4VERBOSE</span></u></td></tr>
+<tr><th id="901">901</th><td>    <b>if</b> (<a class="member" href="../include/G4Scheduler.hh.html#G4Scheduler::fVerbose" title='G4Scheduler::fVerbose' data-ref="G4Scheduler::fVerbose">fVerbose</a> &gt;= <var>2</var>)</td></tr>
+<tr><th id="902">902</th><td>    {</td></tr>
+<tr><th id="903">903</th><td><u>#<span data-ppcond="903">ifdef</span> <span class="macro" data-ref="_M/USE_COLOR">USE_COLOR</span></u></td></tr>
+<tr><th id="904">904</th><td>      G4cout &lt;&lt; LIGHT_RED;</td></tr>
+<tr><th id="905">905</th><td><u>#<span data-ppcond="903">endif</span></u></td></tr>
+<tr><th id="906">906</th><td></td></tr>
+<tr><th id="907">907</th><td>      <a class="type" href="../../../../../global/management/include/G4String.hh.html#G4String" title='G4String' data-ref="G4String">G4String</a> <a class="ref fake" href="../../../../../global/management/include/G4String.hh.html#_ZN8G4StringC1Ev" title='G4String::G4String' data-ref="_ZN8G4StringC1Ev"></a><dfn class="local col8 decl" id="18interactionType" title='interactionType' data-type='G4String' data-ref="18interactionType">interactionType</dfn>;</td></tr>
+<tr><th id="908">908</th><td>      <a class="member" href="#_ZN11G4Scheduler16GetCollisionTypeER8G4String" title='G4Scheduler::GetCollisionType' data-ref="_ZN11G4Scheduler16GetCollisionTypeER8G4String">GetCollisionType</a>(<span class='refarg'><a class="local col8 ref" href="#18interactionType" title='interactionType' data-ref="18interactionType">interactionType</a></span>);</td></tr>
+<tr><th id="909">909</th><td></td></tr>
+<tr><th id="910">910</th><td>      <span class='error' title="use of undeclared identifier &apos;std&apos;">std</span>::stringstream <dfn class="local col9 decl" id="19finalOutput" title='finalOutput' data-type='int' data-ref="19finalOutput">finalOutput</dfn>;</td></tr>
+<tr><th id="911">911</th><td></td></tr>
+<tr><th id="912">912</th><td>      finalOutput &lt;&lt; <q>"*** End of step N°"</q> &lt;&lt; fNbSteps</td></tr>
+<tr><th id="913">913</th><td>             &lt;&lt; <q>"\t T_i= "</q> &lt;&lt; G4BestUnit(fGlobalTime-fTimeStep, <q>"Time"</q>)</td></tr>
+<tr><th id="914">914</th><td>             &lt;&lt; <q>"\t dt= "</q> &lt;&lt; G4BestUnit(fTimeStep, <q>"Time"</q>)</td></tr>
+<tr><th id="915">915</th><td>             &lt;&lt; <q>"\t T_f= "</q> &lt;&lt; G4BestUnit(fGlobalTime, <q>"Time"</q>)</td></tr>
+<tr><th id="916">916</th><td>             &lt;&lt; <q>"\t "</q> &lt;&lt; interactionType</td></tr>
+<tr><th id="917">917</th><td>             &lt;&lt; <a class="macro" href="../../../../../global/management/include/G4ios.hh.html#60" title="std::endl" data-ref="_M/G4endl">G4endl</a>;</td></tr>
+<tr><th id="918">918</th><td></td></tr>
+<tr><th id="919">919</th><td>      <b>if</b>(<a class="member" href="../include/G4Scheduler.hh.html#G4Scheduler::fVerbose" title='G4Scheduler::fVerbose' data-ref="G4Scheduler::fVerbose">fVerbose</a>&gt;<var>2</var>)</td></tr>
+<tr><th id="920">920</th><td>      {</td></tr>
+<tr><th id="921">921</th><td>        <b>if</b>(<a class="member" href="../include/G4Scheduler.hh.html#G4Scheduler::fReachedUserTimeLimit" title='G4Scheduler::fReachedUserTimeLimit' data-ref="G4Scheduler::fReachedUserTimeLimit">fReachedUserTimeLimit</a>)</td></tr>
+<tr><th id="922">922</th><td>        {</td></tr>
+<tr><th id="923">923</th><td>          finalOutput &lt;&lt; <q>"It has also reached the user time limit"</q> &lt;&lt; <a class="macro" href="../../../../../global/management/include/G4ios.hh.html#60" title="std::endl" data-ref="_M/G4endl">G4endl</a>;</td></tr>
+<tr><th id="924">924</th><td>        }</td></tr>
+<tr><th id="925">925</th><td>        finalOutput &lt;&lt; <q>"_______________________________________________________________"</q></td></tr>
+<tr><th id="926">926</th><td>            <q>"_______"</q>&lt;&lt; <a class="macro" href="../../../../../global/management/include/G4ios.hh.html#60" title="std::endl" data-ref="_M/G4endl">G4endl</a>;</td></tr>
+<tr><th id="927">927</th><td>      }</td></tr>
+<tr><th id="928">928</th><td></td></tr>
+<tr><th id="929">929</th><td>      <a class="macro" href="../../../../../global/management/include/G4ios.hh.html#46" title="(*_G4cout_p())" data-ref="_M/G4cout">G4cout</a> &lt;&lt; finalOutput.str();</td></tr>
+<tr><th id="930">930</th><td></td></tr>
+<tr><th id="931">931</th><td><u>#<span data-ppcond="931">ifdef</span> <span class="macro" data-ref="_M/USE_COLOR">USE_COLOR</span></u></td></tr>
+<tr><th id="932">932</th><td>      G4cout &lt;&lt; RESET_COLOR;</td></tr>
+<tr><th id="933">933</th><td><u>#<span data-ppcond="931">endif</span></u></td></tr>
+<tr><th id="934">934</th><td>    }</td></tr>
+<tr><th id="935">935</th><td><u>#<span data-ppcond="900">endif</span></u></td></tr>
+<tr><th id="936">936</th><td></td></tr>
+<tr><th id="937">937</th><td>}</td></tr>
+<tr><th id="938">938</th><td><i>//_________________________________________________________________________</i></td></tr>
+<tr><th id="939">939</th><td></td></tr>
+<tr><th id="940">940</th><td><em>double</em> <a class="type" href="../include/G4Scheduler.hh.html#G4Scheduler" title='G4Scheduler' data-ref="G4Scheduler">G4Scheduler</a>::<dfn class="virtual decl def" id="_ZNK11G4Scheduler19GetLimitingTimeStepEv" title='G4Scheduler::GetLimitingTimeStep' data-ref="_ZNK11G4Scheduler19GetLimitingTimeStepEv">GetLimitingTimeStep</dfn>() <em>const</em></td></tr>
+<tr><th id="941">941</th><td>{</td></tr>
+<tr><th id="942">942</th><td>  <b>if</b> (<span class='error' title="use of undeclared identifier &apos;fpUserTimeSteps&apos;">fpUserTimeSteps</span> == <var>0</var>) <b>return</b> <a class="member" href="../include/G4Scheduler.hh.html#G4Scheduler::fDefaultMinTimeStep" title='G4Scheduler::fDefaultMinTimeStep' data-ref="G4Scheduler::fDefaultMinTimeStep">fDefaultMinTimeStep</a>;</td></tr>
+<tr><th id="943">943</th><td>  <b>if</b> (<span class='error' title="use of undeclared identifier &apos;fabs&apos;">fabs</span>(fGlobalTime - fUserUpperTimeLimit) &lt; fTimeTolerance)</td></tr>
+<tr><th id="944">944</th><td>    <b>return</b> <a class="member" href="../include/G4Scheduler.hh.html#G4Scheduler::fDefinedMinTimeStep" title='G4Scheduler::fDefinedMinTimeStep' data-ref="G4Scheduler::fDefinedMinTimeStep">fDefinedMinTimeStep</a>;</td></tr>
+<tr><th id="945">945</th><td></td></tr>
+<tr><th id="946">946</th><td>  <span class='error' title="use of undeclared identifier &apos;map&apos;">map</span>&lt;<em>double</em><span class='error' title="expected &apos;(&apos; for function-style cast or type construction">,</span> <em>double</em>&gt;::const_iterator it_fpUserTimeSteps_i = fpUserTimeSteps</td></tr>
+<tr><th id="947">947</th><td>      -&gt;upper_bound(fGlobalTime);</td></tr>
+<tr><th id="948">948</th><td>  <span class='error' title="use of undeclared identifier &apos;map&apos;">map</span>&lt;<em>double</em><span class='error' title="expected &apos;(&apos; for function-style cast or type construction">,</span> <em>double</em>&gt;::const_iterator it_fpUserTimeSteps_low = fpUserTimeSteps</td></tr>
+<tr><th id="949">949</th><td>      -&gt;lower_bound(fGlobalTime);</td></tr>
+<tr><th id="950">950</th><td></td></tr>
+<tr><th id="951">951</th><td>  <i>// DEBUG</i></td></tr>
+<tr><th id="952">952</th><td><i>  // G4cout &lt;&lt; "fGlobalTime : " &lt;&lt; G4BestUnit(fGlobalTime,"Time")</i></td></tr>
+<tr><th id="953">953</th><td><i>  //            &lt;&lt; G4endl;</i></td></tr>
+<tr><th id="954">954</th><td><i>  // G4cout &lt;&lt; "fpUserTimeSteps_i : "</i></td></tr>
+<tr><th id="955">955</th><td><i>  //        &lt;&lt;"&lt;"&lt;&lt;G4BestUnit(it_fpUserTimeSteps-&gt;first,"Time")</i></td></tr>
+<tr><th id="956">956</th><td><i>  //        &lt;&lt;", "&lt;&lt; G4BestUnit(it_fpUserTimeSteps-&gt;second,"Time")&lt;&lt;"&gt;"</i></td></tr>
+<tr><th id="957">957</th><td><i>  //        &lt;&lt; "\t fpUserTimeSteps_low : "</i></td></tr>
+<tr><th id="958">958</th><td><i>  //        &lt;&lt;"&lt;"&lt;&lt;G4BestUnit(fpUserTimeSteps_low-&gt;first,"Time")&lt;&lt;", "*</i></td></tr>
+<tr><th id="959">959</th><td><i>  //        &lt;&lt; G4BestUnit(fpUserTimeSteps_low-&gt;second,"Time")&lt;&lt;"&gt;"</i></td></tr>
+<tr><th id="960">960</th><td><i>  //        &lt;&lt; G4endl;</i></td></tr>
+<tr><th id="961">961</th><td></td></tr>
+<tr><th id="962">962</th><td>  <b>if</b> (<span class='error' title="use of undeclared identifier &apos;it_fpUserTimeSteps_i&apos;">it_fpUserTimeSteps_i</span> == <span class='error' title="use of undeclared identifier &apos;fpUserTimeSteps&apos;">fpUserTimeSteps</span>-&gt;end())</td></tr>
+<tr><th id="963">963</th><td>  {</td></tr>
+<tr><th id="964">964</th><td>    <span class='error' title="use of undeclared identifier &apos;it_fpUserTimeSteps_i&apos;">it_fpUserTimeSteps_i</span>--;</td></tr>
+<tr><th id="965">965</th><td>    <a class="member" href="../include/G4Scheduler.hh.html#G4Scheduler::fUserUpperTimeLimit" title='G4Scheduler::fUserUpperTimeLimit' data-ref="G4Scheduler::fUserUpperTimeLimit">fUserUpperTimeLimit</a> = <a class="member" href="../include/G4Scheduler.hh.html#G4Scheduler::fStopTime" title='G4Scheduler::fStopTime' data-ref="G4Scheduler::fStopTime">fStopTime</a>;</td></tr>
+<tr><th id="966">966</th><td>  }</td></tr>
+<tr><th id="967">967</th><td>  <b>else</b> <b>if</b> (fabs(fGlobalTime - <span class='error' title="use of undeclared identifier &apos;it_fpUserTimeSteps_low&apos;">it_fpUserTimeSteps_low</span>-&gt;first) &lt; fTimeTolerance)</td></tr>
+<tr><th id="968">968</th><td>  {</td></tr>
+<tr><th id="969">969</th><td>    <i>// Case : fGlobalTime = X picosecond</i></td></tr>
+<tr><th id="970">970</th><td><i>    // and fpUserTimeSteps_low-&gt;first = X picosecond</i></td></tr>
+<tr><th id="971">971</th><td><i>    // but the precision is not good enough</i></td></tr>
+<tr><th id="972">972</th><td>    <span class='error' title="use of undeclared identifier &apos;it_fpUserTimeSteps_i&apos;">it_fpUserTimeSteps_i</span> = <span class='error' title="use of undeclared identifier &apos;it_fpUserTimeSteps_low&apos;">it_fpUserTimeSteps_low</span>;</td></tr>
+<tr><th id="973">973</th><td>    <span class='error' title="use of undeclared identifier &apos;map&apos;">map</span>&lt;<em>double</em><span class='error' title="expected &apos;(&apos; for function-style cast or type construction">,</span> <em>double</em>&gt;::const_iterator tmp_it = it_fpUserTimeSteps_low;</td></tr>
+<tr><th id="974">974</th><td>    ++<span class='error' title="use of undeclared identifier &apos;tmp_it&apos;">tmp_it</span>;</td></tr>
+<tr><th id="975">975</th><td>    <b>if</b> (<span class='error' title="use of undeclared identifier &apos;tmp_it&apos;">tmp_it</span> == <span class='error' title="use of undeclared identifier &apos;fpUserTimeSteps&apos;">fpUserTimeSteps</span>-&gt;end())</td></tr>
+<tr><th id="976">976</th><td>    {</td></tr>
+<tr><th id="977">977</th><td>      <a class="member" href="../include/G4Scheduler.hh.html#G4Scheduler::fUserUpperTimeLimit" title='G4Scheduler::fUserUpperTimeLimit' data-ref="G4Scheduler::fUserUpperTimeLimit">fUserUpperTimeLimit</a> = <a class="member" href="../include/G4Scheduler.hh.html#G4Scheduler::fStopTime" title='G4Scheduler::fStopTime' data-ref="G4Scheduler::fStopTime">fStopTime</a>;</td></tr>
+<tr><th id="978">978</th><td>    }</td></tr>
+<tr><th id="979">979</th><td>    <b>else</b></td></tr>
+<tr><th id="980">980</th><td>    {</td></tr>
+<tr><th id="981">981</th><td>      fUserUpperTimeLimit = <span class='error' title="use of undeclared identifier &apos;tmp_it&apos;">tmp_it</span>-&gt;first;</td></tr>
+<tr><th id="982">982</th><td>    }</td></tr>
+<tr><th id="983">983</th><td>  }</td></tr>
+<tr><th id="984">984</th><td>  <b>else</b> <b>if</b> (<span class='error' title="use of undeclared identifier &apos;it_fpUserTimeSteps_i&apos;">it_fpUserTimeSteps_i</span> == <span class='error' title="use of undeclared identifier &apos;it_fpUserTimeSteps_low&apos;">it_fpUserTimeSteps_low</span>)</td></tr>
+<tr><th id="985">985</th><td>  {</td></tr>
+<tr><th id="986">986</th><td>    <i>// "Normal" cases</i></td></tr>
+<tr><th id="987">987</th><td>    fUserUpperTimeLimit = <span class='error' title="use of undeclared identifier &apos;it_fpUserTimeSteps_i&apos;">it_fpUserTimeSteps_i</span>-&gt;first;</td></tr>
+<tr><th id="988">988</th><td><i>//    it_fpUserTimeSteps_i++;</i></td></tr>
+<tr><th id="989">989</th><td><i>//    G4cout &lt;&lt; "Global time = " &lt;&lt; fGlobalTime &lt;&lt; G4endl;</i></td></tr>
+<tr><th id="990">990</th><td><i>//    G4cout &lt;&lt; "Is begin = "</i></td></tr>
+<tr><th id="991">991</th><td><i>//    &lt;&lt; (it_fpUserTimeSteps_i == fpUserTimeSteps-&gt;begin())&lt;&lt; G4endl;</i></td></tr>
+<tr><th id="992">992</th><td></td></tr>
+<tr><th id="993">993</th><td>    <b>if</b>(<span class='error' title="use of undeclared identifier &apos;it_fpUserTimeSteps_i&apos;">it_fpUserTimeSteps_i</span> != <span class='error' title="use of undeclared identifier &apos;fpUserTimeSteps&apos;">fpUserTimeSteps</span>-&gt;begin()) <span class='error' title="use of undeclared identifier &apos;it_fpUserTimeSteps_i&apos;">it_fpUserTimeSteps_i</span>--;</td></tr>
+<tr><th id="994">994</th><td>  }</td></tr>
+<tr><th id="995">995</th><td>  <b>else</b></td></tr>
+<tr><th id="996">996</th><td>  {</td></tr>
+<tr><th id="997">997</th><td>    fUserUpperTimeLimit = <span class='error' title="use of undeclared identifier &apos;it_fpUserTimeSteps_i&apos;">it_fpUserTimeSteps_i</span>-&gt;first;</td></tr>
+<tr><th id="998">998</th><td>    <span class='error' title="use of undeclared identifier &apos;it_fpUserTimeSteps_i&apos;">it_fpUserTimeSteps_i</span> = <span class='error' title="use of undeclared identifier &apos;it_fpUserTimeSteps_low&apos;">it_fpUserTimeSteps_low</span>;</td></tr>
+<tr><th id="999">999</th><td>  }</td></tr>
+<tr><th id="1000">1000</th><td></td></tr>
+<tr><th id="1001">1001</th><td>  <b>return</b> <span class='error' title="use of undeclared identifier &apos;it_fpUserTimeSteps_i&apos;">it_fpUserTimeSteps_i</span>-&gt;second;</td></tr>
+<tr><th id="1002">1002</th><td>}</td></tr>
+<tr><th id="1003">1003</th><td></td></tr>
+<tr><th id="1004">1004</th><td><i>//_________________________________________________________________________</i></td></tr>
+<tr><th id="1005">1005</th><td></td></tr>
+<tr><th id="1006">1006</th><td><em>void</em> <a class="type" href="../include/G4Scheduler.hh.html#G4Scheduler" title='G4Scheduler' data-ref="G4Scheduler">G4Scheduler</a>::<dfn class="decl def" id="_ZN11G4Scheduler26FindUserPreDefinedTimeStepEv" title='G4Scheduler::FindUserPreDefinedTimeStep' data-ref="_ZN11G4Scheduler26FindUserPreDefinedTimeStepEv">FindUserPreDefinedTimeStep</dfn>()</td></tr>
+<tr><th id="1007">1007</th><td>{</td></tr>
+<tr><th id="1008">1008</th><td></td></tr>
+<tr><th id="1009">1009</th><td>  <b>if</b>(<span class='error' title="use of undeclared identifier &apos;fpUserTimeSteps&apos;">fpUserTimeSteps</span> == <var>0</var>)</td></tr>
+<tr><th id="1010">1010</th><td>  {</td></tr>
+<tr><th id="1011">1011</th><td>    <a class="typedef" href="../../../../../global/management/include/G4Exception.hh.html#G4ExceptionDescription" title='G4ExceptionDescription' data-type='int' data-ref="G4ExceptionDescription">G4ExceptionDescription</a> <dfn class="local col0 decl" id="20exceptionDescription" title='exceptionDescription' data-type='G4ExceptionDescription' data-ref="20exceptionDescription">exceptionDescription</dfn>;</td></tr>
+<tr><th id="1012">1012</th><td>    exceptionDescription</td></tr>
+<tr><th id="1013">1013</th><td>        <span class='error' title="invalid operands to binary expression (&apos;G4ExceptionDescription&apos; (aka &apos;int&apos;) and &apos;const char *&apos;)">&lt;&lt;</span> <q>"You are asking to use user defined steps but you did not give any."</q>;</td></tr>
+<tr><th id="1014">1014</th><td>    <a class="ref" href="../../../../../global/management/include/G4Exception.hh.html#_Z11G4ExceptionPKcS0_19G4ExceptionSeverityRi" title='G4Exception' data-ref="_Z11G4ExceptionPKcS0_19G4ExceptionSeverityRi">G4Exception</a>(<q>"G4Scheduler::FindUserPreDefinedTimeStep"</q>,</td></tr>
+<tr><th id="1015">1015</th><td>                <q>"Scheduler004"</q>,</td></tr>
+<tr><th id="1016">1016</th><td>                <a class="enum" href="../../../../../global/management/include/G4ExceptionSeverity.hh.html#G4ExceptionSeverity::FatalErrorInArgument" title='G4ExceptionSeverity::FatalErrorInArgument' data-ref="G4ExceptionSeverity::FatalErrorInArgument">FatalErrorInArgument</a>,</td></tr>
+<tr><th id="1017">1017</th><td>                <span class='refarg'><a class="local col0 ref" href="#20exceptionDescription" title='exceptionDescription' data-ref="20exceptionDescription">exceptionDescription</a></span>);</td></tr>
+<tr><th id="1018">1018</th><td>    <b>return</b>; <i>// makes coverity happy</i></td></tr>
+<tr><th id="1019">1019</th><td>  }</td></tr>
+<tr><th id="1020">1020</th><td>  <span class='error' title="use of undeclared identifier &apos;map&apos;">map</span>&lt;<em>double</em><span class='error' title="expected &apos;(&apos; for function-style cast or type construction">,</span> <em>double</em>&gt;::iterator fpUserTimeSteps_i =</td></tr>
+<tr><th id="1021">1021</th><td>      fpUserTimeSteps-&gt;upper_bound(fGlobalTime);</td></tr>
+<tr><th id="1022">1022</th><td>  <span class='error' title="use of undeclared identifier &apos;map&apos;">map</span>&lt;<em>double</em><span class='error' title="expected &apos;(&apos; for function-style cast or type construction">,</span> <em>double</em>&gt;::iterator fpUserTimeSteps_low = fpUserTimeSteps</td></tr>
+<tr><th id="1023">1023</th><td>      -&gt;lower_bound(fGlobalTime);</td></tr>
+<tr><th id="1024">1024</th><td></td></tr>
+<tr><th id="1025">1025</th><td>  <i>// DEBUG</i></td></tr>
+<tr><th id="1026">1026</th><td><i>  // G4cout &lt;&lt; "fGlobalTime : " &lt;&lt; G4BestUnit(fGlobalTime,"Time") &lt;&lt; G4endl;</i></td></tr>
+<tr><th id="1027">1027</th><td><i>  // G4cout &lt;&lt; "fpUserTimeSteps_i : "</i></td></tr>
+<tr><th id="1028">1028</th><td><i>  // &lt;&lt;"&lt;"&lt;&lt;G4BestUnit(fpUserTimeSteps_i-&gt;first,"Time")&lt;&lt;", "</i></td></tr>
+<tr><th id="1029">1029</th><td><i>  // &lt;&lt; G4BestUnit(fpUserTimeSteps_i-&gt;second,"Time")&lt;&lt;"&gt;"</i></td></tr>
+<tr><th id="1030">1030</th><td><i>  // &lt;&lt; "\t fpUserTimeSteps_low : "</i></td></tr>
+<tr><th id="1031">1031</th><td><i>  // &lt;&lt;"&lt;"&lt;&lt;G4BestUnit(fpUserTimeSteps_low-&gt;first,"Time")&lt;&lt;", "</i></td></tr>
+<tr><th id="1032">1032</th><td><i>  // &lt;&lt; G4BestUnit(fpUserTimeSteps_low-&gt;second,"Time")&lt;&lt;"&gt;"</i></td></tr>
+<tr><th id="1033">1033</th><td><i>  // &lt;&lt; G4endl;</i></td></tr>
+<tr><th id="1034">1034</th><td></td></tr>
+<tr><th id="1035">1035</th><td>  <b>if</b>(<span class='error' title="use of undeclared identifier &apos;fpUserTimeSteps_i&apos;">fpUserTimeSteps_i</span> == <span class='error' title="use of undeclared identifier &apos;fpUserTimeSteps&apos;">fpUserTimeSteps</span>-&gt;end())</td></tr>
+<tr><th id="1036">1036</th><td>  {</td></tr>
+<tr><th id="1037">1037</th><td>    <span class='error' title="use of undeclared identifier &apos;fpUserTimeSteps_i&apos;">fpUserTimeSteps_i</span>--;</td></tr>
+<tr><th id="1038">1038</th><td>  }</td></tr>
+<tr><th id="1039">1039</th><td>  <b>else</b> <b>if</b>(fabs(fGlobalTime - <span class='error' title="use of undeclared identifier &apos;fpUserTimeSteps_low&apos;">fpUserTimeSteps_low</span>-&gt;first) &lt; fTimeTolerance)</td></tr>
+<tr><th id="1040">1040</th><td>  {</td></tr>
+<tr><th id="1041">1041</th><td>    <i>// Case : fGlobalTime = X picosecond</i></td></tr>
+<tr><th id="1042">1042</th><td><i>    // and fpUserTimeSteps_low-&gt;first = X picosecond</i></td></tr>
+<tr><th id="1043">1043</th><td><i>    // but the precision is not good enough</i></td></tr>
+<tr><th id="1044">1044</th><td>    <span class='error' title="use of undeclared identifier &apos;fpUserTimeSteps_i&apos;">fpUserTimeSteps_i</span> = <span class='error' title="use of undeclared identifier &apos;fpUserTimeSteps_low&apos;">fpUserTimeSteps_low</span>;</td></tr>
+<tr><th id="1045">1045</th><td>  }</td></tr>
+<tr><th id="1046">1046</th><td>  <b>else</b> <b>if</b>(<span class='error' title="use of undeclared identifier &apos;fpUserTimeSteps_i&apos;">fpUserTimeSteps_i</span> == <span class='error' title="use of undeclared identifier &apos;fpUserTimeSteps_low&apos;">fpUserTimeSteps_low</span>)</td></tr>
+<tr><th id="1047">1047</th><td>  {</td></tr>
+<tr><th id="1048">1048</th><td>    <i>// "Normal" cases</i></td></tr>
+<tr><th id="1049">1049</th><td>    <span class='error' title="use of undeclared identifier &apos;fpUserTimeSteps_i&apos;">fpUserTimeSteps_i</span>--;</td></tr>
+<tr><th id="1050">1050</th><td>  }</td></tr>
+<tr><th id="1051">1051</th><td>  <b>else</b></td></tr>
+<tr><th id="1052">1052</th><td>  {</td></tr>
+<tr><th id="1053">1053</th><td>    <span class='error' title="use of undeclared identifier &apos;fpUserTimeSteps_i&apos;">fpUserTimeSteps_i</span> = <span class='error' title="use of undeclared identifier &apos;fpUserTimeSteps_low&apos;">fpUserTimeSteps_low</span>;</td></tr>
+<tr><th id="1054">1054</th><td>  }</td></tr>
+<tr><th id="1055">1055</th><td></td></tr>
+<tr><th id="1056">1056</th><td>  fDefinedMinTimeStep = <span class='error' title="use of undeclared identifier &apos;fpUserTimeSteps_i&apos;">fpUserTimeSteps_i</span>-&gt;second;</td></tr>
+<tr><th id="1057">1057</th><td>}</td></tr>
+<tr><th id="1058">1058</th><td></td></tr>
+<tr><th id="1059">1059</th><td><i>//_________________________________________________________________________</i></td></tr>
+<tr><th id="1060">1060</th><td></td></tr>
+<tr><th id="1061">1061</th><td><em>void</em> <a class="type" href="../include/G4Scheduler.hh.html#G4Scheduler" title='G4Scheduler' data-ref="G4Scheduler">G4Scheduler</a>::<dfn class="decl def" id="_ZN11G4Scheduler11EndTrackingEv" title='G4Scheduler::EndTracking' data-ref="_ZN11G4Scheduler11EndTrackingEv">EndTracking</dfn>()</td></tr>
+<tr><th id="1062">1062</th><td>{</td></tr>
+<tr><th id="1063">1063</th><td>  <b>if</b>(<a class="member" href="../include/G4Scheduler.hh.html#G4Scheduler::fRunning" title='G4Scheduler::fRunning' data-ref="G4Scheduler::fRunning">fRunning</a>)</td></tr>
+<tr><th id="1064">1064</th><td>  {</td></tr>
+<tr><th id="1065">1065</th><td>    <a class="typedef" href="../../../../../global/management/include/G4Exception.hh.html#G4ExceptionDescription" title='G4ExceptionDescription' data-type='int' data-ref="G4ExceptionDescription">G4ExceptionDescription</a> <dfn class="local col1 decl" id="21exceptionDescription" title='exceptionDescription' data-type='G4ExceptionDescription' data-ref="21exceptionDescription">exceptionDescription</dfn>;</td></tr>
+<tr><th id="1066">1066</th><td>    exceptionDescription</td></tr>
+<tr><th id="1067">1067</th><td>        <span class='error' title="invalid operands to binary expression (&apos;G4ExceptionDescription&apos; (aka &apos;int&apos;) and &apos;const char *&apos;)">&lt;&lt;</span> <q>"End tracking is called while G4Scheduler is still running."</q></td></tr>
+<tr><th id="1068">1068</th><td>        &lt;&lt; <a class="macro" href="../../../../../global/management/include/G4ios.hh.html#60" title="std::endl" data-ref="_M/G4endl">G4endl</a>;</td></tr>
+<tr><th id="1069">1069</th><td></td></tr>
+<tr><th id="1070">1070</th><td>    <a class="ref" href="../../../../../global/management/include/G4Exception.hh.html#_Z11G4ExceptionPKcS0_19G4ExceptionSeverityRi" title='G4Exception' data-ref="_Z11G4ExceptionPKcS0_19G4ExceptionSeverityRi">G4Exception</a>(<q>"G4Scheduler::EndTracking"</q>,</td></tr>
+<tr><th id="1071">1071</th><td>                <q>"Scheduler017"</q>,</td></tr>
+<tr><th id="1072">1072</th><td>                <a class="enum" href="../../../../../global/management/include/G4ExceptionSeverity.hh.html#G4ExceptionSeverity::FatalErrorInArgument" title='G4ExceptionSeverity::FatalErrorInArgument' data-ref="G4ExceptionSeverity::FatalErrorInArgument">FatalErrorInArgument</a>,</td></tr>
+<tr><th id="1073">1073</th><td>                <span class='refarg'><a class="local col1 ref" href="#21exceptionDescription" title='exceptionDescription' data-ref="21exceptionDescription">exceptionDescription</a></span>);</td></tr>
+<tr><th id="1074">1074</th><td>  }</td></tr>
+<tr><th id="1075">1075</th><td></td></tr>
+<tr><th id="1076">1076</th><td>  <a class="member" href="../include/G4Scheduler.hh.html#G4Scheduler::fTrackContainer" title='G4Scheduler::fTrackContainer' data-ref="G4Scheduler::fTrackContainer">fTrackContainer</a>.<a class="ref" href="../include/G4ITTrackHolder.hh.html#_ZN15G4ITTrackHolder28MergeSecondariesWithMainListEv" title='G4ITTrackHolder::MergeSecondariesWithMainList' data-ref="_ZN15G4ITTrackHolder28MergeSecondariesWithMainListEv">MergeSecondariesWithMainList</a>();</td></tr>
+<tr><th id="1077">1077</th><td></td></tr>
+<tr><th id="1078">1078</th><td>  <b>if</b> (<a class="member" href="../include/G4Scheduler.hh.html#G4Scheduler::fTrackContainer" title='G4Scheduler::fTrackContainer' data-ref="G4Scheduler::fTrackContainer">fTrackContainer</a>.<a class="ref" href="../include/G4ITTrackHolder.hh.html#_ZN15G4ITTrackHolder17MainListsNOTEmptyEv" title='G4ITTrackHolder::MainListsNOTEmpty' data-ref="_ZN15G4ITTrackHolder17MainListsNOTEmptyEv">MainListsNOTEmpty</a>())</td></tr>
+<tr><th id="1079">1079</th><td>  {</td></tr>
+<tr><th id="1080">1080</th><td>    <a class="typedef" href="../include/G4TrackList.hh.html#G4TrackManyList" title='G4TrackManyList' data-type='G4ManyFastLists&lt;G4Track&gt;' data-ref="G4TrackManyList">G4TrackManyList</a>* <dfn class="local col2 decl" id="22mainList" title='mainList' data-type='G4TrackManyList *' data-ref="22mainList">mainList</dfn> = <a class="member" href="../include/G4Scheduler.hh.html#G4Scheduler::fTrackContainer" title='G4Scheduler::fTrackContainer' data-ref="G4Scheduler::fTrackContainer">fTrackContainer</a>.<a class="ref" href="../include/G4ITTrackHolder.hh.html#_ZN15G4ITTrackHolder11GetMainListEv" title='G4ITTrackHolder::GetMainList' data-ref="_ZN15G4ITTrackHolder11GetMainListEv">GetMainList</a>();</td></tr>
+<tr><th id="1081">1081</th><td>    <a class="typedef" href="../include/G4TrackList.hh.html#G4TrackManyList" title='G4TrackManyList' data-type='G4ManyFastLists&lt;G4Track&gt;' data-ref="G4TrackManyList">G4TrackManyList</a>::<a class="typedef" href="../include/G4ManyFastLists.hh.html#G4ManyFastLists{G4Track}::iterator" title='G4ManyFastLists&lt;G4Track&gt;::iterator' data-type='G4ManyFastLists_iterator&lt;G4Track&gt;' data-ref="G4ManyFastLists{G4Track}::iterator">iterator</a> <dfn class="local col3 decl" id="23it" title='it' data-type='G4TrackManyList::iterator' data-ref="23it">it</dfn> = <a class="local col2 ref" href="#22mainList" title='mainList' data-ref="22mainList">mainList</a>-&gt;<a class="ref" href="../include/G4ManyFastLists.hh.html#_ZN15G4ManyFastLists5beginEv" title='G4ManyFastLists::begin' data-ref="_ZN15G4ManyFastLists5beginEv">begin</a>();</td></tr>
+<tr><th id="1082">1082</th><td>    <a class="typedef" href="../include/G4TrackList.hh.html#G4TrackManyList" title='G4TrackManyList' data-type='G4ManyFastLists&lt;G4Track&gt;' data-ref="G4TrackManyList">G4TrackManyList</a>::<a class="typedef" href="../include/G4ManyFastLists.hh.html#G4ManyFastLists{G4Track}::iterator" title='G4ManyFastLists&lt;G4Track&gt;::iterator' data-type='G4ManyFastLists_iterator&lt;G4Track&gt;' data-ref="G4ManyFastLists{G4Track}::iterator">iterator</a> <dfn class="local col4 decl" id="24end" title='end' data-type='G4TrackManyList::iterator' data-ref="24end">end</dfn> = <a class="local col2 ref" href="#22mainList" title='mainList' data-ref="22mainList">mainList</a>-&gt;<a class="ref" href="../include/G4ManyFastLists.hh.html#_ZN15G4ManyFastLists3endEv" title='G4ManyFastLists::end' data-ref="_ZN15G4ManyFastLists3endEv">end</a>();</td></tr>
+<tr><th id="1083">1083</th><td>    <b>for</b> (; <a class="local col3 ref" href="#23it" title='it' data-ref="23it">it</a> <a class="ref" href="../include/G4ManyFastLists.hh.html#_ZNK24G4ManyFastLists_iteratorneERK24G4ManyFastLists_iteratorIT_E" title='G4ManyFastLists_iterator::operator!=' data-ref="_ZNK24G4ManyFastLists_iteratorneERK24G4ManyFastLists_iteratorIT_E">!=</a> <a class="local col4 ref" href="#24end" title='end' data-ref="24end">end</a>; <a class="ref" href="../include/G4ManyFastLists.hh.html#_ZN24G4ManyFastLists_iteratorppEv" title='G4ManyFastLists_iterator::operator++' data-ref="_ZN24G4ManyFastLists_iteratorppEv">++</a><a class="local col3 ref" href="#23it" title='it' data-ref="23it">it</a>)</td></tr>
+<tr><th id="1084">1084</th><td>    {</td></tr>
+<tr><th id="1085">1085</th><td>      <a class="member" href="../include/G4Scheduler.hh.html#G4Scheduler::fpTrackingManager" title='G4Scheduler::fpTrackingManager' data-ref="G4Scheduler::fpTrackingManager">fpTrackingManager</a>-&gt;<a class="ref" href="../include/G4ITTrackingManager.hh.html#_ZN19G4ITTrackingManager17EndTrackingWOKillEP7G4Track" title='G4ITTrackingManager::EndTrackingWOKill' data-ref="_ZN19G4ITTrackingManager17EndTrackingWOKillEP7G4Track">EndTrackingWOKill</a>(<a class="ref" href="../include/G4ManyFastLists.hh.html#_ZN24G4ManyFastLists_iteratordeEv" title='G4ManyFastLists_iterator::operator*' data-ref="_ZN24G4ManyFastLists_iteratordeEv">*</a><a class="local col3 ref" href="#23it" title='it' data-ref="23it">it</a>);</td></tr>
+<tr><th id="1086">1086</th><td>    }</td></tr>
+<tr><th id="1087">1087</th><td>  }</td></tr>
+<tr><th id="1088">1088</th><td></td></tr>
+<tr><th id="1089">1089</th><td>  <b>if</b> (<a class="member" href="../include/G4Scheduler.hh.html#G4Scheduler::fTrackContainer" title='G4Scheduler::fTrackContainer' data-ref="G4Scheduler::fTrackContainer">fTrackContainer</a>.<a class="ref" href="../include/G4ITTrackHolder.hh.html#_ZN15G4ITTrackHolder22SecondaryListsNOTEmptyEv" title='G4ITTrackHolder::SecondaryListsNOTEmpty' data-ref="_ZN15G4ITTrackHolder22SecondaryListsNOTEmptyEv">SecondaryListsNOTEmpty</a>()) <i>// should be empty</i></td></tr>
+<tr><th id="1090">1090</th><td>  {</td></tr>
+<tr><th id="1091">1091</th><td>    <a class="typedef" href="../include/G4TrackList.hh.html#G4TrackManyList" title='G4TrackManyList' data-type='G4ManyFastLists&lt;G4Track&gt;' data-ref="G4TrackManyList">G4TrackManyList</a>* <dfn class="local col5 decl" id="25secondaries" title='secondaries' data-type='G4TrackManyList *' data-ref="25secondaries">secondaries</dfn> = <a class="member" href="../include/G4Scheduler.hh.html#G4Scheduler::fTrackContainer" title='G4Scheduler::fTrackContainer' data-ref="G4Scheduler::fTrackContainer">fTrackContainer</a>.<a class="ref" href="../include/G4ITTrackHolder.hh.html#_ZN15G4ITTrackHolder18GetSecondariesListEv" title='G4ITTrackHolder::GetSecondariesList' data-ref="_ZN15G4ITTrackHolder18GetSecondariesListEv">GetSecondariesList</a>();</td></tr>
+<tr><th id="1092">1092</th><td>    <a class="typedef" href="../include/G4TrackList.hh.html#G4TrackManyList" title='G4TrackManyList' data-type='G4ManyFastLists&lt;G4Track&gt;' data-ref="G4TrackManyList">G4TrackManyList</a>::<a class="typedef" href="../include/G4ManyFastLists.hh.html#G4ManyFastLists{G4Track}::iterator" title='G4ManyFastLists&lt;G4Track&gt;::iterator' data-type='G4ManyFastLists_iterator&lt;G4Track&gt;' data-ref="G4ManyFastLists{G4Track}::iterator">iterator</a> <dfn class="local col6 decl" id="26it" title='it' data-type='G4TrackManyList::iterator' data-ref="26it">it</dfn> = <a class="local col5 ref" href="#25secondaries" title='secondaries' data-ref="25secondaries">secondaries</a>-&gt;<a class="ref" href="../include/G4ManyFastLists.hh.html#_ZN15G4ManyFastLists5beginEv" title='G4ManyFastLists::begin' data-ref="_ZN15G4ManyFastLists5beginEv">begin</a>();</td></tr>
+<tr><th id="1093">1093</th><td>    <a class="typedef" href="../include/G4TrackList.hh.html#G4TrackManyList" title='G4TrackManyList' data-type='G4ManyFastLists&lt;G4Track&gt;' data-ref="G4TrackManyList">G4TrackManyList</a>::<a class="typedef" href="../include/G4ManyFastLists.hh.html#G4ManyFastLists{G4Track}::iterator" title='G4ManyFastLists&lt;G4Track&gt;::iterator' data-type='G4ManyFastLists_iterator&lt;G4Track&gt;' data-ref="G4ManyFastLists{G4Track}::iterator">iterator</a> <dfn class="local col7 decl" id="27end" title='end' data-type='G4TrackManyList::iterator' data-ref="27end">end</dfn> = <a class="local col5 ref" href="#25secondaries" title='secondaries' data-ref="25secondaries">secondaries</a>-&gt;<a class="ref" href="../include/G4ManyFastLists.hh.html#_ZN15G4ManyFastLists3endEv" title='G4ManyFastLists::end' data-ref="_ZN15G4ManyFastLists3endEv">end</a>();</td></tr>
+<tr><th id="1094">1094</th><td></td></tr>
+<tr><th id="1095">1095</th><td>    <b>for</b> (; <a class="local col6 ref" href="#26it" title='it' data-ref="26it">it</a> <a class="ref" href="../include/G4ManyFastLists.hh.html#_ZNK24G4ManyFastLists_iteratorneERK24G4ManyFastLists_iteratorIT_E" title='G4ManyFastLists_iterator::operator!=' data-ref="_ZNK24G4ManyFastLists_iteratorneERK24G4ManyFastLists_iteratorIT_E">!=</a> <a class="local col7 ref" href="#27end" title='end' data-ref="27end">end</a>; <a class="ref" href="../include/G4ManyFastLists.hh.html#_ZN24G4ManyFastLists_iteratorppEv" title='G4ManyFastLists_iterator::operator++' data-ref="_ZN24G4ManyFastLists_iteratorppEv">++</a><a class="local col6 ref" href="#26it" title='it' data-ref="26it">it</a>)</td></tr>
+<tr><th id="1096">1096</th><td>    {</td></tr>
+<tr><th id="1097">1097</th><td>      <a class="member" href="../include/G4Scheduler.hh.html#G4Scheduler::fpTrackingManager" title='G4Scheduler::fpTrackingManager' data-ref="G4Scheduler::fpTrackingManager">fpTrackingManager</a>-&gt;<a class="ref" href="../include/G4ITTrackingManager.hh.html#_ZN19G4ITTrackingManager17EndTrackingWOKillEP7G4Track" title='G4ITTrackingManager::EndTrackingWOKill' data-ref="_ZN19G4ITTrackingManager17EndTrackingWOKillEP7G4Track">EndTrackingWOKill</a>(<a class="ref" href="../include/G4ManyFastLists.hh.html#_ZN24G4ManyFastLists_iteratordeEv" title='G4ManyFastLists_iterator::operator*' data-ref="_ZN24G4ManyFastLists_iteratordeEv">*</a><a class="local col6 ref" href="#26it" title='it' data-ref="26it">it</a>);</td></tr>
+<tr><th id="1098">1098</th><td>    }</td></tr>
+<tr><th id="1099">1099</th><td>  }</td></tr>
+<tr><th id="1100">1100</th><td>}</td></tr>
+<tr><th id="1101">1101</th><td></td></tr>
+<tr><th id="1102">1102</th><td><i>//_________________________________________________________________________</i></td></tr>
+<tr><th id="1103">1103</th><td><em>void</em> <a class="type" href="../include/G4Scheduler.hh.html#G4Scheduler" title='G4Scheduler' data-ref="G4Scheduler">G4Scheduler</a>::<dfn class="virtual decl def" id="_ZN11G4Scheduler16SetInteractivityEP25G4ITTrackingInteractivity" title='G4Scheduler::SetInteractivity' data-ref="_ZN11G4Scheduler16SetInteractivityEP25G4ITTrackingInteractivity">SetInteractivity</dfn>(<a class="type" href="../include/G4ITTrackingInteractivity.hh.html#G4ITTrackingInteractivity" title='G4ITTrackingInteractivity' data-ref="G4ITTrackingInteractivity">G4ITTrackingInteractivity</a>* <dfn class="local col8 decl" id="28interactivity" title='interactivity' data-type='G4ITTrackingInteractivity *' data-ref="28interactivity">interactivity</dfn>)</td></tr>
+<tr><th id="1104">1104</th><td>{</td></tr>
+<tr><th id="1105">1105</th><td>  <a class="member" href="../include/G4Scheduler.hh.html#G4Scheduler::fpTrackingInteractivity" title='G4Scheduler::fpTrackingInteractivity' data-ref="G4Scheduler::fpTrackingInteractivity">fpTrackingInteractivity</a> = <a class="local col8 ref" href="#28interactivity" title='interactivity' data-ref="28interactivity">interactivity</a>;</td></tr>
+<tr><th id="1106">1106</th><td>  <b>if</b>(<a class="member" href="../include/G4Scheduler.hh.html#G4Scheduler::fpTrackingManager" title='G4Scheduler::fpTrackingManager' data-ref="G4Scheduler::fpTrackingManager">fpTrackingManager</a>)</td></tr>
+<tr><th id="1107">1107</th><td>  {</td></tr>
+<tr><th id="1108">1108</th><td>    <a class="member" href="../include/G4Scheduler.hh.html#G4Scheduler::fpTrackingManager" title='G4Scheduler::fpTrackingManager' data-ref="G4Scheduler::fpTrackingManager">fpTrackingManager</a>-&gt;<a class="ref" href="../include/G4ITTrackingManager.hh.html#_ZN19G4ITTrackingManager16SetInteractivityEP25G4ITTrackingInteractivity" title='G4ITTrackingManager::SetInteractivity' data-ref="_ZN19G4ITTrackingManager16SetInteractivityEP25G4ITTrackingInteractivity">SetInteractivity</a>(<a class="member" href="../include/G4Scheduler.hh.html#G4Scheduler::fpTrackingInteractivity" title='G4Scheduler::fpTrackingInteractivity' data-ref="G4Scheduler::fpTrackingInteractivity">fpTrackingInteractivity</a>);</td></tr>
+<tr><th id="1109">1109</th><td>  }</td></tr>
+<tr><th id="1110">1110</th><td></td></tr>
+<tr><th id="1111">1111</th><td>  <i>//G4MIWorkspace::GetWorldWorkspace()-&gt;SetTrackingInteractivity(interactivity);</i></td></tr>
+<tr><th id="1112">1112</th><td>}</td></tr>
+<tr><th id="1113">1113</th><td></td></tr>
+<tr><th id="1114">1114</th><td><i>//_________________________________________________________________________</i></td></tr>
+<tr><th id="1115">1115</th><td><em>void</em> <a class="type" href="../include/G4Scheduler.hh.html#G4Scheduler" title='G4Scheduler' data-ref="G4Scheduler">G4Scheduler</a>::<dfn class="decl def" id="_ZN11G4Scheduler21ForceReinitializationEv" title='G4Scheduler::ForceReinitialization' data-ref="_ZN11G4Scheduler21ForceReinitializationEv">ForceReinitialization</dfn>()</td></tr>
+<tr><th id="1116">1116</th><td>{</td></tr>
+<tr><th id="1117">1117</th><td>  <a class="member" href="../include/G4Scheduler.hh.html#G4Scheduler::fInitialized" title='G4Scheduler::fInitialized' data-ref="G4Scheduler::fInitialized">fInitialized</a> = <b>false</b>;</td></tr>
+<tr><th id="1118">1118</th><td>  <a class="virtual member" href="#_ZN11G4Scheduler10InitializeEv" title='G4Scheduler::Initialize' data-ref="_ZN11G4Scheduler10InitializeEv">Initialize</a>();</td></tr>
+<tr><th id="1119">1119</th><td>}</td></tr>
+<tr><th id="1120">1120</th><td></td></tr>
+<tr><th id="1121">1121</th><td><i>//_________________________________________________________________________</i></td></tr>
+<tr><th id="1122">1122</th><td><a class="type" href="../include/G4Scheduler.hh.html#G4Scheduler" title='G4Scheduler' data-ref="G4Scheduler">G4Scheduler</a>::<dfn class="decl def" id="_ZN11G4SchedulerC1ERKS_" title='G4Scheduler::G4Scheduler' data-ref="_ZN11G4SchedulerC1ERKS_">G4Scheduler</dfn>(<em>const</em> <a class="type" href="../include/G4Scheduler.hh.html#G4Scheduler" title='G4Scheduler' data-ref="G4Scheduler">G4Scheduler</a>&amp;) :</td></tr>
+<tr><th id="1123">1123</th><td>    <a class="type" href="../include/G4VScheduler.hh.html#G4VScheduler" title='G4VScheduler' data-ref="G4VScheduler">G4VScheduler</a><a class="ref" href="../include/G4VScheduler.hh.html#_ZN12G4VSchedulerC1Ev" title='G4VScheduler::G4VScheduler' data-ref="_ZN12G4VSchedulerC1Ev">(</a>), <a class="type" href="../../../../../global/management/include/G4VStateDependent.hh.html#G4VStateDependent" title='G4VStateDependent' data-ref="G4VStateDependent">G4VStateDependent</a><a class="ref" href="../../../../../global/management/include/G4VStateDependent.hh.html#_ZN17G4VStateDependentC1Eb" title='G4VStateDependent::G4VStateDependent' data-ref="_ZN17G4VStateDependentC1Eb">(</a>),</td></tr>
+<tr><th id="1124">1124</th><td>    <a class="member" href="../include/G4Scheduler.hh.html#G4Scheduler::fTrackContainer" title='G4Scheduler::fTrackContainer' data-ref="G4Scheduler::fTrackContainer">fTrackContainer</a>((<a class="type" href="../include/G4ITTrackHolder.hh.html#G4ITTrackHolder" title='G4ITTrackHolder' data-ref="G4ITTrackHolder">G4ITTrackHolder</a>&amp;) *<a class="type" href="../include/G4ITTrackHolder.hh.html#G4ITTrackHolder" title='G4ITTrackHolder' data-ref="G4ITTrackHolder">G4ITTrackHolder</a>::<a class="ref" href="../include/G4ITTrackHolder.hh.html#_ZN15G4ITTrackHolder8InstanceEv" title='G4ITTrackHolder::Instance' data-ref="_ZN15G4ITTrackHolder8InstanceEv">Instance</a>())</td></tr>
+<tr><th id="1125">1125</th><td></td></tr>
+<tr><th id="1126">1126</th><td>{</td></tr>
+<tr><th id="1127">1127</th><td>  <a class="member" href="#_ZN11G4Scheduler6CreateEv" title='G4Scheduler::Create' data-ref="_ZN11G4Scheduler6CreateEv">Create</a>();</td></tr>
+<tr><th id="1128">1128</th><td>}</td></tr>
+<tr><th id="1129">1129</th><td></td></tr>
+<tr><th id="1130">1130</th><td><i>//_________________________________________________________________________</i></td></tr>
+<tr><th id="1131">1131</th><td><a class="type" href="../include/G4Scheduler.hh.html#G4Scheduler" title='G4Scheduler' data-ref="G4Scheduler">G4Scheduler</a>&amp; <a class="type" href="../include/G4Scheduler.hh.html#G4Scheduler" title='G4Scheduler' data-ref="G4Scheduler">G4Scheduler</a>::<dfn class="decl def" id="_ZN11G4ScheduleraSERKS_" title='G4Scheduler::operator=' data-ref="_ZN11G4ScheduleraSERKS_"><b>operator</b>=</dfn>(<em>const</em> <a class="type" href="../include/G4Scheduler.hh.html#G4Scheduler" title='G4Scheduler' data-ref="G4Scheduler">G4Scheduler</a>&amp; <dfn class="local col9 decl" id="29right" title='right' data-type='const G4Scheduler &amp;' data-ref="29right">right</dfn>)</td></tr>
+<tr><th id="1132">1132</th><td>{</td></tr>
+<tr><th id="1133">1133</th><td>  <b>if</b>(<b>this</b> != &amp;<a class="local col9 ref" href="#29right" title='right' data-ref="29right">right</a>)</td></tr>
+<tr><th id="1134">1134</th><td>  {</td></tr>
+<tr><th id="1135">1135</th><td>    <a class="member" href="#_ZN11G4Scheduler6CreateEv" title='G4Scheduler::Create' data-ref="_ZN11G4Scheduler6CreateEv">Create</a>();</td></tr>
+<tr><th id="1136">1136</th><td>  }</td></tr>
+<tr><th id="1137">1137</th><td>  <b>return</b> *<b>this</b>;</td></tr>
+<tr><th id="1138">1138</th><td>}</td></tr>
+<tr><th id="1139">1139</th><td></td></tr>
+<tr><th id="1140">1140</th><td><span class='error' title="unknown type name &apos;size_t&apos;">size_t</span> G4Scheduler::GetNTracks()</td></tr>
+<tr><th id="1141">1141</th><td>{</td></tr>
+<tr><th id="1142">1142</th><td>  <b>return</b> fTrackContainer.GetNTracks();</td></tr>
+<tr><th id="1143">1143</th><td>}</td></tr>
+<tr><th id="1144">1144</th><td><i>//_________________________________________________________________________</i></td></tr>
+<tr><th id="1145">1145</th><td></td></tr>
+<tr><th id="1146">1146</th><td><em>void</em> <a class="type" href="../include/G4Scheduler.hh.html#G4Scheduler" title='G4Scheduler' data-ref="G4Scheduler">G4Scheduler</a>::<dfn class="decl def" id="_ZN11G4Scheduler16GetCollisionTypeER8G4String" title='G4Scheduler::GetCollisionType' data-ref="_ZN11G4Scheduler16GetCollisionTypeER8G4String">GetCollisionType</dfn>(<a class="type" href="../../../../../global/management/include/G4String.hh.html#G4String" title='G4String' data-ref="G4String">G4String</a>&amp; <dfn class="local col0 decl" id="30interactionType" title='interactionType' data-type='G4String &amp;' data-ref="30interactionType">interactionType</dfn>)</td></tr>
+<tr><th id="1147">1147</th><td>{</td></tr>
+<tr><th id="1148">1148</th><td>  <b>switch</b>(<a class="member" href="../include/G4Scheduler.hh.html#G4Scheduler::fITStepStatus" title='G4Scheduler::fITStepStatus' data-ref="G4Scheduler::fITStepStatus">fITStepStatus</a>)</td></tr>
+<tr><th id="1149">1149</th><td>  {</td></tr>
+<tr><th id="1150">1150</th><td>    <b>case</b> <a class="enum" href="../include/G4ITStepStatus.hh.html#G4ITStepStatus::eInteractionWithMedium" title='G4ITStepStatus::eInteractionWithMedium' data-ref="G4ITStepStatus::eInteractionWithMedium">eInteractionWithMedium</a>:</td></tr>
+<tr><th id="1151">1151</th><td>      <a class="local col0 ref" href="#30interactionType" title='interactionType' data-ref="30interactionType">interactionType</a> <a class="ref" href="../../../../../global/management/include/G4String.hh.html#_ZN8G4StringaSEPKc" title='G4String::operator=' data-ref="_ZN8G4StringaSEPKc">=</a> <q>"eInteractionWithMedium"</q>;</td></tr>
+<tr><th id="1152">1152</th><td>      <b>break</b>;</td></tr>
+<tr><th id="1153">1153</th><td>    <b>case</b> <a class="enum" href="../include/G4ITStepStatus.hh.html#G4ITStepStatus::eCollisionBetweenTracks" title='G4ITStepStatus::eCollisionBetweenTracks' data-ref="G4ITStepStatus::eCollisionBetweenTracks">eCollisionBetweenTracks</a>:</td></tr>
+<tr><th id="1154">1154</th><td>      <a class="local col0 ref" href="#30interactionType" title='interactionType' data-ref="30interactionType">interactionType</a> <a class="ref" href="../../../../../global/management/include/G4String.hh.html#_ZN8G4StringaSEPKc" title='G4String::operator=' data-ref="_ZN8G4StringaSEPKc">=</a> <q>"eCollisionBetweenTracks"</q>;</td></tr>
+<tr><th id="1155">1155</th><td>      <b>break</b>;</td></tr>
+<tr><th id="1156">1156</th><td>    <b>default</b>:</td></tr>
+<tr><th id="1157">1157</th><td>      <a class="local col0 ref" href="#30interactionType" title='interactionType' data-ref="30interactionType">interactionType</a> <a class="ref" href="../../../../../global/management/include/G4String.hh.html#_ZN8G4StringaSEPKc" title='G4String::operator=' data-ref="_ZN8G4StringaSEPKc">=</a> <q>"eCollisionBetweenTracks"</q>;</td></tr>
+<tr><th id="1158">1158</th><td>      <b>break</b>;</td></tr>
+<tr><th id="1159">1159</th><td>  }</td></tr>
+<tr><th id="1160">1160</th><td>}</td></tr>
+<tr><th id="1161">1161</th><td></td></tr>
+</table><hr/><p id='footer'>
+Generated on <em>2019-Aug-28</em> from project codebrowser<br />Powered by <a href='https://woboq.com'><img alt='Woboq' src='https://code.woboq.org/woboq-16.png' width='41' height='16' /></a> <a href='https://code.woboq.org'>Code Browser</a> 2.1
+<br/>Generator usage only permitted with license.</p>
+</div></body></html>

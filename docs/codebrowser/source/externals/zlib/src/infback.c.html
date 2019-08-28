@@ -1,0 +1,658 @@
+<!doctype html>
+<html>
+<head>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"><title>infback.c source code [codebrowser/source/externals/zlib/src/infback.c] - Woboq Code Browser</title>
+<link rel="stylesheet" href="../../../../../../data/qtcreator.css" title="QtCreator"/>
+<link rel="alternate stylesheet" href="../../../../../../data/kdevelop.css" title="KDevelop"/>
+<script type="text/javascript" src="../../../../../../data/jquery/jquery.min.js"></script>
+<script type="text/javascript" src="../../../../../../data/jquery/jquery-ui.min.js"></script>
+<script>var file = 'codebrowser/source/externals/zlib/src/infback.c'; var root_path = '../../../../..'; var data_path = '../../../../../../data';</script>
+<script src='../../../../../../data/codebrowser.js'></script>
+</head>
+<body><div id='header'><h1 id='breadcrumb'><span>Browse the source code of </span><a href='../../../..'>codebrowser</a>/<a href='../../..'>source</a>/<a href='../..'>externals</a>/<a href='..'>zlib</a>/<a href='./'>src</a>/<a href='infback.c.html'>infback.c</a></h1></div>
+<hr/><div id='content'><table class="code">
+<tr><th id="1">1</th><td><i>/* infback.c -- inflate using a call-back interface</i></td></tr>
+<tr><th id="2">2</th><td><i> * Copyright (C) 1995-2016 Mark Adler</i></td></tr>
+<tr><th id="3">3</th><td><i> * For conditions of distribution and use, see copyright notice in zlib.h</i></td></tr>
+<tr><th id="4">4</th><td><i> */</i></td></tr>
+<tr><th id="5">5</th><td></td></tr>
+<tr><th id="6">6</th><td><i>/*</i></td></tr>
+<tr><th id="7">7</th><td><i>   This code is largely copied from inflate.c.  Normally either infback.o or</i></td></tr>
+<tr><th id="8">8</th><td><i>   inflate.o would be linked into an application--not both.  The interface</i></td></tr>
+<tr><th id="9">9</th><td><i>   with inffast.c is retained so that optimized assembler-coded versions of</i></td></tr>
+<tr><th id="10">10</th><td><i>   inflate_fast() can be used with either inflate.c or infback.c.</i></td></tr>
+<tr><th id="11">11</th><td><i> */</i></td></tr>
+<tr><th id="12">12</th><td></td></tr>
+<tr><th id="13">13</th><td><u>#include <a href="../include/zutil.h.html">"zutil.h"</a></u></td></tr>
+<tr><th id="14">14</th><td><u>#include <a href="../include/inftrees.h.html">"inftrees.h"</a></u></td></tr>
+<tr><th id="15">15</th><td><u>#include <a href="../include/inflate.h.html">"inflate.h"</a></u></td></tr>
+<tr><th id="16">16</th><td><u>#include <a href="../include/inffast.h.html">"inffast.h"</a></u></td></tr>
+<tr><th id="17">17</th><td></td></tr>
+<tr><th id="18">18</th><td><i>/* function prototypes */</i></td></tr>
+<tr><th id="19">19</th><td><a class="macro" href="../include/zutil.h.html#36" title="static" data-ref="_M/local">local</a> <em>void</em> <span class='error' title="variable has incomplete type &apos;void&apos;"><dfn class="decl def" id="fixedtables" title='fixedtables' data-ref="fixedtables">fixedtables</dfn></span><span class='error' title="expected &apos;;&apos; after top level declarator"></span> OF((<b>struct</b> inflate_state FAR *state));</td></tr>
+<tr><th id="20">20</th><td></td></tr>
+<tr><th id="21">21</th><td><i>/*</i></td></tr>
+<tr><th id="22">22</th><td><i>   strm provides memory allocation functions in zalloc and zfree, or</i></td></tr>
+<tr><th id="23">23</th><td><i>   Z_NULL to use the library memory allocation functions.</i></td></tr>
+<tr><th id="24">24</th><td><i></i></td></tr>
+<tr><th id="25">25</th><td><i>   windowBits is in the range 8..15, and window is a user-supplied</i></td></tr>
+<tr><th id="26">26</th><td><i>   window and output buffer that is 2**windowBits bytes.</i></td></tr>
+<tr><th id="27">27</th><td><i> */</i></td></tr>
+<tr><th id="28">28</th><td><em>int</em> <dfn class="decl def" id="ZEXPORT" title='ZEXPORT' data-ref="ZEXPORT">ZEXPORT</dfn><span class='error' title="expected &apos;;&apos; after top level declarator"></span> inflateBackInit_(strm, windowBits, window, version, stream_size)</td></tr>
+<tr><th id="29">29</th><td>z_streamp strm;</td></tr>
+<tr><th id="30">30</th><td><em>int</em> <dfn class="decl def" id="windowBits" title='windowBits' data-ref="windowBits">windowBits</dfn>;</td></tr>
+<tr><th id="31">31</th><td><em>unsigned</em> <em>char</em> <span class='error' title="redefinition of &apos;FAR&apos; as different kind of symbol">FAR</span><span class='error' title="expected &apos;;&apos; after top level declarator"></span> *window;</td></tr>
+<tr><th id="32">32</th><td><em>const</em> <em>char</em> *<dfn class="decl def" id="version" title='version' data-ref="version">version</dfn>;</td></tr>
+<tr><th id="33">33</th><td><em>int</em> <dfn class="decl def" id="stream_size" title='stream_size' data-ref="stream_size">stream_size</dfn>;</td></tr>
+<tr><th id="34">34</th><td><span class='error' title="expected identifier or &apos;(&apos;">{</span></td></tr>
+<tr><th id="35">35</th><td>    <b>struct</b> inflate_state FAR *state;</td></tr>
+<tr><th id="36">36</th><td></td></tr>
+<tr><th id="37">37</th><td>    <b>if</b> (version == <a class="macro" href="../include/zlib.h.html#212" title="0" data-ref="_M/Z_NULL">Z_NULL</a> || version[<var>0</var>] != <a class="macro" href="../include/zlib.h.html#40" title="&quot;1.2.11&quot;" data-ref="_M/ZLIB_VERSION">ZLIB_VERSION</a>[<var>0</var>] ||</td></tr>
+<tr><th id="38">38</th><td>        stream_size != (<em>int</em>)(<b>sizeof</b>(z_stream)))</td></tr>
+<tr><th id="39">39</th><td>        <b>return</b> <a class="macro" href="../include/zlib.h.html#185" title="(-6)" data-ref="_M/Z_VERSION_ERROR">Z_VERSION_ERROR</a>;</td></tr>
+<tr><th id="40">40</th><td>    <b>if</b> (strm == <a class="macro" href="../include/zlib.h.html#212" title="0" data-ref="_M/Z_NULL">Z_NULL</a> || window == <a class="macro" href="../include/zlib.h.html#212" title="0" data-ref="_M/Z_NULL">Z_NULL</a> ||</td></tr>
+<tr><th id="41">41</th><td>        windowBits &lt; <var>8</var> || windowBits &gt; <var>15</var>)</td></tr>
+<tr><th id="42">42</th><td>        <b>return</b> <a class="macro" href="../include/zlib.h.html#181" title="(-2)" data-ref="_M/Z_STREAM_ERROR">Z_STREAM_ERROR</a>;</td></tr>
+<tr><th id="43">43</th><td>    strm-&gt;msg = <a class="macro" href="../include/zlib.h.html#212" title="0" data-ref="_M/Z_NULL">Z_NULL</a>;                 <i>/* in case we return an error */</i></td></tr>
+<tr><th id="44">44</th><td>    <b>if</b> (strm-&gt;zalloc == (alloc_func)<var>0</var>) {</td></tr>
+<tr><th id="45">45</th><td><u>#<span data-ppcond="45">ifdef</span> <span class="macro" data-ref="_M/Z_SOLO">Z_SOLO</span></u></td></tr>
+<tr><th id="46">46</th><td>        <b>return</b> Z_STREAM_ERROR;</td></tr>
+<tr><th id="47">47</th><td><u>#<span data-ppcond="45">else</span></u></td></tr>
+<tr><th id="48">48</th><td>        strm-&gt;zalloc = zcalloc;</td></tr>
+<tr><th id="49">49</th><td>        strm-&gt;opaque = (voidpf)<var>0</var>;</td></tr>
+<tr><th id="50">50</th><td><u>#<span data-ppcond="45">endif</span></u></td></tr>
+<tr><th id="51">51</th><td>    }</td></tr>
+<tr><th id="52">52</th><td>    <b>if</b> (strm-&gt;zfree == (free_func)<var>0</var>)</td></tr>
+<tr><th id="53">53</th><td><u>#<span data-ppcond="53">ifdef</span> <span class="macro" data-ref="_M/Z_SOLO">Z_SOLO</span></u></td></tr>
+<tr><th id="54">54</th><td>        <b>return</b> Z_STREAM_ERROR;</td></tr>
+<tr><th id="55">55</th><td><u>#<span data-ppcond="53">else</span></u></td></tr>
+<tr><th id="56">56</th><td>    strm-&gt;zfree = zcfree;</td></tr>
+<tr><th id="57">57</th><td><u>#<span data-ppcond="53">endif</span></u></td></tr>
+<tr><th id="58">58</th><td>    state = (<b>struct</b> inflate_state FAR *)<a class="macro" href="../include/zutil.h.html#261" title="(*((strm)-&gt;zalloc))((strm)-&gt;opaque, (1), (sizeof(struct inflate_state)))" data-ref="_M/ZALLOC">ZALLOC</a>(strm, <var>1</var>,</td></tr>
+<tr><th id="59">59</th><td>                                               <b>sizeof</b>(<b>struct</b> inflate_state));</td></tr>
+<tr><th id="60">60</th><td>    <b>if</b> (state == <a class="macro" href="../include/zlib.h.html#212" title="0" data-ref="_M/Z_NULL">Z_NULL</a>) <b>return</b> <a class="macro" href="../include/zlib.h.html#183" title="(-4)" data-ref="_M/Z_MEM_ERROR">Z_MEM_ERROR</a>;</td></tr>
+<tr><th id="61">61</th><td>    <a class="macro" href="../include/zutil.h.html#249" title="" data-ref="_M/Tracev">Tracev</a>((stderr, <q>"inflate: allocated\n"</q>));</td></tr>
+<tr><th id="62">62</th><td>    strm-&gt;state = (<b>struct</b> internal_state FAR *)state;</td></tr>
+<tr><th id="63">63</th><td>    state-&gt;dmax = <var>32768U</var>;</td></tr>
+<tr><th id="64">64</th><td>    state-&gt;wbits = (uInt)windowBits;</td></tr>
+<tr><th id="65">65</th><td>    state-&gt;wsize = <var>1U</var> &lt;&lt; windowBits;</td></tr>
+<tr><th id="66">66</th><td>    state-&gt;window = window;</td></tr>
+<tr><th id="67">67</th><td>    state-&gt;wnext = <var>0</var>;</td></tr>
+<tr><th id="68">68</th><td>    state-&gt;whave = <var>0</var>;</td></tr>
+<tr><th id="69">69</th><td>    <b>return</b> <a class="macro" href="../include/zlib.h.html#177" title="0" data-ref="_M/Z_OK">Z_OK</a>;</td></tr>
+<tr><th id="70">70</th><td>}</td></tr>
+<tr><th id="71">71</th><td></td></tr>
+<tr><th id="72">72</th><td><i>/*</i></td></tr>
+<tr><th id="73">73</th><td><i>   Return state with length and distance decoding tables and index sizes set to</i></td></tr>
+<tr><th id="74">74</th><td><i>   fixed code decoding.  Normally this returns fixed tables from inffixed.h.</i></td></tr>
+<tr><th id="75">75</th><td><i>   If BUILDFIXED is defined, then instead this routine builds the tables the</i></td></tr>
+<tr><th id="76">76</th><td><i>   first time it's called, and returns those tables the first time and</i></td></tr>
+<tr><th id="77">77</th><td><i>   thereafter.  This reduces the size of the code by about 2K bytes, in</i></td></tr>
+<tr><th id="78">78</th><td><i>   exchange for a little execution time.  However, BUILDFIXED should not be</i></td></tr>
+<tr><th id="79">79</th><td><i>   used for threaded applications, since the rewriting of the tables and virgin</i></td></tr>
+<tr><th id="80">80</th><td><i>   may not be thread-safe.</i></td></tr>
+<tr><th id="81">81</th><td><i> */</i></td></tr>
+<tr><th id="82">82</th><td><a class="macro" href="../include/zutil.h.html#36" title="static" data-ref="_M/local">local</a> <em>void</em> <span class='error' title="redefinition of &apos;fixedtables&apos; as different kind of symbol">fixedtables</span>(state)</td></tr>
+<tr><th id="83">83</th><td><b>struct</b> inflate_state <span class='error' title="parameter named &apos;FAR&apos; is missing">FAR</span><span class='error' title="expected &apos;;&apos; at end of declaration"></span> *state;</td></tr>
+<tr><th id="84">84</th><td>{</td></tr>
+<tr><th id="85">85</th><td><u>#<span data-ppcond="85">ifdef</span> <span class="macro" data-ref="_M/BUILDFIXED">BUILDFIXED</span></u></td></tr>
+<tr><th id="86">86</th><td>    <em>static</em> <em>int</em> virgin = <var>1</var>;</td></tr>
+<tr><th id="87">87</th><td>    <em>static</em> code *lenfix, *distfix;</td></tr>
+<tr><th id="88">88</th><td>    <em>static</em> code fixed[<var>544</var>];</td></tr>
+<tr><th id="89">89</th><td></td></tr>
+<tr><th id="90">90</th><td>    <i>/* build fixed huffman tables if first call (may not be thread safe) */</i></td></tr>
+<tr><th id="91">91</th><td>    <b>if</b> (virgin) {</td></tr>
+<tr><th id="92">92</th><td>        <em>unsigned</em> sym, bits;</td></tr>
+<tr><th id="93">93</th><td>        <em>static</em> code *next;</td></tr>
+<tr><th id="94">94</th><td></td></tr>
+<tr><th id="95">95</th><td>        <i>/* literal/length table */</i></td></tr>
+<tr><th id="96">96</th><td>        sym = <var>0</var>;</td></tr>
+<tr><th id="97">97</th><td>        <b>while</b> (sym &lt; <var>144</var>) state-&gt;lens[sym++] = <var>8</var>;</td></tr>
+<tr><th id="98">98</th><td>        <b>while</b> (sym &lt; <var>256</var>) state-&gt;lens[sym++] = <var>9</var>;</td></tr>
+<tr><th id="99">99</th><td>        <b>while</b> (sym &lt; <var>280</var>) state-&gt;lens[sym++] = <var>7</var>;</td></tr>
+<tr><th id="100">100</th><td>        <b>while</b> (sym &lt; <var>288</var>) state-&gt;lens[sym++] = <var>8</var>;</td></tr>
+<tr><th id="101">101</th><td>        next = fixed;</td></tr>
+<tr><th id="102">102</th><td>        lenfix = next;</td></tr>
+<tr><th id="103">103</th><td>        bits = <var>9</var>;</td></tr>
+<tr><th id="104">104</th><td>        inflate_table(LENS, state-&gt;lens, <var>288</var>, &amp;(next), &amp;(bits), state-&gt;work);</td></tr>
+<tr><th id="105">105</th><td></td></tr>
+<tr><th id="106">106</th><td>        <i>/* distance table */</i></td></tr>
+<tr><th id="107">107</th><td>        sym = <var>0</var>;</td></tr>
+<tr><th id="108">108</th><td>        <b>while</b> (sym &lt; <var>32</var>) state-&gt;lens[sym++] = <var>5</var>;</td></tr>
+<tr><th id="109">109</th><td>        distfix = next;</td></tr>
+<tr><th id="110">110</th><td>        bits = <var>5</var>;</td></tr>
+<tr><th id="111">111</th><td>        inflate_table(DISTS, state-&gt;lens, <var>32</var>, &amp;(next), &amp;(bits), state-&gt;work);</td></tr>
+<tr><th id="112">112</th><td></td></tr>
+<tr><th id="113">113</th><td>        <i>/* do this just once */</i></td></tr>
+<tr><th id="114">114</th><td>        virgin = <var>0</var>;</td></tr>
+<tr><th id="115">115</th><td>    }</td></tr>
+<tr><th id="116">116</th><td><u>#<span data-ppcond="85">else</span> /* !BUILDFIXED */</u></td></tr>
+<tr><th id="117">117</th><td><u>#   include <a href="../include/inffixed.h.html">"inffixed.h"</a></u></td></tr>
+<tr><th id="118">118</th><td><u>#<span data-ppcond="85">endif</span> /* BUILDFIXED */</u></td></tr>
+<tr><th id="119">119</th><td>    state-&gt;<span class='error' title="member reference type &apos;int&apos; is not a pointer">lencode</span> = lenfix;</td></tr>
+<tr><th id="120">120</th><td>    state-&gt;<span class='error' title="member reference type &apos;int&apos; is not a pointer">lenbits</span> = <var>9</var>;</td></tr>
+<tr><th id="121">121</th><td>    state-&gt;<span class='error' title="member reference type &apos;int&apos; is not a pointer">distcode</span> = distfix;</td></tr>
+<tr><th id="122">122</th><td>    state-&gt;<span class='error' title="member reference type &apos;int&apos; is not a pointer">distbits</span> = <var>5</var>;</td></tr>
+<tr><th id="123">123</th><td>}</td></tr>
+<tr><th id="124">124</th><td></td></tr>
+<tr><th id="125">125</th><td><i>/* Macros for inflateBack(): */</i></td></tr>
+<tr><th id="126">126</th><td></td></tr>
+<tr><th id="127">127</th><td><i>/* Load returned state from inflate_fast() */</i></td></tr>
+<tr><th id="128">128</th><td><u>#define <dfn class="macro" id="_M/LOAD" data-ref="_M/LOAD">LOAD</dfn>() \</u></td></tr>
+<tr><th id="129">129</th><td><u>    do { \</u></td></tr>
+<tr><th id="130">130</th><td><u>        put = strm-&gt;next_out; \</u></td></tr>
+<tr><th id="131">131</th><td><u>        left = strm-&gt;avail_out; \</u></td></tr>
+<tr><th id="132">132</th><td><u>        next = strm-&gt;next_in; \</u></td></tr>
+<tr><th id="133">133</th><td><u>        have = strm-&gt;avail_in; \</u></td></tr>
+<tr><th id="134">134</th><td><u>        hold = state-&gt;hold; \</u></td></tr>
+<tr><th id="135">135</th><td><u>        bits = state-&gt;bits; \</u></td></tr>
+<tr><th id="136">136</th><td><u>    } while (0)</u></td></tr>
+<tr><th id="137">137</th><td></td></tr>
+<tr><th id="138">138</th><td><i>/* Set state from registers for inflate_fast() */</i></td></tr>
+<tr><th id="139">139</th><td><u>#define <dfn class="macro" id="_M/RESTORE" data-ref="_M/RESTORE">RESTORE</dfn>() \</u></td></tr>
+<tr><th id="140">140</th><td><u>    do { \</u></td></tr>
+<tr><th id="141">141</th><td><u>        strm-&gt;next_out = put; \</u></td></tr>
+<tr><th id="142">142</th><td><u>        strm-&gt;avail_out = left; \</u></td></tr>
+<tr><th id="143">143</th><td><u>        strm-&gt;next_in = next; \</u></td></tr>
+<tr><th id="144">144</th><td><u>        strm-&gt;avail_in = have; \</u></td></tr>
+<tr><th id="145">145</th><td><u>        state-&gt;hold = hold; \</u></td></tr>
+<tr><th id="146">146</th><td><u>        state-&gt;bits = bits; \</u></td></tr>
+<tr><th id="147">147</th><td><u>    } while (0)</u></td></tr>
+<tr><th id="148">148</th><td></td></tr>
+<tr><th id="149">149</th><td><i>/* Clear the input bit accumulator */</i></td></tr>
+<tr><th id="150">150</th><td><u>#define <dfn class="macro" id="_M/INITBITS" data-ref="_M/INITBITS">INITBITS</dfn>() \</u></td></tr>
+<tr><th id="151">151</th><td><u>    do { \</u></td></tr>
+<tr><th id="152">152</th><td><u>        hold = 0; \</u></td></tr>
+<tr><th id="153">153</th><td><u>        bits = 0; \</u></td></tr>
+<tr><th id="154">154</th><td><u>    } while (0)</u></td></tr>
+<tr><th id="155">155</th><td></td></tr>
+<tr><th id="156">156</th><td><i>/* Assure that some input is available.  If input is requested, but denied,</i></td></tr>
+<tr><th id="157">157</th><td><i>   then return a Z_BUF_ERROR from inflateBack(). */</i></td></tr>
+<tr><th id="158">158</th><td><u>#define <dfn class="macro" id="_M/PULL" data-ref="_M/PULL">PULL</dfn>() \</u></td></tr>
+<tr><th id="159">159</th><td><u>    do { \</u></td></tr>
+<tr><th id="160">160</th><td><u>        if (have == 0) { \</u></td></tr>
+<tr><th id="161">161</th><td><u>            have = in(in_desc, &amp;next); \</u></td></tr>
+<tr><th id="162">162</th><td><u>            if (have == 0) { \</u></td></tr>
+<tr><th id="163">163</th><td><u>                next = Z_NULL; \</u></td></tr>
+<tr><th id="164">164</th><td><u>                ret = Z_BUF_ERROR; \</u></td></tr>
+<tr><th id="165">165</th><td><u>                goto inf_leave; \</u></td></tr>
+<tr><th id="166">166</th><td><u>            } \</u></td></tr>
+<tr><th id="167">167</th><td><u>        } \</u></td></tr>
+<tr><th id="168">168</th><td><u>    } while (0)</u></td></tr>
+<tr><th id="169">169</th><td></td></tr>
+<tr><th id="170">170</th><td><i>/* Get a byte of input into the bit accumulator, or return from inflateBack()</i></td></tr>
+<tr><th id="171">171</th><td><i>   with an error if there is no input available. */</i></td></tr>
+<tr><th id="172">172</th><td><u>#define <dfn class="macro" id="_M/PULLBYTE" data-ref="_M/PULLBYTE">PULLBYTE</dfn>() \</u></td></tr>
+<tr><th id="173">173</th><td><u>    do { \</u></td></tr>
+<tr><th id="174">174</th><td><u>        PULL(); \</u></td></tr>
+<tr><th id="175">175</th><td><u>        have--; \</u></td></tr>
+<tr><th id="176">176</th><td><u>        hold += (unsigned long)(*next++) &lt;&lt; bits; \</u></td></tr>
+<tr><th id="177">177</th><td><u>        bits += 8; \</u></td></tr>
+<tr><th id="178">178</th><td><u>    } while (0)</u></td></tr>
+<tr><th id="179">179</th><td></td></tr>
+<tr><th id="180">180</th><td><i>/* Assure that there are at least n bits in the bit accumulator.  If there is</i></td></tr>
+<tr><th id="181">181</th><td><i>   not enough available input to do that, then return from inflateBack() with</i></td></tr>
+<tr><th id="182">182</th><td><i>   an error. */</i></td></tr>
+<tr><th id="183">183</th><td><u>#define <dfn class="macro" id="_M/NEEDBITS" data-ref="_M/NEEDBITS">NEEDBITS</dfn>(n) \</u></td></tr>
+<tr><th id="184">184</th><td><u>    do { \</u></td></tr>
+<tr><th id="185">185</th><td><u>        while (bits &lt; (unsigned)(n)) \</u></td></tr>
+<tr><th id="186">186</th><td><u>            PULLBYTE(); \</u></td></tr>
+<tr><th id="187">187</th><td><u>    } while (0)</u></td></tr>
+<tr><th id="188">188</th><td></td></tr>
+<tr><th id="189">189</th><td><i>/* Return the low n bits of the bit accumulator (n &lt; 16) */</i></td></tr>
+<tr><th id="190">190</th><td><u>#define <dfn class="macro" id="_M/BITS" data-ref="_M/BITS">BITS</dfn>(n) \</u></td></tr>
+<tr><th id="191">191</th><td><u>    ((unsigned)hold &amp; ((1U &lt;&lt; (n)) - 1))</u></td></tr>
+<tr><th id="192">192</th><td></td></tr>
+<tr><th id="193">193</th><td><i>/* Remove n bits from the bit accumulator */</i></td></tr>
+<tr><th id="194">194</th><td><u>#define <dfn class="macro" id="_M/DROPBITS" data-ref="_M/DROPBITS">DROPBITS</dfn>(n) \</u></td></tr>
+<tr><th id="195">195</th><td><u>    do { \</u></td></tr>
+<tr><th id="196">196</th><td><u>        hold &gt;&gt;= (n); \</u></td></tr>
+<tr><th id="197">197</th><td><u>        bits -= (unsigned)(n); \</u></td></tr>
+<tr><th id="198">198</th><td><u>    } while (0)</u></td></tr>
+<tr><th id="199">199</th><td></td></tr>
+<tr><th id="200">200</th><td><i>/* Remove zero to seven bits as needed to go to a byte boundary */</i></td></tr>
+<tr><th id="201">201</th><td><u>#define <dfn class="macro" id="_M/BYTEBITS" data-ref="_M/BYTEBITS">BYTEBITS</dfn>() \</u></td></tr>
+<tr><th id="202">202</th><td><u>    do { \</u></td></tr>
+<tr><th id="203">203</th><td><u>        hold &gt;&gt;= bits &amp; 7; \</u></td></tr>
+<tr><th id="204">204</th><td><u>        bits -= bits &amp; 7; \</u></td></tr>
+<tr><th id="205">205</th><td><u>    } while (0)</u></td></tr>
+<tr><th id="206">206</th><td></td></tr>
+<tr><th id="207">207</th><td><i>/* Assure that some output space is available, by writing out the window</i></td></tr>
+<tr><th id="208">208</th><td><i>   if it's full.  If the write fails, return from inflateBack() with a</i></td></tr>
+<tr><th id="209">209</th><td><i>   Z_BUF_ERROR. */</i></td></tr>
+<tr><th id="210">210</th><td><u>#define <dfn class="macro" id="_M/ROOM" data-ref="_M/ROOM">ROOM</dfn>() \</u></td></tr>
+<tr><th id="211">211</th><td><u>    do { \</u></td></tr>
+<tr><th id="212">212</th><td><u>        if (left == 0) { \</u></td></tr>
+<tr><th id="213">213</th><td><u>            put = state-&gt;window; \</u></td></tr>
+<tr><th id="214">214</th><td><u>            left = state-&gt;wsize; \</u></td></tr>
+<tr><th id="215">215</th><td><u>            state-&gt;whave = left; \</u></td></tr>
+<tr><th id="216">216</th><td><u>            if (out(out_desc, put, left)) { \</u></td></tr>
+<tr><th id="217">217</th><td><u>                ret = Z_BUF_ERROR; \</u></td></tr>
+<tr><th id="218">218</th><td><u>                goto inf_leave; \</u></td></tr>
+<tr><th id="219">219</th><td><u>            } \</u></td></tr>
+<tr><th id="220">220</th><td><u>        } \</u></td></tr>
+<tr><th id="221">221</th><td><u>    } while (0)</u></td></tr>
+<tr><th id="222">222</th><td></td></tr>
+<tr><th id="223">223</th><td><i>/*</i></td></tr>
+<tr><th id="224">224</th><td><i>   strm provides the memory allocation functions and window buffer on input,</i></td></tr>
+<tr><th id="225">225</th><td><i>   and provides information on the unused input on return.  For Z_DATA_ERROR</i></td></tr>
+<tr><th id="226">226</th><td><i>   returns, strm will also provide an error message.</i></td></tr>
+<tr><th id="227">227</th><td><i></i></td></tr>
+<tr><th id="228">228</th><td><i>   in() and out() are the call-back input and output functions.  When</i></td></tr>
+<tr><th id="229">229</th><td><i>   inflateBack() needs more input, it calls in().  When inflateBack() has</i></td></tr>
+<tr><th id="230">230</th><td><i>   filled the window with output, or when it completes with data in the</i></td></tr>
+<tr><th id="231">231</th><td><i>   window, it calls out() to write out the data.  The application must not</i></td></tr>
+<tr><th id="232">232</th><td><i>   change the provided input until in() is called again or inflateBack()</i></td></tr>
+<tr><th id="233">233</th><td><i>   returns.  The application must not change the window/output buffer until</i></td></tr>
+<tr><th id="234">234</th><td><i>   inflateBack() returns.</i></td></tr>
+<tr><th id="235">235</th><td><i></i></td></tr>
+<tr><th id="236">236</th><td><i>   in() and out() are called with a descriptor parameter provided in the</i></td></tr>
+<tr><th id="237">237</th><td><i>   inflateBack() call.  This parameter can be a structure that provides the</i></td></tr>
+<tr><th id="238">238</th><td><i>   information required to do the read or write, as well as accumulated</i></td></tr>
+<tr><th id="239">239</th><td><i>   information on the input and output such as totals and check values.</i></td></tr>
+<tr><th id="240">240</th><td><i></i></td></tr>
+<tr><th id="241">241</th><td><i>   in() should return zero on failure.  out() should return non-zero on</i></td></tr>
+<tr><th id="242">242</th><td><i>   failure.  If either in() or out() fails, than inflateBack() returns a</i></td></tr>
+<tr><th id="243">243</th><td><i>   Z_BUF_ERROR.  strm-&gt;next_in can be checked for Z_NULL to see whether it</i></td></tr>
+<tr><th id="244">244</th><td><i>   was in() or out() that caused in the error.  Otherwise,  inflateBack()</i></td></tr>
+<tr><th id="245">245</th><td><i>   returns Z_STREAM_END on success, Z_DATA_ERROR for an deflate format</i></td></tr>
+<tr><th id="246">246</th><td><i>   error, or Z_MEM_ERROR if it could not allocate memory for the state.</i></td></tr>
+<tr><th id="247">247</th><td><i>   inflateBack() can also return Z_STREAM_ERROR if the input parameters</i></td></tr>
+<tr><th id="248">248</th><td><i>   are not correct, i.e. strm is Z_NULL or the state was not initialized.</i></td></tr>
+<tr><th id="249">249</th><td><i> */</i></td></tr>
+<tr><th id="250">250</th><td><em>int</em> <dfn class="decl def" id="ZEXPORT" title='ZEXPORT' data-ref="ZEXPORT">ZEXPORT</dfn><span class='error' title="expected &apos;;&apos; after top level declarator"></span> inflateBack(strm, in, in_desc, out, out_desc)</td></tr>
+<tr><th id="251">251</th><td>z_streamp strm;</td></tr>
+<tr><th id="252">252</th><td><a class="typedef" href="../include/zlib.h.html#in_func" title='in_func' data-type='unsigned int (*)' data-ref="in_func">in_func</a> <dfn class="decl def" id="in" title='in' data-ref="in">in</dfn>;</td></tr>
+<tr><th id="253">253</th><td><em>void</em> <span class='error' title="variable has incomplete type &apos;void&apos;"><dfn class="tu decl def" id="FAR" title='FAR' data-type='void' data-ref="FAR">FAR</dfn></span><span class='error' title="expected &apos;;&apos; after top level declarator"></span> *in_desc;</td></tr>
+<tr><th id="254">254</th><td><a class="typedef" href="../include/zlib.h.html#out_func" title='out_func' data-type='int (*)' data-ref="out_func">out_func</a> <dfn class="decl def" id="out" title='out' data-ref="out">out</dfn>;</td></tr>
+<tr><th id="255">255</th><td><em>void</em> <span class='error' title="variable has incomplete type &apos;void&apos;"><dfn class="tu decl def" id="FAR" title='FAR' data-type='void' data-ref="FAR">FAR</dfn></span><span class='error' title="expected &apos;;&apos; after top level declarator"></span> *out_desc;</td></tr>
+<tr><th id="256">256</th><td><span class='error' title="expected identifier or &apos;(&apos;">{</span></td></tr>
+<tr><th id="257">257</th><td>    <b>struct</b> inflate_state FAR *state;</td></tr>
+<tr><th id="258">258</th><td>    z_const <em>unsigned</em> <em>char</em> FAR *next;    <i>/* next input */</i></td></tr>
+<tr><th id="259">259</th><td>    <em>unsigned</em> <em>char</em> FAR *put;     <i>/* next output */</i></td></tr>
+<tr><th id="260">260</th><td>    <em>unsigned</em> have, left;        <i>/* available input and output */</i></td></tr>
+<tr><th id="261">261</th><td>    <em>unsigned</em> <em>long</em> hold;         <i>/* bit buffer */</i></td></tr>
+<tr><th id="262">262</th><td>    <em>unsigned</em> bits;              <i>/* bits in bit buffer */</i></td></tr>
+<tr><th id="263">263</th><td>    <em>unsigned</em> copy;              <i>/* number of stored or match bytes to copy */</i></td></tr>
+<tr><th id="264">264</th><td>    <em>unsigned</em> <em>char</em> FAR *from;    <i>/* where to copy match bytes from */</i></td></tr>
+<tr><th id="265">265</th><td>    code here;                  <i>/* current decoding table entry */</i></td></tr>
+<tr><th id="266">266</th><td>    code last;                  <i>/* parent table entry */</i></td></tr>
+<tr><th id="267">267</th><td>    <em>unsigned</em> len;               <i>/* length to copy for repeats, bits to drop */</i></td></tr>
+<tr><th id="268">268</th><td>    <em>int</em> ret;                    <i>/* return code */</i></td></tr>
+<tr><th id="269">269</th><td>    <em>static</em> <em>const</em> <em>unsigned</em> <em>short</em> order[<var>19</var>] = <i>/* permutation of code lengths */</i></td></tr>
+<tr><th id="270">270</th><td>        {<var>16</var>, <var>17</var>, <var>18</var>, <var>0</var>, <var>8</var>, <var>7</var>, <var>9</var>, <var>6</var>, <var>10</var>, <var>5</var>, <var>11</var>, <var>4</var>, <var>12</var>, <var>3</var>, <var>13</var>, <var>2</var>, <var>14</var>, <var>1</var>, <var>15</var>};</td></tr>
+<tr><th id="271">271</th><td></td></tr>
+<tr><th id="272">272</th><td>    <i>/* Check that the strm exists and that the state was initialized */</i></td></tr>
+<tr><th id="273">273</th><td>    <b>if</b> (strm == <a class="macro" href="../include/zlib.h.html#212" title="0" data-ref="_M/Z_NULL">Z_NULL</a> || strm-&gt;state == <a class="macro" href="../include/zlib.h.html#212" title="0" data-ref="_M/Z_NULL">Z_NULL</a>)</td></tr>
+<tr><th id="274">274</th><td>        <b>return</b> <a class="macro" href="../include/zlib.h.html#181" title="(-2)" data-ref="_M/Z_STREAM_ERROR">Z_STREAM_ERROR</a>;</td></tr>
+<tr><th id="275">275</th><td>    state = (<b>struct</b> inflate_state FAR *)strm-&gt;state;</td></tr>
+<tr><th id="276">276</th><td></td></tr>
+<tr><th id="277">277</th><td>    <i>/* Reset the state */</i></td></tr>
+<tr><th id="278">278</th><td>    strm-&gt;msg = <a class="macro" href="../include/zlib.h.html#212" title="0" data-ref="_M/Z_NULL">Z_NULL</a>;</td></tr>
+<tr><th id="279">279</th><td>    state-&gt;mode = TYPE;</td></tr>
+<tr><th id="280">280</th><td>    state-&gt;last = <var>0</var>;</td></tr>
+<tr><th id="281">281</th><td>    state-&gt;whave = <var>0</var>;</td></tr>
+<tr><th id="282">282</th><td>    next = strm-&gt;next_in;</td></tr>
+<tr><th id="283">283</th><td>    have = next != <a class="macro" href="../include/zlib.h.html#212" title="0" data-ref="_M/Z_NULL">Z_NULL</a> ? strm-&gt;avail_in : <var>0</var>;</td></tr>
+<tr><th id="284">284</th><td>    hold = <var>0</var>;</td></tr>
+<tr><th id="285">285</th><td>    bits = <var>0</var>;</td></tr>
+<tr><th id="286">286</th><td>    put = state-&gt;window;</td></tr>
+<tr><th id="287">287</th><td>    left = state-&gt;wsize;</td></tr>
+<tr><th id="288">288</th><td></td></tr>
+<tr><th id="289">289</th><td>    <i>/* Inflate until end of block marked as last */</i></td></tr>
+<tr><th id="290">290</th><td>    <b>for</b> (;;)</td></tr>
+<tr><th id="291">291</th><td>        <b>switch</b> (state-&gt;mode) {</td></tr>
+<tr><th id="292">292</th><td>        <b>case</b> TYPE:</td></tr>
+<tr><th id="293">293</th><td>            <i>/* determine and dispatch block type */</i></td></tr>
+<tr><th id="294">294</th><td>            <b>if</b> (state-&gt;last) {</td></tr>
+<tr><th id="295">295</th><td>                <a class="macro" href="#201" title="do { hold &gt;&gt;= bits &amp; 7; bits -= bits &amp; 7; } while (0)" data-ref="_M/BYTEBITS">BYTEBITS</a>();</td></tr>
+<tr><th id="296">296</th><td>                state-&gt;mode = DONE;</td></tr>
+<tr><th id="297">297</th><td>                <b>break</b>;</td></tr>
+<tr><th id="298">298</th><td>            }</td></tr>
+<tr><th id="299">299</th><td>            <a class="macro" href="#183" title="do { while (bits &lt; (unsigned)(3)) do { do { if (have == 0) { have = in(in_desc, &amp;next); if (have == 0) { next = 0; ret = (-5); goto inf_leave; } } } while (0); have--; hold += (unsigned long)(*next++) &lt;&lt; bits; bits += 8; } while (0); } while (0)" data-ref="_M/NEEDBITS">NEEDBITS</a>(<var>3</var>);</td></tr>
+<tr><th id="300">300</th><td>            state-&gt;last = <a class="macro" href="#190" title="((unsigned)hold &amp; ((1U &lt;&lt; (1)) - 1))" data-ref="_M/BITS">BITS</a>(<var>1</var>);</td></tr>
+<tr><th id="301">301</th><td>            <a class="macro" href="#194" title="do { hold &gt;&gt;= (1); bits -= (unsigned)(1); } while (0)" data-ref="_M/DROPBITS">DROPBITS</a>(<var>1</var>);</td></tr>
+<tr><th id="302">302</th><td>            <b>switch</b> (<a class="macro" href="#190" title="((unsigned)hold &amp; ((1U &lt;&lt; (2)) - 1))" data-ref="_M/BITS">BITS</a>(<var>2</var>)) {</td></tr>
+<tr><th id="303">303</th><td>            <b>case</b> <var>0</var>:                             <i>/* stored block */</i></td></tr>
+<tr><th id="304">304</th><td>                <a class="macro" href="../include/zutil.h.html#249" title="" data-ref="_M/Tracev">Tracev</a>((stderr, <q>"inflate:     stored block%s\n"</q>,</td></tr>
+<tr><th id="305">305</th><td>                        state-&gt;last ? <q>" (last)"</q> : <q>""</q>));</td></tr>
+<tr><th id="306">306</th><td>                state-&gt;mode = STORED;</td></tr>
+<tr><th id="307">307</th><td>                <b>break</b>;</td></tr>
+<tr><th id="308">308</th><td>            <b>case</b> <var>1</var>:                             <i>/* fixed block */</i></td></tr>
+<tr><th id="309">309</th><td>                fixedtables(state);</td></tr>
+<tr><th id="310">310</th><td>                <a class="macro" href="../include/zutil.h.html#249" title="" data-ref="_M/Tracev">Tracev</a>((stderr, <q>"inflate:     fixed codes block%s\n"</q>,</td></tr>
+<tr><th id="311">311</th><td>                        state-&gt;last ? <q>" (last)"</q> : <q>""</q>));</td></tr>
+<tr><th id="312">312</th><td>                state-&gt;mode = LEN;              <i>/* decode codes */</i></td></tr>
+<tr><th id="313">313</th><td>                <b>break</b>;</td></tr>
+<tr><th id="314">314</th><td>            <b>case</b> <var>2</var>:                             <i>/* dynamic block */</i></td></tr>
+<tr><th id="315">315</th><td>                <a class="macro" href="../include/zutil.h.html#249" title="" data-ref="_M/Tracev">Tracev</a>((stderr, <q>"inflate:     dynamic codes block%s\n"</q>,</td></tr>
+<tr><th id="316">316</th><td>                        state-&gt;last ? <q>" (last)"</q> : <q>""</q>));</td></tr>
+<tr><th id="317">317</th><td>                state-&gt;mode = TABLE;</td></tr>
+<tr><th id="318">318</th><td>                <b>break</b>;</td></tr>
+<tr><th id="319">319</th><td>            <b>case</b> <var>3</var>:</td></tr>
+<tr><th id="320">320</th><td>                strm-&gt;msg = (<em>char</em> *)<q>"invalid block type"</q>;</td></tr>
+<tr><th id="321">321</th><td>                state-&gt;mode = BAD;</td></tr>
+<tr><th id="322">322</th><td>            }</td></tr>
+<tr><th id="323">323</th><td>            <a class="macro" href="#194" title="do { hold &gt;&gt;= (2); bits -= (unsigned)(2); } while (0)" data-ref="_M/DROPBITS">DROPBITS</a>(<var>2</var>);</td></tr>
+<tr><th id="324">324</th><td>            <b>break</b>;</td></tr>
+<tr><th id="325">325</th><td></td></tr>
+<tr><th id="326">326</th><td>        <b>case</b> STORED:</td></tr>
+<tr><th id="327">327</th><td>            <i>/* get and verify stored block length */</i></td></tr>
+<tr><th id="328">328</th><td>            <a class="macro" href="#201" title="do { hold &gt;&gt;= bits &amp; 7; bits -= bits &amp; 7; } while (0)" data-ref="_M/BYTEBITS">BYTEBITS</a>();                         <i>/* go to byte boundary */</i></td></tr>
+<tr><th id="329">329</th><td>            <a class="macro" href="#183" title="do { while (bits &lt; (unsigned)(32)) do { do { if (have == 0) { have = in(in_desc, &amp;next); if (have == 0) { next = 0; ret = (-5); goto inf_leave; } } } while (0); have--; hold += (unsigned long)(*next++) &lt;&lt; bits; bits += 8; } while (0); } while (0)" data-ref="_M/NEEDBITS">NEEDBITS</a>(<var>32</var>);</td></tr>
+<tr><th id="330">330</th><td>            <b>if</b> ((hold &amp; <var>0xffff</var>) != ((hold &gt;&gt; <var>16</var>) ^ <var>0xffff</var>)) {</td></tr>
+<tr><th id="331">331</th><td>                strm-&gt;msg = (<em>char</em> *)<q>"invalid stored block lengths"</q>;</td></tr>
+<tr><th id="332">332</th><td>                state-&gt;mode = BAD;</td></tr>
+<tr><th id="333">333</th><td>                <b>break</b>;</td></tr>
+<tr><th id="334">334</th><td>            }</td></tr>
+<tr><th id="335">335</th><td>            state-&gt;length = (<em>unsigned</em>)hold &amp; <var>0xffff</var>;</td></tr>
+<tr><th id="336">336</th><td>            <a class="macro" href="../include/zutil.h.html#249" title="" data-ref="_M/Tracev">Tracev</a>((stderr, <q>"inflate:       stored length %u\n"</q>,</td></tr>
+<tr><th id="337">337</th><td>                    state-&gt;length));</td></tr>
+<tr><th id="338">338</th><td>            <a class="macro" href="#150" title="do { hold = 0; bits = 0; } while (0)" data-ref="_M/INITBITS">INITBITS</a>();</td></tr>
+<tr><th id="339">339</th><td></td></tr>
+<tr><th id="340">340</th><td>            <i>/* copy stored block from input to output */</i></td></tr>
+<tr><th id="341">341</th><td>            <b>while</b> (state-&gt;length != <var>0</var>) {</td></tr>
+<tr><th id="342">342</th><td>                copy = state-&gt;length;</td></tr>
+<tr><th id="343">343</th><td>                <a class="macro" href="#158" title="do { if (have == 0) { have = in(in_desc, &amp;next); if (have == 0) { next = 0; ret = (-5); goto inf_leave; } } } while (0)" data-ref="_M/PULL">PULL</a>();</td></tr>
+<tr><th id="344">344</th><td>                <a class="macro" href="#210" title="do { if (left == 0) { put = state-&gt;window; left = state-&gt;wsize; state-&gt;whave = left; if (out(out_desc, put, left)) { ret = (-5); goto inf_leave; } } } while (0)" data-ref="_M/ROOM">ROOM</a>();</td></tr>
+<tr><th id="345">345</th><td>                <b>if</b> (copy &gt; have) copy = have;</td></tr>
+<tr><th id="346">346</th><td>                <b>if</b> (copy &gt; left) copy = left;</td></tr>
+<tr><th id="347">347</th><td>                zmemcpy(put, next, copy);</td></tr>
+<tr><th id="348">348</th><td>                have -= copy;</td></tr>
+<tr><th id="349">349</th><td>                next += copy;</td></tr>
+<tr><th id="350">350</th><td>                left -= copy;</td></tr>
+<tr><th id="351">351</th><td>                put += copy;</td></tr>
+<tr><th id="352">352</th><td>                state-&gt;length -= copy;</td></tr>
+<tr><th id="353">353</th><td>            }</td></tr>
+<tr><th id="354">354</th><td>            <a class="macro" href="../include/zutil.h.html#249" title="" data-ref="_M/Tracev">Tracev</a>((stderr, <q>"inflate:       stored end\n"</q>));</td></tr>
+<tr><th id="355">355</th><td>            state-&gt;mode = TYPE;</td></tr>
+<tr><th id="356">356</th><td>            <b>break</b>;</td></tr>
+<tr><th id="357">357</th><td></td></tr>
+<tr><th id="358">358</th><td>        <b>case</b> TABLE:</td></tr>
+<tr><th id="359">359</th><td>            <i>/* get dynamic table entries descriptor */</i></td></tr>
+<tr><th id="360">360</th><td>            <a class="macro" href="#183" title="do { while (bits &lt; (unsigned)(14)) do { do { if (have == 0) { have = in(in_desc, &amp;next); if (have == 0) { next = 0; ret = (-5); goto inf_leave; } } } while (0); have--; hold += (unsigned long)(*next++) &lt;&lt; bits; bits += 8; } while (0); } while (0)" data-ref="_M/NEEDBITS">NEEDBITS</a>(<var>14</var>);</td></tr>
+<tr><th id="361">361</th><td>            state-&gt;nlen = <a class="macro" href="#190" title="((unsigned)hold &amp; ((1U &lt;&lt; (5)) - 1))" data-ref="_M/BITS">BITS</a>(<var>5</var>) + <var>257</var>;</td></tr>
+<tr><th id="362">362</th><td>            <a class="macro" href="#194" title="do { hold &gt;&gt;= (5); bits -= (unsigned)(5); } while (0)" data-ref="_M/DROPBITS">DROPBITS</a>(<var>5</var>);</td></tr>
+<tr><th id="363">363</th><td>            state-&gt;ndist = <a class="macro" href="#190" title="((unsigned)hold &amp; ((1U &lt;&lt; (5)) - 1))" data-ref="_M/BITS">BITS</a>(<var>5</var>) + <var>1</var>;</td></tr>
+<tr><th id="364">364</th><td>            <a class="macro" href="#194" title="do { hold &gt;&gt;= (5); bits -= (unsigned)(5); } while (0)" data-ref="_M/DROPBITS">DROPBITS</a>(<var>5</var>);</td></tr>
+<tr><th id="365">365</th><td>            state-&gt;ncode = <a class="macro" href="#190" title="((unsigned)hold &amp; ((1U &lt;&lt; (4)) - 1))" data-ref="_M/BITS">BITS</a>(<var>4</var>) + <var>4</var>;</td></tr>
+<tr><th id="366">366</th><td>            <a class="macro" href="#194" title="do { hold &gt;&gt;= (4); bits -= (unsigned)(4); } while (0)" data-ref="_M/DROPBITS">DROPBITS</a>(<var>4</var>);</td></tr>
+<tr><th id="367">367</th><td><u>#<span data-ppcond="367">ifndef</span> <span class="macro" data-ref="_M/PKZIP_BUG_WORKAROUND">PKZIP_BUG_WORKAROUND</span></u></td></tr>
+<tr><th id="368">368</th><td>            <b>if</b> (state-&gt;nlen &gt; <var>286</var> || state-&gt;ndist &gt; <var>30</var>) {</td></tr>
+<tr><th id="369">369</th><td>                strm-&gt;msg = (<em>char</em> *)<q>"too many length or distance symbols"</q>;</td></tr>
+<tr><th id="370">370</th><td>                state-&gt;mode = BAD;</td></tr>
+<tr><th id="371">371</th><td>                <b>break</b>;</td></tr>
+<tr><th id="372">372</th><td>            }</td></tr>
+<tr><th id="373">373</th><td><u>#<span data-ppcond="367">endif</span></u></td></tr>
+<tr><th id="374">374</th><td>            <a class="macro" href="../include/zutil.h.html#249" title="" data-ref="_M/Tracev">Tracev</a>((stderr, <q>"inflate:       table sizes ok\n"</q>));</td></tr>
+<tr><th id="375">375</th><td></td></tr>
+<tr><th id="376">376</th><td>            <i>/* get code length code lengths (not a typo) */</i></td></tr>
+<tr><th id="377">377</th><td>            state-&gt;have = <var>0</var>;</td></tr>
+<tr><th id="378">378</th><td>            <b>while</b> (state-&gt;have &lt; state-&gt;ncode) {</td></tr>
+<tr><th id="379">379</th><td>                <a class="macro" href="#183" title="do { while (bits &lt; (unsigned)(3)) do { do { if (have == 0) { have = in(in_desc, &amp;next); if (have == 0) { next = 0; ret = (-5); goto inf_leave; } } } while (0); have--; hold += (unsigned long)(*next++) &lt;&lt; bits; bits += 8; } while (0); } while (0)" data-ref="_M/NEEDBITS">NEEDBITS</a>(<var>3</var>);</td></tr>
+<tr><th id="380">380</th><td>                state-&gt;lens[order[state-&gt;have++]] = (<em>unsigned</em> <em>short</em>)<a class="macro" href="#190" title="((unsigned)hold &amp; ((1U &lt;&lt; (3)) - 1))" data-ref="_M/BITS">BITS</a>(<var>3</var>);</td></tr>
+<tr><th id="381">381</th><td>                <a class="macro" href="#194" title="do { hold &gt;&gt;= (3); bits -= (unsigned)(3); } while (0)" data-ref="_M/DROPBITS">DROPBITS</a>(<var>3</var>);</td></tr>
+<tr><th id="382">382</th><td>            }</td></tr>
+<tr><th id="383">383</th><td>            <b>while</b> (state-&gt;have &lt; <var>19</var>)</td></tr>
+<tr><th id="384">384</th><td>                state-&gt;lens[order[state-&gt;have++]] = <var>0</var>;</td></tr>
+<tr><th id="385">385</th><td>            state-&gt;next = state-&gt;codes;</td></tr>
+<tr><th id="386">386</th><td>            state-&gt;lencode = (code <em>const</em> FAR *)(state-&gt;next);</td></tr>
+<tr><th id="387">387</th><td>            state-&gt;lenbits = <var>7</var>;</td></tr>
+<tr><th id="388">388</th><td>            ret = inflate_table(CODES, state-&gt;lens, <var>19</var>, &amp;(state-&gt;next),</td></tr>
+<tr><th id="389">389</th><td>                                &amp;(state-&gt;lenbits), state-&gt;work);</td></tr>
+<tr><th id="390">390</th><td>            <b>if</b> (ret) {</td></tr>
+<tr><th id="391">391</th><td>                strm-&gt;msg = (<em>char</em> *)<q>"invalid code lengths set"</q>;</td></tr>
+<tr><th id="392">392</th><td>                state-&gt;mode = BAD;</td></tr>
+<tr><th id="393">393</th><td>                <b>break</b>;</td></tr>
+<tr><th id="394">394</th><td>            }</td></tr>
+<tr><th id="395">395</th><td>            <a class="macro" href="../include/zutil.h.html#249" title="" data-ref="_M/Tracev">Tracev</a>((stderr, <q>"inflate:       code lengths ok\n"</q>));</td></tr>
+<tr><th id="396">396</th><td></td></tr>
+<tr><th id="397">397</th><td>            <i>/* get length and distance code code lengths */</i></td></tr>
+<tr><th id="398">398</th><td>            state-&gt;have = <var>0</var>;</td></tr>
+<tr><th id="399">399</th><td>            <b>while</b> (state-&gt;have &lt; state-&gt;nlen + state-&gt;ndist) {</td></tr>
+<tr><th id="400">400</th><td>                <b>for</b> (;;) {</td></tr>
+<tr><th id="401">401</th><td>                    here = state-&gt;lencode[<a class="macro" href="#190" title="((unsigned)hold &amp; ((1U &lt;&lt; (state-&gt;lenbits)) - 1))" data-ref="_M/BITS">BITS</a>(state-&gt;lenbits)];</td></tr>
+<tr><th id="402">402</th><td>                    <b>if</b> ((<em>unsigned</em>)(here.bits) &lt;= bits) <b>break</b>;</td></tr>
+<tr><th id="403">403</th><td>                    <a class="macro" href="#172" title="do { do { if (have == 0) { have = in(in_desc, &amp;next); if (have == 0) { next = 0; ret = (-5); goto inf_leave; } } } while (0); have--; hold += (unsigned long)(*next++) &lt;&lt; bits; bits += 8; } while (0)" data-ref="_M/PULLBYTE">PULLBYTE</a>();</td></tr>
+<tr><th id="404">404</th><td>                }</td></tr>
+<tr><th id="405">405</th><td>                <b>if</b> (here.val &lt; <var>16</var>) {</td></tr>
+<tr><th id="406">406</th><td>                    <a class="macro" href="#194" title="do { hold &gt;&gt;= (here.bits); bits -= (unsigned)(here.bits); } while (0)" data-ref="_M/DROPBITS">DROPBITS</a>(here.bits);</td></tr>
+<tr><th id="407">407</th><td>                    state-&gt;lens[state-&gt;have++] = here.val;</td></tr>
+<tr><th id="408">408</th><td>                }</td></tr>
+<tr><th id="409">409</th><td>                <b>else</b> {</td></tr>
+<tr><th id="410">410</th><td>                    <b>if</b> (here.val == <var>16</var>) {</td></tr>
+<tr><th id="411">411</th><td>                        <a class="macro" href="#183" title="do { while (bits &lt; (unsigned)(here.bits + 2)) do { do { if (have == 0) { have = in(in_desc, &amp;next); if (have == 0) { next = 0; ret = (-5); goto inf_leave; } } } while (0); have--; hold += (unsigned long)(*next++) &lt;&lt; bits; bits += 8; } while (0); } while (0)" data-ref="_M/NEEDBITS">NEEDBITS</a>(here.bits + <var>2</var>);</td></tr>
+<tr><th id="412">412</th><td>                        <a class="macro" href="#194" title="do { hold &gt;&gt;= (here.bits); bits -= (unsigned)(here.bits); } while (0)" data-ref="_M/DROPBITS">DROPBITS</a>(here.bits);</td></tr>
+<tr><th id="413">413</th><td>                        <b>if</b> (state-&gt;have == <var>0</var>) {</td></tr>
+<tr><th id="414">414</th><td>                            strm-&gt;msg = (<em>char</em> *)<q>"invalid bit length repeat"</q>;</td></tr>
+<tr><th id="415">415</th><td>                            state-&gt;mode = BAD;</td></tr>
+<tr><th id="416">416</th><td>                            <b>break</b>;</td></tr>
+<tr><th id="417">417</th><td>                        }</td></tr>
+<tr><th id="418">418</th><td>                        len = (<em>unsigned</em>)(state-&gt;lens[state-&gt;have - <var>1</var>]);</td></tr>
+<tr><th id="419">419</th><td>                        copy = <var>3</var> + <a class="macro" href="#190" title="((unsigned)hold &amp; ((1U &lt;&lt; (2)) - 1))" data-ref="_M/BITS">BITS</a>(<var>2</var>);</td></tr>
+<tr><th id="420">420</th><td>                        <a class="macro" href="#194" title="do { hold &gt;&gt;= (2); bits -= (unsigned)(2); } while (0)" data-ref="_M/DROPBITS">DROPBITS</a>(<var>2</var>);</td></tr>
+<tr><th id="421">421</th><td>                    }</td></tr>
+<tr><th id="422">422</th><td>                    <b>else</b> <b>if</b> (here.val == <var>17</var>) {</td></tr>
+<tr><th id="423">423</th><td>                        <a class="macro" href="#183" title="do { while (bits &lt; (unsigned)(here.bits + 3)) do { do { if (have == 0) { have = in(in_desc, &amp;next); if (have == 0) { next = 0; ret = (-5); goto inf_leave; } } } while (0); have--; hold += (unsigned long)(*next++) &lt;&lt; bits; bits += 8; } while (0); } while (0)" data-ref="_M/NEEDBITS">NEEDBITS</a>(here.bits + <var>3</var>);</td></tr>
+<tr><th id="424">424</th><td>                        <a class="macro" href="#194" title="do { hold &gt;&gt;= (here.bits); bits -= (unsigned)(here.bits); } while (0)" data-ref="_M/DROPBITS">DROPBITS</a>(here.bits);</td></tr>
+<tr><th id="425">425</th><td>                        len = <var>0</var>;</td></tr>
+<tr><th id="426">426</th><td>                        copy = <var>3</var> + <a class="macro" href="#190" title="((unsigned)hold &amp; ((1U &lt;&lt; (3)) - 1))" data-ref="_M/BITS">BITS</a>(<var>3</var>);</td></tr>
+<tr><th id="427">427</th><td>                        <a class="macro" href="#194" title="do { hold &gt;&gt;= (3); bits -= (unsigned)(3); } while (0)" data-ref="_M/DROPBITS">DROPBITS</a>(<var>3</var>);</td></tr>
+<tr><th id="428">428</th><td>                    }</td></tr>
+<tr><th id="429">429</th><td>                    <b>else</b> {</td></tr>
+<tr><th id="430">430</th><td>                        <a class="macro" href="#183" title="do { while (bits &lt; (unsigned)(here.bits + 7)) do { do { if (have == 0) { have = in(in_desc, &amp;next); if (have == 0) { next = 0; ret = (-5); goto inf_leave; } } } while (0); have--; hold += (unsigned long)(*next++) &lt;&lt; bits; bits += 8; } while (0); } while (0)" data-ref="_M/NEEDBITS">NEEDBITS</a>(here.bits + <var>7</var>);</td></tr>
+<tr><th id="431">431</th><td>                        <a class="macro" href="#194" title="do { hold &gt;&gt;= (here.bits); bits -= (unsigned)(here.bits); } while (0)" data-ref="_M/DROPBITS">DROPBITS</a>(here.bits);</td></tr>
+<tr><th id="432">432</th><td>                        len = <var>0</var>;</td></tr>
+<tr><th id="433">433</th><td>                        copy = <var>11</var> + <a class="macro" href="#190" title="((unsigned)hold &amp; ((1U &lt;&lt; (7)) - 1))" data-ref="_M/BITS">BITS</a>(<var>7</var>);</td></tr>
+<tr><th id="434">434</th><td>                        <a class="macro" href="#194" title="do { hold &gt;&gt;= (7); bits -= (unsigned)(7); } while (0)" data-ref="_M/DROPBITS">DROPBITS</a>(<var>7</var>);</td></tr>
+<tr><th id="435">435</th><td>                    }</td></tr>
+<tr><th id="436">436</th><td>                    <b>if</b> (state-&gt;have + copy &gt; state-&gt;nlen + state-&gt;ndist) {</td></tr>
+<tr><th id="437">437</th><td>                        strm-&gt;msg = (<em>char</em> *)<q>"invalid bit length repeat"</q>;</td></tr>
+<tr><th id="438">438</th><td>                        state-&gt;mode = BAD;</td></tr>
+<tr><th id="439">439</th><td>                        <b>break</b>;</td></tr>
+<tr><th id="440">440</th><td>                    }</td></tr>
+<tr><th id="441">441</th><td>                    <b>while</b> (copy--)</td></tr>
+<tr><th id="442">442</th><td>                        state-&gt;lens[state-&gt;have++] = (<em>unsigned</em> <em>short</em>)len;</td></tr>
+<tr><th id="443">443</th><td>                }</td></tr>
+<tr><th id="444">444</th><td>            }</td></tr>
+<tr><th id="445">445</th><td></td></tr>
+<tr><th id="446">446</th><td>            <i>/* handle error breaks in while */</i></td></tr>
+<tr><th id="447">447</th><td>            <b>if</b> (state-&gt;mode == BAD) <b>break</b>;</td></tr>
+<tr><th id="448">448</th><td></td></tr>
+<tr><th id="449">449</th><td>            <i>/* check for end-of-block code (better have one) */</i></td></tr>
+<tr><th id="450">450</th><td>            <b>if</b> (state-&gt;lens[<var>256</var>] == <var>0</var>) {</td></tr>
+<tr><th id="451">451</th><td>                strm-&gt;msg = (<em>char</em> *)<q>"invalid code -- missing end-of-block"</q>;</td></tr>
+<tr><th id="452">452</th><td>                state-&gt;mode = BAD;</td></tr>
+<tr><th id="453">453</th><td>                <b>break</b>;</td></tr>
+<tr><th id="454">454</th><td>            }</td></tr>
+<tr><th id="455">455</th><td></td></tr>
+<tr><th id="456">456</th><td>            <i>/* build code tables -- note: do not change the lenbits or distbits</i></td></tr>
+<tr><th id="457">457</th><td><i>               values here (9 and 6) without reading the comments in inftrees.h</i></td></tr>
+<tr><th id="458">458</th><td><i>               concerning the ENOUGH constants, which depend on those values */</i></td></tr>
+<tr><th id="459">459</th><td>            state-&gt;next = state-&gt;codes;</td></tr>
+<tr><th id="460">460</th><td>            state-&gt;lencode = (code <em>const</em> FAR *)(state-&gt;next);</td></tr>
+<tr><th id="461">461</th><td>            state-&gt;lenbits = <var>9</var>;</td></tr>
+<tr><th id="462">462</th><td>            ret = inflate_table(LENS, state-&gt;lens, state-&gt;nlen, &amp;(state-&gt;next),</td></tr>
+<tr><th id="463">463</th><td>                                &amp;(state-&gt;lenbits), state-&gt;work);</td></tr>
+<tr><th id="464">464</th><td>            <b>if</b> (ret) {</td></tr>
+<tr><th id="465">465</th><td>                strm-&gt;msg = (<em>char</em> *)<q>"invalid literal/lengths set"</q>;</td></tr>
+<tr><th id="466">466</th><td>                state-&gt;mode = BAD;</td></tr>
+<tr><th id="467">467</th><td>                <b>break</b>;</td></tr>
+<tr><th id="468">468</th><td>            }</td></tr>
+<tr><th id="469">469</th><td>            state-&gt;distcode = (code <em>const</em> FAR *)(state-&gt;next);</td></tr>
+<tr><th id="470">470</th><td>            state-&gt;distbits = <var>6</var>;</td></tr>
+<tr><th id="471">471</th><td>            ret = inflate_table(DISTS, state-&gt;lens + state-&gt;nlen, state-&gt;ndist,</td></tr>
+<tr><th id="472">472</th><td>                            &amp;(state-&gt;next), &amp;(state-&gt;distbits), state-&gt;work);</td></tr>
+<tr><th id="473">473</th><td>            <b>if</b> (ret) {</td></tr>
+<tr><th id="474">474</th><td>                strm-&gt;msg = (<em>char</em> *)<q>"invalid distances set"</q>;</td></tr>
+<tr><th id="475">475</th><td>                state-&gt;mode = BAD;</td></tr>
+<tr><th id="476">476</th><td>                <b>break</b>;</td></tr>
+<tr><th id="477">477</th><td>            }</td></tr>
+<tr><th id="478">478</th><td>            <a class="macro" href="../include/zutil.h.html#249" title="" data-ref="_M/Tracev">Tracev</a>((stderr, <q>"inflate:       codes ok\n"</q>));</td></tr>
+<tr><th id="479">479</th><td>            state-&gt;mode = LEN;</td></tr>
+<tr><th id="480">480</th><td></td></tr>
+<tr><th id="481">481</th><td>        <b>case</b> LEN:</td></tr>
+<tr><th id="482">482</th><td>            <i>/* use inflate_fast() if we have enough input and output */</i></td></tr>
+<tr><th id="483">483</th><td>            <b>if</b> (have &gt;= <var>6</var> &amp;&amp; left &gt;= <var>258</var>) {</td></tr>
+<tr><th id="484">484</th><td>                <a class="macro" href="#139" title="do { strm-&gt;next_out = put; strm-&gt;avail_out = left; strm-&gt;next_in = next; strm-&gt;avail_in = have; state-&gt;hold = hold; state-&gt;bits = bits; } while (0)" data-ref="_M/RESTORE">RESTORE</a>();</td></tr>
+<tr><th id="485">485</th><td>                <b>if</b> (state-&gt;whave &lt; state-&gt;wsize)</td></tr>
+<tr><th id="486">486</th><td>                    state-&gt;whave = state-&gt;wsize - left;</td></tr>
+<tr><th id="487">487</th><td>                inflate_fast(strm, state-&gt;wsize);</td></tr>
+<tr><th id="488">488</th><td>                <a class="macro" href="#128" title="do { put = strm-&gt;next_out; left = strm-&gt;avail_out; next = strm-&gt;next_in; have = strm-&gt;avail_in; hold = state-&gt;hold; bits = state-&gt;bits; } while (0)" data-ref="_M/LOAD">LOAD</a>();</td></tr>
+<tr><th id="489">489</th><td>                <b>break</b>;</td></tr>
+<tr><th id="490">490</th><td>            }</td></tr>
+<tr><th id="491">491</th><td></td></tr>
+<tr><th id="492">492</th><td>            <i>/* get a literal, length, or end-of-block code */</i></td></tr>
+<tr><th id="493">493</th><td>            <b>for</b> (;;) {</td></tr>
+<tr><th id="494">494</th><td>                here = state-&gt;lencode[<a class="macro" href="#190" title="((unsigned)hold &amp; ((1U &lt;&lt; (state-&gt;lenbits)) - 1))" data-ref="_M/BITS">BITS</a>(state-&gt;lenbits)];</td></tr>
+<tr><th id="495">495</th><td>                <b>if</b> ((<em>unsigned</em>)(here.bits) &lt;= bits) <b>break</b>;</td></tr>
+<tr><th id="496">496</th><td>                <a class="macro" href="#172" title="do { do { if (have == 0) { have = in(in_desc, &amp;next); if (have == 0) { next = 0; ret = (-5); goto inf_leave; } } } while (0); have--; hold += (unsigned long)(*next++) &lt;&lt; bits; bits += 8; } while (0)" data-ref="_M/PULLBYTE">PULLBYTE</a>();</td></tr>
+<tr><th id="497">497</th><td>            }</td></tr>
+<tr><th id="498">498</th><td>            <b>if</b> (here.op &amp;&amp; (here.op &amp; <var>0xf0</var>) == <var>0</var>) {</td></tr>
+<tr><th id="499">499</th><td>                last = here;</td></tr>
+<tr><th id="500">500</th><td>                <b>for</b> (;;) {</td></tr>
+<tr><th id="501">501</th><td>                    here = state-&gt;lencode[last.val +</td></tr>
+<tr><th id="502">502</th><td>                            (<a class="macro" href="#190" title="((unsigned)hold &amp; ((1U &lt;&lt; (last.bits + last.op)) - 1))" data-ref="_M/BITS">BITS</a>(last.bits + last.op) &gt;&gt; last.bits)];</td></tr>
+<tr><th id="503">503</th><td>                    <b>if</b> ((<em>unsigned</em>)(last.bits + here.bits) &lt;= bits) <b>break</b>;</td></tr>
+<tr><th id="504">504</th><td>                    <a class="macro" href="#172" title="do { do { if (have == 0) { have = in(in_desc, &amp;next); if (have == 0) { next = 0; ret = (-5); goto inf_leave; } } } while (0); have--; hold += (unsigned long)(*next++) &lt;&lt; bits; bits += 8; } while (0)" data-ref="_M/PULLBYTE">PULLBYTE</a>();</td></tr>
+<tr><th id="505">505</th><td>                }</td></tr>
+<tr><th id="506">506</th><td>                <a class="macro" href="#194" title="do { hold &gt;&gt;= (last.bits); bits -= (unsigned)(last.bits); } while (0)" data-ref="_M/DROPBITS">DROPBITS</a>(last.bits);</td></tr>
+<tr><th id="507">507</th><td>            }</td></tr>
+<tr><th id="508">508</th><td>            <a class="macro" href="#194" title="do { hold &gt;&gt;= (here.bits); bits -= (unsigned)(here.bits); } while (0)" data-ref="_M/DROPBITS">DROPBITS</a>(here.bits);</td></tr>
+<tr><th id="509">509</th><td>            state-&gt;length = (<em>unsigned</em>)here.val;</td></tr>
+<tr><th id="510">510</th><td></td></tr>
+<tr><th id="511">511</th><td>            <i>/* process literal */</i></td></tr>
+<tr><th id="512">512</th><td>            <b>if</b> (here.op == <var>0</var>) {</td></tr>
+<tr><th id="513">513</th><td>                <a class="macro" href="../include/zutil.h.html#250" title="" data-ref="_M/Tracevv">Tracevv</a>((stderr, here.val &gt;= <var>0x20</var> &amp;&amp; here.val &lt; <var>0x7f</var> ?</td></tr>
+<tr><th id="514">514</th><td>                        <q>"inflate:         literal '%c'\n"</q> :</td></tr>
+<tr><th id="515">515</th><td>                        <q>"inflate:         literal 0x%02x\n"</q>, here.val));</td></tr>
+<tr><th id="516">516</th><td>                <a class="macro" href="#210" title="do { if (left == 0) { put = state-&gt;window; left = state-&gt;wsize; state-&gt;whave = left; if (out(out_desc, put, left)) { ret = (-5); goto inf_leave; } } } while (0)" data-ref="_M/ROOM">ROOM</a>();</td></tr>
+<tr><th id="517">517</th><td>                *put++ = (<em>unsigned</em> <em>char</em>)(state-&gt;length);</td></tr>
+<tr><th id="518">518</th><td>                left--;</td></tr>
+<tr><th id="519">519</th><td>                state-&gt;mode = LEN;</td></tr>
+<tr><th id="520">520</th><td>                <b>break</b>;</td></tr>
+<tr><th id="521">521</th><td>            }</td></tr>
+<tr><th id="522">522</th><td></td></tr>
+<tr><th id="523">523</th><td>            <i>/* process end of block */</i></td></tr>
+<tr><th id="524">524</th><td>            <b>if</b> (here.op &amp; <var>32</var>) {</td></tr>
+<tr><th id="525">525</th><td>                <a class="macro" href="../include/zutil.h.html#250" title="" data-ref="_M/Tracevv">Tracevv</a>((stderr, <q>"inflate:         end of block\n"</q>));</td></tr>
+<tr><th id="526">526</th><td>                state-&gt;mode = TYPE;</td></tr>
+<tr><th id="527">527</th><td>                <b>break</b>;</td></tr>
+<tr><th id="528">528</th><td>            }</td></tr>
+<tr><th id="529">529</th><td></td></tr>
+<tr><th id="530">530</th><td>            <i>/* invalid code */</i></td></tr>
+<tr><th id="531">531</th><td>            <b>if</b> (here.op &amp; <var>64</var>) {</td></tr>
+<tr><th id="532">532</th><td>                strm-&gt;msg = (<em>char</em> *)<q>"invalid literal/length code"</q>;</td></tr>
+<tr><th id="533">533</th><td>                state-&gt;mode = BAD;</td></tr>
+<tr><th id="534">534</th><td>                <b>break</b>;</td></tr>
+<tr><th id="535">535</th><td>            }</td></tr>
+<tr><th id="536">536</th><td></td></tr>
+<tr><th id="537">537</th><td>            <i>/* length code -- get extra bits, if any */</i></td></tr>
+<tr><th id="538">538</th><td>            state-&gt;extra = (<em>unsigned</em>)(here.op) &amp; <var>15</var>;</td></tr>
+<tr><th id="539">539</th><td>            <b>if</b> (state-&gt;extra != <var>0</var>) {</td></tr>
+<tr><th id="540">540</th><td>                <a class="macro" href="#183" title="do { while (bits &lt; (unsigned)(state-&gt;extra)) do { do { if (have == 0) { have = in(in_desc, &amp;next); if (have == 0) { next = 0; ret = (-5); goto inf_leave; } } } while (0); have--; hold += (unsigned long)(*next++) &lt;&lt; bits; bits += 8; } while (0); } while (0)" data-ref="_M/NEEDBITS">NEEDBITS</a>(state-&gt;extra);</td></tr>
+<tr><th id="541">541</th><td>                state-&gt;length += <a class="macro" href="#190" title="((unsigned)hold &amp; ((1U &lt;&lt; (state-&gt;extra)) - 1))" data-ref="_M/BITS">BITS</a>(state-&gt;extra);</td></tr>
+<tr><th id="542">542</th><td>                <a class="macro" href="#194" title="do { hold &gt;&gt;= (state-&gt;extra); bits -= (unsigned)(state-&gt;extra); } while (0)" data-ref="_M/DROPBITS">DROPBITS</a>(state-&gt;extra);</td></tr>
+<tr><th id="543">543</th><td>            }</td></tr>
+<tr><th id="544">544</th><td>            <a class="macro" href="../include/zutil.h.html#250" title="" data-ref="_M/Tracevv">Tracevv</a>((stderr, <q>"inflate:         length %u\n"</q>, state-&gt;length));</td></tr>
+<tr><th id="545">545</th><td></td></tr>
+<tr><th id="546">546</th><td>            <i>/* get distance code */</i></td></tr>
+<tr><th id="547">547</th><td>            <b>for</b> (;;) {</td></tr>
+<tr><th id="548">548</th><td>                here = state-&gt;distcode[<a class="macro" href="#190" title="((unsigned)hold &amp; ((1U &lt;&lt; (state-&gt;distbits)) - 1))" data-ref="_M/BITS">BITS</a>(state-&gt;distbits)];</td></tr>
+<tr><th id="549">549</th><td>                <b>if</b> ((<em>unsigned</em>)(here.bits) &lt;= bits) <b>break</b>;</td></tr>
+<tr><th id="550">550</th><td>                <a class="macro" href="#172" title="do { do { if (have == 0) { have = in(in_desc, &amp;next); if (have == 0) { next = 0; ret = (-5); goto inf_leave; } } } while (0); have--; hold += (unsigned long)(*next++) &lt;&lt; bits; bits += 8; } while (0)" data-ref="_M/PULLBYTE">PULLBYTE</a>();</td></tr>
+<tr><th id="551">551</th><td>            }</td></tr>
+<tr><th id="552">552</th><td>            <b>if</b> ((here.op &amp; <var>0xf0</var>) == <var>0</var>) {</td></tr>
+<tr><th id="553">553</th><td>                last = here;</td></tr>
+<tr><th id="554">554</th><td>                <b>for</b> (;;) {</td></tr>
+<tr><th id="555">555</th><td>                    here = state-&gt;distcode[last.val +</td></tr>
+<tr><th id="556">556</th><td>                            (<a class="macro" href="#190" title="((unsigned)hold &amp; ((1U &lt;&lt; (last.bits + last.op)) - 1))" data-ref="_M/BITS">BITS</a>(last.bits + last.op) &gt;&gt; last.bits)];</td></tr>
+<tr><th id="557">557</th><td>                    <b>if</b> ((<em>unsigned</em>)(last.bits + here.bits) &lt;= bits) <b>break</b>;</td></tr>
+<tr><th id="558">558</th><td>                    <a class="macro" href="#172" title="do { do { if (have == 0) { have = in(in_desc, &amp;next); if (have == 0) { next = 0; ret = (-5); goto inf_leave; } } } while (0); have--; hold += (unsigned long)(*next++) &lt;&lt; bits; bits += 8; } while (0)" data-ref="_M/PULLBYTE">PULLBYTE</a>();</td></tr>
+<tr><th id="559">559</th><td>                }</td></tr>
+<tr><th id="560">560</th><td>                <a class="macro" href="#194" title="do { hold &gt;&gt;= (last.bits); bits -= (unsigned)(last.bits); } while (0)" data-ref="_M/DROPBITS">DROPBITS</a>(last.bits);</td></tr>
+<tr><th id="561">561</th><td>            }</td></tr>
+<tr><th id="562">562</th><td>            <a class="macro" href="#194" title="do { hold &gt;&gt;= (here.bits); bits -= (unsigned)(here.bits); } while (0)" data-ref="_M/DROPBITS">DROPBITS</a>(here.bits);</td></tr>
+<tr><th id="563">563</th><td>            <b>if</b> (here.op &amp; <var>64</var>) {</td></tr>
+<tr><th id="564">564</th><td>                strm-&gt;msg = (<em>char</em> *)<q>"invalid distance code"</q>;</td></tr>
+<tr><th id="565">565</th><td>                state-&gt;mode = BAD;</td></tr>
+<tr><th id="566">566</th><td>                <b>break</b>;</td></tr>
+<tr><th id="567">567</th><td>            }</td></tr>
+<tr><th id="568">568</th><td>            state-&gt;offset = (<em>unsigned</em>)here.val;</td></tr>
+<tr><th id="569">569</th><td></td></tr>
+<tr><th id="570">570</th><td>            <i>/* get distance extra bits, if any */</i></td></tr>
+<tr><th id="571">571</th><td>            state-&gt;extra = (<em>unsigned</em>)(here.op) &amp; <var>15</var>;</td></tr>
+<tr><th id="572">572</th><td>            <b>if</b> (state-&gt;extra != <var>0</var>) {</td></tr>
+<tr><th id="573">573</th><td>                <a class="macro" href="#183" title="do { while (bits &lt; (unsigned)(state-&gt;extra)) do { do { if (have == 0) { have = in(in_desc, &amp;next); if (have == 0) { next = 0; ret = (-5); goto inf_leave; } } } while (0); have--; hold += (unsigned long)(*next++) &lt;&lt; bits; bits += 8; } while (0); } while (0)" data-ref="_M/NEEDBITS">NEEDBITS</a>(state-&gt;extra);</td></tr>
+<tr><th id="574">574</th><td>                state-&gt;offset += <a class="macro" href="#190" title="((unsigned)hold &amp; ((1U &lt;&lt; (state-&gt;extra)) - 1))" data-ref="_M/BITS">BITS</a>(state-&gt;extra);</td></tr>
+<tr><th id="575">575</th><td>                <a class="macro" href="#194" title="do { hold &gt;&gt;= (state-&gt;extra); bits -= (unsigned)(state-&gt;extra); } while (0)" data-ref="_M/DROPBITS">DROPBITS</a>(state-&gt;extra);</td></tr>
+<tr><th id="576">576</th><td>            }</td></tr>
+<tr><th id="577">577</th><td>            <b>if</b> (state-&gt;offset &gt; state-&gt;wsize - (state-&gt;whave &lt; state-&gt;wsize ?</td></tr>
+<tr><th id="578">578</th><td>                                                left : <var>0</var>)) {</td></tr>
+<tr><th id="579">579</th><td>                strm-&gt;msg = (<em>char</em> *)<q>"invalid distance too far back"</q>;</td></tr>
+<tr><th id="580">580</th><td>                state-&gt;mode = BAD;</td></tr>
+<tr><th id="581">581</th><td>                <b>break</b>;</td></tr>
+<tr><th id="582">582</th><td>            }</td></tr>
+<tr><th id="583">583</th><td>            <a class="macro" href="../include/zutil.h.html#250" title="" data-ref="_M/Tracevv">Tracevv</a>((stderr, <q>"inflate:         distance %u\n"</q>, state-&gt;offset));</td></tr>
+<tr><th id="584">584</th><td></td></tr>
+<tr><th id="585">585</th><td>            <i>/* copy match from window to output */</i></td></tr>
+<tr><th id="586">586</th><td>            <b>do</b> {</td></tr>
+<tr><th id="587">587</th><td>                <a class="macro" href="#210" title="do { if (left == 0) { put = state-&gt;window; left = state-&gt;wsize; state-&gt;whave = left; if (out(out_desc, put, left)) { ret = (-5); goto inf_leave; } } } while (0)" data-ref="_M/ROOM">ROOM</a>();</td></tr>
+<tr><th id="588">588</th><td>                copy = state-&gt;wsize - state-&gt;offset;</td></tr>
+<tr><th id="589">589</th><td>                <b>if</b> (copy &lt; left) {</td></tr>
+<tr><th id="590">590</th><td>                    from = put + copy;</td></tr>
+<tr><th id="591">591</th><td>                    copy = left - copy;</td></tr>
+<tr><th id="592">592</th><td>                }</td></tr>
+<tr><th id="593">593</th><td>                <b>else</b> {</td></tr>
+<tr><th id="594">594</th><td>                    from = put - state-&gt;offset;</td></tr>
+<tr><th id="595">595</th><td>                    copy = left;</td></tr>
+<tr><th id="596">596</th><td>                }</td></tr>
+<tr><th id="597">597</th><td>                <b>if</b> (copy &gt; state-&gt;length) copy = state-&gt;length;</td></tr>
+<tr><th id="598">598</th><td>                state-&gt;length -= copy;</td></tr>
+<tr><th id="599">599</th><td>                left -= copy;</td></tr>
+<tr><th id="600">600</th><td>                <b>do</b> {</td></tr>
+<tr><th id="601">601</th><td>                    *put++ = *from++;</td></tr>
+<tr><th id="602">602</th><td>                } <b>while</b> (--copy);</td></tr>
+<tr><th id="603">603</th><td>            } <b>while</b> (state-&gt;length != <var>0</var>);</td></tr>
+<tr><th id="604">604</th><td>            <b>break</b>;</td></tr>
+<tr><th id="605">605</th><td></td></tr>
+<tr><th id="606">606</th><td>        <b>case</b> DONE:</td></tr>
+<tr><th id="607">607</th><td>            <i>/* inflate stream terminated properly -- write leftover output */</i></td></tr>
+<tr><th id="608">608</th><td>            ret = <a class="macro" href="../include/zlib.h.html#178" title="1" data-ref="_M/Z_STREAM_END">Z_STREAM_END</a>;</td></tr>
+<tr><th id="609">609</th><td>            <b>if</b> (left &lt; state-&gt;wsize) {</td></tr>
+<tr><th id="610">610</th><td>                <b>if</b> (out(out_desc, state-&gt;window, state-&gt;wsize - left))</td></tr>
+<tr><th id="611">611</th><td>                    ret = <a class="macro" href="../include/zlib.h.html#184" title="(-5)" data-ref="_M/Z_BUF_ERROR">Z_BUF_ERROR</a>;</td></tr>
+<tr><th id="612">612</th><td>            }</td></tr>
+<tr><th id="613">613</th><td>            <b>goto</b> inf_leave;</td></tr>
+<tr><th id="614">614</th><td></td></tr>
+<tr><th id="615">615</th><td>        <b>case</b> BAD:</td></tr>
+<tr><th id="616">616</th><td>            ret = <a class="macro" href="../include/zlib.h.html#182" title="(-3)" data-ref="_M/Z_DATA_ERROR">Z_DATA_ERROR</a>;</td></tr>
+<tr><th id="617">617</th><td>            <b>goto</b> inf_leave;</td></tr>
+<tr><th id="618">618</th><td></td></tr>
+<tr><th id="619">619</th><td>        <b>default</b>:                <i>/* can't happen, but makes compilers happy */</i></td></tr>
+<tr><th id="620">620</th><td>            ret = <a class="macro" href="../include/zlib.h.html#181" title="(-2)" data-ref="_M/Z_STREAM_ERROR">Z_STREAM_ERROR</a>;</td></tr>
+<tr><th id="621">621</th><td>            <b>goto</b> inf_leave;</td></tr>
+<tr><th id="622">622</th><td>        }</td></tr>
+<tr><th id="623">623</th><td></td></tr>
+<tr><th id="624">624</th><td>    <i>/* Return unused input */</i></td></tr>
+<tr><th id="625">625</th><td>  inf_leave:</td></tr>
+<tr><th id="626">626</th><td>    strm-&gt;next_in = next;</td></tr>
+<tr><th id="627">627</th><td>    strm-&gt;avail_in = have;</td></tr>
+<tr><th id="628">628</th><td>    <b>return</b> ret;</td></tr>
+<tr><th id="629">629</th><td>}</td></tr>
+<tr><th id="630">630</th><td></td></tr>
+<tr><th id="631">631</th><td><em>int</em> <dfn class="decl def" id="ZEXPORT" title='ZEXPORT' data-ref="ZEXPORT">ZEXPORT</dfn><span class='error' title="expected &apos;;&apos; after top level declarator"></span> inflateBackEnd(strm)</td></tr>
+<tr><th id="632">632</th><td>z_streamp strm;</td></tr>
+<tr><th id="633">633</th><td><span class='error' title="expected identifier or &apos;(&apos;">{</span></td></tr>
+<tr><th id="634">634</th><td>    <b>if</b> (strm == <a class="macro" href="../include/zlib.h.html#212" title="0" data-ref="_M/Z_NULL">Z_NULL</a> || strm-&gt;state == <a class="macro" href="../include/zlib.h.html#212" title="0" data-ref="_M/Z_NULL">Z_NULL</a> || strm-&gt;zfree == (free_func)<var>0</var>)</td></tr>
+<tr><th id="635">635</th><td>        <b>return</b> <a class="macro" href="../include/zlib.h.html#181" title="(-2)" data-ref="_M/Z_STREAM_ERROR">Z_STREAM_ERROR</a>;</td></tr>
+<tr><th id="636">636</th><td>    <a class="macro" href="../include/zutil.h.html#263" title="(*((strm)-&gt;zfree))((strm)-&gt;opaque, (voidpf)(strm-&gt;state))" data-ref="_M/ZFREE">ZFREE</a>(strm, strm-&gt;state);</td></tr>
+<tr><th id="637">637</th><td>    strm-&gt;state = <a class="macro" href="../include/zlib.h.html#212" title="0" data-ref="_M/Z_NULL">Z_NULL</a>;</td></tr>
+<tr><th id="638">638</th><td>    <a class="macro" href="../include/zutil.h.html#249" title="" data-ref="_M/Tracev">Tracev</a>((stderr, <q>"inflate: end\n"</q>));</td></tr>
+<tr><th id="639">639</th><td>    <b>return</b> <a class="macro" href="../include/zlib.h.html#177" title="0" data-ref="_M/Z_OK">Z_OK</a>;</td></tr>
+<tr><th id="640">640</th><td>}</td></tr>
+<tr><th id="641">641</th><td></td></tr>
+</table><hr/><p id='footer'>
+Generated on <em>2019-Aug-28</em> from project codebrowser<br />Powered by <a href='https://woboq.com'><img alt='Woboq' src='https://code.woboq.org/woboq-16.png' width='41' height='16' /></a> <a href='https://code.woboq.org'>Code Browser</a> 2.1
+<br/>Generator usage only permitted with license.</p>
+</div></body></html>

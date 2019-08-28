@@ -1,0 +1,838 @@
+<!doctype html>
+<html>
+<head>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"><title>Transform3D.h source code [codebrowser/source/externals/clhep/include/CLHEP/Geometry/Transform3D.h] - Woboq Code Browser</title>
+<meta name="woboq:interestingDefinitions" content="HepGeom::Reflect3D,HepGeom::ReflectX3D,HepGeom::ReflectY3D,HepGeom::ReflectZ3D,HepGeom::Rotate3D,HepGeom::RotateX3D,HepGeom::RotateY3D,HepGeom::RotateZ3D,HepGeom::Scale3D,HepGeom::ScaleX3D,HepGeom::ScaleY3D,HepGeom::ScaleZ3D,HepGeom::Transform3D,HepGeom::Translate3D,HepGeom::TranslateX3D,HepGeom::TranslateY3D,HepGeom::TranslateZ3D "/>
+<link rel="stylesheet" href="../../../../../../../../data/qtcreator.css" title="QtCreator"/>
+<link rel="alternate stylesheet" href="../../../../../../../../data/kdevelop.css" title="KDevelop"/>
+<script type="text/javascript" src="../../../../../../../../data/jquery/jquery.min.js"></script>
+<script type="text/javascript" src="../../../../../../../../data/jquery/jquery-ui.min.js"></script>
+<script>var file = 'codebrowser/source/externals/clhep/include/CLHEP/Geometry/Transform3D.h'; var root_path = '../../../../../../..'; var data_path = '../../../../../../../../data';</script>
+<script src='../../../../../../../../data/codebrowser.js'></script>
+</head>
+<body><div id='header'><h1 id='breadcrumb'><span>Browse the source code of </span><a href='../../../../../..'>codebrowser</a>/<a href='../../../../..'>source</a>/<a href='../../../..'>externals</a>/<a href='../../..'>clhep</a>/<a href='../..'>include</a>/<a href='..'>CLHEP</a>/<a href='./'>Geometry</a>/<a href='Transform3D.h.html'>Transform3D.h</a></h1></div>
+<hr/><div id='content'><table class="code">
+<tr><th id="1">1</th><td><i>// -*- C++ -*-</i></td></tr>
+<tr><th id="2">2</th><td><i>// ---------------------------------------------------------------------------</i></td></tr>
+<tr><th id="3">3</th><td><i>//</i></td></tr>
+<tr><th id="4">4</th><td><i>// This file is a part of the CLHEP - a Class Library for High Energy Physics.</i></td></tr>
+<tr><th id="5">5</th><td><i>//</i></td></tr>
+<tr><th id="6">6</th><td><i>// Hep geometrical 3D Transformation class</i></td></tr>
+<tr><th id="7">7</th><td><i>//</i></td></tr>
+<tr><th id="8">8</th><td><i>// Author: Evgeni Chernyaev &lt;Evgueni.Tcherniaev@cern.ch&gt;</i></td></tr>
+<tr><th id="9">9</th><td><i>//</i></td></tr>
+<tr><th id="10">10</th><td><i>//          ******************************************</i></td></tr>
+<tr><th id="11">11</th><td><i>//          *                                        *</i></td></tr>
+<tr><th id="12">12</th><td><i>//          *               Transform                *</i></td></tr>
+<tr><th id="13">13</th><td><i>//          *               /  / \  \                *</i></td></tr>
+<tr><th id="14">14</th><td><i>//          *       --------  /   \  --------        *</i></td></tr>
+<tr><th id="15">15</th><td><i>//          *      /         /     \         \       *</i></td></tr>
+<tr><th id="16">16</th><td><i>//          *   Rotate Translate  Reflect   Scale    *</i></td></tr>
+<tr><th id="17">17</th><td><i>//          *    / | \    / | \    / | \    / | \    *</i></td></tr>
+<tr><th id="18">18</th><td><i>//          *   X  Y  Z  X  Y  Z  X  Y  Z  X  Y  Z   *</i></td></tr>
+<tr><th id="19">19</th><td><i>//          *                                        *</i></td></tr>
+<tr><th id="20">20</th><td><i>//          ******************************************</i></td></tr>
+<tr><th id="21">21</th><td><i>//</i></td></tr>
+<tr><th id="22">22</th><td><i>// Identity transformation:</i></td></tr>
+<tr><th id="23">23</th><td><i>//   Transform3D::Identity   - global identity transformation;</i></td></tr>
+<tr><th id="24">24</th><td><i>//   any constructor without parameters, e.g. Transform3D();</i></td></tr>
+<tr><th id="25">25</th><td><i>//   m.setIdentity()            - set "m" to identity;</i></td></tr>
+<tr><th id="26">26</th><td><i>//</i></td></tr>
+<tr><th id="27">27</th><td><i>// General transformations:</i></td></tr>
+<tr><th id="28">28</th><td><i>//   Transform3D(m,v)         - transformation given by Rotation "m"</i></td></tr>
+<tr><th id="29">29</th><td><i>//                              and CLHEP::Hep3Vector "v";</i></td></tr>
+<tr><th id="30">30</th><td><i>//   Transform3D(a0,a1,a2, b0,b1,b2) - transformation given by initial</i></td></tr>
+<tr><th id="31">31</th><td><i>//                               and transformed positions of three points;</i></td></tr>
+<tr><th id="32">32</th><td><i>// Rotations:</i></td></tr>
+<tr><th id="33">33</th><td><i>//   Rotate3D(m)              - rotation given by CLHEP::HepRotation "m";</i></td></tr>
+<tr><th id="34">34</th><td><i>//   Rotate3D(ang,v)          - rotation through the angle "ang" around</i></td></tr>
+<tr><th id="35">35</th><td><i>//                              vector "v";</i></td></tr>
+<tr><th id="36">36</th><td><i>//   Rotate3D(ang,p1,p2)      - rotation through the angle "ang"</i></td></tr>
+<tr><th id="37">37</th><td><i>//                              counterclockwise around the axis given by</i></td></tr>
+<tr><th id="38">38</th><td><i>//                              two points p1-&gt;p2;</i></td></tr>
+<tr><th id="39">39</th><td><i>//   Rotate3D(a1,a2, b1,b2)   - rotation around the origin defined by initial</i></td></tr>
+<tr><th id="40">40</th><td><i>//                              and transformed positions of two points;</i></td></tr>
+<tr><th id="41">41</th><td><i>//   RotateX3D(ang)           - rotation around X-axis;</i></td></tr>
+<tr><th id="42">42</th><td><i>//   RotateY3D(ang)           - rotation around Y-axis;</i></td></tr>
+<tr><th id="43">43</th><td><i>//   RotateZ3D(ang)           - rotation around Z-axis;</i></td></tr>
+<tr><th id="44">44</th><td><i>//</i></td></tr>
+<tr><th id="45">45</th><td><i>// Translations:</i></td></tr>
+<tr><th id="46">46</th><td><i>//   Translate3D(v)           - translation given by CLHEP::Hep3Vector "v";</i></td></tr>
+<tr><th id="47">47</th><td><i>//   Translate3D(dx,dy,dz)    - translation on vector (dx,dy,dz);</i></td></tr>
+<tr><th id="48">48</th><td><i>//   TraslateX3D(dx)          - translation along X-axis;</i></td></tr>
+<tr><th id="49">49</th><td><i>//   TraslateY3D(dy)          - translation along Y-axis;</i></td></tr>
+<tr><th id="50">50</th><td><i>//   TraslateZ3D(dz)          - translation along Z-axis;</i></td></tr>
+<tr><th id="51">51</th><td><i>//</i></td></tr>
+<tr><th id="52">52</th><td><i>// Reflections:</i></td></tr>
+<tr><th id="53">53</th><td><i>//   Reflect3D(a,b,c,d)       - reflection in the plane a*x+b*y+c*z+d=0;</i></td></tr>
+<tr><th id="54">54</th><td><i>//   Reflect3D(normal,p)      - reflection in the plane going through "p"</i></td></tr>
+<tr><th id="55">55</th><td><i>//                              and whose normal is equal to "normal";</i></td></tr>
+<tr><th id="56">56</th><td><i>//   ReflectX3D(a)            - reflect X in the plane x=a (default a=0);</i></td></tr>
+<tr><th id="57">57</th><td><i>//   ReflectY3D(a)            - reflect Y in the plane y=a (default a=0);</i></td></tr>
+<tr><th id="58">58</th><td><i>//   ReflectZ3D(a)            - reflect Z in the plane z=a (default a=0);</i></td></tr>
+<tr><th id="59">59</th><td><i>//</i></td></tr>
+<tr><th id="60">60</th><td><i>// Scalings:</i></td></tr>
+<tr><th id="61">61</th><td><i>//   Scale3D(sx,sy,sz)        - general scaling with factors "sx","sy","sz"</i></td></tr>
+<tr><th id="62">62</th><td><i>//                                 along X, Y and Z;</i></td></tr>
+<tr><th id="63">63</th><td><i>//   Scale3D(s)               - scaling with constant factor "s" along all </i></td></tr>
+<tr><th id="64">64</th><td><i>//                                 directions;</i></td></tr>
+<tr><th id="65">65</th><td><i>//   ScaleX3D(sx)             - scale X;</i></td></tr>
+<tr><th id="66">66</th><td><i>//   ScaleY3D(sy)             - scale Y;</i></td></tr>
+<tr><th id="67">67</th><td><i>//   ScaleZ3D(sz)             - scale Z;</i></td></tr>
+<tr><th id="68">68</th><td><i>//</i></td></tr>
+<tr><th id="69">69</th><td><i>// Inverse transformation:</i></td></tr>
+<tr><th id="70">70</th><td><i>//   m.inverse() or           - returns inverse transformation;</i></td></tr>
+<tr><th id="71">71</th><td><i>//</i></td></tr>
+<tr><th id="72">72</th><td><i>// Compound transformation:</i></td></tr>
+<tr><th id="73">73</th><td><i>//   m3 = m2 * m1             - it is relatively slow in comparison with</i></td></tr>
+<tr><th id="74">74</th><td><i>//                              transformation of a vector. Use parenthesis</i></td></tr>
+<tr><th id="75">75</th><td><i>//                              to avoid this operation (see example below);</i></td></tr>
+<tr><th id="76">76</th><td><i>// Transformation of point:</i></td></tr>
+<tr><th id="77">77</th><td><i>//   p2 = m * p1</i></td></tr>
+<tr><th id="78">78</th><td><i>//</i></td></tr>
+<tr><th id="79">79</th><td><i>// Transformation of vector:</i></td></tr>
+<tr><th id="80">80</th><td><i>//   v2 = m * v1</i></td></tr>
+<tr><th id="81">81</th><td><i>//</i></td></tr>
+<tr><th id="82">82</th><td><i>// Transformation of normal:</i></td></tr>
+<tr><th id="83">83</th><td><i>//   n2 = m * n1</i></td></tr>
+<tr><th id="84">84</th><td><i>//</i></td></tr>
+<tr><th id="85">85</th><td><i>// The following table explains how different transformations affect</i></td></tr>
+<tr><th id="86">86</th><td><i>// point, vector and normal. "+" means affect, "-" means do not affect,</i></td></tr>
+<tr><th id="87">87</th><td><i>// "*" meas affect but in different way than "+" </i></td></tr>
+<tr><th id="88">88</th><td><i>//</i></td></tr>
+<tr><th id="89">89</th><td><i>//                     Point  Vector  Normal</i></td></tr>
+<tr><th id="90">90</th><td><i>//      -------------+-------+-------+-------</i></td></tr>
+<tr><th id="91">91</th><td><i>//       Rotation    !   +   !   +   !   +</i></td></tr>
+<tr><th id="92">92</th><td><i>//       Translation !   +   !   -   !   -</i></td></tr>
+<tr><th id="93">93</th><td><i>//       Reflection  !   +   !   +   !   *</i></td></tr>
+<tr><th id="94">94</th><td><i>//       Scaling     !   +   !   +   !   *</i></td></tr>
+<tr><th id="95">95</th><td><i>//      -------------+-------+-------+-------</i></td></tr>
+<tr><th id="96">96</th><td><i>//</i></td></tr>
+<tr><th id="97">97</th><td><i>// Example of the usage:</i></td></tr>
+<tr><th id="98">98</th><td><i>//</i></td></tr>
+<tr><th id="99">99</th><td><i>//   Transform3D m1, m2, m3;</i></td></tr>
+<tr><th id="100">100</th><td><i>//   HepVector3D    v2, v1(0,0,0);</i></td></tr>
+<tr><th id="101">101</th><td><i>//</i></td></tr>
+<tr><th id="102">102</th><td><i>//   m1 = Rotate3D(angle, Vector3D(1,1,1));</i></td></tr>
+<tr><th id="103">103</th><td><i>//   m2 = Translate3D(dx,dy,dz);</i></td></tr>
+<tr><th id="104">104</th><td><i>//   m3 = m1.inverse();</i></td></tr>
+<tr><th id="105">105</th><td><i>//</i></td></tr>
+<tr><th id="106">106</th><td><i>//   v2 = m3*(m2*(m1*v1));</i></td></tr>
+<tr><th id="107">107</th><td><i>//</i></td></tr>
+<tr><th id="108">108</th><td><i>// History:</i></td></tr>
+<tr><th id="109">109</th><td><i>// 24.09.96 E.Chernyaev - initial version</i></td></tr>
+<tr><th id="110">110</th><td><i>//</i></td></tr>
+<tr><th id="111">111</th><td><i>// 26.02.97 E.Chernyaev</i></td></tr>
+<tr><th id="112">112</th><td><i>// - added global Identity by request of John Allison </i></td></tr>
+<tr><th id="113">113</th><td><i>//   (to avoid problems with compilation on HP) </i></td></tr>
+<tr><th id="114">114</th><td><i>// - added getRotation and getTranslation </i></td></tr>
+<tr><th id="115">115</th><td><i>//</i></td></tr>
+<tr><th id="116">116</th><td><i>// 29.01.01 E.Chernyaev - added subscripting</i></td></tr>
+<tr><th id="117">117</th><td><i>// 11.06.01 E.Chernyaev - added getDecomposition</i></td></tr>
+<tr><th id="118">118</th><td></td></tr>
+<tr><th id="119">119</th><td><u>#<span data-ppcond="119">ifndef</span> <span class="macro" data-ref="_M/HEP_TRANSFROM3D_H">HEP_TRANSFROM3D_H</span></u></td></tr>
+<tr><th id="120">120</th><td><u>#define <dfn class="macro" id="_M/HEP_TRANSFROM3D_H" data-ref="_M/HEP_TRANSFROM3D_H">HEP_TRANSFROM3D_H</dfn></u></td></tr>
+<tr><th id="121">121</th><td></td></tr>
+<tr><th id="122">122</th><td><u>#include <a href="../Vector/ThreeVector.h.html">"CLHEP/Vector/ThreeVector.h"</a></u></td></tr>
+<tr><th id="123">123</th><td></td></tr>
+<tr><th id="124">124</th><td><b>namespace</b> <span class="namespace">HepGeom</span> {</td></tr>
+<tr><th id="125">125</th><td></td></tr>
+<tr><th id="126">126</th><td>  <b>template</b>&lt;<b>class</b> T&gt; <b>class</b> <a class="type" href="Point3D.h.html#HepGeom::Point3D" title='HepGeom::Point3D' data-ref="HepGeom::Point3D" id="HepGeom::Point3D">Point3D</a>;</td></tr>
+<tr><th id="127">127</th><td>  <b>template</b>&lt;<b>class</b> T&gt; <b>class</b> <a class="type" href="Vector3D.h.html#HepGeom::Vector3D" title='HepGeom::Vector3D' data-ref="HepGeom::Vector3D" id="HepGeom::Vector3D">Vector3D</a>;</td></tr>
+<tr><th id="128">128</th><td>  <b>template</b>&lt;<b>class</b> T&gt; <b>class</b> <a class="type" href="Normal3D.h.html#HepGeom::Normal3D" title='HepGeom::Normal3D' data-ref="HepGeom::Normal3D" id="HepGeom::Normal3D">Normal3D</a>;</td></tr>
+<tr><th id="129">129</th><td></td></tr>
+<tr><th id="130">130</th><td>  <b>class</b> <a class="type" href="#HepGeom::Translate3D" title='HepGeom::Translate3D' data-ref="HepGeom::Translate3D">Translate3D</a>;</td></tr>
+<tr><th id="131">131</th><td>  <b>class</b> <a class="type" href="#HepGeom::Rotate3D" title='HepGeom::Rotate3D' data-ref="HepGeom::Rotate3D">Rotate3D</a>;</td></tr>
+<tr><th id="132">132</th><td>  <b>class</b> <a class="type" href="#HepGeom::Scale3D" title='HepGeom::Scale3D' data-ref="HepGeom::Scale3D">Scale3D</a>;</td></tr>
+<tr><th id="133">133</th><td></td></tr>
+<tr><th id="134">134</th><td>  <i class="doc">/**</i></td></tr>
+<tr><th id="135">135</th><td><i class="doc">   * Class for transformation of 3D geometrical objects.</i></td></tr>
+<tr><th id="136">136</th><td><i class="doc">   * It allows different translations, rotations, scalings and reflections.</i></td></tr>
+<tr><th id="137">137</th><td><i class="doc">   * Several specialized classes are derived from it:</i></td></tr>
+<tr><th id="138">138</th><td><i class="doc">   *</i></td></tr>
+<tr><th id="139">139</th><td><i class="doc">   * TranslateX3D, TranslateY3D, TranslateZ3D, Translate3D,<span class="tag">&lt;br&gt;</span></i></td></tr>
+<tr><th id="140">140</th><td><i class="doc">   * RotateX3D,    RotateY3D,    RotateZ3D,    Rotate3D,   <span class="tag">&lt;br&gt;</span></i></td></tr>
+<tr><th id="141">141</th><td><i class="doc">   * ScaleX3D,     ScaleY3D,     ScaleZ3D,     Scale3D,    <span class="tag">&lt;br&gt;</span></i></td></tr>
+<tr><th id="142">142</th><td><i class="doc">   * ReflectX3D,   ReflectY3D,   ReflectZ3D,   Reflect3D.</i></td></tr>
+<tr><th id="143">143</th><td><i class="doc">   *</i></td></tr>
+<tr><th id="144">144</th><td><i class="doc">   * The idea behind these classes is to provide some additional constructors</i></td></tr>
+<tr><th id="145">145</th><td><i class="doc">   * for Transform3D, they normally should not be used as separate classes.</i></td></tr>
+<tr><th id="146">146</th><td><i class="doc">   *</i></td></tr>
+<tr><th id="147">147</th><td><i class="doc">   * Example:</i></td></tr>
+<tr><th id="148">148</th><td><i class="doc">   * <span class="command">@code</span></i></td></tr>
+<tr><th id="149">149</th><td><i class="doc">   *<span class="verb">   HepGeom::Transform3D m;</span></i></td></tr>
+<tr><th id="150">150</th><td><i class="doc"><span class="verb"></span>   *<span class="verb">   m = HepGeom::TranslateX3D(10.*cm);</span></i></td></tr>
+<tr><th id="151">151</th><td><i class="doc"><span class="verb"></span>   * @endcode</i></td></tr>
+<tr><th id="152">152</th><td><i class="doc">   *</i></td></tr>
+<tr><th id="153">153</th><td><i class="doc">   * Remark:</i></td></tr>
+<tr><th id="154">154</th><td><i class="doc">   * For the reason that the operator* is left associative, the notation</i></td></tr>
+<tr><th id="155">155</th><td><i class="doc">   * <span class="command">@code</span></i></td></tr>
+<tr><th id="156">156</th><td><i class="doc">   *<span class="verb">   v2 = m3*(m2*(m1*v1));</span></i></td></tr>
+<tr><th id="157">157</th><td><i class="doc"><span class="verb"></span>   * @endcode</i></td></tr>
+<tr><th id="158">158</th><td><i class="doc">   * is much more effective then the notation</i></td></tr>
+<tr><th id="159">159</th><td><i class="doc">   * <span class="command">@code</span></i></td></tr>
+<tr><th id="160">160</th><td><i class="doc">   *<span class="verb">   v2 = m3*m2*m1*v1;</span></i></td></tr>
+<tr><th id="161">161</th><td><i class="doc"><span class="verb"></span>   * @endcode</i></td></tr>
+<tr><th id="162">162</th><td><i class="doc">   * In the first case three operations Transform3D*Vector3D are executed,</i></td></tr>
+<tr><th id="163">163</th><td><i class="doc">   * in the second case two operations Transform3D*Transform3D and one</i></td></tr>
+<tr><th id="164">164</th><td><i class="doc">   * Transform3D*Vector3D are performed. Transform3D*Transform3D is</i></td></tr>
+<tr><th id="165">165</th><td><i class="doc">   * roughly three times slower than Transform3D*Vector3D.</i></td></tr>
+<tr><th id="166">166</th><td><i class="doc">   *</i></td></tr>
+<tr><th id="167">167</th><td><i class="doc">   * <span class="command">@author</span> &lt;Evgueni.Tcherniae<span class="command">v@cern</span>.ch&gt;</i></td></tr>
+<tr><th id="168">168</th><td><i class="doc">   * <span class="command">@ingroup</span> <span class="verb">geometry</span></i></td></tr>
+<tr><th id="169">169</th><td><i class="doc">   */</i></td></tr>
+<tr><th id="170">170</th><td>  <b>class</b> <dfn class="type def" id="HepGeom::Transform3D" title='HepGeom::Transform3D' data-ref="HepGeom::Transform3D">Transform3D</dfn> {</td></tr>
+<tr><th id="171">171</th><td>  <b>protected</b>:</td></tr>
+<tr><th id="172">172</th><td>    <em>double</em> <dfn class="decl" id="HepGeom::Transform3D::xx_" title='HepGeom::Transform3D::xx_' data-ref="HepGeom::Transform3D::xx_">xx_</dfn>, <dfn class="decl" id="HepGeom::Transform3D::xy_" title='HepGeom::Transform3D::xy_' data-ref="HepGeom::Transform3D::xy_">xy_</dfn>, <dfn class="decl" id="HepGeom::Transform3D::xz_" title='HepGeom::Transform3D::xz_' data-ref="HepGeom::Transform3D::xz_">xz_</dfn>, <dfn class="decl" id="HepGeom::Transform3D::dx_" title='HepGeom::Transform3D::dx_' data-ref="HepGeom::Transform3D::dx_">dx_</dfn>,     <i>// 4x3  Transformation Matrix</i></td></tr>
+<tr><th id="173">173</th><td>           <dfn class="decl" id="HepGeom::Transform3D::yx_" title='HepGeom::Transform3D::yx_' data-ref="HepGeom::Transform3D::yx_">yx_</dfn>, <dfn class="decl" id="HepGeom::Transform3D::yy_" title='HepGeom::Transform3D::yy_' data-ref="HepGeom::Transform3D::yy_">yy_</dfn>, <dfn class="decl" id="HepGeom::Transform3D::yz_" title='HepGeom::Transform3D::yz_' data-ref="HepGeom::Transform3D::yz_">yz_</dfn>, <dfn class="decl" id="HepGeom::Transform3D::dy_" title='HepGeom::Transform3D::dy_' data-ref="HepGeom::Transform3D::dy_">dy_</dfn>,</td></tr>
+<tr><th id="174">174</th><td>           <dfn class="decl" id="HepGeom::Transform3D::zx_" title='HepGeom::Transform3D::zx_' data-ref="HepGeom::Transform3D::zx_">zx_</dfn>, <dfn class="decl" id="HepGeom::Transform3D::zy_" title='HepGeom::Transform3D::zy_' data-ref="HepGeom::Transform3D::zy_">zy_</dfn>, <dfn class="decl" id="HepGeom::Transform3D::zz_" title='HepGeom::Transform3D::zz_' data-ref="HepGeom::Transform3D::zz_">zz_</dfn>, <dfn class="decl" id="HepGeom::Transform3D::dz_" title='HepGeom::Transform3D::dz_' data-ref="HepGeom::Transform3D::dz_">dz_</dfn>;</td></tr>
+<tr><th id="175">175</th><td></td></tr>
+<tr><th id="176">176</th><td>    <i>// Protected constructor</i></td></tr>
+<tr><th id="177">177</th><td>    <dfn class="decl def" id="_ZN7HepGeom11Transform3DC1Edddddddddddd" title='HepGeom::Transform3D::Transform3D' data-ref="_ZN7HepGeom11Transform3DC1Edddddddddddd">Transform3D</dfn>(<em>double</em> <dfn class="local col7 decl" id="27XX" title='XX' data-type='double' data-ref="27XX">XX</dfn>, <em>double</em> <dfn class="local col8 decl" id="28XY" title='XY' data-type='double' data-ref="28XY">XY</dfn>, <em>double</em> <dfn class="local col9 decl" id="29XZ" title='XZ' data-type='double' data-ref="29XZ">XZ</dfn>, <em>double</em> <dfn class="local col0 decl" id="30DX" title='DX' data-type='double' data-ref="30DX">DX</dfn>,</td></tr>
+<tr><th id="178">178</th><td>		<em>double</em> <dfn class="local col1 decl" id="31YX" title='YX' data-type='double' data-ref="31YX">YX</dfn>, <em>double</em> <dfn class="local col2 decl" id="32YY" title='YY' data-type='double' data-ref="32YY">YY</dfn>, <em>double</em> <dfn class="local col3 decl" id="33YZ" title='YZ' data-type='double' data-ref="33YZ">YZ</dfn>, <em>double</em> <dfn class="local col4 decl" id="34DY" title='DY' data-type='double' data-ref="34DY">DY</dfn>,</td></tr>
+<tr><th id="179">179</th><td>		<em>double</em> <dfn class="local col5 decl" id="35ZX" title='ZX' data-type='double' data-ref="35ZX">ZX</dfn>, <em>double</em> <dfn class="local col6 decl" id="36ZY" title='ZY' data-type='double' data-ref="36ZY">ZY</dfn>, <em>double</em> <dfn class="local col7 decl" id="37ZZ" title='ZZ' data-type='double' data-ref="37ZZ">ZZ</dfn>, <em>double</em> <dfn class="local col8 decl" id="38DZ" title='DZ' data-type='double' data-ref="38DZ">DZ</dfn>)</td></tr>
+<tr><th id="180">180</th><td>      : <a class="member" href="#HepGeom::Transform3D::xx_" title='HepGeom::Transform3D::xx_' data-ref="HepGeom::Transform3D::xx_">xx_</a>(<a class="local col7 ref" href="#27XX" title='XX' data-ref="27XX">XX</a>), <a class="member" href="#HepGeom::Transform3D::xy_" title='HepGeom::Transform3D::xy_' data-ref="HepGeom::Transform3D::xy_">xy_</a>(<a class="local col8 ref" href="#28XY" title='XY' data-ref="28XY">XY</a>), <a class="member" href="#HepGeom::Transform3D::xz_" title='HepGeom::Transform3D::xz_' data-ref="HepGeom::Transform3D::xz_">xz_</a>(<a class="local col9 ref" href="#29XZ" title='XZ' data-ref="29XZ">XZ</a>), <a class="member" href="#HepGeom::Transform3D::dx_" title='HepGeom::Transform3D::dx_' data-ref="HepGeom::Transform3D::dx_">dx_</a>(<a class="local col0 ref" href="#30DX" title='DX' data-ref="30DX">DX</a>),</td></tr>
+<tr><th id="181">181</th><td>	<a class="member" href="#HepGeom::Transform3D::yx_" title='HepGeom::Transform3D::yx_' data-ref="HepGeom::Transform3D::yx_">yx_</a>(<a class="local col1 ref" href="#31YX" title='YX' data-ref="31YX">YX</a>), <a class="member" href="#HepGeom::Transform3D::yy_" title='HepGeom::Transform3D::yy_' data-ref="HepGeom::Transform3D::yy_">yy_</a>(<a class="local col2 ref" href="#32YY" title='YY' data-ref="32YY">YY</a>), <a class="member" href="#HepGeom::Transform3D::yz_" title='HepGeom::Transform3D::yz_' data-ref="HepGeom::Transform3D::yz_">yz_</a>(<a class="local col3 ref" href="#33YZ" title='YZ' data-ref="33YZ">YZ</a>), <a class="member" href="#HepGeom::Transform3D::dy_" title='HepGeom::Transform3D::dy_' data-ref="HepGeom::Transform3D::dy_">dy_</a>(<a class="local col4 ref" href="#34DY" title='DY' data-ref="34DY">DY</a>),</td></tr>
+<tr><th id="182">182</th><td>	<a class="member" href="#HepGeom::Transform3D::zx_" title='HepGeom::Transform3D::zx_' data-ref="HepGeom::Transform3D::zx_">zx_</a>(<a class="local col5 ref" href="#35ZX" title='ZX' data-ref="35ZX">ZX</a>), <a class="member" href="#HepGeom::Transform3D::zy_" title='HepGeom::Transform3D::zy_' data-ref="HepGeom::Transform3D::zy_">zy_</a>(<a class="local col6 ref" href="#36ZY" title='ZY' data-ref="36ZY">ZY</a>), <a class="member" href="#HepGeom::Transform3D::zz_" title='HepGeom::Transform3D::zz_' data-ref="HepGeom::Transform3D::zz_">zz_</a>(<a class="local col7 ref" href="#37ZZ" title='ZZ' data-ref="37ZZ">ZZ</a>), <a class="member" href="#HepGeom::Transform3D::dz_" title='HepGeom::Transform3D::dz_' data-ref="HepGeom::Transform3D::dz_">dz_</a>(<a class="local col8 ref" href="#38DZ" title='DZ' data-ref="38DZ">DZ</a>) {}</td></tr>
+<tr><th id="183">183</th><td></td></tr>
+<tr><th id="184">184</th><td>    <i>// Set transformation matrix</i></td></tr>
+<tr><th id="185">185</th><td>    <em>void</em> <dfn class="decl def" id="_ZN7HepGeom11Transform3D12setTransformEdddddddddddd" title='HepGeom::Transform3D::setTransform' data-ref="_ZN7HepGeom11Transform3D12setTransformEdddddddddddd">setTransform</dfn>(<em>double</em> <dfn class="local col9 decl" id="39XX" title='XX' data-type='double' data-ref="39XX">XX</dfn>, <em>double</em> <dfn class="local col0 decl" id="40XY" title='XY' data-type='double' data-ref="40XY">XY</dfn>, <em>double</em> <dfn class="local col1 decl" id="41XZ" title='XZ' data-type='double' data-ref="41XZ">XZ</dfn>, <em>double</em> <dfn class="local col2 decl" id="42DX" title='DX' data-type='double' data-ref="42DX">DX</dfn>,</td></tr>
+<tr><th id="186">186</th><td>		      <em>double</em> <dfn class="local col3 decl" id="43YX" title='YX' data-type='double' data-ref="43YX">YX</dfn>, <em>double</em> <dfn class="local col4 decl" id="44YY" title='YY' data-type='double' data-ref="44YY">YY</dfn>, <em>double</em> <dfn class="local col5 decl" id="45YZ" title='YZ' data-type='double' data-ref="45YZ">YZ</dfn>, <em>double</em> <dfn class="local col6 decl" id="46DY" title='DY' data-type='double' data-ref="46DY">DY</dfn>,</td></tr>
+<tr><th id="187">187</th><td>		      <em>double</em> <dfn class="local col7 decl" id="47ZX" title='ZX' data-type='double' data-ref="47ZX">ZX</dfn>, <em>double</em> <dfn class="local col8 decl" id="48ZY" title='ZY' data-type='double' data-ref="48ZY">ZY</dfn>, <em>double</em> <dfn class="local col9 decl" id="49ZZ" title='ZZ' data-type='double' data-ref="49ZZ">ZZ</dfn>, <em>double</em> <dfn class="local col0 decl" id="50DZ" title='DZ' data-type='double' data-ref="50DZ">DZ</dfn>) {</td></tr>
+<tr><th id="188">188</th><td>      <a class="member" href="#HepGeom::Transform3D::xx_" title='HepGeom::Transform3D::xx_' data-ref="HepGeom::Transform3D::xx_">xx_</a> = <a class="local col9 ref" href="#39XX" title='XX' data-ref="39XX">XX</a>; <a class="member" href="#HepGeom::Transform3D::xy_" title='HepGeom::Transform3D::xy_' data-ref="HepGeom::Transform3D::xy_">xy_</a> = <a class="local col0 ref" href="#40XY" title='XY' data-ref="40XY">XY</a>; <a class="member" href="#HepGeom::Transform3D::xz_" title='HepGeom::Transform3D::xz_' data-ref="HepGeom::Transform3D::xz_">xz_</a> = <a class="local col1 ref" href="#41XZ" title='XZ' data-ref="41XZ">XZ</a>; <a class="member" href="#HepGeom::Transform3D::dx_" title='HepGeom::Transform3D::dx_' data-ref="HepGeom::Transform3D::dx_">dx_</a> = <a class="local col2 ref" href="#42DX" title='DX' data-ref="42DX">DX</a>;</td></tr>
+<tr><th id="189">189</th><td>      <a class="member" href="#HepGeom::Transform3D::yx_" title='HepGeom::Transform3D::yx_' data-ref="HepGeom::Transform3D::yx_">yx_</a> = <a class="local col3 ref" href="#43YX" title='YX' data-ref="43YX">YX</a>; <a class="member" href="#HepGeom::Transform3D::yy_" title='HepGeom::Transform3D::yy_' data-ref="HepGeom::Transform3D::yy_">yy_</a> = <a class="local col4 ref" href="#44YY" title='YY' data-ref="44YY">YY</a>; <a class="member" href="#HepGeom::Transform3D::yz_" title='HepGeom::Transform3D::yz_' data-ref="HepGeom::Transform3D::yz_">yz_</a> = <a class="local col5 ref" href="#45YZ" title='YZ' data-ref="45YZ">YZ</a>; <a class="member" href="#HepGeom::Transform3D::dy_" title='HepGeom::Transform3D::dy_' data-ref="HepGeom::Transform3D::dy_">dy_</a> = <a class="local col6 ref" href="#46DY" title='DY' data-ref="46DY">DY</a>;</td></tr>
+<tr><th id="190">190</th><td>      <a class="member" href="#HepGeom::Transform3D::zx_" title='HepGeom::Transform3D::zx_' data-ref="HepGeom::Transform3D::zx_">zx_</a> = <a class="local col7 ref" href="#47ZX" title='ZX' data-ref="47ZX">ZX</a>; <a class="member" href="#HepGeom::Transform3D::zy_" title='HepGeom::Transform3D::zy_' data-ref="HepGeom::Transform3D::zy_">zy_</a> = <a class="local col8 ref" href="#48ZY" title='ZY' data-ref="48ZY">ZY</a>; <a class="member" href="#HepGeom::Transform3D::zz_" title='HepGeom::Transform3D::zz_' data-ref="HepGeom::Transform3D::zz_">zz_</a> = <a class="local col9 ref" href="#49ZZ" title='ZZ' data-ref="49ZZ">ZZ</a>; <a class="member" href="#HepGeom::Transform3D::dz_" title='HepGeom::Transform3D::dz_' data-ref="HepGeom::Transform3D::dz_">dz_</a> = <a class="local col0 ref" href="#50DZ" title='DZ' data-ref="50DZ">DZ</a>;</td></tr>
+<tr><th id="191">191</th><td>    }</td></tr>
+<tr><th id="192">192</th><td></td></tr>
+<tr><th id="193">193</th><td>  <b>public</b>:</td></tr>
+<tr><th id="194">194</th><td>    <i class="doc">/**</i></td></tr>
+<tr><th id="195">195</th><td><i class="doc">     * Global identity transformation. */</i></td></tr>
+<tr><th id="196">196</th><td>    <a class="macro" href="../Utility/defs.h.html#19" title="" data-ref="_M/DLL_API">DLL_API</a> <em>static</em> <em>const</em> <a class="type" href="#HepGeom::Transform3D" title='HepGeom::Transform3D' data-ref="HepGeom::Transform3D">Transform3D</a> <dfn class="decl" id="HepGeom::Transform3D::Identity" title='HepGeom::Transform3D::Identity' data-ref="HepGeom::Transform3D::Identity">Identity</dfn>;</td></tr>
+<tr><th id="197">197</th><td></td></tr>
+<tr><th id="198">198</th><td>    <i>// Helper class for implemention of C-style subscripting r[i][j] </i></td></tr>
+<tr><th id="199">199</th><td>    <b>class</b> <dfn class="type def" id="HepGeom::Transform3D::Transform3D_row" title='HepGeom::Transform3D::Transform3D_row' data-ref="HepGeom::Transform3D::Transform3D_row">Transform3D_row</dfn> {</td></tr>
+<tr><th id="200">200</th><td>    <b>public</b>:</td></tr>
+<tr><th id="201">201</th><td>      <b>inline</b> <a class="decl" href="Transform3D.icc.html#_ZN7HepGeom11Transform3D15Transform3D_rowC1ERKS0_i" title='HepGeom::Transform3D::Transform3D_row::Transform3D_row' data-ref="_ZN7HepGeom11Transform3D15Transform3D_rowC1ERKS0_i" id="_ZN7HepGeom11Transform3D15Transform3D_rowC1ERKS0_i">Transform3D_row</a>(<em>const</em> <a class="type" href="#HepGeom::Transform3D" title='HepGeom::Transform3D' data-ref="HepGeom::Transform3D">Transform3D</a> &amp;, <em>int</em>);</td></tr>
+<tr><th id="202">202</th><td>      <b>inline</b> <em>double</em> <a class="decl" href="Transform3D.icc.html#_ZNK7HepGeom11Transform3D15Transform3D_rowixEi" title='HepGeom::Transform3D::Transform3D_row::operator[]' data-ref="_ZNK7HepGeom11Transform3D15Transform3D_rowixEi" id="_ZNK7HepGeom11Transform3D15Transform3D_rowixEi"><b>operator</b> []</a> (<em>int</em>) <em>const</em>;</td></tr>
+<tr><th id="203">203</th><td>    <b>private</b>:</td></tr>
+<tr><th id="204">204</th><td>      <em>const</em> <a class="type" href="#HepGeom::Transform3D" title='HepGeom::Transform3D' data-ref="HepGeom::Transform3D">Transform3D</a> &amp; <dfn class="decl" id="HepGeom::Transform3D::Transform3D_row::rr" title='HepGeom::Transform3D::Transform3D_row::rr' data-ref="HepGeom::Transform3D::Transform3D_row::rr">rr</dfn>;</td></tr>
+<tr><th id="205">205</th><td>      <em>int</em> <dfn class="decl" id="HepGeom::Transform3D::Transform3D_row::ii" title='HepGeom::Transform3D::Transform3D_row::ii' data-ref="HepGeom::Transform3D::Transform3D_row::ii">ii</dfn>;</td></tr>
+<tr><th id="206">206</th><td>    };</td></tr>
+<tr><th id="207">207</th><td></td></tr>
+<tr><th id="208">208</th><td>    <i class="doc">/**</i></td></tr>
+<tr><th id="209">209</th><td><i class="doc">     * Default constructor - sets the Identity transformation. */</i></td></tr>
+<tr><th id="210">210</th><td>    <dfn class="decl def" id="_ZN7HepGeom11Transform3DC1Ev" title='HepGeom::Transform3D::Transform3D' data-ref="_ZN7HepGeom11Transform3DC1Ev">Transform3D</dfn>()</td></tr>
+<tr><th id="211">211</th><td>      : <a class="member" href="#HepGeom::Transform3D::xx_" title='HepGeom::Transform3D::xx_' data-ref="HepGeom::Transform3D::xx_">xx_</a>(<var>1</var>), <a class="member" href="#HepGeom::Transform3D::xy_" title='HepGeom::Transform3D::xy_' data-ref="HepGeom::Transform3D::xy_">xy_</a>(<var>0</var>), <a class="member" href="#HepGeom::Transform3D::xz_" title='HepGeom::Transform3D::xz_' data-ref="HepGeom::Transform3D::xz_">xz_</a>(<var>0</var>), <a class="member" href="#HepGeom::Transform3D::dx_" title='HepGeom::Transform3D::dx_' data-ref="HepGeom::Transform3D::dx_">dx_</a>(<var>0</var>),</td></tr>
+<tr><th id="212">212</th><td>	<a class="member" href="#HepGeom::Transform3D::yx_" title='HepGeom::Transform3D::yx_' data-ref="HepGeom::Transform3D::yx_">yx_</a>(<var>0</var>), <a class="member" href="#HepGeom::Transform3D::yy_" title='HepGeom::Transform3D::yy_' data-ref="HepGeom::Transform3D::yy_">yy_</a>(<var>1</var>), <a class="member" href="#HepGeom::Transform3D::yz_" title='HepGeom::Transform3D::yz_' data-ref="HepGeom::Transform3D::yz_">yz_</a>(<var>0</var>), <a class="member" href="#HepGeom::Transform3D::dy_" title='HepGeom::Transform3D::dy_' data-ref="HepGeom::Transform3D::dy_">dy_</a>(<var>0</var>),</td></tr>
+<tr><th id="213">213</th><td>	<a class="member" href="#HepGeom::Transform3D::zx_" title='HepGeom::Transform3D::zx_' data-ref="HepGeom::Transform3D::zx_">zx_</a>(<var>0</var>), <a class="member" href="#HepGeom::Transform3D::zy_" title='HepGeom::Transform3D::zy_' data-ref="HepGeom::Transform3D::zy_">zy_</a>(<var>0</var>), <a class="member" href="#HepGeom::Transform3D::zz_" title='HepGeom::Transform3D::zz_' data-ref="HepGeom::Transform3D::zz_">zz_</a>(<var>1</var>), <a class="member" href="#HepGeom::Transform3D::dz_" title='HepGeom::Transform3D::dz_' data-ref="HepGeom::Transform3D::dz_">dz_</a>(<var>0</var>) {}</td></tr>
+<tr><th id="214">214</th><td>  </td></tr>
+<tr><th id="215">215</th><td>    <i class="doc">/**</i></td></tr>
+<tr><th id="216">216</th><td><i class="doc">     * Constructor: rotation and then translation. */</i></td></tr>
+<tr><th id="217">217</th><td>    <b>inline</b> <a class="decl" href="Transform3D.icc.html#_ZN7HepGeom11Transform3DC1ERKN5CLHEP11HepRotationERKNS1_10Hep3VectorE" title='HepGeom::Transform3D::Transform3D' data-ref="_ZN7HepGeom11Transform3DC1ERKN5CLHEP11HepRotationERKNS1_10Hep3VectorE" id="_ZN7HepGeom11Transform3DC1ERKN5CLHEP11HepRotationERKNS1_10Hep3VectorE">Transform3D</a>(<em>const</em> <span class="namespace">CLHEP::</span><a class="type" href="../Vector/Rotation.h.html#CLHEP::HepRotation" title='CLHEP::HepRotation' data-ref="CLHEP::HepRotation">HepRotation</a> &amp; <dfn class="local col1 decl" id="51m" title='m' data-type='const CLHEP::HepRotation &amp;' data-ref="51m">m</dfn>, <em>const</em> <span class="namespace">CLHEP::</span><a class="type" href="../Vector/ThreeVector.h.html#CLHEP::Hep3Vector" title='CLHEP::Hep3Vector' data-ref="CLHEP::Hep3Vector">Hep3Vector</a> &amp; <dfn class="local col2 decl" id="52v" title='v' data-type='const CLHEP::Hep3Vector &amp;' data-ref="52v">v</dfn>);</td></tr>
+<tr><th id="218">218</th><td></td></tr>
+<tr><th id="219">219</th><td>    <i class="doc">/**</i></td></tr>
+<tr><th id="220">220</th><td><i class="doc">     * Constructor: transformation of basis (assumed - no reflection). */</i></td></tr>
+<tr><th id="221">221</th><td>    <dfn class="decl" id="_ZN7HepGeom11Transform3DC1ERKNS_7Point3DIdEES4_S4_S4_S4_S4_" title='HepGeom::Transform3D::Transform3D' data-ref="_ZN7HepGeom11Transform3DC1ERKNS_7Point3DIdEES4_S4_S4_S4_S4_">Transform3D</dfn>(<em>const</em> <a class="type" href="#HepGeom::Point3D" title='HepGeom::Point3D' data-ref="HepGeom::Point3D">Point3D</a>&lt;<em>double</em>&gt; &amp; <dfn class="local col3 decl" id="53fr0" title='fr0' data-type='const Point3D&lt;double&gt; &amp;' data-ref="53fr0">fr0</dfn>,</td></tr>
+<tr><th id="222">222</th><td>		<em>const</em> <a class="type" href="#HepGeom::Point3D" title='HepGeom::Point3D' data-ref="HepGeom::Point3D">Point3D</a>&lt;<em>double</em>&gt; &amp; <dfn class="local col4 decl" id="54fr1" title='fr1' data-type='const Point3D&lt;double&gt; &amp;' data-ref="54fr1">fr1</dfn>,</td></tr>
+<tr><th id="223">223</th><td>		<em>const</em> <a class="type" href="#HepGeom::Point3D" title='HepGeom::Point3D' data-ref="HepGeom::Point3D">Point3D</a>&lt;<em>double</em>&gt; &amp; <dfn class="local col5 decl" id="55fr2" title='fr2' data-type='const Point3D&lt;double&gt; &amp;' data-ref="55fr2">fr2</dfn>,</td></tr>
+<tr><th id="224">224</th><td>		<em>const</em> <a class="type" href="#HepGeom::Point3D" title='HepGeom::Point3D' data-ref="HepGeom::Point3D">Point3D</a>&lt;<em>double</em>&gt; &amp; <dfn class="local col6 decl" id="56to0" title='to0' data-type='const Point3D&lt;double&gt; &amp;' data-ref="56to0">to0</dfn>,</td></tr>
+<tr><th id="225">225</th><td>		<em>const</em> <a class="type" href="#HepGeom::Point3D" title='HepGeom::Point3D' data-ref="HepGeom::Point3D">Point3D</a>&lt;<em>double</em>&gt; &amp; <dfn class="local col7 decl" id="57to1" title='to1' data-type='const Point3D&lt;double&gt; &amp;' data-ref="57to1">to1</dfn>,</td></tr>
+<tr><th id="226">226</th><td>		<em>const</em> <a class="type" href="#HepGeom::Point3D" title='HepGeom::Point3D' data-ref="HepGeom::Point3D">Point3D</a>&lt;<em>double</em>&gt; &amp; <dfn class="local col8 decl" id="58to2" title='to2' data-type='const Point3D&lt;double&gt; &amp;' data-ref="58to2">to2</dfn>);</td></tr>
+<tr><th id="227">227</th><td></td></tr>
+<tr><th id="228">228</th><td>    <i class="doc">/**</i></td></tr>
+<tr><th id="229">229</th><td><i class="doc">     * Copy constructor. */</i></td></tr>
+<tr><th id="230">230</th><td>    <dfn class="decl def" id="_ZN7HepGeom11Transform3DC1ERKS0_" title='HepGeom::Transform3D::Transform3D' data-ref="_ZN7HepGeom11Transform3DC1ERKS0_">Transform3D</dfn>(<em>const</em> <a class="type" href="#HepGeom::Transform3D" title='HepGeom::Transform3D' data-ref="HepGeom::Transform3D">Transform3D</a> &amp; <dfn class="local col9 decl" id="59m" title='m' data-type='const HepGeom::Transform3D &amp;' data-ref="59m">m</dfn>)</td></tr>
+<tr><th id="231">231</th><td>      : <a class="member" href="#HepGeom::Transform3D::xx_" title='HepGeom::Transform3D::xx_' data-ref="HepGeom::Transform3D::xx_">xx_</a>(<a class="local col9 ref" href="#59m" title='m' data-ref="59m">m</a>.<a class="member" href="#HepGeom::Transform3D::xx_" title='HepGeom::Transform3D::xx_' data-ref="HepGeom::Transform3D::xx_">xx_</a>), <a class="member" href="#HepGeom::Transform3D::xy_" title='HepGeom::Transform3D::xy_' data-ref="HepGeom::Transform3D::xy_">xy_</a>(<a class="local col9 ref" href="#59m" title='m' data-ref="59m">m</a>.<a class="member" href="#HepGeom::Transform3D::xy_" title='HepGeom::Transform3D::xy_' data-ref="HepGeom::Transform3D::xy_">xy_</a>), <a class="member" href="#HepGeom::Transform3D::xz_" title='HepGeom::Transform3D::xz_' data-ref="HepGeom::Transform3D::xz_">xz_</a>(<a class="local col9 ref" href="#59m" title='m' data-ref="59m">m</a>.<a class="member" href="#HepGeom::Transform3D::xz_" title='HepGeom::Transform3D::xz_' data-ref="HepGeom::Transform3D::xz_">xz_</a>), <a class="member" href="#HepGeom::Transform3D::dx_" title='HepGeom::Transform3D::dx_' data-ref="HepGeom::Transform3D::dx_">dx_</a>(<a class="local col9 ref" href="#59m" title='m' data-ref="59m">m</a>.<a class="member" href="#HepGeom::Transform3D::dx_" title='HepGeom::Transform3D::dx_' data-ref="HepGeom::Transform3D::dx_">dx_</a>),</td></tr>
+<tr><th id="232">232</th><td>	<a class="member" href="#HepGeom::Transform3D::yx_" title='HepGeom::Transform3D::yx_' data-ref="HepGeom::Transform3D::yx_">yx_</a>(<a class="local col9 ref" href="#59m" title='m' data-ref="59m">m</a>.<a class="member" href="#HepGeom::Transform3D::yx_" title='HepGeom::Transform3D::yx_' data-ref="HepGeom::Transform3D::yx_">yx_</a>), <a class="member" href="#HepGeom::Transform3D::yy_" title='HepGeom::Transform3D::yy_' data-ref="HepGeom::Transform3D::yy_">yy_</a>(<a class="local col9 ref" href="#59m" title='m' data-ref="59m">m</a>.<a class="member" href="#HepGeom::Transform3D::yy_" title='HepGeom::Transform3D::yy_' data-ref="HepGeom::Transform3D::yy_">yy_</a>), <a class="member" href="#HepGeom::Transform3D::yz_" title='HepGeom::Transform3D::yz_' data-ref="HepGeom::Transform3D::yz_">yz_</a>(<a class="local col9 ref" href="#59m" title='m' data-ref="59m">m</a>.<a class="member" href="#HepGeom::Transform3D::yz_" title='HepGeom::Transform3D::yz_' data-ref="HepGeom::Transform3D::yz_">yz_</a>), <a class="member" href="#HepGeom::Transform3D::dy_" title='HepGeom::Transform3D::dy_' data-ref="HepGeom::Transform3D::dy_">dy_</a>(<a class="local col9 ref" href="#59m" title='m' data-ref="59m">m</a>.<a class="member" href="#HepGeom::Transform3D::dy_" title='HepGeom::Transform3D::dy_' data-ref="HepGeom::Transform3D::dy_">dy_</a>),</td></tr>
+<tr><th id="233">233</th><td>	<a class="member" href="#HepGeom::Transform3D::zx_" title='HepGeom::Transform3D::zx_' data-ref="HepGeom::Transform3D::zx_">zx_</a>(<a class="local col9 ref" href="#59m" title='m' data-ref="59m">m</a>.<a class="member" href="#HepGeom::Transform3D::zx_" title='HepGeom::Transform3D::zx_' data-ref="HepGeom::Transform3D::zx_">zx_</a>), <a class="member" href="#HepGeom::Transform3D::zy_" title='HepGeom::Transform3D::zy_' data-ref="HepGeom::Transform3D::zy_">zy_</a>(<a class="local col9 ref" href="#59m" title='m' data-ref="59m">m</a>.<a class="member" href="#HepGeom::Transform3D::zy_" title='HepGeom::Transform3D::zy_' data-ref="HepGeom::Transform3D::zy_">zy_</a>), <a class="member" href="#HepGeom::Transform3D::zz_" title='HepGeom::Transform3D::zz_' data-ref="HepGeom::Transform3D::zz_">zz_</a>(<a class="local col9 ref" href="#59m" title='m' data-ref="59m">m</a>.<a class="member" href="#HepGeom::Transform3D::zz_" title='HepGeom::Transform3D::zz_' data-ref="HepGeom::Transform3D::zz_">zz_</a>), <a class="member" href="#HepGeom::Transform3D::dz_" title='HepGeom::Transform3D::dz_' data-ref="HepGeom::Transform3D::dz_">dz_</a>(<a class="local col9 ref" href="#59m" title='m' data-ref="59m">m</a>.<a class="member" href="#HepGeom::Transform3D::dz_" title='HepGeom::Transform3D::dz_' data-ref="HepGeom::Transform3D::dz_">dz_</a>) {}</td></tr>
+<tr><th id="234">234</th><td></td></tr>
+<tr><th id="235">235</th><td>    <i class="doc">/**</i></td></tr>
+<tr><th id="236">236</th><td><i class="doc">     * Destructor. </i></td></tr>
+<tr><th id="237">237</th><td><i class="doc">     * Virtual for now as some persistency mechanism needs that,</i></td></tr>
+<tr><th id="238">238</th><td><i class="doc">     * in future releases this might go away again.</i></td></tr>
+<tr><th id="239">239</th><td><i class="doc">     */</i></td></tr>
+<tr><th id="240">240</th><td>    <dfn class="decl def" id="_ZN7HepGeom11Transform3DD1Ev" title='HepGeom::Transform3D::~Transform3D' data-ref="_ZN7HepGeom11Transform3DD1Ev">~Transform3D</dfn>() { <i>/* nop */</i> }</td></tr>
+<tr><th id="241">241</th><td></td></tr>
+<tr><th id="242">242</th><td>    <i class="doc">/**</i></td></tr>
+<tr><th id="243">243</th><td><i class="doc">     * Returns object of the helper class for C-style subscripting r[i][j] */</i></td></tr>
+<tr><th id="244">244</th><td>    <b>inline</b> <em>const</em> <a class="type" href="#HepGeom::Transform3D::Transform3D_row" title='HepGeom::Transform3D::Transform3D_row' data-ref="HepGeom::Transform3D::Transform3D_row">Transform3D_row</a> <a class="decl" href="Transform3D.icc.html#_ZNK7HepGeom11Transform3DixEi" title='HepGeom::Transform3D::operator[]' data-ref="_ZNK7HepGeom11Transform3DixEi" id="_ZNK7HepGeom11Transform3DixEi"><b>operator</b> []</a> (<em>int</em>) <em>const</em>; </td></tr>
+<tr><th id="245">245</th><td></td></tr>
+<tr><th id="246">246</th><td>    <i class="doc">/** Fortran-style subscripting: returns (i,j) element of the matrix. */</i></td></tr>
+<tr><th id="247">247</th><td>    <em>double</em> <dfn class="decl" id="_ZNK7HepGeom11Transform3DclEii" title='HepGeom::Transform3D::operator()' data-ref="_ZNK7HepGeom11Transform3DclEii"><b>operator</b> ()</dfn> (<em>int</em>, <em>int</em>) <em>const</em>;</td></tr>
+<tr><th id="248">248</th><td></td></tr>
+<tr><th id="249">249</th><td>    <i class="doc">/**</i></td></tr>
+<tr><th id="250">250</th><td><i class="doc">     * Gets xx-element of the transformation matrix. */</i></td></tr>
+<tr><th id="251">251</th><td>    <em>double</em> <dfn class="decl def" id="_ZNK7HepGeom11Transform3D2xxEv" title='HepGeom::Transform3D::xx' data-ref="_ZNK7HepGeom11Transform3D2xxEv">xx</dfn>() <em>const</em> { <b>return</b> <a class="member" href="#HepGeom::Transform3D::xx_" title='HepGeom::Transform3D::xx_' data-ref="HepGeom::Transform3D::xx_">xx_</a>; }</td></tr>
+<tr><th id="252">252</th><td>    <i class="doc">/**</i></td></tr>
+<tr><th id="253">253</th><td><i class="doc">     * Gets xy-element of the transformation matrix. */</i></td></tr>
+<tr><th id="254">254</th><td>    <em>double</em> <dfn class="decl def" id="_ZNK7HepGeom11Transform3D2xyEv" title='HepGeom::Transform3D::xy' data-ref="_ZNK7HepGeom11Transform3D2xyEv">xy</dfn>() <em>const</em> { <b>return</b> <a class="member" href="#HepGeom::Transform3D::xy_" title='HepGeom::Transform3D::xy_' data-ref="HepGeom::Transform3D::xy_">xy_</a>; }</td></tr>
+<tr><th id="255">255</th><td>    <i class="doc">/**</i></td></tr>
+<tr><th id="256">256</th><td><i class="doc">     * Gets xz-element of the transformation matrix. */</i></td></tr>
+<tr><th id="257">257</th><td>    <em>double</em> <dfn class="decl def" id="_ZNK7HepGeom11Transform3D2xzEv" title='HepGeom::Transform3D::xz' data-ref="_ZNK7HepGeom11Transform3D2xzEv">xz</dfn>() <em>const</em> { <b>return</b> <a class="member" href="#HepGeom::Transform3D::xz_" title='HepGeom::Transform3D::xz_' data-ref="HepGeom::Transform3D::xz_">xz_</a>; }</td></tr>
+<tr><th id="258">258</th><td>    <i class="doc">/**</i></td></tr>
+<tr><th id="259">259</th><td><i class="doc">     * Gets yx-element of the transformation matrix. */</i></td></tr>
+<tr><th id="260">260</th><td>    <em>double</em> <dfn class="decl def" id="_ZNK7HepGeom11Transform3D2yxEv" title='HepGeom::Transform3D::yx' data-ref="_ZNK7HepGeom11Transform3D2yxEv">yx</dfn>() <em>const</em> { <b>return</b> <a class="member" href="#HepGeom::Transform3D::yx_" title='HepGeom::Transform3D::yx_' data-ref="HepGeom::Transform3D::yx_">yx_</a>; }</td></tr>
+<tr><th id="261">261</th><td>    <i class="doc">/**</i></td></tr>
+<tr><th id="262">262</th><td><i class="doc">     * Gets yy-element of the transformation matrix. */</i></td></tr>
+<tr><th id="263">263</th><td>    <em>double</em> <dfn class="decl def" id="_ZNK7HepGeom11Transform3D2yyEv" title='HepGeom::Transform3D::yy' data-ref="_ZNK7HepGeom11Transform3D2yyEv">yy</dfn>() <em>const</em> { <b>return</b> <a class="member" href="#HepGeom::Transform3D::yy_" title='HepGeom::Transform3D::yy_' data-ref="HepGeom::Transform3D::yy_">yy_</a>; }</td></tr>
+<tr><th id="264">264</th><td>    <i class="doc">/**</i></td></tr>
+<tr><th id="265">265</th><td><i class="doc">     * Gets yz-element of the transformation matrix. */</i></td></tr>
+<tr><th id="266">266</th><td>    <em>double</em> <dfn class="decl def" id="_ZNK7HepGeom11Transform3D2yzEv" title='HepGeom::Transform3D::yz' data-ref="_ZNK7HepGeom11Transform3D2yzEv">yz</dfn>() <em>const</em> { <b>return</b> <a class="member" href="#HepGeom::Transform3D::yz_" title='HepGeom::Transform3D::yz_' data-ref="HepGeom::Transform3D::yz_">yz_</a>; }</td></tr>
+<tr><th id="267">267</th><td>    <i class="doc">/** </i></td></tr>
+<tr><th id="268">268</th><td><i class="doc">     * Gets zx-element of the transformation matrix. */</i></td></tr>
+<tr><th id="269">269</th><td>    <em>double</em> <dfn class="decl def" id="_ZNK7HepGeom11Transform3D2zxEv" title='HepGeom::Transform3D::zx' data-ref="_ZNK7HepGeom11Transform3D2zxEv">zx</dfn>() <em>const</em> { <b>return</b> <a class="member" href="#HepGeom::Transform3D::zx_" title='HepGeom::Transform3D::zx_' data-ref="HepGeom::Transform3D::zx_">zx_</a>; }</td></tr>
+<tr><th id="270">270</th><td>    <i class="doc">/**</i></td></tr>
+<tr><th id="271">271</th><td><i class="doc">     * Gets zy-element of the transformation matrix. */</i></td></tr>
+<tr><th id="272">272</th><td>    <em>double</em> <dfn class="decl def" id="_ZNK7HepGeom11Transform3D2zyEv" title='HepGeom::Transform3D::zy' data-ref="_ZNK7HepGeom11Transform3D2zyEv">zy</dfn>() <em>const</em> { <b>return</b> <a class="member" href="#HepGeom::Transform3D::zy_" title='HepGeom::Transform3D::zy_' data-ref="HepGeom::Transform3D::zy_">zy_</a>; }</td></tr>
+<tr><th id="273">273</th><td>    <i class="doc">/**</i></td></tr>
+<tr><th id="274">274</th><td><i class="doc">     * Gets zz-element of the transformation matrix. */</i></td></tr>
+<tr><th id="275">275</th><td>    <em>double</em> <dfn class="decl def" id="_ZNK7HepGeom11Transform3D2zzEv" title='HepGeom::Transform3D::zz' data-ref="_ZNK7HepGeom11Transform3D2zzEv">zz</dfn>() <em>const</em> { <b>return</b> <a class="member" href="#HepGeom::Transform3D::zz_" title='HepGeom::Transform3D::zz_' data-ref="HepGeom::Transform3D::zz_">zz_</a>; }</td></tr>
+<tr><th id="276">276</th><td>    <i class="doc">/**</i></td></tr>
+<tr><th id="277">277</th><td><i class="doc">     * Gets dx-element of the transformation matrix. */</i></td></tr>
+<tr><th id="278">278</th><td>    <em>double</em> <dfn class="decl def" id="_ZNK7HepGeom11Transform3D2dxEv" title='HepGeom::Transform3D::dx' data-ref="_ZNK7HepGeom11Transform3D2dxEv">dx</dfn>() <em>const</em> { <b>return</b> <a class="member" href="#HepGeom::Transform3D::dx_" title='HepGeom::Transform3D::dx_' data-ref="HepGeom::Transform3D::dx_">dx_</a>; }</td></tr>
+<tr><th id="279">279</th><td>    <i class="doc">/**</i></td></tr>
+<tr><th id="280">280</th><td><i class="doc">     * Gets dy-element of the transformation matrix. */</i></td></tr>
+<tr><th id="281">281</th><td>    <em>double</em> <dfn class="decl def" id="_ZNK7HepGeom11Transform3D2dyEv" title='HepGeom::Transform3D::dy' data-ref="_ZNK7HepGeom11Transform3D2dyEv">dy</dfn>() <em>const</em> { <b>return</b> <a class="member" href="#HepGeom::Transform3D::dy_" title='HepGeom::Transform3D::dy_' data-ref="HepGeom::Transform3D::dy_">dy_</a>; }</td></tr>
+<tr><th id="282">282</th><td>    <i class="doc">/**</i></td></tr>
+<tr><th id="283">283</th><td><i class="doc">     * Gets dz-element of the transformation matrix. */</i></td></tr>
+<tr><th id="284">284</th><td>    <em>double</em> <dfn class="decl def" id="_ZNK7HepGeom11Transform3D2dzEv" title='HepGeom::Transform3D::dz' data-ref="_ZNK7HepGeom11Transform3D2dzEv">dz</dfn>() <em>const</em> { <b>return</b> <a class="member" href="#HepGeom::Transform3D::dz_" title='HepGeom::Transform3D::dz_' data-ref="HepGeom::Transform3D::dz_">dz_</a>; }</td></tr>
+<tr><th id="285">285</th><td>    </td></tr>
+<tr><th id="286">286</th><td>    <i class="doc">/**</i></td></tr>
+<tr><th id="287">287</th><td><i class="doc">     * Assignment. */</i></td></tr>
+<tr><th id="288">288</th><td>    <a class="type" href="#HepGeom::Transform3D" title='HepGeom::Transform3D' data-ref="HepGeom::Transform3D">Transform3D</a> &amp; <dfn class="decl def" id="_ZN7HepGeom11Transform3DaSERKS0_" title='HepGeom::Transform3D::operator=' data-ref="_ZN7HepGeom11Transform3DaSERKS0_"><b>operator</b>=</dfn>(<em>const</em> <a class="type" href="#HepGeom::Transform3D" title='HepGeom::Transform3D' data-ref="HepGeom::Transform3D">Transform3D</a> &amp;<dfn class="local col0 decl" id="60m" title='m' data-type='const HepGeom::Transform3D &amp;' data-ref="60m">m</dfn>) {</td></tr>
+<tr><th id="289">289</th><td>      <a class="member" href="#HepGeom::Transform3D::xx_" title='HepGeom::Transform3D::xx_' data-ref="HepGeom::Transform3D::xx_">xx_</a>= <a class="local col0 ref" href="#60m" title='m' data-ref="60m">m</a>.<a class="member" href="#HepGeom::Transform3D::xx_" title='HepGeom::Transform3D::xx_' data-ref="HepGeom::Transform3D::xx_">xx_</a>; <a class="member" href="#HepGeom::Transform3D::xy_" title='HepGeom::Transform3D::xy_' data-ref="HepGeom::Transform3D::xy_">xy_</a>= <a class="local col0 ref" href="#60m" title='m' data-ref="60m">m</a>.<a class="member" href="#HepGeom::Transform3D::xy_" title='HepGeom::Transform3D::xy_' data-ref="HepGeom::Transform3D::xy_">xy_</a>; <a class="member" href="#HepGeom::Transform3D::xz_" title='HepGeom::Transform3D::xz_' data-ref="HepGeom::Transform3D::xz_">xz_</a>= <a class="local col0 ref" href="#60m" title='m' data-ref="60m">m</a>.<a class="member" href="#HepGeom::Transform3D::xz_" title='HepGeom::Transform3D::xz_' data-ref="HepGeom::Transform3D::xz_">xz_</a>; <a class="member" href="#HepGeom::Transform3D::dx_" title='HepGeom::Transform3D::dx_' data-ref="HepGeom::Transform3D::dx_">dx_</a>= <a class="local col0 ref" href="#60m" title='m' data-ref="60m">m</a>.<a class="member" href="#HepGeom::Transform3D::dx_" title='HepGeom::Transform3D::dx_' data-ref="HepGeom::Transform3D::dx_">dx_</a>;</td></tr>
+<tr><th id="290">290</th><td>      <a class="member" href="#HepGeom::Transform3D::yx_" title='HepGeom::Transform3D::yx_' data-ref="HepGeom::Transform3D::yx_">yx_</a>= <a class="local col0 ref" href="#60m" title='m' data-ref="60m">m</a>.<a class="member" href="#HepGeom::Transform3D::yx_" title='HepGeom::Transform3D::yx_' data-ref="HepGeom::Transform3D::yx_">yx_</a>; <a class="member" href="#HepGeom::Transform3D::yy_" title='HepGeom::Transform3D::yy_' data-ref="HepGeom::Transform3D::yy_">yy_</a>= <a class="local col0 ref" href="#60m" title='m' data-ref="60m">m</a>.<a class="member" href="#HepGeom::Transform3D::yy_" title='HepGeom::Transform3D::yy_' data-ref="HepGeom::Transform3D::yy_">yy_</a>; <a class="member" href="#HepGeom::Transform3D::yz_" title='HepGeom::Transform3D::yz_' data-ref="HepGeom::Transform3D::yz_">yz_</a>= <a class="local col0 ref" href="#60m" title='m' data-ref="60m">m</a>.<a class="member" href="#HepGeom::Transform3D::yz_" title='HepGeom::Transform3D::yz_' data-ref="HepGeom::Transform3D::yz_">yz_</a>; <a class="member" href="#HepGeom::Transform3D::dy_" title='HepGeom::Transform3D::dy_' data-ref="HepGeom::Transform3D::dy_">dy_</a>= <a class="local col0 ref" href="#60m" title='m' data-ref="60m">m</a>.<a class="member" href="#HepGeom::Transform3D::dy_" title='HepGeom::Transform3D::dy_' data-ref="HepGeom::Transform3D::dy_">dy_</a>;</td></tr>
+<tr><th id="291">291</th><td>      <a class="member" href="#HepGeom::Transform3D::zx_" title='HepGeom::Transform3D::zx_' data-ref="HepGeom::Transform3D::zx_">zx_</a>= <a class="local col0 ref" href="#60m" title='m' data-ref="60m">m</a>.<a class="member" href="#HepGeom::Transform3D::zx_" title='HepGeom::Transform3D::zx_' data-ref="HepGeom::Transform3D::zx_">zx_</a>; <a class="member" href="#HepGeom::Transform3D::zy_" title='HepGeom::Transform3D::zy_' data-ref="HepGeom::Transform3D::zy_">zy_</a>= <a class="local col0 ref" href="#60m" title='m' data-ref="60m">m</a>.<a class="member" href="#HepGeom::Transform3D::zy_" title='HepGeom::Transform3D::zy_' data-ref="HepGeom::Transform3D::zy_">zy_</a>; <a class="member" href="#HepGeom::Transform3D::zz_" title='HepGeom::Transform3D::zz_' data-ref="HepGeom::Transform3D::zz_">zz_</a>= <a class="local col0 ref" href="#60m" title='m' data-ref="60m">m</a>.<a class="member" href="#HepGeom::Transform3D::zz_" title='HepGeom::Transform3D::zz_' data-ref="HepGeom::Transform3D::zz_">zz_</a>; <a class="member" href="#HepGeom::Transform3D::dz_" title='HepGeom::Transform3D::dz_' data-ref="HepGeom::Transform3D::dz_">dz_</a>= <a class="local col0 ref" href="#60m" title='m' data-ref="60m">m</a>.<a class="member" href="#HepGeom::Transform3D::dz_" title='HepGeom::Transform3D::dz_' data-ref="HepGeom::Transform3D::dz_">dz_</a>;</td></tr>
+<tr><th id="292">292</th><td>      <b>return</b> *<b>this</b>;</td></tr>
+<tr><th id="293">293</th><td>    }</td></tr>
+<tr><th id="294">294</th><td></td></tr>
+<tr><th id="295">295</th><td>    <i class="doc">/**</i></td></tr>
+<tr><th id="296">296</th><td><i class="doc">     * Sets the Identity transformation. */</i></td></tr>
+<tr><th id="297">297</th><td>    <em>void</em> <dfn class="decl def" id="_ZN7HepGeom11Transform3D11setIdentityEv" title='HepGeom::Transform3D::setIdentity' data-ref="_ZN7HepGeom11Transform3D11setIdentityEv">setIdentity</dfn>() { </td></tr>
+<tr><th id="298">298</th><td>      <a class="member" href="#HepGeom::Transform3D::xy_" title='HepGeom::Transform3D::xy_' data-ref="HepGeom::Transform3D::xy_">xy_</a>= <a class="member" href="#HepGeom::Transform3D::xz_" title='HepGeom::Transform3D::xz_' data-ref="HepGeom::Transform3D::xz_">xz_</a>= <a class="member" href="#HepGeom::Transform3D::dx_" title='HepGeom::Transform3D::dx_' data-ref="HepGeom::Transform3D::dx_">dx_</a>= <a class="member" href="#HepGeom::Transform3D::yx_" title='HepGeom::Transform3D::yx_' data-ref="HepGeom::Transform3D::yx_">yx_</a>= <a class="member" href="#HepGeom::Transform3D::yz_" title='HepGeom::Transform3D::yz_' data-ref="HepGeom::Transform3D::yz_">yz_</a>= <a class="member" href="#HepGeom::Transform3D::dy_" title='HepGeom::Transform3D::dy_' data-ref="HepGeom::Transform3D::dy_">dy_</a>= <a class="member" href="#HepGeom::Transform3D::zx_" title='HepGeom::Transform3D::zx_' data-ref="HepGeom::Transform3D::zx_">zx_</a>= <a class="member" href="#HepGeom::Transform3D::zy_" title='HepGeom::Transform3D::zy_' data-ref="HepGeom::Transform3D::zy_">zy_</a>= <a class="member" href="#HepGeom::Transform3D::dz_" title='HepGeom::Transform3D::dz_' data-ref="HepGeom::Transform3D::dz_">dz_</a>= <var>0</var>; <a class="member" href="#HepGeom::Transform3D::xx_" title='HepGeom::Transform3D::xx_' data-ref="HepGeom::Transform3D::xx_">xx_</a>= <a class="member" href="#HepGeom::Transform3D::yy_" title='HepGeom::Transform3D::yy_' data-ref="HepGeom::Transform3D::yy_">yy_</a>= <a class="member" href="#HepGeom::Transform3D::zz_" title='HepGeom::Transform3D::zz_' data-ref="HepGeom::Transform3D::zz_">zz_</a>= <var>1</var>;</td></tr>
+<tr><th id="299">299</th><td>    }</td></tr>
+<tr><th id="300">300</th><td>    </td></tr>
+<tr><th id="301">301</th><td>    <i class="doc">/**</i></td></tr>
+<tr><th id="302">302</th><td><i class="doc">     * Returns the inverse transformation. */</i></td></tr>
+<tr><th id="303">303</th><td>    <a class="type" href="#HepGeom::Transform3D" title='HepGeom::Transform3D' data-ref="HepGeom::Transform3D">Transform3D</a> <dfn class="decl" id="_ZNK7HepGeom11Transform3D7inverseEv" title='HepGeom::Transform3D::inverse' data-ref="_ZNK7HepGeom11Transform3D7inverseEv">inverse</dfn>() <em>const</em>;</td></tr>
+<tr><th id="304">304</th><td>    </td></tr>
+<tr><th id="305">305</th><td>    <i class="doc">/**</i></td></tr>
+<tr><th id="306">306</th><td><i class="doc">     * Transformation by another Transform3D. */</i></td></tr>
+<tr><th id="307">307</th><td>    <a class="type" href="#HepGeom::Transform3D" title='HepGeom::Transform3D' data-ref="HepGeom::Transform3D">Transform3D</a> <dfn class="decl" id="_ZNK7HepGeom11Transform3DmlERKS0_" title='HepGeom::Transform3D::operator*' data-ref="_ZNK7HepGeom11Transform3DmlERKS0_"><b>operator</b>*</dfn>(<em>const</em> <a class="type" href="#HepGeom::Transform3D" title='HepGeom::Transform3D' data-ref="HepGeom::Transform3D">Transform3D</a> &amp; <dfn class="local col1 decl" id="61b" title='b' data-type='const HepGeom::Transform3D &amp;' data-ref="61b">b</dfn>) <em>const</em>;</td></tr>
+<tr><th id="308">308</th><td>    </td></tr>
+<tr><th id="309">309</th><td>    <i class="doc">/**</i></td></tr>
+<tr><th id="310">310</th><td><i class="doc">     * Decomposition of general transformation.</i></td></tr>
+<tr><th id="311">311</th><td><i class="doc">     * This function gets decomposition of the transformation</i></td></tr>
+<tr><th id="312">312</th><td><i class="doc">     * in three consequentive specific transformations: Scale3D,</i></td></tr>
+<tr><th id="313">313</th><td><i class="doc">     * then Rotate3D, then Translate3, i.e.</i></td></tr>
+<tr><th id="314">314</th><td><i class="doc">     * <span class="command">@code</span></i></td></tr>
+<tr><th id="315">315</th><td><i class="doc">     *<span class="verb">   Transform3D = Translate3D * Rotate3D * Scale3D</span></i></td></tr>
+<tr><th id="316">316</th><td><i class="doc"><span class="verb"></span>     * @endcode</i></td></tr>
+<tr><th id="317">317</th><td><i class="doc">     *</i></td></tr>
+<tr><th id="318">318</th><td><i class="doc">     * <span class="command">@param</span> <span class="arg">scale</span>       output: scaling transformation;</i></td></tr>
+<tr><th id="319">319</th><td><i class="doc">     *                    if there was a reflection, then scale factor for</i></td></tr>
+<tr><th id="320">320</th><td><i class="doc">     *                    z-component (scale(2,2)) will be negative.</i></td></tr>
+<tr><th id="321">321</th><td><i class="doc">     * <span class="command">@param</span> <span class="arg">rotation</span>    output: rotation transformaion.</i></td></tr>
+<tr><th id="322">322</th><td><i class="doc">     * <span class="command">@param</span> <span class="arg">translation</span> output: translation transformaion.</i></td></tr>
+<tr><th id="323">323</th><td><i class="doc">     */</i></td></tr>
+<tr><th id="324">324</th><td>    <em>void</em> <dfn class="decl" id="_ZNK7HepGeom11Transform3D16getDecompositionERNS_7Scale3DERNS_8Rotate3DERNS_11Translate3DE" title='HepGeom::Transform3D::getDecomposition' data-ref="_ZNK7HepGeom11Transform3D16getDecompositionERNS_7Scale3DERNS_8Rotate3DERNS_11Translate3DE">getDecomposition</dfn>(<a class="type" href="#HepGeom::Scale3D" title='HepGeom::Scale3D' data-ref="HepGeom::Scale3D">Scale3D</a> &amp; <dfn class="local col2 decl" id="62scale" title='scale' data-type='HepGeom::Scale3D &amp;' data-ref="62scale">scale</dfn>,</td></tr>
+<tr><th id="325">325</th><td>			  <a class="type" href="#HepGeom::Rotate3D" title='HepGeom::Rotate3D' data-ref="HepGeom::Rotate3D">Rotate3D</a> &amp; <dfn class="local col3 decl" id="63rotation" title='rotation' data-type='HepGeom::Rotate3D &amp;' data-ref="63rotation">rotation</dfn>,</td></tr>
+<tr><th id="326">326</th><td>			  <a class="type" href="#HepGeom::Translate3D" title='HepGeom::Translate3D' data-ref="HepGeom::Translate3D">Translate3D</a> &amp; <dfn class="local col4 decl" id="64translation" title='translation' data-type='HepGeom::Translate3D &amp;' data-ref="64translation">translation</dfn>) <em>const</em>;</td></tr>
+<tr><th id="327">327</th><td></td></tr>
+<tr><th id="328">328</th><td>    <i class="doc">/**</i></td></tr>
+<tr><th id="329">329</th><td><i class="doc">     * Returns true if the difference between corresponding</i></td></tr>
+<tr><th id="330">330</th><td><i class="doc">     * matrix elements is less than the tolerance.</i></td></tr>
+<tr><th id="331">331</th><td><i class="doc">     */</i></td></tr>
+<tr><th id="332">332</th><td>    <em>bool</em> <dfn class="decl" id="_ZNK7HepGeom11Transform3D6isNearERKS0_d" title='HepGeom::Transform3D::isNear' data-ref="_ZNK7HepGeom11Transform3D6isNearERKS0_d">isNear</dfn>(<em>const</em> <a class="type" href="#HepGeom::Transform3D" title='HepGeom::Transform3D' data-ref="HepGeom::Transform3D">Transform3D</a> &amp; <dfn class="local col5 decl" id="65t" title='t' data-type='const HepGeom::Transform3D &amp;' data-ref="65t">t</dfn>, <em>double</em> <dfn class="local col6 decl" id="66tolerance" title='tolerance' data-type='double' data-ref="66tolerance">tolerance</dfn> = <var>2.2E-14</var> ) <em>const</em>;</td></tr>
+<tr><th id="333">333</th><td></td></tr>
+<tr><th id="334">334</th><td>    <i class="doc">/**</i></td></tr>
+<tr><th id="335">335</th><td><i class="doc">     * Extracts the rotation matrix.</i></td></tr>
+<tr><th id="336">336</th><td><i class="doc">     * This functions is obsolete - use getDecomposition() instead.</i></td></tr>
+<tr><th id="337">337</th><td><i class="doc">     */</i></td></tr>
+<tr><th id="338">338</th><td>    <b>inline</b> <span class="namespace">CLHEP::</span><a class="type" href="../Vector/Rotation.h.html#CLHEP::HepRotation" title='CLHEP::HepRotation' data-ref="CLHEP::HepRotation">HepRotation</a> <a class="decl" href="Transform3D.icc.html#_ZNK7HepGeom11Transform3D11getRotationEv" title='HepGeom::Transform3D::getRotation' data-ref="_ZNK7HepGeom11Transform3D11getRotationEv" id="_ZNK7HepGeom11Transform3D11getRotationEv">getRotation</a>() <em>const</em>;</td></tr>
+<tr><th id="339">339</th><td>    </td></tr>
+<tr><th id="340">340</th><td>    <i class="doc">/**</i></td></tr>
+<tr><th id="341">341</th><td><i class="doc">     * Extracts the translation vector.</i></td></tr>
+<tr><th id="342">342</th><td><i class="doc">     * This functions is obsolete - use getDecomposition() instead.</i></td></tr>
+<tr><th id="343">343</th><td><i class="doc">     */</i></td></tr>
+<tr><th id="344">344</th><td>    <b>inline</b> <span class="namespace">CLHEP::</span><a class="type" href="../Vector/ThreeVector.h.html#CLHEP::Hep3Vector" title='CLHEP::Hep3Vector' data-ref="CLHEP::Hep3Vector">Hep3Vector</a> <a class="decl" href="Transform3D.icc.html#_ZNK7HepGeom11Transform3D14getTranslationEv" title='HepGeom::Transform3D::getTranslation' data-ref="_ZNK7HepGeom11Transform3D14getTranslationEv" id="_ZNK7HepGeom11Transform3D14getTranslationEv">getTranslation</a>() <em>const</em>;</td></tr>
+<tr><th id="345">345</th><td>    </td></tr>
+<tr><th id="346">346</th><td>    <i class="doc">/**</i></td></tr>
+<tr><th id="347">347</th><td><i class="doc">     * Test for equality. */</i></td></tr>
+<tr><th id="348">348</th><td>    <em>bool</em> <dfn class="decl" id="_ZNK7HepGeom11Transform3DeqERKS0_" title='HepGeom::Transform3D::operator==' data-ref="_ZNK7HepGeom11Transform3DeqERKS0_"><b>operator</b> ==</dfn> (<em>const</em> <a class="type" href="#HepGeom::Transform3D" title='HepGeom::Transform3D' data-ref="HepGeom::Transform3D">Transform3D</a> &amp; <dfn class="local col7 decl" id="67transform" title='transform' data-type='const HepGeom::Transform3D &amp;' data-ref="67transform">transform</dfn>) <em>const</em>;</td></tr>
+<tr><th id="349">349</th><td>    </td></tr>
+<tr><th id="350">350</th><td>    <i class="doc">/**</i></td></tr>
+<tr><th id="351">351</th><td><i class="doc">     * Test for inequality. */</i></td></tr>
+<tr><th id="352">352</th><td>    <em>bool</em> <dfn class="decl def" id="_ZNK7HepGeom11Transform3DneERKS0_" title='HepGeom::Transform3D::operator!=' data-ref="_ZNK7HepGeom11Transform3DneERKS0_"><b>operator</b> !=</dfn> (<em>const</em> <a class="type" href="#HepGeom::Transform3D" title='HepGeom::Transform3D' data-ref="HepGeom::Transform3D">Transform3D</a> &amp; <dfn class="local col8 decl" id="68transform" title='transform' data-type='const HepGeom::Transform3D &amp;' data-ref="68transform">transform</dfn>) <em>const</em> {</td></tr>
+<tr><th id="353">353</th><td>      <b>return</b> ! <a class="member" href="#_ZNK7HepGeom11Transform3DeqERKS0_" title='HepGeom::Transform3D::operator==' data-ref="_ZNK7HepGeom11Transform3DeqERKS0_"><b>operator</b>==</a>(<a class="local col8 ref" href="#68transform" title='transform' data-ref="68transform">transform</a>);</td></tr>
+<tr><th id="354">354</th><td>    }</td></tr>
+<tr><th id="355">355</th><td>  };</td></tr>
+<tr><th id="356">356</th><td></td></tr>
+<tr><th id="357">357</th><td>  <i>//   R O T A T I O N S</i></td></tr>
+<tr><th id="358">358</th><td></td></tr>
+<tr><th id="359">359</th><td>  <i class="doc">/**</i></td></tr>
+<tr><th id="360">360</th><td><i class="doc">   * Constructs a rotation transformation.</i></td></tr>
+<tr><th id="361">361</th><td><i class="doc">   * This class provides additional constructors for Transform3D</i></td></tr>
+<tr><th id="362">362</th><td><i class="doc">   * and should not be used as a separate class.</i></td></tr>
+<tr><th id="363">363</th><td><i class="doc">   * </i></td></tr>
+<tr><th id="364">364</th><td><i class="doc">   * Example of use:</i></td></tr>
+<tr><th id="365">365</th><td><i class="doc">   * <span class="command">@code</span></i></td></tr>
+<tr><th id="366">366</th><td><i class="doc">   *<span class="verb">   Transform3D m;</span></i></td></tr>
+<tr><th id="367">367</th><td><i class="doc"><span class="verb"></span>   *<span class="verb">   m = Rotate3D(30.*deg, HepVector3D(1.,1.,1.));</span></i></td></tr>
+<tr><th id="368">368</th><td><i class="doc"><span class="verb"></span>   * @endcode</i></td></tr>
+<tr><th id="369">369</th><td><i class="doc">   *</i></td></tr>
+<tr><th id="370">370</th><td><i class="doc">   * <span class="command">@author</span> &lt;Evgueni.Tcherniae<span class="command">v@cern</span>.ch&gt;</i></td></tr>
+<tr><th id="371">371</th><td><i class="doc">   * <span class="command">@ingroup</span> <span class="verb">geometry</span></i></td></tr>
+<tr><th id="372">372</th><td><i class="doc">   */</i></td></tr>
+<tr><th id="373">373</th><td>  <b>class</b> <dfn class="type def" id="HepGeom::Rotate3D" title='HepGeom::Rotate3D' data-ref="HepGeom::Rotate3D">Rotate3D</dfn> : <b>public</b> <a class="type" href="#HepGeom::Transform3D" title='HepGeom::Transform3D' data-ref="HepGeom::Transform3D">Transform3D</a> {</td></tr>
+<tr><th id="374">374</th><td>  <b>public</b>:</td></tr>
+<tr><th id="375">375</th><td>    <i class="doc">/**</i></td></tr>
+<tr><th id="376">376</th><td><i class="doc">     * Default constructor: sets the Identity transformation. */</i></td></tr>
+<tr><th id="377">377</th><td>    <dfn class="decl def" id="_ZN7HepGeom8Rotate3DC1Ev" title='HepGeom::Rotate3D::Rotate3D' data-ref="_ZN7HepGeom8Rotate3DC1Ev">Rotate3D</dfn>() : <a class="type" href="#HepGeom::Transform3D" title='HepGeom::Transform3D' data-ref="HepGeom::Transform3D">Transform3D</a><a class="ref" href="#_ZN7HepGeom11Transform3DC1Ev" title='HepGeom::Transform3D::Transform3D' data-ref="_ZN7HepGeom11Transform3DC1Ev">(</a>) {}</td></tr>
+<tr><th id="378">378</th><td>    </td></tr>
+<tr><th id="379">379</th><td>    <i class="doc">/**</i></td></tr>
+<tr><th id="380">380</th><td><i class="doc">     * Constructor from CLHEP::HepRotation. */</i></td></tr>
+<tr><th id="381">381</th><td>    <b>inline</b> <a class="decl" href="Transform3D.icc.html#_ZN7HepGeom8Rotate3DC1ERKN5CLHEP11HepRotationE" title='HepGeom::Rotate3D::Rotate3D' data-ref="_ZN7HepGeom8Rotate3DC1ERKN5CLHEP11HepRotationE" id="_ZN7HepGeom8Rotate3DC1ERKN5CLHEP11HepRotationE">Rotate3D</a>(<em>const</em> <span class="namespace">CLHEP::</span><a class="type" href="../Vector/Rotation.h.html#CLHEP::HepRotation" title='CLHEP::HepRotation' data-ref="CLHEP::HepRotation">HepRotation</a> &amp;<dfn class="local col9 decl" id="69m" title='m' data-type='const CLHEP::HepRotation &amp;' data-ref="69m">m</dfn>);</td></tr>
+<tr><th id="382">382</th><td></td></tr>
+<tr><th id="383">383</th><td>    <i class="doc">/**</i></td></tr>
+<tr><th id="384">384</th><td><i class="doc">     * Constructor from angle and axis given by two points.</i></td></tr>
+<tr><th id="385">385</th><td><i class="doc">     * <span class="command">@param</span> <span class="arg">a</span>  angle of rotation</i></td></tr>
+<tr><th id="386">386</th><td><i class="doc">     * <span class="command">@param</span> <span class="arg">p1</span> begin point of the axis</i></td></tr>
+<tr><th id="387">387</th><td><i class="doc">     * <span class="command">@param</span> <span class="arg">p2</span> end point of the axis</i></td></tr>
+<tr><th id="388">388</th><td><i class="doc">     */</i></td></tr>
+<tr><th id="389">389</th><td>    <dfn class="decl" id="_ZN7HepGeom8Rotate3DC1EdRKNS_7Point3DIdEES4_" title='HepGeom::Rotate3D::Rotate3D' data-ref="_ZN7HepGeom8Rotate3DC1EdRKNS_7Point3DIdEES4_">Rotate3D</dfn>(<em>double</em> <dfn class="local col0 decl" id="70a" title='a' data-type='double' data-ref="70a">a</dfn>,</td></tr>
+<tr><th id="390">390</th><td>	     <em>const</em> <a class="type" href="#HepGeom::Point3D" title='HepGeom::Point3D' data-ref="HepGeom::Point3D">Point3D</a>&lt;<em>double</em>&gt; &amp; <dfn class="local col1 decl" id="71p1" title='p1' data-type='const Point3D&lt;double&gt; &amp;' data-ref="71p1">p1</dfn>,</td></tr>
+<tr><th id="391">391</th><td>	     <em>const</em> <a class="type" href="#HepGeom::Point3D" title='HepGeom::Point3D' data-ref="HepGeom::Point3D">Point3D</a>&lt;<em>double</em>&gt; &amp; <dfn class="local col2 decl" id="72p2" title='p2' data-type='const Point3D&lt;double&gt; &amp;' data-ref="72p2">p2</dfn>);</td></tr>
+<tr><th id="392">392</th><td>    </td></tr>
+<tr><th id="393">393</th><td>    <i class="doc">/**</i></td></tr>
+<tr><th id="394">394</th><td><i class="doc">     * Constructor from angle and axis.</i></td></tr>
+<tr><th id="395">395</th><td><i class="doc">     * <span class="command">@param</span> <span class="arg">a</span> angle of rotation</i></td></tr>
+<tr><th id="396">396</th><td><i class="doc">     * <span class="command">@param</span> <span class="arg">v</span> axis of rotation</i></td></tr>
+<tr><th id="397">397</th><td><i class="doc">     */</i></td></tr>
+<tr><th id="398">398</th><td>    <b>inline</b> <a class="decl" href="Transform3D.icc.html#_ZN7HepGeom8Rotate3DC1EdRKNS_8Vector3DIdEE" title='HepGeom::Rotate3D::Rotate3D' data-ref="_ZN7HepGeom8Rotate3DC1EdRKNS_8Vector3DIdEE" id="_ZN7HepGeom8Rotate3DC1EdRKNS_8Vector3DIdEE">Rotate3D</a>(<em>double</em> <dfn class="local col3 decl" id="73a" title='a' data-type='double' data-ref="73a">a</dfn>, <em>const</em> <a class="type" href="#HepGeom::Vector3D" title='HepGeom::Vector3D' data-ref="HepGeom::Vector3D">Vector3D</a>&lt;<em>double</em>&gt; &amp; <dfn class="local col4 decl" id="74v" title='v' data-type='const Vector3D&lt;double&gt; &amp;' data-ref="74v">v</dfn>);</td></tr>
+<tr><th id="399">399</th><td></td></tr>
+<tr><th id="400">400</th><td>    <i class="doc">/**</i></td></tr>
+<tr><th id="401">401</th><td><i class="doc">     * Constructor for rotation given by original and rotated position of</i></td></tr>
+<tr><th id="402">402</th><td><i class="doc">     * two points. It is assumed that there is no reflection.</i></td></tr>
+<tr><th id="403">403</th><td><i class="doc">     * <span class="command">@param</span> <span class="arg">fr1</span> original position of 1st point</i></td></tr>
+<tr><th id="404">404</th><td><i class="doc">     * <span class="command">@param</span> <span class="arg">fr2</span> original position of 2nd point</i></td></tr>
+<tr><th id="405">405</th><td><i class="doc">     * <span class="command">@param</span> <span class="arg">to1</span> rotated position of 1st point</i></td></tr>
+<tr><th id="406">406</th><td><i class="doc">     * <span class="command">@param</span> <span class="arg">to2</span> rotated position of 2nd point</i></td></tr>
+<tr><th id="407">407</th><td><i class="doc">     */</i></td></tr>
+<tr><th id="408">408</th><td>    <b>inline</b> <a class="decl" href="Transform3D.icc.html#_ZN7HepGeom8Rotate3DC1ERKNS_7Point3DIdEES4_S4_S4_" title='HepGeom::Rotate3D::Rotate3D' data-ref="_ZN7HepGeom8Rotate3DC1ERKNS_7Point3DIdEES4_S4_S4_" id="_ZN7HepGeom8Rotate3DC1ERKNS_7Point3DIdEES4_S4_S4_">Rotate3D</a>(<em>const</em> <a class="type" href="#HepGeom::Point3D" title='HepGeom::Point3D' data-ref="HepGeom::Point3D">Point3D</a>&lt;<em>double</em>&gt; &amp; <dfn class="local col5 decl" id="75fr1" title='fr1' data-type='const Point3D&lt;double&gt; &amp;' data-ref="75fr1">fr1</dfn>,</td></tr>
+<tr><th id="409">409</th><td>		    <em>const</em> <a class="type" href="#HepGeom::Point3D" title='HepGeom::Point3D' data-ref="HepGeom::Point3D">Point3D</a>&lt;<em>double</em>&gt; &amp; <dfn class="local col6 decl" id="76fr2" title='fr2' data-type='const Point3D&lt;double&gt; &amp;' data-ref="76fr2">fr2</dfn>,</td></tr>
+<tr><th id="410">410</th><td>		    <em>const</em> <a class="type" href="#HepGeom::Point3D" title='HepGeom::Point3D' data-ref="HepGeom::Point3D">Point3D</a>&lt;<em>double</em>&gt; &amp; <dfn class="local col7 decl" id="77to1" title='to1' data-type='const Point3D&lt;double&gt; &amp;' data-ref="77to1">to1</dfn>,</td></tr>
+<tr><th id="411">411</th><td>		    <em>const</em> <a class="type" href="#HepGeom::Point3D" title='HepGeom::Point3D' data-ref="HepGeom::Point3D">Point3D</a>&lt;<em>double</em>&gt; &amp; <dfn class="local col8 decl" id="78to2" title='to2' data-type='const Point3D&lt;double&gt; &amp;' data-ref="78to2">to2</dfn>);</td></tr>
+<tr><th id="412">412</th><td>  };</td></tr>
+<tr><th id="413">413</th><td></td></tr>
+<tr><th id="414">414</th><td>  <i class="doc">/**</i></td></tr>
+<tr><th id="415">415</th><td><i class="doc">   * Constructs a rotation around x-axis.</i></td></tr>
+<tr><th id="416">416</th><td><i class="doc">   * This class provides additional constructors for Transform3D</i></td></tr>
+<tr><th id="417">417</th><td><i class="doc">   * and should not be used as a separate class.</i></td></tr>
+<tr><th id="418">418</th><td><i class="doc">   * </i></td></tr>
+<tr><th id="419">419</th><td><i class="doc">   * Example of use:</i></td></tr>
+<tr><th id="420">420</th><td><i class="doc">   * <span class="command">@code</span></i></td></tr>
+<tr><th id="421">421</th><td><i class="doc">   *<span class="verb">   Transform3D m;</span></i></td></tr>
+<tr><th id="422">422</th><td><i class="doc"><span class="verb"></span>   *<span class="verb">   m = RotateX3D(30.*deg);</span></i></td></tr>
+<tr><th id="423">423</th><td><i class="doc"><span class="verb"></span>   * @endcode</i></td></tr>
+<tr><th id="424">424</th><td><i class="doc">   *</i></td></tr>
+<tr><th id="425">425</th><td><i class="doc">   * <span class="command">@author</span> &lt;Evgueni.Tcherniae<span class="command">v@cern</span>.ch&gt;</i></td></tr>
+<tr><th id="426">426</th><td><i class="doc">   * <span class="command">@ingroup</span> <span class="verb">geometry</span></i></td></tr>
+<tr><th id="427">427</th><td><i class="doc">   */</i></td></tr>
+<tr><th id="428">428</th><td>  <b>class</b> <dfn class="type def" id="HepGeom::RotateX3D" title='HepGeom::RotateX3D' data-ref="HepGeom::RotateX3D">RotateX3D</dfn> : <b>public</b> <a class="type" href="#HepGeom::Rotate3D" title='HepGeom::Rotate3D' data-ref="HepGeom::Rotate3D">Rotate3D</a> {</td></tr>
+<tr><th id="429">429</th><td>  <b>public</b>:</td></tr>
+<tr><th id="430">430</th><td>    <i class="doc">/**</i></td></tr>
+<tr><th id="431">431</th><td><i class="doc">     * Default constructor: sets the Identity transformation. */</i></td></tr>
+<tr><th id="432">432</th><td>    <dfn class="decl def" id="_ZN7HepGeom9RotateX3DC1Ev" title='HepGeom::RotateX3D::RotateX3D' data-ref="_ZN7HepGeom9RotateX3DC1Ev">RotateX3D</dfn>() : <a class="type" href="#HepGeom::Rotate3D" title='HepGeom::Rotate3D' data-ref="HepGeom::Rotate3D">Rotate3D</a><a class="ref" href="#_ZN7HepGeom8Rotate3DC1Ev" title='HepGeom::Rotate3D::Rotate3D' data-ref="_ZN7HepGeom8Rotate3DC1Ev">(</a>) {}</td></tr>
+<tr><th id="433">433</th><td>    </td></tr>
+<tr><th id="434">434</th><td>    <i class="doc">/**</i></td></tr>
+<tr><th id="435">435</th><td><i class="doc">     * Constructs a rotation around x-axis by angle a. */</i></td></tr>
+<tr><th id="436">436</th><td>    <dfn class="decl def" id="_ZN7HepGeom9RotateX3DC1Ed" title='HepGeom::RotateX3D::RotateX3D' data-ref="_ZN7HepGeom9RotateX3DC1Ed">RotateX3D</dfn>(<em>double</em> <dfn class="local col9 decl" id="79a" title='a' data-type='double' data-ref="79a">a</dfn>) {</td></tr>
+<tr><th id="437">437</th><td>      <em>double</em> <dfn class="local col0 decl" id="80cosa" title='cosa' data-type='double' data-ref="80cosa">cosa</dfn> = <span class='error' title="use of undeclared identifier &apos;std&apos;">std</span>::cos(a), <dfn class="local col1 decl" id="81sina" title='sina' data-type='double' data-ref="81sina">sina</dfn> = <span class='error' title="use of undeclared identifier &apos;std&apos;">std</span>::sin(a); </td></tr>
+<tr><th id="438">438</th><td>      <a class="member" href="#_ZN7HepGeom11Transform3D12setTransformEdddddddddddd" title='HepGeom::Transform3D::setTransform' data-ref="_ZN7HepGeom11Transform3D12setTransformEdddddddddddd">setTransform</a>(<var>1</var>,<var>0</var>,<var>0</var>,<var>0</var>,  <var>0</var>,<a class="local col0 ref" href="#80cosa" title='cosa' data-ref="80cosa">cosa</a>,-<a class="local col1 ref" href="#81sina" title='sina' data-ref="81sina">sina</a>,<var>0</var>,  <var>0</var>,<a class="local col1 ref" href="#81sina" title='sina' data-ref="81sina">sina</a>,<a class="local col0 ref" href="#80cosa" title='cosa' data-ref="80cosa">cosa</a>,<var>0</var>);</td></tr>
+<tr><th id="439">439</th><td>    }</td></tr>
+<tr><th id="440">440</th><td>  };</td></tr>
+<tr><th id="441">441</th><td></td></tr>
+<tr><th id="442">442</th><td>  <i class="doc">/**</i></td></tr>
+<tr><th id="443">443</th><td><i class="doc">   * Constructs a rotation around y-axis.</i></td></tr>
+<tr><th id="444">444</th><td><i class="doc">   * This class provides additional constructors for Transform3D</i></td></tr>
+<tr><th id="445">445</th><td><i class="doc">   * and should not be used as a separate class.</i></td></tr>
+<tr><th id="446">446</th><td><i class="doc">   * </i></td></tr>
+<tr><th id="447">447</th><td><i class="doc">   * Example of use:</i></td></tr>
+<tr><th id="448">448</th><td><i class="doc">   * <span class="command">@code</span></i></td></tr>
+<tr><th id="449">449</th><td><i class="doc">   *<span class="verb">   Transform3D m;</span></i></td></tr>
+<tr><th id="450">450</th><td><i class="doc"><span class="verb"></span>   *<span class="verb">   m = RotateY3D(30.*deg);</span></i></td></tr>
+<tr><th id="451">451</th><td><i class="doc"><span class="verb"></span>   * @endcode</i></td></tr>
+<tr><th id="452">452</th><td><i class="doc">   *</i></td></tr>
+<tr><th id="453">453</th><td><i class="doc">   * <span class="command">@author</span> &lt;Evgueni.Tcherniae<span class="command">v@cern</span>.ch&gt;</i></td></tr>
+<tr><th id="454">454</th><td><i class="doc">   * <span class="command">@ingroup</span> <span class="verb">geometry</span></i></td></tr>
+<tr><th id="455">455</th><td><i class="doc">   */</i></td></tr>
+<tr><th id="456">456</th><td>  <b>class</b> <dfn class="type def" id="HepGeom::RotateY3D" title='HepGeom::RotateY3D' data-ref="HepGeom::RotateY3D">RotateY3D</dfn> : <b>public</b> <a class="type" href="#HepGeom::Rotate3D" title='HepGeom::Rotate3D' data-ref="HepGeom::Rotate3D">Rotate3D</a> {</td></tr>
+<tr><th id="457">457</th><td>  <b>public</b>:</td></tr>
+<tr><th id="458">458</th><td>    <i class="doc">/**</i></td></tr>
+<tr><th id="459">459</th><td><i class="doc">     * Default constructor: sets the Identity transformation. */</i></td></tr>
+<tr><th id="460">460</th><td>    <dfn class="decl def" id="_ZN7HepGeom9RotateY3DC1Ev" title='HepGeom::RotateY3D::RotateY3D' data-ref="_ZN7HepGeom9RotateY3DC1Ev">RotateY3D</dfn>() : <a class="type" href="#HepGeom::Rotate3D" title='HepGeom::Rotate3D' data-ref="HepGeom::Rotate3D">Rotate3D</a><a class="ref" href="#_ZN7HepGeom8Rotate3DC1Ev" title='HepGeom::Rotate3D::Rotate3D' data-ref="_ZN7HepGeom8Rotate3DC1Ev">(</a>) {}</td></tr>
+<tr><th id="461">461</th><td>    </td></tr>
+<tr><th id="462">462</th><td>    <i class="doc">/**</i></td></tr>
+<tr><th id="463">463</th><td><i class="doc">     * Constructs a rotation around y-axis by angle a. */</i></td></tr>
+<tr><th id="464">464</th><td>    <dfn class="decl def" id="_ZN7HepGeom9RotateY3DC1Ed" title='HepGeom::RotateY3D::RotateY3D' data-ref="_ZN7HepGeom9RotateY3DC1Ed">RotateY3D</dfn>(<em>double</em> <dfn class="local col2 decl" id="82a" title='a' data-type='double' data-ref="82a">a</dfn>) {</td></tr>
+<tr><th id="465">465</th><td>      <em>double</em> <dfn class="local col3 decl" id="83cosa" title='cosa' data-type='double' data-ref="83cosa">cosa</dfn> = <span class='error' title="use of undeclared identifier &apos;std&apos;">std</span>::cos(a), <dfn class="local col4 decl" id="84sina" title='sina' data-type='double' data-ref="84sina">sina</dfn> = <span class='error' title="use of undeclared identifier &apos;std&apos;">std</span>::sin(a); </td></tr>
+<tr><th id="466">466</th><td>      <a class="member" href="#_ZN7HepGeom11Transform3D12setTransformEdddddddddddd" title='HepGeom::Transform3D::setTransform' data-ref="_ZN7HepGeom11Transform3D12setTransformEdddddddddddd">setTransform</a>(<a class="local col3 ref" href="#83cosa" title='cosa' data-ref="83cosa">cosa</a>,<var>0</var>,<a class="local col4 ref" href="#84sina" title='sina' data-ref="84sina">sina</a>,<var>0</var>,  <var>0</var>,<var>1</var>,<var>0</var>,<var>0</var>,  -<a class="local col4 ref" href="#84sina" title='sina' data-ref="84sina">sina</a>,<var>0</var>,<a class="local col3 ref" href="#83cosa" title='cosa' data-ref="83cosa">cosa</a>,<var>0</var>);</td></tr>
+<tr><th id="467">467</th><td>    }</td></tr>
+<tr><th id="468">468</th><td>  };</td></tr>
+<tr><th id="469">469</th><td></td></tr>
+<tr><th id="470">470</th><td>  <i class="doc">/**</i></td></tr>
+<tr><th id="471">471</th><td><i class="doc">   * Constructs a rotation around z-axis.</i></td></tr>
+<tr><th id="472">472</th><td><i class="doc">   * This class provides additional constructors for Transform3D</i></td></tr>
+<tr><th id="473">473</th><td><i class="doc">   * and should not be used as a separate class.</i></td></tr>
+<tr><th id="474">474</th><td><i class="doc">   * </i></td></tr>
+<tr><th id="475">475</th><td><i class="doc">   * Example of use:</i></td></tr>
+<tr><th id="476">476</th><td><i class="doc">   * <span class="command">@code</span></i></td></tr>
+<tr><th id="477">477</th><td><i class="doc">   *<span class="verb">   Transform3D m;</span></i></td></tr>
+<tr><th id="478">478</th><td><i class="doc"><span class="verb"></span>   *<span class="verb">   m = RotateZ3D(30.*deg);</span></i></td></tr>
+<tr><th id="479">479</th><td><i class="doc"><span class="verb"></span>   * @endcode</i></td></tr>
+<tr><th id="480">480</th><td><i class="doc">   *</i></td></tr>
+<tr><th id="481">481</th><td><i class="doc">   * <span class="command">@author</span> &lt;Evgueni.Tcherniae<span class="command">v@cern</span>.ch&gt;</i></td></tr>
+<tr><th id="482">482</th><td><i class="doc">   * <span class="command">@ingroup</span> <span class="verb">geometry</span></i></td></tr>
+<tr><th id="483">483</th><td><i class="doc">   */</i></td></tr>
+<tr><th id="484">484</th><td>  <b>class</b> <dfn class="type def" id="HepGeom::RotateZ3D" title='HepGeom::RotateZ3D' data-ref="HepGeom::RotateZ3D">RotateZ3D</dfn> : <b>public</b> <a class="type" href="#HepGeom::Rotate3D" title='HepGeom::Rotate3D' data-ref="HepGeom::Rotate3D">Rotate3D</a> {</td></tr>
+<tr><th id="485">485</th><td>  <b>public</b>:</td></tr>
+<tr><th id="486">486</th><td>    <i class="doc">/**</i></td></tr>
+<tr><th id="487">487</th><td><i class="doc">     * Default constructor: sets the Identity transformation. */</i></td></tr>
+<tr><th id="488">488</th><td>    <dfn class="decl def" id="_ZN7HepGeom9RotateZ3DC1Ev" title='HepGeom::RotateZ3D::RotateZ3D' data-ref="_ZN7HepGeom9RotateZ3DC1Ev">RotateZ3D</dfn>() : <a class="type" href="#HepGeom::Rotate3D" title='HepGeom::Rotate3D' data-ref="HepGeom::Rotate3D">Rotate3D</a><a class="ref" href="#_ZN7HepGeom8Rotate3DC1Ev" title='HepGeom::Rotate3D::Rotate3D' data-ref="_ZN7HepGeom8Rotate3DC1Ev">(</a>) {}</td></tr>
+<tr><th id="489">489</th><td>    </td></tr>
+<tr><th id="490">490</th><td>    <i class="doc">/**</i></td></tr>
+<tr><th id="491">491</th><td><i class="doc">     * Constructs a rotation around z-axis by angle a. */</i></td></tr>
+<tr><th id="492">492</th><td>    <dfn class="decl def" id="_ZN7HepGeom9RotateZ3DC1Ed" title='HepGeom::RotateZ3D::RotateZ3D' data-ref="_ZN7HepGeom9RotateZ3DC1Ed">RotateZ3D</dfn>(<em>double</em> <dfn class="local col5 decl" id="85a" title='a' data-type='double' data-ref="85a">a</dfn>) {</td></tr>
+<tr><th id="493">493</th><td>      <em>double</em> <dfn class="local col6 decl" id="86cosa" title='cosa' data-type='double' data-ref="86cosa">cosa</dfn> = <span class='error' title="use of undeclared identifier &apos;std&apos;">std</span>::cos(a), <dfn class="local col7 decl" id="87sina" title='sina' data-type='double' data-ref="87sina">sina</dfn> = <span class='error' title="use of undeclared identifier &apos;std&apos;">std</span>::sin(a); </td></tr>
+<tr><th id="494">494</th><td>      <a class="member" href="#_ZN7HepGeom11Transform3D12setTransformEdddddddddddd" title='HepGeom::Transform3D::setTransform' data-ref="_ZN7HepGeom11Transform3D12setTransformEdddddddddddd">setTransform</a>(<a class="local col6 ref" href="#86cosa" title='cosa' data-ref="86cosa">cosa</a>,-<a class="local col7 ref" href="#87sina" title='sina' data-ref="87sina">sina</a>,<var>0</var>,<var>0</var>,  <a class="local col7 ref" href="#87sina" title='sina' data-ref="87sina">sina</a>,<a class="local col6 ref" href="#86cosa" title='cosa' data-ref="86cosa">cosa</a>,<var>0</var>,<var>0</var>,  <var>0</var>,<var>0</var>,<var>1</var>,<var>0</var>);</td></tr>
+<tr><th id="495">495</th><td>    }</td></tr>
+<tr><th id="496">496</th><td>  };</td></tr>
+<tr><th id="497">497</th><td></td></tr>
+<tr><th id="498">498</th><td>  <i>//   T R A N S L A T I O N S</i></td></tr>
+<tr><th id="499">499</th><td>  </td></tr>
+<tr><th id="500">500</th><td>  <i class="doc">/**</i></td></tr>
+<tr><th id="501">501</th><td><i class="doc">   * Constructs a translation transformation.</i></td></tr>
+<tr><th id="502">502</th><td><i class="doc">   * This class provides additional constructors for Transform3D</i></td></tr>
+<tr><th id="503">503</th><td><i class="doc">   * and should not be used as a separate class.</i></td></tr>
+<tr><th id="504">504</th><td><i class="doc">   * </i></td></tr>
+<tr><th id="505">505</th><td><i class="doc">   * Example of use:</i></td></tr>
+<tr><th id="506">506</th><td><i class="doc">   * <span class="command">@code</span></i></td></tr>
+<tr><th id="507">507</th><td><i class="doc">   *<span class="verb">   Transform3D m;</span></i></td></tr>
+<tr><th id="508">508</th><td><i class="doc"><span class="verb"></span>   *<span class="verb">   m = Translate3D(10.,20.,30.);</span></i></td></tr>
+<tr><th id="509">509</th><td><i class="doc"><span class="verb"></span>   * @endcode</i></td></tr>
+<tr><th id="510">510</th><td><i class="doc">   *</i></td></tr>
+<tr><th id="511">511</th><td><i class="doc">   * <span class="command">@author</span> &lt;Evgueni.Tcherniae<span class="command">v@cern</span>.ch&gt;</i></td></tr>
+<tr><th id="512">512</th><td><i class="doc">   * <span class="command">@ingroup</span> <span class="verb">geometry</span></i></td></tr>
+<tr><th id="513">513</th><td><i class="doc">   */</i></td></tr>
+<tr><th id="514">514</th><td>  <b>class</b> <dfn class="type def" id="HepGeom::Translate3D" title='HepGeom::Translate3D' data-ref="HepGeom::Translate3D">Translate3D</dfn> : <b>public</b> <a class="type" href="#HepGeom::Transform3D" title='HepGeom::Transform3D' data-ref="HepGeom::Transform3D">Transform3D</a> {</td></tr>
+<tr><th id="515">515</th><td>  <b>public</b>:</td></tr>
+<tr><th id="516">516</th><td>    <i class="doc">/**</i></td></tr>
+<tr><th id="517">517</th><td><i class="doc">     * Default constructor: sets the Identity transformation. */</i></td></tr>
+<tr><th id="518">518</th><td>    <dfn class="decl def" id="_ZN7HepGeom11Translate3DC1Ev" title='HepGeom::Translate3D::Translate3D' data-ref="_ZN7HepGeom11Translate3DC1Ev">Translate3D</dfn>() : <a class="type" href="#HepGeom::Transform3D" title='HepGeom::Transform3D' data-ref="HepGeom::Transform3D">Transform3D</a><a class="ref" href="#_ZN7HepGeom11Transform3DC1Ev" title='HepGeom::Transform3D::Transform3D' data-ref="_ZN7HepGeom11Transform3DC1Ev">(</a>) {}</td></tr>
+<tr><th id="519">519</th><td>    </td></tr>
+<tr><th id="520">520</th><td>    <i class="doc">/**</i></td></tr>
+<tr><th id="521">521</th><td><i class="doc">     * Constructor from CLHEP::Hep3Vector. */</i></td></tr>
+<tr><th id="522">522</th><td>    <b>inline</b> <a class="decl" href="Transform3D.icc.html#_ZN7HepGeom11Translate3DC1ERKN5CLHEP10Hep3VectorE" title='HepGeom::Translate3D::Translate3D' data-ref="_ZN7HepGeom11Translate3DC1ERKN5CLHEP10Hep3VectorE" id="_ZN7HepGeom11Translate3DC1ERKN5CLHEP10Hep3VectorE">Translate3D</a>(<em>const</em> <span class="namespace">CLHEP::</span><a class="type" href="../Vector/ThreeVector.h.html#CLHEP::Hep3Vector" title='CLHEP::Hep3Vector' data-ref="CLHEP::Hep3Vector">Hep3Vector</a> &amp;<dfn class="local col8 decl" id="88v" title='v' data-type='const CLHEP::Hep3Vector &amp;' data-ref="88v">v</dfn>);</td></tr>
+<tr><th id="523">523</th><td>    </td></tr>
+<tr><th id="524">524</th><td>    <i class="doc">/**</i></td></tr>
+<tr><th id="525">525</th><td><i class="doc">     * Constructor from three numbers. */</i></td></tr>
+<tr><th id="526">526</th><td>    <dfn class="decl def" id="_ZN7HepGeom11Translate3DC1Eddd" title='HepGeom::Translate3D::Translate3D' data-ref="_ZN7HepGeom11Translate3DC1Eddd">Translate3D</dfn>(<em>double</em> <dfn class="local col9 decl" id="89x" title='x' data-type='double' data-ref="89x">x</dfn>, <em>double</em> <dfn class="local col0 decl" id="90y" title='y' data-type='double' data-ref="90y">y</dfn>, <em>double</em> <dfn class="local col1 decl" id="91z" title='z' data-type='double' data-ref="91z">z</dfn>)</td></tr>
+<tr><th id="527">527</th><td>      : <a class="type" href="#HepGeom::Transform3D" title='HepGeom::Transform3D' data-ref="HepGeom::Transform3D">Transform3D</a><a class="ref" href="#_ZN7HepGeom11Transform3DC1Edddddddddddd" title='HepGeom::Transform3D::Transform3D' data-ref="_ZN7HepGeom11Transform3DC1Edddddddddddd">(</a><var>1</var>,<var>0</var>,<var>0</var>,<a class="local col9 ref" href="#89x" title='x' data-ref="89x">x</a>, <var>0</var>,<var>1</var>,<var>0</var>,<a class="local col0 ref" href="#90y" title='y' data-ref="90y">y</a>, <var>0</var>,<var>0</var>,<var>1</var>,<a class="local col1 ref" href="#91z" title='z' data-ref="91z">z</a>) {}</td></tr>
+<tr><th id="528">528</th><td>  };</td></tr>
+<tr><th id="529">529</th><td></td></tr>
+<tr><th id="530">530</th><td>  <i class="doc">/**</i></td></tr>
+<tr><th id="531">531</th><td><i class="doc">   * Constructs a translation along x-axis.</i></td></tr>
+<tr><th id="532">532</th><td><i class="doc">   * This class provides additional constructors for Transform3D</i></td></tr>
+<tr><th id="533">533</th><td><i class="doc">   * and should not be used as a separate class.</i></td></tr>
+<tr><th id="534">534</th><td><i class="doc">   * </i></td></tr>
+<tr><th id="535">535</th><td><i class="doc">   * Example of use:</i></td></tr>
+<tr><th id="536">536</th><td><i class="doc">   * <span class="command">@code</span></i></td></tr>
+<tr><th id="537">537</th><td><i class="doc">   *<span class="verb">   Transform3D m;</span></i></td></tr>
+<tr><th id="538">538</th><td><i class="doc"><span class="verb"></span>   *<span class="verb">   m = TranslateX3D(10.);</span></i></td></tr>
+<tr><th id="539">539</th><td><i class="doc"><span class="verb"></span>   * @endcode</i></td></tr>
+<tr><th id="540">540</th><td><i class="doc">   *</i></td></tr>
+<tr><th id="541">541</th><td><i class="doc">   * <span class="command">@author</span> &lt;Evgueni.Tcherniae<span class="command">v@cern</span>.ch&gt;</i></td></tr>
+<tr><th id="542">542</th><td><i class="doc">   * <span class="command">@ingroup</span> <span class="verb">geometry</span></i></td></tr>
+<tr><th id="543">543</th><td><i class="doc">   */</i></td></tr>
+<tr><th id="544">544</th><td>  <b>class</b> <dfn class="type def" id="HepGeom::TranslateX3D" title='HepGeom::TranslateX3D' data-ref="HepGeom::TranslateX3D">TranslateX3D</dfn> : <b>public</b> <a class="type" href="#HepGeom::Translate3D" title='HepGeom::Translate3D' data-ref="HepGeom::Translate3D">Translate3D</a> {</td></tr>
+<tr><th id="545">545</th><td>  <b>public</b>:</td></tr>
+<tr><th id="546">546</th><td>    <i class="doc">/**</i></td></tr>
+<tr><th id="547">547</th><td><i class="doc">     * Default constructor: sets the Identity transformation. */</i></td></tr>
+<tr><th id="548">548</th><td>    <dfn class="decl def" id="_ZN7HepGeom12TranslateX3DC1Ev" title='HepGeom::TranslateX3D::TranslateX3D' data-ref="_ZN7HepGeom12TranslateX3DC1Ev">TranslateX3D</dfn>() : <a class="type" href="#HepGeom::Translate3D" title='HepGeom::Translate3D' data-ref="HepGeom::Translate3D">Translate3D</a><a class="ref" href="#_ZN7HepGeom11Translate3DC1Ev" title='HepGeom::Translate3D::Translate3D' data-ref="_ZN7HepGeom11Translate3DC1Ev">(</a>) {}</td></tr>
+<tr><th id="549">549</th><td>    </td></tr>
+<tr><th id="550">550</th><td>    <i class="doc">/**</i></td></tr>
+<tr><th id="551">551</th><td><i class="doc">     * Constructor from a number. */</i></td></tr>
+<tr><th id="552">552</th><td>    <dfn class="decl def" id="_ZN7HepGeom12TranslateX3DC1Ed" title='HepGeom::TranslateX3D::TranslateX3D' data-ref="_ZN7HepGeom12TranslateX3DC1Ed">TranslateX3D</dfn>(<em>double</em> <dfn class="local col2 decl" id="92x" title='x' data-type='double' data-ref="92x">x</dfn>) : <a class="type" href="#HepGeom::Translate3D" title='HepGeom::Translate3D' data-ref="HepGeom::Translate3D">Translate3D</a><a class="ref" href="#_ZN7HepGeom11Translate3DC1Eddd" title='HepGeom::Translate3D::Translate3D' data-ref="_ZN7HepGeom11Translate3DC1Eddd">(</a><a class="local col2 ref" href="#92x" title='x' data-ref="92x">x</a>, <var>0</var>, <var>0</var>) {}</td></tr>
+<tr><th id="553">553</th><td>  };</td></tr>
+<tr><th id="554">554</th><td></td></tr>
+<tr><th id="555">555</th><td>  <i class="doc">/**</i></td></tr>
+<tr><th id="556">556</th><td><i class="doc">   * Constructs a translation along y-axis.</i></td></tr>
+<tr><th id="557">557</th><td><i class="doc">   * This class provides additional constructors for Transform3D</i></td></tr>
+<tr><th id="558">558</th><td><i class="doc">   * and should not be used as a separate class.</i></td></tr>
+<tr><th id="559">559</th><td><i class="doc">   * </i></td></tr>
+<tr><th id="560">560</th><td><i class="doc">   * Example of use:</i></td></tr>
+<tr><th id="561">561</th><td><i class="doc">   * <span class="command">@code</span></i></td></tr>
+<tr><th id="562">562</th><td><i class="doc">   *<span class="verb">   Transform3D m;</span></i></td></tr>
+<tr><th id="563">563</th><td><i class="doc"><span class="verb"></span>   *<span class="verb">   m = TranslateY3D(10.);</span></i></td></tr>
+<tr><th id="564">564</th><td><i class="doc"><span class="verb"></span>   * @endcode</i></td></tr>
+<tr><th id="565">565</th><td><i class="doc">   *</i></td></tr>
+<tr><th id="566">566</th><td><i class="doc">   * <span class="command">@author</span> &lt;Evgueni.Tcherniae<span class="command">v@cern</span>.ch&gt;</i></td></tr>
+<tr><th id="567">567</th><td><i class="doc">   * <span class="command">@ingroup</span> <span class="verb">geometry</span></i></td></tr>
+<tr><th id="568">568</th><td><i class="doc">   */</i></td></tr>
+<tr><th id="569">569</th><td>  <b>class</b> <dfn class="type def" id="HepGeom::TranslateY3D" title='HepGeom::TranslateY3D' data-ref="HepGeom::TranslateY3D">TranslateY3D</dfn> : <b>public</b> <a class="type" href="#HepGeom::Translate3D" title='HepGeom::Translate3D' data-ref="HepGeom::Translate3D">Translate3D</a> {</td></tr>
+<tr><th id="570">570</th><td>  <b>public</b>:</td></tr>
+<tr><th id="571">571</th><td>    <i class="doc">/**</i></td></tr>
+<tr><th id="572">572</th><td><i class="doc">     * Default constructor: sets the Identity transformation. */</i></td></tr>
+<tr><th id="573">573</th><td>    <dfn class="decl def" id="_ZN7HepGeom12TranslateY3DC1Ev" title='HepGeom::TranslateY3D::TranslateY3D' data-ref="_ZN7HepGeom12TranslateY3DC1Ev">TranslateY3D</dfn>() : <a class="type" href="#HepGeom::Translate3D" title='HepGeom::Translate3D' data-ref="HepGeom::Translate3D">Translate3D</a><a class="ref" href="#_ZN7HepGeom11Translate3DC1Ev" title='HepGeom::Translate3D::Translate3D' data-ref="_ZN7HepGeom11Translate3DC1Ev">(</a>) {}</td></tr>
+<tr><th id="574">574</th><td></td></tr>
+<tr><th id="575">575</th><td>    <i class="doc">/**</i></td></tr>
+<tr><th id="576">576</th><td><i class="doc">     * Constructor from a number. */</i></td></tr>
+<tr><th id="577">577</th><td>    <dfn class="decl def" id="_ZN7HepGeom12TranslateY3DC1Ed" title='HepGeom::TranslateY3D::TranslateY3D' data-ref="_ZN7HepGeom12TranslateY3DC1Ed">TranslateY3D</dfn>(<em>double</em> <dfn class="local col3 decl" id="93y" title='y' data-type='double' data-ref="93y">y</dfn>) : <a class="type" href="#HepGeom::Translate3D" title='HepGeom::Translate3D' data-ref="HepGeom::Translate3D">Translate3D</a><a class="ref" href="#_ZN7HepGeom11Translate3DC1Eddd" title='HepGeom::Translate3D::Translate3D' data-ref="_ZN7HepGeom11Translate3DC1Eddd">(</a><var>0</var>, <a class="local col3 ref" href="#93y" title='y' data-ref="93y">y</a>, <var>0</var>) {}</td></tr>
+<tr><th id="578">578</th><td>  };</td></tr>
+<tr><th id="579">579</th><td></td></tr>
+<tr><th id="580">580</th><td>  <i class="doc">/**</i></td></tr>
+<tr><th id="581">581</th><td><i class="doc">   * Constructs a translation along z-axis.</i></td></tr>
+<tr><th id="582">582</th><td><i class="doc">   * This class provides additional constructors for Transform3D</i></td></tr>
+<tr><th id="583">583</th><td><i class="doc">   * and should not be used as a separate class.</i></td></tr>
+<tr><th id="584">584</th><td><i class="doc">   * </i></td></tr>
+<tr><th id="585">585</th><td><i class="doc">   * Example of use:</i></td></tr>
+<tr><th id="586">586</th><td><i class="doc">   * <span class="command">@code</span></i></td></tr>
+<tr><th id="587">587</th><td><i class="doc">   *<span class="verb">   Transform3D m;</span></i></td></tr>
+<tr><th id="588">588</th><td><i class="doc"><span class="verb"></span>   *<span class="verb">   m = TranslateZ3D(10.);</span></i></td></tr>
+<tr><th id="589">589</th><td><i class="doc"><span class="verb"></span>   * @endcode</i></td></tr>
+<tr><th id="590">590</th><td><i class="doc">   *</i></td></tr>
+<tr><th id="591">591</th><td><i class="doc">   * <span class="command">@author</span> &lt;Evgueni.Tcherniae<span class="command">v@cern</span>.ch&gt;</i></td></tr>
+<tr><th id="592">592</th><td><i class="doc">   * <span class="command">@ingroup</span> <span class="verb">geometry</span></i></td></tr>
+<tr><th id="593">593</th><td><i class="doc">   */</i></td></tr>
+<tr><th id="594">594</th><td>  <b>class</b> <dfn class="type def" id="HepGeom::TranslateZ3D" title='HepGeom::TranslateZ3D' data-ref="HepGeom::TranslateZ3D">TranslateZ3D</dfn> : <b>public</b> <a class="type" href="#HepGeom::Translate3D" title='HepGeom::Translate3D' data-ref="HepGeom::Translate3D">Translate3D</a> {</td></tr>
+<tr><th id="595">595</th><td>  <b>public</b>:</td></tr>
+<tr><th id="596">596</th><td>    <i class="doc">/**</i></td></tr>
+<tr><th id="597">597</th><td><i class="doc">     * Default constructor: sets the Identity transformation. */</i></td></tr>
+<tr><th id="598">598</th><td>    <dfn class="decl def" id="_ZN7HepGeom12TranslateZ3DC1Ev" title='HepGeom::TranslateZ3D::TranslateZ3D' data-ref="_ZN7HepGeom12TranslateZ3DC1Ev">TranslateZ3D</dfn>() : <a class="type" href="#HepGeom::Translate3D" title='HepGeom::Translate3D' data-ref="HepGeom::Translate3D">Translate3D</a><a class="ref" href="#_ZN7HepGeom11Translate3DC1Ev" title='HepGeom::Translate3D::Translate3D' data-ref="_ZN7HepGeom11Translate3DC1Ev">(</a>) {}</td></tr>
+<tr><th id="599">599</th><td></td></tr>
+<tr><th id="600">600</th><td>    <i class="doc">/**</i></td></tr>
+<tr><th id="601">601</th><td><i class="doc">     * Constructor from a number. */</i></td></tr>
+<tr><th id="602">602</th><td>    <dfn class="decl def" id="_ZN7HepGeom12TranslateZ3DC1Ed" title='HepGeom::TranslateZ3D::TranslateZ3D' data-ref="_ZN7HepGeom12TranslateZ3DC1Ed">TranslateZ3D</dfn>(<em>double</em> <dfn class="local col4 decl" id="94z" title='z' data-type='double' data-ref="94z">z</dfn>) : <a class="type" href="#HepGeom::Translate3D" title='HepGeom::Translate3D' data-ref="HepGeom::Translate3D">Translate3D</a><a class="ref" href="#_ZN7HepGeom11Translate3DC1Eddd" title='HepGeom::Translate3D::Translate3D' data-ref="_ZN7HepGeom11Translate3DC1Eddd">(</a><var>0</var>, <var>0</var>, <a class="local col4 ref" href="#94z" title='z' data-ref="94z">z</a>) {}</td></tr>
+<tr><th id="603">603</th><td>  };</td></tr>
+<tr><th id="604">604</th><td></td></tr>
+<tr><th id="605">605</th><td>  <i>//   R E F L E C T I O N S</i></td></tr>
+<tr><th id="606">606</th><td></td></tr>
+<tr><th id="607">607</th><td>  <i class="doc">/**</i></td></tr>
+<tr><th id="608">608</th><td><i class="doc">   * Constructs a reflection transformation.</i></td></tr>
+<tr><th id="609">609</th><td><i class="doc">   * This class provides additional constructors for Transform3D</i></td></tr>
+<tr><th id="610">610</th><td><i class="doc">   * and should not be used as a separate class.</i></td></tr>
+<tr><th id="611">611</th><td><i class="doc">   * </i></td></tr>
+<tr><th id="612">612</th><td><i class="doc">   * Example of use:</i></td></tr>
+<tr><th id="613">613</th><td><i class="doc">   * <span class="command">@code</span></i></td></tr>
+<tr><th id="614">614</th><td><i class="doc">   *<span class="verb">   Transform3D m;</span></i></td></tr>
+<tr><th id="615">615</th><td><i class="doc"><span class="verb"></span>   *<span class="verb">   m = Reflect3D(1.,1.,1.,0.);</span></i></td></tr>
+<tr><th id="616">616</th><td><i class="doc"><span class="verb"></span>   * @endcode</i></td></tr>
+<tr><th id="617">617</th><td><i class="doc">   *</i></td></tr>
+<tr><th id="618">618</th><td><i class="doc">   * <span class="command">@author</span> &lt;Evgueni.Tcherniae<span class="command">v@cern</span>.ch&gt;</i></td></tr>
+<tr><th id="619">619</th><td><i class="doc">   * <span class="command">@ingroup</span> <span class="verb">geometry</span></i></td></tr>
+<tr><th id="620">620</th><td><i class="doc">   */</i></td></tr>
+<tr><th id="621">621</th><td>  <b>class</b> <dfn class="type def" id="HepGeom::Reflect3D" title='HepGeom::Reflect3D' data-ref="HepGeom::Reflect3D">Reflect3D</dfn> : <b>public</b> <a class="type" href="#HepGeom::Transform3D" title='HepGeom::Transform3D' data-ref="HepGeom::Transform3D">Transform3D</a> {</td></tr>
+<tr><th id="622">622</th><td>  <b>protected</b>:</td></tr>
+<tr><th id="623">623</th><td>    <dfn class="decl def" id="_ZN7HepGeom9Reflect3DC1Edddddddddddd" title='HepGeom::Reflect3D::Reflect3D' data-ref="_ZN7HepGeom9Reflect3DC1Edddddddddddd">Reflect3D</dfn>(<em>double</em> <dfn class="local col5 decl" id="95XX" title='XX' data-type='double' data-ref="95XX">XX</dfn>, <em>double</em> <dfn class="local col6 decl" id="96XY" title='XY' data-type='double' data-ref="96XY">XY</dfn>, <em>double</em> <dfn class="local col7 decl" id="97XZ" title='XZ' data-type='double' data-ref="97XZ">XZ</dfn>, <em>double</em> <dfn class="local col8 decl" id="98DX" title='DX' data-type='double' data-ref="98DX">DX</dfn>,</td></tr>
+<tr><th id="624">624</th><td>		 <em>double</em> <dfn class="local col9 decl" id="99YX" title='YX' data-type='double' data-ref="99YX">YX</dfn>, <em>double</em> <dfn class="local col0 decl" id="100YY" title='YY' data-type='double' data-ref="100YY">YY</dfn>, <em>double</em> <dfn class="local col1 decl" id="101YZ" title='YZ' data-type='double' data-ref="101YZ">YZ</dfn>, <em>double</em> <dfn class="local col2 decl" id="102DY" title='DY' data-type='double' data-ref="102DY">DY</dfn>,</td></tr>
+<tr><th id="625">625</th><td>		 <em>double</em> <dfn class="local col3 decl" id="103ZX" title='ZX' data-type='double' data-ref="103ZX">ZX</dfn>, <em>double</em> <dfn class="local col4 decl" id="104ZY" title='ZY' data-type='double' data-ref="104ZY">ZY</dfn>, <em>double</em> <dfn class="local col5 decl" id="105ZZ" title='ZZ' data-type='double' data-ref="105ZZ">ZZ</dfn>, <em>double</em> <dfn class="local col6 decl" id="106DZ" title='DZ' data-type='double' data-ref="106DZ">DZ</dfn>)</td></tr>
+<tr><th id="626">626</th><td>      : <a class="type" href="#HepGeom::Transform3D" title='HepGeom::Transform3D' data-ref="HepGeom::Transform3D">Transform3D</a><a class="ref" href="#_ZN7HepGeom11Transform3DC1Edddddddddddd" title='HepGeom::Transform3D::Transform3D' data-ref="_ZN7HepGeom11Transform3DC1Edddddddddddd">(</a><a class="local col5 ref" href="#95XX" title='XX' data-ref="95XX">XX</a>,<a class="local col6 ref" href="#96XY" title='XY' data-ref="96XY">XY</a>,<a class="local col7 ref" href="#97XZ" title='XZ' data-ref="97XZ">XZ</a>,<a class="local col8 ref" href="#98DX" title='DX' data-ref="98DX">DX</a>, <a class="local col9 ref" href="#99YX" title='YX' data-ref="99YX">YX</a>,<a class="local col0 ref" href="#100YY" title='YY' data-ref="100YY">YY</a>,<a class="local col1 ref" href="#101YZ" title='YZ' data-ref="101YZ">YZ</a>,<a class="local col2 ref" href="#102DY" title='DY' data-ref="102DY">DY</a>, <a class="local col3 ref" href="#103ZX" title='ZX' data-ref="103ZX">ZX</a>,<a class="local col4 ref" href="#104ZY" title='ZY' data-ref="104ZY">ZY</a>,<a class="local col5 ref" href="#105ZZ" title='ZZ' data-ref="105ZZ">ZZ</a>,<a class="local col6 ref" href="#106DZ" title='DZ' data-ref="106DZ">DZ</a>) {}</td></tr>
+<tr><th id="627">627</th><td></td></tr>
+<tr><th id="628">628</th><td>  <b>public</b>:</td></tr>
+<tr><th id="629">629</th><td>    <i class="doc">/**</i></td></tr>
+<tr><th id="630">630</th><td><i class="doc">     * Default constructor: sets the Identity transformation. */</i></td></tr>
+<tr><th id="631">631</th><td>    <dfn class="decl def" id="_ZN7HepGeom9Reflect3DC1Ev" title='HepGeom::Reflect3D::Reflect3D' data-ref="_ZN7HepGeom9Reflect3DC1Ev">Reflect3D</dfn>() : <a class="type" href="#HepGeom::Transform3D" title='HepGeom::Transform3D' data-ref="HepGeom::Transform3D">Transform3D</a><a class="ref" href="#_ZN7HepGeom11Transform3DC1Ev" title='HepGeom::Transform3D::Transform3D' data-ref="_ZN7HepGeom11Transform3DC1Ev">(</a>) {}</td></tr>
+<tr><th id="632">632</th><td></td></tr>
+<tr><th id="633">633</th><td>    <i class="doc">/**</i></td></tr>
+<tr><th id="634">634</th><td><i class="doc">     * Constructor from four numbers.</i></td></tr>
+<tr><th id="635">635</th><td><i class="doc">     * Sets reflection in a plane a*x+b*y+c*z+d=0</i></td></tr>
+<tr><th id="636">636</th><td><i class="doc">     */</i></td></tr>
+<tr><th id="637">637</th><td>    <dfn class="decl" id="_ZN7HepGeom9Reflect3DC1Edddd" title='HepGeom::Reflect3D::Reflect3D' data-ref="_ZN7HepGeom9Reflect3DC1Edddd">Reflect3D</dfn>(<em>double</em> <dfn class="local col7 decl" id="107a" title='a' data-type='double' data-ref="107a">a</dfn>, <em>double</em> <dfn class="local col8 decl" id="108b" title='b' data-type='double' data-ref="108b">b</dfn>, <em>double</em> <dfn class="local col9 decl" id="109c" title='c' data-type='double' data-ref="109c">c</dfn>, <em>double</em> <dfn class="local col0 decl" id="110d" title='d' data-type='double' data-ref="110d">d</dfn>);</td></tr>
+<tr><th id="638">638</th><td></td></tr>
+<tr><th id="639">639</th><td>    <i class="doc">/**</i></td></tr>
+<tr><th id="640">640</th><td><i class="doc">     * Constructor from a plane given by its normal and origin. */</i></td></tr>
+<tr><th id="641">641</th><td>    <b>inline</b> <a class="decl" href="Transform3D.icc.html#_ZN7HepGeom9Reflect3DC1ERKNS_8Normal3DIdEERKNS_7Point3DIdEE" title='HepGeom::Reflect3D::Reflect3D' data-ref="_ZN7HepGeom9Reflect3DC1ERKNS_8Normal3DIdEERKNS_7Point3DIdEE" id="_ZN7HepGeom9Reflect3DC1ERKNS_8Normal3DIdEERKNS_7Point3DIdEE">Reflect3D</a>(<em>const</em> <a class="type" href="#HepGeom::Normal3D" title='HepGeom::Normal3D' data-ref="HepGeom::Normal3D">Normal3D</a>&lt;<em>double</em>&gt; &amp; <dfn class="local col1 decl" id="111normal" title='normal' data-type='const Normal3D&lt;double&gt; &amp;' data-ref="111normal">normal</dfn>,</td></tr>
+<tr><th id="642">642</th><td>			<em>const</em> <a class="type" href="#HepGeom::Point3D" title='HepGeom::Point3D' data-ref="HepGeom::Point3D">Point3D</a>&lt;<em>double</em>&gt; &amp; <dfn class="local col2 decl" id="112point" title='point' data-type='const Point3D&lt;double&gt; &amp;' data-ref="112point">point</dfn>);</td></tr>
+<tr><th id="643">643</th><td>  };</td></tr>
+<tr><th id="644">644</th><td></td></tr>
+<tr><th id="645">645</th><td>  <i class="doc">/**</i></td></tr>
+<tr><th id="646">646</th><td><i class="doc">   * Constructs reflection in a plane x=const.</i></td></tr>
+<tr><th id="647">647</th><td><i class="doc">   * This class provides additional constructors for Transform3D</i></td></tr>
+<tr><th id="648">648</th><td><i class="doc">   * and should not be used as a separate class.</i></td></tr>
+<tr><th id="649">649</th><td><i class="doc">   * </i></td></tr>
+<tr><th id="650">650</th><td><i class="doc">   * Example of use:</i></td></tr>
+<tr><th id="651">651</th><td><i class="doc">   * <span class="command">@code</span></i></td></tr>
+<tr><th id="652">652</th><td><i class="doc">   *<span class="verb">   Transform3D m;</span></i></td></tr>
+<tr><th id="653">653</th><td><i class="doc"><span class="verb"></span>   *<span class="verb">   m = ReflectX3D(1.);</span></i></td></tr>
+<tr><th id="654">654</th><td><i class="doc"><span class="verb"></span>   * @endcode</i></td></tr>
+<tr><th id="655">655</th><td><i class="doc">   *</i></td></tr>
+<tr><th id="656">656</th><td><i class="doc">   * <span class="command">@author</span> &lt;Evgueni.Tcherniae<span class="command">v@cern</span>.ch&gt;</i></td></tr>
+<tr><th id="657">657</th><td><i class="doc">   * <span class="command">@ingroup</span> <span class="verb">geometry</span></i></td></tr>
+<tr><th id="658">658</th><td><i class="doc">   */</i></td></tr>
+<tr><th id="659">659</th><td>  <b>class</b> <dfn class="type def" id="HepGeom::ReflectX3D" title='HepGeom::ReflectX3D' data-ref="HepGeom::ReflectX3D">ReflectX3D</dfn> : <b>public</b> <a class="type" href="#HepGeom::Reflect3D" title='HepGeom::Reflect3D' data-ref="HepGeom::Reflect3D">Reflect3D</a> {</td></tr>
+<tr><th id="660">660</th><td>  <b>public</b>:</td></tr>
+<tr><th id="661">661</th><td>    <i class="doc">/**</i></td></tr>
+<tr><th id="662">662</th><td><i class="doc">     * Constructor from a number. */</i></td></tr>
+<tr><th id="663">663</th><td>    <dfn class="decl def" id="_ZN7HepGeom10ReflectX3DC1Ed" title='HepGeom::ReflectX3D::ReflectX3D' data-ref="_ZN7HepGeom10ReflectX3DC1Ed">ReflectX3D</dfn>(<em>double</em> <dfn class="local col3 decl" id="113x" title='x' data-type='double' data-ref="113x">x</dfn>=<var>0</var>) : <a class="type" href="#HepGeom::Reflect3D" title='HepGeom::Reflect3D' data-ref="HepGeom::Reflect3D">Reflect3D</a><a class="ref" href="#_ZN7HepGeom9Reflect3DC1Edddddddddddd" title='HepGeom::Reflect3D::Reflect3D' data-ref="_ZN7HepGeom9Reflect3DC1Edddddddddddd">(</a>-<var>1</var>,<var>0</var>,<var>0</var>,<a class="local col3 ref" href="#113x" title='x' data-ref="113x">x</a>+<a class="local col3 ref" href="#113x" title='x' data-ref="113x">x</a>, <var>0</var>,<var>1</var>,<var>0</var>,<var>0</var>, <var>0</var>,<var>0</var>,<var>1</var>,<var>0</var>) {}</td></tr>
+<tr><th id="664">664</th><td>  };</td></tr>
+<tr><th id="665">665</th><td> </td></tr>
+<tr><th id="666">666</th><td>  <i class="doc">/**</i></td></tr>
+<tr><th id="667">667</th><td><i class="doc">   * Constructs reflection in a plane y=const.</i></td></tr>
+<tr><th id="668">668</th><td><i class="doc">   * This class provides additional constructors for Transform3D</i></td></tr>
+<tr><th id="669">669</th><td><i class="doc">   * and should not be used as a separate class.</i></td></tr>
+<tr><th id="670">670</th><td><i class="doc">   * </i></td></tr>
+<tr><th id="671">671</th><td><i class="doc">   * Example of use:</i></td></tr>
+<tr><th id="672">672</th><td><i class="doc">   * <span class="command">@code</span></i></td></tr>
+<tr><th id="673">673</th><td><i class="doc">   *<span class="verb">   Transform3D m;</span></i></td></tr>
+<tr><th id="674">674</th><td><i class="doc"><span class="verb"></span>   *<span class="verb">   m = ReflectY3D(1.);</span></i></td></tr>
+<tr><th id="675">675</th><td><i class="doc"><span class="verb"></span>   * @endcode</i></td></tr>
+<tr><th id="676">676</th><td><i class="doc">   *</i></td></tr>
+<tr><th id="677">677</th><td><i class="doc">   * <span class="command">@author</span> &lt;Evgueni.Tcherniae<span class="command">v@cern</span>.ch&gt;</i></td></tr>
+<tr><th id="678">678</th><td><i class="doc">   * <span class="command">@ingroup</span> <span class="verb">geometry</span></i></td></tr>
+<tr><th id="679">679</th><td><i class="doc">   */</i></td></tr>
+<tr><th id="680">680</th><td>  <b>class</b> <dfn class="type def" id="HepGeom::ReflectY3D" title='HepGeom::ReflectY3D' data-ref="HepGeom::ReflectY3D">ReflectY3D</dfn> : <b>public</b> <a class="type" href="#HepGeom::Reflect3D" title='HepGeom::Reflect3D' data-ref="HepGeom::Reflect3D">Reflect3D</a> {</td></tr>
+<tr><th id="681">681</th><td>  <b>public</b>:</td></tr>
+<tr><th id="682">682</th><td>    <i class="doc">/**</i></td></tr>
+<tr><th id="683">683</th><td><i class="doc">     * Constructor from a number. */</i></td></tr>
+<tr><th id="684">684</th><td>    <dfn class="decl def" id="_ZN7HepGeom10ReflectY3DC1Ed" title='HepGeom::ReflectY3D::ReflectY3D' data-ref="_ZN7HepGeom10ReflectY3DC1Ed">ReflectY3D</dfn>(<em>double</em> <dfn class="local col4 decl" id="114y" title='y' data-type='double' data-ref="114y">y</dfn>=<var>0</var>) : <a class="type" href="#HepGeom::Reflect3D" title='HepGeom::Reflect3D' data-ref="HepGeom::Reflect3D">Reflect3D</a><a class="ref" href="#_ZN7HepGeom9Reflect3DC1Edddddddddddd" title='HepGeom::Reflect3D::Reflect3D' data-ref="_ZN7HepGeom9Reflect3DC1Edddddddddddd">(</a><var>1</var>,<var>0</var>,<var>0</var>,<var>0</var>, <var>0</var>,-<var>1</var>,<var>0</var>,<a class="local col4 ref" href="#114y" title='y' data-ref="114y">y</a>+<a class="local col4 ref" href="#114y" title='y' data-ref="114y">y</a>, <var>0</var>,<var>0</var>,<var>1</var>,<var>0</var>) {}</td></tr>
+<tr><th id="685">685</th><td>  };</td></tr>
+<tr><th id="686">686</th><td> </td></tr>
+<tr><th id="687">687</th><td>  <i class="doc">/**</i></td></tr>
+<tr><th id="688">688</th><td><i class="doc">   * Constructs reflection in a plane z=const.</i></td></tr>
+<tr><th id="689">689</th><td><i class="doc">   * This class provides additional constructors for Transform3D</i></td></tr>
+<tr><th id="690">690</th><td><i class="doc">   * and should not be used as a separate class.</i></td></tr>
+<tr><th id="691">691</th><td><i class="doc">   * </i></td></tr>
+<tr><th id="692">692</th><td><i class="doc">   * Example of use:</i></td></tr>
+<tr><th id="693">693</th><td><i class="doc">   * <span class="command">@code</span></i></td></tr>
+<tr><th id="694">694</th><td><i class="doc">   *<span class="verb">   Transform3D m;</span></i></td></tr>
+<tr><th id="695">695</th><td><i class="doc"><span class="verb"></span>   *<span class="verb">   m = ReflectZ3D(1.);</span></i></td></tr>
+<tr><th id="696">696</th><td><i class="doc"><span class="verb"></span>   * @endcode</i></td></tr>
+<tr><th id="697">697</th><td><i class="doc">   *</i></td></tr>
+<tr><th id="698">698</th><td><i class="doc">   * <span class="command">@author</span> &lt;Evgueni.Tcherniae<span class="command">v@cern</span>.ch&gt;</i></td></tr>
+<tr><th id="699">699</th><td><i class="doc">   * <span class="command">@ingroup</span> <span class="verb">geometry</span></i></td></tr>
+<tr><th id="700">700</th><td><i class="doc">   */</i></td></tr>
+<tr><th id="701">701</th><td>  <b>class</b> <dfn class="type def" id="HepGeom::ReflectZ3D" title='HepGeom::ReflectZ3D' data-ref="HepGeom::ReflectZ3D">ReflectZ3D</dfn> : <b>public</b> <a class="type" href="#HepGeom::Reflect3D" title='HepGeom::Reflect3D' data-ref="HepGeom::Reflect3D">Reflect3D</a> {</td></tr>
+<tr><th id="702">702</th><td>  <b>public</b>:</td></tr>
+<tr><th id="703">703</th><td>    <i class="doc">/**</i></td></tr>
+<tr><th id="704">704</th><td><i class="doc">     *  Constructor from a number. */</i></td></tr>
+<tr><th id="705">705</th><td>    <dfn class="decl def" id="_ZN7HepGeom10ReflectZ3DC1Ed" title='HepGeom::ReflectZ3D::ReflectZ3D' data-ref="_ZN7HepGeom10ReflectZ3DC1Ed">ReflectZ3D</dfn>(<em>double</em> <dfn class="local col5 decl" id="115z" title='z' data-type='double' data-ref="115z">z</dfn>=<var>0</var>) : <a class="type" href="#HepGeom::Reflect3D" title='HepGeom::Reflect3D' data-ref="HepGeom::Reflect3D">Reflect3D</a><a class="ref" href="#_ZN7HepGeom9Reflect3DC1Edddddddddddd" title='HepGeom::Reflect3D::Reflect3D' data-ref="_ZN7HepGeom9Reflect3DC1Edddddddddddd">(</a><var>1</var>,<var>0</var>,<var>0</var>,<var>0</var>, <var>0</var>,<var>1</var>,<var>0</var>,<var>0</var>, <var>0</var>,<var>0</var>,-<var>1</var>,<a class="local col5 ref" href="#115z" title='z' data-ref="115z">z</a>+<a class="local col5 ref" href="#115z" title='z' data-ref="115z">z</a>) {}</td></tr>
+<tr><th id="706">706</th><td>  };</td></tr>
+<tr><th id="707">707</th><td> </td></tr>
+<tr><th id="708">708</th><td>  <i>//   S C A L I N G S</i></td></tr>
+<tr><th id="709">709</th><td></td></tr>
+<tr><th id="710">710</th><td>  <i class="doc">/**</i></td></tr>
+<tr><th id="711">711</th><td><i class="doc">   * Constructs a scaling transformation.</i></td></tr>
+<tr><th id="712">712</th><td><i class="doc">   * This class provides additional constructors for Transform3D</i></td></tr>
+<tr><th id="713">713</th><td><i class="doc">   * and should not be used as a separate class.</i></td></tr>
+<tr><th id="714">714</th><td><i class="doc">   * </i></td></tr>
+<tr><th id="715">715</th><td><i class="doc">   * Example of use:</i></td></tr>
+<tr><th id="716">716</th><td><i class="doc">   * <span class="command">@code</span></i></td></tr>
+<tr><th id="717">717</th><td><i class="doc">   *<span class="verb">   Transform3D m;</span></i></td></tr>
+<tr><th id="718">718</th><td><i class="doc"><span class="verb"></span>   *<span class="verb">   m = Scale3D(2.);</span></i></td></tr>
+<tr><th id="719">719</th><td><i class="doc"><span class="verb"></span>   * @endcode</i></td></tr>
+<tr><th id="720">720</th><td><i class="doc">   *</i></td></tr>
+<tr><th id="721">721</th><td><i class="doc">   * <span class="command">@author</span> &lt;Evgueni.Tcherniae<span class="command">v@cern</span>.ch&gt;</i></td></tr>
+<tr><th id="722">722</th><td><i class="doc">   * <span class="command">@ingroup</span> <span class="verb">geometry</span></i></td></tr>
+<tr><th id="723">723</th><td><i class="doc">   */</i></td></tr>
+<tr><th id="724">724</th><td>  <b>class</b> <dfn class="type def" id="HepGeom::Scale3D" title='HepGeom::Scale3D' data-ref="HepGeom::Scale3D">Scale3D</dfn> : <b>public</b> <a class="type" href="#HepGeom::Transform3D" title='HepGeom::Transform3D' data-ref="HepGeom::Transform3D">Transform3D</a> {</td></tr>
+<tr><th id="725">725</th><td>  <b>public</b>:</td></tr>
+<tr><th id="726">726</th><td>    <i class="doc">/**</i></td></tr>
+<tr><th id="727">727</th><td><i class="doc">     * Default constructor: sets the Identity transformation. */</i></td></tr>
+<tr><th id="728">728</th><td>    <dfn class="decl def" id="_ZN7HepGeom7Scale3DC1Ev" title='HepGeom::Scale3D::Scale3D' data-ref="_ZN7HepGeom7Scale3DC1Ev">Scale3D</dfn>() : <a class="type" href="#HepGeom::Transform3D" title='HepGeom::Transform3D' data-ref="HepGeom::Transform3D">Transform3D</a><a class="ref" href="#_ZN7HepGeom11Transform3DC1Ev" title='HepGeom::Transform3D::Transform3D' data-ref="_ZN7HepGeom11Transform3DC1Ev">(</a>) {}</td></tr>
+<tr><th id="729">729</th><td></td></tr>
+<tr><th id="730">730</th><td>    <i class="doc">/**</i></td></tr>
+<tr><th id="731">731</th><td><i class="doc">     * Constructor from three numbers - scale factors in different directions.</i></td></tr>
+<tr><th id="732">732</th><td><i class="doc">     */</i></td></tr>
+<tr><th id="733">733</th><td>    <dfn class="decl def" id="_ZN7HepGeom7Scale3DC1Eddd" title='HepGeom::Scale3D::Scale3D' data-ref="_ZN7HepGeom7Scale3DC1Eddd">Scale3D</dfn>(<em>double</em> <dfn class="local col6 decl" id="116x" title='x' data-type='double' data-ref="116x">x</dfn>, <em>double</em> <dfn class="local col7 decl" id="117y" title='y' data-type='double' data-ref="117y">y</dfn>, <em>double</em> <dfn class="local col8 decl" id="118z" title='z' data-type='double' data-ref="118z">z</dfn>)</td></tr>
+<tr><th id="734">734</th><td>      : <a class="type" href="#HepGeom::Transform3D" title='HepGeom::Transform3D' data-ref="HepGeom::Transform3D">Transform3D</a><a class="ref" href="#_ZN7HepGeom11Transform3DC1Edddddddddddd" title='HepGeom::Transform3D::Transform3D' data-ref="_ZN7HepGeom11Transform3DC1Edddddddddddd">(</a><a class="local col6 ref" href="#116x" title='x' data-ref="116x">x</a>,<var>0</var>,<var>0</var>,<var>0</var>, <var>0</var>,<a class="local col7 ref" href="#117y" title='y' data-ref="117y">y</a>,<var>0</var>,<var>0</var>, <var>0</var>,<var>0</var>,<a class="local col8 ref" href="#118z" title='z' data-ref="118z">z</a>,<var>0</var>) {}</td></tr>
+<tr><th id="735">735</th><td></td></tr>
+<tr><th id="736">736</th><td>    <i class="doc">/**</i></td></tr>
+<tr><th id="737">737</th><td><i class="doc">     * Constructor from a number: sets uniform scaling in all directions. */</i></td></tr>
+<tr><th id="738">738</th><td>    <dfn class="decl def" id="_ZN7HepGeom7Scale3DC1Ed" title='HepGeom::Scale3D::Scale3D' data-ref="_ZN7HepGeom7Scale3DC1Ed">Scale3D</dfn>(<em>double</em> <dfn class="local col9 decl" id="119s" title='s' data-type='double' data-ref="119s">s</dfn>)</td></tr>
+<tr><th id="739">739</th><td>      : <a class="type" href="#HepGeom::Transform3D" title='HepGeom::Transform3D' data-ref="HepGeom::Transform3D">Transform3D</a><a class="ref" href="#_ZN7HepGeom11Transform3DC1Edddddddddddd" title='HepGeom::Transform3D::Transform3D' data-ref="_ZN7HepGeom11Transform3DC1Edddddddddddd">(</a><a class="local col9 ref" href="#119s" title='s' data-ref="119s">s</a>,<var>0</var>,<var>0</var>,<var>0</var>, <var>0</var>,<a class="local col9 ref" href="#119s" title='s' data-ref="119s">s</a>,<var>0</var>,<var>0</var>, <var>0</var>,<var>0</var>,<a class="local col9 ref" href="#119s" title='s' data-ref="119s">s</a>,<var>0</var>) {}</td></tr>
+<tr><th id="740">740</th><td>  };</td></tr>
+<tr><th id="741">741</th><td></td></tr>
+<tr><th id="742">742</th><td>  <i class="doc">/**</i></td></tr>
+<tr><th id="743">743</th><td><i class="doc">   * Constructs a scaling transformation in x-direction.</i></td></tr>
+<tr><th id="744">744</th><td><i class="doc">   * This class provides additional constructors for Transform3D</i></td></tr>
+<tr><th id="745">745</th><td><i class="doc">   * and should not be used as a separate class.</i></td></tr>
+<tr><th id="746">746</th><td><i class="doc">   * </i></td></tr>
+<tr><th id="747">747</th><td><i class="doc">   * Example of use:</i></td></tr>
+<tr><th id="748">748</th><td><i class="doc">   * <span class="command">@code</span></i></td></tr>
+<tr><th id="749">749</th><td><i class="doc">   *<span class="verb">   Transform3D m;</span></i></td></tr>
+<tr><th id="750">750</th><td><i class="doc"><span class="verb"></span>   *<span class="verb">   m = ScaleX3D(2.);</span></i></td></tr>
+<tr><th id="751">751</th><td><i class="doc"><span class="verb"></span>   * @endcode</i></td></tr>
+<tr><th id="752">752</th><td><i class="doc">   *</i></td></tr>
+<tr><th id="753">753</th><td><i class="doc">   * <span class="command">@author</span> &lt;Evgueni.Tcherniae<span class="command">v@cern</span>.ch&gt;</i></td></tr>
+<tr><th id="754">754</th><td><i class="doc">   * <span class="command">@ingroup</span> <span class="verb">geometry</span></i></td></tr>
+<tr><th id="755">755</th><td><i class="doc">   */</i></td></tr>
+<tr><th id="756">756</th><td>  <b>class</b> <dfn class="type def" id="HepGeom::ScaleX3D" title='HepGeom::ScaleX3D' data-ref="HepGeom::ScaleX3D">ScaleX3D</dfn> : <b>public</b> <a class="type" href="#HepGeom::Scale3D" title='HepGeom::Scale3D' data-ref="HepGeom::Scale3D">Scale3D</a> {</td></tr>
+<tr><th id="757">757</th><td>  <b>public</b>:</td></tr>
+<tr><th id="758">758</th><td>    <i class="doc">/**</i></td></tr>
+<tr><th id="759">759</th><td><i class="doc">     * Default constructor: sets the Identity transformation. */</i></td></tr>
+<tr><th id="760">760</th><td>    <dfn class="decl def" id="_ZN7HepGeom8ScaleX3DC1Ev" title='HepGeom::ScaleX3D::ScaleX3D' data-ref="_ZN7HepGeom8ScaleX3DC1Ev">ScaleX3D</dfn>() : <a class="type" href="#HepGeom::Scale3D" title='HepGeom::Scale3D' data-ref="HepGeom::Scale3D">Scale3D</a><a class="ref" href="#_ZN7HepGeom7Scale3DC1Ev" title='HepGeom::Scale3D::Scale3D' data-ref="_ZN7HepGeom7Scale3DC1Ev">(</a>) {}</td></tr>
+<tr><th id="761">761</th><td></td></tr>
+<tr><th id="762">762</th><td>    <i class="doc">/**</i></td></tr>
+<tr><th id="763">763</th><td><i class="doc">     * Constructor from a number (scale factor in x-direction). */</i></td></tr>
+<tr><th id="764">764</th><td>    <dfn class="decl def" id="_ZN7HepGeom8ScaleX3DC1Ed" title='HepGeom::ScaleX3D::ScaleX3D' data-ref="_ZN7HepGeom8ScaleX3DC1Ed">ScaleX3D</dfn>(<em>double</em> <dfn class="local col0 decl" id="120x" title='x' data-type='double' data-ref="120x">x</dfn>) : <a class="type" href="#HepGeom::Scale3D" title='HepGeom::Scale3D' data-ref="HepGeom::Scale3D">Scale3D</a><a class="ref" href="#_ZN7HepGeom7Scale3DC1Eddd" title='HepGeom::Scale3D::Scale3D' data-ref="_ZN7HepGeom7Scale3DC1Eddd">(</a><a class="local col0 ref" href="#120x" title='x' data-ref="120x">x</a>, <var>1</var>, <var>1</var>) {}</td></tr>
+<tr><th id="765">765</th><td>  };</td></tr>
+<tr><th id="766">766</th><td></td></tr>
+<tr><th id="767">767</th><td>  <i class="doc">/**</i></td></tr>
+<tr><th id="768">768</th><td><i class="doc">   * Constructs a scaling transformation in y-direction.</i></td></tr>
+<tr><th id="769">769</th><td><i class="doc">   * This class provides additional constructors for Transform3D</i></td></tr>
+<tr><th id="770">770</th><td><i class="doc">   * and should not be used as a separate class.</i></td></tr>
+<tr><th id="771">771</th><td><i class="doc">   * </i></td></tr>
+<tr><th id="772">772</th><td><i class="doc">   * Example of use:</i></td></tr>
+<tr><th id="773">773</th><td><i class="doc">   * <span class="command">@code</span></i></td></tr>
+<tr><th id="774">774</th><td><i class="doc">   *<span class="verb">   Transform3D m;</span></i></td></tr>
+<tr><th id="775">775</th><td><i class="doc"><span class="verb"></span>   *<span class="verb">   m = ScaleY3D(2.);</span></i></td></tr>
+<tr><th id="776">776</th><td><i class="doc"><span class="verb"></span>   * @endcode</i></td></tr>
+<tr><th id="777">777</th><td><i class="doc">   *</i></td></tr>
+<tr><th id="778">778</th><td><i class="doc">   * <span class="command">@author</span> &lt;Evgueni.Tcherniae<span class="command">v@cern</span>.ch&gt;</i></td></tr>
+<tr><th id="779">779</th><td><i class="doc">   * <span class="command">@ingroup</span> <span class="verb">geometry</span></i></td></tr>
+<tr><th id="780">780</th><td><i class="doc">   */</i></td></tr>
+<tr><th id="781">781</th><td>  <b>class</b> <dfn class="type def" id="HepGeom::ScaleY3D" title='HepGeom::ScaleY3D' data-ref="HepGeom::ScaleY3D">ScaleY3D</dfn> : <b>public</b> <a class="type" href="#HepGeom::Scale3D" title='HepGeom::Scale3D' data-ref="HepGeom::Scale3D">Scale3D</a> {</td></tr>
+<tr><th id="782">782</th><td>  <b>public</b>:</td></tr>
+<tr><th id="783">783</th><td>    <i class="doc">/**</i></td></tr>
+<tr><th id="784">784</th><td><i class="doc">     * Default constructor: sets the Identity transformation. */</i></td></tr>
+<tr><th id="785">785</th><td>    <dfn class="decl def" id="_ZN7HepGeom8ScaleY3DC1Ev" title='HepGeom::ScaleY3D::ScaleY3D' data-ref="_ZN7HepGeom8ScaleY3DC1Ev">ScaleY3D</dfn>() : <a class="type" href="#HepGeom::Scale3D" title='HepGeom::Scale3D' data-ref="HepGeom::Scale3D">Scale3D</a><a class="ref" href="#_ZN7HepGeom7Scale3DC1Ev" title='HepGeom::Scale3D::Scale3D' data-ref="_ZN7HepGeom7Scale3DC1Ev">(</a>) {}</td></tr>
+<tr><th id="786">786</th><td></td></tr>
+<tr><th id="787">787</th><td>    <i class="doc">/**</i></td></tr>
+<tr><th id="788">788</th><td><i class="doc">     * Constructor from a number (scale factor in y-direction). */</i></td></tr>
+<tr><th id="789">789</th><td>    <dfn class="decl def" id="_ZN7HepGeom8ScaleY3DC1Ed" title='HepGeom::ScaleY3D::ScaleY3D' data-ref="_ZN7HepGeom8ScaleY3DC1Ed">ScaleY3D</dfn>(<em>double</em> <dfn class="local col1 decl" id="121y" title='y' data-type='double' data-ref="121y">y</dfn>) : <a class="type" href="#HepGeom::Scale3D" title='HepGeom::Scale3D' data-ref="HepGeom::Scale3D">Scale3D</a><a class="ref" href="#_ZN7HepGeom7Scale3DC1Eddd" title='HepGeom::Scale3D::Scale3D' data-ref="_ZN7HepGeom7Scale3DC1Eddd">(</a><var>1</var>, <a class="local col1 ref" href="#121y" title='y' data-ref="121y">y</a>, <var>1</var>) {}</td></tr>
+<tr><th id="790">790</th><td>  };</td></tr>
+<tr><th id="791">791</th><td></td></tr>
+<tr><th id="792">792</th><td>  <i class="doc">/**</i></td></tr>
+<tr><th id="793">793</th><td><i class="doc">   * Constructs a scaling transformation in z-direction.</i></td></tr>
+<tr><th id="794">794</th><td><i class="doc">   * This class provides additional constructors for Transform3D</i></td></tr>
+<tr><th id="795">795</th><td><i class="doc">   * and should not be used as a separate class.</i></td></tr>
+<tr><th id="796">796</th><td><i class="doc">   *</i></td></tr>
+<tr><th id="797">797</th><td><i class="doc">   * Example of use:</i></td></tr>
+<tr><th id="798">798</th><td><i class="doc">   * <span class="command">@code</span></i></td></tr>
+<tr><th id="799">799</th><td><i class="doc">   *<span class="verb">   Transform3D m;</span></i></td></tr>
+<tr><th id="800">800</th><td><i class="doc"><span class="verb"></span>   *<span class="verb">   m = ScaleZ3D(2.);</span></i></td></tr>
+<tr><th id="801">801</th><td><i class="doc"><span class="verb"></span>   * @endcode</i></td></tr>
+<tr><th id="802">802</th><td><i class="doc">   *</i></td></tr>
+<tr><th id="803">803</th><td><i class="doc">   * <span class="command">@author</span> &lt;Evgueni.Tcherniae<span class="command">v@cern</span>.ch&gt;</i></td></tr>
+<tr><th id="804">804</th><td><i class="doc">   * <span class="command">@ingroup</span> <span class="verb">geometry</span></i></td></tr>
+<tr><th id="805">805</th><td><i class="doc">   */</i></td></tr>
+<tr><th id="806">806</th><td>  <b>class</b> <dfn class="type def" id="HepGeom::ScaleZ3D" title='HepGeom::ScaleZ3D' data-ref="HepGeom::ScaleZ3D">ScaleZ3D</dfn> : <b>public</b> <a class="type" href="#HepGeom::Scale3D" title='HepGeom::Scale3D' data-ref="HepGeom::Scale3D">Scale3D</a> {</td></tr>
+<tr><th id="807">807</th><td>  <b>public</b>:</td></tr>
+<tr><th id="808">808</th><td>    <i class="doc">/**</i></td></tr>
+<tr><th id="809">809</th><td><i class="doc">     * Default constructor: sets the Identity transformation. */</i></td></tr>
+<tr><th id="810">810</th><td>    <dfn class="decl def" id="_ZN7HepGeom8ScaleZ3DC1Ev" title='HepGeom::ScaleZ3D::ScaleZ3D' data-ref="_ZN7HepGeom8ScaleZ3DC1Ev">ScaleZ3D</dfn>() : <a class="type" href="#HepGeom::Scale3D" title='HepGeom::Scale3D' data-ref="HepGeom::Scale3D">Scale3D</a><a class="ref" href="#_ZN7HepGeom7Scale3DC1Ev" title='HepGeom::Scale3D::Scale3D' data-ref="_ZN7HepGeom7Scale3DC1Ev">(</a>) {}</td></tr>
+<tr><th id="811">811</th><td>    <i class="doc">/**</i></td></tr>
+<tr><th id="812">812</th><td><i class="doc">     * Constructor from a number (scale factor in z-direction). */</i></td></tr>
+<tr><th id="813">813</th><td>    <dfn class="decl def" id="_ZN7HepGeom8ScaleZ3DC1Ed" title='HepGeom::ScaleZ3D::ScaleZ3D' data-ref="_ZN7HepGeom8ScaleZ3DC1Ed">ScaleZ3D</dfn>(<em>double</em> <dfn class="local col2 decl" id="122z" title='z' data-type='double' data-ref="122z">z</dfn>) : <a class="type" href="#HepGeom::Scale3D" title='HepGeom::Scale3D' data-ref="HepGeom::Scale3D">Scale3D</a><a class="ref" href="#_ZN7HepGeom7Scale3DC1Eddd" title='HepGeom::Scale3D::Scale3D' data-ref="_ZN7HepGeom7Scale3DC1Eddd">(</a><var>1</var>, <var>1</var>, <a class="local col2 ref" href="#122z" title='z' data-ref="122z">z</a>) {}</td></tr>
+<tr><th id="814">814</th><td>  };</td></tr>
+<tr><th id="815">815</th><td>} <i>/* namespace HepGeom */</i></td></tr>
+<tr><th id="816">816</th><td></td></tr>
+<tr><th id="817">817</th><td><u>#include <a href="Transform3D.icc.html">"CLHEP/Geometry/Transform3D.icc"</a></u></td></tr>
+<tr><th id="818">818</th><td></td></tr>
+<tr><th id="819">819</th><td><u>#<span data-ppcond="119">endif</span> /* HEP_TRANSFROM3D_H */</u></td></tr>
+<tr><th id="820">820</th><td></td></tr>
+</table><hr/><p id='footer'>
+Generated while processing <a href='../../../../../digits_hits/detector/src/G4HCtable.cc.html'>codebrowser/source/digits_hits/detector/src/G4HCtable.cc</a><br/>Generated on <em>2019-Aug-28</em> from project codebrowser<br />Powered by <a href='https://woboq.com'><img alt='Woboq' src='https://code.woboq.org/woboq-16.png' width='41' height='16' /></a> <a href='https://code.woboq.org'>Code Browser</a> 2.1
+<br/>Generator usage only permitted with license.</p>
+</div></body></html>

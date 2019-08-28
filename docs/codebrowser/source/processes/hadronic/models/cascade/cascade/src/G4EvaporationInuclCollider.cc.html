@@ -1,0 +1,91 @@
+<!doctype html>
+<html>
+<head>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"><title>G4EvaporationInuclCollider.cc source code [codebrowser/source/processes/hadronic/models/cascade/cascade/src/G4EvaporationInuclCollider.cc] - Woboq Code Browser</title>
+<link rel="stylesheet" href="../../../../../../../../../data/qtcreator.css" title="QtCreator"/>
+<link rel="alternate stylesheet" href="../../../../../../../../../data/kdevelop.css" title="KDevelop"/>
+<script type="text/javascript" src="../../../../../../../../../data/jquery/jquery.min.js"></script>
+<script type="text/javascript" src="../../../../../../../../../data/jquery/jquery-ui.min.js"></script>
+<script>var file = 'codebrowser/source/processes/hadronic/models/cascade/cascade/src/G4EvaporationInuclCollider.cc'; var root_path = '../../../../../../../..'; var data_path = '../../../../../../../../../data';</script>
+<script src='../../../../../../../../../data/codebrowser.js'></script>
+</head>
+<body><div id='header'><h1 id='breadcrumb'><span>Browse the source code of </span><a href='../../../../../../..'>codebrowser</a>/<a href='../../../../../..'>source</a>/<a href='../../../../..'>processes</a>/<a href='../../../..'>hadronic</a>/<a href='../../..'>models</a>/<a href='../..'>cascade</a>/<a href='..'>cascade</a>/<a href='./'>src</a>/<a href='G4EvaporationInuclCollider.cc.html'>G4EvaporationInuclCollider.cc</a></h1></div>
+<hr/><div id='content'><table class="code">
+<tr><th id="1">1</th><td><i>//</i></td></tr>
+<tr><th id="2">2</th><td><i>// ********************************************************************</i></td></tr>
+<tr><th id="3">3</th><td><i>// * License and Disclaimer                                           *</i></td></tr>
+<tr><th id="4">4</th><td><i>// *                                                                  *</i></td></tr>
+<tr><th id="5">5</th><td><i>// * The  Geant4 software  is  copyright of the Copyright Holders  of *</i></td></tr>
+<tr><th id="6">6</th><td><i>// * the Geant4 Collaboration.  It is provided  under  the terms  and *</i></td></tr>
+<tr><th id="7">7</th><td><i>// * conditions of the Geant4 Software License,  included in the file *</i></td></tr>
+<tr><th id="8">8</th><td><i>// * LICENSE and available at  <a href="http://cern.ch/geant4/license">http://cern.ch/geant4/license</a> .  These *</i></td></tr>
+<tr><th id="9">9</th><td><i>// * include a list of copyright holders.                             *</i></td></tr>
+<tr><th id="10">10</th><td><i>// *                                                                  *</i></td></tr>
+<tr><th id="11">11</th><td><i>// * Neither the authors of this software system, nor their employing *</i></td></tr>
+<tr><th id="12">12</th><td><i>// * institutes,nor the agencies providing financial support for this *</i></td></tr>
+<tr><th id="13">13</th><td><i>// * work  make  any representation or  warranty, express or implied, *</i></td></tr>
+<tr><th id="14">14</th><td><i>// * regarding  this  software system or assume any liability for its *</i></td></tr>
+<tr><th id="15">15</th><td><i>// * use.  Please see the license in the file  LICENSE  and URL above *</i></td></tr>
+<tr><th id="16">16</th><td><i>// * for the full disclaimer and the limitation of liability.         *</i></td></tr>
+<tr><th id="17">17</th><td><i>// *                                                                  *</i></td></tr>
+<tr><th id="18">18</th><td><i>// * This  code  implementation is the result of  the  scientific and *</i></td></tr>
+<tr><th id="19">19</th><td><i>// * technical work of the GEANT4 collaboration.                      *</i></td></tr>
+<tr><th id="20">20</th><td><i>// * By using,  copying,  modifying or  distributing the software (or *</i></td></tr>
+<tr><th id="21">21</th><td><i>// * any work based  on the software)  you  agree  to acknowledge its *</i></td></tr>
+<tr><th id="22">22</th><td><i>// * use  in  resulting  scientific  publications,  and indicate your *</i></td></tr>
+<tr><th id="23">23</th><td><i>// * acceptance of all terms of the Geant4 Software license.          *</i></td></tr>
+<tr><th id="24">24</th><td><i>// ********************************************************************</i></td></tr>
+<tr><th id="25">25</th><td><i>//</i></td></tr>
+<tr><th id="26">26</th><td><i>//</i></td></tr>
+<tr><th id="27">27</th><td><i>// 20100114  M. Kelsey -- Remove G4CascadeMomentum, use G4LorentzVector directly</i></td></tr>
+<tr><th id="28">28</th><td><i>// 20100309  M. Kelsey -- Eliminate some unnecessary std::pow()</i></td></tr>
+<tr><th id="29">29</th><td><i>// 20100413  M. Kelsey -- Pass G4CollisionOutput by ref to ::collide()</i></td></tr>
+<tr><th id="30">30</th><td><i>// 20100517  M. Kelsey -- Inherit from common base class, make other colliders</i></td></tr>
+<tr><th id="31">31</th><td><i>//		simple data members.  Eliminate unnecessary G4InuclNuclei ctor.</i></td></tr>
+<tr><th id="32">32</th><td><i>// 20100714  M. Kelsey -- Switch to new G4CascadeColliderBase class</i></td></tr>
+<tr><th id="33">33</th><td><i>// 20110728  M. Kelsey -- Fix Coverity #23843, delete evaporator in dtor.</i></td></tr>
+<tr><th id="34">34</th><td><i>// 20110922  M. Kelsey -- Follow G4InuclParticle::print(ostream&amp;) migration</i></td></tr>
+<tr><th id="35">35</th><td><i>// 20130622  Inherit from G4CascadeDeexciteBase, move to deExcite() interface</i></td></tr>
+<tr><th id="36">36</th><td><i>//		with G4Fragment</i></td></tr>
+<tr><th id="37">37</th><td></td></tr>
+<tr><th id="38">38</th><td><u>#include <a href="../include/G4EvaporationInuclCollider.hh.html">"G4EvaporationInuclCollider.hh"</a></u></td></tr>
+<tr><th id="39">39</th><td><u>#include <a href="../include/G4CollisionOutput.hh.html">"G4CollisionOutput.hh"</a></u></td></tr>
+<tr><th id="40">40</th><td><u>#include <a href="../include/G4EquilibriumEvaporator.hh.html">"G4EquilibriumEvaporator.hh"</a></u></td></tr>
+<tr><th id="41">41</th><td><u>#include <a href="../include/G4InuclNuclei.hh.html">"G4InuclNuclei.hh"</a></u></td></tr>
+<tr><th id="42">42</th><td></td></tr>
+<tr><th id="43">43</th><td></td></tr>
+<tr><th id="44">44</th><td><b>typedef</b> <span class='error' title="use of undeclared identifier &apos;std&apos;">std</span>::vector<span class='error' title="expected unqualified-id">&lt;</span>G4InuclElementaryParticle&gt;::iterator particleIterator;</td></tr>
+<tr><th id="45">45</th><td><b>typedef</b> <span class='error' title="use of undeclared identifier &apos;std&apos;">std</span>::vector<span class='error' title="expected unqualified-id">&lt;</span>G4InuclNuclei&gt;::iterator nucleiIterator;</td></tr>
+<tr><th id="46">46</th><td></td></tr>
+<tr><th id="47">47</th><td>	 </td></tr>
+<tr><th id="48">48</th><td><a class="type" href="../include/G4EvaporationInuclCollider.hh.html#G4EvaporationInuclCollider" title='G4EvaporationInuclCollider' data-ref="G4EvaporationInuclCollider">G4EvaporationInuclCollider</a>::<dfn class="decl def" id="_ZN26G4EvaporationInuclColliderC1Ev" title='G4EvaporationInuclCollider::G4EvaporationInuclCollider' data-ref="_ZN26G4EvaporationInuclColliderC1Ev">G4EvaporationInuclCollider</dfn>()</td></tr>
+<tr><th id="49">49</th><td>  : <a class="type" href="../include/G4CascadeDeexciteBase.hh.html#G4CascadeDeexciteBase" title='G4CascadeDeexciteBase' data-ref="G4CascadeDeexciteBase">G4CascadeDeexciteBase</a><a class="ref" href="../include/G4CascadeDeexciteBase.hh.html#_ZN21G4CascadeDeexciteBaseC1EPKc" title='G4CascadeDeexciteBase::G4CascadeDeexciteBase' data-ref="_ZN21G4CascadeDeexciteBaseC1EPKc">(</a><q>"G4EvaporationInuclCollider"</q>),</td></tr>
+<tr><th id="50">50</th><td>    <a class="member" href="../include/G4EvaporationInuclCollider.hh.html#G4EvaporationInuclCollider::theEquilibriumEvaporator" title='G4EvaporationInuclCollider::theEquilibriumEvaporator' data-ref="G4EvaporationInuclCollider::theEquilibriumEvaporator">theEquilibriumEvaporator</a>(<b>new</b> <a class="ref fake" href="../include/G4EquilibriumEvaporator.hh.html#_ZN23G4EquilibriumEvaporatorC1Ev" title='G4EquilibriumEvaporator::G4EquilibriumEvaporator' data-ref="_ZN23G4EquilibriumEvaporatorC1Ev"></a><a class="type" href="../include/G4EquilibriumEvaporator.hh.html#G4EquilibriumEvaporator" title='G4EquilibriumEvaporator' data-ref="G4EquilibriumEvaporator">G4EquilibriumEvaporator</a>) {}</td></tr>
+<tr><th id="51">51</th><td></td></tr>
+<tr><th id="52">52</th><td><a class="type" href="../include/G4EvaporationInuclCollider.hh.html#G4EvaporationInuclCollider" title='G4EvaporationInuclCollider' data-ref="G4EvaporationInuclCollider">G4EvaporationInuclCollider</a>::<dfn class="virtual decl def" id="_ZN26G4EvaporationInuclColliderD1Ev" title='G4EvaporationInuclCollider::~G4EvaporationInuclCollider' data-ref="_ZN26G4EvaporationInuclColliderD1Ev">~G4EvaporationInuclCollider</dfn>() {</td></tr>
+<tr><th id="53">53</th><td>  <b>delete</b> <a class="member" href="../include/G4EvaporationInuclCollider.hh.html#G4EvaporationInuclCollider::theEquilibriumEvaporator" title='G4EvaporationInuclCollider::theEquilibriumEvaporator' data-ref="G4EvaporationInuclCollider::theEquilibriumEvaporator">theEquilibriumEvaporator</a>;</td></tr>
+<tr><th id="54">54</th><td>}</td></tr>
+<tr><th id="55">55</th><td></td></tr>
+<tr><th id="56">56</th><td></td></tr>
+<tr><th id="57">57</th><td><em>void</em></td></tr>
+<tr><th id="58">58</th><td><a class="type" href="../include/G4EvaporationInuclCollider.hh.html#G4EvaporationInuclCollider" title='G4EvaporationInuclCollider' data-ref="G4EvaporationInuclCollider">G4EvaporationInuclCollider</a>::<dfn class="virtual decl def" id="_ZN26G4EvaporationInuclCollider8deExciteERK10G4FragmentR17G4CollisionOutput" title='G4EvaporationInuclCollider::deExcite' data-ref="_ZN26G4EvaporationInuclCollider8deExciteERK10G4FragmentR17G4CollisionOutput">deExcite</dfn>(<em>const</em> <a class="type" href="../../../util/include/G4Fragment.hh.html#G4Fragment" title='G4Fragment' data-ref="G4Fragment">G4Fragment</a>&amp; <dfn class="local col3 decl" id="3target" title='target' data-type='const G4Fragment &amp;' data-ref="3target">target</dfn>,</td></tr>
+<tr><th id="59">59</th><td>				     <a class="type" href="../include/G4CollisionOutput.hh.html#G4CollisionOutput" title='G4CollisionOutput' data-ref="G4CollisionOutput">G4CollisionOutput</a>&amp; <dfn class="local col4 decl" id="4globalOutput" title='globalOutput' data-type='G4CollisionOutput &amp;' data-ref="4globalOutput">globalOutput</dfn>) {</td></tr>
+<tr><th id="60">60</th><td>  <b>if</b> (<a class="member" href="../include/G4VCascadeCollider.hh.html#G4VCascadeCollider::verboseLevel" title='G4VCascadeCollider::verboseLevel' data-ref="G4VCascadeCollider::verboseLevel">verboseLevel</a>) {</td></tr>
+<tr><th id="61">61</th><td>    <a class="macro" href="../../../../../../global/management/include/G4ios.hh.html#46" title="(*_G4cout_p())" data-ref="_M/G4cout">G4cout</a> <span class='error' title="invalid operands to binary expression (&apos;int&apos; and &apos;const char *&apos;)">&lt;&lt;</span> <q>" &gt;&gt;&gt; G4EvaporationInuclCollider::deExcite"</q> &lt;&lt; <a class="macro" href="../../../../../../global/management/include/G4ios.hh.html#60" title="std::endl" data-ref="_M/G4endl">G4endl</a>;</td></tr>
+<tr><th id="62">62</th><td>  }</td></tr>
+<tr><th id="63">63</th><td></td></tr>
+<tr><th id="64">64</th><td>  <b>if</b> (verboseLevel&gt;<var>3</var>) <a class="macro" href="../../../../../../global/management/include/G4ios.hh.html#46" title="(*_G4cout_p())" data-ref="_M/G4cout">G4cout</a> &lt;&lt; target &lt;&lt; <a class="macro" href="../../../../../../global/management/include/G4ios.hh.html#60" title="std::endl" data-ref="_M/G4endl">G4endl</a>;</td></tr>
+<tr><th id="65">65</th><td></td></tr>
+<tr><th id="66">66</th><td>  <a class="member" href="../include/G4EvaporationInuclCollider.hh.html#G4EvaporationInuclCollider::theEquilibriumEvaporator" title='G4EvaporationInuclCollider::theEquilibriumEvaporator' data-ref="G4EvaporationInuclCollider::theEquilibriumEvaporator">theEquilibriumEvaporator</a>-&gt;<a class="virtual ref" href="../include/G4EquilibriumEvaporator.hh.html#_ZN23G4EquilibriumEvaporator8deExciteERK10G4FragmentR17G4CollisionOutput" title='G4EquilibriumEvaporator::deExcite' data-ref="_ZN23G4EquilibriumEvaporator8deExciteERK10G4FragmentR17G4CollisionOutput">deExcite</a>(<a class="local col3 ref" href="#3target" title='target' data-ref="3target">target</a>, <span class='refarg'><a class="local col4 ref" href="#4globalOutput" title='globalOutput' data-ref="4globalOutput">globalOutput</a></span>);</td></tr>
+<tr><th id="67">67</th><td></td></tr>
+<tr><th id="68">68</th><td>  <b>if</b> (<a class="member" href="../include/G4VCascadeCollider.hh.html#G4VCascadeCollider::verboseLevel" title='G4VCascadeCollider::verboseLevel' data-ref="G4VCascadeCollider::verboseLevel">verboseLevel</a> &gt; <var>2</var>) {</td></tr>
+<tr><th id="69">69</th><td>    <a class="macro" href="../../../../../../global/management/include/G4ios.hh.html#46" title="(*_G4cout_p())" data-ref="_M/G4cout">G4cout</a> <span class='error' title="invalid operands to binary expression (&apos;int&apos; and &apos;const char *&apos;)">&lt;&lt;</span> <q>" After EquilibriumEvaporator "</q> &lt;&lt; <a class="macro" href="../../../../../../global/management/include/G4ios.hh.html#60" title="std::endl" data-ref="_M/G4endl">G4endl</a>;</td></tr>
+<tr><th id="70">70</th><td>    globalOutput.printCollisionOutput();</td></tr>
+<tr><th id="71">71</th><td>    <a class="macro" href="../../../../../../global/management/include/G4ios.hh.html#46" title="(*_G4cout_p())" data-ref="_M/G4cout">G4cout</a> <span class='error' title="invalid operands to binary expression (&apos;int&apos; and &apos;const char *&apos;)">&lt;&lt;</span> <q>"G4EvaporationInuclCollider::collide end"</q> &lt;&lt; <a class="macro" href="../../../../../../global/management/include/G4ios.hh.html#60" title="std::endl" data-ref="_M/G4endl">G4endl</a>;</td></tr>
+<tr><th id="72">72</th><td>  }</td></tr>
+<tr><th id="73">73</th><td>}</td></tr>
+<tr><th id="74">74</th><td></td></tr>
+</table><hr/><p id='footer'>
+Generated on <em>2019-Aug-28</em> from project codebrowser<br />Powered by <a href='https://woboq.com'><img alt='Woboq' src='https://code.woboq.org/woboq-16.png' width='41' height='16' /></a> <a href='https://code.woboq.org'>Code Browser</a> 2.1
+<br/>Generator usage only permitted with license.</p>
+</div></body></html>

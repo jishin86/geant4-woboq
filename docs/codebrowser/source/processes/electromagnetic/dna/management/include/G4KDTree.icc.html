@@ -1,0 +1,446 @@
+<!doctype html>
+<html>
+<head>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"><title>G4KDTree.icc source code [codebrowser/source/processes/electromagnetic/dna/management/include/G4KDTree.icc] - Woboq Code Browser</title>
+<link rel="stylesheet" href="../../../../../../../../data/qtcreator.css" title="QtCreator"/>
+<link rel="alternate stylesheet" href="../../../../../../../../data/kdevelop.css" title="KDevelop"/>
+<script type="text/javascript" src="../../../../../../../../data/jquery/jquery.min.js"></script>
+<script type="text/javascript" src="../../../../../../../../data/jquery/jquery-ui.min.js"></script>
+<script>var file = 'codebrowser/source/processes/electromagnetic/dna/management/include/G4KDTree.icc'; var root_path = '../../../../../../..'; var data_path = '../../../../../../../../data';</script>
+<script src='../../../../../../../../data/codebrowser.js'></script>
+</head>
+<body><div id='header'><h1 id='breadcrumb'><span>Browse the source code of </span><a href='../../../../../..'>codebrowser</a>/<a href='../../../../..'>source</a>/<a href='../../../..'>processes</a>/<a href='../../..'>electromagnetic</a>/<a href='../..'>dna</a>/<a href='..'>management</a>/<a href='./'>include</a>/<a href='G4KDTree.icc.html'>G4KDTree.icc</a></h1></div>
+<hr/><div id='content'><table class="code">
+<tr><th id="1">1</th><td><i>//</i></td></tr>
+<tr><th id="2">2</th><td><i>// ********************************************************************</i></td></tr>
+<tr><th id="3">3</th><td><i>// * License and Disclaimer                                           *</i></td></tr>
+<tr><th id="4">4</th><td><i>// *                                                                  *</i></td></tr>
+<tr><th id="5">5</th><td><i>// * The  Geant4 software  is  copyright of the Copyright Holders  of *</i></td></tr>
+<tr><th id="6">6</th><td><i>// * the Geant4 Collaboration.  It is provided  under  the terms  and *</i></td></tr>
+<tr><th id="7">7</th><td><i>// * conditions of the Geant4 Software License,  included in the file *</i></td></tr>
+<tr><th id="8">8</th><td><i>// * LICENSE and available at  <a href="http://cern.ch/geant4/license">http://cern.ch/geant4/license</a> .  These *</i></td></tr>
+<tr><th id="9">9</th><td><i>// * include a list of copyright holders.                             *</i></td></tr>
+<tr><th id="10">10</th><td><i>// *                                                                  *</i></td></tr>
+<tr><th id="11">11</th><td><i>// * Neither the authors of this software system, nor their employing *</i></td></tr>
+<tr><th id="12">12</th><td><i>// * institutes,nor the agencies providing financial support for this *</i></td></tr>
+<tr><th id="13">13</th><td><i>// * work  make  any representation or  warranty, express or implied, *</i></td></tr>
+<tr><th id="14">14</th><td><i>// * regarding  this  software system or assume any liability for its *</i></td></tr>
+<tr><th id="15">15</th><td><i>// * use.  Please see the license in the file  LICENSE  and URL above *</i></td></tr>
+<tr><th id="16">16</th><td><i>// * for the full disclaimer and the limitation of liability.         *</i></td></tr>
+<tr><th id="17">17</th><td><i>// *                                                                  *</i></td></tr>
+<tr><th id="18">18</th><td><i>// * This  code  implementation is the result of  the  scientific and *</i></td></tr>
+<tr><th id="19">19</th><td><i>// * technical work of the GEANT4 collaboration.                      *</i></td></tr>
+<tr><th id="20">20</th><td><i>// * By using,  copying,  modifying or  distributing the software (or *</i></td></tr>
+<tr><th id="21">21</th><td><i>// * any work based  on the software)  you  agree  to acknowledge its *</i></td></tr>
+<tr><th id="22">22</th><td><i>// * use  in  resulting  scientific  publications,  and indicate your *</i></td></tr>
+<tr><th id="23">23</th><td><i>// * acceptance of all terms of the Geant4 Software license.          *</i></td></tr>
+<tr><th id="24">24</th><td><i>// ********************************************************************</i></td></tr>
+<tr><th id="25">25</th><td><i>//</i></td></tr>
+<tr><th id="26">26</th><td><i>//</i></td></tr>
+<tr><th id="27">27</th><td><i>// Author: Mathieu Karamitros (kara (AT) cenbg . in2p3 . fr) </i></td></tr>
+<tr><th id="28">28</th><td><i>//</i></td></tr>
+<tr><th id="29">29</th><td><i>// History:</i></td></tr>
+<tr><th id="30">30</th><td><i>// -----------</i></td></tr>
+<tr><th id="31">31</th><td><i>// 10 Oct 2011 M.Karamitros created</i></td></tr>
+<tr><th id="32">32</th><td><i>//</i></td></tr>
+<tr><th id="33">33</th><td><i>// -------------------------------------------------------------------</i></td></tr>
+<tr><th id="34">34</th><td><i>/*</i></td></tr>
+<tr><th id="35">35</th><td><i> * Based on ``kdtree'', a library for working with kd-trees.</i></td></tr>
+<tr><th id="36">36</th><td><i> * Copyright (C) 2007-2009 John Tsiombikas &lt;nuclear@siggraph.org&gt;</i></td></tr>
+<tr><th id="37">37</th><td><i> * The original open-source version of this code</i></td></tr>
+<tr><th id="38">38</th><td><i> * may be found at <a href="http://code.google.com/p/kdtree/">http://code.google.com/p/kdtree/</a></i></td></tr>
+<tr><th id="39">39</th><td><i> *</i></td></tr>
+<tr><th id="40">40</th><td><i> * Redistribution and use in source and binary forms, with or without</i></td></tr>
+<tr><th id="41">41</th><td><i> * modification, are permitted provided that the following conditions are</i></td></tr>
+<tr><th id="42">42</th><td><i> * met:</i></td></tr>
+<tr><th id="43">43</th><td><i> * 1. Redistributions of source code must retain the above copyright</i></td></tr>
+<tr><th id="44">44</th><td><i> * notice, this</i></td></tr>
+<tr><th id="45">45</th><td><i> * list of conditions and the following disclaimer.</i></td></tr>
+<tr><th id="46">46</th><td><i> * 2. Redistributions in binary form must reproduce the above copyright</i></td></tr>
+<tr><th id="47">47</th><td><i> * notice,</i></td></tr>
+<tr><th id="48">48</th><td><i> *  this list of conditions and the following disclaimer in the</i></td></tr>
+<tr><th id="49">49</th><td><i> * documentation</i></td></tr>
+<tr><th id="50">50</th><td><i> *  and/or other materials provided with the distribution.</i></td></tr>
+<tr><th id="51">51</th><td><i> * 3. The name of the author may not be used to endorse or promote products</i></td></tr>
+<tr><th id="52">52</th><td><i> *  derived from this software without specific prior written permission.</i></td></tr>
+<tr><th id="53">53</th><td><i> *</i></td></tr>
+<tr><th id="54">54</th><td><i> * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"</i></td></tr>
+<tr><th id="55">55</th><td><i> * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED</i></td></tr>
+<tr><th id="56">56</th><td><i> * WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED.</i></td></tr>
+<tr><th id="57">57</th><td><i> * IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT,</i></td></tr>
+<tr><th id="58">58</th><td><i> * INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT</i></td></tr>
+<tr><th id="59">59</th><td><i> * LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS;</i></td></tr>
+<tr><th id="60">60</th><td><i> * OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT,</i></td></tr>
+<tr><th id="61">61</th><td><i> * STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE</i></td></tr>
+<tr><th id="62">62</th><td><i> * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.</i></td></tr>
+<tr><th id="63">63</th><td><i> */</i></td></tr>
+<tr><th id="64">64</th><td><i>/* single nearest neighbor search written by Tamas Nepusz</i></td></tr>
+<tr><th id="65">65</th><td><i> * &lt;tamas@cs.rhul.ac.uk&gt;</i></td></tr>
+<tr><th id="66">66</th><td><i> */</i></td></tr>
+<tr><th id="67">67</th><td></td></tr>
+<tr><th id="68">68</th><td><b>template</b>&lt;<b>typename</b> PointT&gt;</td></tr>
+<tr><th id="69">69</th><td>  <a class="type" href="G4KDNode.hh.html#G4KDNode_Base" title='G4KDNode_Base' data-ref="G4KDNode_Base">G4KDNode_Base</a>* <a class="type" href="G4KDTree.hh.html#G4KDTree" title='G4KDTree' data-ref="G4KDTree">G4KDTree</a>::<dfn class="decl def" id="_ZN8G4KDTree9InsertMapEPT_" title='G4KDTree::InsertMap' data-ref="_ZN8G4KDTree9InsertMapEPT_">InsertMap</dfn>(PointT* <dfn class="local col5 decl" id="65point" title='point' data-type='PointT *' data-ref="65point">point</dfn>)</td></tr>
+<tr><th id="70">70</th><td>  {</td></tr>
+<tr><th id="71">71</th><td>    <a class="type" href="G4KDNode.hh.html#G4KDNode" title='G4KDNode' data-ref="G4KDNode">G4KDNode</a>&lt;PointT&gt;* <dfn class="local col6 decl" id="66node" title='node' data-type='G4KDNode&lt;PointT&gt; *' data-ref="66node">node</dfn> = <b>new</b> <a class="type" href="G4KDNode.hh.html#G4KDNode" title='G4KDNode' data-ref="G4KDNode">G4KDNode</a>&lt;PointT&gt;(<b>this</b>, <a class="local col5 ref" href="#65point" title='point' data-ref="65point">point</a>, <var>0</var>);</td></tr>
+<tr><th id="72">72</th><td>    <b>this</b>-&gt;<a class="member" href="G4KDTree.hh.html#_ZN8G4KDTree11__InsertMapEP13G4KDNode_Base" title='G4KDTree::__InsertMap' data-ref="_ZN8G4KDTree11__InsertMapEP13G4KDNode_Base">__InsertMap</a>(<a class="local col6 ref" href="#66node" title='node' data-ref="66node">node</a>);</td></tr>
+<tr><th id="73">73</th><td>    <b>return</b> <a class="local col6 ref" href="#66node" title='node' data-ref="66node">node</a>;</td></tr>
+<tr><th id="74">74</th><td>  }</td></tr>
+<tr><th id="75">75</th><td></td></tr>
+<tr><th id="76">76</th><td><b>template</b>&lt;<b>typename</b> PointT&gt;</td></tr>
+<tr><th id="77">77</th><td>  <a class="type" href="G4KDNode.hh.html#G4KDNode_Base" title='G4KDNode_Base' data-ref="G4KDNode_Base">G4KDNode_Base</a>* <a class="type" href="G4KDTree.hh.html#G4KDTree" title='G4KDTree' data-ref="G4KDTree">G4KDTree</a>::<dfn class="decl def" id="_ZN8G4KDTree6InsertEPT_" title='G4KDTree::Insert' data-ref="_ZN8G4KDTree6InsertEPT_">Insert</dfn>(PointT* <dfn class="local col7 decl" id="67pos" title='pos' data-type='PointT *' data-ref="67pos">pos</dfn>)</td></tr>
+<tr><th id="78">78</th><td>  {</td></tr>
+<tr><th id="79">79</th><td>    <a class="type" href="G4KDNode.hh.html#G4KDNode_Base" title='G4KDNode_Base' data-ref="G4KDNode_Base">G4KDNode_Base</a>* <dfn class="local col8 decl" id="68node" title='node' data-type='G4KDNode_Base *' data-ref="68node">node</dfn> = <var>0</var>;</td></tr>
+<tr><th id="80">80</th><td>    <b>if</b> (!<a class="member" href="G4KDTree.hh.html#G4KDTree::fRoot" title='G4KDTree::fRoot' data-ref="G4KDTree::fRoot">fRoot</a>)</td></tr>
+<tr><th id="81">81</th><td>    {</td></tr>
+<tr><th id="82">82</th><td>      <a class="member" href="G4KDTree.hh.html#G4KDTree::fRoot" title='G4KDTree::fRoot' data-ref="G4KDTree::fRoot">fRoot</a> = <b>new</b> <a class="type" href="G4KDNode.hh.html#G4KDNode" title='G4KDNode' data-ref="G4KDNode">G4KDNode</a>&lt;PointT&gt;(<b>this</b>, <a class="local col7 ref" href="#67pos" title='pos' data-ref="67pos">pos</a>, <var>0</var>);</td></tr>
+<tr><th id="83">83</th><td>      <a class="local col8 ref" href="#68node" title='node' data-ref="68node">node</a> = <a class="member" href="G4KDTree.hh.html#G4KDTree::fRoot" title='G4KDTree::fRoot' data-ref="G4KDTree::fRoot">fRoot</a>;</td></tr>
+<tr><th id="84">84</th><td>      <a class="member" href="G4KDTree.hh.html#G4KDTree::fNbNodes" title='G4KDTree::fNbNodes' data-ref="G4KDTree::fNbNodes">fNbNodes</a> = <var>0</var>;</td></tr>
+<tr><th id="85">85</th><td>      <a class="member" href="G4KDTree.hh.html#G4KDTree::fNbNodes" title='G4KDTree::fNbNodes' data-ref="G4KDTree::fNbNodes">fNbNodes</a>++;</td></tr>
+<tr><th id="86">86</th><td>      <a class="member" href="G4KDTree.hh.html#G4KDTree::fNbActiveNodes" title='G4KDTree::fNbActiveNodes' data-ref="G4KDTree::fNbActiveNodes">fNbActiveNodes</a>++;</td></tr>
+<tr><th id="87">87</th><td>    }</td></tr>
+<tr><th id="88">88</th><td>    <b>else</b></td></tr>
+<tr><th id="89">89</th><td>    {</td></tr>
+<tr><th id="90">90</th><td>      <b>if</b> ((<a class="local col8 ref" href="#68node" title='node' data-ref="68node">node</a> = <a class="member" href="G4KDTree.hh.html#G4KDTree::fRoot" title='G4KDTree::fRoot' data-ref="G4KDTree::fRoot">fRoot</a>-&gt;Insert&lt;PointT&gt;(<a class="local col7 ref" href="#67pos" title='pos' data-ref="67pos">pos</a>)))</td></tr>
+<tr><th id="91">91</th><td>      {</td></tr>
+<tr><th id="92">92</th><td>        <a class="member" href="G4KDTree.hh.html#G4KDTree::fNbNodes" title='G4KDTree::fNbNodes' data-ref="G4KDTree::fNbNodes">fNbNodes</a>++;</td></tr>
+<tr><th id="93">93</th><td>        <a class="member" href="G4KDTree.hh.html#G4KDTree::fNbActiveNodes" title='G4KDTree::fNbActiveNodes' data-ref="G4KDTree::fNbActiveNodes">fNbActiveNodes</a>++;</td></tr>
+<tr><th id="94">94</th><td>      }</td></tr>
+<tr><th id="95">95</th><td>    }</td></tr>
+<tr><th id="96">96</th><td></td></tr>
+<tr><th id="97">97</th><td>    <b>if</b> (<a class="member" href="G4KDTree.hh.html#G4KDTree::fRect" title='G4KDTree::fRect' data-ref="G4KDTree::fRect">fRect</a> == <var>0</var>)</td></tr>
+<tr><th id="98">98</th><td>    {</td></tr>
+<tr><th id="99">99</th><td>      fRect = <b>new</b> HyperRect(fDim);</td></tr>
+<tr><th id="100">100</th><td>      <a class="member" href="G4KDTree.hh.html#G4KDTree::fRect" title='G4KDTree::fRect' data-ref="G4KDTree::fRect">fRect</a>-&gt;SetMinMax(*<a class="local col7 ref" href="#67pos" title='pos' data-ref="67pos">pos</a>, *<a class="local col7 ref" href="#67pos" title='pos' data-ref="67pos">pos</a>);</td></tr>
+<tr><th id="101">101</th><td>    }</td></tr>
+<tr><th id="102">102</th><td>    <b>else</b></td></tr>
+<tr><th id="103">103</th><td>    {</td></tr>
+<tr><th id="104">104</th><td>      <a class="member" href="G4KDTree.hh.html#G4KDTree::fRect" title='G4KDTree::fRect' data-ref="G4KDTree::fRect">fRect</a>-&gt;Extend(*<a class="local col7 ref" href="#67pos" title='pos' data-ref="67pos">pos</a>);</td></tr>
+<tr><th id="105">105</th><td>    }</td></tr>
+<tr><th id="106">106</th><td></td></tr>
+<tr><th id="107">107</th><td>    <b>return</b> <a class="local col8 ref" href="#68node" title='node' data-ref="68node">node</a>;</td></tr>
+<tr><th id="108">108</th><td>  }</td></tr>
+<tr><th id="109">109</th><td></td></tr>
+<tr><th id="110">110</th><td><b>template</b>&lt;<b>typename</b> PointT&gt;</td></tr>
+<tr><th id="111">111</th><td>  <a class="type" href="G4KDNode.hh.html#G4KDNode_Base" title='G4KDNode_Base' data-ref="G4KDNode_Base">G4KDNode_Base</a>* <a class="type" href="G4KDTree.hh.html#G4KDTree" title='G4KDTree' data-ref="G4KDTree">G4KDTree</a>::<dfn class="decl def" id="_ZN8G4KDTree6InsertERKT_" title='G4KDTree::Insert' data-ref="_ZN8G4KDTree6InsertERKT_">Insert</dfn>(<em>const</em> PointT&amp; <dfn class="local col9 decl" id="69pos" title='pos' data-type='const PointT &amp;' data-ref="69pos">pos</dfn>)</td></tr>
+<tr><th id="112">112</th><td>  {</td></tr>
+<tr><th id="113">113</th><td>    <a class="type" href="G4KDNode.hh.html#G4KDNode_Base" title='G4KDNode_Base' data-ref="G4KDNode_Base">G4KDNode_Base</a>* <dfn class="local col0 decl" id="70node" title='node' data-type='G4KDNode_Base *' data-ref="70node">node</dfn> = <var>0</var>;</td></tr>
+<tr><th id="114">114</th><td>    <b>if</b> (!<a class="member" href="G4KDTree.hh.html#G4KDTree::fRoot" title='G4KDTree::fRoot' data-ref="G4KDTree::fRoot">fRoot</a>)</td></tr>
+<tr><th id="115">115</th><td>    {</td></tr>
+<tr><th id="116">116</th><td>      <a class="member" href="G4KDTree.hh.html#G4KDTree::fRoot" title='G4KDTree::fRoot' data-ref="G4KDTree::fRoot">fRoot</a> = <b>new</b> <a class="type" href="G4KDNode.hh.html#G4KDNodeCopy" title='G4KDNodeCopy' data-ref="G4KDNodeCopy">G4KDNodeCopy</a>&lt;PointT&gt;(<b>this</b>, <a class="local col9 ref" href="#69pos" title='pos' data-ref="69pos">pos</a>, <var>0</var>);</td></tr>
+<tr><th id="117">117</th><td>      <a class="local col0 ref" href="#70node" title='node' data-ref="70node">node</a> = <a class="member" href="G4KDTree.hh.html#G4KDTree::fRoot" title='G4KDTree::fRoot' data-ref="G4KDTree::fRoot">fRoot</a>;</td></tr>
+<tr><th id="118">118</th><td>      <a class="member" href="G4KDTree.hh.html#G4KDTree::fNbNodes" title='G4KDTree::fNbNodes' data-ref="G4KDTree::fNbNodes">fNbNodes</a> = <var>0</var>;</td></tr>
+<tr><th id="119">119</th><td>      <a class="member" href="G4KDTree.hh.html#G4KDTree::fNbNodes" title='G4KDTree::fNbNodes' data-ref="G4KDTree::fNbNodes">fNbNodes</a>++;</td></tr>
+<tr><th id="120">120</th><td>      <a class="member" href="G4KDTree.hh.html#G4KDTree::fNbActiveNodes" title='G4KDTree::fNbActiveNodes' data-ref="G4KDTree::fNbActiveNodes">fNbActiveNodes</a>++;</td></tr>
+<tr><th id="121">121</th><td>    }</td></tr>
+<tr><th id="122">122</th><td>    <b>else</b></td></tr>
+<tr><th id="123">123</th><td>    {</td></tr>
+<tr><th id="124">124</th><td>      <b>if</b> ((<a class="local col0 ref" href="#70node" title='node' data-ref="70node">node</a> = <a class="member" href="G4KDTree.hh.html#G4KDTree::fRoot" title='G4KDTree::fRoot' data-ref="G4KDTree::fRoot">fRoot</a>-&gt;Insert&lt;PointT&gt;(<a class="local col9 ref" href="#69pos" title='pos' data-ref="69pos">pos</a>)))</td></tr>
+<tr><th id="125">125</th><td>      {</td></tr>
+<tr><th id="126">126</th><td>        <a class="member" href="G4KDTree.hh.html#G4KDTree::fNbNodes" title='G4KDTree::fNbNodes' data-ref="G4KDTree::fNbNodes">fNbNodes</a>++;</td></tr>
+<tr><th id="127">127</th><td>        <a class="member" href="G4KDTree.hh.html#G4KDTree::fNbActiveNodes" title='G4KDTree::fNbActiveNodes' data-ref="G4KDTree::fNbActiveNodes">fNbActiveNodes</a>++;</td></tr>
+<tr><th id="128">128</th><td>      }</td></tr>
+<tr><th id="129">129</th><td>    }</td></tr>
+<tr><th id="130">130</th><td></td></tr>
+<tr><th id="131">131</th><td>    <b>if</b> (<a class="member" href="G4KDTree.hh.html#G4KDTree::fRect" title='G4KDTree::fRect' data-ref="G4KDTree::fRect">fRect</a> == <var>0</var>)</td></tr>
+<tr><th id="132">132</th><td>    {</td></tr>
+<tr><th id="133">133</th><td>      fRect = <b>new</b> HyperRect(fDim);</td></tr>
+<tr><th id="134">134</th><td>      <a class="member" href="G4KDTree.hh.html#G4KDTree::fRect" title='G4KDTree::fRect' data-ref="G4KDTree::fRect">fRect</a>-&gt;SetMinMax(<a class="local col9 ref" href="#69pos" title='pos' data-ref="69pos">pos</a>, <a class="local col9 ref" href="#69pos" title='pos' data-ref="69pos">pos</a>);</td></tr>
+<tr><th id="135">135</th><td>    }</td></tr>
+<tr><th id="136">136</th><td>    <b>else</b></td></tr>
+<tr><th id="137">137</th><td>    {</td></tr>
+<tr><th id="138">138</th><td>      <a class="member" href="G4KDTree.hh.html#G4KDTree::fRect" title='G4KDTree::fRect' data-ref="G4KDTree::fRect">fRect</a>-&gt;Extend(<a class="local col9 ref" href="#69pos" title='pos' data-ref="69pos">pos</a>);</td></tr>
+<tr><th id="139">139</th><td>    }</td></tr>
+<tr><th id="140">140</th><td></td></tr>
+<tr><th id="141">141</th><td>    <b>return</b> <a class="local col0 ref" href="#70node" title='node' data-ref="70node">node</a>;</td></tr>
+<tr><th id="142">142</th><td>  }</td></tr>
+<tr><th id="143">143</th><td></td></tr>
+<tr><th id="144">144</th><td><i>//__________________________________________________________________</i></td></tr>
+<tr><th id="145">145</th><td><b>template</b>&lt;<b>typename</b> Position&gt;</td></tr>
+<tr><th id="146">146</th><td>  <em>int</em> <a class="type" href="G4KDTree.hh.html#G4KDTree" title='G4KDTree' data-ref="G4KDTree">G4KDTree</a>::<dfn class="decl def" id="_ZN8G4KDTree16__NearestInRangeEP13G4KDNode_BaseRKT_RKdS6_R14G4KDTreeResultiS1_" title='G4KDTree::__NearestInRange' data-ref="_ZN8G4KDTree16__NearestInRangeEP13G4KDNode_BaseRKT_RKdS6_R14G4KDTreeResultiS1_">__NearestInRange</dfn>(<a class="type" href="G4KDNode.hh.html#G4KDNode_Base" title='G4KDNode_Base' data-ref="G4KDNode_Base">G4KDNode_Base</a>* <dfn class="local col1 decl" id="71node" title='node' data-type='G4KDNode_Base *' data-ref="71node">node</dfn>,</td></tr>
+<tr><th id="147">147</th><td>                                 <em>const</em> Position&amp; <dfn class="local col2 decl" id="72pos" title='pos' data-type='const Position &amp;' data-ref="72pos">pos</dfn>,</td></tr>
+<tr><th id="148">148</th><td>                                 <em>const</em> <em>double</em>&amp; <dfn class="local col3 decl" id="73range_sq" title='range_sq' data-type='const double &amp;' data-ref="73range_sq">range_sq</dfn>,</td></tr>
+<tr><th id="149">149</th><td>                                 <em>const</em> <em>double</em>&amp; <dfn class="local col4 decl" id="74range" title='range' data-type='const double &amp;' data-ref="74range">range</dfn>,</td></tr>
+<tr><th id="150">150</th><td>                                 <a class="type" href="G4KDTreeResult.hh.html#G4KDTreeResult" title='G4KDTreeResult' data-ref="G4KDTreeResult">G4KDTreeResult</a>&amp; <dfn class="local col5 decl" id="75list" title='list' data-type='G4KDTreeResult &amp;' data-ref="75list">list</dfn>,</td></tr>
+<tr><th id="151">151</th><td>                                 <em>int</em> <dfn class="local col6 decl" id="76ordered" title='ordered' data-type='int' data-ref="76ordered">ordered</dfn>,</td></tr>
+<tr><th id="152">152</th><td>                                 <a class="type" href="G4KDNode.hh.html#G4KDNode_Base" title='G4KDNode_Base' data-ref="G4KDNode_Base">G4KDNode_Base</a> *<dfn class="local col7 decl" id="77source_node" title='source_node' data-type='G4KDNode_Base *' data-ref="77source_node">source_node</dfn>)</td></tr>
+<tr><th id="153">153</th><td>  {</td></tr>
+<tr><th id="154">154</th><td>    <b>if</b> (!<a class="local col1 ref" href="#71node" title='node' data-ref="71node">node</a>) <b>return</b> <var>0</var>;</td></tr>
+<tr><th id="155">155</th><td></td></tr>
+<tr><th id="156">156</th><td>    <em>double</em> <dfn class="local col8 decl" id="78dist_sq" title='dist_sq' data-type='double' data-ref="78dist_sq">dist_sq</dfn>(<a class="macro" href="../../../../../global/management/include/templates.hh.html#82" title="std::numeric_limits&lt;double&gt;::max()" data-ref="_M/DBL_MAX">DBL_MAX</a>), <dfn class="local col9 decl" id="79dx" title='dx' data-type='double' data-ref="79dx">dx</dfn>(<a class="macro" href="../../../../../global/management/include/templates.hh.html#82" title="std::numeric_limits&lt;double&gt;::max()" data-ref="_M/DBL_MAX">DBL_MAX</a>);</td></tr>
+<tr><th id="157">157</th><td>    <em>int</em> <dfn class="local col0 decl" id="80ret" title='ret' data-type='int' data-ref="80ret">ret</dfn>(-<var>1</var>), <dfn class="local col1 decl" id="81added_res" title='added_res' data-type='int' data-ref="81added_res">added_res</dfn>(<var>0</var>);</td></tr>
+<tr><th id="158">158</th><td></td></tr>
+<tr><th id="159">159</th><td>    <b>if</b> (<a class="local col1 ref" href="#71node" title='node' data-ref="71node">node</a>-&gt;<a class="virtual ref" href="G4KDNode.hh.html#_ZNK13G4KDNode_Base7IsValidEv" title='G4KDNode_Base::IsValid' data-ref="_ZNK13G4KDNode_Base7IsValidEv">IsValid</a>() &amp;&amp; <a class="local col1 ref" href="#71node" title='node' data-ref="71node">node</a> != <a class="local col7 ref" href="#77source_node" title='source_node' data-ref="77source_node">source_node</a>)</td></tr>
+<tr><th id="160">160</th><td>    {</td></tr>
+<tr><th id="161">161</th><td>      <em>bool</em> <dfn class="local col2 decl" id="82do_break" title='do_break' data-type='bool' data-ref="82do_break">do_break</dfn> = <b>false</b>;</td></tr>
+<tr><th id="162">162</th><td>      <a class="local col8 ref" href="#78dist_sq" title='dist_sq' data-ref="78dist_sq">dist_sq</a> = <var>0</var>;</td></tr>
+<tr><th id="163">163</th><td>      <b>for</b> (<span class='error' title="unknown type name &apos;size_t&apos;">size_t</span> <dfn class="local col3 decl" id="83i" title='i' data-type='int' data-ref="83i">i</dfn> = <var>0</var>; i &lt; fDim; i++)</td></tr>
+<tr><th id="164">164</th><td>      {</td></tr>
+<tr><th id="165">165</th><td>        dist_sq += sqr((*node)[i] - pos[i]);</td></tr>
+<tr><th id="166">166</th><td>        <b>if</b> (<a class="local col8 ref" href="#78dist_sq" title='dist_sq' data-ref="78dist_sq">dist_sq</a> &gt; <a class="local col3 ref" href="#73range_sq" title='range_sq' data-ref="73range_sq">range_sq</a>)</td></tr>
+<tr><th id="167">167</th><td>        {</td></tr>
+<tr><th id="168">168</th><td>          <a class="local col2 ref" href="#82do_break" title='do_break' data-ref="82do_break">do_break</a> = <b>true</b>;</td></tr>
+<tr><th id="169">169</th><td>          <b>break</b>;</td></tr>
+<tr><th id="170">170</th><td>        }</td></tr>
+<tr><th id="171">171</th><td>      }</td></tr>
+<tr><th id="172">172</th><td>      <b>if</b> (!<a class="local col2 ref" href="#82do_break" title='do_break' data-ref="82do_break">do_break</a> &amp;&amp; <a class="local col8 ref" href="#78dist_sq" title='dist_sq' data-ref="78dist_sq">dist_sq</a> &lt;= <a class="local col3 ref" href="#73range_sq" title='range_sq' data-ref="73range_sq">range_sq</a>)</td></tr>
+<tr><th id="173">173</th><td>      {</td></tr>
+<tr><th id="174">174</th><td>        <a class="local col5 ref" href="#75list" title='list' data-ref="75list">list</a>.<a class="ref" href="G4KDTreeResult.hh.html#_ZN14G4KDTreeResult6InsertEdP13G4KDNode_Base" title='G4KDTreeResult::Insert' data-ref="_ZN14G4KDTreeResult6InsertEdP13G4KDNode_Base">Insert</a>(<a class="local col8 ref" href="#78dist_sq" title='dist_sq' data-ref="78dist_sq">dist_sq</a>, <a class="local col1 ref" href="#71node" title='node' data-ref="71node">node</a>);</td></tr>
+<tr><th id="175">175</th><td>        <a class="local col1 ref" href="#81added_res" title='added_res' data-ref="81added_res">added_res</a> = <var>1</var>;</td></tr>
+<tr><th id="176">176</th><td>      }</td></tr>
+<tr><th id="177">177</th><td>    }</td></tr>
+<tr><th id="178">178</th><td></td></tr>
+<tr><th id="179">179</th><td>    <a class="local col9 ref" href="#79dx" title='dx' data-ref="79dx">dx</a> = <a class="local col2 ref" href="#72pos" title='pos' data-ref="72pos">pos</a>[<a class="local col1 ref" href="#71node" title='node' data-ref="71node">node</a>-&gt;<a class="ref" href="G4KDNode.hh.html#_ZNK13G4KDNode_Base7GetAxisEv" title='G4KDNode_Base::GetAxis' data-ref="_ZNK13G4KDNode_Base7GetAxisEv">GetAxis</a>()] - (*<a class="local col1 ref" href="#71node" title='node' data-ref="71node">node</a>)<a class="virtual ref" href="G4KDNode.hh.html#_ZNK13G4KDNode_BaseixEi" title='G4KDNode_Base::operator[]' data-ref="_ZNK13G4KDNode_BaseixEi">[<a class="local col1 ref" href="#71node" title='node' data-ref="71node">node</a>-&gt;<a class="ref" href="G4KDNode.hh.html#_ZNK13G4KDNode_Base7GetAxisEv" title='G4KDNode_Base::GetAxis' data-ref="_ZNK13G4KDNode_Base7GetAxisEv">GetAxis</a>()]</a>;</td></tr>
+<tr><th id="180">180</th><td></td></tr>
+<tr><th id="181">181</th><td>    <a class="local col0 ref" href="#80ret" title='ret' data-ref="80ret">ret</a> = __NearestInRange(<a class="local col9 ref" href="#79dx" title='dx' data-ref="79dx">dx</a> &lt;= <var>0.0</var> ? <a class="local col1 ref" href="#71node" title='node' data-ref="71node">node</a>-&gt;<a class="ref" href="G4KDNode.hh.html#_ZN13G4KDNode_Base7GetLeftEv" title='G4KDNode_Base::GetLeft' data-ref="_ZN13G4KDNode_Base7GetLeftEv">GetLeft</a>() : <a class="local col1 ref" href="#71node" title='node' data-ref="71node">node</a>-&gt;<a class="ref" href="G4KDNode.hh.html#_ZN13G4KDNode_Base8GetRightEv" title='G4KDNode_Base::GetRight' data-ref="_ZN13G4KDNode_Base8GetRightEv">GetRight</a>(), <a class="local col2 ref" href="#72pos" title='pos' data-ref="72pos">pos</a>,</td></tr>
+<tr><th id="182">182</th><td>                           <a class="local col3 ref" href="#73range_sq" title='range_sq' data-ref="73range_sq">range_sq</a>, <a class="local col4 ref" href="#74range" title='range' data-ref="74range">range</a>, <a class="local col5 ref" href="#75list" title='list' data-ref="75list">list</a>, <a class="local col6 ref" href="#76ordered" title='ordered' data-ref="76ordered">ordered</a>, <a class="local col7 ref" href="#77source_node" title='source_node' data-ref="77source_node">source_node</a>);</td></tr>
+<tr><th id="183">183</th><td>    <b>if</b> (ret &gt;= <var>0</var> &amp;&amp; <span class='error' title="use of undeclared identifier &apos;std&apos;">std</span>::fabs(dx) &lt;= range)</td></tr>
+<tr><th id="184">184</th><td>    {</td></tr>
+<tr><th id="185">185</th><td>      <a class="local col1 ref" href="#81added_res" title='added_res' data-ref="81added_res">added_res</a> += <a class="local col0 ref" href="#80ret" title='ret' data-ref="80ret">ret</a>;</td></tr>
+<tr><th id="186">186</th><td>      <a class="local col0 ref" href="#80ret" title='ret' data-ref="80ret">ret</a> = __NearestInRange(<a class="local col9 ref" href="#79dx" title='dx' data-ref="79dx">dx</a> &lt;= <var>0.0</var> ? <a class="local col1 ref" href="#71node" title='node' data-ref="71node">node</a>-&gt;<a class="ref" href="G4KDNode.hh.html#_ZN13G4KDNode_Base8GetRightEv" title='G4KDNode_Base::GetRight' data-ref="_ZN13G4KDNode_Base8GetRightEv">GetRight</a>() : <a class="local col1 ref" href="#71node" title='node' data-ref="71node">node</a>-&gt;<a class="ref" href="G4KDNode.hh.html#_ZN13G4KDNode_Base7GetLeftEv" title='G4KDNode_Base::GetLeft' data-ref="_ZN13G4KDNode_Base7GetLeftEv">GetLeft</a>(),</td></tr>
+<tr><th id="187">187</th><td>                             <a class="local col2 ref" href="#72pos" title='pos' data-ref="72pos">pos</a>, <a class="local col3 ref" href="#73range_sq" title='range_sq' data-ref="73range_sq">range_sq</a>, <a class="local col4 ref" href="#74range" title='range' data-ref="74range">range</a>, <a class="local col5 ref" href="#75list" title='list' data-ref="75list">list</a>, <a class="local col6 ref" href="#76ordered" title='ordered' data-ref="76ordered">ordered</a>, <a class="local col7 ref" href="#77source_node" title='source_node' data-ref="77source_node">source_node</a>);</td></tr>
+<tr><th id="188">188</th><td>    }</td></tr>
+<tr><th id="189">189</th><td></td></tr>
+<tr><th id="190">190</th><td>    <b>if</b> (<a class="local col0 ref" href="#80ret" title='ret' data-ref="80ret">ret</a> == -<var>1</var>)</td></tr>
+<tr><th id="191">191</th><td>    {</td></tr>
+<tr><th id="192">192</th><td>      <b>return</b> -<var>1</var>;</td></tr>
+<tr><th id="193">193</th><td>    }</td></tr>
+<tr><th id="194">194</th><td>    <a class="local col1 ref" href="#81added_res" title='added_res' data-ref="81added_res">added_res</a> += <a class="local col0 ref" href="#80ret" title='ret' data-ref="80ret">ret</a>;</td></tr>
+<tr><th id="195">195</th><td></td></tr>
+<tr><th id="196">196</th><td>    <b>return</b> <a class="local col1 ref" href="#81added_res" title='added_res' data-ref="81added_res">added_res</a>;</td></tr>
+<tr><th id="197">197</th><td>  }</td></tr>
+<tr><th id="198">198</th><td></td></tr>
+<tr><th id="199">199</th><td><i>//__________________________________________________________________</i></td></tr>
+<tr><th id="200">200</th><td><b>template</b>&lt;<b>typename</b> Position&gt;</td></tr>
+<tr><th id="201">201</th><td>  <em>void</em> <a class="type" href="G4KDTree.hh.html#G4KDTree" title='G4KDTree' data-ref="G4KDTree">G4KDTree</a>::<dfn class="decl def" id="_ZN8G4KDTree19__NearestToPositionEP13G4KDNode_BaseRKT_RS1_PdPNS_9HyperRectE" title='G4KDTree::__NearestToPosition' data-ref="_ZN8G4KDTree19__NearestToPositionEP13G4KDNode_BaseRKT_RS1_PdPNS_9HyperRectE">__NearestToPosition</dfn>(<a class="type" href="G4KDNode.hh.html#G4KDNode_Base" title='G4KDNode_Base' data-ref="G4KDNode_Base">G4KDNode_Base</a> *<dfn class="local col4 decl" id="84node" title='node' data-type='G4KDNode_Base *' data-ref="84node">node</dfn>,</td></tr>
+<tr><th id="202">202</th><td>                                     <em>const</em> Position &amp;<dfn class="local col5 decl" id="85pos" title='pos' data-type='const Position &amp;' data-ref="85pos">pos</dfn>,</td></tr>
+<tr><th id="203">203</th><td>                                     <a class="type" href="G4KDNode.hh.html#G4KDNode_Base" title='G4KDNode_Base' data-ref="G4KDNode_Base">G4KDNode_Base</a> *&amp;<dfn class="local col6 decl" id="86result" title='result' data-type='G4KDNode_Base *&amp;' data-ref="86result">result</dfn>,</td></tr>
+<tr><th id="204">204</th><td>                                     <em>double</em> *<dfn class="local col7 decl" id="87result_dist_sq" title='result_dist_sq' data-type='double *' data-ref="87result_dist_sq">result_dist_sq</dfn>,</td></tr>
+<tr><th id="205">205</th><td>                                     <a class="type" href="G4KDTree.hh.html#G4KDTree::HyperRect" title='G4KDTree::HyperRect' data-ref="G4KDTree::HyperRect">HyperRect</a>* <dfn class="local col8 decl" id="88rect" title='rect' data-type='G4KDTree::HyperRect *' data-ref="88rect">rect</dfn>)</td></tr>
+<tr><th id="206">206</th><td>  {</td></tr>
+<tr><th id="207">207</th><td>    <em>int</em> <dfn class="local col9 decl" id="89dir" title='dir' data-type='int' data-ref="89dir">dir</dfn> = <a class="local col4 ref" href="#84node" title='node' data-ref="84node">node</a>-&gt;<a class="ref" href="G4KDNode.hh.html#_ZNK13G4KDNode_Base7GetAxisEv" title='G4KDNode_Base::GetAxis' data-ref="_ZNK13G4KDNode_Base7GetAxisEv">GetAxis</a>();</td></tr>
+<tr><th id="208">208</th><td>    <em>double</em> <dfn class="local col0 decl" id="90dummy" title='dummy' data-type='double' data-ref="90dummy">dummy</dfn>(<var>0.</var>), <dfn class="local col1 decl" id="91dist_sq" title='dist_sq' data-type='double' data-ref="91dist_sq">dist_sq</dfn>(-<var>1.</var>);</td></tr>
+<tr><th id="209">209</th><td>    <a class="type" href="G4KDNode.hh.html#G4KDNode_Base" title='G4KDNode_Base' data-ref="G4KDNode_Base">G4KDNode_Base</a>* <dfn class="local col2 decl" id="92nearer_subtree" title='nearer_subtree' data-type='G4KDNode_Base *' data-ref="92nearer_subtree">nearer_subtree</dfn>(<var>0</var>), *<dfn class="local col3 decl" id="93farther_subtree" title='farther_subtree' data-type='G4KDNode_Base *' data-ref="93farther_subtree">farther_subtree</dfn>(<var>0</var>);</td></tr>
+<tr><th id="210">210</th><td>    <em>double</em> *<dfn class="local col4 decl" id="94nearer_hyperrect_coord" title='nearer_hyperrect_coord' data-type='double *' data-ref="94nearer_hyperrect_coord">nearer_hyperrect_coord</dfn>(<var>0</var>), *<dfn class="local col5 decl" id="95farther_hyperrect_coord" title='farther_hyperrect_coord' data-type='double *' data-ref="95farther_hyperrect_coord">farther_hyperrect_coord</dfn>(<var>0</var>);</td></tr>
+<tr><th id="211">211</th><td></td></tr>
+<tr><th id="212">212</th><td>    <i>/* Decide whether to go left or right in the tree */</i></td></tr>
+<tr><th id="213">213</th><td>    <a class="local col0 ref" href="#90dummy" title='dummy' data-ref="90dummy">dummy</a> = <a class="local col5 ref" href="#85pos" title='pos' data-ref="85pos">pos</a>[<a class="local col9 ref" href="#89dir" title='dir' data-ref="89dir">dir</a>] - (*<a class="local col4 ref" href="#84node" title='node' data-ref="84node">node</a>)<a class="virtual ref" href="G4KDNode.hh.html#_ZNK13G4KDNode_BaseixEi" title='G4KDNode_Base::operator[]' data-ref="_ZNK13G4KDNode_BaseixEi">[<a class="local col9 ref" href="#89dir" title='dir' data-ref="89dir">dir</a>]</a>;</td></tr>
+<tr><th id="214">214</th><td>    <b>if</b> (<a class="local col0 ref" href="#90dummy" title='dummy' data-ref="90dummy">dummy</a> &lt;= <var>0</var>)</td></tr>
+<tr><th id="215">215</th><td>    {</td></tr>
+<tr><th id="216">216</th><td>      <a class="local col2 ref" href="#92nearer_subtree" title='nearer_subtree' data-ref="92nearer_subtree">nearer_subtree</a> = <a class="local col4 ref" href="#84node" title='node' data-ref="84node">node</a>-&gt;<a class="ref" href="G4KDNode.hh.html#_ZN13G4KDNode_Base7GetLeftEv" title='G4KDNode_Base::GetLeft' data-ref="_ZN13G4KDNode_Base7GetLeftEv">GetLeft</a>();</td></tr>
+<tr><th id="217">217</th><td>      <a class="local col3 ref" href="#93farther_subtree" title='farther_subtree' data-ref="93farther_subtree">farther_subtree</a> = <a class="local col4 ref" href="#84node" title='node' data-ref="84node">node</a>-&gt;<a class="ref" href="G4KDNode.hh.html#_ZN13G4KDNode_Base8GetRightEv" title='G4KDNode_Base::GetRight' data-ref="_ZN13G4KDNode_Base8GetRightEv">GetRight</a>();</td></tr>
+<tr><th id="218">218</th><td></td></tr>
+<tr><th id="219">219</th><td>      <a class="local col4 ref" href="#94nearer_hyperrect_coord" title='nearer_hyperrect_coord' data-ref="94nearer_hyperrect_coord">nearer_hyperrect_coord</a> = <a class="local col8 ref" href="#88rect" title='rect' data-ref="88rect">rect</a>-&gt;<a class="ref" href="G4KDTree.hh.html#_ZN8G4KDTree9HyperRect6GetMaxEv" title='G4KDTree::HyperRect::GetMax' data-ref="_ZN8G4KDTree9HyperRect6GetMaxEv">GetMax</a>() + <a class="local col9 ref" href="#89dir" title='dir' data-ref="89dir">dir</a>;</td></tr>
+<tr><th id="220">220</th><td>      <a class="local col5 ref" href="#95farther_hyperrect_coord" title='farther_hyperrect_coord' data-ref="95farther_hyperrect_coord">farther_hyperrect_coord</a> = <a class="local col8 ref" href="#88rect" title='rect' data-ref="88rect">rect</a>-&gt;<a class="ref" href="G4KDTree.hh.html#_ZN8G4KDTree9HyperRect6GetMinEv" title='G4KDTree::HyperRect::GetMin' data-ref="_ZN8G4KDTree9HyperRect6GetMinEv">GetMin</a>() + <a class="local col9 ref" href="#89dir" title='dir' data-ref="89dir">dir</a>;</td></tr>
+<tr><th id="221">221</th><td>    }</td></tr>
+<tr><th id="222">222</th><td>    <b>else</b></td></tr>
+<tr><th id="223">223</th><td>    {</td></tr>
+<tr><th id="224">224</th><td>      <a class="local col2 ref" href="#92nearer_subtree" title='nearer_subtree' data-ref="92nearer_subtree">nearer_subtree</a> = <a class="local col4 ref" href="#84node" title='node' data-ref="84node">node</a>-&gt;<a class="ref" href="G4KDNode.hh.html#_ZN13G4KDNode_Base8GetRightEv" title='G4KDNode_Base::GetRight' data-ref="_ZN13G4KDNode_Base8GetRightEv">GetRight</a>();</td></tr>
+<tr><th id="225">225</th><td>      <a class="local col3 ref" href="#93farther_subtree" title='farther_subtree' data-ref="93farther_subtree">farther_subtree</a> = <a class="local col4 ref" href="#84node" title='node' data-ref="84node">node</a>-&gt;<a class="ref" href="G4KDNode.hh.html#_ZN13G4KDNode_Base7GetLeftEv" title='G4KDNode_Base::GetLeft' data-ref="_ZN13G4KDNode_Base7GetLeftEv">GetLeft</a>();</td></tr>
+<tr><th id="226">226</th><td>      <a class="local col4 ref" href="#94nearer_hyperrect_coord" title='nearer_hyperrect_coord' data-ref="94nearer_hyperrect_coord">nearer_hyperrect_coord</a> = <a class="local col8 ref" href="#88rect" title='rect' data-ref="88rect">rect</a>-&gt;<a class="ref" href="G4KDTree.hh.html#_ZN8G4KDTree9HyperRect6GetMinEv" title='G4KDTree::HyperRect::GetMin' data-ref="_ZN8G4KDTree9HyperRect6GetMinEv">GetMin</a>() + <a class="local col9 ref" href="#89dir" title='dir' data-ref="89dir">dir</a>;</td></tr>
+<tr><th id="227">227</th><td>      <a class="local col5 ref" href="#95farther_hyperrect_coord" title='farther_hyperrect_coord' data-ref="95farther_hyperrect_coord">farther_hyperrect_coord</a> = <a class="local col8 ref" href="#88rect" title='rect' data-ref="88rect">rect</a>-&gt;<a class="ref" href="G4KDTree.hh.html#_ZN8G4KDTree9HyperRect6GetMaxEv" title='G4KDTree::HyperRect::GetMax' data-ref="_ZN8G4KDTree9HyperRect6GetMaxEv">GetMax</a>() + <a class="local col9 ref" href="#89dir" title='dir' data-ref="89dir">dir</a>;</td></tr>
+<tr><th id="228">228</th><td>    }</td></tr>
+<tr><th id="229">229</th><td></td></tr>
+<tr><th id="230">230</th><td>    <b>if</b> (<a class="local col2 ref" href="#92nearer_subtree" title='nearer_subtree' data-ref="92nearer_subtree">nearer_subtree</a>)</td></tr>
+<tr><th id="231">231</th><td>    {</td></tr>
+<tr><th id="232">232</th><td>      <i>/* Slice the hyperrect to get the hyperrect of the nearer subtree */</i></td></tr>
+<tr><th id="233">233</th><td>      <a class="local col0 ref" href="#90dummy" title='dummy' data-ref="90dummy">dummy</a> = *<a class="local col4 ref" href="#94nearer_hyperrect_coord" title='nearer_hyperrect_coord' data-ref="94nearer_hyperrect_coord">nearer_hyperrect_coord</a>;</td></tr>
+<tr><th id="234">234</th><td>      *<a class="local col4 ref" href="#94nearer_hyperrect_coord" title='nearer_hyperrect_coord' data-ref="94nearer_hyperrect_coord">nearer_hyperrect_coord</a> = (*<a class="local col4 ref" href="#84node" title='node' data-ref="84node">node</a>)<a class="virtual ref" href="G4KDNode.hh.html#_ZNK13G4KDNode_BaseixEi" title='G4KDNode_Base::operator[]' data-ref="_ZNK13G4KDNode_BaseixEi">[<a class="local col9 ref" href="#89dir" title='dir' data-ref="89dir">dir</a>]</a>;</td></tr>
+<tr><th id="235">235</th><td>      <i>/* Recurse down into nearer subtree */</i></td></tr>
+<tr><th id="236">236</th><td>      __NearestToPosition(<a class="local col2 ref" href="#92nearer_subtree" title='nearer_subtree' data-ref="92nearer_subtree">nearer_subtree</a>, <a class="local col5 ref" href="#85pos" title='pos' data-ref="85pos">pos</a>, <a class="local col6 ref" href="#86result" title='result' data-ref="86result">result</a>, <a class="local col7 ref" href="#87result_dist_sq" title='result_dist_sq' data-ref="87result_dist_sq">result_dist_sq</a>, <a class="local col8 ref" href="#88rect" title='rect' data-ref="88rect">rect</a>);</td></tr>
+<tr><th id="237">237</th><td>      <i>/* Undo the slice */</i></td></tr>
+<tr><th id="238">238</th><td>      *<a class="local col4 ref" href="#94nearer_hyperrect_coord" title='nearer_hyperrect_coord' data-ref="94nearer_hyperrect_coord">nearer_hyperrect_coord</a> = <a class="local col0 ref" href="#90dummy" title='dummy' data-ref="90dummy">dummy</a>;</td></tr>
+<tr><th id="239">239</th><td>    }</td></tr>
+<tr><th id="240">240</th><td></td></tr>
+<tr><th id="241">241</th><td>    <i>/* Check the distance of the point at the current node, compare it</i></td></tr>
+<tr><th id="242">242</th><td><i>     * with our best so far */</i></td></tr>
+<tr><th id="243">243</th><td>    <b>if</b> (<a class="local col4 ref" href="#84node" title='node' data-ref="84node">node</a>-&gt;<a class="virtual ref" href="G4KDNode.hh.html#_ZNK13G4KDNode_Base7IsValidEv" title='G4KDNode_Base::IsValid' data-ref="_ZNK13G4KDNode_Base7IsValidEv">IsValid</a>()) <i>// TODO</i></td></tr>
+<tr><th id="244">244</th><td>    {</td></tr>
+<tr><th id="245">245</th><td>      <a class="local col1 ref" href="#91dist_sq" title='dist_sq' data-ref="91dist_sq">dist_sq</a> = <var>0</var>;</td></tr>
+<tr><th id="246">246</th><td>      <em>bool</em> <dfn class="local col6 decl" id="96do_break" title='do_break' data-type='bool' data-ref="96do_break">do_break</dfn> = <b>false</b>;</td></tr>
+<tr><th id="247">247</th><td>      <b>for</b> (<span class='error' title="unknown type name &apos;size_t&apos;">size_t</span> <dfn class="local col7 decl" id="97i" title='i' data-type='int' data-ref="97i">i</dfn> = <var>0</var>; i &lt; fDim; i++)</td></tr>
+<tr><th id="248">248</th><td>      {</td></tr>
+<tr><th id="249">249</th><td>        dist_sq += sqr((*node)[i] - pos[i]);</td></tr>
+<tr><th id="250">250</th><td>        <b>if</b> (<a class="local col1 ref" href="#91dist_sq" title='dist_sq' data-ref="91dist_sq">dist_sq</a> &gt; *<a class="local col7 ref" href="#87result_dist_sq" title='result_dist_sq' data-ref="87result_dist_sq">result_dist_sq</a>)</td></tr>
+<tr><th id="251">251</th><td>        {</td></tr>
+<tr><th id="252">252</th><td>          <a class="local col6 ref" href="#96do_break" title='do_break' data-ref="96do_break">do_break</a> = <b>true</b>;</td></tr>
+<tr><th id="253">253</th><td>          <b>break</b>;</td></tr>
+<tr><th id="254">254</th><td>        }</td></tr>
+<tr><th id="255">255</th><td>      }</td></tr>
+<tr><th id="256">256</th><td>      <b>if</b> (!<a class="local col6 ref" href="#96do_break" title='do_break' data-ref="96do_break">do_break</a> &amp;&amp; <a class="local col1 ref" href="#91dist_sq" title='dist_sq' data-ref="91dist_sq">dist_sq</a> &lt; *<a class="local col7 ref" href="#87result_dist_sq" title='result_dist_sq' data-ref="87result_dist_sq">result_dist_sq</a>)</td></tr>
+<tr><th id="257">257</th><td>      {</td></tr>
+<tr><th id="258">258</th><td>        <a class="local col6 ref" href="#86result" title='result' data-ref="86result">result</a> = <a class="local col4 ref" href="#84node" title='node' data-ref="84node">node</a>;</td></tr>
+<tr><th id="259">259</th><td>        *<a class="local col7 ref" href="#87result_dist_sq" title='result_dist_sq' data-ref="87result_dist_sq">result_dist_sq</a> = <a class="local col1 ref" href="#91dist_sq" title='dist_sq' data-ref="91dist_sq">dist_sq</a>;</td></tr>
+<tr><th id="260">260</th><td>      }</td></tr>
+<tr><th id="261">261</th><td>    }</td></tr>
+<tr><th id="262">262</th><td></td></tr>
+<tr><th id="263">263</th><td>    <b>if</b> (<a class="local col3 ref" href="#93farther_subtree" title='farther_subtree' data-ref="93farther_subtree">farther_subtree</a>)</td></tr>
+<tr><th id="264">264</th><td>    {</td></tr>
+<tr><th id="265">265</th><td>      <i>/* Get the hyperrect of the farther subtree */</i></td></tr>
+<tr><th id="266">266</th><td>      <a class="local col0 ref" href="#90dummy" title='dummy' data-ref="90dummy">dummy</a> = *<a class="local col5 ref" href="#95farther_hyperrect_coord" title='farther_hyperrect_coord' data-ref="95farther_hyperrect_coord">farther_hyperrect_coord</a>;</td></tr>
+<tr><th id="267">267</th><td>      *<a class="local col5 ref" href="#95farther_hyperrect_coord" title='farther_hyperrect_coord' data-ref="95farther_hyperrect_coord">farther_hyperrect_coord</a> = (*<a class="local col4 ref" href="#84node" title='node' data-ref="84node">node</a>)<a class="virtual ref" href="G4KDNode.hh.html#_ZNK13G4KDNode_BaseixEi" title='G4KDNode_Base::operator[]' data-ref="_ZNK13G4KDNode_BaseixEi">[<a class="local col9 ref" href="#89dir" title='dir' data-ref="89dir">dir</a>]</a>;</td></tr>
+<tr><th id="268">268</th><td>      <i>/* Check if we have to recurse down by calculating the closest</i></td></tr>
+<tr><th id="269">269</th><td><i>       * point of the hyperrect and see if it's closer than our</i></td></tr>
+<tr><th id="270">270</th><td><i>       * minimum distance in result_dist_sq. */</i></td></tr>
+<tr><th id="271">271</th><td>      <b>if</b> (<a class="local col8 ref" href="#88rect" title='rect' data-ref="88rect">rect</a>-&gt;CompareDistSqr(<a class="local col5 ref" href="#85pos" title='pos' data-ref="85pos">pos</a>, <a class="local col7 ref" href="#87result_dist_sq" title='result_dist_sq' data-ref="87result_dist_sq">result_dist_sq</a>))</td></tr>
+<tr><th id="272">272</th><td>      {</td></tr>
+<tr><th id="273">273</th><td>        <i>/* Recurse down into farther subtree */</i></td></tr>
+<tr><th id="274">274</th><td>        __NearestToPosition(<a class="local col3 ref" href="#93farther_subtree" title='farther_subtree' data-ref="93farther_subtree">farther_subtree</a>, <a class="local col5 ref" href="#85pos" title='pos' data-ref="85pos">pos</a>, <a class="local col6 ref" href="#86result" title='result' data-ref="86result">result</a>, <a class="local col7 ref" href="#87result_dist_sq" title='result_dist_sq' data-ref="87result_dist_sq">result_dist_sq</a>, <a class="local col8 ref" href="#88rect" title='rect' data-ref="88rect">rect</a>);</td></tr>
+<tr><th id="275">275</th><td>      }</td></tr>
+<tr><th id="276">276</th><td>      <i>/* Undo the slice on the hyperrect */</i></td></tr>
+<tr><th id="277">277</th><td>      *<a class="local col5 ref" href="#95farther_hyperrect_coord" title='farther_hyperrect_coord' data-ref="95farther_hyperrect_coord">farther_hyperrect_coord</a> = <a class="local col0 ref" href="#90dummy" title='dummy' data-ref="90dummy">dummy</a>;</td></tr>
+<tr><th id="278">278</th><td>    }</td></tr>
+<tr><th id="279">279</th><td>  }</td></tr>
+<tr><th id="280">280</th><td></td></tr>
+<tr><th id="281">281</th><td><b>template</b>&lt;<b>typename</b> Position&gt;</td></tr>
+<tr><th id="282">282</th><td>  <a class="typedef" href="G4KDTreeResult.hh.html#G4KDTreeResultHandle" title='G4KDTreeResultHandle' data-type='G4ReferenceCountedHandle&lt;G4KDTreeResult&gt;' data-ref="G4KDTreeResultHandle">G4KDTreeResultHandle</a> <a class="type" href="G4KDTree.hh.html#G4KDTree" title='G4KDTree' data-ref="G4KDTree">G4KDTree</a>::<dfn class="decl def" id="_ZN8G4KDTree7NearestERKT_" title='G4KDTree::Nearest' data-ref="_ZN8G4KDTree7NearestERKT_">Nearest</dfn>(<em>const</em> Position&amp; <dfn class="local col8 decl" id="98pos" title='pos' data-type='const Position &amp;' data-ref="98pos">pos</dfn>)</td></tr>
+<tr><th id="283">283</th><td>  {</td></tr>
+<tr><th id="284">284</th><td>    <i>//    G4cout &lt;&lt; "Nearest(pos)" &lt;&lt; G4endl ;</i></td></tr>
+<tr><th id="285">285</th><td></td></tr>
+<tr><th id="286">286</th><td>    <b>if</b> (!<a class="member" href="G4KDTree.hh.html#G4KDTree::fRect" title='G4KDTree::fRect' data-ref="G4KDTree::fRect">fRect</a>) <b>return</b> <a class="ref fake" href="../../../../../global/management/include/G4ReferenceCountedHandle.hh.html#_ZN24G4ReferenceCountedHandleC1EPT_" title='G4ReferenceCountedHandle::G4ReferenceCountedHandle&lt;X&gt;' data-ref="_ZN24G4ReferenceCountedHandleC1EPT_"></a><var>0</var>;</td></tr>
+<tr><th id="287">287</th><td></td></tr>
+<tr><th id="288">288</th><td>    <a class="type" href="G4KDNode.hh.html#G4KDNode_Base" title='G4KDNode_Base' data-ref="G4KDNode_Base">G4KDNode_Base</a> *<dfn class="local col9 decl" id="99result" title='result' data-type='G4KDNode_Base *' data-ref="99result">result</dfn>(<var>0</var>);</td></tr>
+<tr><th id="289">289</th><td>    <em>double</em> <dfn class="local col0 decl" id="100dist_sq" title='dist_sq' data-type='double' data-ref="100dist_sq">dist_sq</dfn> = <a class="macro" href="../../../../../global/management/include/templates.hh.html#82" title="std::numeric_limits&lt;double&gt;::max()" data-ref="_M/DBL_MAX">DBL_MAX</a>;</td></tr>
+<tr><th id="290">290</th><td></td></tr>
+<tr><th id="291">291</th><td>    <i>/* Duplicate the bounding hyperrectangle, we will work on the copy */</i></td></tr>
+<tr><th id="292">292</th><td>    <a class="type" href="G4KDTree.hh.html#G4KDTree::HyperRect" title='G4KDTree::HyperRect' data-ref="G4KDTree::HyperRect">HyperRect</a>* <dfn class="local col1 decl" id="101newrect" title='newrect' data-type='G4KDTree::HyperRect *' data-ref="101newrect">newrect</dfn> = <b>new</b> <a class="type" href="G4KDTree.hh.html#G4KDTree::HyperRect" title='G4KDTree::HyperRect' data-ref="G4KDTree::HyperRect">HyperRect</a><a class="ref" href="G4KDTree.hh.html#_ZN8G4KDTree9HyperRectC1ERKS0_" title='G4KDTree::HyperRect::HyperRect' data-ref="_ZN8G4KDTree9HyperRectC1ERKS0_">(</a>*<a class="member" href="G4KDTree.hh.html#G4KDTree::fRect" title='G4KDTree::fRect' data-ref="G4KDTree::fRect">fRect</a>);</td></tr>
+<tr><th id="293">293</th><td></td></tr>
+<tr><th id="294">294</th><td>    <i>/* Our first estimate is the root node */</i></td></tr>
+<tr><th id="295">295</th><td>    <i>/* Search for the nearest neighbour recursively */</i></td></tr>
+<tr><th id="296">296</th><td>    __NearestToPosition(<a class="member" href="G4KDTree.hh.html#G4KDTree::fRoot" title='G4KDTree::fRoot' data-ref="G4KDTree::fRoot">fRoot</a>, <a class="local col8 ref" href="#98pos" title='pos' data-ref="98pos">pos</a>, <a class="local col9 ref" href="#99result" title='result' data-ref="99result">result</a>, &amp;<a class="local col0 ref" href="#100dist_sq" title='dist_sq' data-ref="100dist_sq">dist_sq</a>, <a class="local col1 ref" href="#101newrect" title='newrect' data-ref="101newrect">newrect</a>);</td></tr>
+<tr><th id="297">297</th><td></td></tr>
+<tr><th id="298">298</th><td>    <i>/* Free the copy of the hyperrect */</i></td></tr>
+<tr><th id="299">299</th><td>    <b>delete</b> <a class="local col1 ref" href="#101newrect" title='newrect' data-ref="101newrect">newrect</a>;</td></tr>
+<tr><th id="300">300</th><td></td></tr>
+<tr><th id="301">301</th><td>    <i>/* Store the result */</i></td></tr>
+<tr><th id="302">302</th><td>    <b>if</b> (<a class="local col9 ref" href="#99result" title='result' data-ref="99result">result</a>)</td></tr>
+<tr><th id="303">303</th><td>    {</td></tr>
+<tr><th id="304">304</th><td>      <a class="typedef" href="G4KDTreeResult.hh.html#G4KDTreeResultHandle" title='G4KDTreeResultHandle' data-type='G4ReferenceCountedHandle&lt;G4KDTreeResult&gt;' data-ref="G4KDTreeResultHandle">G4KDTreeResultHandle</a> <dfn class="local col2 decl" id="102rset" title='rset' data-type='G4KDTreeResultHandle' data-ref="102rset">rset</dfn> = <a class="ref fake" href="../../../../../global/management/include/G4ReferenceCountedHandle.hh.html#_ZN24G4ReferenceCountedHandleC1EPT_" title='G4ReferenceCountedHandle::G4ReferenceCountedHandle&lt;X&gt;' data-ref="_ZN24G4ReferenceCountedHandleC1EPT_"></a><b>new</b> <a class="type" href="G4KDTreeResult.hh.html#G4KDTreeResult" title='G4KDTreeResult' data-ref="G4KDTreeResult">G4KDTreeResult</a><a class="ref" href="G4KDTreeResult.hh.html#_ZN14G4KDTreeResultC1EP8G4KDTree" title='G4KDTreeResult::G4KDTreeResult' data-ref="_ZN14G4KDTreeResultC1EP8G4KDTree">(</a><b>this</b>);</td></tr>
+<tr><th id="305">305</th><td>      <a class="local col2 ref" href="#102rset" title='rset' data-ref="102rset">rset</a><a class="ref" href="../../../../../global/management/include/G4ReferenceCountedHandle.hh.html#_ZNK24G4ReferenceCountedHandleptEv" title='G4ReferenceCountedHandle::operator-&gt;' data-ref="_ZNK24G4ReferenceCountedHandleptEv">-&gt;</a><a class="ref" href="G4KDTreeResult.hh.html#_ZN14G4KDTreeResult6InsertEdP13G4KDNode_Base" title='G4KDTreeResult::Insert' data-ref="_ZN14G4KDTreeResult6InsertEdP13G4KDNode_Base">Insert</a>(<a class="local col0 ref" href="#100dist_sq" title='dist_sq' data-ref="100dist_sq">dist_sq</a>, <a class="local col9 ref" href="#99result" title='result' data-ref="99result">result</a>);</td></tr>
+<tr><th id="306">306</th><td>      <a class="local col2 ref" href="#102rset" title='rset' data-ref="102rset">rset</a><a class="ref" href="../../../../../global/management/include/G4ReferenceCountedHandle.hh.html#_ZNK24G4ReferenceCountedHandleptEv" title='G4ReferenceCountedHandle::operator-&gt;' data-ref="_ZNK24G4ReferenceCountedHandleptEv">-&gt;</a><a class="ref" href="G4KDTreeResult.hh.html#_ZN14G4KDTreeResult6RewindEv" title='G4KDTreeResult::Rewind' data-ref="_ZN14G4KDTreeResult6RewindEv">Rewind</a>();</td></tr>
+<tr><th id="307">307</th><td>      <b>return</b> <a class="local col2 ref" href="#102rset" title='rset' data-ref="102rset">rset</a>;</td></tr>
+<tr><th id="308">308</th><td>    }</td></tr>
+<tr><th id="309">309</th><td>    <b>else</b></td></tr>
+<tr><th id="310">310</th><td>    {</td></tr>
+<tr><th id="311">311</th><td>      <b>return</b> <a class="ref fake" href="../../../../../global/management/include/G4ReferenceCountedHandle.hh.html#_ZN24G4ReferenceCountedHandleC1EPT_" title='G4ReferenceCountedHandle::G4ReferenceCountedHandle&lt;X&gt;' data-ref="_ZN24G4ReferenceCountedHandleC1EPT_"></a><var>0</var>;</td></tr>
+<tr><th id="312">312</th><td>    }</td></tr>
+<tr><th id="313">313</th><td>  }</td></tr>
+<tr><th id="314">314</th><td></td></tr>
+<tr><th id="315">315</th><td><i>//__________________________________________________________________</i></td></tr>
+<tr><th id="316">316</th><td><b>template</b>&lt;<b>typename</b> Position&gt;</td></tr>
+<tr><th id="317">317</th><td>  <em>void</em> G4KDTree::__NearestToNode(G4KDNode_Base* source_node,</td></tr>
+<tr><th id="318">318</th><td>                                 G4KDNode_Base* node,</td></tr>
+<tr><th id="319">319</th><td>                                 <em>const</em> Position&amp; pos,</td></tr>
+<tr><th id="320">320</th><td>                                 <span class='error' title="use of undeclared identifier &apos;std&apos;">std</span>::vector<span class='error' title="expected &apos;)&apos;">&lt;</span>G4KDNode_Base*&gt;&amp; result,</td></tr>
+<tr><th id="321">321</th><td>                                 <em>double</em> *result_dist_sq,</td></tr>
+<tr><th id="322">322</th><td>                                 HyperRect* rect,</td></tr>
+<tr><th id="323">323</th><td>                                 <em>int</em>&amp; nbresult)</td></tr>
+<tr><th id="324">324</th><td>  {</td></tr>
+<tr><th id="325">325</th><td>    <em>int</em> dir = node-&gt;GetAxis();</td></tr>
+<tr><th id="326">326</th><td>    <em>double</em> dummy, dist_sq;</td></tr>
+<tr><th id="327">327</th><td>    G4KDNode_Base *nearer_subtree(<var>0</var>), *farther_subtree(<var>0</var>);</td></tr>
+<tr><th id="328">328</th><td>    <em>double</em> *nearer_hyperrect_coord(<var>0</var>), *farther_hyperrect_coord(<var>0</var>);</td></tr>
+<tr><th id="329">329</th><td></td></tr>
+<tr><th id="330">330</th><td>    <i>/* Decide whether to go left or right in the tree */</i></td></tr>
+<tr><th id="331">331</th><td>    dummy = pos[dir] - (*node)[dir];</td></tr>
+<tr><th id="332">332</th><td>    <b>if</b> (dummy &lt;= <var>0</var>)</td></tr>
+<tr><th id="333">333</th><td>    {</td></tr>
+<tr><th id="334">334</th><td>      nearer_subtree = node-&gt;GetLeft();</td></tr>
+<tr><th id="335">335</th><td>      farther_subtree = node-&gt;GetRight();</td></tr>
+<tr><th id="336">336</th><td>      nearer_hyperrect_coord = <span class='error' title="use of undeclared identifier &apos;rect&apos;">rect</span>-&gt;GetMax() + dir;</td></tr>
+<tr><th id="337">337</th><td>      farther_hyperrect_coord = <span class='error' title="use of undeclared identifier &apos;rect&apos;">rect</span>-&gt;GetMin() + dir;</td></tr>
+<tr><th id="338">338</th><td>    }</td></tr>
+<tr><th id="339">339</th><td>    <b>else</b></td></tr>
+<tr><th id="340">340</th><td>    {</td></tr>
+<tr><th id="341">341</th><td>      nearer_subtree = node-&gt;GetRight();</td></tr>
+<tr><th id="342">342</th><td>      farther_subtree = node-&gt;GetLeft();</td></tr>
+<tr><th id="343">343</th><td>      nearer_hyperrect_coord = <span class='error' title="use of undeclared identifier &apos;rect&apos;">rect</span>-&gt;GetMin() + dir;</td></tr>
+<tr><th id="344">344</th><td>      farther_hyperrect_coord = <span class='error' title="use of undeclared identifier &apos;rect&apos;">rect</span>-&gt;GetMax() + dir;</td></tr>
+<tr><th id="345">345</th><td>    }</td></tr>
+<tr><th id="346">346</th><td></td></tr>
+<tr><th id="347">347</th><td>    <b>if</b> (nearer_subtree)</td></tr>
+<tr><th id="348">348</th><td>    {</td></tr>
+<tr><th id="349">349</th><td>      <i>/* Slice the hyperrect to get the hyperrect of the nearer subtree */</i></td></tr>
+<tr><th id="350">350</th><td>      dummy = *nearer_hyperrect_coord;</td></tr>
+<tr><th id="351">351</th><td>      *nearer_hyperrect_coord = (*node)[dir];</td></tr>
+<tr><th id="352">352</th><td>      <i>/* Recurse down into nearer subtree */</i></td></tr>
+<tr><th id="353">353</th><td>      __NearestToNode(source_node, nearer_subtree, pos, <span class='error' title="use of undeclared identifier &apos;result&apos;">result</span>, <span class='error' title="use of undeclared identifier &apos;result_dist_sq&apos;">result_dist_sq</span>,</td></tr>
+<tr><th id="354">354</th><td>                      <span class='error' title="use of undeclared identifier &apos;rect&apos;">rect</span>, <span class='error' title="use of undeclared identifier &apos;nbresult&apos;">nbresult</span>);</td></tr>
+<tr><th id="355">355</th><td>      <i>/* Undo the slice */</i></td></tr>
+<tr><th id="356">356</th><td>      *nearer_hyperrect_coord = dummy;</td></tr>
+<tr><th id="357">357</th><td>    }</td></tr>
+<tr><th id="358">358</th><td></td></tr>
+<tr><th id="359">359</th><td>    <i>/* Check the distance of the point at the current node, compare it</i></td></tr>
+<tr><th id="360">360</th><td><i>     * with our best so far */</i></td></tr>
+<tr><th id="361">361</th><td>    <b>if</b> (node-&gt;IsValid() &amp;&amp; node != source_node)</td></tr>
+<tr><th id="362">362</th><td>    {</td></tr>
+<tr><th id="363">363</th><td>      dist_sq = <var>0</var>;</td></tr>
+<tr><th id="364">364</th><td>      <em>bool</em> do_break = <b>false</b>;</td></tr>
+<tr><th id="365">365</th><td>      <b>for</b> (<span class='error' title="unknown type name &apos;size_t&apos;">size_t</span> i = <var>0</var>; i &lt; fDim; i++)</td></tr>
+<tr><th id="366">366</th><td>      {</td></tr>
+<tr><th id="367">367</th><td>        dist_sq += sqr((*node)[i] - pos[i]);</td></tr>
+<tr><th id="368">368</th><td>        <b>if</b> (dist_sq &gt; *<span class='error' title="use of undeclared identifier &apos;result_dist_sq&apos;">result_dist_sq</span>)</td></tr>
+<tr><th id="369">369</th><td>        {</td></tr>
+<tr><th id="370">370</th><td>          do_break = <b>true</b>;</td></tr>
+<tr><th id="371">371</th><td>          <b>break</b>;</td></tr>
+<tr><th id="372">372</th><td>        }</td></tr>
+<tr><th id="373">373</th><td>      }</td></tr>
+<tr><th id="374">374</th><td>      <b>if</b> (!do_break)</td></tr>
+<tr><th id="375">375</th><td>      {</td></tr>
+<tr><th id="376">376</th><td>        <b>if</b> (dist_sq &lt; *<span class='error' title="use of undeclared identifier &apos;result_dist_sq&apos;">result_dist_sq</span>)</td></tr>
+<tr><th id="377">377</th><td>        {</td></tr>
+<tr><th id="378">378</th><td>          <span class='error' title="use of undeclared identifier &apos;result&apos;">result</span>.clear();</td></tr>
+<tr><th id="379">379</th><td>          <span class='error' title="use of undeclared identifier &apos;nbresult&apos;">nbresult</span> = <var>1</var>;</td></tr>
+<tr><th id="380">380</th><td>          <span class='error' title="use of undeclared identifier &apos;result&apos;">result</span>.push_back(node);</td></tr>
+<tr><th id="381">381</th><td>          *<span class='error' title="use of undeclared identifier &apos;result_dist_sq&apos;">result_dist_sq</span> = dist_sq;</td></tr>
+<tr><th id="382">382</th><td>        }</td></tr>
+<tr><th id="383">383</th><td>        <b>else</b> <b>if</b> (dist_sq == *<span class='error' title="use of undeclared identifier &apos;result_dist_sq&apos;">result_dist_sq</span>)</td></tr>
+<tr><th id="384">384</th><td>        {</td></tr>
+<tr><th id="385">385</th><td>          <span class='error' title="use of undeclared identifier &apos;result&apos;">result</span>.push_back(node);</td></tr>
+<tr><th id="386">386</th><td>          <span class='error' title="use of undeclared identifier &apos;nbresult&apos;">nbresult</span>++;</td></tr>
+<tr><th id="387">387</th><td>        }</td></tr>
+<tr><th id="388">388</th><td>      }</td></tr>
+<tr><th id="389">389</th><td>    }</td></tr>
+<tr><th id="390">390</th><td></td></tr>
+<tr><th id="391">391</th><td>    <b>if</b> (farther_subtree)</td></tr>
+<tr><th id="392">392</th><td>    {</td></tr>
+<tr><th id="393">393</th><td>      <i>/* Get the hyperrect of the farther subtree */</i></td></tr>
+<tr><th id="394">394</th><td>      dummy = *farther_hyperrect_coord;</td></tr>
+<tr><th id="395">395</th><td>      *farther_hyperrect_coord = (*node)[dir];</td></tr>
+<tr><th id="396">396</th><td>      <i>/* Check if we have to recurse down by calculating the closest</i></td></tr>
+<tr><th id="397">397</th><td><i>       * point of the hyperrect and see if it's closer than our</i></td></tr>
+<tr><th id="398">398</th><td><i>       * minimum distance in result_dist_sq. */</i></td></tr>
+<tr><th id="399">399</th><td><i>      //        if (hyperrect_dist_sq(rect, pos) &lt; *result_dist_sq)</i></td></tr>
+<tr><th id="400">400</th><td>      <b>if</b> (<span class='error' title="use of undeclared identifier &apos;rect&apos;">rect</span>-&gt;CompareDistSqr(pos, <span class='error' title="use of undeclared identifier &apos;result_dist_sq&apos;">result_dist_sq</span>))</td></tr>
+<tr><th id="401">401</th><td>      {</td></tr>
+<tr><th id="402">402</th><td>        <i>/* Recurse down into farther subtree */</i></td></tr>
+<tr><th id="403">403</th><td>        __NearestToNode(source_node, farther_subtree, pos, <span class='error' title="use of undeclared identifier &apos;result&apos;">result</span>,</td></tr>
+<tr><th id="404">404</th><td>                        <span class='error' title="use of undeclared identifier &apos;result_dist_sq&apos;">result_dist_sq</span>, <span class='error' title="use of undeclared identifier &apos;rect&apos;">rect</span>, <span class='error' title="use of undeclared identifier &apos;nbresult&apos;">nbresult</span>);</td></tr>
+<tr><th id="405">405</th><td>      }</td></tr>
+<tr><th id="406">406</th><td>      <i>/* Undo the slice on the hyperrect */</i></td></tr>
+<tr><th id="407">407</th><td>      *farther_hyperrect_coord = dummy;</td></tr>
+<tr><th id="408">408</th><td>    }</td></tr>
+<tr><th id="409">409</th><td>  }</td></tr>
+<tr><th id="410">410</th><td></td></tr>
+<tr><th id="411">411</th><td><b>template</b>&lt;<b>typename</b> Position&gt;</td></tr>
+<tr><th id="412">412</th><td>  <a class="typedef" href="G4KDTreeResult.hh.html#G4KDTreeResultHandle" title='G4KDTreeResultHandle' data-type='G4ReferenceCountedHandle&lt;G4KDTreeResult&gt;' data-ref="G4KDTreeResultHandle">G4KDTreeResultHandle</a> <a class="type" href="G4KDTree.hh.html#G4KDTree" title='G4KDTree' data-ref="G4KDTree">G4KDTree</a>::<dfn class="decl def" id="_ZN8G4KDTree14NearestInRangeERKT_RKd" title='G4KDTree::NearestInRange' data-ref="_ZN8G4KDTree14NearestInRangeERKT_RKd">NearestInRange</dfn>(<em>const</em> Position&amp; <dfn class="local col3 decl" id="103pos" title='pos' data-type='const Position &amp;' data-ref="103pos">pos</dfn>,</td></tr>
+<tr><th id="413">413</th><td>                                                <em>const</em> <em>double</em>&amp; <dfn class="local col4 decl" id="104range" title='range' data-type='const double &amp;' data-ref="104range">range</dfn>)</td></tr>
+<tr><th id="414">414</th><td>  {</td></tr>
+<tr><th id="415">415</th><td>    <em>int</em> <dfn class="local col5 decl" id="105ret" title='ret' data-type='int' data-ref="105ret">ret</dfn>(-<var>1</var>);</td></tr>
+<tr><th id="416">416</th><td></td></tr>
+<tr><th id="417">417</th><td>    <em>const</em> <em>double</em> <dfn class="local col6 decl" id="106range_sq" title='range_sq' data-type='const double' data-ref="106range_sq">range_sq</dfn> = <a class="ref" href="../../../../../global/management/include/templates.hh.html#_Z3sqrRKT_" title='sqr' data-ref="_Z3sqrRKT_">sqr</a>(<a class="local col4 ref" href="#104range" title='range' data-ref="104range">range</a>);</td></tr>
+<tr><th id="418">418</th><td></td></tr>
+<tr><th id="419">419</th><td>    <a class="typedef" href="G4KDTreeResult.hh.html#G4KDTreeResultHandle" title='G4KDTreeResultHandle' data-type='G4ReferenceCountedHandle&lt;G4KDTreeResult&gt;' data-ref="G4KDTreeResultHandle">G4KDTreeResultHandle</a> <dfn class="local col7 decl" id="107rset" title='rset' data-type='G4KDTreeResultHandle' data-ref="107rset">rset</dfn> = <a class="ref fake" href="../../../../../global/management/include/G4ReferenceCountedHandle.hh.html#_ZN24G4ReferenceCountedHandleC1EPT_" title='G4ReferenceCountedHandle::G4ReferenceCountedHandle&lt;X&gt;' data-ref="_ZN24G4ReferenceCountedHandleC1EPT_"></a><b>new</b> <a class="type" href="G4KDTreeResult.hh.html#G4KDTreeResult" title='G4KDTreeResult' data-ref="G4KDTreeResult">G4KDTreeResult</a><a class="ref" href="G4KDTreeResult.hh.html#_ZN14G4KDTreeResultC1EP8G4KDTree" title='G4KDTreeResult::G4KDTreeResult' data-ref="_ZN14G4KDTreeResultC1EP8G4KDTree">(</a><b>this</b>);</td></tr>
+<tr><th id="420">420</th><td>    <b>if</b> ((<a class="local col5 ref" href="#105ret" title='ret' data-ref="105ret">ret</a> = __NearestInRange(<a class="member" href="G4KDTree.hh.html#G4KDTree::fRoot" title='G4KDTree::fRoot' data-ref="G4KDTree::fRoot">fRoot</a>, <a class="local col3 ref" href="#103pos" title='pos' data-ref="103pos">pos</a>, <a class="local col6 ref" href="#106range_sq" title='range_sq' data-ref="106range_sq">range_sq</a>, <a class="local col4 ref" href="#104range" title='range' data-ref="104range">range</a>, *(<a class="local col7 ref" href="#107rset" title='rset' data-ref="107rset">rset</a><a class="ref" href="../../../../../global/management/include/G4ReferenceCountedHandle.hh.html#_ZNK24G4ReferenceCountedHandleclEv" title='G4ReferenceCountedHandle::operator()' data-ref="_ZNK24G4ReferenceCountedHandleclEv">()</a>), <var>0</var>)) == -<var>1</var>)</td></tr>
+<tr><th id="421">421</th><td>    {</td></tr>
+<tr><th id="422">422</th><td>      <a class="local col7 ref" href="#107rset" title='rset' data-ref="107rset">rset</a> <a class="ref" href="../../../../../global/management/include/G4ReferenceCountedHandle.hh.html#_ZN24G4ReferenceCountedHandleaSEPT_" title='G4ReferenceCountedHandle::operator=' data-ref="_ZN24G4ReferenceCountedHandleaSEPT_">=</a> <var>0</var>;</td></tr>
+<tr><th id="423">423</th><td>      <b>return</b> <a class="local col7 ref" href="#107rset" title='rset' data-ref="107rset">rset</a>;</td></tr>
+<tr><th id="424">424</th><td>    }</td></tr>
+<tr><th id="425">425</th><td>    <a class="local col7 ref" href="#107rset" title='rset' data-ref="107rset">rset</a><a class="ref" href="../../../../../global/management/include/G4ReferenceCountedHandle.hh.html#_ZNK24G4ReferenceCountedHandleptEv" title='G4ReferenceCountedHandle::operator-&gt;' data-ref="_ZNK24G4ReferenceCountedHandleptEv">-&gt;</a><a class="ref" href="G4KDTreeResult.hh.html#_ZN14G4KDTreeResult4SortEv" title='G4KDTreeResult::Sort' data-ref="_ZN14G4KDTreeResult4SortEv">Sort</a>();</td></tr>
+<tr><th id="426">426</th><td>    <a class="local col7 ref" href="#107rset" title='rset' data-ref="107rset">rset</a><a class="ref" href="../../../../../global/management/include/G4ReferenceCountedHandle.hh.html#_ZNK24G4ReferenceCountedHandleptEv" title='G4ReferenceCountedHandle::operator-&gt;' data-ref="_ZNK24G4ReferenceCountedHandleptEv">-&gt;</a><a class="ref" href="G4KDTreeResult.hh.html#_ZN14G4KDTreeResult6RewindEv" title='G4KDTreeResult::Rewind' data-ref="_ZN14G4KDTreeResult6RewindEv">Rewind</a>();</td></tr>
+<tr><th id="427">427</th><td>    <b>return</b> <a class="local col7 ref" href="#107rset" title='rset' data-ref="107rset">rset</a>;</td></tr>
+<tr><th id="428">428</th><td>  }</td></tr>
+<tr><th id="429">429</th><td></td></tr>
+</table><hr/><p id='footer'>
+Generated while processing <a href='../src/G4AllITFinder.cc.html'>codebrowser/source/processes/electromagnetic/dna/management/src/G4AllITFinder.cc</a><br/>Generated on <em>2019-Aug-28</em> from project codebrowser<br />Powered by <a href='https://woboq.com'><img alt='Woboq' src='https://code.woboq.org/woboq-16.png' width='41' height='16' /></a> <a href='https://code.woboq.org'>Code Browser</a> 2.1
+<br/>Generator usage only permitted with license.</p>
+</div></body></html>

@@ -1,0 +1,67 @@
+<dec f='codebrowser/source/processes/hadronic/models/radioactive_decay/include/G4RadioactiveDecay.hh' l='258' type='G4double G4RadioactiveDecay::ConvolveSourceTimeProfile(const G4double , const G4double )'/>
+<def f='codebrowser/source/processes/hadronic/models/radioactive_decay/src/G4RadioactiveDecay.cc' l='485' ll='539' type='G4double G4RadioactiveDecay::ConvolveSourceTimeProfile(const G4double t, const G4double tau)'/>
+<doc f='codebrowser/source/processes/hadronic/models/radioactive_decay/src/G4RadioactiveDecay.cc' l='419'>/* DHW: long double version - only few % improvement, but don&apos;t delete yet
+G4double
+G4RadioactiveDecay::ConvolveSourceTimeProfile(const G4double t, const G4double tau)
+{
+  long double convolvedTime = 0.L;
+  G4int nbin;
+  if ( t &gt; SBin[NSourceBin]) {
+    nbin  = NSourceBin;
+  } else {
+    nbin = 0;
+
+    G4int loop = 0;
+    G4ExceptionDescription ed;
+    ed &lt;&lt; &quot; While count exceeded &quot; &lt;&lt; G4endl;
+    while (t &gt; SBin[nbin]) {
+      loop++;
+      if (loop &gt; 1000) {
+        G4Exception(&quot;G4RadioactiveDecay::ConvolveSourceTimeProfile()&quot;,
+                    &quot;HAD_RDM_100&quot;, JustWarning, ed);
+        break;
+      }
+ 
+      nbin++;
+    }
+    nbin--;
+  }
+
+  long double lt = t ;
+  long double ltau = tau;
+  long double earg = 0.L;
+  if (nbin &gt; 0) {
+    for (G4int i = 0; i &lt; nbin; i++) {
+      earg = (long double)(SBin[i+1] - SBin[i])/ltau;
+      if (earg &lt; 100.) {
+        convolvedTime += (long double)SProfile[i] *
+                         std::exp(((long double)SBin[i] - lt)/ltau) *
+                         std::expm1(earg);
+      } else {
+        convolvedTime += (long double)SProfile[i] *
+          (std::exp(-(lt-(long double)SBin[i+1])/ltau)-std::exp(-(lt-(long double)SBin[i])/ltau));
+      }
+    }
+  }
+  // Use -expm1 instead of 1 - exp 
+  convolvedTime -= (long double)SProfile[nbin] * std::expm1(((long double)SBin[nbin] - lt)/ltau);
+
+  if (convolvedTime &lt; 0.)  {
+    G4cout &lt;&lt; &quot; Convolved time =: &quot; &lt;&lt; convolvedTime &lt;&lt; &quot; reset to zero! &quot; &lt;&lt; G4endl;
+    G4cout &lt;&lt; &quot; t = &quot; &lt;&lt; t &lt;&lt; &quot; tau = &quot; &lt;&lt; tau &lt;&lt; G4endl;
+    G4cout &lt;&lt; SBin[nbin] &lt;&lt; &quot; &quot; &lt;&lt; SBin[0] &lt;&lt; G4endl;
+    convolvedTime = 0.;
+  }
+#ifdef G4VERBOSE
+  if (GetVerboseLevel() &gt; 1)
+    G4cout &lt;&lt; &quot; Convolved time: &quot; &lt;&lt; convolvedTime &lt;&lt; G4endl;
+#endif
+  return (G4double)convolvedTime;
+}
+*/
+
+// ConvolveSourceTimeProfile performs the convolution of the source time profile
+// function with a single exponential characterized by a decay constant in the 
+// decay chain.  The time profile is treated as a set of step functions so that 
+// the convolution integral can be done bin-by-bin.
+// This implements Eq. 4.13 of DERA technical note, with SProfile[i] = F(t&apos;)</doc>

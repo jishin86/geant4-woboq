@@ -1,0 +1,389 @@
+<!doctype html>
+<html>
+<head>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"><title>G4LogicalVolume.icc source code [codebrowser/source/geometry/management/include/G4LogicalVolume.icc] - Woboq Code Browser</title>
+<link rel="stylesheet" href="../../../../../../data/qtcreator.css" title="QtCreator"/>
+<link rel="alternate stylesheet" href="../../../../../../data/kdevelop.css" title="KDevelop"/>
+<script type="text/javascript" src="../../../../../../data/jquery/jquery.min.js"></script>
+<script type="text/javascript" src="../../../../../../data/jquery/jquery-ui.min.js"></script>
+<script>var file = 'codebrowser/source/geometry/management/include/G4LogicalVolume.icc'; var root_path = '../../../../..'; var data_path = '../../../../../../data';</script>
+<script src='../../../../../../data/codebrowser.js'></script>
+</head>
+<body><div id='header'><h1 id='breadcrumb'><span>Browse the source code of </span><a href='../../../..'>codebrowser</a>/<a href='../../..'>source</a>/<a href='../..'>geometry</a>/<a href='..'>management</a>/<a href='./'>include</a>/<a href='G4LogicalVolume.icc.html'>G4LogicalVolume.icc</a></h1></div>
+<hr/><div id='content'><table class="code">
+<tr><th id="1">1</th><td><i>//</i></td></tr>
+<tr><th id="2">2</th><td><i>// ********************************************************************</i></td></tr>
+<tr><th id="3">3</th><td><i>// * License and Disclaimer                                           *</i></td></tr>
+<tr><th id="4">4</th><td><i>// *                                                                  *</i></td></tr>
+<tr><th id="5">5</th><td><i>// * The  Geant4 software  is  copyright of the Copyright Holders  of *</i></td></tr>
+<tr><th id="6">6</th><td><i>// * the Geant4 Collaboration.  It is provided  under  the terms  and *</i></td></tr>
+<tr><th id="7">7</th><td><i>// * conditions of the Geant4 Software License,  included in the file *</i></td></tr>
+<tr><th id="8">8</th><td><i>// * LICENSE and available at  <a href="http://cern.ch/geant4/license">http://cern.ch/geant4/license</a> .  These *</i></td></tr>
+<tr><th id="9">9</th><td><i>// * include a list of copyright holders.                             *</i></td></tr>
+<tr><th id="10">10</th><td><i>// *                                                                  *</i></td></tr>
+<tr><th id="11">11</th><td><i>// * Neither the authors of this software system, nor their employing *</i></td></tr>
+<tr><th id="12">12</th><td><i>// * institutes,nor the agencies providing financial support for this *</i></td></tr>
+<tr><th id="13">13</th><td><i>// * work  make  any representation or  warranty, express or implied, *</i></td></tr>
+<tr><th id="14">14</th><td><i>// * regarding  this  software system or assume any liability for its *</i></td></tr>
+<tr><th id="15">15</th><td><i>// * use.  Please see the license in the file  LICENSE  and URL above *</i></td></tr>
+<tr><th id="16">16</th><td><i>// * for the full disclaimer and the limitation of liability.         *</i></td></tr>
+<tr><th id="17">17</th><td><i>// *                                                                  *</i></td></tr>
+<tr><th id="18">18</th><td><i>// * This  code  implementation is the result of  the  scientific and *</i></td></tr>
+<tr><th id="19">19</th><td><i>// * technical work of the GEANT4 collaboration.                      *</i></td></tr>
+<tr><th id="20">20</th><td><i>// * By using,  copying,  modifying or  distributing the software (or *</i></td></tr>
+<tr><th id="21">21</th><td><i>// * any work based  on the software)  you  agree  to acknowledge its *</i></td></tr>
+<tr><th id="22">22</th><td><i>// * use  in  resulting  scientific  publications,  and indicate your *</i></td></tr>
+<tr><th id="23">23</th><td><i>// * acceptance of all terms of the Geant4 Software license.          *</i></td></tr>
+<tr><th id="24">24</th><td><i>// ********************************************************************</i></td></tr>
+<tr><th id="25">25</th><td><i>//</i></td></tr>
+<tr><th id="26">26</th><td><i>//</i></td></tr>
+<tr><th id="27">27</th><td><i>//</i></td></tr>
+<tr><th id="28">28</th><td><i>// </i></td></tr>
+<tr><th id="29">29</th><td><i>// class G4LogicalVolume Inline Implementation file</i></td></tr>
+<tr><th id="30">30</th><td><i>//</i></td></tr>
+<tr><th id="31">31</th><td><i>// 15.01.13 - G.Cosmo, A.Dotti: Modified for thread-safety for MT</i></td></tr>
+<tr><th id="32">32</th><td><i>// 10.20.97 - P. MoraDeFreitas : Added SetFastSimulation method</i></td></tr>
+<tr><th id="33">33</th><td><i>// 05.11.98 - M. Verderi: Add Get/Set methods for fBiasWeight</i></td></tr>
+<tr><th id="34">34</th><td><i>// 09.11.98 - J. Apostolakis:  Changed MagneticField to FieldManager</i></td></tr>
+<tr><th id="35">35</th><td><i>// 12.02.99 - S.Giani: Added set/get methods for voxelization quality</i></td></tr>
+<tr><th id="36">36</th><td><i>// 18.04.01 - G.Cosmo: Migrated to STL vector</i></td></tr>
+<tr><th id="37">37</th><td><i>// 17.05.02 - G.Cosmo: Added IsToOptimise() method</i></td></tr>
+<tr><th id="38">38</th><td><i>// --------------------------------------------------------------------</i></td></tr>
+<tr><th id="39">39</th><td><i></i></td></tr>
+<tr><th id="40">40</th><td><i>// ********************************************************************</i></td></tr>
+<tr><th id="41">41</th><td><i>// GetName</i></td></tr>
+<tr><th id="42">42</th><td><i>// ********************************************************************</i></td></tr>
+<tr><th id="43">43</th><td><i>//</i></td></tr>
+<tr><th id="44">44</th><td><b>inline</b></td></tr>
+<tr><th id="45">45</th><td><em>const</em> <a class="type" href="../../../global/management/include/G4String.hh.html#G4String" title='G4String' data-ref="G4String">G4String</a>&amp; <a class="type" href="G4LogicalVolume.hh.html#G4LogicalVolume" title='G4LogicalVolume' data-ref="G4LogicalVolume">G4LogicalVolume</a>::<dfn class="decl def" id="_ZNK15G4LogicalVolume7GetNameEv" title='G4LogicalVolume::GetName' data-ref="_ZNK15G4LogicalVolume7GetNameEv">GetName</dfn>() <em>const</em></td></tr>
+<tr><th id="46">46</th><td>{</td></tr>
+<tr><th id="47">47</th><td>  <b>return</b> <a class="member" href="G4LogicalVolume.hh.html#G4LogicalVolume::fName" title='G4LogicalVolume::fName' data-ref="G4LogicalVolume::fName">fName</a>;</td></tr>
+<tr><th id="48">48</th><td>}</td></tr>
+<tr><th id="49">49</th><td>    </td></tr>
+<tr><th id="50">50</th><td><i>// ********************************************************************</i></td></tr>
+<tr><th id="51">51</th><td><i>// SetName</i></td></tr>
+<tr><th id="52">52</th><td><i>// ********************************************************************</i></td></tr>
+<tr><th id="53">53</th><td><i>//</i></td></tr>
+<tr><th id="54">54</th><td><b>inline</b></td></tr>
+<tr><th id="55">55</th><td><em>void</em> <a class="type" href="G4LogicalVolume.hh.html#G4LogicalVolume" title='G4LogicalVolume' data-ref="G4LogicalVolume">G4LogicalVolume</a>::<dfn class="decl def" id="_ZN15G4LogicalVolume7SetNameERK8G4String" title='G4LogicalVolume::SetName' data-ref="_ZN15G4LogicalVolume7SetNameERK8G4String">SetName</dfn>(<em>const</em> <a class="type" href="../../../global/management/include/G4String.hh.html#G4String" title='G4String' data-ref="G4String">G4String</a>&amp; <dfn class="local col0 decl" id="1340pName" title='pName' data-type='const G4String &amp;' data-ref="1340pName">pName</dfn>)</td></tr>
+<tr><th id="56">56</th><td>{</td></tr>
+<tr><th id="57">57</th><td>  <a class="member" href="G4LogicalVolume.hh.html#G4LogicalVolume::fName" title='G4LogicalVolume::fName' data-ref="G4LogicalVolume::fName">fName</a> <a class="ref" href="../../../global/management/include/G4String.hh.html#_ZN8G4StringaSERKS_" title='G4String::operator=' data-ref="_ZN8G4StringaSERKS_">=</a> <a class="local col0 ref" href="#1340pName" title='pName' data-ref="1340pName">pName</a>;</td></tr>
+<tr><th id="58">58</th><td>}</td></tr>
+<tr><th id="59">59</th><td></td></tr>
+<tr><th id="60">60</th><td><i>// ********************************************************************</i></td></tr>
+<tr><th id="61">61</th><td><i>// GetInstanceID</i></td></tr>
+<tr><th id="62">62</th><td><i>// ********************************************************************</i></td></tr>
+<tr><th id="63">63</th><td><i>//</i></td></tr>
+<tr><th id="64">64</th><td><b>inline</b></td></tr>
+<tr><th id="65">65</th><td><a class="typedef" href="../../../global/management/include/G4Types.hh.html#G4int" title='G4int' data-type='int' data-ref="G4int">G4int</a> <a class="type" href="G4LogicalVolume.hh.html#G4LogicalVolume" title='G4LogicalVolume' data-ref="G4LogicalVolume">G4LogicalVolume</a>::<dfn class="decl def" id="_ZNK15G4LogicalVolume13GetInstanceIDEv" title='G4LogicalVolume::GetInstanceID' data-ref="_ZNK15G4LogicalVolume13GetInstanceIDEv">GetInstanceID</dfn>() <em>const</em></td></tr>
+<tr><th id="66">66</th><td>{</td></tr>
+<tr><th id="67">67</th><td>  <b>return</b> <a class="member" href="G4LogicalVolume.hh.html#G4LogicalVolume::instanceID" title='G4LogicalVolume::instanceID' data-ref="G4LogicalVolume::instanceID">instanceID</a>;</td></tr>
+<tr><th id="68">68</th><td>}</td></tr>
+<tr><th id="69">69</th><td></td></tr>
+<tr><th id="70">70</th><td><i>// ********************************************************************</i></td></tr>
+<tr><th id="71">71</th><td><i>// GetMasterFieldManager</i></td></tr>
+<tr><th id="72">72</th><td><i>// ********************************************************************</i></td></tr>
+<tr><th id="73">73</th><td><i>//</i></td></tr>
+<tr><th id="74">74</th><td><b>inline</b></td></tr>
+<tr><th id="75">75</th><td><a class="type" href="G4Region.hh.html#G4FieldManager" title='G4FieldManager' data-ref="G4FieldManager">G4FieldManager</a>* <a class="type" href="G4LogicalVolume.hh.html#G4LogicalVolume" title='G4LogicalVolume' data-ref="G4LogicalVolume">G4LogicalVolume</a>::<dfn class="decl def" id="_ZNK15G4LogicalVolume21GetMasterFieldManagerEv" title='G4LogicalVolume::GetMasterFieldManager' data-ref="_ZNK15G4LogicalVolume21GetMasterFieldManagerEv">GetMasterFieldManager</dfn>() <em>const</em></td></tr>
+<tr><th id="76">76</th><td>{</td></tr>
+<tr><th id="77">77</th><td>  <b>return</b> <a class="member" href="G4LogicalVolume.hh.html#G4LogicalVolume::fFieldManager" title='G4LogicalVolume::fFieldManager' data-ref="G4LogicalVolume::fFieldManager">fFieldManager</a>;</td></tr>
+<tr><th id="78">78</th><td>}</td></tr>
+<tr><th id="79">79</th><td></td></tr>
+<tr><th id="80">80</th><td><i>// ********************************************************************</i></td></tr>
+<tr><th id="81">81</th><td><i>// GetNoDaughters</i></td></tr>
+<tr><th id="82">82</th><td><i>// ********************************************************************</i></td></tr>
+<tr><th id="83">83</th><td><i>//</i></td></tr>
+<tr><th id="84">84</th><td><b>inline</b></td></tr>
+<tr><th id="85">85</th><td><a class="typedef" href="../../../global/management/include/G4Types.hh.html#G4int" title='G4int' data-type='int' data-ref="G4int">G4int</a> <a class="type" href="G4LogicalVolume.hh.html#G4LogicalVolume" title='G4LogicalVolume' data-ref="G4LogicalVolume">G4LogicalVolume</a>::<dfn class="decl def" id="_ZNK15G4LogicalVolume14GetNoDaughtersEv" title='G4LogicalVolume::GetNoDaughters' data-ref="_ZNK15G4LogicalVolume14GetNoDaughtersEv">GetNoDaughters</dfn>() <em>const</em></td></tr>
+<tr><th id="86">86</th><td>{</td></tr>
+<tr><th id="87">87</th><td>  <b>return</b> fDaughters.size();</td></tr>
+<tr><th id="88">88</th><td>}</td></tr>
+<tr><th id="89">89</th><td></td></tr>
+<tr><th id="90">90</th><td><i>// ********************************************************************</i></td></tr>
+<tr><th id="91">91</th><td><i>// GetDaughter</i></td></tr>
+<tr><th id="92">92</th><td><i>// ********************************************************************</i></td></tr>
+<tr><th id="93">93</th><td><i>//</i></td></tr>
+<tr><th id="94">94</th><td><b>inline</b></td></tr>
+<tr><th id="95">95</th><td><a class="type" href="G4VPhysicalVolume.hh.html#G4VPhysicalVolume" title='G4VPhysicalVolume' data-ref="G4VPhysicalVolume">G4VPhysicalVolume</a>* <a class="type" href="G4LogicalVolume.hh.html#G4LogicalVolume" title='G4LogicalVolume' data-ref="G4LogicalVolume">G4LogicalVolume</a>::<dfn class="decl def" id="_ZNK15G4LogicalVolume11GetDaughterEi" title='G4LogicalVolume::GetDaughter' data-ref="_ZNK15G4LogicalVolume11GetDaughterEi">GetDaughter</dfn>(<em>const</em> <a class="typedef" href="../../../global/management/include/G4Types.hh.html#G4int" title='G4int' data-type='int' data-ref="G4int">G4int</a> <dfn class="local col1 decl" id="1341i" title='i' data-type='const G4int' data-ref="1341i">i</dfn>) <em>const</em></td></tr>
+<tr><th id="96">96</th><td>{</td></tr>
+<tr><th id="97">97</th><td>  <b>return</b> fDaughters[i];</td></tr>
+<tr><th id="98">98</th><td>}</td></tr>
+<tr><th id="99">99</th><td></td></tr>
+<tr><th id="100">100</th><td><i>// ********************************************************************</i></td></tr>
+<tr><th id="101">101</th><td><i>// GetFastSimulationManager</i></td></tr>
+<tr><th id="102">102</th><td><i>// ********************************************************************</i></td></tr>
+<tr><th id="103">103</th><td><i>//</i></td></tr>
+<tr><th id="104">104</th><td><b>inline</b></td></tr>
+<tr><th id="105">105</th><td><a class="type" href="G4Region.hh.html#G4FastSimulationManager" title='G4FastSimulationManager' data-ref="G4FastSimulationManager">G4FastSimulationManager</a>* <a class="type" href="G4LogicalVolume.hh.html#G4LogicalVolume" title='G4LogicalVolume' data-ref="G4LogicalVolume">G4LogicalVolume</a>::<dfn class="decl def" id="_ZNK15G4LogicalVolume24GetFastSimulationManagerEv" title='G4LogicalVolume::GetFastSimulationManager' data-ref="_ZNK15G4LogicalVolume24GetFastSimulationManagerEv">GetFastSimulationManager</dfn> () <em>const</em> </td></tr>
+<tr><th id="106">106</th><td>{</td></tr>
+<tr><th id="107">107</th><td>  <a class="type" href="G4Region.hh.html#G4FastSimulationManager" title='G4FastSimulationManager' data-ref="G4FastSimulationManager">G4FastSimulationManager</a>* <dfn class="local col2 decl" id="1342fFSM" title='fFSM' data-type='G4FastSimulationManager *' data-ref="1342fFSM">fFSM</dfn> = <var>0</var>;</td></tr>
+<tr><th id="108">108</th><td>  <b>if</b>(<a class="member" href="G4LogicalVolume.hh.html#G4LogicalVolume::fRegion" title='G4LogicalVolume::fRegion' data-ref="G4LogicalVolume::fRegion">fRegion</a>) <a class="local col2 ref" href="#1342fFSM" title='fFSM' data-ref="1342fFSM">fFSM</a> = <a class="member" href="G4LogicalVolume.hh.html#G4LogicalVolume::fRegion" title='G4LogicalVolume::fRegion' data-ref="G4LogicalVolume::fRegion">fRegion</a>-&gt;<a class="ref" href="G4Region.hh.html#_ZNK8G4Region24GetFastSimulationManagerEv" title='G4Region::GetFastSimulationManager' data-ref="_ZNK8G4Region24GetFastSimulationManagerEv">GetFastSimulationManager</a>();</td></tr>
+<tr><th id="109">109</th><td>  <b>return</b> <a class="local col2 ref" href="#1342fFSM" title='fFSM' data-ref="1342fFSM">fFSM</a>;</td></tr>
+<tr><th id="110">110</th><td>}</td></tr>
+<tr><th id="111">111</th><td></td></tr>
+<tr><th id="112">112</th><td><i>// ********************************************************************</i></td></tr>
+<tr><th id="113">113</th><td><i>// IsDaughter</i></td></tr>
+<tr><th id="114">114</th><td><i>// ********************************************************************</i></td></tr>
+<tr><th id="115">115</th><td><i>//</i></td></tr>
+<tr><th id="116">116</th><td><b>inline</b></td></tr>
+<tr><th id="117">117</th><td><a class="typedef" href="../../../global/management/include/G4Types.hh.html#G4bool" title='G4bool' data-type='bool' data-ref="G4bool">G4bool</a> <a class="type" href="G4LogicalVolume.hh.html#G4LogicalVolume" title='G4LogicalVolume' data-ref="G4LogicalVolume">G4LogicalVolume</a>::<dfn class="decl def" id="_ZNK15G4LogicalVolume10IsDaughterEPK17G4VPhysicalVolume" title='G4LogicalVolume::IsDaughter' data-ref="_ZNK15G4LogicalVolume10IsDaughterEPK17G4VPhysicalVolume">IsDaughter</dfn>(<em>const</em> <a class="type" href="G4VPhysicalVolume.hh.html#G4VPhysicalVolume" title='G4VPhysicalVolume' data-ref="G4VPhysicalVolume">G4VPhysicalVolume</a>* <dfn class="local col3 decl" id="1343p" title='p' data-type='const G4VPhysicalVolume *' data-ref="1343p">p</dfn>) <em>const</em></td></tr>
+<tr><th id="118">118</th><td>{</td></tr>
+<tr><th id="119">119</th><td>  <span class='error' title="use of undeclared identifier &apos;G4PhysicalVolumeList&apos;">G4PhysicalVolumeList</span>::const_iterator <dfn class="local col4 decl" id="1344i" title='i' data-type='int' data-ref="1344i">i</dfn>;</td></tr>
+<tr><th id="120">120</th><td>  <b>for</b> ( i=fDaughters.begin(); i!=fDaughters.end(); ++i )</td></tr>
+<tr><th id="121">121</th><td>  {</td></tr>
+<tr><th id="122">122</th><td>    <b>if</b> (**i==*p) <b>return</b> <b>true</b>;</td></tr>
+<tr><th id="123">123</th><td>  }</td></tr>
+<tr><th id="124">124</th><td>  <b>return</b> <b>false</b>;</td></tr>
+<tr><th id="125">125</th><td>}</td></tr>
+<tr><th id="126">126</th><td></td></tr>
+<tr><th id="127">127</th><td><i>// ********************************************************************</i></td></tr>
+<tr><th id="128">128</th><td><i>// CharacteriseDaughters</i></td></tr>
+<tr><th id="129">129</th><td><i>// ********************************************************************</i></td></tr>
+<tr><th id="130">130</th><td><i>//</i></td></tr>
+<tr><th id="131">131</th><td><b>inline</b></td></tr>
+<tr><th id="132">132</th><td><a class="type" href="../../../global/HEPGeometry/include/geomdefs.hh.html#EVolume" title='EVolume' data-ref="EVolume">EVolume</a> <a class="type" href="G4LogicalVolume.hh.html#G4LogicalVolume" title='G4LogicalVolume' data-ref="G4LogicalVolume">G4LogicalVolume</a>::<dfn class="decl def" id="_ZNK15G4LogicalVolume21CharacteriseDaughtersEv" title='G4LogicalVolume::CharacteriseDaughters' data-ref="_ZNK15G4LogicalVolume21CharacteriseDaughtersEv">CharacteriseDaughters</dfn>() <em>const</em></td></tr>
+<tr><th id="133">133</th><td>{</td></tr>
+<tr><th id="134">134</th><td>  <a class="type" href="../../../global/HEPGeometry/include/geomdefs.hh.html#EVolume" title='EVolume' data-ref="EVolume">EVolume</a> <dfn class="local col5 decl" id="1345type" title='type' data-type='EVolume' data-ref="1345type">type</dfn>;</td></tr>
+<tr><th id="135">135</th><td>  <a class="type" href="G4VPhysicalVolume.hh.html#G4VPhysicalVolume" title='G4VPhysicalVolume' data-ref="G4VPhysicalVolume">G4VPhysicalVolume</a> *<dfn class="local col6 decl" id="1346pVol" title='pVol' data-type='G4VPhysicalVolume *' data-ref="1346pVol">pVol</dfn>;</td></tr>
+<tr><th id="136">136</th><td></td></tr>
+<tr><th id="137">137</th><td>  <b>if</b> ( <a class="member" href="#_ZNK15G4LogicalVolume14GetNoDaughtersEv" title='G4LogicalVolume::GetNoDaughters' data-ref="_ZNK15G4LogicalVolume14GetNoDaughtersEv">GetNoDaughters</a>()==<var>1</var> )</td></tr>
+<tr><th id="138">138</th><td>  {</td></tr>
+<tr><th id="139">139</th><td>    <a class="local col6 ref" href="#1346pVol" title='pVol' data-ref="1346pVol">pVol</a> = <a class="member" href="#_ZNK15G4LogicalVolume11GetDaughterEi" title='G4LogicalVolume::GetDaughter' data-ref="_ZNK15G4LogicalVolume11GetDaughterEi">GetDaughter</a>(<var>0</var>);</td></tr>
+<tr><th id="140">140</th><td>    <a class="local col5 ref" href="#1345type" title='type' data-ref="1345type">type</a> = <a class="local col6 ref" href="#1346pVol" title='pVol' data-ref="1346pVol">pVol</a>-&gt;<a class="ref" href="G4VPhysicalVolume.icc.html#_ZNK17G4VPhysicalVolume10VolumeTypeEv" title='G4VPhysicalVolume::VolumeType' data-ref="_ZNK17G4VPhysicalVolume10VolumeTypeEv">VolumeType</a>();</td></tr>
+<tr><th id="141">141</th><td>  }</td></tr>
+<tr><th id="142">142</th><td>  <b>else</b></td></tr>
+<tr><th id="143">143</th><td>  {</td></tr>
+<tr><th id="144">144</th><td>    <a class="local col5 ref" href="#1345type" title='type' data-ref="1345type">type</a> = <a class="enum" href="../../../global/HEPGeometry/include/geomdefs.hh.html#EVolume::kNormal" title='EVolume::kNormal' data-ref="EVolume::kNormal">kNormal</a>;</td></tr>
+<tr><th id="145">145</th><td>  }</td></tr>
+<tr><th id="146">146</th><td>  <b>return</b> <a class="local col5 ref" href="#1345type" title='type' data-ref="1345type">type</a>;</td></tr>
+<tr><th id="147">147</th><td>}</td></tr>
+<tr><th id="148">148</th><td></td></tr>
+<tr><th id="149">149</th><td><i>// ********************************************************************</i></td></tr>
+<tr><th id="150">150</th><td><i>// GetMasterSolid</i></td></tr>
+<tr><th id="151">151</th><td><i>// ********************************************************************</i></td></tr>
+<tr><th id="152">152</th><td><i>//</i></td></tr>
+<tr><th id="153">153</th><td><b>inline</b></td></tr>
+<tr><th id="154">154</th><td><a class="type" href="G4VTouchable.hh.html#G4VSolid" title='G4VSolid' data-ref="G4VSolid">G4VSolid</a>* <a class="type" href="G4LogicalVolume.hh.html#G4LogicalVolume" title='G4LogicalVolume' data-ref="G4LogicalVolume">G4LogicalVolume</a>::<dfn class="decl def" id="_ZNK15G4LogicalVolume14GetMasterSolidEv" title='G4LogicalVolume::GetMasterSolid' data-ref="_ZNK15G4LogicalVolume14GetMasterSolidEv">GetMasterSolid</dfn>() <em>const</em></td></tr>
+<tr><th id="155">155</th><td>{</td></tr>
+<tr><th id="156">156</th><td>  <b>return</b> <a class="member" href="G4LogicalVolume.hh.html#G4LogicalVolume::fSolid" title='G4LogicalVolume::fSolid' data-ref="G4LogicalVolume::fSolid">fSolid</a>;</td></tr>
+<tr><th id="157">157</th><td>}</td></tr>
+<tr><th id="158">158</th><td></td></tr>
+<tr><th id="159">159</th><td><i>// ********************************************************************</i></td></tr>
+<tr><th id="160">160</th><td><i>// GetMasterSensitiveDetector</i></td></tr>
+<tr><th id="161">161</th><td><i>// ********************************************************************</i></td></tr>
+<tr><th id="162">162</th><td><i>//</i></td></tr>
+<tr><th id="163">163</th><td><b>inline</b></td></tr>
+<tr><th id="164">164</th><td><a class="type" href="G4LogicalVolume.hh.html#G4VSensitiveDetector" title='G4VSensitiveDetector' data-ref="G4VSensitiveDetector">G4VSensitiveDetector</a>* <a class="type" href="G4LogicalVolume.hh.html#G4LogicalVolume" title='G4LogicalVolume' data-ref="G4LogicalVolume">G4LogicalVolume</a>::<dfn class="decl def" id="_ZNK15G4LogicalVolume26GetMasterSensitiveDetectorEv" title='G4LogicalVolume::GetMasterSensitiveDetector' data-ref="_ZNK15G4LogicalVolume26GetMasterSensitiveDetectorEv">GetMasterSensitiveDetector</dfn>() <em>const</em></td></tr>
+<tr><th id="165">165</th><td>{</td></tr>
+<tr><th id="166">166</th><td>  <b>return</b> <a class="member" href="G4LogicalVolume.hh.html#G4LogicalVolume::fSensitiveDetector" title='G4LogicalVolume::fSensitiveDetector' data-ref="G4LogicalVolume::fSensitiveDetector">fSensitiveDetector</a>;</td></tr>
+<tr><th id="167">167</th><td>}</td></tr>
+<tr><th id="168">168</th><td></td></tr>
+<tr><th id="169">169</th><td><i>// ********************************************************************</i></td></tr>
+<tr><th id="170">170</th><td><i>// GetUserLimits</i></td></tr>
+<tr><th id="171">171</th><td><i>// ********************************************************************</i></td></tr>
+<tr><th id="172">172</th><td><i>//</i></td></tr>
+<tr><th id="173">173</th><td><b>inline</b></td></tr>
+<tr><th id="174">174</th><td><a class="type" href="G4Region.hh.html#G4UserLimits" title='G4UserLimits' data-ref="G4UserLimits">G4UserLimits</a>* <a class="type" href="G4LogicalVolume.hh.html#G4LogicalVolume" title='G4LogicalVolume' data-ref="G4LogicalVolume">G4LogicalVolume</a>::<dfn class="decl def" id="_ZNK15G4LogicalVolume13GetUserLimitsEv" title='G4LogicalVolume::GetUserLimits' data-ref="_ZNK15G4LogicalVolume13GetUserLimitsEv">GetUserLimits</dfn>() <em>const</em></td></tr>
+<tr><th id="175">175</th><td>{</td></tr>
+<tr><th id="176">176</th><td>  <b>if</b>(<a class="member" href="G4LogicalVolume.hh.html#G4LogicalVolume::fUserLimits" title='G4LogicalVolume::fUserLimits' data-ref="G4LogicalVolume::fUserLimits">fUserLimits</a>) <b>return</b> <a class="member" href="G4LogicalVolume.hh.html#G4LogicalVolume::fUserLimits" title='G4LogicalVolume::fUserLimits' data-ref="G4LogicalVolume::fUserLimits">fUserLimits</a>;</td></tr>
+<tr><th id="177">177</th><td>  <b>if</b>(<a class="member" href="G4LogicalVolume.hh.html#G4LogicalVolume::fRegion" title='G4LogicalVolume::fRegion' data-ref="G4LogicalVolume::fRegion">fRegion</a>) <b>return</b> <a class="member" href="G4LogicalVolume.hh.html#G4LogicalVolume::fRegion" title='G4LogicalVolume::fRegion' data-ref="G4LogicalVolume::fRegion">fRegion</a>-&gt;<a class="ref" href="G4Region.icc.html#_ZNK8G4Region13GetUserLimitsEv" title='G4Region::GetUserLimits' data-ref="_ZNK8G4Region13GetUserLimitsEv">GetUserLimits</a>();</td></tr>
+<tr><th id="178">178</th><td>  <b>return</b> <var>0</var>;</td></tr>
+<tr><th id="179">179</th><td>}</td></tr>
+<tr><th id="180">180</th><td></td></tr>
+<tr><th id="181">181</th><td><i>// ********************************************************************</i></td></tr>
+<tr><th id="182">182</th><td><i>// SetUserLimits</i></td></tr>
+<tr><th id="183">183</th><td><i>// ********************************************************************</i></td></tr>
+<tr><th id="184">184</th><td><i>//</i></td></tr>
+<tr><th id="185">185</th><td><b>inline</b></td></tr>
+<tr><th id="186">186</th><td><em>void</em> <a class="type" href="G4LogicalVolume.hh.html#G4LogicalVolume" title='G4LogicalVolume' data-ref="G4LogicalVolume">G4LogicalVolume</a>::<dfn class="decl def" id="_ZN15G4LogicalVolume13SetUserLimitsEP12G4UserLimits" title='G4LogicalVolume::SetUserLimits' data-ref="_ZN15G4LogicalVolume13SetUserLimitsEP12G4UserLimits">SetUserLimits</dfn>(<a class="type" href="G4Region.hh.html#G4UserLimits" title='G4UserLimits' data-ref="G4UserLimits">G4UserLimits</a>* <dfn class="local col7 decl" id="1347pULimits" title='pULimits' data-type='G4UserLimits *' data-ref="1347pULimits">pULimits</dfn>)</td></tr>
+<tr><th id="187">187</th><td>{</td></tr>
+<tr><th id="188">188</th><td>  <a class="member" href="G4LogicalVolume.hh.html#G4LogicalVolume::fUserLimits" title='G4LogicalVolume::fUserLimits' data-ref="G4LogicalVolume::fUserLimits">fUserLimits</a> = <a class="local col7 ref" href="#1347pULimits" title='pULimits' data-ref="1347pULimits">pULimits</a>;</td></tr>
+<tr><th id="189">189</th><td>}</td></tr>
+<tr><th id="190">190</th><td></td></tr>
+<tr><th id="191">191</th><td><i>// ********************************************************************</i></td></tr>
+<tr><th id="192">192</th><td><i>// GetVoxelHeader</i></td></tr>
+<tr><th id="193">193</th><td><i>// ********************************************************************</i></td></tr>
+<tr><th id="194">194</th><td><i>//</i></td></tr>
+<tr><th id="195">195</th><td><b>inline</b></td></tr>
+<tr><th id="196">196</th><td><a class="type" href="G4LogicalVolume.hh.html#G4SmartVoxelHeader" title='G4SmartVoxelHeader' data-ref="G4SmartVoxelHeader">G4SmartVoxelHeader</a>* <a class="type" href="G4LogicalVolume.hh.html#G4LogicalVolume" title='G4LogicalVolume' data-ref="G4LogicalVolume">G4LogicalVolume</a>::<dfn class="decl def" id="_ZNK15G4LogicalVolume14GetVoxelHeaderEv" title='G4LogicalVolume::GetVoxelHeader' data-ref="_ZNK15G4LogicalVolume14GetVoxelHeaderEv">GetVoxelHeader</dfn>() <em>const</em></td></tr>
+<tr><th id="197">197</th><td>{</td></tr>
+<tr><th id="198">198</th><td>  <b>return</b> <a class="member" href="G4LogicalVolume.hh.html#G4LogicalVolume::fVoxel" title='G4LogicalVolume::fVoxel' data-ref="G4LogicalVolume::fVoxel">fVoxel</a>;</td></tr>
+<tr><th id="199">199</th><td>}</td></tr>
+<tr><th id="200">200</th><td></td></tr>
+<tr><th id="201">201</th><td><i>// ********************************************************************</i></td></tr>
+<tr><th id="202">202</th><td><i>// SetVoxelHeader</i></td></tr>
+<tr><th id="203">203</th><td><i>// ********************************************************************</i></td></tr>
+<tr><th id="204">204</th><td><i>//</i></td></tr>
+<tr><th id="205">205</th><td><b>inline</b></td></tr>
+<tr><th id="206">206</th><td><em>void</em> <a class="type" href="G4LogicalVolume.hh.html#G4LogicalVolume" title='G4LogicalVolume' data-ref="G4LogicalVolume">G4LogicalVolume</a>::<dfn class="decl def" id="_ZN15G4LogicalVolume14SetVoxelHeaderEP18G4SmartVoxelHeader" title='G4LogicalVolume::SetVoxelHeader' data-ref="_ZN15G4LogicalVolume14SetVoxelHeaderEP18G4SmartVoxelHeader">SetVoxelHeader</dfn>(<a class="type" href="G4LogicalVolume.hh.html#G4SmartVoxelHeader" title='G4SmartVoxelHeader' data-ref="G4SmartVoxelHeader">G4SmartVoxelHeader</a>* <dfn class="local col8 decl" id="1348pVoxel" title='pVoxel' data-type='G4SmartVoxelHeader *' data-ref="1348pVoxel">pVoxel</dfn>)</td></tr>
+<tr><th id="207">207</th><td>{</td></tr>
+<tr><th id="208">208</th><td>  <a class="member" href="G4LogicalVolume.hh.html#G4LogicalVolume::fVoxel" title='G4LogicalVolume::fVoxel' data-ref="G4LogicalVolume::fVoxel">fVoxel</a> = <a class="local col8 ref" href="#1348pVoxel" title='pVoxel' data-ref="1348pVoxel">pVoxel</a>;</td></tr>
+<tr><th id="209">209</th><td>}</td></tr>
+<tr><th id="210">210</th><td></td></tr>
+<tr><th id="211">211</th><td><i>// ********************************************************************</i></td></tr>
+<tr><th id="212">212</th><td><i>// GetSmartless</i></td></tr>
+<tr><th id="213">213</th><td><i>// ********************************************************************</i></td></tr>
+<tr><th id="214">214</th><td><i>//</i></td></tr>
+<tr><th id="215">215</th><td><b>inline</b></td></tr>
+<tr><th id="216">216</th><td><a class="typedef" href="../../../global/management/include/G4Types.hh.html#G4double" title='G4double' data-type='double' data-ref="G4double">G4double</a> <a class="type" href="G4LogicalVolume.hh.html#G4LogicalVolume" title='G4LogicalVolume' data-ref="G4LogicalVolume">G4LogicalVolume</a>::<dfn class="decl def" id="_ZNK15G4LogicalVolume12GetSmartlessEv" title='G4LogicalVolume::GetSmartless' data-ref="_ZNK15G4LogicalVolume12GetSmartlessEv">GetSmartless</dfn>() <em>const</em></td></tr>
+<tr><th id="217">217</th><td>{</td></tr>
+<tr><th id="218">218</th><td>  <b>return</b> <a class="member" href="G4LogicalVolume.hh.html#G4LogicalVolume::fSmartless" title='G4LogicalVolume::fSmartless' data-ref="G4LogicalVolume::fSmartless">fSmartless</a>;</td></tr>
+<tr><th id="219">219</th><td>}</td></tr>
+<tr><th id="220">220</th><td></td></tr>
+<tr><th id="221">221</th><td><i>// ********************************************************************</i></td></tr>
+<tr><th id="222">222</th><td><i>// SetSmartless</i></td></tr>
+<tr><th id="223">223</th><td><i>// ********************************************************************</i></td></tr>
+<tr><th id="224">224</th><td><i>//</i></td></tr>
+<tr><th id="225">225</th><td><b>inline</b></td></tr>
+<tr><th id="226">226</th><td><em>void</em> <a class="type" href="G4LogicalVolume.hh.html#G4LogicalVolume" title='G4LogicalVolume' data-ref="G4LogicalVolume">G4LogicalVolume</a>::<dfn class="decl def" id="_ZN15G4LogicalVolume12SetSmartlessEd" title='G4LogicalVolume::SetSmartless' data-ref="_ZN15G4LogicalVolume12SetSmartlessEd">SetSmartless</dfn>(<a class="typedef" href="../../../global/management/include/G4Types.hh.html#G4double" title='G4double' data-type='double' data-ref="G4double">G4double</a> <dfn class="local col9 decl" id="1349smt" title='smt' data-type='G4double' data-ref="1349smt">smt</dfn>)</td></tr>
+<tr><th id="227">227</th><td>{</td></tr>
+<tr><th id="228">228</th><td>  <a class="member" href="G4LogicalVolume.hh.html#G4LogicalVolume::fSmartless" title='G4LogicalVolume::fSmartless' data-ref="G4LogicalVolume::fSmartless">fSmartless</a> = <a class="local col9 ref" href="#1349smt" title='smt' data-ref="1349smt">smt</a>;</td></tr>
+<tr><th id="229">229</th><td>}</td></tr>
+<tr><th id="230">230</th><td></td></tr>
+<tr><th id="231">231</th><td><i>// ********************************************************************</i></td></tr>
+<tr><th id="232">232</th><td><i>// IsToOptimise</i></td></tr>
+<tr><th id="233">233</th><td><i>// ********************************************************************</i></td></tr>
+<tr><th id="234">234</th><td><i>//</i></td></tr>
+<tr><th id="235">235</th><td><b>inline</b></td></tr>
+<tr><th id="236">236</th><td><a class="typedef" href="../../../global/management/include/G4Types.hh.html#G4bool" title='G4bool' data-type='bool' data-ref="G4bool">G4bool</a> <a class="type" href="G4LogicalVolume.hh.html#G4LogicalVolume" title='G4LogicalVolume' data-ref="G4LogicalVolume">G4LogicalVolume</a>::<dfn class="decl def" id="_ZNK15G4LogicalVolume12IsToOptimiseEv" title='G4LogicalVolume::IsToOptimise' data-ref="_ZNK15G4LogicalVolume12IsToOptimiseEv">IsToOptimise</dfn>() <em>const</em></td></tr>
+<tr><th id="237">237</th><td>{</td></tr>
+<tr><th id="238">238</th><td>  <b>return</b> <a class="member" href="G4LogicalVolume.hh.html#G4LogicalVolume::fOptimise" title='G4LogicalVolume::fOptimise' data-ref="G4LogicalVolume::fOptimise">fOptimise</a>;</td></tr>
+<tr><th id="239">239</th><td>}</td></tr>
+<tr><th id="240">240</th><td></td></tr>
+<tr><th id="241">241</th><td><i>// ********************************************************************</i></td></tr>
+<tr><th id="242">242</th><td><i>// SetOptimisation</i></td></tr>
+<tr><th id="243">243</th><td><i>// ********************************************************************</i></td></tr>
+<tr><th id="244">244</th><td><i>//</i></td></tr>
+<tr><th id="245">245</th><td><b>inline</b></td></tr>
+<tr><th id="246">246</th><td><em>void</em> <a class="type" href="G4LogicalVolume.hh.html#G4LogicalVolume" title='G4LogicalVolume' data-ref="G4LogicalVolume">G4LogicalVolume</a>::<dfn class="decl def" id="_ZN15G4LogicalVolume15SetOptimisationEb" title='G4LogicalVolume::SetOptimisation' data-ref="_ZN15G4LogicalVolume15SetOptimisationEb">SetOptimisation</dfn>(<a class="typedef" href="../../../global/management/include/G4Types.hh.html#G4bool" title='G4bool' data-type='bool' data-ref="G4bool">G4bool</a> <dfn class="local col0 decl" id="1350optim" title='optim' data-type='G4bool' data-ref="1350optim">optim</dfn>)</td></tr>
+<tr><th id="247">247</th><td>{</td></tr>
+<tr><th id="248">248</th><td>  <a class="member" href="G4LogicalVolume.hh.html#G4LogicalVolume::fOptimise" title='G4LogicalVolume::fOptimise' data-ref="G4LogicalVolume::fOptimise">fOptimise</a> = <a class="local col0 ref" href="#1350optim" title='optim' data-ref="1350optim">optim</a>;</td></tr>
+<tr><th id="249">249</th><td>}</td></tr>
+<tr><th id="250">250</th><td></td></tr>
+<tr><th id="251">251</th><td><i>// ********************************************************************</i></td></tr>
+<tr><th id="252">252</th><td><i>// IsRootRegion</i></td></tr>
+<tr><th id="253">253</th><td><i>// ********************************************************************</i></td></tr>
+<tr><th id="254">254</th><td><i>//</i></td></tr>
+<tr><th id="255">255</th><td><b>inline</b></td></tr>
+<tr><th id="256">256</th><td><a class="typedef" href="../../../global/management/include/G4Types.hh.html#G4bool" title='G4bool' data-type='bool' data-ref="G4bool">G4bool</a> <a class="type" href="G4LogicalVolume.hh.html#G4LogicalVolume" title='G4LogicalVolume' data-ref="G4LogicalVolume">G4LogicalVolume</a>::<dfn class="decl def" id="_ZNK15G4LogicalVolume12IsRootRegionEv" title='G4LogicalVolume::IsRootRegion' data-ref="_ZNK15G4LogicalVolume12IsRootRegionEv">IsRootRegion</dfn>() <em>const</em></td></tr>
+<tr><th id="257">257</th><td>{</td></tr>
+<tr><th id="258">258</th><td>  <b>return</b> <a class="member" href="G4LogicalVolume.hh.html#G4LogicalVolume::fRootRegion" title='G4LogicalVolume::fRootRegion' data-ref="G4LogicalVolume::fRootRegion">fRootRegion</a>;</td></tr>
+<tr><th id="259">259</th><td>}</td></tr>
+<tr><th id="260">260</th><td></td></tr>
+<tr><th id="261">261</th><td><i>// ********************************************************************</i></td></tr>
+<tr><th id="262">262</th><td><i>// SetRegionRootFlag</i></td></tr>
+<tr><th id="263">263</th><td><i>// ********************************************************************</i></td></tr>
+<tr><th id="264">264</th><td><i>//</i></td></tr>
+<tr><th id="265">265</th><td><b>inline</b></td></tr>
+<tr><th id="266">266</th><td><em>void</em> <a class="type" href="G4LogicalVolume.hh.html#G4LogicalVolume" title='G4LogicalVolume' data-ref="G4LogicalVolume">G4LogicalVolume</a>::<dfn class="decl def" id="_ZN15G4LogicalVolume17SetRegionRootFlagEb" title='G4LogicalVolume::SetRegionRootFlag' data-ref="_ZN15G4LogicalVolume17SetRegionRootFlagEb">SetRegionRootFlag</dfn>(<a class="typedef" href="../../../global/management/include/G4Types.hh.html#G4bool" title='G4bool' data-type='bool' data-ref="G4bool">G4bool</a> <dfn class="local col1 decl" id="1351rreg" title='rreg' data-type='G4bool' data-ref="1351rreg">rreg</dfn>)</td></tr>
+<tr><th id="267">267</th><td>{</td></tr>
+<tr><th id="268">268</th><td>  <a class="member" href="G4LogicalVolume.hh.html#G4LogicalVolume::fRootRegion" title='G4LogicalVolume::fRootRegion' data-ref="G4LogicalVolume::fRootRegion">fRootRegion</a> = <a class="local col1 ref" href="#1351rreg" title='rreg' data-ref="1351rreg">rreg</a>;</td></tr>
+<tr><th id="269">269</th><td>}</td></tr>
+<tr><th id="270">270</th><td></td></tr>
+<tr><th id="271">271</th><td><i>// ********************************************************************</i></td></tr>
+<tr><th id="272">272</th><td><i>// IsRegion</i></td></tr>
+<tr><th id="273">273</th><td><i>// ********************************************************************</i></td></tr>
+<tr><th id="274">274</th><td><i>//</i></td></tr>
+<tr><th id="275">275</th><td><b>inline</b></td></tr>
+<tr><th id="276">276</th><td><a class="typedef" href="../../../global/management/include/G4Types.hh.html#G4bool" title='G4bool' data-type='bool' data-ref="G4bool">G4bool</a> <a class="type" href="G4LogicalVolume.hh.html#G4LogicalVolume" title='G4LogicalVolume' data-ref="G4LogicalVolume">G4LogicalVolume</a>::<dfn class="decl def" id="_ZNK15G4LogicalVolume8IsRegionEv" title='G4LogicalVolume::IsRegion' data-ref="_ZNK15G4LogicalVolume8IsRegionEv">IsRegion</dfn>() <em>const</em></td></tr>
+<tr><th id="277">277</th><td>{</td></tr>
+<tr><th id="278">278</th><td>  <a class="typedef" href="../../../global/management/include/G4Types.hh.html#G4bool" title='G4bool' data-type='bool' data-ref="G4bool">G4bool</a> <dfn class="local col2 decl" id="1352reg" title='reg' data-type='G4bool' data-ref="1352reg">reg</dfn> = <b>false</b>;</td></tr>
+<tr><th id="279">279</th><td>  <b>if</b> (<a class="member" href="G4LogicalVolume.hh.html#G4LogicalVolume::fRegion" title='G4LogicalVolume::fRegion' data-ref="G4LogicalVolume::fRegion">fRegion</a>) <a class="local col2 ref" href="#1352reg" title='reg' data-ref="1352reg">reg</a> = <b>true</b>;</td></tr>
+<tr><th id="280">280</th><td>  <b>return</b> <a class="local col2 ref" href="#1352reg" title='reg' data-ref="1352reg">reg</a>;</td></tr>
+<tr><th id="281">281</th><td>}</td></tr>
+<tr><th id="282">282</th><td></td></tr>
+<tr><th id="283">283</th><td><i>// ********************************************************************</i></td></tr>
+<tr><th id="284">284</th><td><i>// SetRegion</i></td></tr>
+<tr><th id="285">285</th><td><i>// ********************************************************************</i></td></tr>
+<tr><th id="286">286</th><td><i>//</i></td></tr>
+<tr><th id="287">287</th><td><b>inline</b></td></tr>
+<tr><th id="288">288</th><td><em>void</em> <a class="type" href="G4LogicalVolume.hh.html#G4LogicalVolume" title='G4LogicalVolume' data-ref="G4LogicalVolume">G4LogicalVolume</a>::<dfn class="decl def" id="_ZN15G4LogicalVolume9SetRegionEP8G4Region" title='G4LogicalVolume::SetRegion' data-ref="_ZN15G4LogicalVolume9SetRegionEP8G4Region">SetRegion</dfn>(<a class="type" href="G4Region.hh.html#G4Region" title='G4Region' data-ref="G4Region">G4Region</a>* <dfn class="local col3 decl" id="1353reg" title='reg' data-type='G4Region *' data-ref="1353reg">reg</dfn>)</td></tr>
+<tr><th id="289">289</th><td>{</td></tr>
+<tr><th id="290">290</th><td>  <a class="member" href="G4LogicalVolume.hh.html#G4LogicalVolume::fRegion" title='G4LogicalVolume::fRegion' data-ref="G4LogicalVolume::fRegion">fRegion</a> = <a class="local col3 ref" href="#1353reg" title='reg' data-ref="1353reg">reg</a>;</td></tr>
+<tr><th id="291">291</th><td>}</td></tr>
+<tr><th id="292">292</th><td></td></tr>
+<tr><th id="293">293</th><td><i>// ********************************************************************</i></td></tr>
+<tr><th id="294">294</th><td><i>// GetRegion</i></td></tr>
+<tr><th id="295">295</th><td><i>// ********************************************************************</i></td></tr>
+<tr><th id="296">296</th><td><i>//</i></td></tr>
+<tr><th id="297">297</th><td><b>inline</b></td></tr>
+<tr><th id="298">298</th><td><a class="type" href="G4Region.hh.html#G4Region" title='G4Region' data-ref="G4Region">G4Region</a>* <a class="type" href="G4LogicalVolume.hh.html#G4LogicalVolume" title='G4LogicalVolume' data-ref="G4LogicalVolume">G4LogicalVolume</a>::<dfn class="decl def" id="_ZNK15G4LogicalVolume9GetRegionEv" title='G4LogicalVolume::GetRegion' data-ref="_ZNK15G4LogicalVolume9GetRegionEv">GetRegion</dfn>() <em>const</em></td></tr>
+<tr><th id="299">299</th><td>{</td></tr>
+<tr><th id="300">300</th><td>  <b>return</b> <a class="member" href="G4LogicalVolume.hh.html#G4LogicalVolume::fRegion" title='G4LogicalVolume::fRegion' data-ref="G4LogicalVolume::fRegion">fRegion</a>;</td></tr>
+<tr><th id="301">301</th><td>}</td></tr>
+<tr><th id="302">302</th><td></td></tr>
+<tr><th id="303">303</th><td><i>// ********************************************************************</i></td></tr>
+<tr><th id="304">304</th><td><i>// PropagateRegion</i></td></tr>
+<tr><th id="305">305</th><td><i>// ********************************************************************</i></td></tr>
+<tr><th id="306">306</th><td><i>//</i></td></tr>
+<tr><th id="307">307</th><td><b>inline</b></td></tr>
+<tr><th id="308">308</th><td><em>void</em> <a class="type" href="G4LogicalVolume.hh.html#G4LogicalVolume" title='G4LogicalVolume' data-ref="G4LogicalVolume">G4LogicalVolume</a>::<dfn class="decl def" id="_ZN15G4LogicalVolume15PropagateRegionEv" title='G4LogicalVolume::PropagateRegion' data-ref="_ZN15G4LogicalVolume15PropagateRegionEv">PropagateRegion</dfn>()</td></tr>
+<tr><th id="309">309</th><td>{</td></tr>
+<tr><th id="310">310</th><td>  <a class="member" href="G4LogicalVolume.hh.html#G4LogicalVolume::fRegion" title='G4LogicalVolume::fRegion' data-ref="G4LogicalVolume::fRegion">fRegion</a>-&gt;<a class="ref" href="G4Region.hh.html#_ZN8G4Region14ScanVolumeTreeEP15G4LogicalVolumeb" title='G4Region::ScanVolumeTree' data-ref="_ZN8G4Region14ScanVolumeTreeEP15G4LogicalVolumeb">ScanVolumeTree</a>(<b>this</b>, <b>true</b>);</td></tr>
+<tr><th id="311">311</th><td>}</td></tr>
+<tr><th id="312">312</th><td></td></tr>
+<tr><th id="313">313</th><td><i>// ********************************************************************</i></td></tr>
+<tr><th id="314">314</th><td><i>// Lock</i></td></tr>
+<tr><th id="315">315</th><td><i>// ********************************************************************</i></td></tr>
+<tr><th id="316">316</th><td><i>//</i></td></tr>
+<tr><th id="317">317</th><td><b>inline</b></td></tr>
+<tr><th id="318">318</th><td><em>void</em> <a class="type" href="G4LogicalVolume.hh.html#G4LogicalVolume" title='G4LogicalVolume' data-ref="G4LogicalVolume">G4LogicalVolume</a>::<dfn class="decl def" id="_ZN15G4LogicalVolume4LockEv" title='G4LogicalVolume::Lock' data-ref="_ZN15G4LogicalVolume4LockEv">Lock</dfn>()</td></tr>
+<tr><th id="319">319</th><td>{</td></tr>
+<tr><th id="320">320</th><td>  <a class="member" href="G4LogicalVolume.hh.html#G4LogicalVolume::fLock" title='G4LogicalVolume::fLock' data-ref="G4LogicalVolume::fLock">fLock</a> = <b>true</b>;</td></tr>
+<tr><th id="321">321</th><td>}</td></tr>
+<tr><th id="322">322</th><td></td></tr>
+<tr><th id="323">323</th><td><i>// ********************************************************************</i></td></tr>
+<tr><th id="324">324</th><td><i>// Operator ==</i></td></tr>
+<tr><th id="325">325</th><td><i>// ********************************************************************</i></td></tr>
+<tr><th id="326">326</th><td><i>//</i></td></tr>
+<tr><th id="327">327</th><td><b>inline</b></td></tr>
+<tr><th id="328">328</th><td><a class="typedef" href="../../../global/management/include/G4Types.hh.html#G4bool" title='G4bool' data-type='bool' data-ref="G4bool">G4bool</a> <a class="type" href="G4LogicalVolume.hh.html#G4LogicalVolume" title='G4LogicalVolume' data-ref="G4LogicalVolume">G4LogicalVolume</a>::<dfn class="decl def" id="_ZNK15G4LogicalVolumeeqERKS_" title='G4LogicalVolume::operator==' data-ref="_ZNK15G4LogicalVolumeeqERKS_"><b>operator</b> ==</dfn> ( <em>const</em> <a class="type" href="G4LogicalVolume.hh.html#G4LogicalVolume" title='G4LogicalVolume' data-ref="G4LogicalVolume">G4LogicalVolume</a>&amp; <dfn class="local col4 decl" id="1354lv" title='lv' data-type='const G4LogicalVolume &amp;' data-ref="1354lv">lv</dfn>) <em>const</em></td></tr>
+<tr><th id="329">329</th><td>{</td></tr>
+<tr><th id="330">330</th><td>  <b>return</b> (<b>this</b>==&amp;<a class="local col4 ref" href="#1354lv" title='lv' data-ref="1354lv">lv</a>) ? <b>true</b> : <b>false</b>;</td></tr>
+<tr><th id="331">331</th><td>}</td></tr>
+<tr><th id="332">332</th><td></td></tr>
+<tr><th id="333">333</th><td><i>// ********************************************************************</i></td></tr>
+<tr><th id="334">334</th><td><i>// GetVisAttributes</i></td></tr>
+<tr><th id="335">335</th><td><i>// ********************************************************************</i></td></tr>
+<tr><th id="336">336</th><td><i>//</i></td></tr>
+<tr><th id="337">337</th><td><b>inline</b></td></tr>
+<tr><th id="338">338</th><td><em>const</em> <a class="type" href="G4LogicalVolume.hh.html#G4VisAttributes" title='G4VisAttributes' data-ref="G4VisAttributes">G4VisAttributes</a>* <a class="type" href="G4LogicalVolume.hh.html#G4LogicalVolume" title='G4LogicalVolume' data-ref="G4LogicalVolume">G4LogicalVolume</a>::<dfn class="decl def" id="_ZNK15G4LogicalVolume16GetVisAttributesEv" title='G4LogicalVolume::GetVisAttributes' data-ref="_ZNK15G4LogicalVolume16GetVisAttributesEv">GetVisAttributes</dfn> () <em>const</em></td></tr>
+<tr><th id="339">339</th><td>{</td></tr>
+<tr><th id="340">340</th><td>  <b>return</b> <a class="member" href="G4LogicalVolume.hh.html#G4LogicalVolume::fVisAttributes" title='G4LogicalVolume::fVisAttributes' data-ref="G4LogicalVolume::fVisAttributes">fVisAttributes</a>;</td></tr>
+<tr><th id="341">341</th><td>}</td></tr>
+<tr><th id="342">342</th><td></td></tr>
+<tr><th id="343">343</th><td><i>// ********************************************************************</i></td></tr>
+<tr><th id="344">344</th><td><i>// SetVisAttributes</i></td></tr>
+<tr><th id="345">345</th><td><i>// ********************************************************************</i></td></tr>
+<tr><th id="346">346</th><td><i>//</i></td></tr>
+<tr><th id="347">347</th><td><b>inline</b></td></tr>
+<tr><th id="348">348</th><td><em>void</em> <a class="type" href="G4LogicalVolume.hh.html#G4LogicalVolume" title='G4LogicalVolume' data-ref="G4LogicalVolume">G4LogicalVolume</a>::<dfn class="decl def" id="_ZN15G4LogicalVolume16SetVisAttributesEPK15G4VisAttributes" title='G4LogicalVolume::SetVisAttributes' data-ref="_ZN15G4LogicalVolume16SetVisAttributesEPK15G4VisAttributes">SetVisAttributes</dfn> (<em>const</em> <a class="type" href="G4LogicalVolume.hh.html#G4VisAttributes" title='G4VisAttributes' data-ref="G4VisAttributes">G4VisAttributes</a>* <dfn class="local col5 decl" id="1355pVA" title='pVA' data-type='const G4VisAttributes *' data-ref="1355pVA">pVA</dfn>)</td></tr>
+<tr><th id="349">349</th><td>{</td></tr>
+<tr><th id="350">350</th><td>  <a class="member" href="G4LogicalVolume.hh.html#G4LogicalVolume::fVisAttributes" title='G4LogicalVolume::fVisAttributes' data-ref="G4LogicalVolume::fVisAttributes">fVisAttributes</a> = <a class="local col5 ref" href="#1355pVA" title='pVA' data-ref="1355pVA">pVA</a>;</td></tr>
+<tr><th id="351">351</th><td>}</td></tr>
+<tr><th id="352">352</th><td></td></tr>
+<tr><th id="353">353</th><td><i>// ********************************************************************</i></td></tr>
+<tr><th id="354">354</th><td><i>// SetBiasWeight</i></td></tr>
+<tr><th id="355">355</th><td><i>// ********************************************************************</i></td></tr>
+<tr><th id="356">356</th><td><i>//</i></td></tr>
+<tr><th id="357">357</th><td><b>inline</b></td></tr>
+<tr><th id="358">358</th><td><em>void</em> <a class="type" href="G4LogicalVolume.hh.html#G4LogicalVolume" title='G4LogicalVolume' data-ref="G4LogicalVolume">G4LogicalVolume</a>::<dfn class="decl def" id="_ZN15G4LogicalVolume13SetBiasWeightEd" title='G4LogicalVolume::SetBiasWeight' data-ref="_ZN15G4LogicalVolume13SetBiasWeightEd">SetBiasWeight</dfn>(<a class="typedef" href="../../../global/management/include/G4Types.hh.html#G4double" title='G4double' data-type='double' data-ref="G4double">G4double</a> <dfn class="local col6 decl" id="1356weight" title='weight' data-type='G4double' data-ref="1356weight">weight</dfn>)</td></tr>
+<tr><th id="359">359</th><td>{</td></tr>
+<tr><th id="360">360</th><td>  <a class="member" href="G4LogicalVolume.hh.html#G4LogicalVolume::fBiasWeight" title='G4LogicalVolume::fBiasWeight' data-ref="G4LogicalVolume::fBiasWeight">fBiasWeight</a> = <a class="local col6 ref" href="#1356weight" title='weight' data-ref="1356weight">weight</a>;</td></tr>
+<tr><th id="361">361</th><td>}</td></tr>
+<tr><th id="362">362</th><td></td></tr>
+<tr><th id="363">363</th><td><i>// ********************************************************************</i></td></tr>
+<tr><th id="364">364</th><td><i>// GetBiasWeight</i></td></tr>
+<tr><th id="365">365</th><td><i>// ********************************************************************</i></td></tr>
+<tr><th id="366">366</th><td><i>//</i></td></tr>
+<tr><th id="367">367</th><td><b>inline</b></td></tr>
+<tr><th id="368">368</th><td><a class="typedef" href="../../../global/management/include/G4Types.hh.html#G4double" title='G4double' data-type='double' data-ref="G4double">G4double</a> <a class="type" href="G4LogicalVolume.hh.html#G4LogicalVolume" title='G4LogicalVolume' data-ref="G4LogicalVolume">G4LogicalVolume</a>::<dfn class="decl def" id="_ZNK15G4LogicalVolume13GetBiasWeightEv" title='G4LogicalVolume::GetBiasWeight' data-ref="_ZNK15G4LogicalVolume13GetBiasWeightEv">GetBiasWeight</dfn>() <em>const</em></td></tr>
+<tr><th id="369">369</th><td>{</td></tr>
+<tr><th id="370">370</th><td>  <b>return</b> <a class="member" href="G4LogicalVolume.hh.html#G4LogicalVolume::fBiasWeight" title='G4LogicalVolume::fBiasWeight' data-ref="G4LogicalVolume::fBiasWeight">fBiasWeight</a>;</td></tr>
+<tr><th id="371">371</th><td>}</td></tr>
+<tr><th id="372">372</th><td></td></tr>
+</table><hr/><p id='footer'>
+Generated while processing <a href='../../../digits_hits/detector/src/G4CellScoreComposer.cc.html'>codebrowser/source/digits_hits/detector/src/G4CellScoreComposer.cc</a><br/>Generated on <em>2019-Aug-28</em> from project codebrowser<br />Powered by <a href='https://woboq.com'><img alt='Woboq' src='https://code.woboq.org/woboq-16.png' width='41' height='16' /></a> <a href='https://code.woboq.org'>Code Browser</a> 2.1
+<br/>Generator usage only permitted with license.</p>
+</div></body></html>

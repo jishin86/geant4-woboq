@@ -1,0 +1,90 @@
+<!doctype html>
+<html>
+<head>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"><title>G4PSTermination3D.cc source code [codebrowser/source/digits_hits/scorer/src/G4PSTermination3D.cc] - Woboq Code Browser</title>
+<link rel="stylesheet" href="../../../../../../data/qtcreator.css" title="QtCreator"/>
+<link rel="alternate stylesheet" href="../../../../../../data/kdevelop.css" title="KDevelop"/>
+<script type="text/javascript" src="../../../../../../data/jquery/jquery.min.js"></script>
+<script type="text/javascript" src="../../../../../../data/jquery/jquery-ui.min.js"></script>
+<script>var file = 'codebrowser/source/digits_hits/scorer/src/G4PSTermination3D.cc'; var root_path = '../../../../..'; var data_path = '../../../../../../data';</script>
+<script src='../../../../../../data/codebrowser.js'></script>
+</head>
+<body><div id='header'><h1 id='breadcrumb'><span>Browse the source code of </span><a href='../../../..'>codebrowser</a>/<a href='../../..'>source</a>/<a href='../..'>digits_hits</a>/<a href='..'>scorer</a>/<a href='./'>src</a>/<a href='G4PSTermination3D.cc.html'>G4PSTermination3D.cc</a></h1></div>
+<hr/><div id='content'><table class="code">
+<tr><th id="1">1</th><td><i>//</i></td></tr>
+<tr><th id="2">2</th><td><i>// ********************************************************************</i></td></tr>
+<tr><th id="3">3</th><td><i>// * License and Disclaimer                                           *</i></td></tr>
+<tr><th id="4">4</th><td><i>// *                                                                  *</i></td></tr>
+<tr><th id="5">5</th><td><i>// * The  Geant4 software  is  copyright of the Copyright Holders  of *</i></td></tr>
+<tr><th id="6">6</th><td><i>// * the Geant4 Collaboration.  It is provided  under  the terms  and *</i></td></tr>
+<tr><th id="7">7</th><td><i>// * conditions of the Geant4 Software License,  included in the file *</i></td></tr>
+<tr><th id="8">8</th><td><i>// * LICENSE and available at  <a href="http://cern.ch/geant4/license">http://cern.ch/geant4/license</a> .  These *</i></td></tr>
+<tr><th id="9">9</th><td><i>// * include a list of copyright holders.                             *</i></td></tr>
+<tr><th id="10">10</th><td><i>// *                                                                  *</i></td></tr>
+<tr><th id="11">11</th><td><i>// * Neither the authors of this software system, nor their employing *</i></td></tr>
+<tr><th id="12">12</th><td><i>// * institutes,nor the agencies providing financial support for this *</i></td></tr>
+<tr><th id="13">13</th><td><i>// * work  make  any representation or  warranty, express or implied, *</i></td></tr>
+<tr><th id="14">14</th><td><i>// * regarding  this  software system or assume any liability for its *</i></td></tr>
+<tr><th id="15">15</th><td><i>// * use.  Please see the license in the file  LICENSE  and URL above *</i></td></tr>
+<tr><th id="16">16</th><td><i>// * for the full disclaimer and the limitation of liability.         *</i></td></tr>
+<tr><th id="17">17</th><td><i>// *                                                                  *</i></td></tr>
+<tr><th id="18">18</th><td><i>// * This  code  implementation is the result of  the  scientific and *</i></td></tr>
+<tr><th id="19">19</th><td><i>// * technical work of the GEANT4 collaboration.                      *</i></td></tr>
+<tr><th id="20">20</th><td><i>// * By using,  copying,  modifying or  distributing the software (or *</i></td></tr>
+<tr><th id="21">21</th><td><i>// * any work based  on the software)  you  agree  to acknowledge its *</i></td></tr>
+<tr><th id="22">22</th><td><i>// * use  in  resulting  scientific  publications,  and indicate your *</i></td></tr>
+<tr><th id="23">23</th><td><i>// * acceptance of all terms of the Geant4 Software license.          *</i></td></tr>
+<tr><th id="24">24</th><td><i>// ********************************************************************</i></td></tr>
+<tr><th id="25">25</th><td><i>//</i></td></tr>
+<tr><th id="26">26</th><td><i>//</i></td></tr>
+<tr><th id="27">27</th><td><i>//</i></td></tr>
+<tr><th id="28">28</th><td><i>// G4PSTermination3D</i></td></tr>
+<tr><th id="29">29</th><td><u>#include <a href="../include/G4PSTermination3D.hh.html">"G4PSTermination3D.hh"</a></u></td></tr>
+<tr><th id="30">30</th><td></td></tr>
+<tr><th id="31">31</th><td><i>///////////////////////////////////////////////////////////////////////////////</i></td></tr>
+<tr><th id="32">32</th><td><i>// (Description)</i></td></tr>
+<tr><th id="33">33</th><td><i>//   This is a primitive scorer class for scoring Surface Current.</i></td></tr>
+<tr><th id="34">34</th><td><i>//  Current version assumes only for G4Box shape, and the surface</i></td></tr>
+<tr><th id="35">35</th><td><i>//  is defined at the -Z plane of the box.</i></td></tr>
+<tr><th id="36">36</th><td><i>//   The current is given in the unit of area.</i></td></tr>
+<tr><th id="37">37</th><td><i>//    e.g.  (Number of tracks)/mm2.</i></td></tr>
+<tr><th id="38">38</th><td><i>//</i></td></tr>
+<tr><th id="39">39</th><td><i>// Surface is defined at the -Z surface.</i></td></tr>
+<tr><th id="40">40</th><td><i>// Direction                  -Z   +Z</i></td></tr>
+<tr><th id="41">41</th><td><i>//   0  IN || OUT            -&gt;|&lt;-  |      fCurrent_InOut</i></td></tr>
+<tr><th id="42">42</th><td><i>//   1  IN                   -&gt;|    |      fCurrent_In</i></td></tr>
+<tr><th id="43">43</th><td><i>//   2  OUT                    |&lt;-  |      fCurrent_Out</i></td></tr>
+<tr><th id="44">44</th><td><i>//</i></td></tr>
+<tr><th id="45">45</th><td><i>//</i></td></tr>
+<tr><th id="46">46</th><td><i>// Created: 2008-08-14  Tsukasa ASO</i></td></tr>
+<tr><th id="47">47</th><td><i>///////////////////////////////////////////////////////////////////////////////</i></td></tr>
+<tr><th id="48">48</th><td></td></tr>
+<tr><th id="49">49</th><td></td></tr>
+<tr><th id="50">50</th><td><a class="type" href="../include/G4PSTermination3D.hh.html#G4PSTermination3D" title='G4PSTermination3D' data-ref="G4PSTermination3D">G4PSTermination3D</a>::<dfn class="decl def" id="_ZN17G4PSTermination3DC1E8G4Stringiiiiii" title='G4PSTermination3D::G4PSTermination3D' data-ref="_ZN17G4PSTermination3DC1E8G4Stringiiiiii">G4PSTermination3D</dfn>(<a class="type" href="../../../global/management/include/G4String.hh.html#G4String" title='G4String' data-ref="G4String">G4String</a> <dfn class="local col8 decl" id="8name" title='name' data-type='G4String' data-ref="8name">name</dfn>, </td></tr>
+<tr><th id="51">51</th><td>				     <a class="typedef" href="../../../global/management/include/G4Types.hh.html#G4int" title='G4int' data-type='int' data-ref="G4int">G4int</a> <dfn class="local col9 decl" id="9ni" title='ni' data-type='G4int' data-ref="9ni">ni</dfn>, <a class="typedef" href="../../../global/management/include/G4Types.hh.html#G4int" title='G4int' data-type='int' data-ref="G4int">G4int</a> <dfn class="local col0 decl" id="10nj" title='nj' data-type='G4int' data-ref="10nj">nj</dfn>, <a class="typedef" href="../../../global/management/include/G4Types.hh.html#G4int" title='G4int' data-type='int' data-ref="G4int">G4int</a> <dfn class="local col1 decl" id="11nk" title='nk' data-type='G4int' data-ref="11nk">nk</dfn>,</td></tr>
+<tr><th id="52">52</th><td>				     <a class="typedef" href="../../../global/management/include/G4Types.hh.html#G4int" title='G4int' data-type='int' data-ref="G4int">G4int</a> <dfn class="local col2 decl" id="12di" title='di' data-type='G4int' data-ref="12di">di</dfn>, <a class="typedef" href="../../../global/management/include/G4Types.hh.html#G4int" title='G4int' data-type='int' data-ref="G4int">G4int</a> <dfn class="local col3 decl" id="13dj" title='dj' data-type='G4int' data-ref="13dj">dj</dfn>, <a class="typedef" href="../../../global/management/include/G4Types.hh.html#G4int" title='G4int' data-type='int' data-ref="G4int">G4int</a> <dfn class="local col4 decl" id="14dk" title='dk' data-type='G4int' data-ref="14dk">dk</dfn>)</td></tr>
+<tr><th id="53">53</th><td>    :<a class="type" href="../include/G4PSTermination.hh.html#G4PSTermination" title='G4PSTermination' data-ref="G4PSTermination">G4PSTermination</a><a class="ref" href="../include/G4PSTermination.hh.html#_ZN15G4PSTerminationC1E8G4Stringi" title='G4PSTermination::G4PSTermination' data-ref="_ZN15G4PSTerminationC1E8G4Stringi">(</a><a class="ref fake" href="../../../global/management/include/G4String.hh.html#_ZN8G4StringC1ERKS_" title='G4String::G4String' data-ref="_ZN8G4StringC1ERKS_"></a><a class="local col8 ref" href="#8name" title='name' data-ref="8name">name</a>),</td></tr>
+<tr><th id="54">54</th><td>     <a class="member" href="../include/G4PSTermination3D.hh.html#G4PSTermination3D::fDepthi" title='G4PSTermination3D::fDepthi' data-ref="G4PSTermination3D::fDepthi">fDepthi</a>(<a class="local col2 ref" href="#12di" title='di' data-ref="12di">di</a>),<a class="member" href="../include/G4PSTermination3D.hh.html#G4PSTermination3D::fDepthj" title='G4PSTermination3D::fDepthj' data-ref="G4PSTermination3D::fDepthj">fDepthj</a>(<a class="local col3 ref" href="#13dj" title='dj' data-ref="13dj">dj</a>),<a class="member" href="../include/G4PSTermination3D.hh.html#G4PSTermination3D::fDepthk" title='G4PSTermination3D::fDepthk' data-ref="G4PSTermination3D::fDepthk">fDepthk</a>(<a class="local col4 ref" href="#14dk" title='dk' data-ref="14dk">dk</a>)</td></tr>
+<tr><th id="55">55</th><td>{</td></tr>
+<tr><th id="56">56</th><td>  <a class="member" href="../../detector/include/G4VPrimitiveScorer.hh.html#G4VPrimitiveScorer::fNi" title='G4VPrimitiveScorer::fNi' data-ref="G4VPrimitiveScorer::fNi">fNi</a>=<a class="local col9 ref" href="#9ni" title='ni' data-ref="9ni">ni</a>;</td></tr>
+<tr><th id="57">57</th><td>  <a class="member" href="../../detector/include/G4VPrimitiveScorer.hh.html#G4VPrimitiveScorer::fNj" title='G4VPrimitiveScorer::fNj' data-ref="G4VPrimitiveScorer::fNj">fNj</a>=<a class="local col0 ref" href="#10nj" title='nj' data-ref="10nj">nj</a>;</td></tr>
+<tr><th id="58">58</th><td>  <a class="member" href="../../detector/include/G4VPrimitiveScorer.hh.html#G4VPrimitiveScorer::fNk" title='G4VPrimitiveScorer::fNk' data-ref="G4VPrimitiveScorer::fNk">fNk</a>=<a class="local col1 ref" href="#11nk" title='nk' data-ref="11nk">nk</a>;</td></tr>
+<tr><th id="59">59</th><td>}</td></tr>
+<tr><th id="60">60</th><td></td></tr>
+<tr><th id="61">61</th><td><a class="type" href="../include/G4PSTermination3D.hh.html#G4PSTermination3D" title='G4PSTermination3D' data-ref="G4PSTermination3D">G4PSTermination3D</a>::<dfn class="virtual decl def" id="_ZN17G4PSTermination3DD1Ev" title='G4PSTermination3D::~G4PSTermination3D' data-ref="_ZN17G4PSTermination3DD1Ev">~G4PSTermination3D</dfn>()</td></tr>
+<tr><th id="62">62</th><td>{;}</td></tr>
+<tr><th id="63">63</th><td></td></tr>
+<tr><th id="64">64</th><td><a class="typedef" href="../../../global/management/include/G4Types.hh.html#G4int" title='G4int' data-type='int' data-ref="G4int">G4int</a> <a class="type" href="../include/G4PSTermination3D.hh.html#G4PSTermination3D" title='G4PSTermination3D' data-ref="G4PSTermination3D">G4PSTermination3D</a>::<dfn class="virtual decl def" id="_ZN17G4PSTermination3D8GetIndexEP6G4Step" title='G4PSTermination3D::GetIndex' data-ref="_ZN17G4PSTermination3D8GetIndexEP6G4Step">GetIndex</dfn>(<a class="type" href="../../../track/include/G4Step.hh.html#G4Step" title='G4Step' data-ref="G4Step">G4Step</a>* <dfn class="local col5 decl" id="15aStep" title='aStep' data-type='G4Step *' data-ref="15aStep">aStep</dfn>)</td></tr>
+<tr><th id="65">65</th><td>{</td></tr>
+<tr><th id="66">66</th><td>  <em>const</em> <a class="type" href="../../../geometry/management/include/G4VTouchable.hh.html#G4VTouchable" title='G4VTouchable' data-ref="G4VTouchable">G4VTouchable</a>* <dfn class="local col6 decl" id="16touchable" title='touchable' data-type='const G4VTouchable *' data-ref="16touchable">touchable</dfn> = <a class="local col5 ref" href="#15aStep" title='aStep' data-ref="15aStep">aStep</a>-&gt;<a class="ref" href="../../../track/include/G4Step.hh.html#_ZNK6G4Step15GetPreStepPointEv" title='G4Step::GetPreStepPoint' data-ref="_ZNK6G4Step15GetPreStepPointEv">GetPreStepPoint</a>()-&gt;<a class="ref" href="../../../track/include/G4StepPoint.hh.html#_ZNK11G4StepPoint12GetTouchableEv" title='G4StepPoint::GetTouchable' data-ref="_ZNK11G4StepPoint12GetTouchableEv">GetTouchable</a>();</td></tr>
+<tr><th id="67">67</th><td>  <a class="typedef" href="../../../global/management/include/G4Types.hh.html#G4int" title='G4int' data-type='int' data-ref="G4int">G4int</a> <dfn class="local col7 decl" id="17i" title='i' data-type='G4int' data-ref="17i">i</dfn> = <a class="local col6 ref" href="#16touchable" title='touchable' data-ref="16touchable">touchable</a>-&gt;<a class="virtual ref" href="../../../geometry/management/include/G4VTouchable.hh.html#_ZNK12G4VTouchable16GetReplicaNumberEi" title='G4VTouchable::GetReplicaNumber' data-ref="_ZNK12G4VTouchable16GetReplicaNumberEi">GetReplicaNumber</a>(<a class="member" href="../include/G4PSTermination3D.hh.html#G4PSTermination3D::fDepthi" title='G4PSTermination3D::fDepthi' data-ref="G4PSTermination3D::fDepthi">fDepthi</a>);</td></tr>
+<tr><th id="68">68</th><td>  <a class="typedef" href="../../../global/management/include/G4Types.hh.html#G4int" title='G4int' data-type='int' data-ref="G4int">G4int</a> <dfn class="local col8 decl" id="18j" title='j' data-type='G4int' data-ref="18j">j</dfn> = <a class="local col6 ref" href="#16touchable" title='touchable' data-ref="16touchable">touchable</a>-&gt;<a class="virtual ref" href="../../../geometry/management/include/G4VTouchable.hh.html#_ZNK12G4VTouchable16GetReplicaNumberEi" title='G4VTouchable::GetReplicaNumber' data-ref="_ZNK12G4VTouchable16GetReplicaNumberEi">GetReplicaNumber</a>(<a class="member" href="../include/G4PSTermination3D.hh.html#G4PSTermination3D::fDepthj" title='G4PSTermination3D::fDepthj' data-ref="G4PSTermination3D::fDepthj">fDepthj</a>);</td></tr>
+<tr><th id="69">69</th><td>  <a class="typedef" href="../../../global/management/include/G4Types.hh.html#G4int" title='G4int' data-type='int' data-ref="G4int">G4int</a> <dfn class="local col9 decl" id="19k" title='k' data-type='G4int' data-ref="19k">k</dfn> = <a class="local col6 ref" href="#16touchable" title='touchable' data-ref="16touchable">touchable</a>-&gt;<a class="virtual ref" href="../../../geometry/management/include/G4VTouchable.hh.html#_ZNK12G4VTouchable16GetReplicaNumberEi" title='G4VTouchable::GetReplicaNumber' data-ref="_ZNK12G4VTouchable16GetReplicaNumberEi">GetReplicaNumber</a>(<a class="member" href="../include/G4PSTermination3D.hh.html#G4PSTermination3D::fDepthk" title='G4PSTermination3D::fDepthk' data-ref="G4PSTermination3D::fDepthk">fDepthk</a>);</td></tr>
+<tr><th id="70">70</th><td>  </td></tr>
+<tr><th id="71">71</th><td>  <b>return</b> <a class="local col7 ref" href="#17i" title='i' data-ref="17i">i</a>*<a class="member" href="../../detector/include/G4VPrimitiveScorer.hh.html#G4VPrimitiveScorer::fNj" title='G4VPrimitiveScorer::fNj' data-ref="G4VPrimitiveScorer::fNj">fNj</a>*<a class="member" href="../../detector/include/G4VPrimitiveScorer.hh.html#G4VPrimitiveScorer::fNk" title='G4VPrimitiveScorer::fNk' data-ref="G4VPrimitiveScorer::fNk">fNk</a>+<a class="local col8 ref" href="#18j" title='j' data-ref="18j">j</a>*<a class="member" href="../../detector/include/G4VPrimitiveScorer.hh.html#G4VPrimitiveScorer::fNk" title='G4VPrimitiveScorer::fNk' data-ref="G4VPrimitiveScorer::fNk">fNk</a>+<a class="local col9 ref" href="#19k" title='k' data-ref="19k">k</a>;</td></tr>
+<tr><th id="72">72</th><td>}</td></tr>
+<tr><th id="73">73</th><td></td></tr>
+</table><hr/><p id='footer'>
+Generated on <em>2019-Aug-28</em> from project codebrowser<br />Powered by <a href='https://woboq.com'><img alt='Woboq' src='https://code.woboq.org/woboq-16.png' width='41' height='16' /></a> <a href='https://code.woboq.org'>Code Browser</a> 2.1
+<br/>Generator usage only permitted with license.</p>
+</div></body></html>

@@ -1,0 +1,810 @@
+<!doctype html>
+<html>
+<head>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"><title>G4eBremsstrahlungRelModel.cc source code [codebrowser/source/processes/electromagnetic/standard/src/G4eBremsstrahlungRelModel.cc] - Woboq Code Browser</title>
+<link rel="stylesheet" href="../../../../../../../data/qtcreator.css" title="QtCreator"/>
+<link rel="alternate stylesheet" href="../../../../../../../data/kdevelop.css" title="KDevelop"/>
+<script type="text/javascript" src="../../../../../../../data/jquery/jquery.min.js"></script>
+<script type="text/javascript" src="../../../../../../../data/jquery/jquery-ui.min.js"></script>
+<script>var file = 'codebrowser/source/processes/electromagnetic/standard/src/G4eBremsstrahlungRelModel.cc'; var root_path = '../../../../../..'; var data_path = '../../../../../../../data';</script>
+<script src='../../../../../../../data/codebrowser.js'></script>
+</head>
+<body><div id='header'><h1 id='breadcrumb'><span>Browse the source code of </span><a href='../../../../..'>codebrowser</a>/<a href='../../../..'>source</a>/<a href='../../..'>processes</a>/<a href='../..'>electromagnetic</a>/<a href='..'>standard</a>/<a href='./'>src</a>/<a href='G4eBremsstrahlungRelModel.cc.html'>G4eBremsstrahlungRelModel.cc</a></h1></div>
+<hr/><div id='content'><table class="code">
+<tr><th id="1">1</th><td><i>//</i></td></tr>
+<tr><th id="2">2</th><td><i>// ********************************************************************</i></td></tr>
+<tr><th id="3">3</th><td><i>// * License and Disclaimer                                           *</i></td></tr>
+<tr><th id="4">4</th><td><i>// *                                                                  *</i></td></tr>
+<tr><th id="5">5</th><td><i>// * The  Geant4 software  is  copyright of the Copyright Holders  of *</i></td></tr>
+<tr><th id="6">6</th><td><i>// * the Geant4 Collaboration.  It is provided  under  the terms  and *</i></td></tr>
+<tr><th id="7">7</th><td><i>// * conditions of the Geant4 Software License,  included in the file *</i></td></tr>
+<tr><th id="8">8</th><td><i>// * LICENSE and available at  <a href="http://cern.ch/geant4/license">http://cern.ch/geant4/license</a> .  These *</i></td></tr>
+<tr><th id="9">9</th><td><i>// * include a list of copyright holders.                             *</i></td></tr>
+<tr><th id="10">10</th><td><i>// *                                                                  *</i></td></tr>
+<tr><th id="11">11</th><td><i>// * Neither the authors of this software system, nor their employing *</i></td></tr>
+<tr><th id="12">12</th><td><i>// * institutes,nor the agencies providing financial support for this *</i></td></tr>
+<tr><th id="13">13</th><td><i>// * work  make  any representation or  warranty, express or implied, *</i></td></tr>
+<tr><th id="14">14</th><td><i>// * regarding  this  software system or assume any liability for its *</i></td></tr>
+<tr><th id="15">15</th><td><i>// * use.  Please see the license in the file  LICENSE  and URL above *</i></td></tr>
+<tr><th id="16">16</th><td><i>// * for the full disclaimer and the limitation of liability.         *</i></td></tr>
+<tr><th id="17">17</th><td><i>// *                                                                  *</i></td></tr>
+<tr><th id="18">18</th><td><i>// * This  code  implementation is the result of  the  scientific and *</i></td></tr>
+<tr><th id="19">19</th><td><i>// * technical work of the GEANT4 collaboration.                      *</i></td></tr>
+<tr><th id="20">20</th><td><i>// * By using,  copying,  modifying or  distributing the software (or *</i></td></tr>
+<tr><th id="21">21</th><td><i>// * any work based  on the software)  you  agree  to acknowledge its *</i></td></tr>
+<tr><th id="22">22</th><td><i>// * use  in  resulting  scientific  publications,  and indicate your *</i></td></tr>
+<tr><th id="23">23</th><td><i>// * acceptance of all terms of the Geant4 Software license.          *</i></td></tr>
+<tr><th id="24">24</th><td><i>// ********************************************************************</i></td></tr>
+<tr><th id="25">25</th><td><i>//</i></td></tr>
+<tr><th id="26">26</th><td><i>//</i></td></tr>
+<tr><th id="27">27</th><td><i>// -------------------------------------------------------------------</i></td></tr>
+<tr><th id="28">28</th><td><i>//</i></td></tr>
+<tr><th id="29">29</th><td><i>// GEANT4 Class file</i></td></tr>
+<tr><th id="30">30</th><td><i>//</i></td></tr>
+<tr><th id="31">31</th><td><i>//</i></td></tr>
+<tr><th id="32">32</th><td><i>// File name:     G4eBremsstrahlungRelModel</i></td></tr>
+<tr><th id="33">33</th><td><i>//</i></td></tr>
+<tr><th id="34">34</th><td><i>// Author:        Andreas Schaelicke</i></td></tr>
+<tr><th id="35">35</th><td><i>//</i></td></tr>
+<tr><th id="36">36</th><td><i>// Creation date: 12.08.2008</i></td></tr>
+<tr><th id="37">37</th><td><i>//</i></td></tr>
+<tr><th id="38">38</th><td><i>// Modifications:</i></td></tr>
+<tr><th id="39">39</th><td><i>//</i></td></tr>
+<tr><th id="40">40</th><td><i>// 13.11.08    add SetLPMflag and SetLPMconstant methods</i></td></tr>
+<tr><th id="41">41</th><td><i>// 13.11.08    change default LPMconstant value</i></td></tr>
+<tr><th id="42">42</th><td><i>// 13.10.10    add angular distributon interface (VI)</i></td></tr>
+<tr><th id="43">43</th><td><i>// 31.05.16    change LPMconstant such that it gives suppression variable 's'</i></td></tr>
+<tr><th id="44">44</th><td><i>//             that consistent to Migdal's one; fix a small bug in 'logTS1'</i></td></tr>
+<tr><th id="45">45</th><td><i>//             computation; better agreement with exp.(M.Novak)</i></td></tr>
+<tr><th id="46">46</th><td><i>// 15.07.18    improved LPM suppression function approximation (no artificial</i></td></tr>
+<tr><th id="47">47</th><td><i>//             steps), code cleanup and optimizations,more implementation and</i></td></tr>
+<tr><th id="48">48</th><td><i>//             model related comments, consistent variable naming (M.Novak)</i></td></tr>
+<tr><th id="49">49</th><td><i>//</i></td></tr>
+<tr><th id="50">50</th><td><i>// Main References:</i></td></tr>
+<tr><th id="51">51</th><td><i>//  Y.-S.Tsai, Rev. Mod. Phys. 46 (1974) 815; Rev. Mod. Phys. 49 (1977) 421.</i></td></tr>
+<tr><th id="52">52</th><td><i>//  S.Klein,  Rev. Mod. Phys. 71 (1999) 1501.</i></td></tr>
+<tr><th id="53">53</th><td><i>//  T.Stanev et.al., Phys. Rev. D25 (1982) 1291.</i></td></tr>
+<tr><th id="54">54</th><td><i>//  M.L.Ter-Mikaelian, High-energy Electromagnetic Processes in Condensed Media,</i></td></tr>
+<tr><th id="55">55</th><td><i>//  Wiley, 1972.</i></td></tr>
+<tr><th id="56">56</th><td><i>//</i></td></tr>
+<tr><th id="57">57</th><td><i>// -------------------------------------------------------------------</i></td></tr>
+<tr><th id="58">58</th><td><i>//</i></td></tr>
+<tr><th id="59">59</th><td></td></tr>
+<tr><th id="60">60</th><td><u>#include <a href="../include/G4eBremsstrahlungRelModel.hh.html">"G4eBremsstrahlungRelModel.hh"</a></u></td></tr>
+<tr><th id="61">61</th><td><u>#include <a href="../../../../global/management/include/G4PhysicalConstants.hh.html">"G4PhysicalConstants.hh"</a></u></td></tr>
+<tr><th id="62">62</th><td><u>#include <a href="../../../../global/management/include/G4SystemOfUnits.hh.html">"G4SystemOfUnits.hh"</a></u></td></tr>
+<tr><th id="63">63</th><td><u>#include <a href="../../../../particles/leptons/include/G4Electron.hh.html">"G4Electron.hh"</a></u></td></tr>
+<tr><th id="64">64</th><td><u>#include <a href="../../../../particles/bosons/include/G4Gamma.hh.html">"G4Gamma.hh"</a></u></td></tr>
+<tr><th id="65">65</th><td><u>#include <a href="../../../../global/HEPRandom/include/Randomize.hh.html">"Randomize.hh"</a></u></td></tr>
+<tr><th id="66">66</th><td><u>#include <a href="../../../../materials/include/G4Material.hh.html">"G4Material.hh"</a></u></td></tr>
+<tr><th id="67">67</th><td><u>#include <a href="../../../../materials/include/G4Element.hh.html">"G4Element.hh"</a></u></td></tr>
+<tr><th id="68">68</th><td><u>#include <a href="../../../../materials/include/G4ElementVector.hh.html">"G4ElementVector.hh"</a></u></td></tr>
+<tr><th id="69">69</th><td><u>#include <a href="../../../../track/include/G4ParticleChangeForLoss.hh.html">"G4ParticleChangeForLoss.hh"</a></u></td></tr>
+<tr><th id="70">70</th><td><u>#include <a href="../include/G4ModifiedTsai.hh.html">"G4ModifiedTsai.hh"</a></u></td></tr>
+<tr><th id="71">71</th><td><i>//#include "G4DipBustGenerator.hh"</i></td></tr>
+<tr><th id="72">72</th><td></td></tr>
+<tr><th id="73">73</th><td><em>const</em> <a class="typedef" href="../../../../global/management/include/G4Types.hh.html#G4int" title='G4int' data-type='int' data-ref="G4int">G4int</a> <a class="type" href="../include/G4eBremsstrahlungRelModel.hh.html#G4eBremsstrahlungRelModel" title='G4eBremsstrahlungRelModel' data-ref="G4eBremsstrahlungRelModel">G4eBremsstrahlungRelModel</a>::<dfn class="decl def" id="G4eBremsstrahlungRelModel::gMaxZet" title='G4eBremsstrahlungRelModel::gMaxZet' data-ref="G4eBremsstrahlungRelModel::gMaxZet">gMaxZet</dfn> = <var>120</var>;</td></tr>
+<tr><th id="74">74</th><td></td></tr>
+<tr><th id="75">75</th><td><i>// constant DCS factor: 16\alpha r_0^2/3</i></td></tr>
+<tr><th id="76">76</th><td><em>const</em> <a class="typedef" href="../../../../global/management/include/G4Types.hh.html#G4double" title='G4double' data-type='double' data-ref="G4double">G4double</a> <a class="type" href="../include/G4eBremsstrahlungRelModel.hh.html#G4eBremsstrahlungRelModel" title='G4eBremsstrahlungRelModel' data-ref="G4eBremsstrahlungRelModel">G4eBremsstrahlungRelModel</a>::<dfn class="decl def" id="G4eBremsstrahlungRelModel::gBremFactor" title='G4eBremsstrahlungRelModel::gBremFactor' data-ref="G4eBremsstrahlungRelModel::gBremFactor">gBremFactor</dfn></td></tr>
+<tr><th id="77">77</th><td>  = <var>16.</var> * <span class="namespace">CLHEP::</span><a class="ref" href="../../../../externals/clhep/include/CLHEP/Units/PhysicalConstants.h.html#CLHEP::fine_structure_const" title='CLHEP::fine_structure_const' data-ref="CLHEP::fine_structure_const">fine_structure_const</a> * <span class="namespace">CLHEP::</span><a class="ref" href="../../../../externals/clhep/include/CLHEP/Units/PhysicalConstants.h.html#CLHEP::classic_electr_radius" title='CLHEP::classic_electr_radius' data-ref="CLHEP::classic_electr_radius">classic_electr_radius</a></td></tr>
+<tr><th id="78">78</th><td>    * <span class="namespace">CLHEP::</span><a class="ref" href="../../../../externals/clhep/include/CLHEP/Units/PhysicalConstants.h.html#CLHEP::classic_electr_radius" title='CLHEP::classic_electr_radius' data-ref="CLHEP::classic_electr_radius">classic_electr_radius</a>/<var>3.</var>;</td></tr>
+<tr><th id="79">79</th><td></td></tr>
+<tr><th id="80">80</th><td><i>// Migdal's constant: 4\pi r_0*electron_reduced_compton_wavelength^2</i></td></tr>
+<tr><th id="81">81</th><td><em>const</em> <a class="typedef" href="../../../../global/management/include/G4Types.hh.html#G4double" title='G4double' data-type='double' data-ref="G4double">G4double</a> <a class="type" href="../include/G4eBremsstrahlungRelModel.hh.html#G4eBremsstrahlungRelModel" title='G4eBremsstrahlungRelModel' data-ref="G4eBremsstrahlungRelModel">G4eBremsstrahlungRelModel</a>::<dfn class="decl def" id="G4eBremsstrahlungRelModel::gMigdalConstant" title='G4eBremsstrahlungRelModel::gMigdalConstant' data-ref="G4eBremsstrahlungRelModel::gMigdalConstant">gMigdalConstant</dfn></td></tr>
+<tr><th id="82">82</th><td>  = <var>4.</var> * <span class="namespace">CLHEP::</span><a class="ref" href="../../../../externals/clhep/include/CLHEP/Units/SystemOfUnits.h.html#CLHEP::pi" title='CLHEP::pi' data-ref="CLHEP::pi">pi</a> * <span class="namespace">CLHEP::</span><a class="ref" href="../../../../externals/clhep/include/CLHEP/Units/PhysicalConstants.h.html#CLHEP::classic_electr_radius" title='CLHEP::classic_electr_radius' data-ref="CLHEP::classic_electr_radius">classic_electr_radius</a></td></tr>
+<tr><th id="83">83</th><td>    * <span class="namespace">CLHEP::</span><a class="ref" href="../../../../externals/clhep/include/CLHEP/Units/PhysicalConstants.h.html#CLHEP::electron_Compton_length" title='CLHEP::electron_Compton_length' data-ref="CLHEP::electron_Compton_length">electron_Compton_length</a> * <span class="namespace">CLHEP::</span><a class="ref" href="../../../../externals/clhep/include/CLHEP/Units/PhysicalConstants.h.html#CLHEP::electron_Compton_length" title='CLHEP::electron_Compton_length' data-ref="CLHEP::electron_Compton_length">electron_Compton_length</a>;</td></tr>
+<tr><th id="84">84</th><td></td></tr>
+<tr><th id="85">85</th><td><i>// LPM constant: \alpha(mc^2)^2/(4\pi*\hbar c)</i></td></tr>
+<tr><th id="86">86</th><td><em>const</em> <a class="typedef" href="../../../../global/management/include/G4Types.hh.html#G4double" title='G4double' data-type='double' data-ref="G4double">G4double</a> <a class="type" href="../include/G4eBremsstrahlungRelModel.hh.html#G4eBremsstrahlungRelModel" title='G4eBremsstrahlungRelModel' data-ref="G4eBremsstrahlungRelModel">G4eBremsstrahlungRelModel</a>::<dfn class="decl def" id="G4eBremsstrahlungRelModel::gLPMconstant" title='G4eBremsstrahlungRelModel::gLPMconstant' data-ref="G4eBremsstrahlungRelModel::gLPMconstant">gLPMconstant</dfn></td></tr>
+<tr><th id="87">87</th><td>  = <span class="namespace">CLHEP::</span><a class="ref" href="../../../../externals/clhep/include/CLHEP/Units/PhysicalConstants.h.html#CLHEP::fine_structure_const" title='CLHEP::fine_structure_const' data-ref="CLHEP::fine_structure_const">fine_structure_const</a> * <span class="namespace">CLHEP::</span><a class="ref" href="../../../../externals/clhep/include/CLHEP/Units/PhysicalConstants.h.html#CLHEP::electron_mass_c2" title='CLHEP::electron_mass_c2' data-ref="CLHEP::electron_mass_c2">electron_mass_c2</a></td></tr>
+<tr><th id="88">88</th><td>    * <span class="namespace">CLHEP::</span><a class="ref" href="../../../../externals/clhep/include/CLHEP/Units/PhysicalConstants.h.html#CLHEP::electron_mass_c2" title='CLHEP::electron_mass_c2' data-ref="CLHEP::electron_mass_c2">electron_mass_c2</a> / (<var>4.</var> * <span class="namespace">CLHEP::</span><a class="ref" href="../../../../externals/clhep/include/CLHEP/Units/SystemOfUnits.h.html#CLHEP::pi" title='CLHEP::pi' data-ref="CLHEP::pi">pi</a> * <span class="namespace">CLHEP::</span><a class="ref" href="../../../../externals/clhep/include/CLHEP/Units/PhysicalConstants.h.html#CLHEP::hbarc" title='CLHEP::hbarc' data-ref="CLHEP::hbarc">hbarc</a>);</td></tr>
+<tr><th id="89">89</th><td></td></tr>
+<tr><th id="90">90</th><td><i>// abscissas and weights of an 8 point Gauss-Legendre quadrature</i></td></tr>
+<tr><th id="91">91</th><td><i>// for numerical integration on [0,1]</i></td></tr>
+<tr><th id="92">92</th><td><em>const</em> <a class="typedef" href="../../../../global/management/include/G4Types.hh.html#G4double" title='G4double' data-type='double' data-ref="G4double">G4double</a> <a class="type" href="../include/G4eBremsstrahlungRelModel.hh.html#G4eBremsstrahlungRelModel" title='G4eBremsstrahlungRelModel' data-ref="G4eBremsstrahlungRelModel">G4eBremsstrahlungRelModel</a>::<dfn class="decl def" id="G4eBremsstrahlungRelModel::gXGL" title='G4eBremsstrahlungRelModel::gXGL' data-ref="G4eBremsstrahlungRelModel::gXGL">gXGL</dfn>[] = {</td></tr>
+<tr><th id="93">93</th><td>  <var>1.98550718e-02</var>, <var>1.01666761e-01</var>, <var>2.37233795e-01</var>, <var>4.08282679e-01</var>,</td></tr>
+<tr><th id="94">94</th><td>  <var>5.91717321e-01</var>, <var>7.62766205e-01</var>, <var>8.98333239e-01</var>, <var>9.80144928e-01</var></td></tr>
+<tr><th id="95">95</th><td>};</td></tr>
+<tr><th id="96">96</th><td><em>const</em> <a class="typedef" href="../../../../global/management/include/G4Types.hh.html#G4double" title='G4double' data-type='double' data-ref="G4double">G4double</a> <a class="type" href="../include/G4eBremsstrahlungRelModel.hh.html#G4eBremsstrahlungRelModel" title='G4eBremsstrahlungRelModel' data-ref="G4eBremsstrahlungRelModel">G4eBremsstrahlungRelModel</a>::<dfn class="decl def" id="G4eBremsstrahlungRelModel::gWGL" title='G4eBremsstrahlungRelModel::gWGL' data-ref="G4eBremsstrahlungRelModel::gWGL">gWGL</dfn>[] = {</td></tr>
+<tr><th id="97">97</th><td>  <var>5.06142681e-02</var>, <var>1.11190517e-01</var>, <var>1.56853323e-01</var>, <var>1.81341892e-01</var>,</td></tr>
+<tr><th id="98">98</th><td>  <var>1.81341892e-01</var>, <var>1.56853323e-01</var>, <var>1.11190517e-01</var>, <var>5.06142681e-02</var></td></tr>
+<tr><th id="99">99</th><td>};</td></tr>
+<tr><th id="100">100</th><td></td></tr>
+<tr><th id="101">101</th><td><i>// elastic and inelatic radiation logarithms for light elements (where the</i></td></tr>
+<tr><th id="102">102</th><td><i>// Thomas-Fermi model doesn't work): computed by using Dirac-Fock model of atom.</i></td></tr>
+<tr><th id="103">103</th><td><em>const</em> <a class="typedef" href="../../../../global/management/include/G4Types.hh.html#G4double" title='G4double' data-type='double' data-ref="G4double">G4double</a> <a class="type" href="../include/G4eBremsstrahlungRelModel.hh.html#G4eBremsstrahlungRelModel" title='G4eBremsstrahlungRelModel' data-ref="G4eBremsstrahlungRelModel">G4eBremsstrahlungRelModel</a>::<dfn class="decl def" id="G4eBremsstrahlungRelModel::gFelLowZet" title='G4eBremsstrahlungRelModel::gFelLowZet' data-ref="G4eBremsstrahlungRelModel::gFelLowZet">gFelLowZet</dfn>  [] = {</td></tr>
+<tr><th id="104">104</th><td>  <var>0.0</var>, <var>5.3104</var>, <var>4.7935</var>, <var>4.7402</var>, <var>4.7112</var>, <var>4.6694</var>, <var>4.6134</var>, <var>4.5520</var></td></tr>
+<tr><th id="105">105</th><td>};</td></tr>
+<tr><th id="106">106</th><td><em>const</em> <a class="typedef" href="../../../../global/management/include/G4Types.hh.html#G4double" title='G4double' data-type='double' data-ref="G4double">G4double</a> <a class="type" href="../include/G4eBremsstrahlungRelModel.hh.html#G4eBremsstrahlungRelModel" title='G4eBremsstrahlungRelModel' data-ref="G4eBremsstrahlungRelModel">G4eBremsstrahlungRelModel</a>::<dfn class="decl def" id="G4eBremsstrahlungRelModel::gFinelLowZet" title='G4eBremsstrahlungRelModel::gFinelLowZet' data-ref="G4eBremsstrahlungRelModel::gFinelLowZet">gFinelLowZet</dfn>[] = {</td></tr>
+<tr><th id="107">107</th><td>  <var>0.0</var>, <var>5.9173</var>, <var>5.6125</var>, <var>5.5377</var>, <var>5.4728</var>, <var>5.4174</var>, <var>5.3688</var>, <var>5.3236</var></td></tr>
+<tr><th id="108">108</th><td>};</td></tr>
+<tr><th id="109">109</th><td></td></tr>
+<tr><th id="110">110</th><td><i>// LPM supression functions evaluated at initialisation time</i></td></tr>
+<tr><th id="111">111</th><td><a class="type" href="../include/G4eBremsstrahlungRelModel.hh.html#G4eBremsstrahlungRelModel" title='G4eBremsstrahlungRelModel' data-ref="G4eBremsstrahlungRelModel">G4eBremsstrahlungRelModel</a>::<a class="type" href="../include/G4eBremsstrahlungRelModel.hh.html#G4eBremsstrahlungRelModel::LPMFuncs" title='G4eBremsstrahlungRelModel::LPMFuncs' data-ref="G4eBremsstrahlungRelModel::LPMFuncs">LPMFuncs</a>  <a class="type" href="../include/G4eBremsstrahlungRelModel.hh.html#G4eBremsstrahlungRelModel" title='G4eBremsstrahlungRelModel' data-ref="G4eBremsstrahlungRelModel">G4eBremsstrahlungRelModel</a>::<a class="ref fake" href="../include/G4eBremsstrahlungRelModel.hh.html#_ZN25G4eBremsstrahlungRelModel8LPMFuncsC1Ev" title='G4eBremsstrahlungRelModel::LPMFuncs::LPMFuncs' data-ref="_ZN25G4eBremsstrahlungRelModel8LPMFuncsC1Ev"></a><dfn class="decl def" id="G4eBremsstrahlungRelModel::gLPMFuncs" title='G4eBremsstrahlungRelModel::gLPMFuncs' data-ref="G4eBremsstrahlungRelModel::gLPMFuncs">gLPMFuncs</dfn>;</td></tr>
+<tr><th id="112">112</th><td></td></tr>
+<tr><th id="113">113</th><td><i>// special data structure per element i.e. per Z</i></td></tr>
+<tr><th id="114">114</th><td><span class='error' title="use of undeclared identifier &apos;std&apos;">std</span>::vector<span class='error' title="expected unqualified-id">&lt;</span>G4eBremsstrahlungRelModel::ElementData*&gt; G4eBremsstrahlungRelModel::gElementData;</td></tr>
+<tr><th id="115">115</th><td></td></tr>
+<tr><th id="116">116</th><td><a class="type" href="../include/G4eBremsstrahlungRelModel.hh.html#G4eBremsstrahlungRelModel" title='G4eBremsstrahlungRelModel' data-ref="G4eBremsstrahlungRelModel">G4eBremsstrahlungRelModel</a>::<dfn class="decl def" id="_ZN25G4eBremsstrahlungRelModelC1EPK20G4ParticleDefinitionRK8G4String" title='G4eBremsstrahlungRelModel::G4eBremsstrahlungRelModel' data-ref="_ZN25G4eBremsstrahlungRelModelC1EPK20G4ParticleDefinitionRK8G4String">G4eBremsstrahlungRelModel</dfn>(<em>const</em> <a class="type" href="../../../../particles/management/include/G4ParticleDefinition.hh.html#G4ParticleDefinition" title='G4ParticleDefinition' data-ref="G4ParticleDefinition">G4ParticleDefinition</a>* <dfn class="local col1 decl" id="1p" title='p' data-type='const G4ParticleDefinition *' data-ref="1p">p</dfn>,</td></tr>
+<tr><th id="117">117</th><td>                                                     <em>const</em> <a class="type" href="../../../../global/management/include/G4String.hh.html#G4String" title='G4String' data-ref="G4String">G4String</a>&amp; <dfn class="local col2 decl" id="2nam" title='nam' data-type='const G4String &amp;' data-ref="2nam">nam</dfn>)</td></tr>
+<tr><th id="118">118</th><td>: <a class="type" href="../../utils/include/G4VEmModel.hh.html#G4VEmModel" title='G4VEmModel' data-ref="G4VEmModel">G4VEmModel</a><a class="ref" href="../../utils/include/G4VEmModel.hh.html#_ZN10G4VEmModelC1ERK8G4String" title='G4VEmModel::G4VEmModel' data-ref="_ZN10G4VEmModelC1ERK8G4String">(</a><a class="local col2 ref" href="#2nam" title='nam' data-ref="2nam">nam</a>), <a class="member" href="../include/G4eBremsstrahlungRelModel.hh.html#G4eBremsstrahlungRelModel::fIsElectron" title='G4eBremsstrahlungRelModel::fIsElectron' data-ref="G4eBremsstrahlungRelModel::fIsElectron">fIsElectron</a>(<b>true</b>), <a class="member" href="../include/G4eBremsstrahlungRelModel.hh.html#G4eBremsstrahlungRelModel::fIsScatOffElectron" title='G4eBremsstrahlungRelModel::fIsScatOffElectron' data-ref="G4eBremsstrahlungRelModel::fIsScatOffElectron">fIsScatOffElectron</a>(<b>false</b>),</td></tr>
+<tr><th id="119">119</th><td>  <a class="member" href="../include/G4eBremsstrahlungRelModel.hh.html#G4eBremsstrahlungRelModel::fIsLPMActive" title='G4eBremsstrahlungRelModel::fIsLPMActive' data-ref="G4eBremsstrahlungRelModel::fIsLPMActive">fIsLPMActive</a>(<b>false</b>), <a class="member" href="../include/G4eBremsstrahlungRelModel.hh.html#G4eBremsstrahlungRelModel::fPrimaryParticle" title='G4eBremsstrahlungRelModel::fPrimaryParticle' data-ref="G4eBremsstrahlungRelModel::fPrimaryParticle">fPrimaryParticle</a>(<b>nullptr</b>), <a class="member" href="../include/G4eBremsstrahlungRelModel.hh.html#G4eBremsstrahlungRelModel::fIsUseCompleteScreening" title='G4eBremsstrahlungRelModel::fIsUseCompleteScreening' data-ref="G4eBremsstrahlungRelModel::fIsUseCompleteScreening">fIsUseCompleteScreening</a>(<b>false</b>)</td></tr>
+<tr><th id="120">120</th><td>{</td></tr>
+<tr><th id="121">121</th><td>  <a class="member" href="../include/G4eBremsstrahlungRelModel.hh.html#G4eBremsstrahlungRelModel::fCurrentIZ" title='G4eBremsstrahlungRelModel::fCurrentIZ' data-ref="G4eBremsstrahlungRelModel::fCurrentIZ">fCurrentIZ</a> = <var>0</var>;</td></tr>
+<tr><th id="122">122</th><td>  <i>//</i></td></tr>
+<tr><th id="123">123</th><td>  <a class="member" href="../include/G4eBremsstrahlungRelModel.hh.html#G4eBremsstrahlungRelModel::fPrimaryParticleMass" title='G4eBremsstrahlungRelModel::fPrimaryParticleMass' data-ref="G4eBremsstrahlungRelModel::fPrimaryParticleMass">fPrimaryParticleMass</a> = <var>0.</var>;</td></tr>
+<tr><th id="124">124</th><td>  <a class="member" href="../include/G4eBremsstrahlungRelModel.hh.html#G4eBremsstrahlungRelModel::fPrimaryKinEnergy" title='G4eBremsstrahlungRelModel::fPrimaryKinEnergy' data-ref="G4eBremsstrahlungRelModel::fPrimaryKinEnergy">fPrimaryKinEnergy</a>    = <var>0.</var>;</td></tr>
+<tr><th id="125">125</th><td>  <a class="member" href="../include/G4eBremsstrahlungRelModel.hh.html#G4eBremsstrahlungRelModel::fPrimaryTotalEnergy" title='G4eBremsstrahlungRelModel::fPrimaryTotalEnergy' data-ref="G4eBremsstrahlungRelModel::fPrimaryTotalEnergy">fPrimaryTotalEnergy</a>  = <var>0.</var>;</td></tr>
+<tr><th id="126">126</th><td>  <a class="member" href="../include/G4eBremsstrahlungRelModel.hh.html#G4eBremsstrahlungRelModel::fDensityFactor" title='G4eBremsstrahlungRelModel::fDensityFactor' data-ref="G4eBremsstrahlungRelModel::fDensityFactor">fDensityFactor</a>       = <var>0.</var>;</td></tr>
+<tr><th id="127">127</th><td>  <a class="member" href="../include/G4eBremsstrahlungRelModel.hh.html#G4eBremsstrahlungRelModel::fDensityCorr" title='G4eBremsstrahlungRelModel::fDensityCorr' data-ref="G4eBremsstrahlungRelModel::fDensityCorr">fDensityCorr</a>         = <var>0.</var>;</td></tr>
+<tr><th id="128">128</th><td>  <a class="member" href="../include/G4eBremsstrahlungRelModel.hh.html#G4eBremsstrahlungRelModel::fNucTerm" title='G4eBremsstrahlungRelModel::fNucTerm' data-ref="G4eBremsstrahlungRelModel::fNucTerm">fNucTerm</a>             = <var>0.</var>;</td></tr>
+<tr><th id="129">129</th><td>  <a class="member" href="../include/G4eBremsstrahlungRelModel.hh.html#G4eBremsstrahlungRelModel::fSumTerm" title='G4eBremsstrahlungRelModel::fSumTerm' data-ref="G4eBremsstrahlungRelModel::fSumTerm">fSumTerm</a>             = <var>0.</var>;</td></tr>
+<tr><th id="130">130</th><td>  <i>//</i></td></tr>
+<tr><th id="131">131</th><td>  <a class="member" href="../include/G4eBremsstrahlungRelModel.hh.html#G4eBremsstrahlungRelModel::fPrimaryParticle" title='G4eBremsstrahlungRelModel::fPrimaryParticle' data-ref="G4eBremsstrahlungRelModel::fPrimaryParticle">fPrimaryParticle</a>     = <b>nullptr</b>;</td></tr>
+<tr><th id="132">132</th><td>  <a class="member" href="../include/G4eBremsstrahlungRelModel.hh.html#G4eBremsstrahlungRelModel::fGammaParticle" title='G4eBremsstrahlungRelModel::fGammaParticle' data-ref="G4eBremsstrahlungRelModel::fGammaParticle">fGammaParticle</a>       = <a class="type" href="../../../../particles/bosons/include/G4Gamma.hh.html#G4Gamma" title='G4Gamma' data-ref="G4Gamma">G4Gamma</a>::<a class="ref" href="../../../../particles/bosons/include/G4Gamma.hh.html#_ZN7G4Gamma5GammaEv" title='G4Gamma::Gamma' data-ref="_ZN7G4Gamma5GammaEv">Gamma</a>();</td></tr>
+<tr><th id="133">133</th><td>  <a class="member" href="../include/G4eBremsstrahlungRelModel.hh.html#G4eBremsstrahlungRelModel::fParticleChange" title='G4eBremsstrahlungRelModel::fParticleChange' data-ref="G4eBremsstrahlungRelModel::fParticleChange">fParticleChange</a>      = <b>nullptr</b>;</td></tr>
+<tr><th id="134">134</th><td>  <i>//</i></td></tr>
+<tr><th id="135">135</th><td>  <a class="member" href="../include/G4eBremsstrahlungRelModel.hh.html#G4eBremsstrahlungRelModel::fLowestKinEnergy" title='G4eBremsstrahlungRelModel::fLowestKinEnergy' data-ref="G4eBremsstrahlungRelModel::fLowestKinEnergy">fLowestKinEnergy</a>     = <var>1.0</var>*<a class="ref" href="../../../../externals/clhep/include/CLHEP/Units/SystemOfUnits.h.html#CLHEP::MeV" title='CLHEP::MeV' data-ref="CLHEP::MeV">MeV</a>;</td></tr>
+<tr><th id="136">136</th><td>  <span class='error' title="cannot initialize object parameter of type &apos;G4VEmModel&apos; with an expression of type &apos;G4eBremsstrahlungRelModel&apos;">SetLowEnergyLimit</span>(fLowestKinEnergy);</td></tr>
+<tr><th id="137">137</th><td>  <i>//</i></td></tr>
+<tr><th id="138">138</th><td>  <a class="member" href="../include/G4eBremsstrahlungRelModel.hh.html#G4eBremsstrahlungRelModel::fLPMEnergyThreshold" title='G4eBremsstrahlungRelModel::fLPMEnergyThreshold' data-ref="G4eBremsstrahlungRelModel::fLPMEnergyThreshold">fLPMEnergyThreshold</a>  = <var>1.e+39</var>;</td></tr>
+<tr><th id="139">139</th><td>  <a class="member" href="../include/G4eBremsstrahlungRelModel.hh.html#G4eBremsstrahlungRelModel::fLPMEnergy" title='G4eBremsstrahlungRelModel::fLPMEnergy' data-ref="G4eBremsstrahlungRelModel::fLPMEnergy">fLPMEnergy</a>           = <var>0.</var>;</td></tr>
+<tr><th id="140">140</th><td></td></tr>
+<tr><th id="141">141</th><td>  <span class='error' title="cannot initialize object parameter of type &apos;G4VEmModel&apos; with an expression of type &apos;G4eBremsstrahlungRelModel&apos;">SetLPMFlag</span>(<b>true</b>);</td></tr>
+<tr><th id="142">142</th><td>  <i>//</i></td></tr>
+<tr><th id="143">143</th><td>  <span class='error' title="cannot initialize object parameter of type &apos;G4VEmModel&apos; with an expression of type &apos;G4eBremsstrahlungRelModel&apos;">SetAngularDistribution</span>(<b>new</b> G4ModifiedTsai());</td></tr>
+<tr><th id="144">144</th><td>  <i>//SetAngularDistribution(new G4DipBustGenerator());</i></td></tr>
+<tr><th id="145">145</th><td><i>  //</i></td></tr>
+<tr><th id="146">146</th><td>  <b>if</b> (<a class="local col1 ref" href="#1p" title='p' data-ref="1p">p</a>) {</td></tr>
+<tr><th id="147">147</th><td>    <a class="member" href="#_ZN25G4eBremsstrahlungRelModel11SetParticleEPK20G4ParticleDefinition" title='G4eBremsstrahlungRelModel::SetParticle' data-ref="_ZN25G4eBremsstrahlungRelModel11SetParticleEPK20G4ParticleDefinition">SetParticle</a>(<a class="local col1 ref" href="#1p" title='p' data-ref="1p">p</a>);</td></tr>
+<tr><th id="148">148</th><td>  }</td></tr>
+<tr><th id="149">149</th><td>}</td></tr>
+<tr><th id="150">150</th><td></td></tr>
+<tr><th id="151">151</th><td>G4eBremsstrahlungRelModel::<span class='error' title="exception specification in declaration does not match previous declaration">~</span>G4eBremsstrahlungRelModel()</td></tr>
+<tr><th id="152">152</th><td>{</td></tr>
+<tr><th id="153">153</th><td>  <b>if</b> (<span class='error' title="cannot initialize object parameter of type &apos;const G4VEmModel&apos; with an expression of type &apos;G4eBremsstrahlungRelModel&apos;">IsMaster</span>()) {</td></tr>
+<tr><th id="154">154</th><td>    <i>// clear ElementData container</i></td></tr>
+<tr><th id="155">155</th><td>    <b>for</b> (<span class='error' title="unknown type name &apos;size_t&apos;">size_t</span> iz = <var>0</var>; iz &lt; <span class='error' title="use of undeclared identifier &apos;gElementData&apos;">gElementData</span>.size(); ++iz) {</td></tr>
+<tr><th id="156">156</th><td>      <b>if</b> (<span class='error' title="use of undeclared identifier &apos;gElementData&apos;">gElementData</span>[iz]) {</td></tr>
+<tr><th id="157">157</th><td>        <b>delete</b> <span class='error' title="use of undeclared identifier &apos;gElementData&apos;">gElementData</span>[iz];</td></tr>
+<tr><th id="158">158</th><td>      }</td></tr>
+<tr><th id="159">159</th><td>    }</td></tr>
+<tr><th id="160">160</th><td>    <span class='error' title="use of undeclared identifier &apos;gElementData&apos;">gElementData</span>.clear();</td></tr>
+<tr><th id="161">161</th><td>    <i>// clear LPMFunctions (if any)</i></td></tr>
+<tr><th id="162">162</th><td>    <b>if</b> (<span class='error' title="cannot initialize object parameter of type &apos;const G4VEmModel&apos; with an expression of type &apos;G4eBremsstrahlungRelModel&apos;">LPMFlag</span>()) {</td></tr>
+<tr><th id="163">163</th><td>      gLPMFuncs.<span class='error' title="no member named &apos;fLPMFuncG&apos; in &apos;G4eBremsstrahlungRelModel::LPMFuncs&apos;">fLPMFuncG</span>.clear();</td></tr>
+<tr><th id="164">164</th><td>      gLPMFuncs.<span class='error' title="no member named &apos;fLPMFuncPhi&apos; in &apos;G4eBremsstrahlungRelModel::LPMFuncs&apos;">fLPMFuncPhi</span>.clear();</td></tr>
+<tr><th id="165">165</th><td>      gLPMFuncs.fIsInitialized = <b>false</b>;</td></tr>
+<tr><th id="166">166</th><td>    }</td></tr>
+<tr><th id="167">167</th><td>  }</td></tr>
+<tr><th id="168">168</th><td>}</td></tr>
+<tr><th id="169">169</th><td></td></tr>
+<tr><th id="170">170</th><td><em>void</em> <a class="type" href="../include/G4eBremsstrahlungRelModel.hh.html#G4eBremsstrahlungRelModel" title='G4eBremsstrahlungRelModel' data-ref="G4eBremsstrahlungRelModel">G4eBremsstrahlungRelModel</a>::<dfn class="virtual decl def" id="_ZN25G4eBremsstrahlungRelModel10InitialiseEPK20G4ParticleDefinitionRK12G4DataVector" title='G4eBremsstrahlungRelModel::Initialise' data-ref="_ZN25G4eBremsstrahlungRelModel10InitialiseEPK20G4ParticleDefinitionRK12G4DataVector">Initialise</dfn>(<em>const</em> <a class="type" href="../../../../particles/management/include/G4ParticleDefinition.hh.html#G4ParticleDefinition" title='G4ParticleDefinition' data-ref="G4ParticleDefinition">G4ParticleDefinition</a>* <dfn class="local col3 decl" id="3p" title='p' data-type='const G4ParticleDefinition *' data-ref="3p">p</dfn>,</td></tr>
+<tr><th id="171">171</th><td>                                           <em>const</em> <a class="type" href="../../../../global/management/include/G4DataVector.hh.html#G4DataVector" title='G4DataVector' data-ref="G4DataVector">G4DataVector</a>&amp; <dfn class="local col4 decl" id="4cuts" title='cuts' data-type='const G4DataVector &amp;' data-ref="4cuts">cuts</dfn>)</td></tr>
+<tr><th id="172">172</th><td>{</td></tr>
+<tr><th id="173">173</th><td>  <b>if</b> (<a class="local col3 ref" href="#3p" title='p' data-ref="3p">p</a>) {</td></tr>
+<tr><th id="174">174</th><td>    <a class="member" href="#_ZN25G4eBremsstrahlungRelModel11SetParticleEPK20G4ParticleDefinition" title='G4eBremsstrahlungRelModel::SetParticle' data-ref="_ZN25G4eBremsstrahlungRelModel11SetParticleEPK20G4ParticleDefinition">SetParticle</a>(<a class="local col3 ref" href="#3p" title='p' data-ref="3p">p</a>);</td></tr>
+<tr><th id="175">175</th><td>  }</td></tr>
+<tr><th id="176">176</th><td>  <a class="member" href="../include/G4eBremsstrahlungRelModel.hh.html#G4eBremsstrahlungRelModel::fCurrentIZ" title='G4eBremsstrahlungRelModel::fCurrentIZ' data-ref="G4eBremsstrahlungRelModel::fCurrentIZ">fCurrentIZ</a> = <var>0</var>;</td></tr>
+<tr><th id="177">177</th><td>  <i>// init element data and precompute LPM functions (only if lpmflag is true)</i></td></tr>
+<tr><th id="178">178</th><td>  <b>if</b> (<span class='error' title="cannot initialize object parameter of type &apos;const G4VEmModel&apos; with an expression of type &apos;G4eBremsstrahlungRelModel&apos;">IsMaster</span>()) {</td></tr>
+<tr><th id="179">179</th><td>    <a class="member" href="../include/G4eBremsstrahlungRelModel.hh.html#_ZN25G4eBremsstrahlungRelModel21InitialiseElementDataEv" title='G4eBremsstrahlungRelModel::InitialiseElementData' data-ref="_ZN25G4eBremsstrahlungRelModel21InitialiseElementDataEv">InitialiseElementData</a>();</td></tr>
+<tr><th id="180">180</th><td>    <b>if</b> (<span class='error' title="cannot initialize object parameter of type &apos;const G4VEmModel&apos; with an expression of type &apos;G4eBremsstrahlungRelModel&apos;">LPMFlag</span>()) { <a class="member" href="../include/G4eBremsstrahlungRelModel.hh.html#_ZN25G4eBremsstrahlungRelModel16InitLPMFunctionsEv" title='G4eBremsstrahlungRelModel::InitLPMFunctions' data-ref="_ZN25G4eBremsstrahlungRelModel16InitLPMFunctionsEv">InitLPMFunctions</a>(); }</td></tr>
+<tr><th id="181">181</th><td>    <b>if</b> (<span class='error' title="cannot initialize object parameter of type &apos;const G4VEmModel&apos; with an expression of type &apos;G4eBremsstrahlungRelModel&apos;">LowEnergyLimit</span>() &lt; <span class='error' title="cannot initialize object parameter of type &apos;const G4VEmModel&apos; with an expression of type &apos;G4eBremsstrahlungRelModel&apos;">HighEnergyLimit</span>()) {</td></tr>
+<tr><th id="182">182</th><td>      <span class='error' title="cannot initialize object parameter of type &apos;G4VEmModel&apos; with an expression of type &apos;G4eBremsstrahlungRelModel&apos;">InitialiseElementSelectors</span>(p, cuts);</td></tr>
+<tr><th id="183">183</th><td>    }</td></tr>
+<tr><th id="184">184</th><td>  }</td></tr>
+<tr><th id="185">185</th><td>  <b>if</b> (!<a class="member" href="../include/G4eBremsstrahlungRelModel.hh.html#G4eBremsstrahlungRelModel::fParticleChange" title='G4eBremsstrahlungRelModel::fParticleChange' data-ref="G4eBremsstrahlungRelModel::fParticleChange">fParticleChange</a>) { fParticleChange = <span class='error' title="cannot initialize object parameter of type &apos;G4VEmModel&apos; with an expression of type &apos;G4eBremsstrahlungRelModel&apos;">GetParticleChangeForLoss</span>(); }</td></tr>
+<tr><th id="186">186</th><td>  <b>if</b> (<span class='error' title="cannot initialize object parameter of type &apos;G4VEmModel&apos; with an expression of type &apos;G4eBremsstrahlungRelModel&apos;">GetTripletModel</span>()) {</td></tr>
+<tr><th id="187">187</th><td>    <span class='error' title="cannot initialize object parameter of type &apos;G4VEmModel&apos; with an expression of type &apos;G4eBremsstrahlungRelModel&apos;">GetTripletModel</span>()-&gt;Initialise(p, cuts);</td></tr>
+<tr><th id="188">188</th><td>    <a class="member" href="../include/G4eBremsstrahlungRelModel.hh.html#G4eBremsstrahlungRelModel::fIsScatOffElectron" title='G4eBremsstrahlungRelModel::fIsScatOffElectron' data-ref="G4eBremsstrahlungRelModel::fIsScatOffElectron">fIsScatOffElectron</a> = <b>true</b>;</td></tr>
+<tr><th id="189">189</th><td>  }</td></tr>
+<tr><th id="190">190</th><td>}</td></tr>
+<tr><th id="191">191</th><td></td></tr>
+<tr><th id="192">192</th><td><em>void</em> <a class="type" href="../include/G4eBremsstrahlungRelModel.hh.html#G4eBremsstrahlungRelModel" title='G4eBremsstrahlungRelModel' data-ref="G4eBremsstrahlungRelModel">G4eBremsstrahlungRelModel</a>::<dfn class="virtual decl def" id="_ZN25G4eBremsstrahlungRelModel15InitialiseLocalEPK20G4ParticleDefinitionP10G4VEmModel" title='G4eBremsstrahlungRelModel::InitialiseLocal' data-ref="_ZN25G4eBremsstrahlungRelModel15InitialiseLocalEPK20G4ParticleDefinitionP10G4VEmModel">InitialiseLocal</dfn>(<em>const</em> <a class="type" href="../../../../particles/management/include/G4ParticleDefinition.hh.html#G4ParticleDefinition" title='G4ParticleDefinition' data-ref="G4ParticleDefinition">G4ParticleDefinition</a>*,</td></tr>
+<tr><th id="193">193</th><td>                                                <a class="type" href="../../utils/include/G4VEmModel.hh.html#G4VEmModel" title='G4VEmModel' data-ref="G4VEmModel">G4VEmModel</a>* <dfn class="local col5 decl" id="5masterModel" title='masterModel' data-type='G4VEmModel *' data-ref="5masterModel">masterModel</dfn>)</td></tr>
+<tr><th id="194">194</th><td>{</td></tr>
+<tr><th id="195">195</th><td>  <b>if</b> (<span class='error' title="cannot initialize object parameter of type &apos;const G4VEmModel&apos; with an expression of type &apos;G4eBremsstrahlungRelModel&apos;">LowEnergyLimit</span>() &lt; <span class='error' title="cannot initialize object parameter of type &apos;const G4VEmModel&apos; with an expression of type &apos;G4eBremsstrahlungRelModel&apos;">HighEnergyLimit</span>()) {</td></tr>
+<tr><th id="196">196</th><td>    SetElementSelectors(masterModel-&gt;<span class='error' title="no member named &apos;GetElementSelectors&apos; in &apos;G4VEmModel&apos;">GetElementSelectors</span>());</td></tr>
+<tr><th id="197">197</th><td>  }</td></tr>
+<tr><th id="198">198</th><td>}</td></tr>
+<tr><th id="199">199</th><td></td></tr>
+<tr><th id="200">200</th><td><em>void</em> <a class="type" href="../include/G4eBremsstrahlungRelModel.hh.html#G4eBremsstrahlungRelModel" title='G4eBremsstrahlungRelModel' data-ref="G4eBremsstrahlungRelModel">G4eBremsstrahlungRelModel</a>::<dfn class="decl def" id="_ZN25G4eBremsstrahlungRelModel11SetParticleEPK20G4ParticleDefinition" title='G4eBremsstrahlungRelModel::SetParticle' data-ref="_ZN25G4eBremsstrahlungRelModel11SetParticleEPK20G4ParticleDefinition">SetParticle</dfn>(<em>const</em> <a class="type" href="../../../../particles/management/include/G4ParticleDefinition.hh.html#G4ParticleDefinition" title='G4ParticleDefinition' data-ref="G4ParticleDefinition">G4ParticleDefinition</a>* <dfn class="local col6 decl" id="6p" title='p' data-type='const G4ParticleDefinition *' data-ref="6p">p</dfn>)</td></tr>
+<tr><th id="201">201</th><td>{</td></tr>
+<tr><th id="202">202</th><td>  <a class="member" href="../include/G4eBremsstrahlungRelModel.hh.html#G4eBremsstrahlungRelModel::fPrimaryParticle" title='G4eBremsstrahlungRelModel::fPrimaryParticle' data-ref="G4eBremsstrahlungRelModel::fPrimaryParticle">fPrimaryParticle</a>     = <a class="local col6 ref" href="#6p" title='p' data-ref="6p">p</a>;</td></tr>
+<tr><th id="203">203</th><td>  <a class="member" href="../include/G4eBremsstrahlungRelModel.hh.html#G4eBremsstrahlungRelModel::fPrimaryParticleMass" title='G4eBremsstrahlungRelModel::fPrimaryParticleMass' data-ref="G4eBremsstrahlungRelModel::fPrimaryParticleMass">fPrimaryParticleMass</a> = <a class="local col6 ref" href="#6p" title='p' data-ref="6p">p</a>-&gt;<a class="ref" href="../../../../particles/management/include/G4ParticleDefinition.hh.html#_ZNK20G4ParticleDefinition10GetPDGMassEv" title='G4ParticleDefinition::GetPDGMass' data-ref="_ZNK20G4ParticleDefinition10GetPDGMassEv">GetPDGMass</a>();</td></tr>
+<tr><th id="204">204</th><td>  <a class="member" href="../include/G4eBremsstrahlungRelModel.hh.html#G4eBremsstrahlungRelModel::fIsElectron" title='G4eBremsstrahlungRelModel::fIsElectron' data-ref="G4eBremsstrahlungRelModel::fIsElectron">fIsElectron</a>          = (<a class="local col6 ref" href="#6p" title='p' data-ref="6p">p</a>==<a class="type" href="../../../../particles/leptons/include/G4Electron.hh.html#G4Electron" title='G4Electron' data-ref="G4Electron">G4Electron</a>::<a class="ref" href="../../../../particles/leptons/include/G4Electron.hh.html#_ZN10G4Electron8ElectronEv" title='G4Electron::Electron' data-ref="_ZN10G4Electron8ElectronEv">Electron</a>());</td></tr>
+<tr><th id="205">205</th><td>}</td></tr>
+<tr><th id="206">206</th><td></td></tr>
+<tr><th id="207">207</th><td><i>// Sets kinematical variables like E_kin, E_t and some material dependent</i></td></tr>
+<tr><th id="208">208</th><td><i>// variables like LPM energy and characteristic photon energy k_p (more exactly</i></td></tr>
+<tr><th id="209">209</th><td><i>// k_p^2) for the Ter-Mikaelian suppression effect.</i></td></tr>
+<tr><th id="210">210</th><td><em>void</em> <a class="type" href="../include/G4eBremsstrahlungRelModel.hh.html#G4eBremsstrahlungRelModel" title='G4eBremsstrahlungRelModel' data-ref="G4eBremsstrahlungRelModel">G4eBremsstrahlungRelModel</a>::<dfn class="virtual decl def" id="_ZN25G4eBremsstrahlungRelModel16SetupForMaterialEPK20G4ParticleDefinitionPK10G4Materiald" title='G4eBremsstrahlungRelModel::SetupForMaterial' data-ref="_ZN25G4eBremsstrahlungRelModel16SetupForMaterialEPK20G4ParticleDefinitionPK10G4Materiald">SetupForMaterial</dfn>(<em>const</em> <a class="type" href="../../../../particles/management/include/G4ParticleDefinition.hh.html#G4ParticleDefinition" title='G4ParticleDefinition' data-ref="G4ParticleDefinition">G4ParticleDefinition</a>*,</td></tr>
+<tr><th id="211">211</th><td>                                                 <em>const</em> <a class="type" href="../../../../materials/include/G4Material.hh.html#G4Material" title='G4Material' data-ref="G4Material">G4Material</a>* <dfn class="local col7 decl" id="7mat" title='mat' data-type='const G4Material *' data-ref="7mat">mat</dfn>,</td></tr>
+<tr><th id="212">212</th><td>	                                               <a class="typedef" href="../../../../global/management/include/G4Types.hh.html#G4double" title='G4double' data-type='double' data-ref="G4double">G4double</a> <dfn class="local col8 decl" id="8kineticEnergy" title='kineticEnergy' data-type='G4double' data-ref="8kineticEnergy">kineticEnergy</dfn>)</td></tr>
+<tr><th id="213">213</th><td>{</td></tr>
+<tr><th id="214">214</th><td>  <a class="member" href="../include/G4eBremsstrahlungRelModel.hh.html#G4eBremsstrahlungRelModel::fDensityFactor" title='G4eBremsstrahlungRelModel::fDensityFactor' data-ref="G4eBremsstrahlungRelModel::fDensityFactor">fDensityFactor</a> = <a class="member" href="../include/G4eBremsstrahlungRelModel.hh.html#G4eBremsstrahlungRelModel::gMigdalConstant" title='G4eBremsstrahlungRelModel::gMigdalConstant' data-ref="G4eBremsstrahlungRelModel::gMigdalConstant">gMigdalConstant</a>*<a class="local col7 ref" href="#7mat" title='mat' data-ref="7mat">mat</a>-&gt;<a class="ref" href="../../../../materials/include/G4Material.hh.html#_ZNK10G4Material18GetElectronDensityEv" title='G4Material::GetElectronDensity' data-ref="_ZNK10G4Material18GetElectronDensityEv">GetElectronDensity</a>();</td></tr>
+<tr><th id="215">215</th><td>  <a class="member" href="../include/G4eBremsstrahlungRelModel.hh.html#G4eBremsstrahlungRelModel::fLPMEnergy" title='G4eBremsstrahlungRelModel::fLPMEnergy' data-ref="G4eBremsstrahlungRelModel::fLPMEnergy">fLPMEnergy</a>     = <a class="member" href="../include/G4eBremsstrahlungRelModel.hh.html#G4eBremsstrahlungRelModel::gLPMconstant" title='G4eBremsstrahlungRelModel::gLPMconstant' data-ref="G4eBremsstrahlungRelModel::gLPMconstant">gLPMconstant</a>*<a class="local col7 ref" href="#7mat" title='mat' data-ref="7mat">mat</a>-&gt;<a class="ref" href="../../../../materials/include/G4Material.hh.html#_ZNK10G4Material9GetRadlenEv" title='G4Material::GetRadlen' data-ref="_ZNK10G4Material9GetRadlenEv">GetRadlen</a>();</td></tr>
+<tr><th id="216">216</th><td>  <i>// threshold for LPM effect (i.e. below which LPM hidden by density effect)</i></td></tr>
+<tr><th id="217">217</th><td>  <b>if</b> (<span class='error' title="cannot initialize object parameter of type &apos;const G4VEmModel&apos; with an expression of type &apos;G4eBremsstrahlungRelModel&apos;">LPMFlag</span>()) {</td></tr>
+<tr><th id="218">218</th><td>    fLPMEnergyThreshold = <span class='error' title="use of undeclared identifier &apos;std&apos;">std</span>::sqrt(fDensityFactor)*fLPMEnergy;</td></tr>
+<tr><th id="219">219</th><td>  } <b>else</b> {</td></tr>
+<tr><th id="220">220</th><td>    <a class="member" href="../include/G4eBremsstrahlungRelModel.hh.html#G4eBremsstrahlungRelModel::fLPMEnergyThreshold" title='G4eBremsstrahlungRelModel::fLPMEnergyThreshold' data-ref="G4eBremsstrahlungRelModel::fLPMEnergyThreshold">fLPMEnergyThreshold</a> = <var>1.e+39</var>;   <i>// i.e. do not use LPM effect</i></td></tr>
+<tr><th id="221">221</th><td>  }</td></tr>
+<tr><th id="222">222</th><td>  <i>// calculate threshold for density effect: k_p = sqrt(fDensityCorr)</i></td></tr>
+<tr><th id="223">223</th><td>  <a class="member" href="../include/G4eBremsstrahlungRelModel.hh.html#G4eBremsstrahlungRelModel::fPrimaryKinEnergy" title='G4eBremsstrahlungRelModel::fPrimaryKinEnergy' data-ref="G4eBremsstrahlungRelModel::fPrimaryKinEnergy">fPrimaryKinEnergy</a>   = <a class="local col8 ref" href="#8kineticEnergy" title='kineticEnergy' data-ref="8kineticEnergy">kineticEnergy</a>;</td></tr>
+<tr><th id="224">224</th><td>  <a class="member" href="../include/G4eBremsstrahlungRelModel.hh.html#G4eBremsstrahlungRelModel::fPrimaryTotalEnergy" title='G4eBremsstrahlungRelModel::fPrimaryTotalEnergy' data-ref="G4eBremsstrahlungRelModel::fPrimaryTotalEnergy">fPrimaryTotalEnergy</a> = <a class="local col8 ref" href="#8kineticEnergy" title='kineticEnergy' data-ref="8kineticEnergy">kineticEnergy</a>+<a class="member" href="../include/G4eBremsstrahlungRelModel.hh.html#G4eBremsstrahlungRelModel::fPrimaryParticleMass" title='G4eBremsstrahlungRelModel::fPrimaryParticleMass' data-ref="G4eBremsstrahlungRelModel::fPrimaryParticleMass">fPrimaryParticleMass</a>;</td></tr>
+<tr><th id="225">225</th><td>  <a class="member" href="../include/G4eBremsstrahlungRelModel.hh.html#G4eBremsstrahlungRelModel::fDensityCorr" title='G4eBremsstrahlungRelModel::fDensityCorr' data-ref="G4eBremsstrahlungRelModel::fDensityCorr">fDensityCorr</a>        = <a class="member" href="../include/G4eBremsstrahlungRelModel.hh.html#G4eBremsstrahlungRelModel::fDensityFactor" title='G4eBremsstrahlungRelModel::fDensityFactor' data-ref="G4eBremsstrahlungRelModel::fDensityFactor">fDensityFactor</a>*<a class="member" href="../include/G4eBremsstrahlungRelModel.hh.html#G4eBremsstrahlungRelModel::fPrimaryTotalEnergy" title='G4eBremsstrahlungRelModel::fPrimaryTotalEnergy' data-ref="G4eBremsstrahlungRelModel::fPrimaryTotalEnergy">fPrimaryTotalEnergy</a>*<a class="member" href="../include/G4eBremsstrahlungRelModel.hh.html#G4eBremsstrahlungRelModel::fPrimaryTotalEnergy" title='G4eBremsstrahlungRelModel::fPrimaryTotalEnergy' data-ref="G4eBremsstrahlungRelModel::fPrimaryTotalEnergy">fPrimaryTotalEnergy</a>;</td></tr>
+<tr><th id="226">226</th><td>  <i>// set activation flag for LPM effects in the DCS</i></td></tr>
+<tr><th id="227">227</th><td>  <a class="member" href="../include/G4eBremsstrahlungRelModel.hh.html#G4eBremsstrahlungRelModel::fIsLPMActive" title='G4eBremsstrahlungRelModel::fIsLPMActive' data-ref="G4eBremsstrahlungRelModel::fIsLPMActive">fIsLPMActive</a>        = (<a class="member" href="../include/G4eBremsstrahlungRelModel.hh.html#G4eBremsstrahlungRelModel::fPrimaryTotalEnergy" title='G4eBremsstrahlungRelModel::fPrimaryTotalEnergy' data-ref="G4eBremsstrahlungRelModel::fPrimaryTotalEnergy">fPrimaryTotalEnergy</a>&gt;<a class="member" href="../include/G4eBremsstrahlungRelModel.hh.html#G4eBremsstrahlungRelModel::fLPMEnergyThreshold" title='G4eBremsstrahlungRelModel::fLPMEnergyThreshold' data-ref="G4eBremsstrahlungRelModel::fLPMEnergyThreshold">fLPMEnergyThreshold</a>);</td></tr>
+<tr><th id="228">228</th><td>}</td></tr>
+<tr><th id="229">229</th><td></td></tr>
+<tr><th id="230">230</th><td><i>// minimum primary (e-/e+) energy at which discrete interaction is possible</i></td></tr>
+<tr><th id="231">231</th><td><a class="typedef" href="../../../../global/management/include/G4Types.hh.html#G4double" title='G4double' data-type='double' data-ref="G4double">G4double</a> <a class="type" href="../include/G4eBremsstrahlungRelModel.hh.html#G4eBremsstrahlungRelModel" title='G4eBremsstrahlungRelModel' data-ref="G4eBremsstrahlungRelModel">G4eBremsstrahlungRelModel</a>::<dfn class="virtual decl def" id="_ZN25G4eBremsstrahlungRelModel16MinPrimaryEnergyEPK10G4MaterialPK20G4ParticleDefinitiond" title='G4eBremsstrahlungRelModel::MinPrimaryEnergy' data-ref="_ZN25G4eBremsstrahlungRelModel16MinPrimaryEnergyEPK10G4MaterialPK20G4ParticleDefinitiond">MinPrimaryEnergy</dfn>(<em>const</em> <a class="type" href="../../../../materials/include/G4Material.hh.html#G4Material" title='G4Material' data-ref="G4Material">G4Material</a>*,</td></tr>
+<tr><th id="232">232</th><td>                                                     <em>const</em> <a class="type" href="../../../../particles/management/include/G4ParticleDefinition.hh.html#G4ParticleDefinition" title='G4ParticleDefinition' data-ref="G4ParticleDefinition">G4ParticleDefinition</a>*,</td></tr>
+<tr><th id="233">233</th><td>                                                     <a class="typedef" href="../../../../global/management/include/G4Types.hh.html#G4double" title='G4double' data-type='double' data-ref="G4double">G4double</a> <dfn class="local col9 decl" id="9cut" title='cut' data-type='G4double' data-ref="9cut">cut</dfn>)</td></tr>
+<tr><th id="234">234</th><td>{</td></tr>
+<tr><th id="235">235</th><td>  <b>return</b> <span class='error' title="use of undeclared identifier &apos;std&apos;">std</span>::max(fLowestKinEnergy, cut);</td></tr>
+<tr><th id="236">236</th><td>}</td></tr>
+<tr><th id="237">237</th><td></td></tr>
+<tr><th id="238">238</th><td><i>// Computes the restricted dE/dx as the appropriate weight of the individual</i></td></tr>
+<tr><th id="239">239</th><td><i>// element contributions that are computed by numerically integrating the DCS.</i></td></tr>
+<tr><th id="240">240</th><td><a class="typedef" href="../../../../global/management/include/G4Types.hh.html#G4double" title='G4double' data-type='double' data-ref="G4double">G4double</a></td></tr>
+<tr><th id="241">241</th><td><a class="type" href="../include/G4eBremsstrahlungRelModel.hh.html#G4eBremsstrahlungRelModel" title='G4eBremsstrahlungRelModel' data-ref="G4eBremsstrahlungRelModel">G4eBremsstrahlungRelModel</a>::<dfn class="virtual decl def" id="_ZN25G4eBremsstrahlungRelModel20ComputeDEDXPerVolumeEPK10G4MaterialPK20G4ParticleDefinitiondd" title='G4eBremsstrahlungRelModel::ComputeDEDXPerVolume' data-ref="_ZN25G4eBremsstrahlungRelModel20ComputeDEDXPerVolumeEPK10G4MaterialPK20G4ParticleDefinitiondd">ComputeDEDXPerVolume</dfn>(<em>const</em> <a class="type" href="../../../../materials/include/G4Material.hh.html#G4Material" title='G4Material' data-ref="G4Material">G4Material</a>* <dfn class="local col0 decl" id="10material" title='material' data-type='const G4Material *' data-ref="10material">material</dfn>,</td></tr>
+<tr><th id="242">242</th><td>                                                <em>const</em> <a class="type" href="../../../../particles/management/include/G4ParticleDefinition.hh.html#G4ParticleDefinition" title='G4ParticleDefinition' data-ref="G4ParticleDefinition">G4ParticleDefinition</a>* <dfn class="local col1 decl" id="11p" title='p' data-type='const G4ParticleDefinition *' data-ref="11p">p</dfn>,</td></tr>
+<tr><th id="243">243</th><td>                                                <a class="typedef" href="../../../../global/management/include/G4Types.hh.html#G4double" title='G4double' data-type='double' data-ref="G4double">G4double</a> <dfn class="local col2 decl" id="12kineticEnergy" title='kineticEnergy' data-type='G4double' data-ref="12kineticEnergy">kineticEnergy</dfn>,</td></tr>
+<tr><th id="244">244</th><td>                                                <a class="typedef" href="../../../../global/management/include/G4Types.hh.html#G4double" title='G4double' data-type='double' data-ref="G4double">G4double</a> <dfn class="local col3 decl" id="13cutEnergy" title='cutEnergy' data-type='G4double' data-ref="13cutEnergy">cutEnergy</dfn>)</td></tr>
+<tr><th id="245">245</th><td>{</td></tr>
+<tr><th id="246">246</th><td>  <a class="typedef" href="../../../../global/management/include/G4Types.hh.html#G4double" title='G4double' data-type='double' data-ref="G4double">G4double</a> <dfn class="local col4 decl" id="14dedx" title='dedx' data-type='G4double' data-ref="14dedx">dedx</dfn> = <var>0.0</var>;</td></tr>
+<tr><th id="247">247</th><td>  <b>if</b> (!<a class="member" href="../include/G4eBremsstrahlungRelModel.hh.html#G4eBremsstrahlungRelModel::fPrimaryParticle" title='G4eBremsstrahlungRelModel::fPrimaryParticle' data-ref="G4eBremsstrahlungRelModel::fPrimaryParticle">fPrimaryParticle</a>) {</td></tr>
+<tr><th id="248">248</th><td>    <a class="member" href="#_ZN25G4eBremsstrahlungRelModel11SetParticleEPK20G4ParticleDefinition" title='G4eBremsstrahlungRelModel::SetParticle' data-ref="_ZN25G4eBremsstrahlungRelModel11SetParticleEPK20G4ParticleDefinition">SetParticle</a>(<a class="local col1 ref" href="#11p" title='p' data-ref="11p">p</a>);</td></tr>
+<tr><th id="249">249</th><td>  }</td></tr>
+<tr><th id="250">250</th><td>  <b>if</b> (kineticEnergy &lt; <span class='error' title="cannot initialize object parameter of type &apos;const G4VEmModel&apos; with an expression of type &apos;G4eBremsstrahlungRelModel&apos;">LowEnergyLimit</span>()) {</td></tr>
+<tr><th id="251">251</th><td>    <b>return</b> <a class="local col4 ref" href="#14dedx" title='dedx' data-ref="14dedx">dedx</a>;</td></tr>
+<tr><th id="252">252</th><td>  }</td></tr>
+<tr><th id="253">253</th><td>  <i>// maximum value of the dE/dx integral (the minimum is 0 of course)</i></td></tr>
+<tr><th id="254">254</th><td>  <a class="typedef" href="../../../../global/management/include/G4Types.hh.html#G4double" title='G4double' data-type='double' data-ref="G4double">G4double</a> <dfn class="local col5 decl" id="15tmax" title='tmax' data-type='G4double' data-ref="15tmax">tmax</dfn> = <span class='error' title="use of undeclared identifier &apos;std&apos;">std</span>::min(cutEnergy, kineticEnergy);</td></tr>
+<tr><th id="255">255</th><td>  <b>if</b> (<a class="local col5 ref" href="#15tmax" title='tmax' data-ref="15tmax">tmax</a> == <var>0.0</var>) {</td></tr>
+<tr><th id="256">256</th><td>    <b>return</b> <a class="local col4 ref" href="#14dedx" title='dedx' data-ref="14dedx">dedx</a>;</td></tr>
+<tr><th id="257">257</th><td>  }</td></tr>
+<tr><th id="258">258</th><td>  <i>// sets kinematical and material related variables</i></td></tr>
+<tr><th id="259">259</th><td>  <a class="virtual member" href="#_ZN25G4eBremsstrahlungRelModel16SetupForMaterialEPK20G4ParticleDefinitionPK10G4Materiald" title='G4eBremsstrahlungRelModel::SetupForMaterial' data-ref="_ZN25G4eBremsstrahlungRelModel16SetupForMaterialEPK20G4ParticleDefinitionPK10G4Materiald">SetupForMaterial</a>(<a class="member" href="../include/G4eBremsstrahlungRelModel.hh.html#G4eBremsstrahlungRelModel::fPrimaryParticle" title='G4eBremsstrahlungRelModel::fPrimaryParticle' data-ref="G4eBremsstrahlungRelModel::fPrimaryParticle">fPrimaryParticle</a>, <a class="local col0 ref" href="#10material" title='material' data-ref="10material">material</a>,<a class="local col2 ref" href="#12kineticEnergy" title='kineticEnergy' data-ref="12kineticEnergy">kineticEnergy</a>);</td></tr>
+<tr><th id="260">260</th><td>  <i>// get element compositions of the material</i></td></tr>
+<tr><th id="261">261</th><td>  <em>const</em> <span class='error' title="unknown type name &apos;G4ElementVector&apos;">G4ElementVector</span>* <dfn class="local col6 decl" id="16theElemVector" title='theElemVector' data-type='const int *' data-ref="16theElemVector">theElemVector</dfn> = material-&gt;GetElementVector();</td></tr>
+<tr><th id="262">262</th><td>  <em>const</em> <a class="typedef" href="../../../../global/management/include/G4Types.hh.html#G4double" title='G4double' data-type='double' data-ref="G4double">G4double</a>* <dfn class="local col7 decl" id="17theAtomNumDensVector" title='theAtomNumDensVector' data-type='const G4double *' data-ref="17theAtomNumDensVector">theAtomNumDensVector</dfn> = <a class="local col0 ref" href="#10material" title='material' data-ref="10material">material</a>-&gt;<a class="ref" href="../../../../materials/include/G4Material.hh.html#_ZNK10G4Material25GetAtomicNumDensityVectorEv" title='G4Material::GetAtomicNumDensityVector' data-ref="_ZNK10G4Material25GetAtomicNumDensityVectorEv">GetAtomicNumDensityVector</a>();</td></tr>
+<tr><th id="263">263</th><td>  <em>const</em> <span class='error' title="unknown type name &apos;size_t&apos;">size_t</span>        <dfn class="local col8 decl" id="18numberOfElements" title='numberOfElements' data-type='const int' data-ref="18numberOfElements">numberOfElements</dfn> = theElemVector-&gt;size();</td></tr>
+<tr><th id="264">264</th><td>  <i>// loop over the elements of the material and compute their contributions to</i></td></tr>
+<tr><th id="265">265</th><td><i>  // the restricted dE/dx by numerical integration of the dependent part of DCS</i></td></tr>
+<tr><th id="266">266</th><td>  <b>for</b> (<span class='error' title="unknown type name &apos;size_t&apos;">size_t</span> <dfn class="local col9 decl" id="19ie" title='ie' data-type='int' data-ref="19ie">ie</dfn> = <var>0</var>; ie &lt; numberOfElements; ++ie) {</td></tr>
+<tr><th id="267">267</th><td>    G4VEmModel::SetCurrentElement((*theElemVector)[ie]);</td></tr>
+<tr><th id="268">268</th><td>    <i>//SetCurrentElement((*theElementVector)[i]-&gt;GetZasInt());</i></td></tr>
+<tr><th id="269">269</th><td>    <em>const</em> <a class="typedef" href="../../../../global/management/include/G4Types.hh.html#G4double" title='G4double' data-type='double' data-ref="G4double">G4double</a> <dfn class="local col0 decl" id="20zet" title='zet' data-type='const G4double' data-ref="20zet">zet</dfn> = (*theElemVector)[ie]-&gt;GetZ();</td></tr>
+<tr><th id="270">270</th><td>    fCurrentIZ         = <span class='error' title="use of undeclared identifier &apos;std&apos;">std</span>::min(G4lrint(zet), gMaxZet);</td></tr>
+<tr><th id="271">271</th><td>    dedx              += theAtomNumDensVector[ie]*zet*zet*ComputeBremLoss(tmax);</td></tr>
+<tr><th id="272">272</th><td>  }</td></tr>
+<tr><th id="273">273</th><td>  <i>// apply the constant factor C/Z = 16\alpha r_0^2/3</i></td></tr>
+<tr><th id="274">274</th><td>  <a class="local col4 ref" href="#14dedx" title='dedx' data-ref="14dedx">dedx</a> *= <a class="member" href="../include/G4eBremsstrahlungRelModel.hh.html#G4eBremsstrahlungRelModel::gBremFactor" title='G4eBremsstrahlungRelModel::gBremFactor' data-ref="G4eBremsstrahlungRelModel::gBremFactor">gBremFactor</a>;</td></tr>
+<tr><th id="275">275</th><td>  <b>return</b> <span class='error' title="use of undeclared identifier &apos;std&apos;">std</span>::max(dedx,<var>0.</var>);</td></tr>
+<tr><th id="276">276</th><td>}</td></tr>
+<tr><th id="277">277</th><td></td></tr>
+<tr><th id="278">278</th><td><i>// Computes the integral part of the restricted dE/dx contribution from a given</i></td></tr>
+<tr><th id="279">279</th><td><i>// element (Z) by numerically integrating the k dependent part of the DCS between</i></td></tr>
+<tr><th id="280">280</th><td><i>// k_min=0 and k_max = tmax = min[gamma-cut, electron-kinetic-eenrgy].</i></td></tr>
+<tr><th id="281">281</th><td><i>// The numerical integration is done by dividing the integration range into 'n'</i></td></tr>
+<tr><th id="282">282</th><td><i>// subintervals and an 8 pint GL integral (on [0,1]) is performed on each sub-</i></td></tr>
+<tr><th id="283">283</th><td><i>// inteval by tranforming k to alpha=k/E_t (E_t is the total energy of the e-)</i></td></tr>
+<tr><th id="284">284</th><td><i>// and each sub-interavl is transformed to [0,1]. So the integrastion is done</i></td></tr>
+<tr><th id="285">285</th><td><i>// in xi(alpha) = xi(k) = [k/E_t-alpha_i]/delta where alpha_i=(i-1)*delta for</i></td></tr>
+<tr><th id="286">286</th><td><i>// the i = 1,2,..,n-th sub-interval so xi(k) in [0,1] on each sub-intevals.</i></td></tr>
+<tr><th id="287">287</th><td><i>// This transformation from 'k' to 'xi(k)' results in a multiplicative factor</i></td></tr>
+<tr><th id="288">288</th><td><i>// of E_t*delta at each step.</i></td></tr>
+<tr><th id="289">289</th><td><i>// The restricted dE/dx = N int_{0}^{k_max} k*ds/dk dk. There are 2 DCS model</i></td></tr>
+<tr><th id="290">290</th><td><i>// one with LPM and one without LPM effects (see them below). In both case not</i></td></tr>
+<tr><th id="291">291</th><td><i>// the ds/dk(Z,k) but ds/dk(Z,k)*[F*k/C] is computed since:</i></td></tr>
+<tr><th id="292">292</th><td><i>// (i)    what we need here is ds/dk*k and not k so this multiplication is done</i></td></tr>
+<tr><th id="293">293</th><td><i>// (ii)   the Ter-Mikaelian suppression i.e. F related factor is done here</i></td></tr>
+<tr><th id="294">294</th><td><i>// (iii)  the constant factor C (includes Z^2 as well)is accounted in the caller</i></td></tr>
+<tr><th id="295">295</th><td><a class="typedef" href="../../../../global/management/include/G4Types.hh.html#G4double" title='G4double' data-type='double' data-ref="G4double">G4double</a> <a class="type" href="../include/G4eBremsstrahlungRelModel.hh.html#G4eBremsstrahlungRelModel" title='G4eBremsstrahlungRelModel' data-ref="G4eBremsstrahlungRelModel">G4eBremsstrahlungRelModel</a>::<dfn class="decl def" id="_ZN25G4eBremsstrahlungRelModel15ComputeBremLossEd" title='G4eBremsstrahlungRelModel::ComputeBremLoss' data-ref="_ZN25G4eBremsstrahlungRelModel15ComputeBremLossEd">ComputeBremLoss</dfn>(<a class="typedef" href="../../../../global/management/include/G4Types.hh.html#G4double" title='G4double' data-type='double' data-ref="G4double">G4double</a> <dfn class="local col1 decl" id="21tmax" title='tmax' data-type='G4double' data-ref="21tmax">tmax</dfn>)</td></tr>
+<tr><th id="296">296</th><td>{</td></tr>
+<tr><th id="297">297</th><td>  <i>// number of intervals and integration step</i></td></tr>
+<tr><th id="298">298</th><td>  <em>const</em> <a class="typedef" href="../../../../global/management/include/G4Types.hh.html#G4double" title='G4double' data-type='double' data-ref="G4double">G4double</a> <dfn class="local col2 decl" id="22alphaMax" title='alphaMax' data-type='const G4double' data-ref="22alphaMax">alphaMax</dfn> = <a class="local col1 ref" href="#21tmax" title='tmax' data-ref="21tmax">tmax</a>/<a class="member" href="../include/G4eBremsstrahlungRelModel.hh.html#G4eBremsstrahlungRelModel::fPrimaryTotalEnergy" title='G4eBremsstrahlungRelModel::fPrimaryTotalEnergy' data-ref="G4eBremsstrahlungRelModel::fPrimaryTotalEnergy">fPrimaryTotalEnergy</a>;</td></tr>
+<tr><th id="299">299</th><td>  <em>const</em> <a class="typedef" href="../../../../global/management/include/G4Types.hh.html#G4int" title='G4int' data-type='int' data-ref="G4int">G4int</a>        <dfn class="local col3 decl" id="23nSub" title='nSub' data-type='const G4int' data-ref="23nSub">nSub</dfn> = (<a class="typedef" href="../../../../global/management/include/G4Types.hh.html#G4int" title='G4int' data-type='int' data-ref="G4int">G4int</a>)(<var>20</var>*<a class="local col2 ref" href="#22alphaMax" title='alphaMax' data-ref="22alphaMax">alphaMax</a>)+<var>3</var>;</td></tr>
+<tr><th id="300">300</th><td>  <em>const</em> <a class="typedef" href="../../../../global/management/include/G4Types.hh.html#G4double" title='G4double' data-type='double' data-ref="G4double">G4double</a>    <dfn class="local col4 decl" id="24delta" title='delta' data-type='const G4double' data-ref="24delta">delta</dfn> = <a class="local col2 ref" href="#22alphaMax" title='alphaMax' data-ref="22alphaMax">alphaMax</a>/((<a class="typedef" href="../../../../global/management/include/G4Types.hh.html#G4double" title='G4double' data-type='double' data-ref="G4double">G4double</a>)<a class="local col3 ref" href="#23nSub" title='nSub' data-ref="23nSub">nSub</a>);</td></tr>
+<tr><th id="301">301</th><td>  <i>// set minimum value of the first sub-inteval</i></td></tr>
+<tr><th id="302">302</th><td>  <a class="typedef" href="../../../../global/management/include/G4Types.hh.html#G4double" title='G4double' data-type='double' data-ref="G4double">G4double</a> <dfn class="local col5 decl" id="25alpha_i" title='alpha_i' data-type='G4double' data-ref="25alpha_i">alpha_i</dfn>        = <var>0.0</var>;</td></tr>
+<tr><th id="303">303</th><td>  <a class="typedef" href="../../../../global/management/include/G4Types.hh.html#G4double" title='G4double' data-type='double' data-ref="G4double">G4double</a> <dfn class="local col6 decl" id="26dedxInteg" title='dedxInteg' data-type='G4double' data-ref="26dedxInteg">dedxInteg</dfn>      = <var>0.0</var>;</td></tr>
+<tr><th id="304">304</th><td>  <b>for</b> (<a class="typedef" href="../../../../global/management/include/G4Types.hh.html#G4int" title='G4int' data-type='int' data-ref="G4int">G4int</a> <dfn class="local col7 decl" id="27l" title='l' data-type='G4int' data-ref="27l">l</dfn> = <var>0</var>; <a class="local col7 ref" href="#27l" title='l' data-ref="27l">l</a> &lt; <a class="local col3 ref" href="#23nSub" title='nSub' data-ref="23nSub">nSub</a>; ++<a class="local col7 ref" href="#27l" title='l' data-ref="27l">l</a>) {</td></tr>
+<tr><th id="305">305</th><td>    <b>for</b> (<a class="typedef" href="../../../../global/management/include/G4Types.hh.html#G4int" title='G4int' data-type='int' data-ref="G4int">G4int</a> <dfn class="local col8 decl" id="28igl" title='igl' data-type='G4int' data-ref="28igl">igl</dfn> = <var>0</var>; <a class="local col8 ref" href="#28igl" title='igl' data-ref="28igl">igl</a> &lt; <var>8</var>; ++<a class="local col8 ref" href="#28igl" title='igl' data-ref="28igl">igl</a>) {</td></tr>
+<tr><th id="306">306</th><td>      <i>// compute the emitted photon energy k</i></td></tr>
+<tr><th id="307">307</th><td>      <em>const</em> <a class="typedef" href="../../../../global/management/include/G4Types.hh.html#G4double" title='G4double' data-type='double' data-ref="G4double">G4double</a> <dfn class="local col9 decl" id="29k" title='k' data-type='const G4double' data-ref="29k">k</dfn>   = (<a class="local col5 ref" href="#25alpha_i" title='alpha_i' data-ref="25alpha_i">alpha_i</a>+<a class="member" href="../include/G4eBremsstrahlungRelModel.hh.html#G4eBremsstrahlungRelModel::gXGL" title='G4eBremsstrahlungRelModel::gXGL' data-ref="G4eBremsstrahlungRelModel::gXGL">gXGL</a>[<a class="local col8 ref" href="#28igl" title='igl' data-ref="28igl">igl</a>]*<a class="local col4 ref" href="#24delta" title='delta' data-ref="24delta">delta</a>)*<a class="member" href="../include/G4eBremsstrahlungRelModel.hh.html#G4eBremsstrahlungRelModel::fPrimaryTotalEnergy" title='G4eBremsstrahlungRelModel::fPrimaryTotalEnergy' data-ref="G4eBremsstrahlungRelModel::fPrimaryTotalEnergy">fPrimaryTotalEnergy</a>;</td></tr>
+<tr><th id="308">308</th><td>      <i>// compute the DCS value at k (without the constant, the 1/k, 1/F factors)</i></td></tr>
+<tr><th id="309">309</th><td>      <em>const</em> <a class="typedef" href="../../../../global/management/include/G4Types.hh.html#G4double" title='G4double' data-type='double' data-ref="G4double">G4double</a> <dfn class="local col0 decl" id="30dcs" title='dcs' data-type='const G4double' data-ref="30dcs">dcs</dfn> = <a class="member" href="../include/G4eBremsstrahlungRelModel.hh.html#G4eBremsstrahlungRelModel::fIsLPMActive" title='G4eBremsstrahlungRelModel::fIsLPMActive' data-ref="G4eBremsstrahlungRelModel::fIsLPMActive">fIsLPMActive</a></td></tr>
+<tr><th id="310">310</th><td>                          ? <a class="member" href="#_ZN25G4eBremsstrahlungRelModel26ComputeRelDXSectionPerAtomEd" title='G4eBremsstrahlungRelModel::ComputeRelDXSectionPerAtom' data-ref="_ZN25G4eBremsstrahlungRelModel26ComputeRelDXSectionPerAtomEd">ComputeRelDXSectionPerAtom</a>(<a class="local col9 ref" href="#29k" title='k' data-ref="29k">k</a>)  <i>// DCS WITHOUT LPM</i></td></tr>
+<tr><th id="311">311</th><td>                          : <a class="virtual member" href="#_ZN25G4eBremsstrahlungRelModel23ComputeDXSectionPerAtomEd" title='G4eBremsstrahlungRelModel::ComputeDXSectionPerAtom' data-ref="_ZN25G4eBremsstrahlungRelModel23ComputeDXSectionPerAtomEd">ComputeDXSectionPerAtom</a>(<a class="local col9 ref" href="#29k" title='k' data-ref="29k">k</a>);    <i>// DCS WITH    LPM</i></td></tr>
+<tr><th id="312">312</th><td>      <i>// account Ter-Mikaelian suppression: times 1/F with F = 1+(k_p/k)^2</i></td></tr>
+<tr><th id="313">313</th><td>      <a class="local col6 ref" href="#26dedxInteg" title='dedxInteg' data-ref="26dedxInteg">dedxInteg</a> += <a class="member" href="../include/G4eBremsstrahlungRelModel.hh.html#G4eBremsstrahlungRelModel::gWGL" title='G4eBremsstrahlungRelModel::gWGL' data-ref="G4eBremsstrahlungRelModel::gWGL">gWGL</a>[<a class="local col8 ref" href="#28igl" title='igl' data-ref="28igl">igl</a>]*<a class="local col0 ref" href="#30dcs" title='dcs' data-ref="30dcs">dcs</a>/(<var>1.0</var>+<a class="member" href="../include/G4eBremsstrahlungRelModel.hh.html#G4eBremsstrahlungRelModel::fDensityCorr" title='G4eBremsstrahlungRelModel::fDensityCorr' data-ref="G4eBremsstrahlungRelModel::fDensityCorr">fDensityCorr</a>/(<a class="local col9 ref" href="#29k" title='k' data-ref="29k">k</a>*<a class="local col9 ref" href="#29k" title='k' data-ref="29k">k</a>));</td></tr>
+<tr><th id="314">314</th><td>    }</td></tr>
+<tr><th id="315">315</th><td>    <i>// update sub-interval minimum value</i></td></tr>
+<tr><th id="316">316</th><td>    <a class="local col5 ref" href="#25alpha_i" title='alpha_i' data-ref="25alpha_i">alpha_i</a> += <a class="local col4 ref" href="#24delta" title='delta' data-ref="24delta">delta</a>;</td></tr>
+<tr><th id="317">317</th><td>  }</td></tr>
+<tr><th id="318">318</th><td>  <i>// apply corrections due to variable transformation i.e. E_t*delta</i></td></tr>
+<tr><th id="319">319</th><td>  <a class="local col6 ref" href="#26dedxInteg" title='dedxInteg' data-ref="26dedxInteg">dedxInteg</a> *= <a class="local col4 ref" href="#24delta" title='delta' data-ref="24delta">delta</a>*<a class="member" href="../include/G4eBremsstrahlungRelModel.hh.html#G4eBremsstrahlungRelModel::fPrimaryTotalEnergy" title='G4eBremsstrahlungRelModel::fPrimaryTotalEnergy' data-ref="G4eBremsstrahlungRelModel::fPrimaryTotalEnergy">fPrimaryTotalEnergy</a>;</td></tr>
+<tr><th id="320">320</th><td>  <b>return</b> <span class='error' title="use of undeclared identifier &apos;std&apos;">std</span>::max(dedxInteg,<var>0.</var>);</td></tr>
+<tr><th id="321">321</th><td>}</td></tr>
+<tr><th id="322">322</th><td></td></tr>
+<tr><th id="323">323</th><td><i>// Computes restrected atomic cross section by numerically integrating the</i></td></tr>
+<tr><th id="324">324</th><td><i>// DCS between the proper kinematical limits accounting the gamma production cut</i></td></tr>
+<tr><th id="325">325</th><td><a class="typedef" href="../../../../global/management/include/G4Types.hh.html#G4double" title='G4double' data-type='double' data-ref="G4double">G4double</a> <a class="type" href="../include/G4eBremsstrahlungRelModel.hh.html#G4eBremsstrahlungRelModel" title='G4eBremsstrahlungRelModel' data-ref="G4eBremsstrahlungRelModel">G4eBremsstrahlungRelModel</a>::<dfn class="virtual decl def" id="_ZN25G4eBremsstrahlungRelModel26ComputeCrossSectionPerAtomEPK20G4ParticleDefinitionddddd" title='G4eBremsstrahlungRelModel::ComputeCrossSectionPerAtom' data-ref="_ZN25G4eBremsstrahlungRelModel26ComputeCrossSectionPerAtomEPK20G4ParticleDefinitionddddd">ComputeCrossSectionPerAtom</dfn>(</td></tr>
+<tr><th id="326">326</th><td>                                                  <em>const</em> <a class="type" href="../../../../particles/management/include/G4ParticleDefinition.hh.html#G4ParticleDefinition" title='G4ParticleDefinition' data-ref="G4ParticleDefinition">G4ParticleDefinition</a>* <dfn class="local col1 decl" id="31p" title='p' data-type='const G4ParticleDefinition *' data-ref="31p">p</dfn>,</td></tr>
+<tr><th id="327">327</th><td>                                                  <a class="typedef" href="../../../../global/management/include/G4Types.hh.html#G4double" title='G4double' data-type='double' data-ref="G4double">G4double</a> <dfn class="local col2 decl" id="32kineticEnergy" title='kineticEnergy' data-type='G4double' data-ref="32kineticEnergy">kineticEnergy</dfn>,</td></tr>
+<tr><th id="328">328</th><td>                                                  <a class="typedef" href="../../../../global/management/include/G4Types.hh.html#G4double" title='G4double' data-type='double' data-ref="G4double">G4double</a> <dfn class="local col3 decl" id="33Z" title='Z' data-type='G4double' data-ref="33Z">Z</dfn>,</td></tr>
+<tr><th id="329">329</th><td>                                                  <a class="typedef" href="../../../../global/management/include/G4Types.hh.html#G4double" title='G4double' data-type='double' data-ref="G4double">G4double</a>,</td></tr>
+<tr><th id="330">330</th><td>                                                  <a class="typedef" href="../../../../global/management/include/G4Types.hh.html#G4double" title='G4double' data-type='double' data-ref="G4double">G4double</a> <dfn class="local col4 decl" id="34cut" title='cut' data-type='G4double' data-ref="34cut">cut</dfn>,</td></tr>
+<tr><th id="331">331</th><td>                                                  <a class="typedef" href="../../../../global/management/include/G4Types.hh.html#G4double" title='G4double' data-type='double' data-ref="G4double">G4double</a> <dfn class="local col5 decl" id="35maxEnergy" title='maxEnergy' data-type='G4double' data-ref="35maxEnergy">maxEnergy</dfn>)</td></tr>
+<tr><th id="332">332</th><td>{</td></tr>
+<tr><th id="333">333</th><td>  <a class="typedef" href="../../../../global/management/include/G4Types.hh.html#G4double" title='G4double' data-type='double' data-ref="G4double">G4double</a> <dfn class="local col6 decl" id="36crossSection" title='crossSection' data-type='G4double' data-ref="36crossSection">crossSection</dfn> = <var>0.0</var>;</td></tr>
+<tr><th id="334">334</th><td>  <b>if</b> (!<a class="member" href="../include/G4eBremsstrahlungRelModel.hh.html#G4eBremsstrahlungRelModel::fPrimaryParticle" title='G4eBremsstrahlungRelModel::fPrimaryParticle' data-ref="G4eBremsstrahlungRelModel::fPrimaryParticle">fPrimaryParticle</a>) {</td></tr>
+<tr><th id="335">335</th><td>    <a class="member" href="#_ZN25G4eBremsstrahlungRelModel11SetParticleEPK20G4ParticleDefinition" title='G4eBremsstrahlungRelModel::SetParticle' data-ref="_ZN25G4eBremsstrahlungRelModel11SetParticleEPK20G4ParticleDefinition">SetParticle</a>(<a class="local col1 ref" href="#31p" title='p' data-ref="31p">p</a>);</td></tr>
+<tr><th id="336">336</th><td>  }</td></tr>
+<tr><th id="337">337</th><td>  <b>if</b> (kineticEnergy &lt; <span class='error' title="cannot initialize object parameter of type &apos;const G4VEmModel&apos; with an expression of type &apos;G4eBremsstrahlungRelModel&apos;">LowEnergyLimit</span>()) {</td></tr>
+<tr><th id="338">338</th><td>    <b>return</b> <a class="local col6 ref" href="#36crossSection" title='crossSection' data-ref="36crossSection">crossSection</a>;</td></tr>
+<tr><th id="339">339</th><td>  }</td></tr>
+<tr><th id="340">340</th><td>  <i>// min/max kinetic energy limits of the DCS integration:</i></td></tr>
+<tr><th id="341">341</th><td>  <em>const</em> <a class="typedef" href="../../../../global/management/include/G4Types.hh.html#G4double" title='G4double' data-type='double' data-ref="G4double">G4double</a> <dfn class="local col7 decl" id="37tmin" title='tmin' data-type='const G4double' data-ref="37tmin">tmin</dfn> = <span class='error' title="use of undeclared identifier &apos;std&apos;">std</span>::min(cut, kineticEnergy);</td></tr>
+<tr><th id="342">342</th><td>  <em>const</em> <a class="typedef" href="../../../../global/management/include/G4Types.hh.html#G4double" title='G4double' data-type='double' data-ref="G4double">G4double</a> <dfn class="local col8 decl" id="38tmax" title='tmax' data-type='const G4double' data-ref="38tmax">tmax</dfn> = <span class='error' title="use of undeclared identifier &apos;std&apos;">std</span>::min(maxEnergy, kineticEnergy);</td></tr>
+<tr><th id="343">343</th><td>  <i>// zero restricted x-section if e- kinetic energy is below gamma cut</i></td></tr>
+<tr><th id="344">344</th><td>  <b>if</b> (<a class="local col7 ref" href="#37tmin" title='tmin' data-ref="37tmin">tmin</a> &gt;= <a class="local col8 ref" href="#38tmax" title='tmax' data-ref="38tmax">tmax</a>) {</td></tr>
+<tr><th id="345">345</th><td>    <b>return</b> <a class="local col6 ref" href="#36crossSection" title='crossSection' data-ref="36crossSection">crossSection</a>;</td></tr>
+<tr><th id="346">346</th><td>  }</td></tr>
+<tr><th id="347">347</th><td>  fCurrentIZ   = <span class='error' title="use of undeclared identifier &apos;std&apos;">std</span>::min(G4lrint(Z), gMaxZet);</td></tr>
+<tr><th id="348">348</th><td>  <i>// integrate numerically (dependent part of) the DCS between the kin. limits:</i></td></tr>
+<tr><th id="349">349</th><td><i>  // a. integrate between tmin and kineticEnergy of the e-</i></td></tr>
+<tr><th id="350">350</th><td>  <a class="local col6 ref" href="#36crossSection" title='crossSection' data-ref="36crossSection">crossSection</a> = <a class="member" href="#_ZN25G4eBremsstrahlungRelModel22ComputeXSectionPerAtomEd" title='G4eBremsstrahlungRelModel::ComputeXSectionPerAtom' data-ref="_ZN25G4eBremsstrahlungRelModel22ComputeXSectionPerAtomEd">ComputeXSectionPerAtom</a>(<a class="local col7 ref" href="#37tmin" title='tmin' data-ref="37tmin">tmin</a>);</td></tr>
+<tr><th id="351">351</th><td>  <i>// allow partial integration: only if maxEnergy &lt; kineticEnergy</i></td></tr>
+<tr><th id="352">352</th><td><i>  // b. integrate between tmax and kineticEnergy (tmax=maxEnergy in this case)</i></td></tr>
+<tr><th id="353">353</th><td><i>  // (so the result in this case is the integral of DCS between tmin and</i></td></tr>
+<tr><th id="354">354</th><td><i>  // maxEnergy)</i></td></tr>
+<tr><th id="355">355</th><td>  <b>if</b> (<a class="local col8 ref" href="#38tmax" title='tmax' data-ref="38tmax">tmax</a> &lt; <a class="local col2 ref" href="#32kineticEnergy" title='kineticEnergy' data-ref="32kineticEnergy">kineticEnergy</a>) {</td></tr>
+<tr><th id="356">356</th><td>    <a class="local col6 ref" href="#36crossSection" title='crossSection' data-ref="36crossSection">crossSection</a> -= <a class="member" href="#_ZN25G4eBremsstrahlungRelModel22ComputeXSectionPerAtomEd" title='G4eBremsstrahlungRelModel::ComputeXSectionPerAtom' data-ref="_ZN25G4eBremsstrahlungRelModel22ComputeXSectionPerAtomEd">ComputeXSectionPerAtom</a>(<a class="local col8 ref" href="#38tmax" title='tmax' data-ref="38tmax">tmax</a>);</td></tr>
+<tr><th id="357">357</th><td>  }</td></tr>
+<tr><th id="358">358</th><td>  <i>// multiply with the constant factors: 16\alpha r_0^2/3 Z^2</i></td></tr>
+<tr><th id="359">359</th><td>  <a class="local col6 ref" href="#36crossSection" title='crossSection' data-ref="36crossSection">crossSection</a> *= <a class="local col3 ref" href="#33Z" title='Z' data-ref="33Z">Z</a>*<a class="local col3 ref" href="#33Z" title='Z' data-ref="33Z">Z</a>*<a class="member" href="../include/G4eBremsstrahlungRelModel.hh.html#G4eBremsstrahlungRelModel::gBremFactor" title='G4eBremsstrahlungRelModel::gBremFactor' data-ref="G4eBremsstrahlungRelModel::gBremFactor">gBremFactor</a>;</td></tr>
+<tr><th id="360">360</th><td>  <b>return</b> <span class='error' title="use of undeclared identifier &apos;std&apos;">std</span>::max(crossSection, <var>0.</var>);</td></tr>
+<tr><th id="361">361</th><td>}</td></tr>
+<tr><th id="362">362</th><td></td></tr>
+<tr><th id="363">363</th><td><i>// Numerical integral of the (k dependent part of) DCS between k_min=tmin and</i></td></tr>
+<tr><th id="364">364</th><td><i>// k_max = E_k (where E_k is the kinetic energy of the e- and tmin is the</i></td></tr>
+<tr><th id="365">365</th><td><i>// minimum of energy of the  emitted photon). The integration is done in the</i></td></tr>
+<tr><th id="366">366</th><td><i>// transformed alpha(k) = ln(k/E_t) variable (with E_t being the total energy of</i></td></tr>
+<tr><th id="367">367</th><td><i>// the primary e-). The integration range is divided into n sub-intervals with</i></td></tr>
+<tr><th id="368">368</th><td><i>// delta = [ln(k_min/E_t)-ln(k_max/E_t)]/n width each. An 8 point GL integral</i></td></tr>
+<tr><th id="369">369</th><td><i>// on [0,1] is applied on each sub-inteval so alpha is transformed to</i></td></tr>
+<tr><th id="370">370</th><td><i>// xi(alpha) = xi(k) = [ln(k/E_t)-alpha_i]/delta where alpha_i = ln(k_min/E_t) +</i></td></tr>
+<tr><th id="371">371</th><td><i>// (i-1)*delta for the i = 1,2,..,n-th sub-interval and xi(k) in [0,1] on each</i></td></tr>
+<tr><th id="372">372</th><td><i>// sub-intevals. From the transformed xi, k(xi) = E_t exp[xi*delta+alpha_i].</i></td></tr>
+<tr><th id="373">373</th><td><i>// Since the integration is done in variable xi instead of k this</i></td></tr>
+<tr><th id="374">374</th><td><i>// transformation results in a multiplicative factor of k*delta at each step.</i></td></tr>
+<tr><th id="375">375</th><td><i>// However, DCS differential in k is ~1/k so the multiplicative factor is simple</i></td></tr>
+<tr><th id="376">376</th><td><i>// becomes delta and the 1/k factor is dropped from the DCS computation.</i></td></tr>
+<tr><th id="377">377</th><td><i>// NOTE:</i></td></tr>
+<tr><th id="378">378</th><td><i>//   - LPM suppression is accounted above threshold e- energy (corresponidng</i></td></tr>
+<tr><th id="379">379</th><td><i>//     flag is set in SetUpForMaterial() =&gt; 2 DCS with/without LPM</i></td></tr>
+<tr><th id="380">380</th><td><i>//   - Ter-Mikaelian suppression is always accounted</i></td></tr>
+<tr><th id="381">381</th><td><a class="typedef" href="../../../../global/management/include/G4Types.hh.html#G4double" title='G4double' data-type='double' data-ref="G4double">G4double</a> <a class="type" href="../include/G4eBremsstrahlungRelModel.hh.html#G4eBremsstrahlungRelModel" title='G4eBremsstrahlungRelModel' data-ref="G4eBremsstrahlungRelModel">G4eBremsstrahlungRelModel</a>::<dfn class="decl def" id="_ZN25G4eBremsstrahlungRelModel22ComputeXSectionPerAtomEd" title='G4eBremsstrahlungRelModel::ComputeXSectionPerAtom' data-ref="_ZN25G4eBremsstrahlungRelModel22ComputeXSectionPerAtomEd">ComputeXSectionPerAtom</dfn>(<a class="typedef" href="../../../../global/management/include/G4Types.hh.html#G4double" title='G4double' data-type='double' data-ref="G4double">G4double</a> <dfn class="local col9 decl" id="39tmin" title='tmin' data-type='G4double' data-ref="39tmin">tmin</dfn>)</td></tr>
+<tr><th id="382">382</th><td>{</td></tr>
+<tr><th id="383">383</th><td>  <a class="typedef" href="../../../../global/management/include/G4Types.hh.html#G4double" title='G4double' data-type='double' data-ref="G4double">G4double</a> <dfn class="local col0 decl" id="40xSection" title='xSection' data-type='G4double' data-ref="40xSection">xSection</dfn> = <var>0.0</var>;</td></tr>
+<tr><th id="384">384</th><td>  <em>const</em> <a class="typedef" href="../../../../global/management/include/G4Types.hh.html#G4double" title='G4double' data-type='double' data-ref="G4double">G4double</a> <dfn class="local col1 decl" id="41alphaMin" title='alphaMin' data-type='const G4double' data-ref="41alphaMin">alphaMin</dfn> = <a class="ref" href="../../../../global/management/include/G4Log.hh.html#_Z5G4Logd" title='G4Log' data-ref="_Z5G4Logd">G4Log</a>(<a class="local col9 ref" href="#39tmin" title='tmin' data-ref="39tmin">tmin</a>/<a class="member" href="../include/G4eBremsstrahlungRelModel.hh.html#G4eBremsstrahlungRelModel::fPrimaryTotalEnergy" title='G4eBremsstrahlungRelModel::fPrimaryTotalEnergy' data-ref="G4eBremsstrahlungRelModel::fPrimaryTotalEnergy">fPrimaryTotalEnergy</a>);</td></tr>
+<tr><th id="385">385</th><td>  <em>const</em> <a class="typedef" href="../../../../global/management/include/G4Types.hh.html#G4double" title='G4double' data-type='double' data-ref="G4double">G4double</a> <dfn class="local col2 decl" id="42alphaMax" title='alphaMax' data-type='const G4double' data-ref="42alphaMax">alphaMax</dfn> = <a class="ref" href="../../../../global/management/include/G4Log.hh.html#_Z5G4Logd" title='G4Log' data-ref="_Z5G4Logd">G4Log</a>(<a class="member" href="../include/G4eBremsstrahlungRelModel.hh.html#G4eBremsstrahlungRelModel::fPrimaryKinEnergy" title='G4eBremsstrahlungRelModel::fPrimaryKinEnergy' data-ref="G4eBremsstrahlungRelModel::fPrimaryKinEnergy">fPrimaryKinEnergy</a>/<a class="member" href="../include/G4eBremsstrahlungRelModel.hh.html#G4eBremsstrahlungRelModel::fPrimaryTotalEnergy" title='G4eBremsstrahlungRelModel::fPrimaryTotalEnergy' data-ref="G4eBremsstrahlungRelModel::fPrimaryTotalEnergy">fPrimaryTotalEnergy</a>);</td></tr>
+<tr><th id="386">386</th><td>  <em>const</em> <a class="typedef" href="../../../../global/management/include/G4Types.hh.html#G4int" title='G4int' data-type='int' data-ref="G4int">G4int</a>    <dfn class="local col3 decl" id="43nSub" title='nSub' data-type='const G4int' data-ref="43nSub">nSub</dfn>     = (<a class="typedef" href="../../../../global/management/include/G4Types.hh.html#G4int" title='G4int' data-type='int' data-ref="G4int">G4int</a>)(<var>0.45</var>*(<a class="local col2 ref" href="#42alphaMax" title='alphaMax' data-ref="42alphaMax">alphaMax</a>-<a class="local col1 ref" href="#41alphaMin" title='alphaMin' data-ref="41alphaMin">alphaMin</a>))+<var>4</var>;</td></tr>
+<tr><th id="387">387</th><td>  <em>const</em> <a class="typedef" href="../../../../global/management/include/G4Types.hh.html#G4double" title='G4double' data-type='double' data-ref="G4double">G4double</a> <dfn class="local col4 decl" id="44delta" title='delta' data-type='const G4double' data-ref="44delta">delta</dfn>    = (<a class="local col2 ref" href="#42alphaMax" title='alphaMax' data-ref="42alphaMax">alphaMax</a>-<a class="local col1 ref" href="#41alphaMin" title='alphaMin' data-ref="41alphaMin">alphaMin</a>)/((<a class="typedef" href="../../../../global/management/include/G4Types.hh.html#G4double" title='G4double' data-type='double' data-ref="G4double">G4double</a>)<a class="local col3 ref" href="#43nSub" title='nSub' data-ref="43nSub">nSub</a>);</td></tr>
+<tr><th id="388">388</th><td>  <i>// set minimum value of the first sub-inteval</i></td></tr>
+<tr><th id="389">389</th><td>  <a class="typedef" href="../../../../global/management/include/G4Types.hh.html#G4double" title='G4double' data-type='double' data-ref="G4double">G4double</a> <dfn class="local col5 decl" id="45alpha_i" title='alpha_i' data-type='G4double' data-ref="45alpha_i">alpha_i</dfn>        = <a class="local col1 ref" href="#41alphaMin" title='alphaMin' data-ref="41alphaMin">alphaMin</a>;</td></tr>
+<tr><th id="390">390</th><td>  <b>for</b> (<a class="typedef" href="../../../../global/management/include/G4Types.hh.html#G4int" title='G4int' data-type='int' data-ref="G4int">G4int</a> <dfn class="local col6 decl" id="46l" title='l' data-type='G4int' data-ref="46l">l</dfn> = <var>0</var>; <a class="local col6 ref" href="#46l" title='l' data-ref="46l">l</a> &lt; <a class="local col3 ref" href="#43nSub" title='nSub' data-ref="43nSub">nSub</a>; ++<a class="local col6 ref" href="#46l" title='l' data-ref="46l">l</a>) {</td></tr>
+<tr><th id="391">391</th><td>    <b>for</b> (<a class="typedef" href="../../../../global/management/include/G4Types.hh.html#G4int" title='G4int' data-type='int' data-ref="G4int">G4int</a> <dfn class="local col7 decl" id="47igl" title='igl' data-type='G4int' data-ref="47igl">igl</dfn> = <var>0</var>; <a class="local col7 ref" href="#47igl" title='igl' data-ref="47igl">igl</a> &lt; <var>8</var>; ++<a class="local col7 ref" href="#47igl" title='igl' data-ref="47igl">igl</a>) {</td></tr>
+<tr><th id="392">392</th><td>      <i>// compute the emitted photon energy k</i></td></tr>
+<tr><th id="393">393</th><td>      <em>const</em> <a class="typedef" href="../../../../global/management/include/G4Types.hh.html#G4double" title='G4double' data-type='double' data-ref="G4double">G4double</a> <dfn class="local col8 decl" id="48k" title='k' data-type='const G4double' data-ref="48k">k</dfn>   = <a class="ref" href="../../../../global/management/include/G4Exp.hh.html#_Z5G4Expd" title='G4Exp' data-ref="_Z5G4Expd">G4Exp</a>(<a class="local col5 ref" href="#45alpha_i" title='alpha_i' data-ref="45alpha_i">alpha_i</a>+<a class="member" href="../include/G4eBremsstrahlungRelModel.hh.html#G4eBremsstrahlungRelModel::gXGL" title='G4eBremsstrahlungRelModel::gXGL' data-ref="G4eBremsstrahlungRelModel::gXGL">gXGL</a>[<a class="local col7 ref" href="#47igl" title='igl' data-ref="47igl">igl</a>]*<a class="local col4 ref" href="#44delta" title='delta' data-ref="44delta">delta</a>)*<a class="member" href="../include/G4eBremsstrahlungRelModel.hh.html#G4eBremsstrahlungRelModel::fPrimaryTotalEnergy" title='G4eBremsstrahlungRelModel::fPrimaryTotalEnergy' data-ref="G4eBremsstrahlungRelModel::fPrimaryTotalEnergy">fPrimaryTotalEnergy</a>;</td></tr>
+<tr><th id="394">394</th><td>      <i>// compute the DCS value at k (without the constant, the 1/k, 1/F factors)</i></td></tr>
+<tr><th id="395">395</th><td>      <em>const</em> <a class="typedef" href="../../../../global/management/include/G4Types.hh.html#G4double" title='G4double' data-type='double' data-ref="G4double">G4double</a> <dfn class="local col9 decl" id="49dcs" title='dcs' data-type='const G4double' data-ref="49dcs">dcs</dfn> = <a class="member" href="../include/G4eBremsstrahlungRelModel.hh.html#G4eBremsstrahlungRelModel::fIsLPMActive" title='G4eBremsstrahlungRelModel::fIsLPMActive' data-ref="G4eBremsstrahlungRelModel::fIsLPMActive">fIsLPMActive</a></td></tr>
+<tr><th id="396">396</th><td>                          ? <a class="member" href="#_ZN25G4eBremsstrahlungRelModel26ComputeRelDXSectionPerAtomEd" title='G4eBremsstrahlungRelModel::ComputeRelDXSectionPerAtom' data-ref="_ZN25G4eBremsstrahlungRelModel26ComputeRelDXSectionPerAtomEd">ComputeRelDXSectionPerAtom</a>(<a class="local col8 ref" href="#48k" title='k' data-ref="48k">k</a>) <i>// DCS WITHOUT LPM</i></td></tr>
+<tr><th id="397">397</th><td>                          : <a class="virtual member" href="#_ZN25G4eBremsstrahlungRelModel23ComputeDXSectionPerAtomEd" title='G4eBremsstrahlungRelModel::ComputeDXSectionPerAtom' data-ref="_ZN25G4eBremsstrahlungRelModel23ComputeDXSectionPerAtomEd">ComputeDXSectionPerAtom</a>(<a class="local col8 ref" href="#48k" title='k' data-ref="48k">k</a>);   <i>// DCS WITH    LPM</i></td></tr>
+<tr><th id="398">398</th><td>      <i>// account Ter-Mikaelian suppression: times 1/F with F = 1+(k_p/k)^2</i></td></tr>
+<tr><th id="399">399</th><td>      <a class="local col0 ref" href="#40xSection" title='xSection' data-ref="40xSection">xSection</a> += <a class="member" href="../include/G4eBremsstrahlungRelModel.hh.html#G4eBremsstrahlungRelModel::gWGL" title='G4eBremsstrahlungRelModel::gWGL' data-ref="G4eBremsstrahlungRelModel::gWGL">gWGL</a>[<a class="local col7 ref" href="#47igl" title='igl' data-ref="47igl">igl</a>]*<a class="local col9 ref" href="#49dcs" title='dcs' data-ref="49dcs">dcs</a>/(<var>1.0</var>+<a class="member" href="../include/G4eBremsstrahlungRelModel.hh.html#G4eBremsstrahlungRelModel::fDensityCorr" title='G4eBremsstrahlungRelModel::fDensityCorr' data-ref="G4eBremsstrahlungRelModel::fDensityCorr">fDensityCorr</a>/(<a class="local col8 ref" href="#48k" title='k' data-ref="48k">k</a>*<a class="local col8 ref" href="#48k" title='k' data-ref="48k">k</a>));</td></tr>
+<tr><th id="400">400</th><td>    }</td></tr>
+<tr><th id="401">401</th><td>    <i>// update sub-interval minimum value</i></td></tr>
+<tr><th id="402">402</th><td>    <a class="local col5 ref" href="#45alpha_i" title='alpha_i' data-ref="45alpha_i">alpha_i</a> += <a class="local col4 ref" href="#44delta" title='delta' data-ref="44delta">delta</a>;</td></tr>
+<tr><th id="403">403</th><td>  }</td></tr>
+<tr><th id="404">404</th><td>  <i>// apply corrections due to variable transformation</i></td></tr>
+<tr><th id="405">405</th><td>  <a class="local col0 ref" href="#40xSection" title='xSection' data-ref="40xSection">xSection</a> *= <a class="local col4 ref" href="#44delta" title='delta' data-ref="44delta">delta</a>;</td></tr>
+<tr><th id="406">406</th><td>  <i>// final check</i></td></tr>
+<tr><th id="407">407</th><td>  <b>return</b> <span class='error' title="use of undeclared identifier &apos;std&apos;">std</span>::max(xSection, <var>0.</var>);</td></tr>
+<tr><th id="408">408</th><td>}</td></tr>
+<tr><th id="409">409</th><td></td></tr>
+<tr><th id="410">410</th><td><i>// DCS WITH LPM EFFECT: complete screening aprx. and includes LPM suppression</i></td></tr>
+<tr><th id="411">411</th><td><i>// ds/dk(Z,k) = C/[F*k]*{ Xi(s*F)*[y^2*G/4 +(1-y+y^2/3)Phi]*[L_el-f_c+L_inel/Z]</i></td></tr>
+<tr><th id="412">412</th><td><i>//                        +(1-y)*[1+1/Z]/12}  with C = 16\alpha r_0^2/3 Z^2 and</i></td></tr>
+<tr><th id="413">413</th><td><i>// Xi(s),G(s), Phi(s) are LPM suppression functions:</i></td></tr>
+<tr><th id="414">414</th><td><i>//</i></td></tr>
+<tr><th id="415">415</th><td><i>// LPM SUPPRESSION: The 's' is the suppression variable and F = F(k,k_p) =</i></td></tr>
+<tr><th id="416">416</th><td><i>// 1+(k_p/k)^2 with k_p = hbar*w_p*E/(m*c^2) is a material (e- density)</i></td></tr>
+<tr><th id="417">417</th><td><i>// dependent constant. F accounts the Ter-Mikaelian suppression with a smooth</i></td></tr>
+<tr><th id="418">418</th><td><i>// transition in the emitted photon energy. Also, the LPM suppression functions</i></td></tr>
+<tr><th id="419">419</th><td><i>// goes to 0 when s goes to 0 and goes to 1 when s is increasing (=1 at s=~2)</i></td></tr>
+<tr><th id="420">420</th><td><i>// So evaluating the LPM suppression functions at 'sF' instead of 's' ensures a</i></td></tr>
+<tr><th id="421">421</th><td><i>// smooth transition depending on the emitted photon energy 'k': LPM effect is</i></td></tr>
+<tr><th id="422">422</th><td><i>// smoothly turned off i.e. Xi(sF)=G(sF)=Phi(sF)=1 when k &lt;&lt; k_p because F &gt;&gt; 1</i></td></tr>
+<tr><th id="423">423</th><td><i>// and sF ~ s when k &gt;&gt; k_p since F ~ 1 in that case.</i></td></tr>
+<tr><th id="424">424</th><td><i>// HERE, ds/dk(Z,k)*[F*k/C] is computed since:</i></td></tr>
+<tr><th id="425">425</th><td><i>//  (i)   DCS ~ 1/k factor will disappear due to the variable transformation</i></td></tr>
+<tr><th id="426">426</th><td><i>//        v(k)=ln(k/E_t) -&gt; dk/dv=E_t*e^v=k -&gt; ds/dv= ds/dk*dk/dv=ds/dk*k so it</i></td></tr>
+<tr><th id="427">427</th><td><i>//        would cnacell out the 1/k factor =&gt; 1/k don't included here</i></td></tr>
+<tr><th id="428">428</th><td><i>//  (ii)  the constant factor C and Z don't depend on 'k' =&gt; not included here</i></td></tr>
+<tr><th id="429">429</th><td><i>//  (iii) the 1/F(k) factor is accounted in the callers: explicitely (cross sec-</i></td></tr>
+<tr><th id="430">430</th><td><i>//        tion computation) or implicitly through further variable transformaton</i></td></tr>
+<tr><th id="431">431</th><td><i>//        (in the final state sampling algorithm)</i></td></tr>
+<tr><th id="432">432</th><td><i>// COMPLETE SCREENING: see more at the DCS without LPM effect below.</i></td></tr>
+<tr><th id="433">433</th><td><a class="typedef" href="../../../../global/management/include/G4Types.hh.html#G4double" title='G4double' data-type='double' data-ref="G4double">G4double</a></td></tr>
+<tr><th id="434">434</th><td><a class="type" href="../include/G4eBremsstrahlungRelModel.hh.html#G4eBremsstrahlungRelModel" title='G4eBremsstrahlungRelModel' data-ref="G4eBremsstrahlungRelModel">G4eBremsstrahlungRelModel</a>::<dfn class="decl def" id="_ZN25G4eBremsstrahlungRelModel26ComputeRelDXSectionPerAtomEd" title='G4eBremsstrahlungRelModel::ComputeRelDXSectionPerAtom' data-ref="_ZN25G4eBremsstrahlungRelModel26ComputeRelDXSectionPerAtomEd">ComputeRelDXSectionPerAtom</dfn>(<a class="typedef" href="../../../../global/management/include/G4Types.hh.html#G4double" title='G4double' data-type='double' data-ref="G4double">G4double</a> <dfn class="local col0 decl" id="50gammaEnergy" title='gammaEnergy' data-type='G4double' data-ref="50gammaEnergy">gammaEnergy</dfn>)</td></tr>
+<tr><th id="435">435</th><td>{</td></tr>
+<tr><th id="436">436</th><td>  <a class="typedef" href="../../../../global/management/include/G4Types.hh.html#G4double" title='G4double' data-type='double' data-ref="G4double">G4double</a> <dfn class="local col1 decl" id="51dxsec" title='dxsec' data-type='G4double' data-ref="51dxsec">dxsec</dfn> = <var>0.0</var>;</td></tr>
+<tr><th id="437">437</th><td>  <b>if</b> (<a class="local col0 ref" href="#50gammaEnergy" title='gammaEnergy' data-ref="50gammaEnergy">gammaEnergy</a> &lt; <var>0.</var>) {</td></tr>
+<tr><th id="438">438</th><td>    <b>return</b> <a class="local col1 ref" href="#51dxsec" title='dxsec' data-ref="51dxsec">dxsec</a>;</td></tr>
+<tr><th id="439">439</th><td>  }</td></tr>
+<tr><th id="440">440</th><td>  <em>const</em> <a class="typedef" href="../../../../global/management/include/G4Types.hh.html#G4double" title='G4double' data-type='double' data-ref="G4double">G4double</a> <dfn class="local col2 decl" id="52y" title='y' data-type='const G4double' data-ref="52y">y</dfn>     = <a class="local col0 ref" href="#50gammaEnergy" title='gammaEnergy' data-ref="50gammaEnergy">gammaEnergy</a>/<a class="member" href="../include/G4eBremsstrahlungRelModel.hh.html#G4eBremsstrahlungRelModel::fPrimaryTotalEnergy" title='G4eBremsstrahlungRelModel::fPrimaryTotalEnergy' data-ref="G4eBremsstrahlungRelModel::fPrimaryTotalEnergy">fPrimaryTotalEnergy</a>;</td></tr>
+<tr><th id="441">441</th><td>  <em>const</em> <a class="typedef" href="../../../../global/management/include/G4Types.hh.html#G4double" title='G4double' data-type='double' data-ref="G4double">G4double</a> <dfn class="local col3 decl" id="53onemy" title='onemy' data-type='const G4double' data-ref="53onemy">onemy</dfn> = <var>1.</var>-<a class="local col2 ref" href="#52y" title='y' data-ref="52y">y</a>;</td></tr>
+<tr><th id="442">442</th><td>  <em>const</em> <a class="typedef" href="../../../../global/management/include/G4Types.hh.html#G4double" title='G4double' data-type='double' data-ref="G4double">G4double</a> <dfn class="local col4 decl" id="54dum0" title='dum0' data-type='const G4double' data-ref="54dum0">dum0</dfn>  = <var>0.25</var>*<a class="local col2 ref" href="#52y" title='y' data-ref="52y">y</a>*<a class="local col2 ref" href="#52y" title='y' data-ref="52y">y</a>;</td></tr>
+<tr><th id="443">443</th><td>  <i>// evaluate LPM functions (combined with the Ter-Mikaelian effect)</i></td></tr>
+<tr><th id="444">444</th><td>  <a class="typedef" href="../../../../global/management/include/G4Types.hh.html#G4double" title='G4double' data-type='double' data-ref="G4double">G4double</a> <dfn class="local col5 decl" id="55funcGS" title='funcGS' data-type='G4double' data-ref="55funcGS">funcGS</dfn>, <dfn class="local col6 decl" id="56funcPhiS" title='funcPhiS' data-type='G4double' data-ref="56funcPhiS">funcPhiS</dfn>, <dfn class="local col7 decl" id="57funcXiS" title='funcXiS' data-type='G4double' data-ref="57funcXiS">funcXiS</dfn>;</td></tr>
+<tr><th id="445">445</th><td>  <a class="member" href="../include/G4eBremsstrahlungRelModel.hh.html#_ZN25G4eBremsstrahlungRelModel19ComputeLPMfunctionsERdS0_S0_d" title='G4eBremsstrahlungRelModel::ComputeLPMfunctions' data-ref="_ZN25G4eBremsstrahlungRelModel19ComputeLPMfunctionsERdS0_S0_d">ComputeLPMfunctions</a>(<span class='refarg'><a class="local col7 ref" href="#57funcXiS" title='funcXiS' data-ref="57funcXiS">funcXiS</a></span>, <span class='refarg'><a class="local col5 ref" href="#55funcGS" title='funcGS' data-ref="55funcGS">funcGS</a></span>, <span class='refarg'><a class="local col6 ref" href="#56funcPhiS" title='funcPhiS' data-ref="56funcPhiS">funcPhiS</a></span>, <a class="local col0 ref" href="#50gammaEnergy" title='gammaEnergy' data-ref="50gammaEnergy">gammaEnergy</a>);</td></tr>
+<tr><th id="446">446</th><td>  <em>const</em> <a class="type" href="../include/G4eBremsstrahlungRelModel.hh.html#G4eBremsstrahlungRelModel::ElementData" title='G4eBremsstrahlungRelModel::ElementData' data-ref="G4eBremsstrahlungRelModel::ElementData">ElementData</a>* <dfn class="local col8 decl" id="58elDat" title='elDat' data-type='const G4eBremsstrahlungRelModel::ElementData *' data-ref="58elDat">elDat</dfn> = <span class='error' title="use of undeclared identifier &apos;gElementData&apos;">gElementData</span>[fCurrentIZ];</td></tr>
+<tr><th id="447">447</th><td>  <em>const</em> <a class="typedef" href="../../../../global/management/include/G4Types.hh.html#G4double" title='G4double' data-type='double' data-ref="G4double">G4double</a> <dfn class="local col9 decl" id="59term1" title='term1' data-type='const G4double' data-ref="59term1">term1</dfn>     = <a class="local col7 ref" href="#57funcXiS" title='funcXiS' data-ref="57funcXiS">funcXiS</a>*(<a class="local col4 ref" href="#54dum0" title='dum0' data-ref="54dum0">dum0</a>*<a class="local col5 ref" href="#55funcGS" title='funcGS' data-ref="55funcGS">funcGS</a>+(<a class="local col3 ref" href="#53onemy" title='onemy' data-ref="53onemy">onemy</a>+<var>2.0</var>*<a class="local col4 ref" href="#54dum0" title='dum0' data-ref="54dum0">dum0</a>)*<a class="local col6 ref" href="#56funcPhiS" title='funcPhiS' data-ref="56funcPhiS">funcPhiS</a>);</td></tr>
+<tr><th id="448">448</th><td>  <a class="local col1 ref" href="#51dxsec" title='dxsec' data-ref="51dxsec">dxsec</a> = <a class="local col9 ref" href="#59term1" title='term1' data-ref="59term1">term1</a>*<a class="local col8 ref" href="#58elDat" title='elDat' data-ref="58elDat">elDat</a>-&gt;<a class="ref" href="../include/G4eBremsstrahlungRelModel.hh.html#G4eBremsstrahlungRelModel::ElementData::fZFactor1" title='G4eBremsstrahlungRelModel::ElementData::fZFactor1' data-ref="G4eBremsstrahlungRelModel::ElementData::fZFactor1">fZFactor1</a>+<a class="local col3 ref" href="#53onemy" title='onemy' data-ref="53onemy">onemy</a>*<a class="local col8 ref" href="#58elDat" title='elDat' data-ref="58elDat">elDat</a>-&gt;<a class="ref" href="../include/G4eBremsstrahlungRelModel.hh.html#G4eBremsstrahlungRelModel::ElementData::fZFactor2" title='G4eBremsstrahlungRelModel::ElementData::fZFactor2' data-ref="G4eBremsstrahlungRelModel::ElementData::fZFactor2">fZFactor2</a>;</td></tr>
+<tr><th id="449">449</th><td>  <i>//</i></td></tr>
+<tr><th id="450">450</th><td>  <b>if</b> (<a class="member" href="../include/G4eBremsstrahlungRelModel.hh.html#G4eBremsstrahlungRelModel::fIsScatOffElectron" title='G4eBremsstrahlungRelModel::fIsScatOffElectron' data-ref="G4eBremsstrahlungRelModel::fIsScatOffElectron">fIsScatOffElectron</a>) {</td></tr>
+<tr><th id="451">451</th><td>    <a class="member" href="../include/G4eBremsstrahlungRelModel.hh.html#G4eBremsstrahlungRelModel::fSumTerm" title='G4eBremsstrahlungRelModel::fSumTerm' data-ref="G4eBremsstrahlungRelModel::fSumTerm">fSumTerm</a> = <a class="local col1 ref" href="#51dxsec" title='dxsec' data-ref="51dxsec">dxsec</a>;</td></tr>
+<tr><th id="452">452</th><td>    <a class="member" href="../include/G4eBremsstrahlungRelModel.hh.html#G4eBremsstrahlungRelModel::fNucTerm" title='G4eBremsstrahlungRelModel::fNucTerm' data-ref="G4eBremsstrahlungRelModel::fNucTerm">fNucTerm</a> = <a class="local col9 ref" href="#59term1" title='term1' data-ref="59term1">term1</a>*<a class="local col8 ref" href="#58elDat" title='elDat' data-ref="58elDat">elDat</a>-&gt;<a class="ref" href="../include/G4eBremsstrahlungRelModel.hh.html#G4eBremsstrahlungRelModel::ElementData::fZFactor11" title='G4eBremsstrahlungRelModel::ElementData::fZFactor11' data-ref="G4eBremsstrahlungRelModel::ElementData::fZFactor11">fZFactor11</a> + <a class="local col3 ref" href="#53onemy" title='onemy' data-ref="53onemy">onemy</a>/<var>12.</var>;</td></tr>
+<tr><th id="453">453</th><td>  }</td></tr>
+<tr><th id="454">454</th><td>  <b>return</b> <span class='error' title="use of undeclared identifier &apos;std&apos;">std</span>::max(dxsec,<var>0.0</var>);</td></tr>
+<tr><th id="455">455</th><td>}</td></tr>
+<tr><th id="456">456</th><td></td></tr>
+<tr><th id="457">457</th><td><i>// DCS WITHOUT LPM EFFECT: DCS with sceening (Z&gt;5) and Coulomb cor. no LPM</i></td></tr>
+<tr><th id="458">458</th><td><i>// ds/dk(Z,k)=C/[F*k]*{(1-y+3*y^2/4)*[(0.25*phi1(g)-ln(Z)/3-f_c)+(0.25*psi1(e)</i></td></tr>
+<tr><th id="459">459</th><td><i>// -2*ln(Z)/3)/Z]+ (1-y)*[(phi1(g)-phi2(g))+(psi1(e)-psi2(e))/Z]/8}</i></td></tr>
+<tr><th id="460">460</th><td><i>// where f_c(Z) is the Coulomb correction factor and phi1(g),phi2(g) and psi1(e),</i></td></tr>
+<tr><th id="461">461</th><td><i>// psi2(e) are coherent and incoherent screening functions. In the Thomas-Fermi</i></td></tr>
+<tr><th id="462">462</th><td><i>// model of the atom, the screening functions will have a form that do not</i></td></tr>
+<tr><th id="463">463</th><td><i>// depend on Z (not explicitely). These numerical screening functions can be</i></td></tr>
+<tr><th id="464">464</th><td><i>// approximated as Tsai Eqs. [3.38-3.41] with the variables g=gamma and</i></td></tr>
+<tr><th id="465">465</th><td><i>// e=epsilon given by Tsai Eqs. [3.30 and 3.31] (see more details at the method</i></td></tr>
+<tr><th id="466">466</th><td><i>// ComputeScreeningFunctions()). Note, that in case of complete screening i.e.</i></td></tr>
+<tr><th id="467">467</th><td><i>// g = e = 0 =&gt; 0.25*phi1(0)-ln(Z)/3 = ln(184.149/Z^(1/3)) = L_el and</i></td></tr>
+<tr><th id="468">468</th><td><i>// 0.25*psi1(0)-2*ln(Z)/3=ln(1193.923/Z^(2/3))=L_inel and phi1(0)-phi2(0) =</i></td></tr>
+<tr><th id="469">469</th><td><i>// psi1(0)-psi2(0) = 2/3 so the DCS in complete screening =&gt;</i></td></tr>
+<tr><th id="470">470</th><td><i>// COMPLETE SCREENING:</i></td></tr>
+<tr><th id="471">471</th><td><i>// ds/dk(Z,k)=C/k*{(1-y+3*y^2/4)*[L_el-f_c+L_inel/Z] + (1-y)*[1+1/Z]/12} that is</i></td></tr>
+<tr><th id="472">472</th><td><i>// used in case of DCS with LPM above (if all the suprression functions are</i></td></tr>
+<tr><th id="473">473</th><td><i>// absent i.e. their value = 1).</i></td></tr>
+<tr><th id="474">474</th><td><i>// Since the Thomas-Fermi model of the atom is not accurate at low Z, the DCS in</i></td></tr>
+<tr><th id="475">475</th><td><i>// complete screening is used here at low Z(&lt;5) with L_el(Z), L_inel(Z) values</i></td></tr>
+<tr><th id="476">476</th><td><i>// computed by using the Dirac-Fock model of the atom.</i></td></tr>
+<tr><th id="477">477</th><td><i>// NOTE: that the Ter-Mikaelian suppression is accounted in the DCS through the</i></td></tr>
+<tr><th id="478">478</th><td><i>// 1/F factor but it is included in the caller and not considered here.</i></td></tr>
+<tr><th id="479">479</th><td><i>// HERE, ds/dk(Z,k)*[F*k/C] is computed exactly like in the DCS with LPM case.</i></td></tr>
+<tr><th id="480">480</th><td><a class="typedef" href="../../../../global/management/include/G4Types.hh.html#G4double" title='G4double' data-type='double' data-ref="G4double">G4double</a></td></tr>
+<tr><th id="481">481</th><td><a class="type" href="../include/G4eBremsstrahlungRelModel.hh.html#G4eBremsstrahlungRelModel" title='G4eBremsstrahlungRelModel' data-ref="G4eBremsstrahlungRelModel">G4eBremsstrahlungRelModel</a>::<dfn class="virtual decl def" id="_ZN25G4eBremsstrahlungRelModel23ComputeDXSectionPerAtomEd" title='G4eBremsstrahlungRelModel::ComputeDXSectionPerAtom' data-ref="_ZN25G4eBremsstrahlungRelModel23ComputeDXSectionPerAtomEd">ComputeDXSectionPerAtom</dfn>(<a class="typedef" href="../../../../global/management/include/G4Types.hh.html#G4double" title='G4double' data-type='double' data-ref="G4double">G4double</a> <dfn class="local col0 decl" id="60gammaEnergy" title='gammaEnergy' data-type='G4double' data-ref="60gammaEnergy">gammaEnergy</dfn>)</td></tr>
+<tr><th id="482">482</th><td>{</td></tr>
+<tr><th id="483">483</th><td>  <a class="typedef" href="../../../../global/management/include/G4Types.hh.html#G4double" title='G4double' data-type='double' data-ref="G4double">G4double</a> <dfn class="local col1 decl" id="61dxsec" title='dxsec' data-type='G4double' data-ref="61dxsec">dxsec</dfn> = <var>0.0</var>;</td></tr>
+<tr><th id="484">484</th><td>  <b>if</b> (<a class="local col0 ref" href="#60gammaEnergy" title='gammaEnergy' data-ref="60gammaEnergy">gammaEnergy</a> &lt; <var>0.</var>) {</td></tr>
+<tr><th id="485">485</th><td>    <b>return</b> <a class="local col1 ref" href="#61dxsec" title='dxsec' data-ref="61dxsec">dxsec</a>;</td></tr>
+<tr><th id="486">486</th><td>  }</td></tr>
+<tr><th id="487">487</th><td>  <em>const</em> <a class="typedef" href="../../../../global/management/include/G4Types.hh.html#G4double" title='G4double' data-type='double' data-ref="G4double">G4double</a> <dfn class="local col2 decl" id="62y" title='y' data-type='const G4double' data-ref="62y">y</dfn>         = <a class="local col0 ref" href="#60gammaEnergy" title='gammaEnergy' data-ref="60gammaEnergy">gammaEnergy</a>/<a class="member" href="../include/G4eBremsstrahlungRelModel.hh.html#G4eBremsstrahlungRelModel::fPrimaryTotalEnergy" title='G4eBremsstrahlungRelModel::fPrimaryTotalEnergy' data-ref="G4eBremsstrahlungRelModel::fPrimaryTotalEnergy">fPrimaryTotalEnergy</a>;</td></tr>
+<tr><th id="488">488</th><td>  <em>const</em> <a class="typedef" href="../../../../global/management/include/G4Types.hh.html#G4double" title='G4double' data-type='double' data-ref="G4double">G4double</a> <dfn class="local col3 decl" id="63onemy" title='onemy' data-type='const G4double' data-ref="63onemy">onemy</dfn>     = <var>1.</var>-<a class="local col2 ref" href="#62y" title='y' data-ref="62y">y</a>;</td></tr>
+<tr><th id="489">489</th><td>  <em>const</em> <a class="typedef" href="../../../../global/management/include/G4Types.hh.html#G4double" title='G4double' data-type='double' data-ref="G4double">G4double</a> <dfn class="local col4 decl" id="64dum0" title='dum0' data-type='const G4double' data-ref="64dum0">dum0</dfn>      = <a class="local col3 ref" href="#63onemy" title='onemy' data-ref="63onemy">onemy</a>+<var>0.75</var>*<a class="local col2 ref" href="#62y" title='y' data-ref="62y">y</a>*<a class="local col2 ref" href="#62y" title='y' data-ref="62y">y</a>;</td></tr>
+<tr><th id="490">490</th><td>  <em>const</em> <a class="type" href="../include/G4eBremsstrahlungRelModel.hh.html#G4eBremsstrahlungRelModel::ElementData" title='G4eBremsstrahlungRelModel::ElementData' data-ref="G4eBremsstrahlungRelModel::ElementData">ElementData</a>* <dfn class="local col5 decl" id="65elDat" title='elDat' data-type='const G4eBremsstrahlungRelModel::ElementData *' data-ref="65elDat">elDat</dfn> = <span class='error' title="use of undeclared identifier &apos;gElementData&apos;">gElementData</span>[fCurrentIZ];</td></tr>
+<tr><th id="491">491</th><td>  <i>// use complete screening and L_el, L_inel from Dirac-Fock model instead of TF</i></td></tr>
+<tr><th id="492">492</th><td>  <b>if</b> (<a class="member" href="../include/G4eBremsstrahlungRelModel.hh.html#G4eBremsstrahlungRelModel::fCurrentIZ" title='G4eBremsstrahlungRelModel::fCurrentIZ' data-ref="G4eBremsstrahlungRelModel::fCurrentIZ">fCurrentIZ</a> &lt; <var>5</var> || <a class="member" href="../include/G4eBremsstrahlungRelModel.hh.html#G4eBremsstrahlungRelModel::fIsUseCompleteScreening" title='G4eBremsstrahlungRelModel::fIsUseCompleteScreening' data-ref="G4eBremsstrahlungRelModel::fIsUseCompleteScreening">fIsUseCompleteScreening</a>) {</td></tr>
+<tr><th id="493">493</th><td>    <a class="local col1 ref" href="#61dxsec" title='dxsec' data-ref="61dxsec">dxsec</a>  = <a class="local col4 ref" href="#64dum0" title='dum0' data-ref="64dum0">dum0</a>*<a class="local col5 ref" href="#65elDat" title='elDat' data-ref="65elDat">elDat</a>-&gt;<a class="ref" href="../include/G4eBremsstrahlungRelModel.hh.html#G4eBremsstrahlungRelModel::ElementData::fZFactor1" title='G4eBremsstrahlungRelModel::ElementData::fZFactor1' data-ref="G4eBremsstrahlungRelModel::ElementData::fZFactor1">fZFactor1</a>;</td></tr>
+<tr><th id="494">494</th><td>    <a class="local col1 ref" href="#61dxsec" title='dxsec' data-ref="61dxsec">dxsec</a> += <a class="local col3 ref" href="#63onemy" title='onemy' data-ref="63onemy">onemy</a>*<a class="local col5 ref" href="#65elDat" title='elDat' data-ref="65elDat">elDat</a>-&gt;<a class="ref" href="../include/G4eBremsstrahlungRelModel.hh.html#G4eBremsstrahlungRelModel::ElementData::fZFactor2" title='G4eBremsstrahlungRelModel::ElementData::fZFactor2' data-ref="G4eBremsstrahlungRelModel::ElementData::fZFactor2">fZFactor2</a>;</td></tr>
+<tr><th id="495">495</th><td>    <b>if</b> (<a class="member" href="../include/G4eBremsstrahlungRelModel.hh.html#G4eBremsstrahlungRelModel::fIsScatOffElectron" title='G4eBremsstrahlungRelModel::fIsScatOffElectron' data-ref="G4eBremsstrahlungRelModel::fIsScatOffElectron">fIsScatOffElectron</a>) {</td></tr>
+<tr><th id="496">496</th><td>      <a class="member" href="../include/G4eBremsstrahlungRelModel.hh.html#G4eBremsstrahlungRelModel::fSumTerm" title='G4eBremsstrahlungRelModel::fSumTerm' data-ref="G4eBremsstrahlungRelModel::fSumTerm">fSumTerm</a> = <a class="local col1 ref" href="#61dxsec" title='dxsec' data-ref="61dxsec">dxsec</a>;</td></tr>
+<tr><th id="497">497</th><td>      <a class="member" href="../include/G4eBremsstrahlungRelModel.hh.html#G4eBremsstrahlungRelModel::fNucTerm" title='G4eBremsstrahlungRelModel::fNucTerm' data-ref="G4eBremsstrahlungRelModel::fNucTerm">fNucTerm</a> = <a class="local col4 ref" href="#64dum0" title='dum0' data-ref="64dum0">dum0</a>*<a class="local col5 ref" href="#65elDat" title='elDat' data-ref="65elDat">elDat</a>-&gt;<a class="ref" href="../include/G4eBremsstrahlungRelModel.hh.html#G4eBremsstrahlungRelModel::ElementData::fZFactor11" title='G4eBremsstrahlungRelModel::ElementData::fZFactor11' data-ref="G4eBremsstrahlungRelModel::ElementData::fZFactor11">fZFactor11</a>+<a class="local col3 ref" href="#63onemy" title='onemy' data-ref="63onemy">onemy</a>/<var>12.</var>;</td></tr>
+<tr><th id="498">498</th><td>    }</td></tr>
+<tr><th id="499">499</th><td>  } <b>else</b> {</td></tr>
+<tr><th id="500">500</th><td>    <i>// use Tsai's analytical approx. (Tsai Eqs. [3.38-3.41]) to the 'universal'</i></td></tr>
+<tr><th id="501">501</th><td><i>    // numerical screening functions computed by using the TF model of the atom</i></td></tr>
+<tr><th id="502">502</th><td>    <em>const</em> <a class="typedef" href="../../../../global/management/include/G4Types.hh.html#G4double" title='G4double' data-type='double' data-ref="G4double">G4double</a> <dfn class="local col6 decl" id="66invZ" title='invZ' data-type='const G4double' data-ref="66invZ">invZ</dfn>    = <var>1.</var>/(<a class="typedef" href="../../../../global/management/include/G4Types.hh.html#G4double" title='G4double' data-type='double' data-ref="G4double">G4double</a>)<a class="member" href="../include/G4eBremsstrahlungRelModel.hh.html#G4eBremsstrahlungRelModel::fCurrentIZ" title='G4eBremsstrahlungRelModel::fCurrentIZ' data-ref="G4eBremsstrahlungRelModel::fCurrentIZ">fCurrentIZ</a>;</td></tr>
+<tr><th id="503">503</th><td>    <em>const</em> <a class="typedef" href="../../../../global/management/include/G4Types.hh.html#G4double" title='G4double' data-type='double' data-ref="G4double">G4double</a> <dfn class="local col7 decl" id="67Fz" title='Fz' data-type='const G4double' data-ref="67Fz">Fz</dfn>      = <a class="local col5 ref" href="#65elDat" title='elDat' data-ref="65elDat">elDat</a>-&gt;<a class="ref" href="../include/G4eBremsstrahlungRelModel.hh.html#G4eBremsstrahlungRelModel::ElementData::fFz" title='G4eBremsstrahlungRelModel::ElementData::fFz' data-ref="G4eBremsstrahlungRelModel::ElementData::fFz">fFz</a>;</td></tr>
+<tr><th id="504">504</th><td>    <em>const</em> <a class="typedef" href="../../../../global/management/include/G4Types.hh.html#G4double" title='G4double' data-type='double' data-ref="G4double">G4double</a> <dfn class="local col8 decl" id="68logZ" title='logZ' data-type='const G4double' data-ref="68logZ">logZ</dfn>    = <a class="local col5 ref" href="#65elDat" title='elDat' data-ref="65elDat">elDat</a>-&gt;<a class="ref" href="../include/G4eBremsstrahlungRelModel.hh.html#G4eBremsstrahlungRelModel::ElementData::fLogZ" title='G4eBremsstrahlungRelModel::ElementData::fLogZ' data-ref="G4eBremsstrahlungRelModel::ElementData::fLogZ">fLogZ</a>;</td></tr>
+<tr><th id="505">505</th><td>    <em>const</em> <a class="typedef" href="../../../../global/management/include/G4Types.hh.html#G4double" title='G4double' data-type='double' data-ref="G4double">G4double</a> <dfn class="local col9 decl" id="69dum1" title='dum1' data-type='const G4double' data-ref="69dum1">dum1</dfn>    = <a class="local col2 ref" href="#62y" title='y' data-ref="62y">y</a>/(<a class="member" href="../include/G4eBremsstrahlungRelModel.hh.html#G4eBremsstrahlungRelModel::fPrimaryTotalEnergy" title='G4eBremsstrahlungRelModel::fPrimaryTotalEnergy' data-ref="G4eBremsstrahlungRelModel::fPrimaryTotalEnergy">fPrimaryTotalEnergy</a>-<a class="local col0 ref" href="#60gammaEnergy" title='gammaEnergy' data-ref="60gammaEnergy">gammaEnergy</a>);</td></tr>
+<tr><th id="506">506</th><td>    <em>const</em> <a class="typedef" href="../../../../global/management/include/G4Types.hh.html#G4double" title='G4double' data-type='double' data-ref="G4double">G4double</a> <dfn class="local col0 decl" id="70gamma" title='gamma' data-type='const G4double' data-ref="70gamma">gamma</dfn>   = <a class="local col9 ref" href="#69dum1" title='dum1' data-ref="69dum1">dum1</a>*<a class="local col5 ref" href="#65elDat" title='elDat' data-ref="65elDat">elDat</a>-&gt;<a class="ref" href="../include/G4eBremsstrahlungRelModel.hh.html#G4eBremsstrahlungRelModel::ElementData::fGammaFactor" title='G4eBremsstrahlungRelModel::ElementData::fGammaFactor' data-ref="G4eBremsstrahlungRelModel::ElementData::fGammaFactor">fGammaFactor</a>;</td></tr>
+<tr><th id="507">507</th><td>    <em>const</em> <a class="typedef" href="../../../../global/management/include/G4Types.hh.html#G4double" title='G4double' data-type='double' data-ref="G4double">G4double</a> <dfn class="local col1 decl" id="71epsilon" title='epsilon' data-type='const G4double' data-ref="71epsilon">epsilon</dfn> = <a class="local col9 ref" href="#69dum1" title='dum1' data-ref="69dum1">dum1</a>*<a class="local col5 ref" href="#65elDat" title='elDat' data-ref="65elDat">elDat</a>-&gt;<a class="ref" href="../include/G4eBremsstrahlungRelModel.hh.html#G4eBremsstrahlungRelModel::ElementData::fEpsilonFactor" title='G4eBremsstrahlungRelModel::ElementData::fEpsilonFactor' data-ref="G4eBremsstrahlungRelModel::ElementData::fEpsilonFactor">fEpsilonFactor</a>;</td></tr>
+<tr><th id="508">508</th><td>    <i>// evaluate the screening functions</i></td></tr>
+<tr><th id="509">509</th><td>    <a class="typedef" href="../../../../global/management/include/G4Types.hh.html#G4double" title='G4double' data-type='double' data-ref="G4double">G4double</a> <dfn class="local col2 decl" id="72phi1" title='phi1' data-type='G4double' data-ref="72phi1">phi1</dfn>, <dfn class="local col3 decl" id="73phi1m2" title='phi1m2' data-type='G4double' data-ref="73phi1m2">phi1m2</dfn>, <dfn class="local col4 decl" id="74psi1" title='psi1' data-type='G4double' data-ref="74psi1">psi1</dfn>, <dfn class="local col5 decl" id="75psi1m2" title='psi1m2' data-type='G4double' data-ref="75psi1m2">psi1m2</dfn>;</td></tr>
+<tr><th id="510">510</th><td>    <a class="member" href="#_ZN25G4eBremsstrahlungRelModel25ComputeScreeningFunctionsERdS0_S0_S0_dd" title='G4eBremsstrahlungRelModel::ComputeScreeningFunctions' data-ref="_ZN25G4eBremsstrahlungRelModel25ComputeScreeningFunctionsERdS0_S0_S0_dd">ComputeScreeningFunctions</a>(<span class='refarg'><a class="local col2 ref" href="#72phi1" title='phi1' data-ref="72phi1">phi1</a></span>, <span class='refarg'><a class="local col3 ref" href="#73phi1m2" title='phi1m2' data-ref="73phi1m2">phi1m2</a></span>, <span class='refarg'><a class="local col4 ref" href="#74psi1" title='psi1' data-ref="74psi1">psi1</a></span>, <span class='refarg'><a class="local col5 ref" href="#75psi1m2" title='psi1m2' data-ref="75psi1m2">psi1m2</a></span>, <a class="local col0 ref" href="#70gamma" title='gamma' data-ref="70gamma">gamma</a>, <a class="local col1 ref" href="#71epsilon" title='epsilon' data-ref="71epsilon">epsilon</a>);</td></tr>
+<tr><th id="511">511</th><td>    <a class="local col1 ref" href="#61dxsec" title='dxsec' data-ref="61dxsec">dxsec</a>  = <a class="local col4 ref" href="#64dum0" title='dum0' data-ref="64dum0">dum0</a>*((<var>0.25</var>*<a class="local col2 ref" href="#72phi1" title='phi1' data-ref="72phi1">phi1</a>-<a class="local col7 ref" href="#67Fz" title='Fz' data-ref="67Fz">Fz</a>) + (<var>0.25</var>*<a class="local col4 ref" href="#74psi1" title='psi1' data-ref="74psi1">psi1</a>-<var>2.</var>*<a class="local col8 ref" href="#68logZ" title='logZ' data-ref="68logZ">logZ</a>/<var>3.</var>)*<a class="local col6 ref" href="#66invZ" title='invZ' data-ref="66invZ">invZ</a>);</td></tr>
+<tr><th id="512">512</th><td>    <a class="local col1 ref" href="#61dxsec" title='dxsec' data-ref="61dxsec">dxsec</a> += <var>0.125</var>*<a class="local col3 ref" href="#63onemy" title='onemy' data-ref="63onemy">onemy</a>*(<a class="local col3 ref" href="#73phi1m2" title='phi1m2' data-ref="73phi1m2">phi1m2</a> + <a class="local col5 ref" href="#75psi1m2" title='psi1m2' data-ref="75psi1m2">psi1m2</a>*<a class="local col6 ref" href="#66invZ" title='invZ' data-ref="66invZ">invZ</a>);</td></tr>
+<tr><th id="513">513</th><td>    <b>if</b> (<a class="member" href="../include/G4eBremsstrahlungRelModel.hh.html#G4eBremsstrahlungRelModel::fIsScatOffElectron" title='G4eBremsstrahlungRelModel::fIsScatOffElectron' data-ref="G4eBremsstrahlungRelModel::fIsScatOffElectron">fIsScatOffElectron</a>) {</td></tr>
+<tr><th id="514">514</th><td>      <a class="member" href="../include/G4eBremsstrahlungRelModel.hh.html#G4eBremsstrahlungRelModel::fSumTerm" title='G4eBremsstrahlungRelModel::fSumTerm' data-ref="G4eBremsstrahlungRelModel::fSumTerm">fSumTerm</a> = <a class="local col1 ref" href="#61dxsec" title='dxsec' data-ref="61dxsec">dxsec</a>;</td></tr>
+<tr><th id="515">515</th><td>      <a class="member" href="../include/G4eBremsstrahlungRelModel.hh.html#G4eBremsstrahlungRelModel::fNucTerm" title='G4eBremsstrahlungRelModel::fNucTerm' data-ref="G4eBremsstrahlungRelModel::fNucTerm">fNucTerm</a> = <a class="local col4 ref" href="#64dum0" title='dum0' data-ref="64dum0">dum0</a>*(<var>0.25</var>*<a class="local col2 ref" href="#72phi1" title='phi1' data-ref="72phi1">phi1</a>-<a class="local col7 ref" href="#67Fz" title='Fz' data-ref="67Fz">Fz</a>) + <var>0.125</var>*<a class="local col3 ref" href="#63onemy" title='onemy' data-ref="63onemy">onemy</a>*<a class="local col3 ref" href="#73phi1m2" title='phi1m2' data-ref="73phi1m2">phi1m2</a>;</td></tr>
+<tr><th id="516">516</th><td>    }</td></tr>
+<tr><th id="517">517</th><td>  }</td></tr>
+<tr><th id="518">518</th><td>  <b>return</b> <span class='error' title="use of undeclared identifier &apos;std&apos;">std</span>::max(dxsec,<var>0.0</var>);</td></tr>
+<tr><th id="519">519</th><td>}</td></tr>
+<tr><th id="520">520</th><td></td></tr>
+<tr><th id="521">521</th><td><i>// Coherent and incoherent screening function approximations (see Tsai</i></td></tr>
+<tr><th id="522">522</th><td><i>// Eqs.[3.38-3.41]). Tsai's analytical approximations to the numerical screening</i></td></tr>
+<tr><th id="523">523</th><td><i>// functions computed by using the Thomas-Fermi model of atom (Moliere's appro-</i></td></tr>
+<tr><th id="524">524</th><td><i>// ximation to the numerical TF screening function). In the TF-model, these</i></td></tr>
+<tr><th id="525">525</th><td><i>// screening functions can be expressed in a 'universal' i.e. Z (directly) inde-</i></td></tr>
+<tr><th id="526">526</th><td><i>// pendent variable (see Tsai Eqs. Eqs. [3.30 and 3.31]).</i></td></tr>
+<tr><th id="527">527</th><td><em>void</em> <a class="type" href="../include/G4eBremsstrahlungRelModel.hh.html#G4eBremsstrahlungRelModel" title='G4eBremsstrahlungRelModel' data-ref="G4eBremsstrahlungRelModel">G4eBremsstrahlungRelModel</a>::<dfn class="decl def" id="_ZN25G4eBremsstrahlungRelModel25ComputeScreeningFunctionsERdS0_S0_S0_dd" title='G4eBremsstrahlungRelModel::ComputeScreeningFunctions' data-ref="_ZN25G4eBremsstrahlungRelModel25ComputeScreeningFunctionsERdS0_S0_S0_dd">ComputeScreeningFunctions</dfn>(<a class="typedef" href="../../../../global/management/include/G4Types.hh.html#G4double" title='G4double' data-type='double' data-ref="G4double">G4double</a>&amp; <dfn class="local col6 decl" id="76phi1" title='phi1' data-type='G4double &amp;' data-ref="76phi1">phi1</dfn>,</td></tr>
+<tr><th id="528">528</th><td>                                                          <a class="typedef" href="../../../../global/management/include/G4Types.hh.html#G4double" title='G4double' data-type='double' data-ref="G4double">G4double</a>&amp; <dfn class="local col7 decl" id="77phi1m2" title='phi1m2' data-type='G4double &amp;' data-ref="77phi1m2">phi1m2</dfn>,</td></tr>
+<tr><th id="529">529</th><td>                                                          <a class="typedef" href="../../../../global/management/include/G4Types.hh.html#G4double" title='G4double' data-type='double' data-ref="G4double">G4double</a>&amp; <dfn class="local col8 decl" id="78psi1" title='psi1' data-type='G4double &amp;' data-ref="78psi1">psi1</dfn>,</td></tr>
+<tr><th id="530">530</th><td>                                                          <a class="typedef" href="../../../../global/management/include/G4Types.hh.html#G4double" title='G4double' data-type='double' data-ref="G4double">G4double</a>&amp; <dfn class="local col9 decl" id="79psi1m2" title='psi1m2' data-type='G4double &amp;' data-ref="79psi1m2">psi1m2</dfn>,</td></tr>
+<tr><th id="531">531</th><td>                                                          <em>const</em> <a class="typedef" href="../../../../global/management/include/G4Types.hh.html#G4double" title='G4double' data-type='double' data-ref="G4double">G4double</a> <dfn class="local col0 decl" id="80gam" title='gam' data-type='const G4double' data-ref="80gam">gam</dfn>,</td></tr>
+<tr><th id="532">532</th><td>                                                          <em>const</em> <a class="typedef" href="../../../../global/management/include/G4Types.hh.html#G4double" title='G4double' data-type='double' data-ref="G4double">G4double</a> <dfn class="local col1 decl" id="81eps" title='eps' data-type='const G4double' data-ref="81eps">eps</dfn>)</td></tr>
+<tr><th id="533">533</th><td>{</td></tr>
+<tr><th id="534">534</th><td>  <em>const</em> <a class="typedef" href="../../../../global/management/include/G4Types.hh.html#G4double" title='G4double' data-type='double' data-ref="G4double">G4double</a> <dfn class="local col2 decl" id="82gam2" title='gam2' data-type='const G4double' data-ref="82gam2">gam2</dfn> = <a class="local col0 ref" href="#80gam" title='gam' data-ref="80gam">gam</a>*<a class="local col0 ref" href="#80gam" title='gam' data-ref="80gam">gam</a>;</td></tr>
+<tr><th id="535">535</th><td>  <a class="local col6 ref" href="#76phi1" title='phi1' data-ref="76phi1">phi1</a>   = <var>16.863</var>-<var>2.0</var>*<a class="ref" href="../../../../global/management/include/G4Log.hh.html#_Z5G4Logd" title='G4Log' data-ref="_Z5G4Logd">G4Log</a>(<var>1.0</var>+<var>0.311877</var>*<a class="local col2 ref" href="#82gam2" title='gam2' data-ref="82gam2">gam2</a>)+<var>2.4</var>*<a class="ref" href="../../../../global/management/include/G4Exp.hh.html#_Z5G4Expd" title='G4Exp' data-ref="_Z5G4Expd">G4Exp</a>(-<var>0.9</var>*<a class="local col0 ref" href="#80gam" title='gam' data-ref="80gam">gam</a>)</td></tr>
+<tr><th id="536">536</th><td>          +<var>1.6</var>*<a class="ref" href="../../../../global/management/include/G4Exp.hh.html#_Z5G4Expd" title='G4Exp' data-ref="_Z5G4Expd">G4Exp</a>(-<var>1.5</var>*<a class="local col0 ref" href="#80gam" title='gam' data-ref="80gam">gam</a>);</td></tr>
+<tr><th id="537">537</th><td>  <a class="local col7 ref" href="#77phi1m2" title='phi1m2' data-ref="77phi1m2">phi1m2</a> = <var>2.0</var>/(<var>3.0</var>+<var>19.5</var>*<a class="local col0 ref" href="#80gam" title='gam' data-ref="80gam">gam</a>+<var>18.0</var>*<a class="local col2 ref" href="#82gam2" title='gam2' data-ref="82gam2">gam2</a>);    <i>// phi1-phi2</i></td></tr>
+<tr><th id="538">538</th><td>  <em>const</em> <a class="typedef" href="../../../../global/management/include/G4Types.hh.html#G4double" title='G4double' data-type='double' data-ref="G4double">G4double</a> <dfn class="local col3 decl" id="83eps2" title='eps2' data-type='const G4double' data-ref="83eps2">eps2</dfn> = <a class="local col1 ref" href="#81eps" title='eps' data-ref="81eps">eps</a>*<a class="local col1 ref" href="#81eps" title='eps' data-ref="81eps">eps</a>;</td></tr>
+<tr><th id="539">539</th><td>  <a class="local col8 ref" href="#78psi1" title='psi1' data-ref="78psi1">psi1</a>   = <var>24.34</var>-<var>2.0</var>*<a class="ref" href="../../../../global/management/include/G4Log.hh.html#_Z5G4Logd" title='G4Log' data-ref="_Z5G4Logd">G4Log</a>(<var>1.0</var>+<var>13.111641</var>*<a class="local col3 ref" href="#83eps2" title='eps2' data-ref="83eps2">eps2</a>)+<var>2.8</var>*<a class="ref" href="../../../../global/management/include/G4Exp.hh.html#_Z5G4Expd" title='G4Exp' data-ref="_Z5G4Expd">G4Exp</a>(-<var>8.0</var>*<a class="local col1 ref" href="#81eps" title='eps' data-ref="81eps">eps</a>)</td></tr>
+<tr><th id="540">540</th><td>          +<var>1.2</var>*<a class="ref" href="../../../../global/management/include/G4Exp.hh.html#_Z5G4Expd" title='G4Exp' data-ref="_Z5G4Expd">G4Exp</a>(-<var>29.2</var>*<a class="local col1 ref" href="#81eps" title='eps' data-ref="81eps">eps</a>);</td></tr>
+<tr><th id="541">541</th><td>  <a class="local col9 ref" href="#79psi1m2" title='psi1m2' data-ref="79psi1m2">psi1m2</a> = <var>2.0</var>/(<var>3.0</var>+<var>120.0</var>*<a class="local col1 ref" href="#81eps" title='eps' data-ref="81eps">eps</a>+<var>1200.0</var>*<a class="local col3 ref" href="#83eps2" title='eps2' data-ref="83eps2">eps2</a>); <i>//psi1-psi2</i></td></tr>
+<tr><th id="542">542</th><td>}</td></tr>
+<tr><th id="543">543</th><td></td></tr>
+<tr><th id="544">544</th><td><em>void</em></td></tr>
+<tr><th id="545">545</th><td><a class="type" href="../include/G4eBremsstrahlungRelModel.hh.html#G4eBremsstrahlungRelModel" title='G4eBremsstrahlungRelModel' data-ref="G4eBremsstrahlungRelModel">G4eBremsstrahlungRelModel</a>::<span class='error' title="variable has incomplete type &apos;void&apos;"><dfn class="tu decl def" id="G4eBremsstrahlungRelModel::SampleSecondaries" title='G4eBremsstrahlungRelModel::SampleSecondaries' data-type='void' data-ref="G4eBremsstrahlungRelModel::SampleSecondaries">SampleSecondaries</dfn></span>(<span class='error' title="use of undeclared identifier &apos;std&apos;">std</span>::vector&lt;<span class='error' title="&apos;G4DynamicParticle&apos; does not refer to a value">G4DynamicParticle</span>*<span class='error' title="expected expression">&gt;</span>* <span class='error' title="use of undeclared identifier &apos;vdp&apos;">vdp</span>,</td></tr>
+<tr><th id="546">546</th><td>                                             <span class='error' title="expected expression"><em>const</em></span> G4MaterialCutsCouple* couple,</td></tr>
+<tr><th id="547">547</th><td>                                             <span class='error' title="expected expression"><em>const</em></span> G4DynamicParticle* dp,</td></tr>
+<tr><th id="548">548</th><td>                                             <span class='error' title="unexpected type name &apos;G4double&apos;: expected expression">G4double</span> cutEnergy,</td></tr>
+<tr><th id="549">549</th><td>                                             <span class='error' title="unexpected type name &apos;G4double&apos;: expected expression">G4double</span> maxEnergy)<span class='error' title="expected &apos;;&apos; after top level declarator"></span></td></tr>
+<tr><th id="550">550</th><td>{</td></tr>
+<tr><th id="551">551</th><td>  <em>const</em> G4double kineticEnergy    = dp-&gt;GetKineticEnergy();</td></tr>
+<tr><th id="552">552</th><td><i>//  const G4double logKineticEnergy = dp-&gt;GetLogKineticEnergy();</i></td></tr>
+<tr><th id="553">553</th><td>  <b>if</b> (kineticEnergy &lt; LowEnergyLimit()) {</td></tr>
+<tr><th id="554">554</th><td>    <b>return</b>;</td></tr>
+<tr><th id="555">555</th><td>  }</td></tr>
+<tr><th id="556">556</th><td>  <i>// min, max kinetic energy limits</i></td></tr>
+<tr><th id="557">557</th><td>  <em>const</em> G4double tmin = std::min(cutEnergy, kineticEnergy);</td></tr>
+<tr><th id="558">558</th><td>  <em>const</em> G4double tmax = std::min(maxEnergy, kineticEnergy);</td></tr>
+<tr><th id="559">559</th><td>  <b>if</b> (tmin &gt;= tmax) {</td></tr>
+<tr><th id="560">560</th><td>    <b>return</b>;</td></tr>
+<tr><th id="561">561</th><td>  }</td></tr>
+<tr><th id="562">562</th><td>  <i>//</i></td></tr>
+<tr><th id="563">563</th><td>  SetupForMaterial(fPrimaryParticle, couple-&gt;GetMaterial(), kineticEnergy);</td></tr>
+<tr><th id="564">564</th><td>  <em>const</em> G4Element* elem = SelectRandomAtom(couple, fPrimaryParticle, kineticEnergy,</td></tr>
+<tr><th id="565">565</th><td>                                          tmin, tmax);</td></tr>
+<tr><th id="566">566</th><td><i>//  const G4Element* elem = SelectTargetAtom(couple,fPrimaryParticle,kineticEnergy,</i></td></tr>
+<tr><th id="567">567</th><td><i>//                                           logKineticEnergy, fElemSelectorEkinIndx,</i></td></tr>
+<tr><th id="568">568</th><td><i>//                                           tmin,tmax);</i></td></tr>
+<tr><th id="569">569</th><td><i>  //</i></td></tr>
+<tr><th id="570">570</th><td>  fCurrentIZ = elem-&gt;GetZasInt();</td></tr>
+<tr><th id="571">571</th><td>  <em>const</em> ElementData* elDat = gElementData[fCurrentIZ];</td></tr>
+<tr><th id="572">572</th><td>  <em>const</em> G4double funcMax = elDat-&gt;fZFactor1+elDat-&gt;fZFactor2;</td></tr>
+<tr><th id="573">573</th><td>  <i>// get the random engine</i></td></tr>
+<tr><th id="574">574</th><td>  G4double rndm[<var>2</var>];</td></tr>
+<tr><th id="575">575</th><td>  CLHEP::HepRandomEngine* rndmEngine = <a class="macro" href="../../../../global/HEPRandom/include/Randomize.hh.html#50" title="CLHEP::HepRandom" data-ref="_M/G4Random">G4Random</a>::getTheEngine();</td></tr>
+<tr><th id="576">576</th><td>  <i>// min max of the transformed variable: x(k) = ln(k^2+k_p^2) that is in [ln(k_c^2+k_p^2), ln(E_k^2+k_p^2)]</i></td></tr>
+<tr><th id="577">577</th><td>  <em>const</em> G4double xmin   = G4Log(tmin*tmin+fDensityCorr);</td></tr>
+<tr><th id="578">578</th><td>  <em>const</em> G4double xrange = G4Log(tmax*tmax+fDensityCorr)-xmin;</td></tr>
+<tr><th id="579">579</th><td>  G4double gammaEnergy, funcVal;</td></tr>
+<tr><th id="580">580</th><td>  <b>do</b> {</td></tr>
+<tr><th id="581">581</th><td>    rndmEngine-&gt;flatArray(<var>2</var>, rndm);</td></tr>
+<tr><th id="582">582</th><td>    gammaEnergy = std::sqrt(std::max(G4Exp(xmin+rndm[<var>0</var>]*xrange)-fDensityCorr, <var>0.0</var>));</td></tr>
+<tr><th id="583">583</th><td>    funcVal     = fIsLPMActive</td></tr>
+<tr><th id="584">584</th><td>                 ? ComputeRelDXSectionPerAtom(gammaEnergy)</td></tr>
+<tr><th id="585">585</th><td>                 : ComputeDXSectionPerAtom(gammaEnergy);</td></tr>
+<tr><th id="586">586</th><td>    <i>// cross-check of proper function maximum in the rejection</i></td></tr>
+<tr><th id="587">587</th><td><i>//    if (funcVal &gt; funcMax) {</i></td></tr>
+<tr><th id="588">588</th><td><i>//      G4cout &lt;&lt; "### G4eBremsstrahlungRelModel Warning: Majoranta exceeded! "</i></td></tr>
+<tr><th id="589">589</th><td><i>//	     &lt;&lt; funcVal &lt;&lt; " &gt; " &lt;&lt; funcMax</i></td></tr>
+<tr><th id="590">590</th><td><i>//	     &lt;&lt; " Egamma(MeV)= " &lt;&lt; gammaEnergy</i></td></tr>
+<tr><th id="591">591</th><td><i>//	     &lt;&lt; " Ee(MeV)= " &lt;&lt; kineticEnergy</i></td></tr>
+<tr><th id="592">592</th><td><i>//	     &lt;&lt; "  " &lt;&lt; GetName()</i></td></tr>
+<tr><th id="593">593</th><td><i>//	     &lt;&lt; G4endl;</i></td></tr>
+<tr><th id="594">594</th><td><i>//    }</i></td></tr>
+<tr><th id="595">595</th><td><i>    // Loop checking, 03-Aug-2015, Vladimir Ivanchenko</i></td></tr>
+<tr><th id="596">596</th><td>  } <b>while</b> (funcVal &lt; funcMax*rndm[<var>1</var>]);</td></tr>
+<tr><th id="597">597</th><td>  <i>//</i></td></tr>
+<tr><th id="598">598</th><td><i>  // scattering off nucleus or off e- by triplet model</i></td></tr>
+<tr><th id="599">599</th><td>  <b>if</b> (fIsScatOffElectron &amp;&amp; rndmEngine-&gt;flat()*fSumTerm&gt;fNucTerm) {</td></tr>
+<tr><th id="600">600</th><td>    GetTripletModel()-&gt;SampleSecondaries(vdp, couple, dp, cutEnergy, maxEnergy);</td></tr>
+<tr><th id="601">601</th><td>    <b>return</b>;</td></tr>
+<tr><th id="602">602</th><td>  }</td></tr>
+<tr><th id="603">603</th><td>  <i>//</i></td></tr>
+<tr><th id="604">604</th><td><i>  // angles of the emitted gamma. ( Z - axis along the parent particle)</i></td></tr>
+<tr><th id="605">605</th><td><i>  // use general interface</i></td></tr>
+<tr><th id="606">606</th><td>  G4ThreeVector gamDir =</td></tr>
+<tr><th id="607">607</th><td>    GetAngularDistribution()-&gt;SampleDirection(dp,fPrimaryTotalEnergy-gammaEnergy,</td></tr>
+<tr><th id="608">608</th><td>                                              fCurrentIZ, couple-&gt;GetMaterial());</td></tr>
+<tr><th id="609">609</th><td>  <i>// create G4DynamicParticle object for the Gamma</i></td></tr>
+<tr><th id="610">610</th><td>  G4DynamicParticle* gamma = <b>new</b> G4DynamicParticle(fGammaParticle, gamDir,</td></tr>
+<tr><th id="611">611</th><td>                                                   gammaEnergy);</td></tr>
+<tr><th id="612">612</th><td>  vdp-&gt;push_back(gamma);</td></tr>
+<tr><th id="613">613</th><td>  <i>// compute post-interaction kinematics of primary e-/e+ based on</i></td></tr>
+<tr><th id="614">614</th><td><i>  // energy-momentum conservation</i></td></tr>
+<tr><th id="615">615</th><td>  <em>const</em> G4double totMomentum = std::sqrt(kineticEnergy*(</td></tr>
+<tr><th id="616">616</th><td>                               fPrimaryTotalEnergy + CLHEP::electron_mass_c2));</td></tr>
+<tr><th id="617">617</th><td>  G4ThreeVector dir =</td></tr>
+<tr><th id="618">618</th><td>             (totMomentum*dp-&gt;GetMomentumDirection()-gammaEnergy*gamDir).unit();</td></tr>
+<tr><th id="619">619</th><td>  <em>const</em> G4double finalE   = kineticEnergy-gammaEnergy;</td></tr>
+<tr><th id="620">620</th><td>  <i>// if secondary gamma energy is higher than threshold(very high by default)</i></td></tr>
+<tr><th id="621">621</th><td><i>  // then stop tracking the primary particle and create new secondary e-/e+</i></td></tr>
+<tr><th id="622">622</th><td><i>  // instead of the primary one</i></td></tr>
+<tr><th id="623">623</th><td>  <b>if</b> (gammaEnergy &gt; SecondaryThreshold()) {</td></tr>
+<tr><th id="624">624</th><td>    fParticleChange-&gt;ProposeTrackStatus(fStopAndKill);</td></tr>
+<tr><th id="625">625</th><td>    fParticleChange-&gt;SetProposedKineticEnergy(<var>0.0</var>);</td></tr>
+<tr><th id="626">626</th><td>    G4DynamicParticle* el = <b>new</b> G4DynamicParticle(</td></tr>
+<tr><th id="627">627</th><td>              <b>const_cast</b>&lt;G4ParticleDefinition*&gt;(fPrimaryParticle), dir, finalE);</td></tr>
+<tr><th id="628">628</th><td>    vdp-&gt;push_back(el);</td></tr>
+<tr><th id="629">629</th><td>  } <b>else</b> { <i>// continue tracking the primary e-/e+ otherwise</i></td></tr>
+<tr><th id="630">630</th><td>    fParticleChange-&gt;SetProposedMomentumDirection(dir);</td></tr>
+<tr><th id="631">631</th><td>    fParticleChange-&gt;SetProposedKineticEnergy(finalE);</td></tr>
+<tr><th id="632">632</th><td>  }</td></tr>
+<tr><th id="633">633</th><td>}</td></tr>
+<tr><th id="634">634</th><td></td></tr>
+<tr><th id="635">635</th><td><em>void</em> G4eBremsstrahlungRelModel::InitialiseElementData()</td></tr>
+<tr><th id="636">636</th><td>{</td></tr>
+<tr><th id="637">637</th><td>  <em>const</em> G4int size = gElementData.size();</td></tr>
+<tr><th id="638">638</th><td>  <b>if</b> (size &lt; gMaxZet+<var>1</var>) {</td></tr>
+<tr><th id="639">639</th><td>    gElementData.resize(gMaxZet+<var>1</var>, <b>nullptr</b>);</td></tr>
+<tr><th id="640">640</th><td>  }</td></tr>
+<tr><th id="641">641</th><td>  <i>// create for all elements that are in the detector</i></td></tr>
+<tr><th id="642">642</th><td>  <em>const</em> G4ElementTable* elemTable = G4Element::GetElementTable();</td></tr>
+<tr><th id="643">643</th><td>  size_t numElems = (*elemTable).size();</td></tr>
+<tr><th id="644">644</th><td>  <b>for</b> (size_t ielem=<var>0</var>; ielem&lt;numElems; ++ielem) {</td></tr>
+<tr><th id="645">645</th><td>    <em>const</em> G4Element* elem = (*elemTable)[ielem];</td></tr>
+<tr><th id="646">646</th><td>    <em>const</em> G4double    zet = elem-&gt;GetZ();</td></tr>
+<tr><th id="647">647</th><td>    <em>const</em> G4int      izet = std::min(G4lrint(zet),gMaxZet);</td></tr>
+<tr><th id="648">648</th><td>    <b>if</b> (!gElementData[izet]) {</td></tr>
+<tr><th id="649">649</th><td>      ElementData *elemData  = <b>new</b> ElementData();</td></tr>
+<tr><th id="650">650</th><td>      <em>const</em> G4double fc = elem-&gt;GetfCoulomb();</td></tr>
+<tr><th id="651">651</th><td>      G4double Fel      = <var>1.</var>;</td></tr>
+<tr><th id="652">652</th><td>      G4double Finel    = <var>1.</var>;</td></tr>
+<tr><th id="653">653</th><td>      elemData-&gt;fLogZ   = G4Log(zet);</td></tr>
+<tr><th id="654">654</th><td>      elemData-&gt;fFz     = elemData-&gt;fLogZ/<var>3.</var>+fc;</td></tr>
+<tr><th id="655">655</th><td>      <b>if</b> (izet &lt; <var>5</var>) {</td></tr>
+<tr><th id="656">656</th><td>        Fel   = gFelLowZet[izet];</td></tr>
+<tr><th id="657">657</th><td>        Finel = gFinelLowZet[izet];</td></tr>
+<tr><th id="658">658</th><td>      } <b>else</b> {</td></tr>
+<tr><th id="659">659</th><td>        Fel   = G4Log(<var>184.15</var>) -    elemData-&gt;fLogZ/<var>3.</var>;</td></tr>
+<tr><th id="660">660</th><td>        Finel = G4Log(<var>1194</var>)   - <var>2.</var>*elemData-&gt;fLogZ/<var>3.</var>;</td></tr>
+<tr><th id="661">661</th><td>      }</td></tr>
+<tr><th id="662">662</th><td>      <em>const</em> G4double z23       = std::pow(zet,<var>2.</var>/<var>3.</var>);</td></tr>
+<tr><th id="663">663</th><td>      <em>const</em> G4double z13       = std::pow(zet,<var>1.</var>/<var>3.</var>);</td></tr>
+<tr><th id="664">664</th><td>      elemData-&gt;fZFactor1      = (Fel-fc)+Finel/zet;</td></tr>
+<tr><th id="665">665</th><td>      elemData-&gt;fZFactor11     = (Fel-fc); <i>// used only for the triplet</i></td></tr>
+<tr><th id="666">666</th><td>      elemData-&gt;fZFactor2      = (<var>1.</var>+<var>1.</var>/zet)/<var>12.</var>;</td></tr>
+<tr><th id="667">667</th><td>      elemData-&gt;fVarS1         = z23/(<var>184.15</var>*<var>184.15</var>);</td></tr>
+<tr><th id="668">668</th><td>      elemData-&gt;fILVarS1Cond   = <var>1.</var>/(G4Log(std::sqrt(<var>2.0</var>)*elemData-&gt;fVarS1));</td></tr>
+<tr><th id="669">669</th><td>      elemData-&gt;fILVarS1       = <var>1.</var>/G4Log(elemData-&gt;fVarS1);</td></tr>
+<tr><th id="670">670</th><td>      elemData-&gt;fGammaFactor   = <var>100.0</var>*electron_mass_c2/z13;</td></tr>
+<tr><th id="671">671</th><td>      elemData-&gt;fEpsilonFactor = <var>100.0</var>*electron_mass_c2/z23;</td></tr>
+<tr><th id="672">672</th><td>      gElementData[izet] = elemData;</td></tr>
+<tr><th id="673">673</th><td>    }</td></tr>
+<tr><th id="674">674</th><td>  }</td></tr>
+<tr><th id="675">675</th><td>}</td></tr>
+<tr><th id="676">676</th><td></td></tr>
+<tr><th id="677">677</th><td><em>void</em> G4eBremsstrahlungRelModel::ComputeLPMfunctions(G4double&amp; funcXiS,</td></tr>
+<tr><th id="678">678</th><td>                                                    G4double&amp; funcGS,</td></tr>
+<tr><th id="679">679</th><td>                                                    G4double&amp; funcPhiS,</td></tr>
+<tr><th id="680">680</th><td>	                                                  <em>const</em> G4double egamma)</td></tr>
+<tr><th id="681">681</th><td>{</td></tr>
+<tr><th id="682">682</th><td>  <em>static</em> <em>const</em> G4double sqrt2 = std::sqrt(<var>2.</var>);</td></tr>
+<tr><th id="683">683</th><td>  <em>const</em> G4double    redegamma = egamma/fPrimaryTotalEnergy;</td></tr>
+<tr><th id="684">684</th><td>  <em>const</em> G4double    varSprime = std::sqrt(<var>0.125</var>*redegamma*fLPMEnergy/</td></tr>
+<tr><th id="685">685</th><td>                                ((<var>1.0</var>-redegamma)*fPrimaryTotalEnergy));</td></tr>
+<tr><th id="686">686</th><td>  <em>const</em> ElementData* elDat    = gElementData[fCurrentIZ];</td></tr>
+<tr><th id="687">687</th><td>  <em>const</em> G4double varS1        = elDat-&gt;fVarS1;</td></tr>
+<tr><th id="688">688</th><td>  <em>const</em> G4double condition    = sqrt2*varS1;</td></tr>
+<tr><th id="689">689</th><td>  G4double funcXiSprime = <var>2.0</var>;</td></tr>
+<tr><th id="690">690</th><td>  <b>if</b> (varSprime &gt; <var>1.0</var>) {</td></tr>
+<tr><th id="691">691</th><td>    funcXiSprime = <var>1.0</var>;</td></tr>
+<tr><th id="692">692</th><td>  } <b>else</b> <b>if</b> (varSprime &gt; condition) {</td></tr>
+<tr><th id="693">693</th><td>    <em>const</em> G4double ilVarS1Cond = elDat-&gt;fILVarS1Cond;</td></tr>
+<tr><th id="694">694</th><td>    <em>const</em> G4double funcHSprime = G4Log(varSprime)*ilVarS1Cond;</td></tr>
+<tr><th id="695">695</th><td>    funcXiSprime = <var>1.0</var> + funcHSprime - <var>0.08</var>*(<var>1.0</var>-funcHSprime)*funcHSprime</td></tr>
+<tr><th id="696">696</th><td>                                      *(<var>2.0</var>-funcHSprime)*ilVarS1Cond;</td></tr>
+<tr><th id="697">697</th><td>  }</td></tr>
+<tr><th id="698">698</th><td>  <em>const</em> G4double varS    = varSprime/std::sqrt(funcXiSprime);</td></tr>
+<tr><th id="699">699</th><td>  <i>// - include dielectric suppression effect into s according to Migdal</i></td></tr>
+<tr><th id="700">700</th><td>  <em>const</em> G4double varShat = varS*(<var>1.0</var>+fDensityCorr/(egamma*egamma));</td></tr>
+<tr><th id="701">701</th><td>  funcXiS = <var>2.0</var>;</td></tr>
+<tr><th id="702">702</th><td>  <b>if</b> (varShat &gt; <var>1.0</var>) {</td></tr>
+<tr><th id="703">703</th><td>    funcXiS = <var>1.0</var>;</td></tr>
+<tr><th id="704">704</th><td>  } <b>else</b> <b>if</b> (varShat &gt; varS1) {</td></tr>
+<tr><th id="705">705</th><td>    funcXiS = <var>1.0</var>+G4Log(varShat)*elDat-&gt;fILVarS1;</td></tr>
+<tr><th id="706">706</th><td>  }</td></tr>
+<tr><th id="707">707</th><td>  GetLPMFunctions(funcGS, funcPhiS, varShat);</td></tr>
+<tr><th id="708">708</th><td>  <i>//ComputeLPMGsPhis(funcGS, funcPhiS, varShat);</i></td></tr>
+<tr><th id="709">709</th><td><i>  //</i></td></tr>
+<tr><th id="710">710</th><td><i>  //MAKE SURE SUPPRESSION IS SMALLER THAN 1: due to Migdal's approximation on xi</i></td></tr>
+<tr><th id="711">711</th><td>  <b>if</b> (funcXiS*funcPhiS &gt; <var>1.</var> || varShat &gt; <var>0.57</var>) {</td></tr>
+<tr><th id="712">712</th><td>    funcXiS=<var>1.</var>/funcPhiS;</td></tr>
+<tr><th id="713">713</th><td>  }</td></tr>
+<tr><th id="714">714</th><td>}</td></tr>
+<tr><th id="715">715</th><td></td></tr>
+<tr><th id="716">716</th><td><em>void</em> G4eBremsstrahlungRelModel::ComputeLPMGsPhis(G4double&amp; funcGS,</td></tr>
+<tr><th id="717">717</th><td>                                                 G4double&amp; funcPhiS,</td></tr>
+<tr><th id="718">718</th><td>                                                 <em>const</em> G4double varShat)</td></tr>
+<tr><th id="719">719</th><td>{</td></tr>
+<tr><th id="720">720</th><td>  <b>if</b> (varShat &lt; <var>0.01</var>) {</td></tr>
+<tr><th id="721">721</th><td>    funcPhiS = <var>6.0</var>*varShat*(<var>1.0</var>-CLHEP::pi*varShat);</td></tr>
+<tr><th id="722">722</th><td>    funcGS   = <var>12.0</var>*varShat-<var>2.0</var>*funcPhiS;</td></tr>
+<tr><th id="723">723</th><td>  } <b>else</b> {</td></tr>
+<tr><th id="724">724</th><td>    <em>const</em> G4double varShat2 = varShat*varShat;</td></tr>
+<tr><th id="725">725</th><td>    <em>const</em> G4double varShat3 = varShat*varShat2;</td></tr>
+<tr><th id="726">726</th><td>    <em>const</em> G4double varShat4 = varShat2*varShat2;</td></tr>
+<tr><th id="727">727</th><td>    <i>// use Stanev approximation: for \psi(s) and compute G(s)</i></td></tr>
+<tr><th id="728">728</th><td>    <b>if</b> (varShat &lt; <var>0.415827</var>) {</td></tr>
+<tr><th id="729">729</th><td>      funcPhiS = <var>1.0</var>-G4Exp(-<var>6.0</var>*varShat*(<var>1.0</var>+varShat*(<var>3.0</var>-CLHEP::pi))</td></tr>
+<tr><th id="730">730</th><td>                + varShat3/(<var>0.623</var>+<var>0.796</var>*varShat+<var>0.658</var>*varShat2));</td></tr>
+<tr><th id="731">731</th><td>      <i>// 1-\exp \left\{-4s-\frac{8s^2}{1+3.936s+4.97s^2-0.05s^3+7.5s^4} \right\}</i></td></tr>
+<tr><th id="732">732</th><td>      <em>const</em> G4double funcPsiS = <var>1.0</var> - G4Exp(-<var>4.0</var>*varShat</td></tr>
+<tr><th id="733">733</th><td>                               - <var>8.0</var>*varShat2/(<var>1.0</var>+<var>3.936</var>*varShat+<var>4.97</var>*varShat2</td></tr>
+<tr><th id="734">734</th><td>                               - <var>0.05</var>*varShat3 + <var>7.5</var>*varShat4));</td></tr>
+<tr><th id="735">735</th><td>      <i>// G(s) = 3 \psi(s) - 2 \phi(s)</i></td></tr>
+<tr><th id="736">736</th><td>      funcGS = <var>3.0</var>*funcPsiS - <var>2.0</var>*funcPhiS;</td></tr>
+<tr><th id="737">737</th><td>    } <b>else</b> <b>if</b> (varShat&lt;<var>1.55</var>) {</td></tr>
+<tr><th id="738">738</th><td>      funcPhiS = <var>1.0</var>-G4Exp(-<var>6.0</var>*varShat*(<var>1.0</var>+varShat*(<var>3.0</var>-CLHEP::pi))</td></tr>
+<tr><th id="739">739</th><td>                + varShat3/(<var>0.623</var>+<var>0.796</var>*varShat+<var>0.658</var>*varShat2));</td></tr>
+<tr><th id="740">740</th><td>      <em>const</em> G4double dum0  = -<var>0.160723</var>          + <var>3.755030</var>*varShat</td></tr>
+<tr><th id="741">741</th><td>                             -<var>1.798138</var>*varShat2 + <var>0.672827</var>*varShat3</td></tr>
+<tr><th id="742">742</th><td>                             -<var>0.120772</var>*varShat4;</td></tr>
+<tr><th id="743">743</th><td>      funcGS = std::tanh(dum0);</td></tr>
+<tr><th id="744">744</th><td>    } <b>else</b> {</td></tr>
+<tr><th id="745">745</th><td>      funcPhiS = <var>1.0</var>-<var>0.011905</var>/varShat4;</td></tr>
+<tr><th id="746">746</th><td>      <b>if</b> (varShat&lt;<var>1.9156</var>) {</td></tr>
+<tr><th id="747">747</th><td>        <em>const</em> G4double dum0 = -<var>0.160723</var>          + <var>3.755030</var>*varShat</td></tr>
+<tr><th id="748">748</th><td>                              -<var>1.798138</var>*varShat2 + <var>0.672827</var>*varShat3</td></tr>
+<tr><th id="749">749</th><td>                              -<var>0.120772</var>*varShat4;</td></tr>
+<tr><th id="750">750</th><td>        funcGS = std::tanh(dum0);</td></tr>
+<tr><th id="751">751</th><td>      } <b>else</b> {</td></tr>
+<tr><th id="752">752</th><td>        funcGS   = <var>1.0</var>-<var>0.023065</var>/varShat4;</td></tr>
+<tr><th id="753">753</th><td>      }</td></tr>
+<tr><th id="754">754</th><td>    }</td></tr>
+<tr><th id="755">755</th><td>  }</td></tr>
+<tr><th id="756">756</th><td>}</td></tr>
+<tr><th id="757">757</th><td></td></tr>
+<tr><th id="758">758</th><td><i>// s goes up to 2 with ds = 0.01 to be the default bining</i></td></tr>
+<tr><th id="759">759</th><td><em>void</em> G4eBremsstrahlungRelModel::InitLPMFunctions()</td></tr>
+<tr><th id="760">760</th><td>{</td></tr>
+<tr><th id="761">761</th><td>  <b>if</b> (!gLPMFuncs.fIsInitialized) {</td></tr>
+<tr><th id="762">762</th><td>    <em>const</em> G4int num = gLPMFuncs.fSLimit*gLPMFuncs.fISDelta+<var>1</var>;</td></tr>
+<tr><th id="763">763</th><td>    gLPMFuncs.fLPMFuncG.resize(num);</td></tr>
+<tr><th id="764">764</th><td>    gLPMFuncs.fLPMFuncPhi.resize(num);</td></tr>
+<tr><th id="765">765</th><td>    <b>for</b> (G4int i = <var>0</var>; i &lt; num; ++i) {</td></tr>
+<tr><th id="766">766</th><td>      <em>const</em> G4double sval=i/gLPMFuncs.fISDelta;</td></tr>
+<tr><th id="767">767</th><td>      ComputeLPMGsPhis(gLPMFuncs.fLPMFuncG[i],gLPMFuncs.fLPMFuncPhi[i],sval);</td></tr>
+<tr><th id="768">768</th><td>    }</td></tr>
+<tr><th id="769">769</th><td>    gLPMFuncs.fIsInitialized = <b>true</b>;</td></tr>
+<tr><th id="770">770</th><td>  }</td></tr>
+<tr><th id="771">771</th><td>}</td></tr>
+<tr><th id="772">772</th><td></td></tr>
+<tr><th id="773">773</th><td><em>void</em> G4eBremsstrahlungRelModel::GetLPMFunctions(G4double&amp; lpmGs,</td></tr>
+<tr><th id="774">774</th><td>                                                G4double&amp; lpmPhis,</td></tr>
+<tr><th id="775">775</th><td>                                                <em>const</em> G4double sval)</td></tr>
+<tr><th id="776">776</th><td>{</td></tr>
+<tr><th id="777">777</th><td>  <b>if</b> (sval &lt; gLPMFuncs.fSLimit) {</td></tr>
+<tr><th id="778">778</th><td>    G4double     val = sval*gLPMFuncs.fISDelta;</td></tr>
+<tr><th id="779">779</th><td>    <em>const</em> G4int ilow = (G4int)val;</td></tr>
+<tr><th id="780">780</th><td>    val    -= ilow;</td></tr>
+<tr><th id="781">781</th><td>    lpmGs   = (gLPMFuncs.fLPMFuncG[ilow+<var>1</var>]-gLPMFuncs.fLPMFuncG[ilow])*val</td></tr>
+<tr><th id="782">782</th><td>              + gLPMFuncs.fLPMFuncG[ilow];</td></tr>
+<tr><th id="783">783</th><td>    lpmPhis = (gLPMFuncs.fLPMFuncPhi[ilow+<var>1</var>]-gLPMFuncs.fLPMFuncPhi[ilow])*val</td></tr>
+<tr><th id="784">784</th><td>              + gLPMFuncs.fLPMFuncPhi[ilow];</td></tr>
+<tr><th id="785">785</th><td>  } <b>else</b> {</td></tr>
+<tr><th id="786">786</th><td>    G4double ss = sval*sval;</td></tr>
+<tr><th id="787">787</th><td>    ss *= ss;</td></tr>
+<tr><th id="788">788</th><td>    lpmPhis = <var>1.0</var>-<var>0.01190476</var>/ss;</td></tr>
+<tr><th id="789">789</th><td>    lpmGs   = <var>1.0</var>-<var>0.0230655</var>/ss;</td></tr>
+<tr><th id="790">790</th><td>  }</td></tr>
+<tr><th id="791">791</th><td>}</td></tr>
+<tr><th id="792">792</th><td></td></tr>
+<tr><th id="793">793</th><td></td></tr>
+</table><hr/><p id='footer'>
+Generated on <em>2019-Aug-28</em> from project codebrowser<br />Powered by <a href='https://woboq.com'><img alt='Woboq' src='https://code.woboq.org/woboq-16.png' width='41' height='16' /></a> <a href='https://code.woboq.org'>Code Browser</a> 2.1
+<br/>Generator usage only permitted with license.</p>
+</div></body></html>

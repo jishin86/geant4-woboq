@@ -1,0 +1,381 @@
+<!doctype html>
+<html>
+<head>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"><title>G4QuadrangularFacet.cc source code [codebrowser/source/geometry/solids/specific/src/G4QuadrangularFacet.cc] - Woboq Code Browser</title>
+<link rel="stylesheet" href="../../../../../../../data/qtcreator.css" title="QtCreator"/>
+<link rel="alternate stylesheet" href="../../../../../../../data/kdevelop.css" title="KDevelop"/>
+<script type="text/javascript" src="../../../../../../../data/jquery/jquery.min.js"></script>
+<script type="text/javascript" src="../../../../../../../data/jquery/jquery-ui.min.js"></script>
+<script>var file = 'codebrowser/source/geometry/solids/specific/src/G4QuadrangularFacet.cc'; var root_path = '../../../../../..'; var data_path = '../../../../../../../data';</script>
+<script src='../../../../../../../data/codebrowser.js'></script>
+</head>
+<body><div id='header'><h1 id='breadcrumb'><span>Browse the source code of </span><a href='../../../../..'>codebrowser</a>/<a href='../../../..'>source</a>/<a href='../../..'>geometry</a>/<a href='../..'>solids</a>/<a href='..'>specific</a>/<a href='./'>src</a>/<a href='G4QuadrangularFacet.cc.html'>G4QuadrangularFacet.cc</a></h1></div>
+<hr/><div id='content'><table class="code">
+<tr><th id="1">1</th><td><i>//</i></td></tr>
+<tr><th id="2">2</th><td><i>// ********************************************************************</i></td></tr>
+<tr><th id="3">3</th><td><i>// * License and Disclaimer                                           *</i></td></tr>
+<tr><th id="4">4</th><td><i>// *                                                                  *</i></td></tr>
+<tr><th id="5">5</th><td><i>// * The  Geant4 software  is  copyright of the Copyright Holders  of *</i></td></tr>
+<tr><th id="6">6</th><td><i>// * the Geant4 Collaboration.  It is provided  under  the terms  and *</i></td></tr>
+<tr><th id="7">7</th><td><i>// * conditions of the Geant4 Software License,  included in the file *</i></td></tr>
+<tr><th id="8">8</th><td><i>// * LICENSE and available at  <a href="http://cern.ch/geant4/license">http://cern.ch/geant4/license</a> .  These *</i></td></tr>
+<tr><th id="9">9</th><td><i>// * include a list of copyright holders.                             *</i></td></tr>
+<tr><th id="10">10</th><td><i>// *                                                                  *</i></td></tr>
+<tr><th id="11">11</th><td><i>// * Neither the authors of this software system, nor their employing *</i></td></tr>
+<tr><th id="12">12</th><td><i>// * institutes,nor the agencies providing financial support for this *</i></td></tr>
+<tr><th id="13">13</th><td><i>// * work  make  any representation or  warranty, express or implied, *</i></td></tr>
+<tr><th id="14">14</th><td><i>// * regarding  this  software system or assume any liability for its *</i></td></tr>
+<tr><th id="15">15</th><td><i>// * use.  Please see the license in the file  LICENSE  and URL above *</i></td></tr>
+<tr><th id="16">16</th><td><i>// * for the full disclaimer and the limitation of liability.         *</i></td></tr>
+<tr><th id="17">17</th><td><i>// *                                                                  *</i></td></tr>
+<tr><th id="18">18</th><td><i>// * This  code  implementation is the result of  the  scientific and *</i></td></tr>
+<tr><th id="19">19</th><td><i>// * technical work of the GEANT4 collaboration and of QinetiQ Ltd,   *</i></td></tr>
+<tr><th id="20">20</th><td><i>// * subject to DEFCON 705 IPR conditions.                            *</i></td></tr>
+<tr><th id="21">21</th><td><i>// * By using,  copying,  modifying or  distributing the software (or *</i></td></tr>
+<tr><th id="22">22</th><td><i>// * any work based  on the software)  you  agree  to acknowledge its *</i></td></tr>
+<tr><th id="23">23</th><td><i>// * use  in  resulting  scientific  publications,  and indicate your *</i></td></tr>
+<tr><th id="24">24</th><td><i>// * acceptance of all terms of the Geant4 Software license.          *</i></td></tr>
+<tr><th id="25">25</th><td><i>// ********************************************************************</i></td></tr>
+<tr><th id="26">26</th><td><i>//</i></td></tr>
+<tr><th id="27">27</th><td><i>//</i></td></tr>
+<tr><th id="28">28</th><td><i>//</i></td></tr>
+<tr><th id="29">29</th><td><i>// %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%</i></td></tr>
+<tr><th id="30">30</th><td><i>//</i></td></tr>
+<tr><th id="31">31</th><td><i>// CHANGE HISTORY</i></td></tr>
+<tr><th id="32">32</th><td><i>// --------------</i></td></tr>
+<tr><th id="33">33</th><td><i>//</i></td></tr>
+<tr><th id="34">34</th><td><i>// 31 October 2004  P R Truscott, QinetiQ Ltd, UK - Created.</i></td></tr>
+<tr><th id="35">35</th><td><i>//</i></td></tr>
+<tr><th id="36">36</th><td><i>// 12 October 2012  M Gayer, CERN</i></td></tr>
+<tr><th id="37">37</th><td><i>//                  New implementation reducing memory requirements by 50%,</i></td></tr>
+<tr><th id="38">38</th><td><i>//                  and considerable CPU speedup together with the new</i></td></tr>
+<tr><th id="39">39</th><td><i>//                  implementation of G4TessellatedSolid.</i></td></tr>
+<tr><th id="40">40</th><td><i>//</i></td></tr>
+<tr><th id="41">41</th><td><i>// 29 February 2016 E Tcherniaev, CERN</i></td></tr>
+<tr><th id="42">42</th><td><i>//                  Added exhaustive tests to catch various problems with a</i></td></tr>
+<tr><th id="43">43</th><td><i>//                  quadrangular facet: collinear vertices, non planar surface,</i></td></tr>
+<tr><th id="44">44</th><td><i>//                  degenerate, concave or self intersecting quadrilateral.</i></td></tr>
+<tr><th id="45">45</th><td><i>//</i></td></tr>
+<tr><th id="46">46</th><td><i>// %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%</i></td></tr>
+<tr><th id="47">47</th><td></td></tr>
+<tr><th id="48">48</th><td><u>#include <a href="../include/G4QuadrangularFacet.hh.html">"G4QuadrangularFacet.hh"</a></u></td></tr>
+<tr><th id="49">49</th><td><u>#include <a href="../../../../global/HEPGeometry/include/geomdefs.hh.html">"geomdefs.hh"</a></u></td></tr>
+<tr><th id="50">50</th><td><u>#include <a href="../../../../global/HEPRandom/include/Randomize.hh.html">"Randomize.hh"</a></u></td></tr>
+<tr><th id="51">51</th><td> </td></tr>
+<tr><th id="52">52</th><td><b>using</b> <b>namespace</b> <span class="namespace">std</span>;</td></tr>
+<tr><th id="53">53</th><td></td></tr>
+<tr><th id="54">54</th><td><i>///////////////////////////////////////////////////////////////////////////////</i></td></tr>
+<tr><th id="55">55</th><td><i>//</i></td></tr>
+<tr><th id="56">56</th><td><i>// !!!THIS IS A FUDGE!!!  IT'S TWO ADJACENT G4TRIANGULARFACETS</i></td></tr>
+<tr><th id="57">57</th><td><i>// --- NOT EFFICIENT BUT PRACTICAL.</i></td></tr>
+<tr><th id="58">58</th><td><i>//</i></td></tr>
+<tr><th id="59">59</th><td><span class='error' title="use of undeclared identifier &apos;G4QuadrangularFacet&apos;">G4QuadrangularFacet</span>::G4QuadrangularFacet (<em>const</em> G4ThreeVector &amp;vt0,</td></tr>
+<tr><th id="60">60</th><td>                                          <em>const</em> G4ThreeVector &amp;vt1,</td></tr>
+<tr><th id="61">61</th><td>                                          <em>const</em> G4ThreeVector &amp;vt2,</td></tr>
+<tr><th id="62">62</th><td>                                          <em>const</em> G4ThreeVector &amp;vt3,</td></tr>
+<tr><th id="63">63</th><td>                                                G4FacetVertexType vertexType)</td></tr>
+<tr><th id="64">64</th><td>{</td></tr>
+<tr><th id="65">65</th><td>  G4double delta   =  <var>1.0</var> * kCarTolerance; <i>// dimension tolerance</i></td></tr>
+<tr><th id="66">66</th><td>  G4double epsilon = <var>0.01</var> * kCarTolerance; <i>// planarity tolerance</i></td></tr>
+<tr><th id="67">67</th><td></td></tr>
+<tr><th id="68">68</th><td>  fRadius = <var>0.0</var>;</td></tr>
+<tr><th id="69">69</th><td></td></tr>
+<tr><th id="70">70</th><td>  G4ThreeVector e1, e2, e3;</td></tr>
+<tr><th id="71">71</th><td>  SetVertex(<var>0</var>, vt0);</td></tr>
+<tr><th id="72">72</th><td>  <b>if</b> (vertexType == ABSOLUTE)</td></tr>
+<tr><th id="73">73</th><td>  {</td></tr>
+<tr><th id="74">74</th><td>    SetVertex(<var>1</var>, vt1);</td></tr>
+<tr><th id="75">75</th><td>    SetVertex(<var>2</var>, vt2);</td></tr>
+<tr><th id="76">76</th><td>    SetVertex(<var>3</var>, vt3);</td></tr>
+<tr><th id="77">77</th><td></td></tr>
+<tr><th id="78">78</th><td>    e1 = vt1 - vt0;</td></tr>
+<tr><th id="79">79</th><td>    e2 = vt2 - vt0;</td></tr>
+<tr><th id="80">80</th><td>    e3 = vt3 - vt0;</td></tr>
+<tr><th id="81">81</th><td>  }</td></tr>
+<tr><th id="82">82</th><td>  <b>else</b></td></tr>
+<tr><th id="83">83</th><td>  {</td></tr>
+<tr><th id="84">84</th><td>    SetVertex(<var>1</var>, vt0 + vt1);</td></tr>
+<tr><th id="85">85</th><td>    SetVertex(<var>2</var>, vt0 + vt2);</td></tr>
+<tr><th id="86">86</th><td>    SetVertex(<var>3</var>, vt0 + vt3);</td></tr>
+<tr><th id="87">87</th><td></td></tr>
+<tr><th id="88">88</th><td>    e1 = vt1;</td></tr>
+<tr><th id="89">89</th><td>    e2 = vt2;</td></tr>
+<tr><th id="90">90</th><td>    e3 = vt3;</td></tr>
+<tr><th id="91">91</th><td>  }</td></tr>
+<tr><th id="92">92</th><td></td></tr>
+<tr><th id="93">93</th><td>  <i>// Check length of sides and diagonals</i></td></tr>
+<tr><th id="94">94</th><td><i>  //</i></td></tr>
+<tr><th id="95">95</th><td>  G4double leng1 = e1.mag();</td></tr>
+<tr><th id="96">96</th><td>  G4double leng2 = (e2-e1).mag();</td></tr>
+<tr><th id="97">97</th><td>  G4double leng3 = (e3-e2).mag();</td></tr>
+<tr><th id="98">98</th><td>  G4double leng4 = e3.mag();</td></tr>
+<tr><th id="99">99</th><td></td></tr>
+<tr><th id="100">100</th><td>  G4double diag1 = e2.mag();</td></tr>
+<tr><th id="101">101</th><td>  G4double diag2 = (e3-e1).mag();</td></tr>
+<tr><th id="102">102</th><td></td></tr>
+<tr><th id="103">103</th><td>  <b>if</b> (leng1 &lt;= delta || leng2 &lt;= delta || leng3 &lt;= delta || leng4 &lt;= delta ||</td></tr>
+<tr><th id="104">104</th><td>      diag1 &lt;= delta || diag2 &lt;= delta)</td></tr>
+<tr><th id="105">105</th><td>  {</td></tr>
+<tr><th id="106">106</th><td>    ostringstream message;</td></tr>
+<tr><th id="107">107</th><td>    message &lt;&lt; <q>"Sides/diagonals of facet are too small."</q> &lt;&lt; <a class="macro" href="../../../../global/management/include/G4ios.hh.html#60" title="std::endl" data-ref="_M/G4endl">G4endl</a></td></tr>
+<tr><th id="108">108</th><td>            &lt;&lt; <q>"P0 = "</q> &lt;&lt; GetVertex(<var>0</var>) &lt;&lt; <a class="macro" href="../../../../global/management/include/G4ios.hh.html#60" title="std::endl" data-ref="_M/G4endl">G4endl</a></td></tr>
+<tr><th id="109">109</th><td>            &lt;&lt; <q>"P1 = "</q> &lt;&lt; GetVertex(<var>1</var>) &lt;&lt; <a class="macro" href="../../../../global/management/include/G4ios.hh.html#60" title="std::endl" data-ref="_M/G4endl">G4endl</a></td></tr>
+<tr><th id="110">110</th><td>            &lt;&lt; <q>"P2 = "</q> &lt;&lt; GetVertex(<var>2</var>) &lt;&lt; <a class="macro" href="../../../../global/management/include/G4ios.hh.html#60" title="std::endl" data-ref="_M/G4endl">G4endl</a></td></tr>
+<tr><th id="111">111</th><td>            &lt;&lt; <q>"P3 = "</q> &lt;&lt; GetVertex(<var>3</var>) &lt;&lt; <a class="macro" href="../../../../global/management/include/G4ios.hh.html#60" title="std::endl" data-ref="_M/G4endl">G4endl</a></td></tr>
+<tr><th id="112">112</th><td>            &lt;&lt; <q>"Side1 length (P0-&gt;P1) = "</q> &lt;&lt; leng1 &lt;&lt; <a class="macro" href="../../../../global/management/include/G4ios.hh.html#60" title="std::endl" data-ref="_M/G4endl">G4endl</a></td></tr>
+<tr><th id="113">113</th><td>            &lt;&lt; <q>"Side2 length (P1-&gt;P2) = "</q> &lt;&lt; leng2 &lt;&lt; <a class="macro" href="../../../../global/management/include/G4ios.hh.html#60" title="std::endl" data-ref="_M/G4endl">G4endl</a></td></tr>
+<tr><th id="114">114</th><td>            &lt;&lt; <q>"Side3 length (P2-&gt;P3) = "</q> &lt;&lt; leng3 &lt;&lt; <a class="macro" href="../../../../global/management/include/G4ios.hh.html#60" title="std::endl" data-ref="_M/G4endl">G4endl</a></td></tr>
+<tr><th id="115">115</th><td>            &lt;&lt; <q>"Side4 length (P3-&gt;P0) = "</q> &lt;&lt; leng4 &lt;&lt; <a class="macro" href="../../../../global/management/include/G4ios.hh.html#60" title="std::endl" data-ref="_M/G4endl">G4endl</a></td></tr>
+<tr><th id="116">116</th><td>            &lt;&lt; <q>"Diagonal1 length (P0-&gt;P2) = "</q> &lt;&lt; diag1 &lt;&lt; <a class="macro" href="../../../../global/management/include/G4ios.hh.html#60" title="std::endl" data-ref="_M/G4endl">G4endl</a></td></tr>
+<tr><th id="117">117</th><td>            &lt;&lt; <q>"Diagonal2 length (P1-&gt;P3) = "</q> &lt;&lt; diag2;</td></tr>
+<tr><th id="118">118</th><td>    G4Exception(<q>"G4QuadrangularFacet::G4QuadrangularFacet()"</q>,</td></tr>
+<tr><th id="119">119</th><td>                <q>"GeomSolids1001"</q>, JustWarning, message);</td></tr>
+<tr><th id="120">120</th><td>    <b>return</b>;</td></tr>
+<tr><th id="121">121</th><td>  }</td></tr>
+<tr><th id="122">122</th><td></td></tr>
+<tr><th id="123">123</th><td>  <i>// Check that vertices are not collinear</i></td></tr>
+<tr><th id="124">124</th><td><i>  //</i></td></tr>
+<tr><th id="125">125</th><td>  G4double s1 = (e1.cross(e2)).mag()*<var>0.5</var>;</td></tr>
+<tr><th id="126">126</th><td>  G4double s2 = ((e2-e1).cross(e3-e2)).mag()*<var>0.5</var>;</td></tr>
+<tr><th id="127">127</th><td>  G4double s3 = (e2.cross(e3)).mag()*<var>0.5</var>;</td></tr>
+<tr><th id="128">128</th><td>  G4double s4 = (e1.cross(e3)).mag()*<var>0.5</var>;</td></tr>
+<tr><th id="129">129</th><td></td></tr>
+<tr><th id="130">130</th><td>  G4double h1 = <var>2.</var>*s1 / std::max(std::max(leng1,leng2),diag1);</td></tr>
+<tr><th id="131">131</th><td>  G4double h2 = <var>2.</var>*s2 / std::max(std::max(leng2,leng3),diag2);</td></tr>
+<tr><th id="132">132</th><td>  G4double h3 = <var>2.</var>*s3 / std::max(std::max(leng3,leng4),diag1);</td></tr>
+<tr><th id="133">133</th><td>  G4double h4 = <var>2.</var>*s4 / std::max(std::max(leng4,leng1),diag2);</td></tr>
+<tr><th id="134">134</th><td>   </td></tr>
+<tr><th id="135">135</th><td>  <b>if</b> (h1 &lt;= delta || h2 &lt;= delta || h3 &lt;= delta || h4 &lt;= delta )</td></tr>
+<tr><th id="136">136</th><td>  {</td></tr>
+<tr><th id="137">137</th><td>    ostringstream message;</td></tr>
+<tr><th id="138">138</th><td>    message &lt;&lt; <q>"Facet has three or more collinear vertices."</q> &lt;&lt; <a class="macro" href="../../../../global/management/include/G4ios.hh.html#60" title="std::endl" data-ref="_M/G4endl">G4endl</a></td></tr>
+<tr><th id="139">139</th><td>            &lt;&lt; <q>"P0 = "</q> &lt;&lt; GetVertex(<var>0</var>) &lt;&lt; <a class="macro" href="../../../../global/management/include/G4ios.hh.html#60" title="std::endl" data-ref="_M/G4endl">G4endl</a></td></tr>
+<tr><th id="140">140</th><td>            &lt;&lt; <q>"P1 = "</q> &lt;&lt; GetVertex(<var>1</var>) &lt;&lt; <a class="macro" href="../../../../global/management/include/G4ios.hh.html#60" title="std::endl" data-ref="_M/G4endl">G4endl</a></td></tr>
+<tr><th id="141">141</th><td>            &lt;&lt; <q>"P2 = "</q> &lt;&lt; GetVertex(<var>2</var>) &lt;&lt; <a class="macro" href="../../../../global/management/include/G4ios.hh.html#60" title="std::endl" data-ref="_M/G4endl">G4endl</a></td></tr>
+<tr><th id="142">142</th><td>            &lt;&lt; <q>"P3 = "</q> &lt;&lt; GetVertex(<var>3</var>) &lt;&lt; <a class="macro" href="../../../../global/management/include/G4ios.hh.html#60" title="std::endl" data-ref="_M/G4endl">G4endl</a></td></tr>
+<tr><th id="143">143</th><td>            &lt;&lt; <q>"Height in P0-P1-P2 = "</q> &lt;&lt; h1 &lt;&lt; <a class="macro" href="../../../../global/management/include/G4ios.hh.html#60" title="std::endl" data-ref="_M/G4endl">G4endl</a></td></tr>
+<tr><th id="144">144</th><td>            &lt;&lt; <q>"Height in P1-P2-P3 = "</q> &lt;&lt; h2 &lt;&lt; <a class="macro" href="../../../../global/management/include/G4ios.hh.html#60" title="std::endl" data-ref="_M/G4endl">G4endl</a></td></tr>
+<tr><th id="145">145</th><td>            &lt;&lt; <q>"Height in P2-P3-P4 = "</q> &lt;&lt; h3 &lt;&lt; <a class="macro" href="../../../../global/management/include/G4ios.hh.html#60" title="std::endl" data-ref="_M/G4endl">G4endl</a></td></tr>
+<tr><th id="146">146</th><td>            &lt;&lt; <q>"Height in P4-P0-P1 = "</q> &lt;&lt; h4;</td></tr>
+<tr><th id="147">147</th><td>    G4Exception(<q>"G4QuadrangularFacet::G4QuadrangularFacet()"</q>,</td></tr>
+<tr><th id="148">148</th><td>	        <q>"GeomSolids1001"</q>, JustWarning, message);</td></tr>
+<tr><th id="149">149</th><td>    <b>return</b>;</td></tr>
+<tr><th id="150">150</th><td>  }</td></tr>
+<tr><th id="151">151</th><td></td></tr>
+<tr><th id="152">152</th><td>  <i>// Check that vertices are coplanar by computing minimal</i></td></tr>
+<tr><th id="153">153</th><td><i>  // height of tetrahedron comprising of vertices</i></td></tr>
+<tr><th id="154">154</th><td><i>  //</i></td></tr>
+<tr><th id="155">155</th><td>  G4double smax = std::max( std::max(s1,s2), std::max(s3,s4) ); </td></tr>
+<tr><th id="156">156</th><td>  G4double hmin = <var>0.5</var> * std::fabs( e1.dot(e2.cross(e3)) ) / smax;</td></tr>
+<tr><th id="157">157</th><td>  <b>if</b> (hmin &gt;= epsilon)</td></tr>
+<tr><th id="158">158</th><td>  {</td></tr>
+<tr><th id="159">159</th><td>    ostringstream message;</td></tr>
+<tr><th id="160">160</th><td>    message &lt;&lt; <q>"Facet is not planar."</q> &lt;&lt; <a class="macro" href="../../../../global/management/include/G4ios.hh.html#60" title="std::endl" data-ref="_M/G4endl">G4endl</a></td></tr>
+<tr><th id="161">161</th><td>            &lt;&lt; <q>"Disrepancy = "</q> &lt;&lt; hmin &lt;&lt; <a class="macro" href="../../../../global/management/include/G4ios.hh.html#60" title="std::endl" data-ref="_M/G4endl">G4endl</a></td></tr>
+<tr><th id="162">162</th><td>            &lt;&lt; <q>"P0 = "</q> &lt;&lt; GetVertex(<var>0</var>) &lt;&lt; <a class="macro" href="../../../../global/management/include/G4ios.hh.html#60" title="std::endl" data-ref="_M/G4endl">G4endl</a></td></tr>
+<tr><th id="163">163</th><td>            &lt;&lt; <q>"P1 = "</q> &lt;&lt; GetVertex(<var>1</var>) &lt;&lt; <a class="macro" href="../../../../global/management/include/G4ios.hh.html#60" title="std::endl" data-ref="_M/G4endl">G4endl</a></td></tr>
+<tr><th id="164">164</th><td>            &lt;&lt; <q>"P2 = "</q> &lt;&lt; GetVertex(<var>2</var>) &lt;&lt; <a class="macro" href="../../../../global/management/include/G4ios.hh.html#60" title="std::endl" data-ref="_M/G4endl">G4endl</a></td></tr>
+<tr><th id="165">165</th><td>            &lt;&lt; <q>"P3 = "</q> &lt;&lt; GetVertex(<var>3</var>);</td></tr>
+<tr><th id="166">166</th><td>    G4Exception(<q>"G4QuadrangularFacet::G4QuadrangularFacet()"</q>,</td></tr>
+<tr><th id="167">167</th><td>	        <q>"GeomSolids1001"</q>, JustWarning, message);</td></tr>
+<tr><th id="168">168</th><td>    <b>return</b>;</td></tr>
+<tr><th id="169">169</th><td>  }</td></tr>
+<tr><th id="170">170</th><td>  </td></tr>
+<tr><th id="171">171</th><td>  <i>// Check that facet is convex by computing crosspoint </i></td></tr>
+<tr><th id="172">172</th><td><i>  // of diagonals</i></td></tr>
+<tr><th id="173">173</th><td><i>  //</i></td></tr>
+<tr><th id="174">174</th><td>  G4ThreeVector normal = e2.cross(e3-e1);</td></tr>
+<tr><th id="175">175</th><td>  G4double s = kInfinity, t = kInfinity, magnitude2 = normal.mag2();</td></tr>
+<tr><th id="176">176</th><td>  <b>if</b> (magnitude2 &gt; delta*delta) <i>// check: magnitude2 != 0.</i></td></tr>
+<tr><th id="177">177</th><td>  {</td></tr>
+<tr><th id="178">178</th><td>    s = normal.dot(e1.cross(e3-e1)) / magnitude2;</td></tr>
+<tr><th id="179">179</th><td>    t = normal.dot(e1.cross(e2))    / magnitude2;</td></tr>
+<tr><th id="180">180</th><td>  }</td></tr>
+<tr><th id="181">181</th><td>  <b>if</b> (s &lt;= <var>0.</var> || s &gt;= <var>1.</var> || t &lt;= <var>0.</var> || t &gt;= <var>1.</var>)</td></tr>
+<tr><th id="182">182</th><td>  {</td></tr>
+<tr><th id="183">183</th><td>    ostringstream message;</td></tr>
+<tr><th id="184">184</th><td>    message &lt;&lt; <q>"Facet is not convex."</q> &lt;&lt; <a class="macro" href="../../../../global/management/include/G4ios.hh.html#60" title="std::endl" data-ref="_M/G4endl">G4endl</a></td></tr>
+<tr><th id="185">185</th><td>            &lt;&lt; <q>"Parameters of crosspoint of diagonals: "</q></td></tr>
+<tr><th id="186">186</th><td>            &lt;&lt; s &lt;&lt; <q>" and "</q> &lt;&lt; t &lt;&lt; <a class="macro" href="../../../../global/management/include/G4ios.hh.html#60" title="std::endl" data-ref="_M/G4endl">G4endl</a></td></tr>
+<tr><th id="187">187</th><td>            &lt;&lt; <q>"should both be within (0,1) range"</q> &lt;&lt; <a class="macro" href="../../../../global/management/include/G4ios.hh.html#60" title="std::endl" data-ref="_M/G4endl">G4endl</a></td></tr>
+<tr><th id="188">188</th><td>	    &lt;&lt; <q>"P0 = "</q> &lt;&lt; GetVertex(<var>0</var>) &lt;&lt; <a class="macro" href="../../../../global/management/include/G4ios.hh.html#60" title="std::endl" data-ref="_M/G4endl">G4endl</a></td></tr>
+<tr><th id="189">189</th><td>	    &lt;&lt; <q>"P1 = "</q> &lt;&lt; GetVertex(<var>1</var>) &lt;&lt; <a class="macro" href="../../../../global/management/include/G4ios.hh.html#60" title="std::endl" data-ref="_M/G4endl">G4endl</a></td></tr>
+<tr><th id="190">190</th><td>	    &lt;&lt; <q>"P2 = "</q> &lt;&lt; GetVertex(<var>2</var>) &lt;&lt; <a class="macro" href="../../../../global/management/include/G4ios.hh.html#60" title="std::endl" data-ref="_M/G4endl">G4endl</a></td></tr>
+<tr><th id="191">191</th><td>	    &lt;&lt; <q>"P3 = "</q> &lt;&lt; GetVertex(<var>3</var>);</td></tr>
+<tr><th id="192">192</th><td>    G4Exception(<q>"G4QuadrangularFacet::G4QuadrangularFacet()"</q>,</td></tr>
+<tr><th id="193">193</th><td>	        <q>"GeomSolids1001"</q>, JustWarning, message);</td></tr>
+<tr><th id="194">194</th><td>    <b>return</b>;</td></tr>
+<tr><th id="195">195</th><td>  }</td></tr>
+<tr><th id="196">196</th><td></td></tr>
+<tr><th id="197">197</th><td>  <i>// Define facet</i></td></tr>
+<tr><th id="198">198</th><td><i>  //</i></td></tr>
+<tr><th id="199">199</th><td>  fFacet1 = G4TriangularFacet(GetVertex(<var>0</var>),GetVertex(<var>1</var>),GetVertex(<var>2</var>),ABSOLUTE);</td></tr>
+<tr><th id="200">200</th><td>  fFacet2 = G4TriangularFacet(GetVertex(<var>0</var>),GetVertex(<var>2</var>),GetVertex(<var>3</var>),ABSOLUTE);</td></tr>
+<tr><th id="201">201</th><td></td></tr>
+<tr><th id="202">202</th><td>  normal = normal.unit();</td></tr>
+<tr><th id="203">203</th><td>  fFacet1.SetSurfaceNormal(normal);</td></tr>
+<tr><th id="204">204</th><td>  fFacet2.SetSurfaceNormal(normal);</td></tr>
+<tr><th id="205">205</th><td>  </td></tr>
+<tr><th id="206">206</th><td>  G4ThreeVector vtmp = <var>0.5</var> * (e1 + e2);</td></tr>
+<tr><th id="207">207</th><td>  fCircumcentre = GetVertex(<var>0</var>) + vtmp;</td></tr>
+<tr><th id="208">208</th><td>  G4double radiusSqr = vtmp.mag2();</td></tr>
+<tr><th id="209">209</th><td>  fRadius = std::sqrt(radiusSqr);</td></tr>
+<tr><th id="210">210</th><td>  <i>// 29.02.2016 Remark by E.Tcherniaev: computation</i></td></tr>
+<tr><th id="211">211</th><td><i>  // of fCircumcenter and fRadius is wrong, however</i></td></tr>
+<tr><th id="212">212</th><td><i>  // it did not create any problem till now.</i></td></tr>
+<tr><th id="213">213</th><td><i>  // Bizarre! Need to investigate!</i></td></tr>
+<tr><th id="214">214</th><td>}</td></tr>
+<tr><th id="215">215</th><td></td></tr>
+<tr><th id="216">216</th><td><i>///////////////////////////////////////////////////////////////////////////////</i></td></tr>
+<tr><th id="217">217</th><td><i>//</i></td></tr>
+<tr><th id="218">218</th><td><span class='error' title="use of undeclared identifier &apos;G4QuadrangularFacet&apos;">G4QuadrangularFacet</span>::~G4QuadrangularFacet ()</td></tr>
+<tr><th id="219">219</th><td>{</td></tr>
+<tr><th id="220">220</th><td>}</td></tr>
+<tr><th id="221">221</th><td></td></tr>
+<tr><th id="222">222</th><td><i>///////////////////////////////////////////////////////////////////////////////</i></td></tr>
+<tr><th id="223">223</th><td><i>//</i></td></tr>
+<tr><th id="224">224</th><td><span class='error' title="use of undeclared identifier &apos;G4QuadrangularFacet&apos;">G4QuadrangularFacet</span>::G4QuadrangularFacet (<em>const</em> <span class='error' title="unknown type name &apos;G4QuadrangularFacet&apos;">G4QuadrangularFacet</span> &amp;rhs)</td></tr>
+<tr><th id="225">225</th><td>  : G4VFacet(rhs)</td></tr>
+<tr><th id="226">226</th><td>{</td></tr>
+<tr><th id="227">227</th><td>  fFacet1 = rhs.fFacet1;</td></tr>
+<tr><th id="228">228</th><td>  fFacet2 = rhs.fFacet2;</td></tr>
+<tr><th id="229">229</th><td>  fRadius = <var>0.0</var>;</td></tr>
+<tr><th id="230">230</th><td>}</td></tr>
+<tr><th id="231">231</th><td></td></tr>
+<tr><th id="232">232</th><td><i>///////////////////////////////////////////////////////////////////////////////</i></td></tr>
+<tr><th id="233">233</th><td><i>//</i></td></tr>
+<tr><th id="234">234</th><td><span class='error' title="unknown type name &apos;G4QuadrangularFacet&apos;">G4QuadrangularFacet</span> &amp;</td></tr>
+<tr><th id="235">235</th><td><span class='error' title="use of undeclared identifier &apos;G4QuadrangularFacet&apos;">G4QuadrangularFacet</span>::<b>operator</b>=(<em>const</em> <span class='error' title="unknown type name &apos;G4QuadrangularFacet&apos;">G4QuadrangularFacet</span> &amp;rhs)</td></tr>
+<tr><th id="236">236</th><td>{</td></tr>
+<tr><th id="237">237</th><td>  <b>if</b> (<b>this</b> == &amp;rhs)</td></tr>
+<tr><th id="238">238</th><td>    <b>return</b> *<b>this</b>;</td></tr>
+<tr><th id="239">239</th><td></td></tr>
+<tr><th id="240">240</th><td>  fFacet1 = rhs.fFacet1;</td></tr>
+<tr><th id="241">241</th><td>  fFacet2 = rhs.fFacet2;</td></tr>
+<tr><th id="242">242</th><td>  fRadius = <var>0.0</var>;</td></tr>
+<tr><th id="243">243</th><td></td></tr>
+<tr><th id="244">244</th><td>  <b>return</b> *<b>this</b>;</td></tr>
+<tr><th id="245">245</th><td>}</td></tr>
+<tr><th id="246">246</th><td></td></tr>
+<tr><th id="247">247</th><td><i>///////////////////////////////////////////////////////////////////////////////</i></td></tr>
+<tr><th id="248">248</th><td><i>//</i></td></tr>
+<tr><th id="249">249</th><td>G4VFacet *<span class='error' title="use of undeclared identifier &apos;G4QuadrangularFacet&apos;">G4QuadrangularFacet</span>::GetClone ()</td></tr>
+<tr><th id="250">250</th><td>{</td></tr>
+<tr><th id="251">251</th><td>  G4QuadrangularFacet *c = <b>new</b> G4QuadrangularFacet (GetVertex(<var>0</var>), GetVertex(<var>1</var>),</td></tr>
+<tr><th id="252">252</th><td>                                                    GetVertex(<var>2</var>), GetVertex(<var>3</var>),</td></tr>
+<tr><th id="253">253</th><td>                                                    ABSOLUTE);</td></tr>
+<tr><th id="254">254</th><td>  <b>return</b> c;</td></tr>
+<tr><th id="255">255</th><td>}</td></tr>
+<tr><th id="256">256</th><td></td></tr>
+<tr><th id="257">257</th><td><i>///////////////////////////////////////////////////////////////////////////////</i></td></tr>
+<tr><th id="258">258</th><td><i>//</i></td></tr>
+<tr><th id="259">259</th><td>G4ThreeVector <span class='error' title="use of undeclared identifier &apos;G4QuadrangularFacet&apos;">G4QuadrangularFacet</span>::Distance (<em>const</em> G4ThreeVector &amp;p)</td></tr>
+<tr><th id="260">260</th><td>{</td></tr>
+<tr><th id="261">261</th><td>  G4ThreeVector v1 = fFacet1.Distance(p);</td></tr>
+<tr><th id="262">262</th><td>  G4ThreeVector v2 = fFacet2.Distance(p);</td></tr>
+<tr><th id="263">263</th><td></td></tr>
+<tr><th id="264">264</th><td>  <b>if</b> (v1.mag2() &lt; v2.mag2()) <b>return</b> v1;</td></tr>
+<tr><th id="265">265</th><td>  <b>else</b> <b>return</b> v2;</td></tr>
+<tr><th id="266">266</th><td>}</td></tr>
+<tr><th id="267">267</th><td></td></tr>
+<tr><th id="268">268</th><td><i>///////////////////////////////////////////////////////////////////////////////</i></td></tr>
+<tr><th id="269">269</th><td><i>//</i></td></tr>
+<tr><th id="270">270</th><td>G4double <span class='error' title="use of undeclared identifier &apos;G4QuadrangularFacet&apos;">G4QuadrangularFacet</span>::Distance (<em>const</em> G4ThreeVector &amp;p,</td></tr>
+<tr><th id="271">271</th><td>                                              G4double)</td></tr>
+<tr><th id="272">272</th><td>{  </td></tr>
+<tr><th id="273">273</th><td>  G4double dist = Distance(p).mag();</td></tr>
+<tr><th id="274">274</th><td>  <b>return</b> dist;</td></tr>
+<tr><th id="275">275</th><td>}</td></tr>
+<tr><th id="276">276</th><td></td></tr>
+<tr><th id="277">277</th><td><i>///////////////////////////////////////////////////////////////////////////////</i></td></tr>
+<tr><th id="278">278</th><td><i>//</i></td></tr>
+<tr><th id="279">279</th><td>G4double <span class='error' title="use of undeclared identifier &apos;G4QuadrangularFacet&apos;">G4QuadrangularFacet</span>::Distance (<em>const</em> G4ThreeVector &amp;p, G4double,</td></tr>
+<tr><th id="280">280</th><td>                                        <em>const</em> G4bool outgoing)</td></tr>
+<tr><th id="281">281</th><td>{</td></tr>
+<tr><th id="282">282</th><td>  G4double dist;</td></tr>
+<tr><th id="283">283</th><td></td></tr>
+<tr><th id="284">284</th><td>  G4ThreeVector v = Distance(p);</td></tr>
+<tr><th id="285">285</th><td>  G4double dir = v.dot(GetSurfaceNormal());</td></tr>
+<tr><th id="286">286</th><td>  <b>if</b> ( ((dir &gt; dirTolerance) &amp;&amp; (!outgoing))</td></tr>
+<tr><th id="287">287</th><td>    || ((dir &lt; -dirTolerance) &amp;&amp; outgoing))</td></tr>
+<tr><th id="288">288</th><td>    dist = kInfinity;</td></tr>
+<tr><th id="289">289</th><td>  <b>else</b> </td></tr>
+<tr><th id="290">290</th><td>    dist = v.mag();</td></tr>
+<tr><th id="291">291</th><td>  <b>return</b> dist;</td></tr>
+<tr><th id="292">292</th><td>}</td></tr>
+<tr><th id="293">293</th><td></td></tr>
+<tr><th id="294">294</th><td><i>///////////////////////////////////////////////////////////////////////////////</i></td></tr>
+<tr><th id="295">295</th><td><i>//</i></td></tr>
+<tr><th id="296">296</th><td>G4double <span class='error' title="use of undeclared identifier &apos;G4QuadrangularFacet&apos;">G4QuadrangularFacet</span>::Extent (<em>const</em> G4ThreeVector axis)</td></tr>
+<tr><th id="297">297</th><td>{</td></tr>
+<tr><th id="298">298</th><td>  G4double ss  = <var>0</var>;</td></tr>
+<tr><th id="299">299</th><td></td></tr>
+<tr><th id="300">300</th><td>  <b>for</b> (G4int i = <var>0</var>; i &lt;= <var>3</var>; ++i)</td></tr>
+<tr><th id="301">301</th><td>  {</td></tr>
+<tr><th id="302">302</th><td>    G4double sp = GetVertex(i).dot(axis);</td></tr>
+<tr><th id="303">303</th><td>    <b>if</b> (sp &gt; ss) ss = sp;</td></tr>
+<tr><th id="304">304</th><td>  }</td></tr>
+<tr><th id="305">305</th><td>  <b>return</b> ss;</td></tr>
+<tr><th id="306">306</th><td>}</td></tr>
+<tr><th id="307">307</th><td></td></tr>
+<tr><th id="308">308</th><td><i>///////////////////////////////////////////////////////////////////////////////</i></td></tr>
+<tr><th id="309">309</th><td><i>//</i></td></tr>
+<tr><th id="310">310</th><td>G4bool <span class='error' title="use of undeclared identifier &apos;G4QuadrangularFacet&apos;">G4QuadrangularFacet</span>::Intersect (<em>const</em> G4ThreeVector &amp;p,</td></tr>
+<tr><th id="311">311</th><td>                                       <em>const</em> G4ThreeVector &amp;v,</td></tr>
+<tr><th id="312">312</th><td>                                             G4bool outgoing,</td></tr>
+<tr><th id="313">313</th><td>                                             G4double &amp;distance,</td></tr>
+<tr><th id="314">314</th><td>                                             G4double &amp;distFromSurface,</td></tr>
+<tr><th id="315">315</th><td>                                             G4ThreeVector &amp;normal)</td></tr>
+<tr><th id="316">316</th><td>{</td></tr>
+<tr><th id="317">317</th><td>  G4bool intersect =</td></tr>
+<tr><th id="318">318</th><td>    fFacet1.Intersect(p,v,outgoing,distance,distFromSurface,normal);</td></tr>
+<tr><th id="319">319</th><td>  <b>if</b> (!intersect) intersect =</td></tr>
+<tr><th id="320">320</th><td>    fFacet2.Intersect(p,v,outgoing,distance,distFromSurface,normal);</td></tr>
+<tr><th id="321">321</th><td>  <b>if</b> (!intersect)</td></tr>
+<tr><th id="322">322</th><td>  {</td></tr>
+<tr><th id="323">323</th><td>    distance = distFromSurface = kInfinity;</td></tr>
+<tr><th id="324">324</th><td>    normal.set(<var>0</var>,<var>0</var>,<var>0</var>);</td></tr>
+<tr><th id="325">325</th><td>  }</td></tr>
+<tr><th id="326">326</th><td>  <b>return</b> intersect;</td></tr>
+<tr><th id="327">327</th><td>}</td></tr>
+<tr><th id="328">328</th><td></td></tr>
+<tr><th id="329">329</th><td><i>///////////////////////////////////////////////////////////////////////////////</i></td></tr>
+<tr><th id="330">330</th><td><i>//</i></td></tr>
+<tr><th id="331">331</th><td><i>// Auxiliary method to get a uniform random point on the facet</i></td></tr>
+<tr><th id="332">332</th><td><i>//</i></td></tr>
+<tr><th id="333">333</th><td>G4ThreeVector <span class='error' title="use of undeclared identifier &apos;G4QuadrangularFacet&apos;">G4QuadrangularFacet</span>::GetPointOnFace() <em>const</em></td></tr>
+<tr><th id="334">334</th><td>{</td></tr>
+<tr><th id="335">335</th><td>  G4double s1 = fFacet1.GetArea();</td></tr>
+<tr><th id="336">336</th><td>  G4double s2 = fFacet2.GetArea();</td></tr>
+<tr><th id="337">337</th><td>  <b>return</b> ((s1+s2)*<a class="macro" href="../../../../global/HEPRandom/include/Randomize.hh.html#52" title="CLHEP::HepRandom::getTheEngine()-&gt;flat()" data-ref="_M/G4UniformRand">G4UniformRand</a>() &lt; s1) ?</td></tr>
+<tr><th id="338">338</th><td>    fFacet1.GetPointOnFace() : fFacet2.GetPointOnFace();</td></tr>
+<tr><th id="339">339</th><td>}</td></tr>
+<tr><th id="340">340</th><td></td></tr>
+<tr><th id="341">341</th><td><i>///////////////////////////////////////////////////////////////////////////////</i></td></tr>
+<tr><th id="342">342</th><td><i>//</i></td></tr>
+<tr><th id="343">343</th><td><i>// Auxiliary method for returning the surface area</i></td></tr>
+<tr><th id="344">344</th><td><i>//</i></td></tr>
+<tr><th id="345">345</th><td>G4double <span class='error' title="use of undeclared identifier &apos;G4QuadrangularFacet&apos;">G4QuadrangularFacet</span>::GetArea() <em>const</em></td></tr>
+<tr><th id="346">346</th><td>{</td></tr>
+<tr><th id="347">347</th><td>  G4double area = fFacet1.GetArea() + fFacet2.GetArea();</td></tr>
+<tr><th id="348">348</th><td>  <b>return</b> area;</td></tr>
+<tr><th id="349">349</th><td>}</td></tr>
+<tr><th id="350">350</th><td></td></tr>
+<tr><th id="351">351</th><td><i>///////////////////////////////////////////////////////////////////////////////</i></td></tr>
+<tr><th id="352">352</th><td><i>//</i></td></tr>
+<tr><th id="353">353</th><td>G4String <span class='error' title="use of undeclared identifier &apos;G4QuadrangularFacet&apos;">G4QuadrangularFacet</span>::GetEntityType () <em>const</em></td></tr>
+<tr><th id="354">354</th><td>{</td></tr>
+<tr><th id="355">355</th><td>  <b>return</b> <q>"G4QuadrangularFacet"</q>;</td></tr>
+<tr><th id="356">356</th><td>}</td></tr>
+<tr><th id="357">357</th><td></td></tr>
+<tr><th id="358">358</th><td><i>///////////////////////////////////////////////////////////////////////////////</i></td></tr>
+<tr><th id="359">359</th><td><i>//</i></td></tr>
+<tr><th id="360">360</th><td>G4ThreeVector <span class='error' title="use of undeclared identifier &apos;G4QuadrangularFacet&apos;">G4QuadrangularFacet</span>::GetSurfaceNormal () <em>const</em></td></tr>
+<tr><th id="361">361</th><td>{</td></tr>
+<tr><th id="362">362</th><td>  <b>return</b> fFacet1.GetSurfaceNormal();</td></tr>
+<tr><th id="363">363</th><td>}</td></tr>
+<tr><th id="364">364</th><td></td></tr>
+</table><hr/><p id='footer'>
+Generated on <em>2019-Aug-28</em> from project codebrowser<br />Powered by <a href='https://woboq.com'><img alt='Woboq' src='https://code.woboq.org/woboq-16.png' width='41' height='16' /></a> <a href='https://code.woboq.org'>Code Browser</a> 2.1
+<br/>Generator usage only permitted with license.</p>
+</div></body></html>

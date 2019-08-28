@@ -1,0 +1,119 @@
+<dec f='codebrowser/source/graphics_reps/src/BooleanProcessor.src' l='367' type='void BooleanProcessor::dump()'/>
+<def f='codebrowser/source/graphics_reps/src/BooleanProcessor.src' l='2434' ll='2445' type='void BooleanProcessor::dump()'/>
+<doc f='codebrowser/source/graphics_reps/src/BooleanProcessor.src' l='367'>//G.Barrand</doc>
+<doc f='codebrowser/source/graphics_reps/src/BooleanProcessor.src' l='2318'>/*
+//--------------------------------------------------------------------
+void
+BooleanProcessor::draw_edge(int icol, int iedge) {
+  int   i1, i2;
+  float p1[3], p2[3];
+
+  i1 = edges[iedge].i1;
+  p1[0] = nodes[i1].v.x();
+  p1[1] = nodes[i1].v.y();
+  p1[2] = nodes[i1].v.z();
+  IHWTON(p1,p1);
+  i2 = edges[iedge].i2;
+  p2[0] = nodes[i2].v.x();
+  p2[1] = nodes[i2].v.y();
+  p2[2] = nodes[i2].v.z();
+  IHWTON(p2,p2);
+  IHZLIN(icol,p1[0],p1[1],p1[2], p2[0],p2[1],p2[2]);
+}
+
+//--------------------------------------------------------------------
+void
+BooleanProcessor::draw_contour(int i1col, int i2col, int ihead) {
+  int iedge, icol;
+  iedge = ihead;
+  while (iedge &gt; 0) {
+    icol = (edges[iedge].ivis &gt; 0) ? i1col : i2col;
+    draw_edge(icol, iedge);
+    iedge = edges[iedge].inext;
+  }
+
+  IHZTOX(0,100,100);
+  ixupdwi(0);
+
+  int i; 
+  std::cin &gt;&gt; i; 
+}
+
+//--------------------------------------------------------------------
+void
+BooleanProcessor::print_face(int iface) {
+  G4cout.precision(3);
+  G4cout &lt;&lt; &quot;\n====== Face N &quot; &lt;&lt; iface &lt;&lt; G4endl;
+  G4cout &lt;&lt; &quot;iedges[4] = &quot;
+       &lt;&lt; faces[iface].iedges[0] &lt;&lt; &quot;, &quot;
+       &lt;&lt; faces[iface].iedges[1] &lt;&lt; &quot;, &quot;
+       &lt;&lt; faces[iface].iedges[2] &lt;&lt; &quot;, &quot;
+       &lt;&lt; faces[iface].iedges[3] &lt;&lt; G4endl;
+  G4cout &lt;&lt; &quot;rmin[3] = &quot;
+       &lt;&lt; faces[iface].rmin[0] &lt;&lt; &quot;, &quot;
+       &lt;&lt; faces[iface].rmin[1] &lt;&lt; &quot;, &quot;
+       &lt;&lt; faces[iface].rmin[2] &lt;&lt; G4endl;
+  G4cout &lt;&lt; &quot;rmax[3] = &quot;
+       &lt;&lt; faces[iface].rmax[0] &lt;&lt; &quot;, &quot;
+       &lt;&lt; faces[iface].rmax[1] &lt;&lt; &quot;, &quot;
+       &lt;&lt; faces[iface].rmax[2] &lt;&lt; G4endl;
+  G4cout &lt;&lt; &quot;iprev,inext = &quot;
+       &lt;&lt; faces[iface].iprev &lt;&lt; &quot;, &quot;
+       &lt;&lt; faces[iface].inext &lt;&lt; G4endl;
+  G4cout &lt;&lt; &quot;iold = &quot; &lt;&lt; faces[iface].iold &lt;&lt; G4endl;
+  for(int i = faces[iface].iold; i != 0;) {
+    print_edge(i);
+    i = edges[abs(i)].inext;
+  }
+
+  G4cout &lt;&lt; &quot;inew = &quot;;
+  switch (faces[iface].inew) {
+  case UNKNOWN_FACE:
+    G4cout &lt;&lt; &quot;UNKNOWN_FACE&quot; &lt;&lt; G4endl;
+    break;
+  case ORIGINAL_FACE:
+    G4cout &lt;&lt; &quot;ORIGINAL_FACE&quot; &lt;&lt; G4endl;
+    break;
+  case NEW_FACE:
+    G4cout &lt;&lt; &quot;NEW_FACE&quot; &lt;&lt; G4endl;
+    break;
+  case UNSUITABLE_FACE:
+    G4cout &lt;&lt; &quot;UNSUITABLE_FACE&quot; &lt;&lt; G4endl;
+    break;
+  case DEFECTIVE_FACE:
+    G4cout &lt;&lt; &quot;DEFECTIVE_FACE&quot; &lt;&lt; G4endl;
+    break;
+  default:
+    G4cout &lt;&lt; faces[iface].inew &lt;&lt; G4endl;
+    for(int k = faces[iface].inew; k != 0;) {
+      print_edge(k);
+      k = edges[abs(k)].inext;
+    }
+  }
+}
+
+//--------------------------------------------------------------------
+void
+BooleanProcessor::print_edge(int iedge) {
+  G4cout &lt;&lt; &quot;==== Edge N &quot; &lt;&lt; iedge &lt;&lt; G4endl;
+  int i = std::abs(iedge);
+  int i1 = edges[i].i1;
+  int i2 = edges[i].i2;
+  G4cout &lt;&lt; &quot;node[&quot; &lt;&lt; i1 &lt;&lt; &quot;] = &quot; 
+       &lt;&lt; nodes[i1].v.x() &lt;&lt; &quot;, &quot;
+       &lt;&lt; nodes[i1].v.y() &lt;&lt; &quot;, &quot;
+       &lt;&lt; nodes[i1].v.z() &lt;&lt; G4endl;
+
+  G4cout &lt;&lt; &quot;node[&quot; &lt;&lt; i2 &lt;&lt; &quot;] = &quot; 
+       &lt;&lt; nodes[i2].v.x() &lt;&lt; &quot;, &quot;
+       &lt;&lt; nodes[i2].v.y() &lt;&lt; &quot;, &quot;
+       &lt;&lt; nodes[i2].v.z() &lt;&lt; G4endl;
+
+  G4cout &lt;&lt; &quot;iface1,iface2,ivis,inext = &quot;
+       &lt;&lt; edges[i].iface1 &lt;&lt; &quot;, &quot;
+       &lt;&lt; edges[i].iface2 &lt;&lt; &quot;, &quot;
+       &lt;&lt; edges[i].ivis   &lt;&lt; &quot;, &quot;
+       &lt;&lt; edges[i].inext  &lt;&lt; G4endl;
+}
+*/</doc>
+<doc f='codebrowser/source/graphics_reps/src/BooleanProcessor.src' l='2434'>//G.Barrand</doc>

@@ -1,0 +1,96 @@
+<dec f='codebrowser/source/processes/hadronic/models/lend/include/G4LENDCrossSection.hh' l='123' type='void G4LENDCrossSection::recreate_used_target_map()'/>
+<def f='codebrowser/source/processes/hadronic/models/lend/src/G4LENDCrossSection.cc' l='296' ll='306' type='void G4LENDCrossSection::recreate_used_target_map()'/>
+<doc f='codebrowser/source/processes/hadronic/models/lend/src/G4LENDCrossSection.cc' l='199'>/*
+//110810
+//G4double G4LENDCrossSection::GetCrossSection(const G4DynamicParticle* aP , const G4Element* anElement , G4double aT)
+G4double G4LENDCrossSection::GetCrossSection(const G4DynamicParticle* aP , int iZ , const G4Material* aMat)
+{
+
+//110810
+   G4double aT = aMat-&gt;GetTemperature();
+   G4Element* anElement = lend_manager-&gt;GetNistElementBuilder()-&gt;FindOrBuildElement( iZ );
+
+   G4double ke = aP-&gt;GetKineticEnergy();
+   G4double XS = 0.0;
+
+   G4int numberOfIsotope = anElement-&gt;GetNumberOfIsotopes(); 
+
+   if ( numberOfIsotope &gt; 0 )
+   {
+      // User Defined Abundances   
+      for ( G4int i_iso = 0 ; i_iso &lt; numberOfIsotope ; i_iso++ )
+      {
+
+         G4int iZ = anElement-&gt;GetIsotope( i_iso )-&gt;GetZ();
+         G4int iA = anElement-&gt;GetIsotope( i_iso )-&gt;GetN();
+         G4double ratio = anElement-&gt;GetRelativeAbundanceVector()[i_iso];
+
+         G4GIDI_target* aTarget = usedTarget_map.find( lend_manager-&gt;GetNucleusEncoding( iZ , iA ) )-&gt;second-&gt;GetTarget();
+         XS += ratio*getLENDCrossSection ( aTarget , ke , aT );
+
+      }
+   }
+   else
+   {
+      // Natural Abundances   
+      G4NistElementBuilder* nistElementBuild = lend_manager-&gt;GetNistElementBuilder();
+      G4int iZ = int ( anElement-&gt;GetZ() );
+      G4int numberOfNistIso = nistElementBuild-&gt;GetNumberOfNistIsotopes( int ( anElement-&gt;GetZ() ) ); 
+
+       G4int Nfirst = nistElementBuild-&gt;GetNistFirstIsotopeN( iZ );
+      for ( G4int i = 0 ; i &lt; numberOfNistIso ; i++ )
+      {
+         G4int iA = Nfirst + i;  
+         G4double ratio = nistElementBuild-&gt;GetIsotopeAbundance( iZ , iA );
+         if ( ratio &gt; 0.0 )
+         {
+            G4GIDI_target* aTarget = usedTarget_map.find( lend_manager-&gt;GetNucleusEncoding( iZ , iA ) )-&gt;second-&gt;GetTarget();
+            XS += ratio*getLENDCrossSection ( aTarget , ke , aT );
+            //G4cout &lt;&lt; ke/eV &lt;&lt; &quot; &quot;  &lt;&lt; iZ &lt;&lt; &quot; &quot; &lt;&lt; iMass &lt;&lt; &quot; &quot; &lt;&lt; aTarget &lt;&lt; &quot; &quot; &lt;&lt; getLENDCrossSection ( aTarget , ke , aT ) &lt;&lt; G4endl;
+         }
+      }
+   }
+ 
+   //G4cout &lt;&lt; &quot;XS= &quot; &lt;&lt; XS &lt;&lt; G4endl;
+   return XS;
+}
+
+
+
+//110810
+//G4double G4LENDCrossSection::GetIsoCrossSection(const G4DynamicParticle* dp, const G4Isotope* isotope, G4double aT )
+G4double G4LENDCrossSection::GetIsoCrossSection(const G4DynamicParticle* dp, const G4Isotope* isotope, const G4Material* aMat)
+{
+
+//110810
+   G4double aT = aMat-&gt;GetTemperature();
+
+   G4double ke = dp-&gt;GetKineticEnergy();
+
+   G4int iZ = isotope-&gt;GetZ();
+   G4int iA = isotope-&gt;GetN();
+
+   G4GIDI_target* aTarget = usedTarget_map.find( lend_manager-&gt;GetNucleusEncoding( iZ , iA ) )-&gt;second-&gt;GetTarget();
+
+   return getLENDCrossSection ( aTarget , ke , aT );
+
+}
+
+
+
+//110810
+//G4double G4LENDCrossSection::GetZandACrossSection(const G4DynamicParticle* dp, G4int iZ, G4int iA, G4double aT)
+G4double G4LENDCrossSection::GetZandACrossSection(const G4DynamicParticle* dp, G4int iZ, G4int iA, const G4Material* aMat)
+{
+
+//110810
+   G4double aT = aMat-&gt;GetTemperature();
+
+   G4double ke = dp-&gt;GetKineticEnergy();
+
+   G4GIDI_target* aTarget = usedTarget_map.find( lend_manager-&gt;GetNucleusEncoding( iZ , iA ) )-&gt;second-&gt;GetTarget();
+
+   return getLENDCrossSection ( aTarget , ke , aT );
+
+}
+*/</doc>

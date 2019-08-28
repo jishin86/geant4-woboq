@@ -1,0 +1,64 @@
+<dec f='codebrowser/source/geometry/solids/specific/include/G4IntersectingCone.hh' l='86' type='G4int G4IntersectingCone::LineHitsCone1(const G4ThreeVector &amp; p, const G4ThreeVector &amp; v, G4double * s1, G4double * s2)'/>
+<use f='codebrowser/source/geometry/solids/specific/src/G4IntersectingCone.cc' l='131' u='c' c='_ZN18G4IntersectingCone12LineHitsConeERKN5CLHEP10Hep3VectorES3_PdS4_'/>
+<def f='codebrowser/source/geometry/solids/specific/src/G4IntersectingCone.cc' l='199' ll='284' type='G4int G4IntersectingCone::LineHitsCone1(const G4ThreeVector &amp; p, const G4ThreeVector &amp; v, G4double * s1, G4double * s2)'/>
+<doc f='codebrowser/source/geometry/solids/specific/src/G4IntersectingCone.cc' l='140'>//
+// LineHitsCone1
+//
+// Calculate the intersections of a line with a conical surface. Only
+// suitable if zPlane[0] != zPlane[1].
+//
+// Equation of a line:
+//
+//       x = x0 + s*tx      y = y0 + s*ty      z = z0 + s*tz
+//
+// Equation of a conical surface:
+//
+//       x**2 + y**2 = (A + B*z)**2
+//
+// Solution is quadratic:
+//
+//  a*s**2 + b*s + c = 0
+//
+// where:
+//
+//  a = tx**2 + ty**2 - (B*tz)**2
+//
+//  b = 2*( px*vx + py*vy - B*(A + B*pz)*vz )
+//
+//  c = x0**2 + y0**2 - (A + B*z0)**2
+//
+// Notice, that if a &lt; 0, this indicates that the two solutions (assuming
+// they exist) are in opposite cones (that is, given z0 = -A/B, one z &lt; z0
+// and the other z &gt; z0). For our shapes, the invalid solution is one
+// which produces A + Bz &lt; 0, or the one where Bz is smallest (most negative).
+// Since Bz = B*s*tz, if B*tz &gt; 0, we want the largest s, otherwise,
+// the smaller.
+//
+// If there are two solutions on one side of the cone, we want to make
+// sure that they are on the &quot;correct&quot; side, that is A + B*z0 + s*B*tz &gt;= 0.
+//
+// If a = 0, we have a linear problem: s = c/b, which again gives one solution.
+// This should be rare.
+//
+// For b*b - 4*a*c = 0, we also have one solution, which is almost always
+// a line just grazing the surface of a the cone, which we want to ignore.
+// However, there are two other, very rare, possibilities:
+// a line intersecting the z axis and either:
+//       1. At the same angle std::atan(B) to just miss one side of the cone, or
+//       2. Intersecting the cone apex (0,0,-A/B)
+// We *don&apos;t* want to miss these! How do we identify them? Well, since
+// this case is rare, we can at least swallow a little more CPU than we would
+// normally be comfortable with. Intersection with the z axis means
+// x0*ty - y0*tx = 0. Case (1) means a==0, and we&apos;ve already dealt with that
+// above. Case (2) means a &lt; 0.
+//
+// Now: x0*tx + y0*ty = 0 in terms of roundoff error. We can write:
+//             Delta = x0*tx + y0*ty
+//             b = 2*( Delta - B*(A + B*z0)*tz )
+// For:
+//             b*b - 4*a*c = epsilon
+// where epsilon is small, then:
+//             Delta = epsilon/2/B
+//</doc>
+<doc f='codebrowser/source/geometry/solids/specific/include/G4IntersectingCone.hh' l='83'>//  type 1: r = A + B*z
+                       //  type 2: z = A + B*r</doc>

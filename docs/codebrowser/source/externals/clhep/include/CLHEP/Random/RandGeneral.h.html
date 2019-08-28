@@ -1,0 +1,166 @@
+<!doctype html>
+<html>
+<head>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"><title>RandGeneral.h source code [codebrowser/source/externals/clhep/include/CLHEP/Random/RandGeneral.h] - Woboq Code Browser</title>
+<meta name="woboq:interestingDefinitions" content="CLHEP::RandGeneral "/>
+<link rel="stylesheet" href="../../../../../../../../data/qtcreator.css" title="QtCreator"/>
+<link rel="alternate stylesheet" href="../../../../../../../../data/kdevelop.css" title="KDevelop"/>
+<script type="text/javascript" src="../../../../../../../../data/jquery/jquery.min.js"></script>
+<script type="text/javascript" src="../../../../../../../../data/jquery/jquery-ui.min.js"></script>
+<script>var file = 'codebrowser/source/externals/clhep/include/CLHEP/Random/RandGeneral.h'; var root_path = '../../../../../../..'; var data_path = '../../../../../../../../data';</script>
+<script src='../../../../../../../../data/codebrowser.js'></script>
+</head>
+<body><div id='header'><h1 id='breadcrumb'><span>Browse the source code of </span><a href='../../../../../..'>codebrowser</a>/<a href='../../../../..'>source</a>/<a href='../../../..'>externals</a>/<a href='../../..'>clhep</a>/<a href='../..'>include</a>/<a href='..'>CLHEP</a>/<a href='./'>Random</a>/<a href='RandGeneral.h.html'>RandGeneral.h</a></h1></div>
+<hr/><div id='content'><table class="code">
+<tr><th id="1">1</th><td><i>// -*- C++ -*-</i></td></tr>
+<tr><th id="2">2</th><td><i>//</i></td></tr>
+<tr><th id="3">3</th><td><i>// -----------------------------------------------------------------------</i></td></tr>
+<tr><th id="4">4</th><td><i>//                             HEP Random</i></td></tr>
+<tr><th id="5">5</th><td><i>//                          --- RandGeneral ---</i></td></tr>
+<tr><th id="6">6</th><td><i>//                          class header file</i></td></tr>
+<tr><th id="7">7</th><td><i>// -----------------------------------------------------------------------</i></td></tr>
+<tr><th id="8">8</th><td><i></i></td></tr>
+<tr><th id="9">9</th><td><i>// Class defining methods for shooting generally distributed random values,</i></td></tr>
+<tr><th id="10">10</th><td><i>// given a user-defined probability distribution function.</i></td></tr>
+<tr><th id="11">11</th><td><i></i></td></tr>
+<tr><th id="12">12</th><td><i>// =======================================================================</i></td></tr>
+<tr><th id="13">13</th><td><i>// S.Magni &amp; G.Pieri  - Created: 29 April 1998 </i></td></tr>
+<tr><th id="14">14</th><td><i>// G.Cosmo            - Added constructor using default engine from the</i></td></tr>
+<tr><th id="15">15</th><td><i>//                     	static generator: 20 Aug 1998</i></td></tr>
+<tr><th id="16">16</th><td><i>// S.Magni &amp; G.Pieri  - Added linear interpolation: 24 March 1999</i></td></tr>
+<tr><th id="17">17</th><td><i>// M. Fischler	      - Added private methods that simplify the implementaion</i></td></tr>
+<tr><th id="18">18</th><td><i>// 			prepareTables(), useFlatDistribution(), mapRandom()</i></td></tr>
+<tr><th id="19">19</th><td><i>//		      - Added private variable oneOverNbins.</i></td></tr>
+<tr><th id="20">20</th><td><i>//	     	      - Made the warning about shoot() not being static a tad</i></td></tr>
+<tr><th id="21">21</th><td><i>//			more prominent.   		14 May 1999	</i></td></tr>
+<tr><th id="22">22</th><td><i>// M Fischler         - put and get to/from streams 12/15/04</i></td></tr>
+<tr><th id="23">23</th><td><i>// =======================================================================</i></td></tr>
+<tr><th id="24">24</th><td></td></tr>
+<tr><th id="25">25</th><td><u>#<span data-ppcond="25">ifndef</span> <span class="macro" data-ref="_M/RandGeneral_h">RandGeneral_h</span></u></td></tr>
+<tr><th id="26">26</th><td><u>#define <dfn class="macro" id="_M/RandGeneral_h" data-ref="_M/RandGeneral_h">RandGeneral_h</dfn> 1</u></td></tr>
+<tr><th id="27">27</th><td></td></tr>
+<tr><th id="28">28</th><td><u>#include <a href="Random.h.html">"CLHEP/Random/Random.h"</a></u></td></tr>
+<tr><th id="29">29</th><td><u>#include <a href="../Utility/memory.h.html">"CLHEP/Utility/memory.h"</a></u></td></tr>
+<tr><th id="30">30</th><td><u>#include <span class='error' title="&apos;vector&apos; file not found">&lt;</span>vector&gt;</u></td></tr>
+<tr><th id="31">31</th><td></td></tr>
+<tr><th id="32">32</th><td><b>namespace</b> <span class="namespace">CLHEP</span> {</td></tr>
+<tr><th id="33">33</th><td></td></tr>
+<tr><th id="34">34</th><td><i class="doc">/**</i></td></tr>
+<tr><th id="35">35</th><td><i class="doc"> * <span class="command">@author</span></i></td></tr>
+<tr><th id="36">36</th><td><i class="doc"> * <span class="command">@ingroup</span> <span class="verb">random</span></i></td></tr>
+<tr><th id="37">37</th><td><i class="doc"> */</i></td></tr>
+<tr><th id="38">38</th><td><b>class</b> <dfn class="type def" id="CLHEP::RandGeneral" title='CLHEP::RandGeneral' data-ref="CLHEP::RandGeneral">RandGeneral</dfn> : <b>public</b> <a class="type" href="Random.h.html#CLHEP::HepRandom" title='CLHEP::HepRandom' data-ref="CLHEP::HepRandom">HepRandom</a> {</td></tr>
+<tr><th id="39">39</th><td></td></tr>
+<tr><th id="40">40</th><td><b>public</b>:</td></tr>
+<tr><th id="41">41</th><td></td></tr>
+<tr><th id="42">42</th><td>  <dfn class="decl" id="_ZN5CLHEP11RandGeneralC1EPKdii" title='CLHEP::RandGeneral::RandGeneral' data-ref="_ZN5CLHEP11RandGeneralC1EPKdii">RandGeneral</dfn> ( <em>const</em> <em>double</em>* <dfn class="local col0 decl" id="930aProbFunc" title='aProbFunc' data-type='const double *' data-ref="930aProbFunc">aProbFunc</dfn>, </td></tr>
+<tr><th id="43">43</th><td>		<em>int</em> <dfn class="local col1 decl" id="931theProbSize" title='theProbSize' data-type='int' data-ref="931theProbSize">theProbSize</dfn>, </td></tr>
+<tr><th id="44">44</th><td>		<em>int</em> <dfn class="local col2 decl" id="932IntType" title='IntType' data-type='int' data-ref="932IntType">IntType</dfn>=<var>0</var> );</td></tr>
+<tr><th id="45">45</th><td>  <dfn class="decl" id="_ZN5CLHEP11RandGeneralC1ERNS_15HepRandomEngineEPKdii" title='CLHEP::RandGeneral::RandGeneral' data-ref="_ZN5CLHEP11RandGeneralC1ERNS_15HepRandomEngineEPKdii">RandGeneral</dfn> ( <a class="type" href="RandomEngine.h.html#CLHEP::HepRandomEngine" title='CLHEP::HepRandomEngine' data-ref="CLHEP::HepRandomEngine">HepRandomEngine</a>&amp; <dfn class="local col3 decl" id="933anEngine" title='anEngine' data-type='CLHEP::HepRandomEngine &amp;' data-ref="933anEngine">anEngine</dfn>,</td></tr>
+<tr><th id="46">46</th><td>                <em>const</em> <em>double</em>* <dfn class="local col4 decl" id="934aProbFunc" title='aProbFunc' data-type='const double *' data-ref="934aProbFunc">aProbFunc</dfn>, </td></tr>
+<tr><th id="47">47</th><td>		<em>int</em> <dfn class="local col5 decl" id="935theProbSize" title='theProbSize' data-type='int' data-ref="935theProbSize">theProbSize</dfn>, </td></tr>
+<tr><th id="48">48</th><td>		<em>int</em> <dfn class="local col6 decl" id="936IntType" title='IntType' data-type='int' data-ref="936IntType">IntType</dfn>=<var>0</var> );</td></tr>
+<tr><th id="49">49</th><td>  <dfn class="decl" id="_ZN5CLHEP11RandGeneralC1EPNS_15HepRandomEngineEPKdii" title='CLHEP::RandGeneral::RandGeneral' data-ref="_ZN5CLHEP11RandGeneralC1EPNS_15HepRandomEngineEPKdii">RandGeneral</dfn> ( <a class="type" href="RandomEngine.h.html#CLHEP::HepRandomEngine" title='CLHEP::HepRandomEngine' data-ref="CLHEP::HepRandomEngine">HepRandomEngine</a>* <dfn class="local col7 decl" id="937anEngine" title='anEngine' data-type='CLHEP::HepRandomEngine *' data-ref="937anEngine">anEngine</dfn>, </td></tr>
+<tr><th id="50">50</th><td>                <em>const</em> <em>double</em>* <dfn class="local col8 decl" id="938aProbFunc" title='aProbFunc' data-type='const double *' data-ref="938aProbFunc">aProbFunc</dfn>, </td></tr>
+<tr><th id="51">51</th><td>		<em>int</em> <dfn class="local col9 decl" id="939theProbSize" title='theProbSize' data-type='int' data-ref="939theProbSize">theProbSize</dfn>, </td></tr>
+<tr><th id="52">52</th><td>		<em>int</em> <dfn class="local col0 decl" id="940IntType" title='IntType' data-type='int' data-ref="940IntType">IntType</dfn>=<var>0</var> );</td></tr>
+<tr><th id="53">53</th><td>  <i>// These constructors should be used to instantiate a RandGeneral</i></td></tr>
+<tr><th id="54">54</th><td><i>  // distribution object defining a local engine for it.</i></td></tr>
+<tr><th id="55">55</th><td><i>  // The static generator will be skipped by using the non-static methods</i></td></tr>
+<tr><th id="56">56</th><td><i>  // defined below. In case no engine is specified in the constructor, the</i></td></tr>
+<tr><th id="57">57</th><td><i>  // default engine used by the static generator is applied.</i></td></tr>
+<tr><th id="58">58</th><td><i>  // If the engine is passed by pointer the corresponding engine object</i></td></tr>
+<tr><th id="59">59</th><td><i>  // will be deleted by the RandGeneral destructor.</i></td></tr>
+<tr><th id="60">60</th><td><i>  // If the engine is passed by reference the corresponding engine object</i></td></tr>
+<tr><th id="61">61</th><td><i>  // will not be deleted by the RandGeneral destructor.</i></td></tr>
+<tr><th id="62">62</th><td><i>  // The probability distribution function (Pdf) must be provided by the user</i></td></tr>
+<tr><th id="63">63</th><td><i>  // as an array of positive real number. The array size must also be</i></td></tr>
+<tr><th id="64">64</th><td><i>  // provided. The Pdf doesn't need to be normalized to 1. </i></td></tr>
+<tr><th id="65">65</th><td><i>  // if IntType = 0 ( default value ) a uniform random number is</i></td></tr>
+<tr><th id="66">66</th><td><i>  // generated using the engine. The uniform number is then transformed</i></td></tr>
+<tr><th id="67">67</th><td><i>  // to the user's distribution using the cumulative probability</i></td></tr>
+<tr><th id="68">68</th><td><i>  // distribution constructed from his histogram. The cumulative</i></td></tr>
+<tr><th id="69">69</th><td><i>  // distribution is inverted using a binary search for the nearest</i></td></tr>
+<tr><th id="70">70</th><td><i>  // bin boundary and a linear interpolation within the</i></td></tr>
+<tr><th id="71">71</th><td><i>  // bin. RandGeneral therefore generates a constant density within</i></td></tr>
+<tr><th id="72">72</th><td><i>  // each bin.</i></td></tr>
+<tr><th id="73">73</th><td><i>  // if IntType = 1 no interpolation is performed and the result is a</i></td></tr>
+<tr><th id="74">74</th><td><i>  // discrete distribution.</i></td></tr>
+<tr><th id="75">75</th><td></td></tr>
+<tr><th id="76">76</th><td>  <b>virtual</b> <dfn class="virtual decl" id="_ZN5CLHEP11RandGeneralD1Ev" title='CLHEP::RandGeneral::~RandGeneral' data-ref="_ZN5CLHEP11RandGeneralD1Ev">~RandGeneral</dfn>();</td></tr>
+<tr><th id="77">77</th><td>  <i>// Destructor</i></td></tr>
+<tr><th id="78">78</th><td><i></i></td></tr>
+<tr><th id="79">79</th><td><i>  // Methods to shoot random values using the static generator</i></td></tr>
+<tr><th id="80">80</th><td><i>  // N.B.: The methods are NOT static since they use nonstatic members</i></td></tr>
+<tr><th id="81">81</th><td><i>  // theIntegralPdf &amp; nBins</i></td></tr>
+<tr><th id="82">82</th><td><i></i></td></tr>
+<tr><th id="83">83</th><td><i>	/////////////////////</i></td></tr>
+<tr><th id="84">84</th><td><i>	//		   //</i></td></tr>
+<tr><th id="85">85</th><td><i>	// BIG RED WARNING //</i></td></tr>
+<tr><th id="86">86</th><td><i>	//		   //</i></td></tr>
+<tr><th id="87">87</th><td><i>	/////////////////////</i></td></tr>
+<tr><th id="88">88</th><td><i>	//</i></td></tr>
+<tr><th id="89">89</th><td><i>	// The above N.B. is telling users that the shoot() methods in this</i></td></tr>
+<tr><th id="90">90</th><td><i>	// class are NOT STATIC.  You cannot do </i></td></tr>
+<tr><th id="91">91</th><td><i>	//	double x = RandGeneral::shoot();</i></td></tr>
+<tr><th id="92">92</th><td><i>	// It would not make sense to provide a static shoot -- what would </i></td></tr>
+<tr><th id="93">93</th><td><i>	// the default probability function look like?</i></td></tr>
+<tr><th id="94">94</th><td></td></tr>
+<tr><th id="95">95</th><td>  <b>inline</b> <em>double</em> <a class="decl" href="RandGeneral.icc.html#_ZN5CLHEP11RandGeneral5shootEv" title='CLHEP::RandGeneral::shoot' data-ref="_ZN5CLHEP11RandGeneral5shootEv" id="_ZN5CLHEP11RandGeneral5shootEv">shoot</a>();</td></tr>
+<tr><th id="96">96</th><td></td></tr>
+<tr><th id="97">97</th><td>  <b>inline</b> <em>void</em> <a class="decl" href="RandGeneral.icc.html#_ZN5CLHEP11RandGeneral10shootArrayEiPd" title='CLHEP::RandGeneral::shootArray' data-ref="_ZN5CLHEP11RandGeneral10shootArrayEiPd" id="_ZN5CLHEP11RandGeneral10shootArrayEiPd">shootArray</a> ( <em>const</em> <em>int</em> <dfn class="local col1 decl" id="941size" title='size' data-type='const int' data-ref="941size">size</dfn>, <em>double</em>* <dfn class="local col2 decl" id="942vect" title='vect' data-type='double *' data-ref="942vect">vect</dfn>);</td></tr>
+<tr><th id="98">98</th><td></td></tr>
+<tr><th id="99">99</th><td>  <i>//  Methods to shoot random values using a given engine</i></td></tr>
+<tr><th id="100">100</th><td><i>  //  by-passing the static generator.</i></td></tr>
+<tr><th id="101">101</th><td></td></tr>
+<tr><th id="102">102</th><td>  <em>double</em> <a class="decl" href="RandGeneral.icc.html#_ZN5CLHEP11RandGeneral5shootEPNS_15HepRandomEngineE" title='CLHEP::RandGeneral::shoot' data-ref="_ZN5CLHEP11RandGeneral5shootEPNS_15HepRandomEngineE" id="_ZN5CLHEP11RandGeneral5shootEPNS_15HepRandomEngineE">shoot</a>( <a class="type" href="RandomEngine.h.html#CLHEP::HepRandomEngine" title='CLHEP::HepRandomEngine' data-ref="CLHEP::HepRandomEngine">HepRandomEngine</a>* <dfn class="local col3 decl" id="943anEngine" title='anEngine' data-type='CLHEP::HepRandomEngine *' data-ref="943anEngine">anEngine</dfn> );</td></tr>
+<tr><th id="103">103</th><td></td></tr>
+<tr><th id="104">104</th><td>  <em>void</em> <dfn class="decl" id="_ZN5CLHEP11RandGeneral10shootArrayEPNS_15HepRandomEngineEiPd" title='CLHEP::RandGeneral::shootArray' data-ref="_ZN5CLHEP11RandGeneral10shootArrayEPNS_15HepRandomEngineEiPd">shootArray</dfn> ( <a class="type" href="RandomEngine.h.html#CLHEP::HepRandomEngine" title='CLHEP::HepRandomEngine' data-ref="CLHEP::HepRandomEngine">HepRandomEngine</a>* <dfn class="local col4 decl" id="944anEngine" title='anEngine' data-type='CLHEP::HepRandomEngine *' data-ref="944anEngine">anEngine</dfn>, <em>const</em> <em>int</em> <dfn class="local col5 decl" id="945size" title='size' data-type='const int' data-ref="945size">size</dfn>,</td></tr>
+<tr><th id="105">105</th><td>                    <em>double</em>* <dfn class="local col6 decl" id="946vect" title='vect' data-type='double *' data-ref="946vect">vect</dfn> );</td></tr>
+<tr><th id="106">106</th><td>			    </td></tr>
+<tr><th id="107">107</th><td>  <i>//  Methods using the localEngine to shoot random values, by-passing</i></td></tr>
+<tr><th id="108">108</th><td><i>  //  the static generator.</i></td></tr>
+<tr><th id="109">109</th><td></td></tr>
+<tr><th id="110">110</th><td>  <em>double</em> <a class="decl" href="RandGeneral.icc.html#_ZN5CLHEP11RandGeneral4fireEv" title='CLHEP::RandGeneral::fire' data-ref="_ZN5CLHEP11RandGeneral4fireEv" id="_ZN5CLHEP11RandGeneral4fireEv">fire</a>();</td></tr>
+<tr><th id="111">111</th><td></td></tr>
+<tr><th id="112">112</th><td>  <em>void</em> <dfn class="decl" id="_ZN5CLHEP11RandGeneral9fireArrayEiPd" title='CLHEP::RandGeneral::fireArray' data-ref="_ZN5CLHEP11RandGeneral9fireArrayEiPd">fireArray</dfn> ( <em>const</em> <em>int</em> <dfn class="local col7 decl" id="947size" title='size' data-type='const int' data-ref="947size">size</dfn>, <em>double</em>* <dfn class="local col8 decl" id="948vect" title='vect' data-type='double *' data-ref="948vect">vect</dfn>);</td></tr>
+<tr><th id="113">113</th><td></td></tr>
+<tr><th id="114">114</th><td>  <em>double</em> <a class="virtual decl" href="RandGeneral.icc.html#_ZN5CLHEP11RandGeneralclEv" title='CLHEP::RandGeneral::operator()' data-ref="_ZN5CLHEP11RandGeneralclEv" id="_ZN5CLHEP11RandGeneralclEv"><b>operator</b>()</a>();</td></tr>
+<tr><th id="115">115</th><td></td></tr>
+<tr><th id="116">116</th><td>  <i>// Save and restore to/from streams</i></td></tr>
+<tr><th id="117">117</th><td>  </td></tr>
+<tr><th id="118">118</th><td>  std::ostream &amp; <dfn class="decl" id="_ZNK5CLHEP11RandGeneral3putERi" title='CLHEP::RandGeneral::put' data-ref="_ZNK5CLHEP11RandGeneral3putERi">put</dfn> ( std::ostream &amp; os ) <em>const</em>;</td></tr>
+<tr><th id="119">119</th><td>  std::istream &amp; <dfn class="decl" id="_ZN5CLHEP11RandGeneral3getERi" title='CLHEP::RandGeneral::get' data-ref="_ZN5CLHEP11RandGeneral3getERi">get</dfn> ( std::istream &amp; is );</td></tr>
+<tr><th id="120">120</th><td></td></tr>
+<tr><th id="121">121</th><td>  std::string <dfn class="decl" id="_ZNK5CLHEP11RandGeneral4nameEv" title='CLHEP::RandGeneral::name' data-ref="_ZNK5CLHEP11RandGeneral4nameEv">name</dfn>() <em>const</em>;</td></tr>
+<tr><th id="122">122</th><td>  <a class="type" href="RandomEngine.h.html#CLHEP::HepRandomEngine" title='CLHEP::HepRandomEngine' data-ref="CLHEP::HepRandomEngine">HepRandomEngine</a> &amp; <dfn class="virtual decl" id="_ZN5CLHEP11RandGeneral6engineEv" title='CLHEP::RandGeneral::engine' data-ref="_ZN5CLHEP11RandGeneral6engineEv">engine</dfn>();</td></tr>
+<tr><th id="123">123</th><td></td></tr>
+<tr><th id="124">124</th><td>  <em>static</em> std::string <dfn class="decl def" id="_ZN5CLHEP11RandGeneral16distributionNameEv" title='CLHEP::RandGeneral::distributionName' data-ref="_ZN5CLHEP11RandGeneral16distributionNameEv">distributionName</dfn>() {<b>return</b> <q>"RandGeneral"</q>;}  </td></tr>
+<tr><th id="125">125</th><td>  <i>// Provides the name of this distribution class</i></td></tr>
+<tr><th id="126">126</th><td>  </td></tr>
+<tr><th id="127">127</th><td></td></tr>
+<tr><th id="128">128</th><td><b>private</b>:</td></tr>
+<tr><th id="129">129</th><td></td></tr>
+<tr><th id="130">130</th><td>  std::shared_ptr&lt;HepRandomEngine&gt; localEngine;</td></tr>
+<tr><th id="131">131</th><td>  std::vector&lt;<em>double</em>&gt; theIntegralPdf;</td></tr>
+<tr><th id="132">132</th><td>  <em>int</em> <dfn class="decl" id="CLHEP::RandGeneral::nBins" title='CLHEP::RandGeneral::nBins' data-ref="CLHEP::RandGeneral::nBins">nBins</dfn>;</td></tr>
+<tr><th id="133">133</th><td>  <em>double</em> <dfn class="decl" id="CLHEP::RandGeneral::oneOverNbins" title='CLHEP::RandGeneral::oneOverNbins' data-ref="CLHEP::RandGeneral::oneOverNbins">oneOverNbins</dfn>;</td></tr>
+<tr><th id="134">134</th><td>  <em>int</em> <dfn class="decl" id="CLHEP::RandGeneral::InterpolationType" title='CLHEP::RandGeneral::InterpolationType' data-ref="CLHEP::RandGeneral::InterpolationType">InterpolationType</dfn>;</td></tr>
+<tr><th id="135">135</th><td></td></tr>
+<tr><th id="136">136</th><td>  <i>// Private methods to factor out replicated implementation sections</i></td></tr>
+<tr><th id="137">137</th><td>  <em>void</em> <dfn class="decl" id="_ZN5CLHEP11RandGeneral12prepareTableEPKd" title='CLHEP::RandGeneral::prepareTable' data-ref="_ZN5CLHEP11RandGeneral12prepareTableEPKd">prepareTable</dfn>(<em>const</em> <em>double</em>* <dfn class="local col9 decl" id="949aProbFunc" title='aProbFunc' data-type='const double *' data-ref="949aProbFunc">aProbFunc</dfn>);</td></tr>
+<tr><th id="138">138</th><td>  <em>void</em> <dfn class="decl" id="_ZN5CLHEP11RandGeneral19useFlatDistributionEv" title='CLHEP::RandGeneral::useFlatDistribution' data-ref="_ZN5CLHEP11RandGeneral19useFlatDistributionEv">useFlatDistribution</dfn>();</td></tr>
+<tr><th id="139">139</th><td>  <em>double</em> <dfn class="decl" id="_ZNK5CLHEP11RandGeneral9mapRandomEd" title='CLHEP::RandGeneral::mapRandom' data-ref="_ZNK5CLHEP11RandGeneral9mapRandomEd">mapRandom</dfn>(<em>double</em> <dfn class="local col0 decl" id="950rand" title='rand' data-type='double' data-ref="950rand">rand</dfn>) <em>const</em>;</td></tr>
+<tr><th id="140">140</th><td></td></tr>
+<tr><th id="141">141</th><td>};</td></tr>
+<tr><th id="142">142</th><td></td></tr>
+<tr><th id="143">143</th><td>}  <i>// namespace CLHEP</i></td></tr>
+<tr><th id="144">144</th><td></td></tr>
+<tr><th id="145">145</th><td><u>#include <a href="RandGeneral.icc.html">"CLHEP/Random/RandGeneral.icc"</a></u></td></tr>
+<tr><th id="146">146</th><td></td></tr>
+<tr><th id="147">147</th><td><u>#<span data-ppcond="25">endif</span></u></td></tr>
+<tr><th id="148">148</th><td></td></tr>
+</table><hr/><p id='footer'>
+Generated while processing <a href='../../../../../error_propagation/src/G4ErrorMagFieldLimitProcess.cc.html'>codebrowser/source/error_propagation/src/G4ErrorMagFieldLimitProcess.cc</a><br/>Generated on <em>2019-Aug-28</em> from project codebrowser<br />Powered by <a href='https://woboq.com'><img alt='Woboq' src='https://code.woboq.org/woboq-16.png' width='41' height='16' /></a> <a href='https://code.woboq.org'>Code Browser</a> 2.1
+<br/>Generator usage only permitted with license.</p>
+</div></body></html>

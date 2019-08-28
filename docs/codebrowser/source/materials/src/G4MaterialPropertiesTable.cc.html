@@ -1,0 +1,548 @@
+<!doctype html>
+<html>
+<head>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"><title>G4MaterialPropertiesTable.cc source code [codebrowser/source/materials/src/G4MaterialPropertiesTable.cc] - Woboq Code Browser</title>
+<link rel="stylesheet" href="../../../../../data/qtcreator.css" title="QtCreator"/>
+<link rel="alternate stylesheet" href="../../../../../data/kdevelop.css" title="KDevelop"/>
+<script type="text/javascript" src="../../../../../data/jquery/jquery.min.js"></script>
+<script type="text/javascript" src="../../../../../data/jquery/jquery-ui.min.js"></script>
+<script>var file = 'codebrowser/source/materials/src/G4MaterialPropertiesTable.cc'; var root_path = '../../../..'; var data_path = '../../../../../data';</script>
+<script src='../../../../../data/codebrowser.js'></script>
+</head>
+<body><div id='header'><h1 id='breadcrumb'><span>Browse the source code of </span><a href='../../..'>codebrowser</a>/<a href='../..'>source</a>/<a href='..'>materials</a>/<a href='./'>src</a>/<a href='G4MaterialPropertiesTable.cc.html'>G4MaterialPropertiesTable.cc</a></h1></div>
+<hr/><div id='content'><table class="code">
+<tr><th id="1">1</th><td><i>//</i></td></tr>
+<tr><th id="2">2</th><td><i>// ********************************************************************</i></td></tr>
+<tr><th id="3">3</th><td><i>// * License and Disclaimer                                           *</i></td></tr>
+<tr><th id="4">4</th><td><i>// *                                                                  *</i></td></tr>
+<tr><th id="5">5</th><td><i>// * The  Geant4 software  is  copyright of the Copyright Holders  of *</i></td></tr>
+<tr><th id="6">6</th><td><i>// * the Geant4 Collaboration.  It is provided  under  the terms  and *</i></td></tr>
+<tr><th id="7">7</th><td><i>// * conditions of the Geant4 Software License,  included in the file *</i></td></tr>
+<tr><th id="8">8</th><td><i>// * LICENSE and available at  <a href="http://cern.ch/geant4/license">http://cern.ch/geant4/license</a> .  These *</i></td></tr>
+<tr><th id="9">9</th><td><i>// * include a list of copyright holders.                             *</i></td></tr>
+<tr><th id="10">10</th><td><i>// *                                                                  *</i></td></tr>
+<tr><th id="11">11</th><td><i>// * Neither the authors of this software system, nor their employing *</i></td></tr>
+<tr><th id="12">12</th><td><i>// * institutes,nor the agencies providing financial support for this *</i></td></tr>
+<tr><th id="13">13</th><td><i>// * work  make  any representation or  warranty, express or implied, *</i></td></tr>
+<tr><th id="14">14</th><td><i>// * regarding  this  software system or assume any liability for its *</i></td></tr>
+<tr><th id="15">15</th><td><i>// * use.  Please see the license in the file  LICENSE  and URL above *</i></td></tr>
+<tr><th id="16">16</th><td><i>// * for the full disclaimer and the limitation of liability.         *</i></td></tr>
+<tr><th id="17">17</th><td><i>// *                                                                  *</i></td></tr>
+<tr><th id="18">18</th><td><i>// * This  code  implementation is the result of  the  scientific and *</i></td></tr>
+<tr><th id="19">19</th><td><i>// * technical work of the GEANT4 collaboration.                      *</i></td></tr>
+<tr><th id="20">20</th><td><i>// * By using,  copying,  modifying or  distributing the software (or *</i></td></tr>
+<tr><th id="21">21</th><td><i>// * any work based  on the software)  you  agree  to acknowledge its *</i></td></tr>
+<tr><th id="22">22</th><td><i>// * use  in  resulting  scientific  publications,  and indicate your *</i></td></tr>
+<tr><th id="23">23</th><td><i>// * acceptance of all terms of the Geant4 Software license.          *</i></td></tr>
+<tr><th id="24">24</th><td><i>// ********************************************************************</i></td></tr>
+<tr><th id="25">25</th><td><i>//</i></td></tr>
+<tr><th id="26">26</th><td><i>//</i></td></tr>
+<tr><th id="27">27</th><td><i>//</i></td></tr>
+<tr><th id="28">28</th><td><i>// </i></td></tr>
+<tr><th id="29">29</th><td><i>////////////////////////////////////////////////////////////////////////</i></td></tr>
+<tr><th id="30">30</th><td><i>// G4MaterialPropertiesTable Implementation</i></td></tr>
+<tr><th id="31">31</th><td><i>////////////////////////////////////////////////////////////////////////</i></td></tr>
+<tr><th id="32">32</th><td><i>//</i></td></tr>
+<tr><th id="33">33</th><td><i>// File: G4MaterialPropertiesTable.cc </i></td></tr>
+<tr><th id="34">34</th><td><i>// Version:     1.0</i></td></tr>
+<tr><th id="35">35</th><td><i>// Created:     1996-02-08</i></td></tr>
+<tr><th id="36">36</th><td><i>// Author:      Juliet Armstrong</i></td></tr>
+<tr><th id="37">37</th><td><i>// Updated:     2005-05-12 add SetGROUPVEL(), courtesy of</i></td></tr>
+<tr><th id="38">38</th><td><i>//              Horton-Smith (bug report #741), by P. Gumplinger</i></td></tr>
+<tr><th id="39">39</th><td><i>//              2002-11-05 add named material constants by P. Gumplinger</i></td></tr>
+<tr><th id="40">40</th><td><i>//              1999-11-05 Migration from G4RWTPtrHashDictionary to STL</i></td></tr>
+<tr><th id="41">41</th><td><i>//                         by John Allison</i></td></tr>
+<tr><th id="42">42</th><td><i>//              1997-03-26 by Peter Gumplinger</i></td></tr>
+<tr><th id="43">43</th><td><i>//              &gt; cosmetics (only)</i></td></tr>
+<tr><th id="44">44</th><td><i>// mail:        gum@triumf.ca</i></td></tr>
+<tr><th id="45">45</th><td><i>//</i></td></tr>
+<tr><th id="46">46</th><td><i>////////////////////////////////////////////////////////////////////////</i></td></tr>
+<tr><th id="47">47</th><td></td></tr>
+<tr><th id="48">48</th><td><u>#include <a href="../../global/management/include/globals.hh.html">"globals.hh"</a></u></td></tr>
+<tr><th id="49">49</th><td><u>#include <a href="../include/G4MaterialPropertiesTable.hh.html">"G4MaterialPropertiesTable.hh"</a></u></td></tr>
+<tr><th id="50">50</th><td><u>#include <a href="../../global/management/include/G4PhysicalConstants.hh.html">"G4PhysicalConstants.hh"</a></u></td></tr>
+<tr><th id="51">51</th><td><u>#include <a href="../../global/management/include/G4Log.hh.html">"G4Log.hh"</a></u></td></tr>
+<tr><th id="52">52</th><td></td></tr>
+<tr><th id="53">53</th><td><u>#include <span class='error' title="&apos;algorithm&apos; file not found">&lt;</span>algorithm&gt;</u></td></tr>
+<tr><th id="54">54</th><td></td></tr>
+<tr><th id="55">55</th><td><i>/////////////////</i></td></tr>
+<tr><th id="56">56</th><td><i>// Constructors</i></td></tr>
+<tr><th id="57">57</th><td><i>/////////////////</i></td></tr>
+<tr><th id="58">58</th><td></td></tr>
+<tr><th id="59">59</th><td><a class="type" href="../include/G4MaterialPropertiesTable.hh.html#G4MaterialPropertiesTable" title='G4MaterialPropertiesTable' data-ref="G4MaterialPropertiesTable">G4MaterialPropertiesTable</a>::<dfn class="decl def" id="_ZN25G4MaterialPropertiesTableC1Ev" title='G4MaterialPropertiesTable::G4MaterialPropertiesTable' data-ref="_ZN25G4MaterialPropertiesTableC1Ev">G4MaterialPropertiesTable</dfn>()</td></tr>
+<tr><th id="60">60</th><td>{</td></tr>
+<tr><th id="61">61</th><td>  <i>// elements of these 2 vectors must be in same order as</i></td></tr>
+<tr><th id="62">62</th><td><i>  // the corresponding enums in G4MaterialPropertiesIndex.hh</i></td></tr>
+<tr><th id="63">63</th><td>  G4MaterialPropertyName.push_back(G4String(<q>"RINDEX"</q>));</td></tr>
+<tr><th id="64">64</th><td>  G4MaterialPropertyName.push_back(G4String(<q>"REFLECTIVITY"</q>));</td></tr>
+<tr><th id="65">65</th><td>  G4MaterialPropertyName.push_back(G4String(<q>"REALRINDEX"</q>));</td></tr>
+<tr><th id="66">66</th><td>  G4MaterialPropertyName.push_back(G4String(<q>"IMAGINARYRINDEX"</q>));</td></tr>
+<tr><th id="67">67</th><td>  G4MaterialPropertyName.push_back(G4String(<q>"EFFICIENCY"</q>));</td></tr>
+<tr><th id="68">68</th><td>  G4MaterialPropertyName.push_back(G4String(<q>"TRANSMITTANCE"</q>));</td></tr>
+<tr><th id="69">69</th><td>  G4MaterialPropertyName.push_back(G4String(<q>"SPECULARLOBECONSTANT"</q>));</td></tr>
+<tr><th id="70">70</th><td>  G4MaterialPropertyName.push_back(G4String(<q>"SPECULARSPIKECONSTANT"</q>));</td></tr>
+<tr><th id="71">71</th><td>  G4MaterialPropertyName.push_back(G4String(<q>"BACKSCATTERCONSTANT"</q>));</td></tr>
+<tr><th id="72">72</th><td>  G4MaterialPropertyName.push_back(G4String(<q>"GROUPVEL"</q>));</td></tr>
+<tr><th id="73">73</th><td>  G4MaterialPropertyName.push_back(G4String(<q>"MIEHG"</q>));</td></tr>
+<tr><th id="74">74</th><td>  G4MaterialPropertyName.push_back(G4String(<q>"RAYLEIGH"</q>));</td></tr>
+<tr><th id="75">75</th><td>  G4MaterialPropertyName.push_back(G4String(<q>"WLSCOMPONENT"</q>));</td></tr>
+<tr><th id="76">76</th><td>  G4MaterialPropertyName.push_back(G4String(<q>"WLSABSLENGTH"</q>));</td></tr>
+<tr><th id="77">77</th><td>  G4MaterialPropertyName.push_back(G4String(<q>"ABSLENGTH"</q>));</td></tr>
+<tr><th id="78">78</th><td>  G4MaterialPropertyName.push_back(G4String(<q>"FASTCOMPONENT"</q>));</td></tr>
+<tr><th id="79">79</th><td>  G4MaterialPropertyName.push_back(G4String(<q>"SLOWCOMPONENT"</q>));</td></tr>
+<tr><th id="80">80</th><td>  G4MaterialPropertyName.push_back(G4String(<q>"PROTONSCINTILLATIONYIELD"</q>));</td></tr>
+<tr><th id="81">81</th><td>  G4MaterialPropertyName.push_back(G4String(<q>"DEUTERONSCINTILLATIONYIELD"</q>));</td></tr>
+<tr><th id="82">82</th><td>  G4MaterialPropertyName.push_back(G4String(<q>"TRITONSCINTILLATIONYIELD"</q>));</td></tr>
+<tr><th id="83">83</th><td>  G4MaterialPropertyName.push_back(G4String(<q>"ALPHASCINTILLATIONYIELD"</q>));</td></tr>
+<tr><th id="84">84</th><td>  G4MaterialPropertyName.push_back(G4String(<q>"IONSCINTILLATIONYIELD"</q>));</td></tr>
+<tr><th id="85">85</th><td>  G4MaterialPropertyName.push_back(G4String(<q>"ELECTRONSCINTILLATIONYIELD"</q>));</td></tr>
+<tr><th id="86">86</th><td></td></tr>
+<tr><th id="87">87</th><td>  G4MaterialConstPropertyName.push_back(G4String(<q>"SURFACEROUGHNESS"</q>));</td></tr>
+<tr><th id="88">88</th><td>  G4MaterialConstPropertyName.push_back(G4String(<q>"ISOTHERMAL_COMPRESSIBILITY"</q>));</td></tr>
+<tr><th id="89">89</th><td>  G4MaterialConstPropertyName.push_back(G4String(<q>"RS_SCALE_FACTOR"</q>));</td></tr>
+<tr><th id="90">90</th><td>  G4MaterialConstPropertyName.push_back(G4String(<q>"WLSMEANNUMBERPHOTONS"</q>));</td></tr>
+<tr><th id="91">91</th><td>  G4MaterialConstPropertyName.push_back(G4String(<q>"WLSTIMECONSTANT"</q>));</td></tr>
+<tr><th id="92">92</th><td>  G4MaterialConstPropertyName.push_back(G4String(<q>"MIEHG_FORWARD"</q>));</td></tr>
+<tr><th id="93">93</th><td>  G4MaterialConstPropertyName.push_back(G4String(<q>"MIEHG_BACKWARD"</q>));</td></tr>
+<tr><th id="94">94</th><td>  G4MaterialConstPropertyName.push_back(G4String(<q>"MIEHG_FORWARD_RATIO"</q>));</td></tr>
+<tr><th id="95">95</th><td>  G4MaterialConstPropertyName.push_back(G4String(<q>"SCINTILLATIONYIELD"</q>));</td></tr>
+<tr><th id="96">96</th><td>  G4MaterialConstPropertyName.push_back(G4String(<q>"RESOLUTIONSCALE"</q>));</td></tr>
+<tr><th id="97">97</th><td>  G4MaterialConstPropertyName.push_back(G4String(<q>"FASTTIMECONSTANT"</q>));</td></tr>
+<tr><th id="98">98</th><td>  G4MaterialConstPropertyName.push_back(G4String(<q>"FASTSCINTILLATIONRISETIME"</q>));</td></tr>
+<tr><th id="99">99</th><td>  G4MaterialConstPropertyName.push_back(G4String(<q>"SLOWTIMECONSTANT"</q>));</td></tr>
+<tr><th id="100">100</th><td>  G4MaterialConstPropertyName.push_back(G4String(<q>"SLOWSCINTILLATIONRISETIME"</q>));</td></tr>
+<tr><th id="101">101</th><td>  G4MaterialConstPropertyName.push_back(G4String(<q>"YIELDRATIO"</q>));</td></tr>
+<tr><th id="102">102</th><td>  G4MaterialConstPropertyName.push_back(G4String(<q>"FERMIPOT"</q>));</td></tr>
+<tr><th id="103">103</th><td>  G4MaterialConstPropertyName.push_back(G4String(<q>"DIFFUSION"</q>));</td></tr>
+<tr><th id="104">104</th><td>  G4MaterialConstPropertyName.push_back(G4String(<q>"SPINFLIP"</q>));</td></tr>
+<tr><th id="105">105</th><td>  G4MaterialConstPropertyName.push_back(G4String(<q>"LOSS"</q>));</td></tr>
+<tr><th id="106">106</th><td>  G4MaterialConstPropertyName.push_back(G4String(<q>"LOSSCS"</q>));</td></tr>
+<tr><th id="107">107</th><td>  G4MaterialConstPropertyName.push_back(G4String(<q>"ABSCS"</q>));</td></tr>
+<tr><th id="108">108</th><td>  G4MaterialConstPropertyName.push_back(G4String(<q>"SCATCS"</q>));</td></tr>
+<tr><th id="109">109</th><td>  G4MaterialConstPropertyName.push_back(G4String(<q>"MR_NBTHETA"</q>));</td></tr>
+<tr><th id="110">110</th><td>  G4MaterialConstPropertyName.push_back(G4String(<q>"MR_NBE"</q>));</td></tr>
+<tr><th id="111">111</th><td>  G4MaterialConstPropertyName.push_back(G4String(<q>"MR_RRMS"</q>));</td></tr>
+<tr><th id="112">112</th><td>  G4MaterialConstPropertyName.push_back(G4String(<q>"MR_CORRLEN"</q>));</td></tr>
+<tr><th id="113">113</th><td>  G4MaterialConstPropertyName.push_back(G4String(<q>"MR_THETAMIN"</q>));</td></tr>
+<tr><th id="114">114</th><td>  G4MaterialConstPropertyName.push_back(G4String(<q>"MR_THETAMAX"</q>));</td></tr>
+<tr><th id="115">115</th><td>  G4MaterialConstPropertyName.push_back(G4String(<q>"MR_EMIN"</q>));</td></tr>
+<tr><th id="116">116</th><td>  G4MaterialConstPropertyName.push_back(G4String(<q>"MR_EMAX"</q>));</td></tr>
+<tr><th id="117">117</th><td>  G4MaterialConstPropertyName.push_back(G4String(<q>"MR_ANGNOTHETA"</q>));</td></tr>
+<tr><th id="118">118</th><td>  G4MaterialConstPropertyName.push_back(G4String(<q>"MR_ANGNOPHI"</q>));</td></tr>
+<tr><th id="119">119</th><td>  G4MaterialConstPropertyName.push_back(G4String(<q>"MR_ANGCUT"</q>));</td></tr>
+<tr><th id="120">120</th><td>}</td></tr>
+<tr><th id="121">121</th><td></td></tr>
+<tr><th id="122">122</th><td><i>////////////////</i></td></tr>
+<tr><th id="123">123</th><td><i>// Destructor</i></td></tr>
+<tr><th id="124">124</th><td><i>////////////////</i></td></tr>
+<tr><th id="125">125</th><td></td></tr>
+<tr><th id="126">126</th><td><a class="type" href="../include/G4MaterialPropertiesTable.hh.html#G4MaterialPropertiesTable" title='G4MaterialPropertiesTable' data-ref="G4MaterialPropertiesTable">G4MaterialPropertiesTable</a>::<dfn class="virtual decl def" id="_ZN25G4MaterialPropertiesTableD1Ev" title='G4MaterialPropertiesTable::~G4MaterialPropertiesTable' data-ref="_ZN25G4MaterialPropertiesTableD1Ev">~G4MaterialPropertiesTable</dfn>()</td></tr>
+<tr><th id="127">127</th><td>{</td></tr>
+<tr><th id="128">128</th><td>  <span class='error' title="unknown type name &apos;MPTiterator&apos;">MPTiterator</span> <dfn class="local col1 decl" id="1i" title='i' data-type='int' data-ref="1i">i</dfn>;</td></tr>
+<tr><th id="129">129</th><td>  <b>for</b> (i = <span class='error' title="use of undeclared identifier &apos;MPT&apos;">MPT</span>.begin(); i != <span class='error' title="use of undeclared identifier &apos;MPT&apos;">MPT</span>.end(); ++i)</td></tr>
+<tr><th id="130">130</th><td>  {</td></tr>
+<tr><th id="131">131</th><td>    <b>delete</b> (*i).second;</td></tr>
+<tr><th id="132">132</th><td>  }</td></tr>
+<tr><th id="133">133</th><td>  <span class='error' title="use of undeclared identifier &apos;MPT&apos;">MPT</span>.clear();</td></tr>
+<tr><th id="134">134</th><td>  <span class='error' title="use of undeclared identifier &apos;MPTC&apos;">MPTC</span>.clear();</td></tr>
+<tr><th id="135">135</th><td></td></tr>
+<tr><th id="136">136</th><td>  <span class='error' title="unknown type name &apos;MPiterator&apos;">MPiterator</span> <dfn class="local col2 decl" id="2it" title='it' data-type='int' data-ref="2it">it</dfn>;</td></tr>
+<tr><th id="137">137</th><td>  <b>for</b> (it = <span class='error' title="use of undeclared identifier &apos;MP&apos;">MP</span>.begin(); it != <span class='error' title="use of undeclared identifier &apos;MP&apos;">MP</span>.end(); ++it)</td></tr>
+<tr><th id="138">138</th><td>  {</td></tr>
+<tr><th id="139">139</th><td>    <b>delete</b> (*it).second;</td></tr>
+<tr><th id="140">140</th><td>  }</td></tr>
+<tr><th id="141">141</th><td>  <span class='error' title="use of undeclared identifier &apos;MP&apos;">MP</span>.clear();</td></tr>
+<tr><th id="142">142</th><td>  <span class='error' title="use of undeclared identifier &apos;MCP&apos;">MCP</span>.clear();</td></tr>
+<tr><th id="143">143</th><td></td></tr>
+<tr><th id="144">144</th><td>  <span class='error' title="use of undeclared identifier &apos;G4MaterialPropertyName&apos;">G4MaterialPropertyName</span>.clear();</td></tr>
+<tr><th id="145">145</th><td>  <span class='error' title="use of undeclared identifier &apos;G4MaterialConstPropertyName&apos;">G4MaterialConstPropertyName</span>.clear();</td></tr>
+<tr><th id="146">146</th><td>}</td></tr>
+<tr><th id="147">147</th><td></td></tr>
+<tr><th id="148">148</th><td><i>////////////</i></td></tr>
+<tr><th id="149">149</th><td><i>// Methods</i></td></tr>
+<tr><th id="150">150</th><td><i>////////////</i></td></tr>
+<tr><th id="151">151</th><td></td></tr>
+<tr><th id="152">152</th><td><a class="typedef" href="../../global/management/include/G4Types.hh.html#G4int" title='G4int' data-type='int' data-ref="G4int">G4int</a> <a class="type" href="../include/G4MaterialPropertiesTable.hh.html#G4MaterialPropertiesTable" title='G4MaterialPropertiesTable' data-ref="G4MaterialPropertiesTable">G4MaterialPropertiesTable</a>::<dfn class="decl def" id="_ZNK25G4MaterialPropertiesTable21GetConstPropertyIndexERK8G4Stringb" title='G4MaterialPropertiesTable::GetConstPropertyIndex' data-ref="_ZNK25G4MaterialPropertiesTable21GetConstPropertyIndexERK8G4Stringb">GetConstPropertyIndex</dfn>(<em>const</em> <a class="type" href="../../global/management/include/G4String.hh.html#G4String" title='G4String' data-ref="G4String">G4String</a>&amp; <dfn class="local col3 decl" id="3key" title='key' data-type='const G4String &amp;' data-ref="3key">key</dfn>,</td></tr>
+<tr><th id="153">153</th><td>                                                       <a class="typedef" href="../../global/management/include/G4Types.hh.html#G4bool" title='G4bool' data-type='bool' data-ref="G4bool">G4bool</a> <dfn class="local col4 decl" id="4warning" title='warning' data-type='G4bool' data-ref="4warning">warning</dfn>) <em>const</em></td></tr>
+<tr><th id="154">154</th><td>{</td></tr>
+<tr><th id="155">155</th><td>  <i>// Returns the constant material property index corresponding to a key</i></td></tr>
+<tr><th id="156">156</th><td></td></tr>
+<tr><th id="157">157</th><td>  <span class='error' title="unknown type name &apos;size_t&apos;">size_t</span> <dfn class="local col5 decl" id="5index" title='index' data-type='int' data-ref="5index">index</dfn> = <span class='error' title="use of undeclared identifier &apos;std&apos;">std</span>::distance(<span class='error' title="use of undeclared identifier &apos;G4MaterialConstPropertyName&apos;">G4MaterialConstPropertyName</span>.begin(),</td></tr>
+<tr><th id="158">158</th><td>                     <span class='error' title="use of undeclared identifier &apos;std&apos;">std</span>::find(<span class='error' title="use of undeclared identifier &apos;G4MaterialConstPropertyName&apos;">G4MaterialConstPropertyName</span>.begin(), </td></tr>
+<tr><th id="159">159</th><td>                                     <span class='error' title="use of undeclared identifier &apos;G4MaterialConstPropertyName&apos;">G4MaterialConstPropertyName</span>.end(), key));</td></tr>
+<tr><th id="160">160</th><td>  <b>if</b>(index &lt; <span class='error' title="use of undeclared identifier &apos;G4MaterialConstPropertyName&apos;">G4MaterialConstPropertyName</span>.size()) <b>return</b> index;</td></tr>
+<tr><th id="161">161</th><td>  <b>if</b> (<a class="local col4 ref" href="#4warning" title='warning' data-ref="4warning">warning</a>) {</td></tr>
+<tr><th id="162">162</th><td>    <a class="typedef" href="../../global/management/include/G4Exception.hh.html#G4ExceptionDescription" title='G4ExceptionDescription' data-type='int' data-ref="G4ExceptionDescription">G4ExceptionDescription</a> <dfn class="local col6 decl" id="6ed" title='ed' data-type='G4ExceptionDescription' data-ref="6ed">ed</dfn>;</td></tr>
+<tr><th id="163">163</th><td>    ed <span class='error' title="invalid operands to binary expression (&apos;G4ExceptionDescription&apos; (aka &apos;int&apos;) and &apos;const char *&apos;)">&lt;&lt;</span> <q>"Constant Material Property Index for key "</q> &lt;&lt; key &lt;&lt; <q>" not found."</q>;</td></tr>
+<tr><th id="164">164</th><td>    <a class="ref" href="../../global/management/include/G4Exception.hh.html#_Z11G4ExceptionPKcS0_19G4ExceptionSeverityRi" title='G4Exception' data-ref="_Z11G4ExceptionPKcS0_19G4ExceptionSeverityRi">G4Exception</a>(<q>"G4MaterialPropertiesTable::GetConstPropertyIndex()"</q>,<q>"mat206"</q>,</td></tr>
+<tr><th id="165">165</th><td>                <a class="enum" href="../../global/management/include/G4ExceptionSeverity.hh.html#G4ExceptionSeverity::JustWarning" title='G4ExceptionSeverity::JustWarning' data-ref="G4ExceptionSeverity::JustWarning">JustWarning</a>, <span class='refarg'><a class="local col6 ref" href="#6ed" title='ed' data-ref="6ed">ed</a></span>);</td></tr>
+<tr><th id="166">166</th><td>  }</td></tr>
+<tr><th id="167">167</th><td>  <b>return</b> -<var>1</var>;</td></tr>
+<tr><th id="168">168</th><td>} </td></tr>
+<tr><th id="169">169</th><td></td></tr>
+<tr><th id="170">170</th><td><a class="typedef" href="../../global/management/include/G4Types.hh.html#G4int" title='G4int' data-type='int' data-ref="G4int">G4int</a> <a class="type" href="../include/G4MaterialPropertiesTable.hh.html#G4MaterialPropertiesTable" title='G4MaterialPropertiesTable' data-ref="G4MaterialPropertiesTable">G4MaterialPropertiesTable</a>::<dfn class="decl def" id="_ZNK25G4MaterialPropertiesTable16GetPropertyIndexERK8G4Stringb" title='G4MaterialPropertiesTable::GetPropertyIndex' data-ref="_ZNK25G4MaterialPropertiesTable16GetPropertyIndexERK8G4Stringb">GetPropertyIndex</dfn>(<em>const</em> <a class="type" href="../../global/management/include/G4String.hh.html#G4String" title='G4String' data-ref="G4String">G4String</a>&amp; <dfn class="local col7 decl" id="7key" title='key' data-type='const G4String &amp;' data-ref="7key">key</dfn>,</td></tr>
+<tr><th id="171">171</th><td>                                                  <a class="typedef" href="../../global/management/include/G4Types.hh.html#G4bool" title='G4bool' data-type='bool' data-ref="G4bool">G4bool</a> <dfn class="local col8 decl" id="8warning" title='warning' data-type='G4bool' data-ref="8warning">warning</dfn>) <em>const</em></td></tr>
+<tr><th id="172">172</th><td>{</td></tr>
+<tr><th id="173">173</th><td>  <i>// Returns the material property index corresponding to a key</i></td></tr>
+<tr><th id="174">174</th><td>  <span class='error' title="unknown type name &apos;size_t&apos;">size_t</span> <dfn class="local col9 decl" id="9index" title='index' data-type='int' data-ref="9index">index</dfn> = <span class='error' title="use of undeclared identifier &apos;std&apos;">std</span>::distance(<span class='error' title="use of undeclared identifier &apos;G4MaterialPropertyName&apos;">G4MaterialPropertyName</span>.begin(),</td></tr>
+<tr><th id="175">175</th><td>                     <span class='error' title="use of undeclared identifier &apos;std&apos;">std</span>::find(<span class='error' title="use of undeclared identifier &apos;G4MaterialPropertyName&apos;">G4MaterialPropertyName</span>.begin(), </td></tr>
+<tr><th id="176">176</th><td>                                         <span class='error' title="use of undeclared identifier &apos;G4MaterialPropertyName&apos;">G4MaterialPropertyName</span>.end(), key));</td></tr>
+<tr><th id="177">177</th><td>  <b>if</b>(index &lt; <span class='error' title="use of undeclared identifier &apos;G4MaterialPropertyName&apos;">G4MaterialPropertyName</span>.size()) <b>return</b> index;</td></tr>
+<tr><th id="178">178</th><td>  <b>if</b> (<a class="local col8 ref" href="#8warning" title='warning' data-ref="8warning">warning</a>) {</td></tr>
+<tr><th id="179">179</th><td>    <a class="typedef" href="../../global/management/include/G4Exception.hh.html#G4ExceptionDescription" title='G4ExceptionDescription' data-type='int' data-ref="G4ExceptionDescription">G4ExceptionDescription</a> <dfn class="local col0 decl" id="10ed" title='ed' data-type='G4ExceptionDescription' data-ref="10ed">ed</dfn>;</td></tr>
+<tr><th id="180">180</th><td>    ed <span class='error' title="invalid operands to binary expression (&apos;G4ExceptionDescription&apos; (aka &apos;int&apos;) and &apos;const char *&apos;)">&lt;&lt;</span> <q>"Material Property Index for key "</q> &lt;&lt; key &lt;&lt; <q>" not found."</q>;</td></tr>
+<tr><th id="181">181</th><td>    <a class="ref" href="../../global/management/include/G4Exception.hh.html#_Z11G4ExceptionPKcS0_19G4ExceptionSeverityRi" title='G4Exception' data-ref="_Z11G4ExceptionPKcS0_19G4ExceptionSeverityRi">G4Exception</a>(<q>"G4MaterialPropertiesTable::GetPropertyIndex()"</q>,<q>"mat207"</q>,</td></tr>
+<tr><th id="182">182</th><td>                 <a class="enum" href="../../global/management/include/G4ExceptionSeverity.hh.html#G4ExceptionSeverity::JustWarning" title='G4ExceptionSeverity::JustWarning' data-ref="G4ExceptionSeverity::JustWarning">JustWarning</a>, <span class='refarg'><a class="local col0 ref" href="#10ed" title='ed' data-ref="10ed">ed</a></span>);</td></tr>
+<tr><th id="183">183</th><td>  }</td></tr>
+<tr><th id="184">184</th><td>  <b>return</b> -<var>1</var>;</td></tr>
+<tr><th id="185">185</th><td>} </td></tr>
+<tr><th id="186">186</th><td></td></tr>
+<tr><th id="187">187</th><td><a class="typedef" href="../../global/management/include/G4Types.hh.html#G4double" title='G4double' data-type='double' data-ref="G4double">G4double</a> <a class="type" href="../include/G4MaterialPropertiesTable.hh.html#G4MaterialPropertiesTable" title='G4MaterialPropertiesTable' data-ref="G4MaterialPropertiesTable">G4MaterialPropertiesTable</a>::<dfn class="decl def" id="_ZNK25G4MaterialPropertiesTable16GetConstPropertyEi" title='G4MaterialPropertiesTable::GetConstProperty' data-ref="_ZNK25G4MaterialPropertiesTable16GetConstPropertyEi">GetConstProperty</dfn>(<em>const</em> <a class="typedef" href="../../global/management/include/G4Types.hh.html#G4int" title='G4int' data-type='int' data-ref="G4int">G4int</a> <dfn class="local col1 decl" id="11index" title='index' data-type='const G4int' data-ref="11index">index</dfn>) <em>const</em></td></tr>
+<tr><th id="188">188</th><td>{</td></tr>
+<tr><th id="189">189</th><td>  <i>// Returns the constant material property corresponding to an index</i></td></tr>
+<tr><th id="190">190</th><td><i>  // fatal exception if property not found</i></td></tr>
+<tr><th id="191">191</th><td></td></tr>
+<tr><th id="192">192</th><td>  <span class='error' title="unknown type name &apos;MCPiterator&apos;">MCPiterator</span> <dfn class="local col2 decl" id="12j" title='j' data-type='int' data-ref="12j">j</dfn>;</td></tr>
+<tr><th id="193">193</th><td>  j = <span class='error' title="use of undeclared identifier &apos;MCP&apos;">MCP</span>.find(index);</td></tr>
+<tr><th id="194">194</th><td>  <b>if</b> ( j != <span class='error' title="use of undeclared identifier &apos;MCP&apos;">MCP</span>.end() ) <b>return</b> j-&gt;second;</td></tr>
+<tr><th id="195">195</th><td>  <a class="typedef" href="../../global/management/include/G4Exception.hh.html#G4ExceptionDescription" title='G4ExceptionDescription' data-type='int' data-ref="G4ExceptionDescription">G4ExceptionDescription</a> <dfn class="local col3 decl" id="13ed" title='ed' data-type='G4ExceptionDescription' data-ref="13ed">ed</dfn>;</td></tr>
+<tr><th id="196">196</th><td>  ed <span class='error' title="invalid operands to binary expression (&apos;G4ExceptionDescription&apos; (aka &apos;int&apos;) and &apos;const char *&apos;)">&lt;&lt;</span> <q>"Constant Material Property Index "</q> &lt;&lt; index &lt;&lt; <q>" not found."</q>;</td></tr>
+<tr><th id="197">197</th><td>  <a class="ref" href="../../global/management/include/G4Exception.hh.html#_Z11G4ExceptionPKcS0_19G4ExceptionSeverityRi" title='G4Exception' data-ref="_Z11G4ExceptionPKcS0_19G4ExceptionSeverityRi">G4Exception</a>(<q>"G4MaterialPropertiesTable::GetConstProperty()"</q>,<q>"mat202"</q>,</td></tr>
+<tr><th id="198">198</th><td>              <a class="enum" href="../../global/management/include/G4ExceptionSeverity.hh.html#G4ExceptionSeverity::FatalException" title='G4ExceptionSeverity::FatalException' data-ref="G4ExceptionSeverity::FatalException">FatalException</a>, <span class='refarg'><a class="local col3 ref" href="#13ed" title='ed' data-ref="13ed">ed</a></span>);</td></tr>
+<tr><th id="199">199</th><td>  <b>return</b> <var>0.</var>;</td></tr>
+<tr><th id="200">200</th><td>}</td></tr>
+<tr><th id="201">201</th><td></td></tr>
+<tr><th id="202">202</th><td><a class="typedef" href="../../global/management/include/G4Types.hh.html#G4double" title='G4double' data-type='double' data-ref="G4double">G4double</a> <a class="type" href="../include/G4MaterialPropertiesTable.hh.html#G4MaterialPropertiesTable" title='G4MaterialPropertiesTable' data-ref="G4MaterialPropertiesTable">G4MaterialPropertiesTable</a>::<dfn class="decl def" id="_ZNK25G4MaterialPropertiesTable16GetConstPropertyEPKc" title='G4MaterialPropertiesTable::GetConstProperty' data-ref="_ZNK25G4MaterialPropertiesTable16GetConstPropertyEPKc">GetConstProperty</dfn>(<em>const</em> <em>char</em> *<dfn class="local col4 decl" id="14key" title='key' data-type='const char *' data-ref="14key">key</dfn>) <em>const</em></td></tr>
+<tr><th id="203">203</th><td>{</td></tr>
+<tr><th id="204">204</th><td>  <i>// Returns the constant material property corresponding to a key</i></td></tr>
+<tr><th id="205">205</th><td><i>  // fatal exception if property not found</i></td></tr>
+<tr><th id="206">206</th><td></td></tr>
+<tr><th id="207">207</th><td>  <em>const</em> <a class="typedef" href="../../global/management/include/G4Types.hh.html#G4int" title='G4int' data-type='int' data-ref="G4int">G4int</a> <dfn class="local col5 decl" id="15index" title='index' data-type='const G4int' data-ref="15index">index</dfn> = <a class="member" href="#_ZNK25G4MaterialPropertiesTable21GetConstPropertyIndexERK8G4Stringb" title='G4MaterialPropertiesTable::GetConstPropertyIndex' data-ref="_ZNK25G4MaterialPropertiesTable21GetConstPropertyIndexERK8G4Stringb">GetConstPropertyIndex</a>(<a class="type" href="../../global/management/include/G4String.hh.html#G4String" title='G4String' data-ref="G4String">G4String</a><a class="ref" href="../../global/management/include/G4String.hh.html#_ZN8G4StringC1EPKc" title='G4String::G4String' data-ref="_ZN8G4StringC1EPKc">(</a><a class="local col4 ref" href="#14key" title='key' data-ref="14key">key</a>));</td></tr>
+<tr><th id="208">208</th><td>  <b>return</b> <a class="member" href="#_ZNK25G4MaterialPropertiesTable16GetConstPropertyEi" title='G4MaterialPropertiesTable::GetConstProperty' data-ref="_ZNK25G4MaterialPropertiesTable16GetConstPropertyEi">GetConstProperty</a>(<a class="local col5 ref" href="#15index" title='index' data-ref="15index">index</a>);</td></tr>
+<tr><th id="209">209</th><td>}</td></tr>
+<tr><th id="210">210</th><td></td></tr>
+<tr><th id="211">211</th><td><a class="typedef" href="../../global/management/include/G4Types.hh.html#G4bool" title='G4bool' data-type='bool' data-ref="G4bool">G4bool</a> <a class="type" href="../include/G4MaterialPropertiesTable.hh.html#G4MaterialPropertiesTable" title='G4MaterialPropertiesTable' data-ref="G4MaterialPropertiesTable">G4MaterialPropertiesTable</a>::<dfn class="decl def" id="_ZNK25G4MaterialPropertiesTable19ConstPropertyExistsEPKc" title='G4MaterialPropertiesTable::ConstPropertyExists' data-ref="_ZNK25G4MaterialPropertiesTable19ConstPropertyExistsEPKc">ConstPropertyExists</dfn>(<em>const</em> <em>char</em> *<dfn class="local col6 decl" id="16key" title='key' data-type='const char *' data-ref="16key">key</dfn>) <em>const</em></td></tr>
+<tr><th id="212">212</th><td>{</td></tr>
+<tr><th id="213">213</th><td>  <i>// Returns true if a const property 'key' exists</i></td></tr>
+<tr><th id="214">214</th><td>  <em>const</em> <a class="typedef" href="../../global/management/include/G4Types.hh.html#G4int" title='G4int' data-type='int' data-ref="G4int">G4int</a> <dfn class="local col7 decl" id="17index" title='index' data-type='const G4int' data-ref="17index">index</dfn> = <a class="member" href="#_ZNK25G4MaterialPropertiesTable21GetConstPropertyIndexERK8G4Stringb" title='G4MaterialPropertiesTable::GetConstPropertyIndex' data-ref="_ZNK25G4MaterialPropertiesTable21GetConstPropertyIndexERK8G4Stringb">GetConstPropertyIndex</a>(<a class="type" href="../../global/management/include/G4String.hh.html#G4String" title='G4String' data-ref="G4String">G4String</a><a class="ref" href="../../global/management/include/G4String.hh.html#_ZN8G4StringC1EPKc" title='G4String::G4String' data-ref="_ZN8G4StringC1EPKc">(</a><a class="local col6 ref" href="#16key" title='key' data-ref="16key">key</a>));</td></tr>
+<tr><th id="215">215</th><td></td></tr>
+<tr><th id="216">216</th><td>  <span class='error' title="unknown type name &apos;MCPiterator&apos;">MCPiterator</span> <dfn class="local col8 decl" id="18j" title='j' data-type='int' data-ref="18j">j</dfn>;</td></tr>
+<tr><th id="217">217</th><td>  j = <span class='error' title="use of undeclared identifier &apos;MCP&apos;">MCP</span>.find(index);</td></tr>
+<tr><th id="218">218</th><td>  <b>if</b> ( j != <span class='error' title="use of undeclared identifier &apos;MCP&apos;">MCP</span>.end() ) <b>return</b> <b>true</b>;</td></tr>
+<tr><th id="219">219</th><td>  <b>return</b> <b>false</b>;</td></tr>
+<tr><th id="220">220</th><td>}</td></tr>
+<tr><th id="221">221</th><td></td></tr>
+<tr><th id="222">222</th><td><a class="typedef" href="../include/G4MaterialPropertyVector.hh.html#G4MaterialPropertyVector" title='G4MaterialPropertyVector' data-type='G4PhysicsOrderedFreeVector' data-ref="G4MaterialPropertyVector">G4MaterialPropertyVector</a>*</td></tr>
+<tr><th id="223">223</th><td><a class="type" href="../include/G4MaterialPropertiesTable.hh.html#G4MaterialPropertiesTable" title='G4MaterialPropertiesTable' data-ref="G4MaterialPropertiesTable">G4MaterialPropertiesTable</a>::<dfn class="decl def" id="_ZN25G4MaterialPropertiesTable11GetPropertyEPKcb" title='G4MaterialPropertiesTable::GetProperty' data-ref="_ZN25G4MaterialPropertiesTable11GetPropertyEPKcb">GetProperty</dfn>(<em>const</em> <em>char</em> *<dfn class="local col9 decl" id="19key" title='key' data-type='const char *' data-ref="19key">key</dfn>, <a class="typedef" href="../../global/management/include/G4Types.hh.html#G4bool" title='G4bool' data-type='bool' data-ref="G4bool">G4bool</a> <dfn class="local col0 decl" id="20warning" title='warning' data-type='G4bool' data-ref="20warning">warning</dfn>)</td></tr>
+<tr><th id="224">224</th><td>{</td></tr>
+<tr><th id="225">225</th><td>  <i>// Returns a Material Property Vector corresponding to a key</i></td></tr>
+<tr><th id="226">226</th><td>  <em>const</em> <a class="typedef" href="../../global/management/include/G4Types.hh.html#G4int" title='G4int' data-type='int' data-ref="G4int">G4int</a> <dfn class="local col1 decl" id="21index" title='index' data-type='const G4int' data-ref="21index">index</dfn> = <a class="member" href="#_ZNK25G4MaterialPropertiesTable16GetPropertyIndexERK8G4Stringb" title='G4MaterialPropertiesTable::GetPropertyIndex' data-ref="_ZNK25G4MaterialPropertiesTable16GetPropertyIndexERK8G4Stringb">GetPropertyIndex</a>(<a class="type" href="../../global/management/include/G4String.hh.html#G4String" title='G4String' data-ref="G4String">G4String</a><a class="ref" href="../../global/management/include/G4String.hh.html#_ZN8G4StringC1EPKc" title='G4String::G4String' data-ref="_ZN8G4StringC1EPKc">(</a><a class="local col9 ref" href="#19key" title='key' data-ref="19key">key</a>), <a class="local col0 ref" href="#20warning" title='warning' data-ref="20warning">warning</a>);</td></tr>
+<tr><th id="227">227</th><td>  <b>return</b> <a class="member" href="#_ZN25G4MaterialPropertiesTable11GetPropertyEib" title='G4MaterialPropertiesTable::GetProperty' data-ref="_ZN25G4MaterialPropertiesTable11GetPropertyEib">GetProperty</a>(<a class="local col1 ref" href="#21index" title='index' data-ref="21index">index</a>);</td></tr>
+<tr><th id="228">228</th><td>}</td></tr>
+<tr><th id="229">229</th><td></td></tr>
+<tr><th id="230">230</th><td><a class="typedef" href="../include/G4MaterialPropertyVector.hh.html#G4MaterialPropertyVector" title='G4MaterialPropertyVector' data-type='G4PhysicsOrderedFreeVector' data-ref="G4MaterialPropertyVector">G4MaterialPropertyVector</a>*</td></tr>
+<tr><th id="231">231</th><td><a class="type" href="../include/G4MaterialPropertiesTable.hh.html#G4MaterialPropertiesTable" title='G4MaterialPropertiesTable' data-ref="G4MaterialPropertiesTable">G4MaterialPropertiesTable</a>::<dfn class="decl def" id="_ZN25G4MaterialPropertiesTable11GetPropertyEib" title='G4MaterialPropertiesTable::GetProperty' data-ref="_ZN25G4MaterialPropertiesTable11GetPropertyEib">GetProperty</dfn>(<em>const</em> <a class="typedef" href="../../global/management/include/G4Types.hh.html#G4int" title='G4int' data-type='int' data-ref="G4int">G4int</a> <dfn class="local col2 decl" id="22index" title='index' data-type='const G4int' data-ref="22index">index</dfn>, <a class="typedef" href="../../global/management/include/G4Types.hh.html#G4bool" title='G4bool' data-type='bool' data-ref="G4bool">G4bool</a> <dfn class="local col3 decl" id="23warning" title='warning' data-type='G4bool' data-ref="23warning">warning</dfn>)</td></tr>
+<tr><th id="232">232</th><td>{</td></tr>
+<tr><th id="233">233</th><td>  <i>// Returns a Material Property Vector corresponding to an index</i></td></tr>
+<tr><th id="234">234</th><td>  <span class='error' title="unknown type name &apos;MPiterator&apos;">MPiterator</span> <dfn class="local col4 decl" id="24i" title='i' data-type='int' data-ref="24i">i</dfn>;</td></tr>
+<tr><th id="235">235</th><td>  i = <span class='error' title="use of undeclared identifier &apos;MP&apos;">MP</span>.find(index);</td></tr>
+<tr><th id="236">236</th><td>  <b>if</b> ( i != <span class='error' title="use of undeclared identifier &apos;MP&apos;">MP</span>.end() ) <b>return</b> i-&gt;second;</td></tr>
+<tr><th id="237">237</th><td>  <b>if</b> (<a class="local col3 ref" href="#23warning" title='warning' data-ref="23warning">warning</a>) {</td></tr>
+<tr><th id="238">238</th><td>    <a class="typedef" href="../../global/management/include/G4Exception.hh.html#G4ExceptionDescription" title='G4ExceptionDescription' data-type='int' data-ref="G4ExceptionDescription">G4ExceptionDescription</a> <dfn class="local col5 decl" id="25ed" title='ed' data-type='G4ExceptionDescription' data-ref="25ed">ed</dfn>;</td></tr>
+<tr><th id="239">239</th><td>    ed <span class='error' title="invalid operands to binary expression (&apos;G4ExceptionDescription&apos; (aka &apos;int&apos;) and &apos;const char *&apos;)">&lt;&lt;</span> <q>"Material Property for index "</q> &lt;&lt; index &lt;&lt; <q>" not found."</q>;</td></tr>
+<tr><th id="240">240</th><td>    <a class="ref" href="../../global/management/include/G4Exception.hh.html#_Z11G4ExceptionPKcS0_19G4ExceptionSeverityRi" title='G4Exception' data-ref="_Z11G4ExceptionPKcS0_19G4ExceptionSeverityRi">G4Exception</a>(<q>"G4MaterialPropertiesTable::GetPropertyIndex()"</q>,<q>"mat208"</q>,</td></tr>
+<tr><th id="241">241</th><td>                 <a class="enum" href="../../global/management/include/G4ExceptionSeverity.hh.html#G4ExceptionSeverity::JustWarning" title='G4ExceptionSeverity::JustWarning' data-ref="G4ExceptionSeverity::JustWarning">JustWarning</a>, <span class='refarg'><a class="local col5 ref" href="#25ed" title='ed' data-ref="25ed">ed</a></span>);</td></tr>
+<tr><th id="242">242</th><td>  }</td></tr>
+<tr><th id="243">243</th><td>  <b>return</b> <b>nullptr</b>;</td></tr>
+<tr><th id="244">244</th><td>}</td></tr>
+<tr><th id="245">245</th><td></td></tr>
+<tr><th id="246">246</th><td><a class="typedef" href="../include/G4MaterialPropertyVector.hh.html#G4MaterialPropertyVector" title='G4MaterialPropertyVector' data-type='G4PhysicsOrderedFreeVector' data-ref="G4MaterialPropertyVector">G4MaterialPropertyVector</a>* <a class="type" href="../include/G4MaterialPropertiesTable.hh.html#G4MaterialPropertiesTable" title='G4MaterialPropertiesTable' data-ref="G4MaterialPropertiesTable">G4MaterialPropertiesTable</a>::<dfn class="decl def" id="_ZN25G4MaterialPropertiesTable11AddPropertyEPKcPdS2_i" title='G4MaterialPropertiesTable::AddProperty' data-ref="_ZN25G4MaterialPropertiesTable11AddPropertyEPKcPdS2_i">AddProperty</dfn>(</td></tr>
+<tr><th id="247">247</th><td>                                            <em>const</em> <em>char</em> *<dfn class="local col6 decl" id="26key" title='key' data-type='const char *' data-ref="26key">key</dfn>,</td></tr>
+<tr><th id="248">248</th><td>                                            <a class="typedef" href="../../global/management/include/G4Types.hh.html#G4double" title='G4double' data-type='double' data-ref="G4double">G4double</a>   *<dfn class="local col7 decl" id="27PhotonEnergies" title='PhotonEnergies' data-type='G4double *' data-ref="27PhotonEnergies">PhotonEnergies</dfn>,</td></tr>
+<tr><th id="249">249</th><td>                                            <a class="typedef" href="../../global/management/include/G4Types.hh.html#G4double" title='G4double' data-type='double' data-ref="G4double">G4double</a>   *<dfn class="local col8 decl" id="28PropertyValues" title='PropertyValues' data-type='G4double *' data-ref="28PropertyValues">PropertyValues</dfn>,</td></tr>
+<tr><th id="250">250</th><td>                                            <a class="typedef" href="../../global/management/include/G4Types.hh.html#G4int" title='G4int' data-type='int' data-ref="G4int">G4int</a>      <dfn class="local col9 decl" id="29NumEntries" title='NumEntries' data-type='G4int' data-ref="29NumEntries">NumEntries</dfn>)</td></tr>
+<tr><th id="251">251</th><td>{</td></tr>
+<tr><th id="252">252</th><td>  <i>// Provides a way of adding a property to the Material Properties</i></td></tr>
+<tr><th id="253">253</th><td><i>  // Table given a pair of numbers and a key</i></td></tr>
+<tr><th id="254">254</th><td>  <a class="type" href="../../global/management/include/G4String.hh.html#G4String" title='G4String' data-ref="G4String">G4String</a> <dfn class="local col0 decl" id="30k" title='k' data-type='G4String' data-ref="30k">k</dfn><a class="ref" href="../../global/management/include/G4String.hh.html#_ZN8G4StringC1EPKc" title='G4String::G4String' data-ref="_ZN8G4StringC1EPKc">(</a><a class="local col6 ref" href="#26key" title='key' data-ref="26key">key</a>);</td></tr>
+<tr><th id="255">255</th><td>  <i>// if the key doesn't exist, add it</i></td></tr>
+<tr><th id="256">256</th><td>  <b>if</b> (<span class='error' title="use of undeclared identifier &apos;std&apos;">std</span>::find(<span class='error' title="use of undeclared identifier &apos;G4MaterialPropertyName&apos;">G4MaterialPropertyName</span>.begin(),</td></tr>
+<tr><th id="257">257</th><td>                <span class='error' title="use of undeclared identifier &apos;G4MaterialPropertyName&apos;">G4MaterialPropertyName</span>.end(), k) ==</td></tr>
+<tr><th id="258">258</th><td>       <span class='error' title="use of undeclared identifier &apos;G4MaterialPropertyName&apos;">G4MaterialPropertyName</span>.end()) {</td></tr>
+<tr><th id="259">259</th><td>    <span class='error' title="use of undeclared identifier &apos;G4MaterialPropertyName&apos;">G4MaterialPropertyName</span>.push_back(k);</td></tr>
+<tr><th id="260">260</th><td>  }</td></tr>
+<tr><th id="261">261</th><td>  <a class="typedef" href="../../global/management/include/G4Types.hh.html#G4int" title='G4int' data-type='int' data-ref="G4int">G4int</a> <dfn class="local col1 decl" id="31index" title='index' data-type='G4int' data-ref="31index">index</dfn> = <a class="member" href="#_ZNK25G4MaterialPropertiesTable16GetPropertyIndexERK8G4Stringb" title='G4MaterialPropertiesTable::GetPropertyIndex' data-ref="_ZNK25G4MaterialPropertiesTable16GetPropertyIndexERK8G4Stringb">GetPropertyIndex</a>(<a class="local col0 ref" href="#30k" title='k' data-ref="30k">k</a>);</td></tr>
+<tr><th id="262">262</th><td></td></tr>
+<tr><th id="263">263</th><td>  <a class="typedef" href="../include/G4MaterialPropertyVector.hh.html#G4MaterialPropertyVector" title='G4MaterialPropertyVector' data-type='G4PhysicsOrderedFreeVector' data-ref="G4MaterialPropertyVector">G4MaterialPropertyVector</a> *<dfn class="local col2 decl" id="32mpv" title='mpv' data-type='G4MaterialPropertyVector *' data-ref="32mpv">mpv</dfn> = <b>new</b> <span class='error' title="no matching constructor for initialization of &apos;G4MaterialPropertyVector&apos; (aka &apos;G4PhysicsOrderedFreeVector&apos;)">G4MaterialPropertyVector</span>(PhotonEnergies, </td></tr>
+<tr><th id="264">264</th><td>                                                   PropertyValues, NumEntries);</td></tr>
+<tr><th id="265">265</th><td>  <span class='error' title="use of undeclared identifier &apos;MP&apos;">MP</span>[index] = mpv;</td></tr>
+<tr><th id="266">266</th><td></td></tr>
+<tr><th id="267">267</th><td>  <i>// if key is RINDEX, we calculate GROUPVEL - </i></td></tr>
+<tr><th id="268">268</th><td><i>  // contribution from Tao Lin (IHEP, the JUNO experiment) </i></td></tr>
+<tr><th id="269">269</th><td>  <b>if</b> (<a class="local col0 ref" href="#30k" title='k' data-ref="30k">k</a><a class="ref" href="../../global/management/include/G4String.hh.html#_ZNK8G4StringeqEPKc" title='G4String::operator==' data-ref="_ZNK8G4StringeqEPKc">==</a><q>"RINDEX"</q>) {</td></tr>
+<tr><th id="270">270</th><td>      <span class='error' title="use of undeclared identifier &apos;CalculateGROUPVEL&apos;">CalculateGROUPVEL</span>();</td></tr>
+<tr><th id="271">271</th><td>  }</td></tr>
+<tr><th id="272">272</th><td></td></tr>
+<tr><th id="273">273</th><td>  <b>return</b> <a class="local col2 ref" href="#32mpv" title='mpv' data-ref="32mpv">mpv</a>;</td></tr>
+<tr><th id="274">274</th><td>}</td></tr>
+<tr><th id="275">275</th><td></td></tr>
+<tr><th id="276">276</th><td><em>void</em> <a class="type" href="../include/G4MaterialPropertiesTable.hh.html#G4MaterialPropertiesTable" title='G4MaterialPropertiesTable' data-ref="G4MaterialPropertiesTable">G4MaterialPropertiesTable</a>::</td></tr>
+<tr><th id="277">277</th><td><dfn class="decl def" id="_ZN25G4MaterialPropertiesTable11AddPropertyEPKcP26G4PhysicsOrderedFreeVector" title='G4MaterialPropertiesTable::AddProperty' data-ref="_ZN25G4MaterialPropertiesTable11AddPropertyEPKcP26G4PhysicsOrderedFreeVector">AddProperty</dfn>(<em>const</em> <em>char</em> *<dfn class="local col3 decl" id="33key" title='key' data-type='const char *' data-ref="33key">key</dfn>, <a class="typedef" href="../include/G4MaterialPropertyVector.hh.html#G4MaterialPropertyVector" title='G4MaterialPropertyVector' data-type='G4PhysicsOrderedFreeVector' data-ref="G4MaterialPropertyVector">G4MaterialPropertyVector</a> *<dfn class="local col4 decl" id="34mpv" title='mpv' data-type='G4MaterialPropertyVector *' data-ref="34mpv">mpv</dfn>)</td></tr>
+<tr><th id="278">278</th><td>{</td></tr>
+<tr><th id="279">279</th><td>  <i>//  Provides a way of adding a property to the Material Properties</i></td></tr>
+<tr><th id="280">280</th><td><i>  //  Table given an G4MaterialPropertyVector Reference and a key</i></td></tr>
+<tr><th id="281">281</th><td>  <a class="type" href="../../global/management/include/G4String.hh.html#G4String" title='G4String' data-ref="G4String">G4String</a> <dfn class="local col5 decl" id="35k" title='k' data-type='G4String' data-ref="35k">k</dfn><a class="ref" href="../../global/management/include/G4String.hh.html#_ZN8G4StringC1EPKc" title='G4String::G4String' data-ref="_ZN8G4StringC1EPKc">(</a><a class="local col3 ref" href="#33key" title='key' data-ref="33key">key</a>);</td></tr>
+<tr><th id="282">282</th><td>  <i>// if the key doesn't exist, add it</i></td></tr>
+<tr><th id="283">283</th><td>  <b>if</b> (<span class='error' title="use of undeclared identifier &apos;std&apos;">std</span>::find(<span class='error' title="use of undeclared identifier &apos;G4MaterialPropertyName&apos;">G4MaterialPropertyName</span>.begin(),</td></tr>
+<tr><th id="284">284</th><td>                <span class='error' title="use of undeclared identifier &apos;G4MaterialPropertyName&apos;">G4MaterialPropertyName</span>.end(), k) == </td></tr>
+<tr><th id="285">285</th><td>       <span class='error' title="use of undeclared identifier &apos;G4MaterialPropertyName&apos;">G4MaterialPropertyName</span>.end()) {</td></tr>
+<tr><th id="286">286</th><td>    <span class='error' title="use of undeclared identifier &apos;G4MaterialPropertyName&apos;">G4MaterialPropertyName</span>.push_back(k);</td></tr>
+<tr><th id="287">287</th><td>  }</td></tr>
+<tr><th id="288">288</th><td>  <a class="typedef" href="../../global/management/include/G4Types.hh.html#G4int" title='G4int' data-type='int' data-ref="G4int">G4int</a> <dfn class="local col6 decl" id="36index" title='index' data-type='G4int' data-ref="36index">index</dfn> = <a class="member" href="#_ZNK25G4MaterialPropertiesTable16GetPropertyIndexERK8G4Stringb" title='G4MaterialPropertiesTable::GetPropertyIndex' data-ref="_ZNK25G4MaterialPropertiesTable16GetPropertyIndexERK8G4Stringb">GetPropertyIndex</a>(<a class="local col5 ref" href="#35k" title='k' data-ref="35k">k</a>);</td></tr>
+<tr><th id="289">289</th><td>  <span class='error' title="use of undeclared identifier &apos;MP&apos;">MP</span>[ index ] = mpv;</td></tr>
+<tr><th id="290">290</th><td></td></tr>
+<tr><th id="291">291</th><td>  <i>// if key is RINDEX, we calculate GROUPVEL -</i></td></tr>
+<tr><th id="292">292</th><td><i>  // contribution from Tao Lin (IHEP, the JUNO experiment) </i></td></tr>
+<tr><th id="293">293</th><td>  <b>if</b> (<a class="local col5 ref" href="#35k" title='k' data-ref="35k">k</a><a class="ref" href="../../global/management/include/G4String.hh.html#_ZNK8G4StringeqEPKc" title='G4String::operator==' data-ref="_ZNK8G4StringeqEPKc">==</a><q>"RINDEX"</q>) {</td></tr>
+<tr><th id="294">294</th><td>      <span class='error' title="use of undeclared identifier &apos;CalculateGROUPVEL&apos;">CalculateGROUPVEL</span>();</td></tr>
+<tr><th id="295">295</th><td>  }</td></tr>
+<tr><th id="296">296</th><td>} </td></tr>
+<tr><th id="297">297</th><td></td></tr>
+<tr><th id="298">298</th><td><em>void</em> <a class="type" href="../include/G4MaterialPropertiesTable.hh.html#G4MaterialPropertiesTable" title='G4MaterialPropertiesTable' data-ref="G4MaterialPropertiesTable">G4MaterialPropertiesTable</a>::<dfn class="decl def" id="_ZN25G4MaterialPropertiesTable8AddEntryEPKcdd" title='G4MaterialPropertiesTable::AddEntry' data-ref="_ZN25G4MaterialPropertiesTable8AddEntryEPKcdd">AddEntry</dfn>(<em>const</em> <em>char</em> *<dfn class="local col7 decl" id="37key" title='key' data-type='const char *' data-ref="37key">key</dfn>,</td></tr>
+<tr><th id="299">299</th><td>                                         <a class="typedef" href="../../global/management/include/G4Types.hh.html#G4double" title='G4double' data-type='double' data-ref="G4double">G4double</a>    <dfn class="local col8 decl" id="38aPhotonEnergy" title='aPhotonEnergy' data-type='G4double' data-ref="38aPhotonEnergy">aPhotonEnergy</dfn>,</td></tr>
+<tr><th id="300">300</th><td>                                         <a class="typedef" href="../../global/management/include/G4Types.hh.html#G4double" title='G4double' data-type='double' data-ref="G4double">G4double</a>    <dfn class="local col9 decl" id="39aPropertyValue" title='aPropertyValue' data-type='G4double' data-ref="39aPropertyValue">aPropertyValue</dfn>)</td></tr>
+<tr><th id="301">301</th><td>{</td></tr>
+<tr><th id="302">302</th><td>  <i>// Allows to add an entry pair directly to the Material Property Vector</i></td></tr>
+<tr><th id="303">303</th><td><i>  // given a key</i></td></tr>
+<tr><th id="304">304</th><td>  <a class="type" href="../../global/management/include/G4String.hh.html#G4String" title='G4String' data-ref="G4String">G4String</a> <dfn class="local col0 decl" id="40k" title='k' data-type='G4String' data-ref="40k">k</dfn><a class="ref" href="../../global/management/include/G4String.hh.html#_ZN8G4StringC1EPKc" title='G4String::G4String' data-ref="_ZN8G4StringC1EPKc">(</a><a class="local col7 ref" href="#37key" title='key' data-ref="37key">key</a>);</td></tr>
+<tr><th id="305">305</th><td>  <b>if</b> (<span class='error' title="use of undeclared identifier &apos;std&apos;">std</span>::find(<span class='error' title="use of undeclared identifier &apos;G4MaterialPropertyName&apos;">G4MaterialPropertyName</span>.begin(),</td></tr>
+<tr><th id="306">306</th><td>                <span class='error' title="use of undeclared identifier &apos;G4MaterialPropertyName&apos;">G4MaterialPropertyName</span>.end(), k) == </td></tr>
+<tr><th id="307">307</th><td>       <span class='error' title="use of undeclared identifier &apos;G4MaterialPropertyName&apos;">G4MaterialPropertyName</span>.end()) {</td></tr>
+<tr><th id="308">308</th><td>    <span class='error' title="use of undeclared identifier &apos;G4MaterialPropertyName&apos;">G4MaterialPropertyName</span>.push_back(k);</td></tr>
+<tr><th id="309">309</th><td>  }</td></tr>
+<tr><th id="310">310</th><td>  <a class="typedef" href="../../global/management/include/G4Types.hh.html#G4int" title='G4int' data-type='int' data-ref="G4int">G4int</a> <dfn class="local col1 decl" id="41index" title='index' data-type='G4int' data-ref="41index">index</dfn> = <a class="member" href="#_ZNK25G4MaterialPropertiesTable16GetPropertyIndexERK8G4Stringb" title='G4MaterialPropertiesTable::GetPropertyIndex' data-ref="_ZNK25G4MaterialPropertiesTable16GetPropertyIndexERK8G4Stringb">GetPropertyIndex</a>(<a class="local col0 ref" href="#40k" title='k' data-ref="40k">k</a>);</td></tr>
+<tr><th id="311">311</th><td></td></tr>
+<tr><th id="312">312</th><td>  <a class="typedef" href="../include/G4MaterialPropertyVector.hh.html#G4MaterialPropertyVector" title='G4MaterialPropertyVector' data-type='G4PhysicsOrderedFreeVector' data-ref="G4MaterialPropertyVector">G4MaterialPropertyVector</a> *<dfn class="local col2 decl" id="42targetVector" title='targetVector' data-type='G4MaterialPropertyVector *' data-ref="42targetVector">targetVector</dfn>=<span class='error' title="use of undeclared identifier &apos;MP&apos;">MP</span>[index];</td></tr>
+<tr><th id="313">313</th><td>  <b>if</b> (<a class="local col2 ref" href="#42targetVector" title='targetVector' data-ref="42targetVector">targetVector</a> != <b>nullptr</b>)</td></tr>
+<tr><th id="314">314</th><td>  {</td></tr>
+<tr><th id="315">315</th><td>    <a class="local col2 ref" href="#42targetVector" title='targetVector' data-ref="42targetVector">targetVector</a>-&gt;<a class="ref" href="../../global/management/include/G4PhysicsOrderedFreeVector.hh.html#_ZN26G4PhysicsOrderedFreeVector12InsertValuesEdd" title='G4PhysicsOrderedFreeVector::InsertValues' data-ref="_ZN26G4PhysicsOrderedFreeVector12InsertValuesEdd">InsertValues</a>(<a class="local col8 ref" href="#38aPhotonEnergy" title='aPhotonEnergy' data-ref="38aPhotonEnergy">aPhotonEnergy</a>, <a class="local col9 ref" href="#39aPropertyValue" title='aPropertyValue' data-ref="39aPropertyValue">aPropertyValue</a>);</td></tr>
+<tr><th id="316">316</th><td>  }</td></tr>
+<tr><th id="317">317</th><td>  <b>else</b></td></tr>
+<tr><th id="318">318</th><td>  {</td></tr>
+<tr><th id="319">319</th><td>    <a class="ref" href="../../global/management/include/G4Exception.hh.html#_Z11G4ExceptionPKcS0_19G4ExceptionSeverityS0_" title='G4Exception' data-ref="_Z11G4ExceptionPKcS0_19G4ExceptionSeverityS0_">G4Exception</a>(<q>"G4MaterialPropertiesTable::AddEntry()"</q>, <q>"mat203"</q>,</td></tr>
+<tr><th id="320">320</th><td>                <a class="enum" href="../../global/management/include/G4ExceptionSeverity.hh.html#G4ExceptionSeverity::FatalException" title='G4ExceptionSeverity::FatalException' data-ref="G4ExceptionSeverity::FatalException">FatalException</a>, <q>"Material Property Vector not found."</q>);</td></tr>
+<tr><th id="321">321</th><td>  }</td></tr>
+<tr><th id="322">322</th><td>}</td></tr>
+<tr><th id="323">323</th><td></td></tr>
+<tr><th id="324">324</th><td><em>void</em> <a class="type" href="../include/G4MaterialPropertiesTable.hh.html#G4MaterialPropertiesTable" title='G4MaterialPropertiesTable' data-ref="G4MaterialPropertiesTable">G4MaterialPropertiesTable</a>::<dfn class="decl def" id="_ZN25G4MaterialPropertiesTable9DumpTableEv" title='G4MaterialPropertiesTable::DumpTable' data-ref="_ZN25G4MaterialPropertiesTable9DumpTableEv">DumpTable</dfn>()</td></tr>
+<tr><th id="325">325</th><td>{</td></tr>
+<tr><th id="326">326</th><td>  <i>// material properties</i></td></tr>
+<tr><th id="327">327</th><td>  <span class='error' title="unknown type name &apos;MPiterator&apos;">MPiterator</span> <dfn class="local col3 decl" id="43i" title='i' data-type='int' data-ref="43i">i</dfn>;</td></tr>
+<tr><th id="328">328</th><td>  <b>for</b> (i = <span class='error' title="use of undeclared identifier &apos;MP&apos;">MP</span>.begin(); i != <span class='error' title="use of undeclared identifier &apos;MP&apos;">MP</span>.end(); ++i)</td></tr>
+<tr><th id="329">329</th><td>  {</td></tr>
+<tr><th id="330">330</th><td>    <a class="macro" href="../../global/management/include/G4ios.hh.html#46" title="(*_G4cout_p())" data-ref="_M/G4cout">G4cout</a> &lt;&lt; (*i).first &lt;&lt; <q>": "</q>&lt;&lt; <span class='error' title="use of undeclared identifier &apos;G4MaterialPropertyName&apos;">G4MaterialPropertyName</span>[(*i).first] &lt;&lt;<a class="macro" href="../../global/management/include/G4ios.hh.html#60" title="std::endl" data-ref="_M/G4endl">G4endl</a>;</td></tr>
+<tr><th id="331">331</th><td>    <b>if</b> ( (*i).second != <var>0</var> )</td></tr>
+<tr><th id="332">332</th><td>    {</td></tr>
+<tr><th id="333">333</th><td>      (*i).second-&gt;DumpValues();</td></tr>
+<tr><th id="334">334</th><td>    }</td></tr>
+<tr><th id="335">335</th><td>    <b>else</b></td></tr>
+<tr><th id="336">336</th><td>    {</td></tr>
+<tr><th id="337">337</th><td>      <a class="ref" href="../../global/management/include/G4Exception.hh.html#_Z11G4ExceptionPKcS0_19G4ExceptionSeverityS0_" title='G4Exception' data-ref="_Z11G4ExceptionPKcS0_19G4ExceptionSeverityS0_">G4Exception</a>(<q>"G4MaterialPropertiesTable::DumpTable()"</q>, <q>"mat204"</q>,</td></tr>
+<tr><th id="338">338</th><td>                  <a class="enum" href="../../global/management/include/G4ExceptionSeverity.hh.html#G4ExceptionSeverity::JustWarning" title='G4ExceptionSeverity::JustWarning' data-ref="G4ExceptionSeverity::JustWarning">JustWarning</a>, <q>"NULL Material Property Vector Pointer."</q>);</td></tr>
+<tr><th id="339">339</th><td>    }</td></tr>
+<tr><th id="340">340</th><td>  }</td></tr>
+<tr><th id="341">341</th><td>  <i>// material constant properties</i></td></tr>
+<tr><th id="342">342</th><td>  <span class='error' title="unknown type name &apos;MCPiterator&apos;">MCPiterator</span> <dfn class="local col4 decl" id="44j" title='j' data-type='int' data-ref="44j">j</dfn>;</td></tr>
+<tr><th id="343">343</th><td>  <b>for</b> (j = <span class='error' title="use of undeclared identifier &apos;MCP&apos;">MCP</span>.begin(); j != <span class='error' title="use of undeclared identifier &apos;MCP&apos;">MCP</span>.end(); ++j)</td></tr>
+<tr><th id="344">344</th><td>  {</td></tr>
+<tr><th id="345">345</th><td>    <a class="macro" href="../../global/management/include/G4ios.hh.html#46" title="(*_G4cout_p())" data-ref="_M/G4cout">G4cout</a> &lt;&lt; j-&gt;first &lt;&lt;<q>": "</q>&lt;&lt; <span class='error' title="use of undeclared identifier &apos;G4MaterialConstPropertyName&apos;">G4MaterialConstPropertyName</span>[j-&gt;first] &lt;&lt;<a class="macro" href="../../global/management/include/G4ios.hh.html#60" title="std::endl" data-ref="_M/G4endl">G4endl</a>;</td></tr>
+<tr><th id="346">346</th><td>    <b>if</b> ( j-&gt;second != <var>0</var> )</td></tr>
+<tr><th id="347">347</th><td>    {</td></tr>
+<tr><th id="348">348</th><td>      <a class="macro" href="../../global/management/include/G4ios.hh.html#46" title="(*_G4cout_p())" data-ref="_M/G4cout">G4cout</a> &lt;&lt; j-&gt;second &lt;&lt; <a class="macro" href="../../global/management/include/G4ios.hh.html#60" title="std::endl" data-ref="_M/G4endl">G4endl</a>;</td></tr>
+<tr><th id="349">349</th><td>    }</td></tr>
+<tr><th id="350">350</th><td>    <b>else</b></td></tr>
+<tr><th id="351">351</th><td>    {</td></tr>
+<tr><th id="352">352</th><td>      <a class="ref" href="../../global/management/include/G4Exception.hh.html#_Z11G4ExceptionPKcS0_19G4ExceptionSeverityS0_" title='G4Exception' data-ref="_Z11G4ExceptionPKcS0_19G4ExceptionSeverityS0_">G4Exception</a>(<q>"G4MaterialPropertiesTable::DumpTable()"</q>, <q>"mat202"</q>,</td></tr>
+<tr><th id="353">353</th><td>                  <a class="enum" href="../../global/management/include/G4ExceptionSeverity.hh.html#G4ExceptionSeverity::JustWarning" title='G4ExceptionSeverity::JustWarning' data-ref="G4ExceptionSeverity::JustWarning">JustWarning</a>, <q>"No Material Constant Property."</q>);</td></tr>
+<tr><th id="354">354</th><td>    }</td></tr>
+<tr><th id="355">355</th><td>  }</td></tr>
+<tr><th id="356">356</th><td>}</td></tr>
+<tr><th id="357">357</th><td></td></tr>
+<tr><th id="358">358</th><td><u>#<span data-ppcond="358">ifdef</span> <span class="macro" data-ref="_M/G4MULTITHREADED">G4MULTITHREADED</span></u></td></tr>
+<tr><th id="359">359</th><td><u>#include <a href="../../global/management/include/G4AutoLock.hh.html">"G4AutoLock.hh"</a></u></td></tr>
+<tr><th id="360">360</th><td><b>namespace</b> {</td></tr>
+<tr><th id="361">361</th><td> <span class='error' title="unknown type name &apos;G4Mutex&apos;">G4Mutex</span> <dfn class="tu decl def" id="(anonymousnamespace)::materialPropertyTableMutex" title='(anonymous namespace)::materialPropertyTableMutex' data-type='int' data-ref="(anonymousnamespace)::materialPropertyTableMutex">materialPropertyTableMutex</dfn> = <a class="macro" href="../../global/management/include/G4Threading.hh.html#88" title="{}" data-ref="_M/G4MUTEX_INITIALIZER">G4MUTEX_INITIALIZER</a>;</td></tr>
+<tr><th id="362">362</th><td>}</td></tr>
+<tr><th id="363">363</th><td><u>#<span data-ppcond="358">endif</span></u></td></tr>
+<tr><th id="364">364</th><td></td></tr>
+<tr><th id="365">365</th><td><a class="typedef" href="../include/G4MaterialPropertyVector.hh.html#G4MaterialPropertyVector" title='G4MaterialPropertyVector' data-type='G4PhysicsOrderedFreeVector' data-ref="G4MaterialPropertyVector">G4MaterialPropertyVector</a>* <a class="type" href="../include/G4MaterialPropertiesTable.hh.html#G4MaterialPropertiesTable" title='G4MaterialPropertiesTable' data-ref="G4MaterialPropertiesTable">G4MaterialPropertiesTable</a>::<span class='error' title="out-of-line definition of &apos;CalculateGROUPVEL&apos; does not match any declaration in &apos;G4MaterialPropertiesTable&apos;"><dfn class="decl def" id="_ZN25G4MaterialPropertiesTable17CalculateGROUPVELEv" title='G4MaterialPropertiesTable::CalculateGROUPVEL' data-ref="_ZN25G4MaterialPropertiesTable17CalculateGROUPVELEv">CalculateGROUPVEL</dfn></span>()</td></tr>
+<tr><th id="366">366</th><td>{</td></tr>
+<tr><th id="367">367</th><td><u>#<span data-ppcond="367">ifdef</span> <span class="macro" data-ref="_M/G4MULTITHREADED">G4MULTITHREADED</span></u></td></tr>
+<tr><th id="368">368</th><td>  <a class="typedef" href="../../global/management/include/G4AutoLock.hh.html#G4AutoLock" title='G4AutoLock' data-type='int' data-ref="G4AutoLock">G4AutoLock</a> <dfn class="local col5 decl" id="45mptm" title='mptm' data-type='G4AutoLock' data-ref="45mptm">mptm</dfn>(&amp;materialPropertyTableMutex);</td></tr>
+<tr><th id="369">369</th><td><u>#<span data-ppcond="367">endif</span></u></td></tr>
+<tr><th id="370">370</th><td>  <i>// reconsider (i.e, remove) above mutex as this method is likely called only</i></td></tr>
+<tr><th id="371">371</th><td><i>  // when RINDEX is added during the detector construction phase (i.e., adding </i></td></tr>
+<tr><th id="372">372</th><td><i>  // meterials properties into geometry) on the master thread (Oct. 2017, SYJ)</i></td></tr>
+<tr><th id="373">373</th><td><i></i></td></tr>
+<tr><th id="374">374</th><td><i>  // check if "GROUPVEL" already exists</i></td></tr>
+<tr><th id="375">375</th><td>  <span class='error' title="unknown type name &apos;MPiterator&apos;">MPiterator</span> <dfn class="local col6 decl" id="46itr" title='itr' data-type='int' data-ref="46itr">itr</dfn>;</td></tr>
+<tr><th id="376">376</th><td>  itr = <span class='error' title="use of undeclared identifier &apos;MP&apos;">MP</span>.find(kGROUPVEL);</td></tr>
+<tr><th id="377">377</th><td>  <b>if</b>(itr != <span class='error' title="use of undeclared identifier &apos;MP&apos;">MP</span>.end()) <b>return</b> itr-&gt;second;</td></tr>
+<tr><th id="378">378</th><td></td></tr>
+<tr><th id="379">379</th><td>  <i>// fetch RINDEX data, give up if unavailable</i></td></tr>
+<tr><th id="380">380</th><td><i>  //</i></td></tr>
+<tr><th id="381">381</th><td>  <a class="typedef" href="../include/G4MaterialPropertyVector.hh.html#G4MaterialPropertyVector" title='G4MaterialPropertyVector' data-type='G4PhysicsOrderedFreeVector' data-ref="G4MaterialPropertyVector">G4MaterialPropertyVector</a> *<dfn class="local col7 decl" id="47rindex" title='rindex' data-type='G4MaterialPropertyVector *' data-ref="47rindex">rindex</dfn> = <b>this</b>-&gt;<a class="member" href="#_ZN25G4MaterialPropertiesTable11GetPropertyEib" title='G4MaterialPropertiesTable::GetProperty' data-ref="_ZN25G4MaterialPropertiesTable11GetPropertyEib">GetProperty</a>(<a class="enum" href="../include/G4MaterialPropertiesIndex.hh.html#G4MaterialPropertyIndex::kRINDEX" title='G4MaterialPropertyIndex::kRINDEX' data-ref="G4MaterialPropertyIndex::kRINDEX">kRINDEX</a>);</td></tr>
+<tr><th id="382">382</th><td>  <b>if</b> (<a class="local col7 ref" href="#47rindex" title='rindex' data-ref="47rindex">rindex</a>==<var>0</var>)  { <b>return</b> <var>0</var>; }</td></tr>
+<tr><th id="383">383</th><td></td></tr>
+<tr><th id="384">384</th><td>  <i>// RINDEX exists but has no entries, give up</i></td></tr>
+<tr><th id="385">385</th><td><i>  //</i></td></tr>
+<tr><th id="386">386</th><td>  <b>if</b> ( rindex-&gt;GetVectorLength() == <var>0</var> ) { <b>return</b> <var>0</var>; }</td></tr>
+<tr><th id="387">387</th><td></td></tr>
+<tr><th id="388">388</th><td>  <i>// add GROUPVEL vector</i></td></tr>
+<tr><th id="389">389</th><td><i>  //</i></td></tr>
+<tr><th id="390">390</th><td>  <a class="typedef" href="../include/G4MaterialPropertyVector.hh.html#G4MaterialPropertyVector" title='G4MaterialPropertyVector' data-type='G4PhysicsOrderedFreeVector' data-ref="G4MaterialPropertyVector">G4MaterialPropertyVector</a>* <dfn class="local col8 decl" id="48groupvel" title='groupvel' data-type='G4MaterialPropertyVector *' data-ref="48groupvel">groupvel</dfn> = <b>new</b> <a class="typedef" href="../include/G4MaterialPropertyVector.hh.html#G4MaterialPropertyVector" title='G4MaterialPropertyVector' data-type='G4PhysicsOrderedFreeVector' data-ref="G4MaterialPropertyVector">G4MaterialPropertyVector</a><a class="ref" href="../../global/management/include/G4PhysicsOrderedFreeVector.hh.html#_ZN26G4PhysicsOrderedFreeVectorC1Ev" title='G4PhysicsOrderedFreeVector::G4PhysicsOrderedFreeVector' data-ref="_ZN26G4PhysicsOrderedFreeVectorC1Ev">(</a>);</td></tr>
+<tr><th id="391">391</th><td></td></tr>
+<tr><th id="392">392</th><td>  <i>// fill GROUPVEL vector using RINDEX values</i></td></tr>
+<tr><th id="393">393</th><td><i>  // rindex built-in "iterator" was advanced to first entry above</i></td></tr>
+<tr><th id="394">394</th><td><i>  //</i></td></tr>
+<tr><th id="395">395</th><td>  <a class="typedef" href="../../global/management/include/G4Types.hh.html#G4double" title='G4double' data-type='double' data-ref="G4double">G4double</a> <dfn class="local col9 decl" id="49E0" title='E0' data-type='G4double' data-ref="49E0">E0</dfn> = rindex-&gt;Energy(<var>0</var>);</td></tr>
+<tr><th id="396">396</th><td>  <a class="typedef" href="../../global/management/include/G4Types.hh.html#G4double" title='G4double' data-type='double' data-ref="G4double">G4double</a> <dfn class="local col0 decl" id="50n0" title='n0' data-type='G4double' data-ref="50n0">n0</dfn> = (*rindex)<span class='error' title="no viable overloaded operator[] for type &apos;G4MaterialPropertyVector&apos; (aka &apos;G4PhysicsOrderedFreeVector&apos;)">[</span><var>0</var>];</td></tr>
+<tr><th id="397">397</th><td></td></tr>
+<tr><th id="398">398</th><td>  <b>if</b> (<a class="local col9 ref" href="#49E0" title='E0' data-ref="49E0">E0</a> &lt;= <var>0.</var>)</td></tr>
+<tr><th id="399">399</th><td>  {</td></tr>
+<tr><th id="400">400</th><td>    <a class="ref" href="../../global/management/include/G4Exception.hh.html#_Z11G4ExceptionPKcS0_19G4ExceptionSeverityS0_" title='G4Exception' data-ref="_Z11G4ExceptionPKcS0_19G4ExceptionSeverityS0_">G4Exception</a>(<q>"G4MaterialPropertiesTable::CalculateGROUPVEL()"</q>, <q>"mat205"</q>,</td></tr>
+<tr><th id="401">401</th><td>                <a class="enum" href="../../global/management/include/G4ExceptionSeverity.hh.html#G4ExceptionSeverity::FatalException" title='G4ExceptionSeverity::FatalException' data-ref="G4ExceptionSeverity::FatalException">FatalException</a>, <q>"Optical Photon Energy &lt;= 0"</q>);</td></tr>
+<tr><th id="402">402</th><td>  }</td></tr>
+<tr><th id="403">403</th><td>                                                                                </td></tr>
+<tr><th id="404">404</th><td>  <b>if</b> ( rindex-&gt;GetVectorLength() &gt;= <var>2</var> )</td></tr>
+<tr><th id="405">405</th><td>  {</td></tr>
+<tr><th id="406">406</th><td>    <i>// good, we have at least two entries in RINDEX</i></td></tr>
+<tr><th id="407">407</th><td><i>    // get next energy/value pair</i></td></tr>
+<tr><th id="408">408</th><td></td></tr>
+<tr><th id="409">409</th><td>    <a class="typedef" href="../../global/management/include/G4Types.hh.html#G4double" title='G4double' data-type='double' data-ref="G4double">G4double</a> <dfn class="local col1 decl" id="51E1" title='E1' data-type='G4double' data-ref="51E1">E1</dfn> = rindex-&gt;Energy(<var>1</var>);</td></tr>
+<tr><th id="410">410</th><td>    <a class="typedef" href="../../global/management/include/G4Types.hh.html#G4double" title='G4double' data-type='double' data-ref="G4double">G4double</a> <dfn class="local col2 decl" id="52n1" title='n1' data-type='G4double' data-ref="52n1">n1</dfn> = (*rindex)<span class='error' title="no viable overloaded operator[] for type &apos;G4MaterialPropertyVector&apos; (aka &apos;G4PhysicsOrderedFreeVector&apos;)">[</span><var>1</var>];</td></tr>
+<tr><th id="411">411</th><td></td></tr>
+<tr><th id="412">412</th><td>    <b>if</b> (<a class="local col1 ref" href="#51E1" title='E1' data-ref="51E1">E1</a> &lt;= <var>0.</var>)</td></tr>
+<tr><th id="413">413</th><td>    {</td></tr>
+<tr><th id="414">414</th><td>      <a class="ref" href="../../global/management/include/G4Exception.hh.html#_Z11G4ExceptionPKcS0_19G4ExceptionSeverityS0_" title='G4Exception' data-ref="_Z11G4ExceptionPKcS0_19G4ExceptionSeverityS0_">G4Exception</a>(<q>"G4MaterialPropertiesTable::CalculateGROUPVEL()"</q>, <q>"mat205"</q>,</td></tr>
+<tr><th id="415">415</th><td>                  <a class="enum" href="../../global/management/include/G4ExceptionSeverity.hh.html#G4ExceptionSeverity::FatalException" title='G4ExceptionSeverity::FatalException' data-ref="G4ExceptionSeverity::FatalException">FatalException</a>, <q>"Optical Photon Energy &lt;= 0"</q>);</td></tr>
+<tr><th id="416">416</th><td>    }</td></tr>
+<tr><th id="417">417</th><td></td></tr>
+<tr><th id="418">418</th><td>    <a class="typedef" href="../../global/management/include/G4Types.hh.html#G4double" title='G4double' data-type='double' data-ref="G4double">G4double</a> <dfn class="local col3 decl" id="53vg" title='vg' data-type='G4double' data-ref="53vg">vg</dfn>;</td></tr>
+<tr><th id="419">419</th><td></td></tr>
+<tr><th id="420">420</th><td>    <i>// add entry at first photon energy</i></td></tr>
+<tr><th id="421">421</th><td><i>    //</i></td></tr>
+<tr><th id="422">422</th><td>    <a class="local col3 ref" href="#53vg" title='vg' data-ref="53vg">vg</a> = <a class="ref" href="../../externals/clhep/include/CLHEP/Units/PhysicalConstants.h.html#CLHEP::c_light" title='CLHEP::c_light' data-ref="CLHEP::c_light">c_light</a>/(<a class="local col0 ref" href="#50n0" title='n0' data-ref="50n0">n0</a>+(<a class="local col2 ref" href="#52n1" title='n1' data-ref="52n1">n1</a>-<a class="local col0 ref" href="#50n0" title='n0' data-ref="50n0">n0</a>)/<a class="ref" href="../../global/management/include/G4Log.hh.html#_Z5G4Logd" title='G4Log' data-ref="_Z5G4Logd">G4Log</a>(<a class="local col1 ref" href="#51E1" title='E1' data-ref="51E1">E1</a>/<a class="local col9 ref" href="#49E0" title='E0' data-ref="49E0">E0</a>));</td></tr>
+<tr><th id="423">423</th><td></td></tr>
+<tr><th id="424">424</th><td>    <i>// allow only for 'normal dispersion' -&gt; dn/d(logE) &gt; 0</i></td></tr>
+<tr><th id="425">425</th><td><i>    //</i></td></tr>
+<tr><th id="426">426</th><td>    <b>if</b>((<a class="local col3 ref" href="#53vg" title='vg' data-ref="53vg">vg</a>&lt;<var>0</var>) || (<a class="local col3 ref" href="#53vg" title='vg' data-ref="53vg">vg</a>&gt;<a class="ref" href="../../externals/clhep/include/CLHEP/Units/PhysicalConstants.h.html#CLHEP::c_light" title='CLHEP::c_light' data-ref="CLHEP::c_light">c_light</a>/<a class="local col0 ref" href="#50n0" title='n0' data-ref="50n0">n0</a>))  { <a class="local col3 ref" href="#53vg" title='vg' data-ref="53vg">vg</a> = <a class="ref" href="../../externals/clhep/include/CLHEP/Units/PhysicalConstants.h.html#CLHEP::c_light" title='CLHEP::c_light' data-ref="CLHEP::c_light">c_light</a>/<a class="local col0 ref" href="#50n0" title='n0' data-ref="50n0">n0</a>; }</td></tr>
+<tr><th id="427">427</th><td></td></tr>
+<tr><th id="428">428</th><td>    <a class="local col8 ref" href="#48groupvel" title='groupvel' data-ref="48groupvel">groupvel</a>-&gt;<a class="ref" href="../../global/management/include/G4PhysicsOrderedFreeVector.hh.html#_ZN26G4PhysicsOrderedFreeVector12InsertValuesEdd" title='G4PhysicsOrderedFreeVector::InsertValues' data-ref="_ZN26G4PhysicsOrderedFreeVector12InsertValuesEdd">InsertValues</a>( <a class="local col9 ref" href="#49E0" title='E0' data-ref="49E0">E0</a>, <a class="local col3 ref" href="#53vg" title='vg' data-ref="53vg">vg</a> );</td></tr>
+<tr><th id="429">429</th><td></td></tr>
+<tr><th id="430">430</th><td>    <i>// add entries at midpoints between remaining photon energies</i></td></tr>
+<tr><th id="431">431</th><td><i>    //</i></td></tr>
+<tr><th id="432">432</th><td></td></tr>
+<tr><th id="433">433</th><td>    <b>for</b> (<span class='error' title="unknown type name &apos;size_t&apos;">size_t</span> <dfn class="local col4 decl" id="54i" title='i' data-type='int' data-ref="54i">i</dfn> = <var>2</var>; i &lt; rindex-&gt;GetVectorLength(); i++)</td></tr>
+<tr><th id="434">434</th><td>    {</td></tr>
+<tr><th id="435">435</th><td>      <a class="local col3 ref" href="#53vg" title='vg' data-ref="53vg">vg</a> = <a class="ref" href="../../externals/clhep/include/CLHEP/Units/PhysicalConstants.h.html#CLHEP::c_light" title='CLHEP::c_light' data-ref="CLHEP::c_light">c_light</a>/( <var>0.5</var>*(<a class="local col0 ref" href="#50n0" title='n0' data-ref="50n0">n0</a>+<a class="local col2 ref" href="#52n1" title='n1' data-ref="52n1">n1</a>)+(<a class="local col2 ref" href="#52n1" title='n1' data-ref="52n1">n1</a>-<a class="local col0 ref" href="#50n0" title='n0' data-ref="50n0">n0</a>)/<a class="ref" href="../../global/management/include/G4Log.hh.html#_Z5G4Logd" title='G4Log' data-ref="_Z5G4Logd">G4Log</a>(<a class="local col1 ref" href="#51E1" title='E1' data-ref="51E1">E1</a>/<a class="local col9 ref" href="#49E0" title='E0' data-ref="49E0">E0</a>));</td></tr>
+<tr><th id="436">436</th><td></td></tr>
+<tr><th id="437">437</th><td>      <i>// allow only for 'normal dispersion' -&gt; dn/d(logE) &gt; 0</i></td></tr>
+<tr><th id="438">438</th><td><i>      //</i></td></tr>
+<tr><th id="439">439</th><td>      <b>if</b>((<a class="local col3 ref" href="#53vg" title='vg' data-ref="53vg">vg</a>&lt;<var>0</var>) || (<a class="local col3 ref" href="#53vg" title='vg' data-ref="53vg">vg</a>&gt;<a class="ref" href="../../externals/clhep/include/CLHEP/Units/PhysicalConstants.h.html#CLHEP::c_light" title='CLHEP::c_light' data-ref="CLHEP::c_light">c_light</a>/(<var>0.5</var>*(<a class="local col0 ref" href="#50n0" title='n0' data-ref="50n0">n0</a>+<a class="local col2 ref" href="#52n1" title='n1' data-ref="52n1">n1</a>))))  { <a class="local col3 ref" href="#53vg" title='vg' data-ref="53vg">vg</a> = <a class="ref" href="../../externals/clhep/include/CLHEP/Units/PhysicalConstants.h.html#CLHEP::c_light" title='CLHEP::c_light' data-ref="CLHEP::c_light">c_light</a>/(<var>0.5</var>*(<a class="local col0 ref" href="#50n0" title='n0' data-ref="50n0">n0</a>+<a class="local col2 ref" href="#52n1" title='n1' data-ref="52n1">n1</a>)); }</td></tr>
+<tr><th id="440">440</th><td>      <a class="local col8 ref" href="#48groupvel" title='groupvel' data-ref="48groupvel">groupvel</a>-&gt;<a class="ref" href="../../global/management/include/G4PhysicsOrderedFreeVector.hh.html#_ZN26G4PhysicsOrderedFreeVector12InsertValuesEdd" title='G4PhysicsOrderedFreeVector::InsertValues' data-ref="_ZN26G4PhysicsOrderedFreeVector12InsertValuesEdd">InsertValues</a>( <var>0.5</var>*(<a class="local col9 ref" href="#49E0" title='E0' data-ref="49E0">E0</a>+<a class="local col1 ref" href="#51E1" title='E1' data-ref="51E1">E1</a>), <a class="local col3 ref" href="#53vg" title='vg' data-ref="53vg">vg</a> );</td></tr>
+<tr><th id="441">441</th><td></td></tr>
+<tr><th id="442">442</th><td>      <i>// get next energy/value pair, or exit loop</i></td></tr>
+<tr><th id="443">443</th><td><i>      //</i></td></tr>
+<tr><th id="444">444</th><td>      <a class="local col9 ref" href="#49E0" title='E0' data-ref="49E0">E0</a> = <a class="local col1 ref" href="#51E1" title='E1' data-ref="51E1">E1</a>;</td></tr>
+<tr><th id="445">445</th><td>      <a class="local col0 ref" href="#50n0" title='n0' data-ref="50n0">n0</a> = <a class="local col2 ref" href="#52n1" title='n1' data-ref="52n1">n1</a>;</td></tr>
+<tr><th id="446">446</th><td>      E1 = rindex-&gt;Energy(i);</td></tr>
+<tr><th id="447">447</th><td>      n1 = (*rindex)[i];</td></tr>
+<tr><th id="448">448</th><td></td></tr>
+<tr><th id="449">449</th><td>      <b>if</b> (<a class="local col1 ref" href="#51E1" title='E1' data-ref="51E1">E1</a> &lt;= <var>0.</var>)</td></tr>
+<tr><th id="450">450</th><td>      {</td></tr>
+<tr><th id="451">451</th><td>        <a class="ref" href="../../global/management/include/G4Exception.hh.html#_Z11G4ExceptionPKcS0_19G4ExceptionSeverityS0_" title='G4Exception' data-ref="_Z11G4ExceptionPKcS0_19G4ExceptionSeverityS0_">G4Exception</a>(<q>"G4MaterialPropertiesTable::CalculateGROUPVEL()"</q>, <q>"mat205"</q>,</td></tr>
+<tr><th id="452">452</th><td>                    <a class="enum" href="../../global/management/include/G4ExceptionSeverity.hh.html#G4ExceptionSeverity::FatalException" title='G4ExceptionSeverity::FatalException' data-ref="G4ExceptionSeverity::FatalException">FatalException</a>, <q>"Optical Photon Energy &lt;= 0"</q>);</td></tr>
+<tr><th id="453">453</th><td>      }</td></tr>
+<tr><th id="454">454</th><td>    }</td></tr>
+<tr><th id="455">455</th><td></td></tr>
+<tr><th id="456">456</th><td>    <i>// add entry at last photon energy</i></td></tr>
+<tr><th id="457">457</th><td><i>    //</i></td></tr>
+<tr><th id="458">458</th><td>    <a class="local col3 ref" href="#53vg" title='vg' data-ref="53vg">vg</a> = <a class="ref" href="../../externals/clhep/include/CLHEP/Units/PhysicalConstants.h.html#CLHEP::c_light" title='CLHEP::c_light' data-ref="CLHEP::c_light">c_light</a>/(<a class="local col2 ref" href="#52n1" title='n1' data-ref="52n1">n1</a>+(<a class="local col2 ref" href="#52n1" title='n1' data-ref="52n1">n1</a>-<a class="local col0 ref" href="#50n0" title='n0' data-ref="50n0">n0</a>)/<a class="ref" href="../../global/management/include/G4Log.hh.html#_Z5G4Logd" title='G4Log' data-ref="_Z5G4Logd">G4Log</a>(<a class="local col1 ref" href="#51E1" title='E1' data-ref="51E1">E1</a>/<a class="local col9 ref" href="#49E0" title='E0' data-ref="49E0">E0</a>));</td></tr>
+<tr><th id="459">459</th><td></td></tr>
+<tr><th id="460">460</th><td>    <i>// allow only for 'normal dispersion' -&gt; dn/d(logE) &gt; 0</i></td></tr>
+<tr><th id="461">461</th><td><i>    //</i></td></tr>
+<tr><th id="462">462</th><td>    <b>if</b>((<a class="local col3 ref" href="#53vg" title='vg' data-ref="53vg">vg</a>&lt;<var>0</var>) || (<a class="local col3 ref" href="#53vg" title='vg' data-ref="53vg">vg</a>&gt;<a class="ref" href="../../externals/clhep/include/CLHEP/Units/PhysicalConstants.h.html#CLHEP::c_light" title='CLHEP::c_light' data-ref="CLHEP::c_light">c_light</a>/<a class="local col2 ref" href="#52n1" title='n1' data-ref="52n1">n1</a>))  { <a class="local col3 ref" href="#53vg" title='vg' data-ref="53vg">vg</a> = <a class="ref" href="../../externals/clhep/include/CLHEP/Units/PhysicalConstants.h.html#CLHEP::c_light" title='CLHEP::c_light' data-ref="CLHEP::c_light">c_light</a>/<a class="local col2 ref" href="#52n1" title='n1' data-ref="52n1">n1</a>; }</td></tr>
+<tr><th id="463">463</th><td>    <a class="local col8 ref" href="#48groupvel" title='groupvel' data-ref="48groupvel">groupvel</a>-&gt;<a class="ref" href="../../global/management/include/G4PhysicsOrderedFreeVector.hh.html#_ZN26G4PhysicsOrderedFreeVector12InsertValuesEdd" title='G4PhysicsOrderedFreeVector::InsertValues' data-ref="_ZN26G4PhysicsOrderedFreeVector12InsertValuesEdd">InsertValues</a>( <a class="local col1 ref" href="#51E1" title='E1' data-ref="51E1">E1</a>, <a class="local col3 ref" href="#53vg" title='vg' data-ref="53vg">vg</a> );</td></tr>
+<tr><th id="464">464</th><td>  }</td></tr>
+<tr><th id="465">465</th><td>  <b>else</b> <i>// only one entry in RINDEX -- weird!</i></td></tr>
+<tr><th id="466">466</th><td>  {</td></tr>
+<tr><th id="467">467</th><td>    <a class="local col8 ref" href="#48groupvel" title='groupvel' data-ref="48groupvel">groupvel</a>-&gt;<a class="ref" href="../../global/management/include/G4PhysicsOrderedFreeVector.hh.html#_ZN26G4PhysicsOrderedFreeVector12InsertValuesEdd" title='G4PhysicsOrderedFreeVector::InsertValues' data-ref="_ZN26G4PhysicsOrderedFreeVector12InsertValuesEdd">InsertValues</a>( <a class="local col9 ref" href="#49E0" title='E0' data-ref="49E0">E0</a>, <a class="ref" href="../../externals/clhep/include/CLHEP/Units/PhysicalConstants.h.html#CLHEP::c_light" title='CLHEP::c_light' data-ref="CLHEP::c_light">c_light</a>/<a class="local col0 ref" href="#50n0" title='n0' data-ref="50n0">n0</a> );</td></tr>
+<tr><th id="468">468</th><td>  }</td></tr>
+<tr><th id="469">469</th><td>                                                                                </td></tr>
+<tr><th id="470">470</th><td>  <b>this</b>-&gt;<a class="member" href="#_ZN25G4MaterialPropertiesTable11AddPropertyEPKcP26G4PhysicsOrderedFreeVector" title='G4MaterialPropertiesTable::AddProperty' data-ref="_ZN25G4MaterialPropertiesTable11AddPropertyEPKcP26G4PhysicsOrderedFreeVector">AddProperty</a>( <q>"GROUPVEL"</q>, <a class="local col8 ref" href="#48groupvel" title='groupvel' data-ref="48groupvel">groupvel</a> );</td></tr>
+<tr><th id="471">471</th><td>                                                                                </td></tr>
+<tr><th id="472">472</th><td>  <b>return</b> <a class="local col8 ref" href="#48groupvel" title='groupvel' data-ref="48groupvel">groupvel</a>;</td></tr>
+<tr><th id="473">473</th><td>}</td></tr>
+<tr><th id="474">474</th><td></td></tr>
+<tr><th id="475">475</th><td><a class="typedef" href="../include/G4MaterialPropertyVector.hh.html#G4MaterialPropertyVector" title='G4MaterialPropertyVector' data-type='G4PhysicsOrderedFreeVector' data-ref="G4MaterialPropertyVector">G4MaterialPropertyVector</a>* <a class="type" href="../include/G4MaterialPropertiesTable.hh.html#G4MaterialPropertiesTable" title='G4MaterialPropertiesTable' data-ref="G4MaterialPropertiesTable">G4MaterialPropertiesTable</a>::<dfn class="decl def" id="_ZN25G4MaterialPropertiesTable11SetGROUPVELEv" title='G4MaterialPropertiesTable::SetGROUPVEL' data-ref="_ZN25G4MaterialPropertiesTable11SetGROUPVELEv">SetGROUPVEL</dfn>()</td></tr>
+<tr><th id="476">476</th><td>{</td></tr>
+<tr><th id="477">477</th><td>  <a class="type" href="../../global/management/include/G4String.hh.html#G4String" title='G4String' data-ref="G4String">G4String</a> <dfn class="local col5 decl" id="55message" title='message' data-type='G4String' data-ref="55message">message</dfn><a class="ref" href="../../global/management/include/G4String.hh.html#_ZN8G4StringC1EPKc" title='G4String::G4String' data-ref="_ZN8G4StringC1EPKc">(</a><q>"SetGROUPVEL will be obsolete from the next release "</q>);</td></tr>
+<tr><th id="478">478</th><td>  <a class="local col5 ref" href="#55message" title='message' data-ref="55message">message</a> <a class="ref" href="../../global/management/include/G4String.hh.html#_ZN8G4StringpLEPKc" title='G4String::operator+=' data-ref="_ZN8G4StringpLEPKc">+=</a> <q>"Use G4MaterialPropertiesTable::CalculateGROUPVEL() instead"</q>;</td></tr>
+<tr><th id="479">479</th><td></td></tr>
+<tr><th id="480">480</th><td>  <a class="ref" href="../../global/management/include/G4Exception.hh.html#_Z11G4ExceptionPKcS0_19G4ExceptionSeverityS0_" title='G4Exception' data-ref="_Z11G4ExceptionPKcS0_19G4ExceptionSeverityS0_">G4Exception</a>(<q>"G4MaterialPropertiesTable::SetGROUPVEL()"</q>, <q>"Obsolete"</q>,</td></tr>
+<tr><th id="481">481</th><td>               <a class="enum" href="../../global/management/include/G4ExceptionSeverity.hh.html#G4ExceptionSeverity::JustWarning" title='G4ExceptionSeverity::JustWarning' data-ref="G4ExceptionSeverity::JustWarning">JustWarning</a>, <a class="ref fake" href="../../global/management/include/G4String.hh.html#_ZNK8G4StringcvPKcEv" title='G4String::operator const char *' data-ref="_ZNK8G4StringcvPKcEv"></a><a class="local col5 ref" href="#55message" title='message' data-ref="55message">message</a>);</td></tr>
+<tr><th id="482">482</th><td>  <b>return</b> CalculateGROUPVEL();</td></tr>
+<tr><th id="483">483</th><td>}</td></tr>
+<tr><th id="484">484</th><td></td></tr>
+<tr><th id="485">485</th><td><span class='error' title="use of undeclared identifier &apos;std&apos;">std</span>::map<span class='error' title="expected unqualified-id">&lt;</span> G4String, G4MaterialPropertyVector*, std::less&lt;G4String&gt; &gt;*</td></tr>
+<tr><th id="486">486</th><td>G4MaterialPropertiesTable::GetPropertiesMap() </td></tr>
+<tr><th id="487">487</th><td>{ </td></tr>
+<tr><th id="488">488</th><td>  <i>// warning message</i></td></tr>
+<tr><th id="489">489</th><td>  G4String message(<q>"GetPropertiesMap will be obsolete from the next release "</q>);</td></tr>
+<tr><th id="490">490</th><td>  message += <q>"Use G4MaterialPropertiesTable::GetPropertyMap() instead"</q>;</td></tr>
+<tr><th id="491">491</th><td>  G4Exception(<q>"G4MaterialPropertiesTable::GetPropertiesMap()"</q>, <q>"Obsolete"</q>,</td></tr>
+<tr><th id="492">492</th><td>               JustWarning, message);</td></tr>
+<tr><th id="493">493</th><td></td></tr>
+<tr><th id="494">494</th><td>  <b>for</b> (MPiterator miter = MP.begin(); miter != MP.end(); miter++)</td></tr>
+<tr><th id="495">495</th><td>  {</td></tr>
+<tr><th id="496">496</th><td>    <b>if</b>(miter-&gt;second) {</td></tr>
+<tr><th id="497">497</th><td>      MPT [ G4MaterialPropertyName[miter-&gt;first] ] = miter-&gt;second;</td></tr>
+<tr><th id="498">498</th><td>    }</td></tr>
+<tr><th id="499">499</th><td>    <b>else</b> {</td></tr>
+<tr><th id="500">500</th><td>      G4Exception(<q>"G4MaterialPropertiesTable::GetPropertiesMap()"</q>,<q>"NullPointer"</q>,</td></tr>
+<tr><th id="501">501</th><td>                   JustWarning, <q>"Null Pointer for Material Property"</q>);</td></tr>
+<tr><th id="502">502</th><td>      <b>continue</b>;</td></tr>
+<tr><th id="503">503</th><td>    }</td></tr>
+<tr><th id="504">504</th><td>  }</td></tr>
+<tr><th id="505">505</th><td>  <b>return</b> &amp;MPT; </td></tr>
+<tr><th id="506">506</th><td>}</td></tr>
+<tr><th id="507">507</th><td></td></tr>
+<tr><th id="508">508</th><td><span class='error' title="use of undeclared identifier &apos;std&apos;">std</span>::map<span class='error' title="expected unqualified-id">&lt;</span> G4String, G4double, std::less&lt;G4String&gt; &gt;* G4MaterialPropertiesTable::GetPropertiesCMap()</td></tr>
+<tr><th id="509">509</th><td>{ </td></tr>
+<tr><th id="510">510</th><td>  <i>// warning message</i></td></tr>
+<tr><th id="511">511</th><td>  G4String message(<q>"GetPropertiesCMap will be obsolete from the next release "</q>);</td></tr>
+<tr><th id="512">512</th><td>  message += <q>"Use G4MaterialPropertiesTable::GetConstPropertyMap() instead"</q>;</td></tr>
+<tr><th id="513">513</th><td>  G4Exception(<q>"G4MaterialPropertiesTable::GetPropertiesCMap()"</q>, <q>"Obsolete"</q>,</td></tr>
+<tr><th id="514">514</th><td>               JustWarning, message);</td></tr>
+<tr><th id="515">515</th><td></td></tr>
+<tr><th id="516">516</th><td>  <b>for</b> (MCPiterator miter = MCP.begin(); miter != MCP.end(); miter++) {</td></tr>
+<tr><th id="517">517</th><td>    MPTC[ G4MaterialConstPropertyName[miter-&gt;first] ] = miter-&gt;second;</td></tr>
+<tr><th id="518">518</th><td>  }</td></tr>
+<tr><th id="519">519</th><td>  <b>return</b> &amp;MPTC; </td></tr>
+<tr><th id="520">520</th><td>}</td></tr>
+<tr><th id="521">521</th><td></td></tr>
+<tr><th id="522">522</th><td><span class='error' title="use of undeclared identifier &apos;std&apos;">std</span>::vector<span class='error' title="expected unqualified-id">&lt;</span>G4String&gt; G4MaterialPropertiesTable::GetMaterialPropertyNames() <em>const</em></td></tr>
+<tr><th id="523">523</th><td>{</td></tr>
+<tr><th id="524">524</th><td>  <b>return</b> G4MaterialPropertyName;;</td></tr>
+<tr><th id="525">525</th><td>}</td></tr>
+<tr><th id="526">526</th><td></td></tr>
+<tr><th id="527">527</th><td><span class='error' title="use of undeclared identifier &apos;std&apos;">std</span>::vector<span class='error' title="expected unqualified-id">&lt;</span>G4String&gt; G4MaterialPropertiesTable::GetMaterialConstPropertyNames() <em>const</em></td></tr>
+<tr><th id="528">528</th><td>{</td></tr>
+<tr><th id="529">529</th><td>  <b>return</b> G4MaterialConstPropertyName;</td></tr>
+<tr><th id="530">530</th><td>}</td></tr>
+<tr><th id="531">531</th><td></td></tr>
+</table><hr/><p id='footer'>
+Generated on <em>2019-Aug-28</em> from project codebrowser<br />Powered by <a href='https://woboq.com'><img alt='Woboq' src='https://code.woboq.org/woboq-16.png' width='41' height='16' /></a> <a href='https://code.woboq.org'>Code Browser</a> 2.1
+<br/>Generator usage only permitted with license.</p>
+</div></body></html>

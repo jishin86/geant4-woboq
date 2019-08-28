@@ -1,0 +1,320 @@
+<!doctype html>
+<html>
+<head>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"><title>G4Allocator.hh source code [codebrowser/source/global/management/include/G4Allocator.hh] - Woboq Code Browser</title>
+<meta name="woboq:interestingDefinitions" content="G4Allocator,G4AllocatorBase "/>
+<link rel="stylesheet" href="../../../../../../data/qtcreator.css" title="QtCreator"/>
+<link rel="alternate stylesheet" href="../../../../../../data/kdevelop.css" title="KDevelop"/>
+<script type="text/javascript" src="../../../../../../data/jquery/jquery.min.js"></script>
+<script type="text/javascript" src="../../../../../../data/jquery/jquery-ui.min.js"></script>
+<script>var file = 'codebrowser/source/global/management/include/G4Allocator.hh'; var root_path = '../../../../..'; var data_path = '../../../../../../data';</script>
+<script src='../../../../../../data/codebrowser.js'></script>
+</head>
+<body><div id='header'><h1 id='breadcrumb'><span>Browse the source code of </span><a href='../../../..'>codebrowser</a>/<a href='../../..'>source</a>/<a href='../..'>global</a>/<a href='..'>management</a>/<a href='./'>include</a>/<a href='G4Allocator.hh.html'>G4Allocator.hh</a></h1></div>
+<hr/><div id='content'><table class="code">
+<tr><th id="1">1</th><td><i>//</i></td></tr>
+<tr><th id="2">2</th><td><i>// ********************************************************************</i></td></tr>
+<tr><th id="3">3</th><td><i>// * License and Disclaimer                                           *</i></td></tr>
+<tr><th id="4">4</th><td><i>// *                                                                  *</i></td></tr>
+<tr><th id="5">5</th><td><i>// * The  Geant4 software  is  copyright of the Copyright Holders  of *</i></td></tr>
+<tr><th id="6">6</th><td><i>// * the Geant4 Collaboration.  It is provided  under  the terms  and *</i></td></tr>
+<tr><th id="7">7</th><td><i>// * conditions of the Geant4 Software License,  included in the file *</i></td></tr>
+<tr><th id="8">8</th><td><i>// * LICENSE and available at  <a href="http://cern.ch/geant4/license">http://cern.ch/geant4/license</a> .  These *</i></td></tr>
+<tr><th id="9">9</th><td><i>// * include a list of copyright holders.                             *</i></td></tr>
+<tr><th id="10">10</th><td><i>// *                                                                  *</i></td></tr>
+<tr><th id="11">11</th><td><i>// * Neither the authors of this software system, nor their employing *</i></td></tr>
+<tr><th id="12">12</th><td><i>// * institutes,nor the agencies providing financial support for this *</i></td></tr>
+<tr><th id="13">13</th><td><i>// * work  make  any representation or  warranty, express or implied, *</i></td></tr>
+<tr><th id="14">14</th><td><i>// * regarding  this  software system or assume any liability for its *</i></td></tr>
+<tr><th id="15">15</th><td><i>// * use.  Please see the license in the file  LICENSE  and URL above *</i></td></tr>
+<tr><th id="16">16</th><td><i>// * for the full disclaimer and the limitation of liability.         *</i></td></tr>
+<tr><th id="17">17</th><td><i>// *                                                                  *</i></td></tr>
+<tr><th id="18">18</th><td><i>// * This  code  implementation is the result of  the  scientific and *</i></td></tr>
+<tr><th id="19">19</th><td><i>// * technical work of the GEANT4 collaboration.                      *</i></td></tr>
+<tr><th id="20">20</th><td><i>// * By using,  copying,  modifying or  distributing the software (or *</i></td></tr>
+<tr><th id="21">21</th><td><i>// * any work based  on the software)  you  agree  to acknowledge its *</i></td></tr>
+<tr><th id="22">22</th><td><i>// * use  in  resulting  scientific  publications,  and indicate your *</i></td></tr>
+<tr><th id="23">23</th><td><i>// * acceptance of all terms of the Geant4 Software license.          *</i></td></tr>
+<tr><th id="24">24</th><td><i>// ********************************************************************</i></td></tr>
+<tr><th id="25">25</th><td><i>//</i></td></tr>
+<tr><th id="26">26</th><td><i>//</i></td></tr>
+<tr><th id="27">27</th><td><i>//</i></td></tr>
+<tr><th id="28">28</th><td><i>// </i></td></tr>
+<tr><th id="29">29</th><td><i>// ------------------------------------------------------------</i></td></tr>
+<tr><th id="30">30</th><td><i>// GEANT 4 class header file </i></td></tr>
+<tr><th id="31">31</th><td><i>//</i></td></tr>
+<tr><th id="32">32</th><td><i>// Class Description:</i></td></tr>
+<tr><th id="33">33</th><td><i>//</i></td></tr>
+<tr><th id="34">34</th><td><i>// A class for fast allocation of objects to the heap through a pool of</i></td></tr>
+<tr><th id="35">35</th><td><i>// chunks organised as linked list. It's meant to be used by associating</i></td></tr>
+<tr><th id="36">36</th><td><i>// it to the object to be allocated and defining for it new and delete</i></td></tr>
+<tr><th id="37">37</th><td><i>// operators via MallocSingle() and FreeSingle() methods.</i></td></tr>
+<tr><th id="38">38</th><td><i>       </i></td></tr>
+<tr><th id="39">39</th><td><i>//      ---------------- G4Allocator ----------------</i></td></tr>
+<tr><th id="40">40</th><td><i>//</i></td></tr>
+<tr><th id="41">41</th><td><i>// Author: G.Cosmo (CERN), November 2000</i></td></tr>
+<tr><th id="42">42</th><td><i>// ------------------------------------------------------------</i></td></tr>
+<tr><th id="43">43</th><td></td></tr>
+<tr><th id="44">44</th><td><u>#<span data-ppcond="44">ifndef</span> <span class="macro" data-ref="_M/G4Allocator_h">G4Allocator_h</span></u></td></tr>
+<tr><th id="45">45</th><td><u>#define <dfn class="macro" id="_M/G4Allocator_h" data-ref="_M/G4Allocator_h">G4Allocator_h</dfn> 1</u></td></tr>
+<tr><th id="46">46</th><td></td></tr>
+<tr><th id="47">47</th><td><u>#include <span class='error' title="&apos;cstddef&apos; file not found">&lt;</span>cstddef&gt;</u></td></tr>
+<tr><th id="48">48</th><td><u>#include &lt;typeinfo&gt;</u></td></tr>
+<tr><th id="49">49</th><td></td></tr>
+<tr><th id="50">50</th><td><u>#include <a href="G4AllocatorPool.hh.html">"G4AllocatorPool.hh"</a></u></td></tr>
+<tr><th id="51">51</th><td></td></tr>
+<tr><th id="52">52</th><td><b>class</b> <dfn class="type def" id="G4AllocatorBase" title='G4AllocatorBase' data-ref="G4AllocatorBase">G4AllocatorBase</dfn></td></tr>
+<tr><th id="53">53</th><td>{</td></tr>
+<tr><th id="54">54</th><td>  <b>public</b>:</td></tr>
+<tr><th id="55">55</th><td>    <dfn class="decl" id="_ZN15G4AllocatorBaseC1Ev" title='G4AllocatorBase::G4AllocatorBase' data-ref="_ZN15G4AllocatorBaseC1Ev">G4AllocatorBase</dfn>(); </td></tr>
+<tr><th id="56">56</th><td>    <b>virtual</b> <dfn class="virtual decl" id="_ZN15G4AllocatorBaseD1Ev" title='G4AllocatorBase::~G4AllocatorBase' data-ref="_ZN15G4AllocatorBaseD1Ev">~G4AllocatorBase</dfn>();</td></tr>
+<tr><th id="57">57</th><td>    <b>virtual</b> <em>void</em> <dfn class="virtual decl" id="_ZN15G4AllocatorBase12ResetStorageEv" title='G4AllocatorBase::ResetStorage' data-ref="_ZN15G4AllocatorBase12ResetStorageEv">ResetStorage</dfn>()=<var>0</var>;</td></tr>
+<tr><th id="58">58</th><td>    <b>virtual</b> <span class='error' title="unknown type name &apos;size_t&apos;">size_t</span> <dfn class="decl" id="_ZNK15G4AllocatorBase16GetAllocatedSizeEv" title='G4AllocatorBase::GetAllocatedSize' data-ref="_ZNK15G4AllocatorBase16GetAllocatedSizeEv">GetAllocatedSize</dfn>() <em>const</em>=<var>0</var>;</td></tr>
+<tr><th id="59">59</th><td>    <b>virtual</b> <em>int</em> <dfn class="virtual decl" id="_ZNK15G4AllocatorBase10GetNoPagesEv" title='G4AllocatorBase::GetNoPages' data-ref="_ZNK15G4AllocatorBase10GetNoPagesEv">GetNoPages</dfn>() <em>const</em>=<var>0</var>;</td></tr>
+<tr><th id="60">60</th><td>    <b>virtual</b> <span class='error' title="unknown type name &apos;size_t&apos;">size_t</span> <dfn class="decl" id="_ZNK15G4AllocatorBase11GetPageSizeEv" title='G4AllocatorBase::GetPageSize' data-ref="_ZNK15G4AllocatorBase11GetPageSizeEv">GetPageSize</dfn>() <em>const</em>=<var>0</var>;</td></tr>
+<tr><th id="61">61</th><td>    <b>virtual</b> <em>void</em> <dfn class="virtual decl" id="_ZN15G4AllocatorBase16IncreasePageSizeEj" title='G4AllocatorBase::IncreasePageSize' data-ref="_ZN15G4AllocatorBase16IncreasePageSizeEj">IncreasePageSize</dfn>( <em>unsigned</em> <em>int</em> <dfn class="local col4 decl" id="884sz" title='sz' data-type='unsigned int' data-ref="884sz">sz</dfn> )=<var>0</var>;</td></tr>
+<tr><th id="62">62</th><td>    <b>virtual</b> <em>const</em> <em>char</em>* <dfn class="virtual decl" id="_ZNK15G4AllocatorBase11GetPoolTypeEv" title='G4AllocatorBase::GetPoolType' data-ref="_ZNK15G4AllocatorBase11GetPoolTypeEv">GetPoolType</dfn>() <em>const</em>=<var>0</var>;</td></tr>
+<tr><th id="63">63</th><td>};</td></tr>
+<tr><th id="64">64</th><td></td></tr>
+<tr><th id="65">65</th><td><b>template</b> &lt;<b>class</b> Type&gt;</td></tr>
+<tr><th id="66">66</th><td><b>class</b> <dfn class="type def" id="G4Allocator" title='G4Allocator' data-ref="G4Allocator">G4Allocator</dfn> : <b>public</b> <a class="type" href="#G4AllocatorBase" title='G4AllocatorBase' data-ref="G4AllocatorBase">G4AllocatorBase</a></td></tr>
+<tr><th id="67">67</th><td>{</td></tr>
+<tr><th id="68">68</th><td>  <b>public</b>:  <i>// with description</i></td></tr>
+<tr><th id="69">69</th><td></td></tr>
+<tr><th id="70">70</th><td>    <a class="decl" href="#_ZN11G4AllocatorC1Ev" title='G4Allocator::G4Allocator&lt;Type&gt;' data-ref="_ZN11G4AllocatorC1Ev">G4Allocator</a>() <b>throw</b>();</td></tr>
+<tr><th id="71">71</th><td>    <a class="virtual decl" href="#_ZN11G4AllocatorD1Ev" title='G4Allocator::~G4Allocator&lt;Type&gt;' data-ref="_ZN11G4AllocatorD1Ev">~G4Allocator</a>() <b>throw</b>();</td></tr>
+<tr><th id="72">72</th><td>      <i>// Constructor &amp; destructor</i></td></tr>
+<tr><th id="73">73</th><td></td></tr>
+<tr><th id="74">74</th><td>    <b>inline</b> Type* <a class="decl" href="#_ZN11G4Allocator12MallocSingleEv" title='G4Allocator::MallocSingle' data-ref="_ZN11G4Allocator12MallocSingleEv">MallocSingle</a>();</td></tr>
+<tr><th id="75">75</th><td>    <b>inline</b> <em>void</em> <a class="decl" href="#_ZN11G4Allocator10FreeSingleEPT_" title='G4Allocator::FreeSingle' data-ref="_ZN11G4Allocator10FreeSingleEPT_">FreeSingle</a>(Type* <dfn class="local col5 decl" id="885anElement" title='anElement' data-type='Type *' data-ref="885anElement">anElement</dfn>);</td></tr>
+<tr><th id="76">76</th><td>      <i>// Malloc and Free methods to be used when overloading</i></td></tr>
+<tr><th id="77">77</th><td><i>      // new and delete operators in the client &lt;Type&gt; object</i></td></tr>
+<tr><th id="78">78</th><td></td></tr>
+<tr><th id="79">79</th><td>    <b>inline</b> <em>void</em> <a class="virtual decl" href="#_ZN11G4Allocator12ResetStorageEv" title='G4Allocator::ResetStorage' data-ref="_ZN11G4Allocator12ResetStorageEv">ResetStorage</a>();</td></tr>
+<tr><th id="80">80</th><td>      <i>// Returns allocated storage to the free store, resets allocator.</i></td></tr>
+<tr><th id="81">81</th><td><i>      // Note: contents in memory are lost using this call !</i></td></tr>
+<tr><th id="82">82</th><td></td></tr>
+<tr><th id="83">83</th><td>    <b>inline</b> <span class='error' title="unknown type name &apos;size_t&apos;">size_t</span> <dfn class="decl" id="_ZNK11G4Allocator16GetAllocatedSizeEv" title='G4Allocator::GetAllocatedSize' data-ref="_ZNK11G4Allocator16GetAllocatedSizeEv">GetAllocatedSize</dfn>() <em>const</em>;</td></tr>
+<tr><th id="84">84</th><td>      <i>// Returns the size of the total memory allocated</i></td></tr>
+<tr><th id="85">85</th><td>    <b>inline</b> <em>int</em> <a class="virtual decl" href="#_ZNK11G4Allocator10GetNoPagesEv" title='G4Allocator::GetNoPages' data-ref="_ZNK11G4Allocator10GetNoPagesEv">GetNoPages</a>() <em>const</em>;</td></tr>
+<tr><th id="86">86</th><td>      <i>// Returns the total number of allocated pages</i></td></tr>
+<tr><th id="87">87</th><td>    <b>inline</b> <span class='error' title="unknown type name &apos;size_t&apos;">size_t</span> <dfn class="decl" id="_ZNK11G4Allocator11GetPageSizeEv" title='G4Allocator::GetPageSize' data-ref="_ZNK11G4Allocator11GetPageSizeEv">GetPageSize</dfn>() <em>const</em>;</td></tr>
+<tr><th id="88">88</th><td>      <i>// Returns the current size of a page</i></td></tr>
+<tr><th id="89">89</th><td>    <b>inline</b> <em>void</em> <a class="virtual decl" href="#_ZN11G4Allocator16IncreasePageSizeEj" title='G4Allocator::IncreasePageSize' data-ref="_ZN11G4Allocator16IncreasePageSizeEj">IncreasePageSize</a>( <em>unsigned</em> <em>int</em> <dfn class="local col6 decl" id="886sz" title='sz' data-type='unsigned int' data-ref="886sz">sz</dfn> );</td></tr>
+<tr><th id="90">90</th><td>      <i>// Resets allocator and increases default page size of a given factor</i></td></tr>
+<tr><th id="91">91</th><td></td></tr>
+<tr><th id="92">92</th><td>    <b>inline</b> <em>const</em> <em>char</em>* <a class="virtual decl" href="#_ZNK11G4Allocator11GetPoolTypeEv" title='G4Allocator::GetPoolType' data-ref="_ZNK11G4Allocator11GetPoolTypeEv">GetPoolType</a>() <em>const</em>;</td></tr>
+<tr><th id="93">93</th><td>      <i>// Returns the type_info Id of the allocated type in the pool</i></td></tr>
+<tr><th id="94">94</th><td></td></tr>
+<tr><th id="95">95</th><td>  <b>public</b>:  <i>// without description</i></td></tr>
+<tr><th id="96">96</th><td></td></tr>
+<tr><th id="97">97</th><td>    <i>// This public section includes standard methods and types</i></td></tr>
+<tr><th id="98">98</th><td><i>    // required if the allocator is to be used as alternative</i></td></tr>
+<tr><th id="99">99</th><td><i>    // allocator for STL containers.</i></td></tr>
+<tr><th id="100">100</th><td><i>    // NOTE: the code below is a trivial implementation to make</i></td></tr>
+<tr><th id="101">101</th><td><i>    //       this class an STL compliant allocator.</i></td></tr>
+<tr><th id="102">102</th><td><i>    //       It is anyhow NOT recommended to use this class as</i></td></tr>
+<tr><th id="103">103</th><td><i>    //       alternative allocator for STL containers !</i></td></tr>
+<tr><th id="104">104</th><td></td></tr>
+<tr><th id="105">105</th><td>    <b>typedef</b> Type <dfn class="typedef" id="G4Allocator::value_type" title='G4Allocator::value_type' data-type='Type' data-ref="G4Allocator::value_type">value_type</dfn>;</td></tr>
+<tr><th id="106">106</th><td>    <b>typedef</b> <span class='error' title="unknown type name &apos;size_t&apos;">size_t</span> <dfn class="typedef" id="G4Allocator::size_type" title='G4Allocator::size_type' data-type='int' data-ref="G4Allocator::size_type">size_type</dfn>;</td></tr>
+<tr><th id="107">107</th><td>    <b>typedef</b> <span class='error' title="unknown type name &apos;ptrdiff_t&apos;">ptrdiff_t</span> <dfn class="typedef" id="G4Allocator::difference_type" title='G4Allocator::difference_type' data-type='int' data-ref="G4Allocator::difference_type">difference_type</dfn>;</td></tr>
+<tr><th id="108">108</th><td>    <b>typedef</b> Type* <dfn class="typedef" id="G4Allocator::pointer" title='G4Allocator::pointer' data-type='Type *' data-ref="G4Allocator::pointer">pointer</dfn>;</td></tr>
+<tr><th id="109">109</th><td>    <b>typedef</b> <em>const</em> Type* <dfn class="typedef" id="G4Allocator::const_pointer" title='G4Allocator::const_pointer' data-type='const Type *' data-ref="G4Allocator::const_pointer">const_pointer</dfn>;</td></tr>
+<tr><th id="110">110</th><td>    <b>typedef</b> Type&amp; <dfn class="typedef" id="G4Allocator::reference" title='G4Allocator::reference' data-type='Type &amp;' data-ref="G4Allocator::reference">reference</dfn>;</td></tr>
+<tr><th id="111">111</th><td>    <b>typedef</b> <em>const</em> Type&amp; <dfn class="typedef" id="G4Allocator::const_reference" title='G4Allocator::const_reference' data-type='const Type &amp;' data-ref="G4Allocator::const_reference">const_reference</dfn>;</td></tr>
+<tr><th id="112">112</th><td></td></tr>
+<tr><th id="113">113</th><td>    <b>template</b> &lt;<b>class</b> U&gt; <dfn class="decl def" id="_ZN11G4AllocatorC1ERK11G4AllocatorIT_E" title='G4Allocator::G4Allocator&lt;Type&gt;' data-ref="_ZN11G4AllocatorC1ERK11G4AllocatorIT_E">G4Allocator</dfn>(<em>const</em> <a class="type" href="#G4Allocator" title='G4Allocator' data-ref="G4Allocator">G4Allocator</a>&lt;U&gt;&amp; <dfn class="local col7 decl" id="887right" title='right' data-type='const G4Allocator&lt;U&gt; &amp;' data-ref="887right">right</dfn>) <b>throw</b>()</td></tr>
+<tr><th id="114">114</th><td>      : <a class="member" href="#G4Allocator::mem" title='G4Allocator::mem' data-ref="G4Allocator::mem">mem</a>(<a class="local col7 ref" href="#887right" title='right' data-ref="887right">right</a>.mem) {}</td></tr>
+<tr><th id="115">115</th><td>      <i>// Copy constructor</i></td></tr>
+<tr><th id="116">116</th><td></td></tr>
+<tr><th id="117">117</th><td>    <a class="typedef" href="#G4Allocator::pointer" title='G4Allocator::pointer' data-type='Type *' data-ref="G4Allocator::pointer">pointer</a> <dfn class="decl def" id="_ZNK11G4Allocator7addressERT_" title='G4Allocator::address' data-ref="_ZNK11G4Allocator7addressERT_">address</dfn>(<a class="typedef" href="#G4Allocator::reference" title='G4Allocator::reference' data-type='Type &amp;' data-ref="G4Allocator::reference">reference</a> <dfn class="local col8 decl" id="888r" title='r' data-type='reference' data-ref="888r">r</dfn>) <em>const</em> { <b>return</b> &amp;<a class="local col8 ref" href="#888r" title='r' data-ref="888r">r</a>; }</td></tr>
+<tr><th id="118">118</th><td>    <a class="typedef" href="#G4Allocator::const_pointer" title='G4Allocator::const_pointer' data-type='const Type *' data-ref="G4Allocator::const_pointer">const_pointer</a> <dfn class="decl def" id="_ZNK11G4Allocator7addressERKT_" title='G4Allocator::address' data-ref="_ZNK11G4Allocator7addressERKT_">address</dfn>(<a class="typedef" href="#G4Allocator::const_reference" title='G4Allocator::const_reference' data-type='const Type &amp;' data-ref="G4Allocator::const_reference">const_reference</a> <dfn class="local col9 decl" id="889r" title='r' data-type='const_reference' data-ref="889r">r</dfn>) <em>const</em> { <b>return</b> &amp;<a class="local col9 ref" href="#889r" title='r' data-ref="889r">r</a>; }</td></tr>
+<tr><th id="119">119</th><td>      <i>// Returns the address of values</i></td></tr>
+<tr><th id="120">120</th><td></td></tr>
+<tr><th id="121">121</th><td>    <a class="typedef" href="#G4Allocator::pointer" title='G4Allocator::pointer' data-type='Type *' data-ref="G4Allocator::pointer">pointer</a> <dfn class="decl def" id="_ZN11G4Allocator8allocateEiPv" title='G4Allocator::allocate' data-ref="_ZN11G4Allocator8allocateEiPv">allocate</dfn>(<a class="typedef" href="#G4Allocator::size_type" title='G4Allocator::size_type' data-type='int' data-ref="G4Allocator::size_type">size_type</a> <dfn class="local col0 decl" id="890n" title='n' data-type='size_type' data-ref="890n">n</dfn>, <em>void</em>* = <var>0</var>)</td></tr>
+<tr><th id="122">122</th><td>    {</td></tr>
+<tr><th id="123">123</th><td>      <i>// Allocates space for n elements of type Type, but does not initialise</i></td></tr>
+<tr><th id="124">124</th><td><i>      //</i></td></tr>
+<tr><th id="125">125</th><td>      Type* <dfn class="local col1 decl" id="891mem_alloc" title='mem_alloc' data-type='Type *' data-ref="891mem_alloc">mem_alloc</dfn> = <var>0</var>;</td></tr>
+<tr><th id="126">126</th><td>      <b>if</b> (<a class="local col0 ref" href="#890n" title='n' data-ref="890n">n</a> == <var>1</var>)</td></tr>
+<tr><th id="127">127</th><td>        <a class="local col1 ref" href="#891mem_alloc" title='mem_alloc' data-ref="891mem_alloc">mem_alloc</a> = <a class="member" href="#_ZN11G4Allocator12MallocSingleEv" title='G4Allocator::MallocSingle' data-ref="_ZN11G4Allocator12MallocSingleEv">MallocSingle</a>();</td></tr>
+<tr><th id="128">128</th><td>      <b>else</b></td></tr>
+<tr><th id="129">129</th><td>        <a class="local col1 ref" href="#891mem_alloc" title='mem_alloc' data-ref="891mem_alloc">mem_alloc</a> = <b>static_cast</b>&lt;Type*&gt;(::<span class='ref' title='operator new' data-ref="_Znwm"><b>operator</b> <b>new</b></span>(<a class="local col0 ref" href="#890n" title='n' data-ref="890n">n</a>*<b>sizeof</b>(Type)));</td></tr>
+<tr><th id="130">130</th><td>      <b>return</b> <a class="local col1 ref" href="#891mem_alloc" title='mem_alloc' data-ref="891mem_alloc">mem_alloc</a>;</td></tr>
+<tr><th id="131">131</th><td>    }</td></tr>
+<tr><th id="132">132</th><td>    <em>void</em> <dfn class="decl def" id="_ZN11G4Allocator10deallocateEPT_i" title='G4Allocator::deallocate' data-ref="_ZN11G4Allocator10deallocateEPT_i">deallocate</dfn>(<a class="typedef" href="#G4Allocator::pointer" title='G4Allocator::pointer' data-type='Type *' data-ref="G4Allocator::pointer">pointer</a> <dfn class="local col2 decl" id="892p" title='p' data-type='pointer' data-ref="892p">p</dfn>, <a class="typedef" href="#G4Allocator::size_type" title='G4Allocator::size_type' data-type='int' data-ref="G4Allocator::size_type">size_type</a> <dfn class="local col3 decl" id="893n" title='n' data-type='size_type' data-ref="893n">n</dfn>)</td></tr>
+<tr><th id="133">133</th><td>    {</td></tr>
+<tr><th id="134">134</th><td>      <i>// Deallocates n elements of type Type, but doesn't destroy</i></td></tr>
+<tr><th id="135">135</th><td><i>      //</i></td></tr>
+<tr><th id="136">136</th><td>      <b>if</b> (<a class="local col3 ref" href="#893n" title='n' data-ref="893n">n</a> == <var>1</var>)</td></tr>
+<tr><th id="137">137</th><td>        <a class="member" href="#_ZN11G4Allocator10FreeSingleEPT_" title='G4Allocator::FreeSingle' data-ref="_ZN11G4Allocator10FreeSingleEPT_">FreeSingle</a>(<a class="local col2 ref" href="#892p" title='p' data-ref="892p">p</a>);</td></tr>
+<tr><th id="138">138</th><td>      <b>else</b></td></tr>
+<tr><th id="139">139</th><td>        ::<span class='ref' title='operator delete' data-ref="_ZdlPv"><b>operator</b> <b>delete</b></span>((<em>void</em>*)<a class="local col2 ref" href="#892p" title='p' data-ref="892p">p</a>);</td></tr>
+<tr><th id="140">140</th><td>      <b>return</b>;</td></tr>
+<tr><th id="141">141</th><td>    }</td></tr>
+<tr><th id="142">142</th><td></td></tr>
+<tr><th id="143">143</th><td>    <em>void</em> <dfn class="decl def" id="_ZN11G4Allocator9constructEPT_RKS0_" title='G4Allocator::construct' data-ref="_ZN11G4Allocator9constructEPT_RKS0_">construct</dfn>(<a class="typedef" href="#G4Allocator::pointer" title='G4Allocator::pointer' data-type='Type *' data-ref="G4Allocator::pointer">pointer</a> <dfn class="local col4 decl" id="894p" title='p' data-type='pointer' data-ref="894p">p</dfn>, <em>const</em> Type&amp; <dfn class="local col5 decl" id="895val" title='val' data-type='const Type &amp;' data-ref="895val">val</dfn>) { <b>new</b>((<em>void</em>*)<a class="local col4 ref" href="#894p" title='p' data-ref="894p">p</a>) Type(<a class="local col5 ref" href="#895val" title='val' data-ref="895val">val</a>); }</td></tr>
+<tr><th id="144">144</th><td>      <i>// Initialises *p by val</i></td></tr>
+<tr><th id="145">145</th><td>    <em>void</em> <dfn class="decl def" id="_ZN11G4Allocator7destroyEPT_" title='G4Allocator::destroy' data-ref="_ZN11G4Allocator7destroyEPT_">destroy</dfn>(<a class="typedef" href="#G4Allocator::pointer" title='G4Allocator::pointer' data-type='Type *' data-ref="G4Allocator::pointer">pointer</a> <dfn class="local col6 decl" id="896p" title='p' data-type='pointer' data-ref="896p">p</dfn>) { <a class="local col6 ref" href="#896p" title='p' data-ref="896p">p</a>-&gt;~Type(); }</td></tr>
+<tr><th id="146">146</th><td>      <i>// Destroy *p but doesn't deallocate</i></td></tr>
+<tr><th id="147">147</th><td></td></tr>
+<tr><th id="148">148</th><td>    <a class="typedef" href="#G4Allocator::size_type" title='G4Allocator::size_type' data-type='int' data-ref="G4Allocator::size_type">size_type</a> <dfn class="decl def" id="_ZNK11G4Allocator8max_sizeEv" title='G4Allocator::max_size' data-ref="_ZNK11G4Allocator8max_sizeEv">max_size</dfn>() <em>const</em> <b>throw</b>()</td></tr>
+<tr><th id="149">149</th><td>    {</td></tr>
+<tr><th id="150">150</th><td>      <i>// Returns the maximum number of elements that can be allocated</i></td></tr>
+<tr><th id="151">151</th><td><i>      //</i></td></tr>
+<tr><th id="152">152</th><td>      <b>return</b> <var>2147483647</var>/<b>sizeof</b>(Type);</td></tr>
+<tr><th id="153">153</th><td>    }</td></tr>
+<tr><th id="154">154</th><td></td></tr>
+<tr><th id="155">155</th><td>    <b>template</b> &lt;<b>class</b> U&gt;</td></tr>
+<tr><th id="156">156</th><td>    <b>struct</b> <dfn class="type def" id="G4Allocator::rebind" title='G4Allocator::rebind' data-ref="G4Allocator::rebind">rebind</dfn> { <b>typedef</b> <a class="type" href="#G4Allocator" title='G4Allocator' data-ref="G4Allocator">G4Allocator</a>&lt;U&gt; <dfn class="typedef" id="G4Allocator::rebind::other" title='G4Allocator::rebind::other' data-type='G4Allocator&lt;U&gt;' data-ref="G4Allocator::rebind::other">other</dfn>; };</td></tr>
+<tr><th id="157">157</th><td>      <i>// Rebind allocator to type U</i></td></tr>
+<tr><th id="158">158</th><td></td></tr>
+<tr><th id="159">159</th><td>    <a class="type" href="G4AllocatorPool.hh.html#G4AllocatorPool" title='G4AllocatorPool' data-ref="G4AllocatorPool">G4AllocatorPool</a> <dfn class="decl" id="G4Allocator::mem" title='G4Allocator::mem' data-ref="G4Allocator::mem">mem</dfn>;</td></tr>
+<tr><th id="160">160</th><td>      <i>// Pool of elements of sizeof(Type)</i></td></tr>
+<tr><th id="161">161</th><td></td></tr>
+<tr><th id="162">162</th><td>  <b>private</b>:</td></tr>
+<tr><th id="163">163</th><td></td></tr>
+<tr><th id="164">164</th><td>    <em>const</em> <em>char</em>* <dfn class="decl" id="G4Allocator::tname" title='G4Allocator::tname' data-ref="G4Allocator::tname">tname</dfn>;</td></tr>
+<tr><th id="165">165</th><td>      <i>// Type name identifier</i></td></tr>
+<tr><th id="166">166</th><td>};</td></tr>
+<tr><th id="167">167</th><td></td></tr>
+<tr><th id="168">168</th><td><i>// ------------------------------------------------------------</i></td></tr>
+<tr><th id="169">169</th><td><i>// Inline implementation</i></td></tr>
+<tr><th id="170">170</th><td><i>// ------------------------------------------------------------</i></td></tr>
+<tr><th id="171">171</th><td><i></i></td></tr>
+<tr><th id="172">172</th><td><i>// Initialization of the static pool</i></td></tr>
+<tr><th id="173">173</th><td><i>//</i></td></tr>
+<tr><th id="174">174</th><td><i>// template &lt;class Type&gt; G4AllocatorPool G4Allocator&lt;Type&gt;::mem(sizeof(Type));</i></td></tr>
+<tr><th id="175">175</th><td><i></i></td></tr>
+<tr><th id="176">176</th><td><i>// ************************************************************</i></td></tr>
+<tr><th id="177">177</th><td><i>// G4Allocator constructor</i></td></tr>
+<tr><th id="178">178</th><td><i>// ************************************************************</i></td></tr>
+<tr><th id="179">179</th><td><i>//</i></td></tr>
+<tr><th id="180">180</th><td><b>template</b> &lt;<b>class</b> Type&gt;</td></tr>
+<tr><th id="181">181</th><td><a class="type" href="#G4Allocator" title='G4Allocator' data-ref="G4Allocator">G4Allocator</a>&lt;Type&gt;::<dfn class="decl def" id="_ZN11G4AllocatorC1Ev" title='G4Allocator::G4Allocator&lt;Type&gt;' data-ref="_ZN11G4AllocatorC1Ev">G4Allocator</dfn>() <b>throw</b>()</td></tr>
+<tr><th id="182">182</th><td>  : <a class="member" href="#G4Allocator::mem" title='G4Allocator::mem' data-ref="G4Allocator::mem">mem</a><a class="ref" href="G4AllocatorPool.hh.html#_ZN15G4AllocatorPoolC1Ej" title='G4AllocatorPool::G4AllocatorPool' data-ref="_ZN15G4AllocatorPoolC1Ej">(</a><b>sizeof</b>(Type))</td></tr>
+<tr><th id="183">183</th><td>{</td></tr>
+<tr><th id="184">184</th><td>  tname = <span class='error' title="you need to include &lt;typeinfo&gt; before using the &apos;typeid&apos; operator"><b>typeid</b></span>(Type).name();</td></tr>
+<tr><th id="185">185</th><td>}</td></tr>
+<tr><th id="186">186</th><td></td></tr>
+<tr><th id="187">187</th><td><i>// ************************************************************</i></td></tr>
+<tr><th id="188">188</th><td><i>// G4Allocator destructor</i></td></tr>
+<tr><th id="189">189</th><td><i>// ************************************************************</i></td></tr>
+<tr><th id="190">190</th><td><i>//</i></td></tr>
+<tr><th id="191">191</th><td><b>template</b> &lt;<b>class</b> Type&gt;</td></tr>
+<tr><th id="192">192</th><td><a class="type" href="#G4Allocator" title='G4Allocator' data-ref="G4Allocator">G4Allocator</a>&lt;Type&gt;::<dfn class="virtual decl def" id="_ZN11G4AllocatorD1Ev" title='G4Allocator::~G4Allocator&lt;Type&gt;' data-ref="_ZN11G4AllocatorD1Ev">~G4Allocator</dfn>() <b>throw</b>()</td></tr>
+<tr><th id="193">193</th><td>{</td></tr>
+<tr><th id="194">194</th><td>}</td></tr>
+<tr><th id="195">195</th><td></td></tr>
+<tr><th id="196">196</th><td><i>// ************************************************************</i></td></tr>
+<tr><th id="197">197</th><td><i>// MallocSingle</i></td></tr>
+<tr><th id="198">198</th><td><i>// ************************************************************</i></td></tr>
+<tr><th id="199">199</th><td><i>//</i></td></tr>
+<tr><th id="200">200</th><td><b>template</b> &lt;<b>class</b> Type&gt;</td></tr>
+<tr><th id="201">201</th><td>Type* <a class="type" href="#G4Allocator" title='G4Allocator' data-ref="G4Allocator">G4Allocator</a>&lt;Type&gt;::<dfn class="decl def" id="_ZN11G4Allocator12MallocSingleEv" title='G4Allocator::MallocSingle' data-ref="_ZN11G4Allocator12MallocSingleEv">MallocSingle</dfn>()</td></tr>
+<tr><th id="202">202</th><td>{</td></tr>
+<tr><th id="203">203</th><td>  <b>return</b> <b>static_cast</b>&lt;Type*&gt;(<a class="member" href="#G4Allocator::mem" title='G4Allocator::mem' data-ref="G4Allocator::mem">mem</a>.<a class="ref" href="G4AllocatorPool.hh.html#_ZN15G4AllocatorPool5AllocEv" title='G4AllocatorPool::Alloc' data-ref="_ZN15G4AllocatorPool5AllocEv">Alloc</a>());</td></tr>
+<tr><th id="204">204</th><td>}</td></tr>
+<tr><th id="205">205</th><td></td></tr>
+<tr><th id="206">206</th><td><i>// ************************************************************</i></td></tr>
+<tr><th id="207">207</th><td><i>// FreeSingle</i></td></tr>
+<tr><th id="208">208</th><td><i>// ************************************************************</i></td></tr>
+<tr><th id="209">209</th><td><i>//</i></td></tr>
+<tr><th id="210">210</th><td><b>template</b> &lt;<b>class</b> Type&gt;</td></tr>
+<tr><th id="211">211</th><td><em>void</em> <a class="type" href="#G4Allocator" title='G4Allocator' data-ref="G4Allocator">G4Allocator</a>&lt;Type&gt;::<dfn class="decl def" id="_ZN11G4Allocator10FreeSingleEPT_" title='G4Allocator::FreeSingle' data-ref="_ZN11G4Allocator10FreeSingleEPT_">FreeSingle</dfn>(Type* <dfn class="local col7 decl" id="897anElement" title='anElement' data-type='Type *' data-ref="897anElement">anElement</dfn>)</td></tr>
+<tr><th id="212">212</th><td>{</td></tr>
+<tr><th id="213">213</th><td>  <a class="member" href="#G4Allocator::mem" title='G4Allocator::mem' data-ref="G4Allocator::mem">mem</a>.<a class="ref" href="G4AllocatorPool.hh.html#_ZN15G4AllocatorPool4FreeEPv" title='G4AllocatorPool::Free' data-ref="_ZN15G4AllocatorPool4FreeEPv">Free</a>(<a class="local col7 ref" href="#897anElement" title='anElement' data-ref="897anElement">anElement</a>);</td></tr>
+<tr><th id="214">214</th><td>  <b>return</b>;</td></tr>
+<tr><th id="215">215</th><td>}</td></tr>
+<tr><th id="216">216</th><td></td></tr>
+<tr><th id="217">217</th><td><i>// ************************************************************</i></td></tr>
+<tr><th id="218">218</th><td><i>// ResetStorage</i></td></tr>
+<tr><th id="219">219</th><td><i>// ************************************************************</i></td></tr>
+<tr><th id="220">220</th><td><i>//</i></td></tr>
+<tr><th id="221">221</th><td><b>template</b> &lt;<b>class</b> Type&gt;</td></tr>
+<tr><th id="222">222</th><td><em>void</em> <a class="type" href="#G4Allocator" title='G4Allocator' data-ref="G4Allocator">G4Allocator</a>&lt;Type&gt;::<dfn class="virtual decl def" id="_ZN11G4Allocator12ResetStorageEv" title='G4Allocator::ResetStorage' data-ref="_ZN11G4Allocator12ResetStorageEv">ResetStorage</dfn>()</td></tr>
+<tr><th id="223">223</th><td>{</td></tr>
+<tr><th id="224">224</th><td>  <i>// Clear all allocated storage and return it to the free store</i></td></tr>
+<tr><th id="225">225</th><td><i>  //</i></td></tr>
+<tr><th id="226">226</th><td>  <a class="member" href="#G4Allocator::mem" title='G4Allocator::mem' data-ref="G4Allocator::mem">mem</a>.<a class="ref" href="G4AllocatorPool.hh.html#_ZN15G4AllocatorPool5ResetEv" title='G4AllocatorPool::Reset' data-ref="_ZN15G4AllocatorPool5ResetEv">Reset</a>();</td></tr>
+<tr><th id="227">227</th><td>  <b>return</b>;</td></tr>
+<tr><th id="228">228</th><td>}</td></tr>
+<tr><th id="229">229</th><td></td></tr>
+<tr><th id="230">230</th><td><i>// ************************************************************</i></td></tr>
+<tr><th id="231">231</th><td><i>// GetAllocatedSize</i></td></tr>
+<tr><th id="232">232</th><td><i>// ************************************************************</i></td></tr>
+<tr><th id="233">233</th><td><i>//</i></td></tr>
+<tr><th id="234">234</th><td><b>template</b> &lt;<b>class</b> Type&gt;</td></tr>
+<tr><th id="235">235</th><td><span class='error' title="unknown type name &apos;size_t&apos;">size_t</span> G4Allocator&lt;Type&gt;::GetAllocatedSize() <em>const</em></td></tr>
+<tr><th id="236">236</th><td>{</td></tr>
+<tr><th id="237">237</th><td>  <b>return</b> mem.Size();</td></tr>
+<tr><th id="238">238</th><td>}</td></tr>
+<tr><th id="239">239</th><td></td></tr>
+<tr><th id="240">240</th><td><i>// ************************************************************</i></td></tr>
+<tr><th id="241">241</th><td><i>// GetNoPages</i></td></tr>
+<tr><th id="242">242</th><td><i>// ************************************************************</i></td></tr>
+<tr><th id="243">243</th><td><i>//</i></td></tr>
+<tr><th id="244">244</th><td><b>template</b> &lt;<b>class</b> Type&gt;</td></tr>
+<tr><th id="245">245</th><td><em>int</em> <a class="type" href="#G4Allocator" title='G4Allocator' data-ref="G4Allocator">G4Allocator</a>&lt;Type&gt;::<dfn class="virtual decl def" id="_ZNK11G4Allocator10GetNoPagesEv" title='G4Allocator::GetNoPages' data-ref="_ZNK11G4Allocator10GetNoPagesEv">GetNoPages</dfn>() <em>const</em></td></tr>
+<tr><th id="246">246</th><td>{</td></tr>
+<tr><th id="247">247</th><td>  <b>return</b> <a class="member" href="#G4Allocator::mem" title='G4Allocator::mem' data-ref="G4Allocator::mem">mem</a>.<a class="ref" href="G4AllocatorPool.hh.html#_ZNK15G4AllocatorPool10GetNoPagesEv" title='G4AllocatorPool::GetNoPages' data-ref="_ZNK15G4AllocatorPool10GetNoPagesEv">GetNoPages</a>();</td></tr>
+<tr><th id="248">248</th><td>}</td></tr>
+<tr><th id="249">249</th><td></td></tr>
+<tr><th id="250">250</th><td><i>// ************************************************************</i></td></tr>
+<tr><th id="251">251</th><td><i>// GetPageSize</i></td></tr>
+<tr><th id="252">252</th><td><i>// ************************************************************</i></td></tr>
+<tr><th id="253">253</th><td><i>//</i></td></tr>
+<tr><th id="254">254</th><td><b>template</b> &lt;<b>class</b> Type&gt;</td></tr>
+<tr><th id="255">255</th><td><span class='error' title="unknown type name &apos;size_t&apos;">size_t</span> G4Allocator&lt;Type&gt;::GetPageSize() <em>const</em></td></tr>
+<tr><th id="256">256</th><td>{</td></tr>
+<tr><th id="257">257</th><td>  <b>return</b> mem.GetPageSize();</td></tr>
+<tr><th id="258">258</th><td>}</td></tr>
+<tr><th id="259">259</th><td></td></tr>
+<tr><th id="260">260</th><td><i>// ************************************************************</i></td></tr>
+<tr><th id="261">261</th><td><i>// IncreasePageSize</i></td></tr>
+<tr><th id="262">262</th><td><i>// ************************************************************</i></td></tr>
+<tr><th id="263">263</th><td><i>//</i></td></tr>
+<tr><th id="264">264</th><td><b>template</b> &lt;<b>class</b> Type&gt;</td></tr>
+<tr><th id="265">265</th><td><em>void</em> <a class="type" href="#G4Allocator" title='G4Allocator' data-ref="G4Allocator">G4Allocator</a>&lt;Type&gt;::<dfn class="virtual decl def" id="_ZN11G4Allocator16IncreasePageSizeEj" title='G4Allocator::IncreasePageSize' data-ref="_ZN11G4Allocator16IncreasePageSizeEj">IncreasePageSize</dfn>( <em>unsigned</em> <em>int</em> <dfn class="local col8 decl" id="898sz" title='sz' data-type='unsigned int' data-ref="898sz">sz</dfn> )</td></tr>
+<tr><th id="266">266</th><td>{</td></tr>
+<tr><th id="267">267</th><td>  <a class="virtual member" href="#_ZN11G4Allocator12ResetStorageEv" title='G4Allocator::ResetStorage' data-ref="_ZN11G4Allocator12ResetStorageEv">ResetStorage</a>();</td></tr>
+<tr><th id="268">268</th><td>  <a class="member" href="#G4Allocator::mem" title='G4Allocator::mem' data-ref="G4Allocator::mem">mem</a>.<a class="ref" href="G4AllocatorPool.hh.html#_ZN15G4AllocatorPool12GrowPageSizeEj" title='G4AllocatorPool::GrowPageSize' data-ref="_ZN15G4AllocatorPool12GrowPageSizeEj">GrowPageSize</a>(<a class="local col8 ref" href="#898sz" title='sz' data-ref="898sz">sz</a>); </td></tr>
+<tr><th id="269">269</th><td>}</td></tr>
+<tr><th id="270">270</th><td></td></tr>
+<tr><th id="271">271</th><td><i>// ************************************************************</i></td></tr>
+<tr><th id="272">272</th><td><i>// GetPoolType</i></td></tr>
+<tr><th id="273">273</th><td><i>// ************************************************************</i></td></tr>
+<tr><th id="274">274</th><td><i>//</i></td></tr>
+<tr><th id="275">275</th><td><b>template</b> &lt;<b>class</b> Type&gt;</td></tr>
+<tr><th id="276">276</th><td><em>const</em> <em>char</em>* <a class="type" href="#G4Allocator" title='G4Allocator' data-ref="G4Allocator">G4Allocator</a>&lt;Type&gt;::<dfn class="virtual decl def" id="_ZNK11G4Allocator11GetPoolTypeEv" title='G4Allocator::GetPoolType' data-ref="_ZNK11G4Allocator11GetPoolTypeEv">GetPoolType</dfn>() <em>const</em></td></tr>
+<tr><th id="277">277</th><td>{</td></tr>
+<tr><th id="278">278</th><td>  <b>return</b> <a class="member" href="#G4Allocator::tname" title='G4Allocator::tname' data-ref="G4Allocator::tname">tname</a>;</td></tr>
+<tr><th id="279">279</th><td>}</td></tr>
+<tr><th id="280">280</th><td></td></tr>
+<tr><th id="281">281</th><td><i>// ************************************************************</i></td></tr>
+<tr><th id="282">282</th><td><i>// operator==</i></td></tr>
+<tr><th id="283">283</th><td><i>// ************************************************************</i></td></tr>
+<tr><th id="284">284</th><td><i>//</i></td></tr>
+<tr><th id="285">285</th><td><b>template</b> &lt;<b>class</b> T1, <b>class</b> T2&gt;</td></tr>
+<tr><th id="286">286</th><td><em>bool</em> <dfn class="decl def" id="_ZeqRK11G4AllocatorIT_ERKS_IT0_E" title='operator==' data-ref="_ZeqRK11G4AllocatorIT_ERKS_IT0_E"><b>operator</b>==</dfn> (<em>const</em> <a class="type" href="#G4Allocator" title='G4Allocator' data-ref="G4Allocator">G4Allocator</a>&lt;T1&gt;&amp;, <em>const</em> <a class="type" href="#G4Allocator" title='G4Allocator' data-ref="G4Allocator">G4Allocator</a>&lt;T2&gt;&amp;) <b>throw</b>()</td></tr>
+<tr><th id="287">287</th><td>{</td></tr>
+<tr><th id="288">288</th><td>  <b>return</b> <b>true</b>;</td></tr>
+<tr><th id="289">289</th><td>}</td></tr>
+<tr><th id="290">290</th><td></td></tr>
+<tr><th id="291">291</th><td><i>// ************************************************************</i></td></tr>
+<tr><th id="292">292</th><td><i>// operator!=</i></td></tr>
+<tr><th id="293">293</th><td><i>// ************************************************************</i></td></tr>
+<tr><th id="294">294</th><td><i>//</i></td></tr>
+<tr><th id="295">295</th><td><b>template</b> &lt;<b>class</b> T1, <b>class</b> T2&gt;</td></tr>
+<tr><th id="296">296</th><td><em>bool</em> <dfn class="decl def" id="_ZneRK11G4AllocatorIT_ERKS_IT0_E" title='operator!=' data-ref="_ZneRK11G4AllocatorIT_ERKS_IT0_E"><b>operator</b>!=</dfn> (<em>const</em> <a class="type" href="#G4Allocator" title='G4Allocator' data-ref="G4Allocator">G4Allocator</a>&lt;T1&gt;&amp;, <em>const</em> <a class="type" href="#G4Allocator" title='G4Allocator' data-ref="G4Allocator">G4Allocator</a>&lt;T2&gt;&amp;) <b>throw</b>()</td></tr>
+<tr><th id="297">297</th><td>{</td></tr>
+<tr><th id="298">298</th><td>  <b>return</b> <b>false</b>;</td></tr>
+<tr><th id="299">299</th><td>}</td></tr>
+<tr><th id="300">300</th><td></td></tr>
+<tr><th id="301">301</th><td><u>#<span data-ppcond="44">endif</span></u></td></tr>
+<tr><th id="302">302</th><td></td></tr>
+</table><hr/><p id='footer'>
+Generated while processing <a href='../../../digits_hits/detector/src/G4CellScoreComposer.cc.html'>codebrowser/source/digits_hits/detector/src/G4CellScoreComposer.cc</a><br/>Generated on <em>2019-Aug-28</em> from project codebrowser<br />Powered by <a href='https://woboq.com'><img alt='Woboq' src='https://code.woboq.org/woboq-16.png' width='41' height='16' /></a> <a href='https://code.woboq.org'>Code Browser</a> 2.1
+<br/>Generator usage only permitted with license.</p>
+</div></body></html>

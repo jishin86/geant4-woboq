@@ -1,0 +1,137 @@
+<!doctype html>
+<html>
+<head>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"><title>G4PhononReflection.cc source code [codebrowser/source/processes/solidstate/phonon/src/G4PhononReflection.cc] - Woboq Code Browser</title>
+<link rel="stylesheet" href="../../../../../../../data/qtcreator.css" title="QtCreator"/>
+<link rel="alternate stylesheet" href="../../../../../../../data/kdevelop.css" title="KDevelop"/>
+<script type="text/javascript" src="../../../../../../../data/jquery/jquery.min.js"></script>
+<script type="text/javascript" src="../../../../../../../data/jquery/jquery-ui.min.js"></script>
+<script>var file = 'codebrowser/source/processes/solidstate/phonon/src/G4PhononReflection.cc'; var root_path = '../../../../../..'; var data_path = '../../../../../../../data';</script>
+<script src='../../../../../../../data/codebrowser.js'></script>
+</head>
+<body><div id='header'><h1 id='breadcrumb'><span>Browse the source code of </span><a href='../../../../..'>codebrowser</a>/<a href='../../../..'>source</a>/<a href='../../..'>processes</a>/<a href='../..'>solidstate</a>/<a href='..'>phonon</a>/<a href='./'>src</a>/<a href='G4PhononReflection.cc.html'>G4PhononReflection.cc</a></h1></div>
+<hr/><div id='content'><table class="code">
+<tr><th id="1">1</th><td><i>//</i></td></tr>
+<tr><th id="2">2</th><td><i>// ********************************************************************</i></td></tr>
+<tr><th id="3">3</th><td><i>// * License and Disclaimer                                           *</i></td></tr>
+<tr><th id="4">4</th><td><i>// *                                                                  *</i></td></tr>
+<tr><th id="5">5</th><td><i>// * The  Geant4 software  is  copyright of the Copyright Holders  of *</i></td></tr>
+<tr><th id="6">6</th><td><i>// * the Geant4 Collaboration.  It is provided  under  the terms  and *</i></td></tr>
+<tr><th id="7">7</th><td><i>// * conditions of the Geant4 Software License,  included in the file *</i></td></tr>
+<tr><th id="8">8</th><td><i>// * LICENSE and available at  <a href="http://cern.ch/geant4/license">http://cern.ch/geant4/license</a> .  These *</i></td></tr>
+<tr><th id="9">9</th><td><i>// * include a list of copyright holders.                             *</i></td></tr>
+<tr><th id="10">10</th><td><i>// *                                                                  *</i></td></tr>
+<tr><th id="11">11</th><td><i>// * Neither the authors of this software system, nor their employing *</i></td></tr>
+<tr><th id="12">12</th><td><i>// * institutes,nor the agencies providing financial support for this *</i></td></tr>
+<tr><th id="13">13</th><td><i>// * work  make  any representation or  warranty, express or implied, *</i></td></tr>
+<tr><th id="14">14</th><td><i>// * regarding  this  software system or assume any liability for its *</i></td></tr>
+<tr><th id="15">15</th><td><i>// * use.  Please see the license in the file  LICENSE  and URL above *</i></td></tr>
+<tr><th id="16">16</th><td><i>// * for the full disclaimer and the limitation of liability.         *</i></td></tr>
+<tr><th id="17">17</th><td><i>// *                                                                  *</i></td></tr>
+<tr><th id="18">18</th><td><i>// * This  code  implementation is the result of  the  scientific and *</i></td></tr>
+<tr><th id="19">19</th><td><i>// * technical work of the GEANT4 collaboration.                      *</i></td></tr>
+<tr><th id="20">20</th><td><i>// * By using,  copying,  modifying or  distributing the software (or *</i></td></tr>
+<tr><th id="21">21</th><td><i>// * any work based  on the software)  you  agree  to acknowledge its *</i></td></tr>
+<tr><th id="22">22</th><td><i>// * use  in  resulting  scientific  publications,  and indicate your *</i></td></tr>
+<tr><th id="23">23</th><td><i>// * acceptance of all terms of the Geant4 Software license.          *</i></td></tr>
+<tr><th id="24">24</th><td><i>// ********************************************************************</i></td></tr>
+<tr><th id="25">25</th><td><i>//</i></td></tr>
+<tr><th id="26">26</th><td><i>/// \file processes/phonon/src/G4PhononReflection.cc</i></td></tr>
+<tr><th id="27">27</th><td><i>/// \brief Implementation of the G4PhononReflection class</i></td></tr>
+<tr><th id="28">28</th><td><i>//</i></td></tr>
+<tr><th id="29">29</th><td><i>// This process handles the interaction of phonons with</i></td></tr>
+<tr><th id="30">30</th><td><i>// boundaries. Implementation of this class is highly </i></td></tr>
+<tr><th id="31">31</th><td><i>// geometry dependent.Currently, phonons are killed when</i></td></tr>
+<tr><th id="32">32</th><td><i>// they reach a boundary. If the other side of the </i></td></tr>
+<tr><th id="33">33</th><td><i>// boundary was Al, a hit is registered.</i></td></tr>
+<tr><th id="34">34</th><td><i>//  </i></td></tr>
+<tr><th id="35">35</th><td><i>//</i></td></tr>
+<tr><th id="36">36</th><td><i>// 20131115  Throw exception if track's polarization state is invalid.</i></td></tr>
+<tr><th id="37">37</th><td></td></tr>
+<tr><th id="38">38</th><td><u>#include <a href="../include/G4PhononReflection.hh.html">"G4PhononReflection.hh"</a></u></td></tr>
+<tr><th id="39">39</th><td><u>#include <a href="../../../../global/management/include/G4ExceptionSeverity.hh.html">"G4ExceptionSeverity.hh"</a></u></td></tr>
+<tr><th id="40">40</th><td><u>#include <a href="../../../../global/management/include/G4GeometryTolerance.hh.html">"G4GeometryTolerance.hh"</a></u></td></tr>
+<tr><th id="41">41</th><td><u>#include <a href="../../../../materials/include/G4LatticePhysical.hh.html">"G4LatticePhysical.hh"</a></u></td></tr>
+<tr><th id="42">42</th><td><u>#include <a href="../../../../particles/bosons/include/G4PhononLong.hh.html">"G4PhononLong.hh"</a></u></td></tr>
+<tr><th id="43">43</th><td><u>#include <a href="../../../../particles/bosons/include/G4PhononTransFast.hh.html">"G4PhononTransFast.hh"</a></u></td></tr>
+<tr><th id="44">44</th><td><u>#include <a href="../../../../particles/bosons/include/G4PhononTransSlow.hh.html">"G4PhononTransSlow.hh"</a></u></td></tr>
+<tr><th id="45">45</th><td><u>#include <a href="../../../../global/management/include/G4PhysicalConstants.hh.html">"G4PhysicalConstants.hh"</a></u></td></tr>
+<tr><th id="46">46</th><td><u>#include <a href="../../../../track/include/G4Step.hh.html">"G4Step.hh"</a></u></td></tr>
+<tr><th id="47">47</th><td><u>#include <a href="../../../../track/include/G4StepPoint.hh.html">"G4StepPoint.hh"</a></u></td></tr>
+<tr><th id="48">48</th><td><u>#include <a href="../../../../global/management/include/G4SystemOfUnits.hh.html">"G4SystemOfUnits.hh"</a></u></td></tr>
+<tr><th id="49">49</th><td><u>#include <a href="../../../../track/include/G4VParticleChange.hh.html">"G4VParticleChange.hh"</a></u></td></tr>
+<tr><th id="50">50</th><td></td></tr>
+<tr><th id="51">51</th><td></td></tr>
+<tr><th id="52">52</th><td><a class="type" href="../include/G4PhononReflection.hh.html#G4PhononReflection" title='G4PhononReflection' data-ref="G4PhononReflection">G4PhononReflection</a>::<dfn class="decl def" id="_ZN18G4PhononReflectionC1ERK8G4String" title='G4PhononReflection::G4PhononReflection' data-ref="_ZN18G4PhononReflectionC1ERK8G4String">G4PhononReflection</dfn>(<em>const</em> <a class="type" href="../../../../global/management/include/G4String.hh.html#G4String" title='G4String' data-ref="G4String">G4String</a>&amp; <dfn class="local col3 decl" id="3aName" title='aName' data-type='const G4String &amp;' data-ref="3aName">aName</dfn>)</td></tr>
+<tr><th id="53">53</th><td>  : <a class="type" href="../include/G4VPhononProcess.hh.html#G4VPhononProcess" title='G4VPhononProcess' data-ref="G4VPhononProcess">G4VPhononProcess</a><a class="ref" href="../include/G4VPhononProcess.hh.html#_ZN16G4VPhononProcessC1ERK8G4String" title='G4VPhononProcess::G4VPhononProcess' data-ref="_ZN16G4VPhononProcessC1ERK8G4String">(</a><a class="local col3 ref" href="#3aName" title='aName' data-ref="3aName">aName</a>),</td></tr>
+<tr><th id="54">54</th><td>    <a class="member" href="../include/G4PhononReflection.hh.html#G4PhononReflection::kCarTolerance" title='G4PhononReflection::kCarTolerance' data-ref="G4PhononReflection::kCarTolerance">kCarTolerance</a>(<a class="type" href="../../../../global/management/include/G4GeometryTolerance.hh.html#G4GeometryTolerance" title='G4GeometryTolerance' data-ref="G4GeometryTolerance">G4GeometryTolerance</a>::<a class="ref" href="../../../../global/management/include/G4GeometryTolerance.hh.html#_ZN19G4GeometryTolerance11GetInstanceEv" title='G4GeometryTolerance::GetInstance' data-ref="_ZN19G4GeometryTolerance11GetInstanceEv">GetInstance</a>()-&gt;<a class="ref" href="../../../../global/management/include/G4GeometryTolerance.hh.html#_ZNK19G4GeometryTolerance19GetSurfaceToleranceEv" title='G4GeometryTolerance::GetSurfaceTolerance' data-ref="_ZNK19G4GeometryTolerance19GetSurfaceToleranceEv">GetSurfaceTolerance</a>()) {;}</td></tr>
+<tr><th id="55">55</th><td></td></tr>
+<tr><th id="56">56</th><td><a class="type" href="../include/G4PhononReflection.hh.html#G4PhononReflection" title='G4PhononReflection' data-ref="G4PhononReflection">G4PhononReflection</a>::<dfn class="virtual decl def" id="_ZN18G4PhononReflectionD1Ev" title='G4PhononReflection::~G4PhononReflection' data-ref="_ZN18G4PhononReflectionD1Ev">~G4PhononReflection</dfn>() {;}</td></tr>
+<tr><th id="57">57</th><td></td></tr>
+<tr><th id="58">58</th><td><i>//....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo....</i></td></tr>
+<tr><th id="59">59</th><td><i></i></td></tr>
+<tr><th id="60">60</th><td><i>// Always return DBL_MAX and Forced. This ensures that the process is</i></td></tr>
+<tr><th id="61">61</th><td><i>// called at the end of every step. In PostStepDoIt the process</i></td></tr>
+<tr><th id="62">62</th><td><i>// decides whether the step encountered a volume boundary and a</i></td></tr>
+<tr><th id="63">63</th><td><i>// reflection should be applied</i></td></tr>
+<tr><th id="64">64</th><td></td></tr>
+<tr><th id="65">65</th><td><a class="typedef" href="../../../../global/management/include/G4Types.hh.html#G4double" title='G4double' data-type='double' data-ref="G4double">G4double</a> <a class="type" href="../include/G4PhononReflection.hh.html#G4PhononReflection" title='G4PhononReflection' data-ref="G4PhononReflection">G4PhononReflection</a>::<dfn class="virtual decl def" id="_ZN18G4PhononReflection15GetMeanFreePathERK7G4TrackdP16G4ForceCondition" title='G4PhononReflection::GetMeanFreePath' data-ref="_ZN18G4PhononReflection15GetMeanFreePathERK7G4TrackdP16G4ForceCondition">GetMeanFreePath</dfn>(<em>const</em> <a class="type" href="../../../../track/include/G4Track.hh.html#G4Track" title='G4Track' data-ref="G4Track">G4Track</a>&amp;, <a class="typedef" href="../../../../global/management/include/G4Types.hh.html#G4double" title='G4double' data-type='double' data-ref="G4double">G4double</a>,</td></tr>
+<tr><th id="66">66</th><td>					     <a class="type" href="../../../../track/include/G4ForceCondition.hh.html#G4ForceCondition" title='G4ForceCondition' data-ref="G4ForceCondition">G4ForceCondition</a>* <dfn class="local col4 decl" id="4condition" title='condition' data-type='G4ForceCondition *' data-ref="4condition">condition</dfn>) {</td></tr>
+<tr><th id="67">67</th><td>  *<a class="local col4 ref" href="#4condition" title='condition' data-ref="4condition">condition</a> = <a class="enum" href="../../../../track/include/G4ForceCondition.hh.html#G4ForceCondition::Forced" title='G4ForceCondition::Forced' data-ref="G4ForceCondition::Forced">Forced</a>;</td></tr>
+<tr><th id="68">68</th><td>  <b>return</b> <a class="macro" href="../../../../global/management/include/templates.hh.html#82" title="std::numeric_limits&lt;double&gt;::max()" data-ref="_M/DBL_MAX">DBL_MAX</a>;</td></tr>
+<tr><th id="69">69</th><td>}</td></tr>
+<tr><th id="70">70</th><td></td></tr>
+<tr><th id="71">71</th><td><i>//....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo....</i></td></tr>
+<tr><th id="72">72</th><td><i></i></td></tr>
+<tr><th id="73">73</th><td><i>// This process handles the interaction of phonons with</i></td></tr>
+<tr><th id="74">74</th><td><i>// boundaries. Implementation of this class is highly geometry</i></td></tr>
+<tr><th id="75">75</th><td><i>// dependent.Currently, phonons are killed when they reach a</i></td></tr>
+<tr><th id="76">76</th><td><i>// boundary. If the other side of the boundary was Al, a hit is</i></td></tr>
+<tr><th id="77">77</th><td><i>// registered.</i></td></tr>
+<tr><th id="78">78</th><td>  </td></tr>
+<tr><th id="79">79</th><td><a class="type" href="../../../../track/include/G4VParticleChange.hh.html#G4VParticleChange" title='G4VParticleChange' data-ref="G4VParticleChange">G4VParticleChange</a>* <a class="type" href="../include/G4PhononReflection.hh.html#G4PhononReflection" title='G4PhononReflection' data-ref="G4PhononReflection">G4PhononReflection</a>::<dfn class="virtual decl def" id="_ZN18G4PhononReflection12PostStepDoItERK7G4TrackRK6G4Step" title='G4PhononReflection::PostStepDoIt' data-ref="_ZN18G4PhononReflection12PostStepDoItERK7G4TrackRK6G4Step">PostStepDoIt</dfn>(<em>const</em> <a class="type" href="../../../../track/include/G4Track.hh.html#G4Track" title='G4Track' data-ref="G4Track">G4Track</a>&amp; <dfn class="local col5 decl" id="5aTrack" title='aTrack' data-type='const G4Track &amp;' data-ref="5aTrack">aTrack</dfn>,</td></tr>
+<tr><th id="80">80</th><td>						    <em>const</em> <a class="type" href="../../../../track/include/G4Step.hh.html#G4Step" title='G4Step' data-ref="G4Step">G4Step</a>&amp; <dfn class="local col6 decl" id="6aStep" title='aStep' data-type='const G4Step &amp;' data-ref="6aStep">aStep</dfn>) { </td></tr>
+<tr><th id="81">81</th><td>  <a class="member" href="../../../management/include/G4VProcess.hh.html#G4VProcess::aParticleChange" title='G4VProcess::aParticleChange' data-ref="G4VProcess::aParticleChange">aParticleChange</a>.<a class="virtual ref" href="../../../../track/include/G4ParticleChange.hh.html#_ZN16G4ParticleChange10InitializeERK7G4Track" title='G4ParticleChange::Initialize' data-ref="_ZN16G4ParticleChange10InitializeERK7G4Track">Initialize</a>(<a class="local col5 ref" href="#5aTrack" title='aTrack' data-ref="5aTrack">aTrack</a>);</td></tr>
+<tr><th id="82">82</th><td>   </td></tr>
+<tr><th id="83">83</th><td>  <i>//Check if current step is limited by a volume boundary</i></td></tr>
+<tr><th id="84">84</th><td>  <a class="type" href="../../../../track/include/G4StepPoint.hh.html#G4StepPoint" title='G4StepPoint' data-ref="G4StepPoint">G4StepPoint</a>* <dfn class="local col7 decl" id="7postStepPoint" title='postStepPoint' data-type='G4StepPoint *' data-ref="7postStepPoint">postStepPoint</dfn> = <a class="local col6 ref" href="#6aStep" title='aStep' data-ref="6aStep">aStep</a>.<a class="ref" href="../../../../track/include/G4Step.hh.html#_ZNK6G4Step16GetPostStepPointEv" title='G4Step::GetPostStepPoint' data-ref="_ZNK6G4Step16GetPostStepPointEv">GetPostStepPoint</a>();</td></tr>
+<tr><th id="85">85</th><td>  <b>if</b> (<a class="local col7 ref" href="#7postStepPoint" title='postStepPoint' data-ref="7postStepPoint">postStepPoint</a>-&gt;<a class="ref" href="../../../../track/include/G4StepPoint.hh.html#_ZNK11G4StepPoint13GetStepStatusEv" title='G4StepPoint::GetStepStatus' data-ref="_ZNK11G4StepPoint13GetStepStatusEv">GetStepStatus</a>()!=<a class="enum" href="../../../../track/include/G4StepStatus.hh.html#G4StepStatus::fGeomBoundary" title='G4StepStatus::fGeomBoundary' data-ref="G4StepStatus::fGeomBoundary">fGeomBoundary</a>) {</td></tr>
+<tr><th id="86">86</th><td>    <i>//make sure that correct phonon velocity is used after the step</i></td></tr>
+<tr><th id="87">87</th><td>    <em>int</em> <dfn class="local col8 decl" id="8pol" title='pol' data-type='int' data-ref="8pol">pol</dfn> = <a class="virtual member" href="../include/G4VPhononProcess.hh.html#_ZNK16G4VPhononProcess15GetPolarizationERK7G4Track" title='G4VPhononProcess::GetPolarization' data-ref="_ZNK16G4VPhononProcess15GetPolarizationERK7G4Track">GetPolarization</a>(<a class="local col5 ref" href="#5aTrack" title='aTrack' data-ref="5aTrack">aTrack</a>);</td></tr>
+<tr><th id="88">88</th><td>    <b>if</b> (<a class="local col8 ref" href="#8pol" title='pol' data-ref="8pol">pol</a> &lt; <var>0</var> || <a class="local col8 ref" href="#8pol" title='pol' data-ref="8pol">pol</a> &gt; <var>2</var>) {</td></tr>
+<tr><th id="89">89</th><td>      <a class="ref" href="../../../../global/management/include/G4Exception.hh.html#_Z11G4ExceptionPKcS0_19G4ExceptionSeverityS0_" title='G4Exception' data-ref="_Z11G4ExceptionPKcS0_19G4ExceptionSeverityS0_">G4Exception</a>(<q>"G4PhononReflection::PostStepDoIt"</q>,<q>"Phonon001"</q>,</td></tr>
+<tr><th id="90">90</th><td>		  <a class="enum" href="../../../../global/management/include/G4ExceptionSeverity.hh.html#G4ExceptionSeverity::EventMustBeAborted" title='G4ExceptionSeverity::EventMustBeAborted' data-ref="G4ExceptionSeverity::EventMustBeAborted">EventMustBeAborted</a>, <q>"Track is not a phonon"</q>);</td></tr>
+<tr><th id="91">91</th><td>      <b>return</b> &amp;<a class="member" href="../../../management/include/G4VProcess.hh.html#G4VProcess::aParticleChange" title='G4VProcess::aParticleChange' data-ref="G4VProcess::aParticleChange">aParticleChange</a>;		<i>// NOTE: Will never get here</i></td></tr>
+<tr><th id="92">92</th><td>    }</td></tr>
+<tr><th id="93">93</th><td></td></tr>
+<tr><th id="94">94</th><td>    <i>// FIXME:  This should be using wave-vector, shouldn't it?</i></td></tr>
+<tr><th id="95">95</th><td>    <a class="typedef" href="../../../../global/management/include/G4Types.hh.html#G4double" title='G4double' data-type='double' data-ref="G4double">G4double</a> <dfn class="local col9 decl" id="9vg" title='vg' data-type='G4double' data-ref="9vg">vg</dfn> = <a class="member" href="../include/G4VPhononProcess.hh.html#G4VPhononProcess::theLattice" title='G4VPhononProcess::theLattice' data-ref="G4VPhononProcess::theLattice">theLattice</a>-&gt;<a class="ref" href="../../../../materials/include/G4LatticePhysical.hh.html#_ZNK17G4LatticePhysical7MapKtoVEiN5CLHEP10Hep3VectorE" title='G4LatticePhysical::MapKtoV' data-ref="_ZNK17G4LatticePhysical7MapKtoVEiN5CLHEP10Hep3VectorE">MapKtoV</a>(<a class="local col8 ref" href="#8pol" title='pol' data-ref="8pol">pol</a>, <a class="ref fake" href="../../../../externals/clhep/include/CLHEP/Vector/ThreeVector.h.html#_ZN5CLHEP10Hep3VectorC1ERKS0_" title='CLHEP::Hep3Vector::Hep3Vector' data-ref="_ZN5CLHEP10Hep3VectorC1ERKS0_"></a><a class="local col5 ref" href="#5aTrack" title='aTrack' data-ref="5aTrack">aTrack</a>.<a class="ref" href="../../../../track/include/G4Track.hh.html#_ZNK7G4Track20GetMomentumDirectionEv" title='G4Track::GetMomentumDirection' data-ref="_ZNK7G4Track20GetMomentumDirectionEv">GetMomentumDirection</a>());</td></tr>
+<tr><th id="96">96</th><td>    </td></tr>
+<tr><th id="97">97</th><td>    <i>//Since step was not a volume boundary, just set correct phonon velocity and return</i></td></tr>
+<tr><th id="98">98</th><td>    <a class="member" href="../../../management/include/G4VProcess.hh.html#G4VProcess::aParticleChange" title='G4VProcess::aParticleChange' data-ref="G4VProcess::aParticleChange">aParticleChange</a>.<a class="ref" href="../../../../track/include/G4ParticleChange.hh.html#_ZN16G4ParticleChange15ProposeVelocityEd" title='G4ParticleChange::ProposeVelocity' data-ref="_ZN16G4ParticleChange15ProposeVelocityEd">ProposeVelocity</a>(<a class="local col9 ref" href="#9vg" title='vg' data-ref="9vg">vg</a>);</td></tr>
+<tr><th id="99">99</th><td>    <b>return</b> &amp;<a class="member" href="../../../management/include/G4VProcess.hh.html#G4VProcess::aParticleChange" title='G4VProcess::aParticleChange' data-ref="G4VProcess::aParticleChange">aParticleChange</a>;</td></tr>
+<tr><th id="100">100</th><td>  }</td></tr>
+<tr><th id="101">101</th><td>  </td></tr>
+<tr><th id="102">102</th><td>  <i>// do nothing but return is the step is too short</i></td></tr>
+<tr><th id="103">103</th><td><i>  // This is to allow actual reflection where after</i></td></tr>
+<tr><th id="104">104</th><td><i>  // the first boundary crossing a second, infinitesimal</i></td></tr>
+<tr><th id="105">105</th><td><i>  // step occurs crossing back into the original volume</i></td></tr>
+<tr><th id="106">106</th><td>  <b>if</b> (<a class="local col5 ref" href="#5aTrack" title='aTrack' data-ref="5aTrack">aTrack</a>.<a class="ref" href="../../../../track/include/G4Track.hh.html#_ZNK7G4Track13GetStepLengthEv" title='G4Track::GetStepLength' data-ref="_ZNK7G4Track13GetStepLengthEv">GetStepLength</a>()&lt;=<a class="member" href="../include/G4PhononReflection.hh.html#G4PhononReflection::kCarTolerance" title='G4PhononReflection::kCarTolerance' data-ref="G4PhononReflection::kCarTolerance">kCarTolerance</a>/<var>2</var>) { </td></tr>
+<tr><th id="107">107</th><td>    <b>return</b> &amp;<a class="member" href="../../../management/include/G4VProcess.hh.html#G4VProcess::aParticleChange" title='G4VProcess::aParticleChange' data-ref="G4VProcess::aParticleChange">aParticleChange</a>;</td></tr>
+<tr><th id="108">108</th><td>  }</td></tr>
+<tr><th id="109">109</th><td>  </td></tr>
+<tr><th id="110">110</th><td>  <a class="typedef" href="../../../../global/management/include/G4Types.hh.html#G4double" title='G4double' data-type='double' data-ref="G4double">G4double</a> <dfn class="local col0 decl" id="10eKin" title='eKin' data-type='G4double' data-ref="10eKin">eKin</dfn> = <a class="local col5 ref" href="#5aTrack" title='aTrack' data-ref="5aTrack">aTrack</a>.<a class="ref" href="../../../../track/include/G4Track.hh.html#_ZNK7G4Track16GetKineticEnergyEv" title='G4Track::GetKineticEnergy' data-ref="_ZNK7G4Track16GetKineticEnergyEv">GetKineticEnergy</a>();     </td></tr>
+<tr><th id="111">111</th><td>  <a class="member" href="../../../management/include/G4VProcess.hh.html#G4VProcess::aParticleChange" title='G4VProcess::aParticleChange' data-ref="G4VProcess::aParticleChange">aParticleChange</a>.<a class="ref" href="../../../../track/include/G4VParticleChange.hh.html#_ZN17G4VParticleChange31ProposeNonIonizingEnergyDepositEd" title='G4VParticleChange::ProposeNonIonizingEnergyDeposit' data-ref="_ZN17G4VParticleChange31ProposeNonIonizingEnergyDepositEd">ProposeNonIonizingEnergyDeposit</a>(<a class="local col0 ref" href="#10eKin" title='eKin' data-ref="10eKin">eKin</a>);</td></tr>
+<tr><th id="112">112</th><td>  <a class="member" href="../../../management/include/G4VProcess.hh.html#G4VProcess::aParticleChange" title='G4VProcess::aParticleChange' data-ref="G4VProcess::aParticleChange">aParticleChange</a>.<a class="ref" href="../../../../track/include/G4VParticleChange.hh.html#_ZN17G4VParticleChange18ProposeTrackStatusE13G4TrackStatus" title='G4VParticleChange::ProposeTrackStatus' data-ref="_ZN17G4VParticleChange18ProposeTrackStatusE13G4TrackStatus">ProposeTrackStatus</a>(<a class="enum" href="../../../../track/include/G4TrackStatus.hh.html#G4TrackStatus::fStopAndKill" title='G4TrackStatus::fStopAndKill' data-ref="G4TrackStatus::fStopAndKill">fStopAndKill</a>);</td></tr>
+<tr><th id="113">113</th><td>  </td></tr>
+<tr><th id="114">114</th><td>  <b>return</b> &amp;<a class="member" href="../../../management/include/G4VProcess.hh.html#G4VProcess::aParticleChange" title='G4VProcess::aParticleChange' data-ref="G4VProcess::aParticleChange">aParticleChange</a>; </td></tr>
+<tr><th id="115">115</th><td>}</td></tr>
+<tr><th id="116">116</th><td></td></tr>
+<tr><th id="117">117</th><td><i>//....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo....</i></td></tr>
+<tr><th id="118">118</th><td></td></tr>
+<tr><th id="119">119</th><td></td></tr>
+<tr><th id="120">120</th><td></td></tr>
+</table><hr/><p id='footer'>
+Generated on <em>2019-Aug-28</em> from project codebrowser<br />Powered by <a href='https://woboq.com'><img alt='Woboq' src='https://code.woboq.org/woboq-16.png' width='41' height='16' /></a> <a href='https://code.woboq.org'>Code Browser</a> 2.1
+<br/>Generator usage only permitted with license.</p>
+</div></body></html>

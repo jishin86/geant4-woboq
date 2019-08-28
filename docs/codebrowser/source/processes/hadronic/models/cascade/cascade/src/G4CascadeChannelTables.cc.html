@@ -1,0 +1,206 @@
+<!doctype html>
+<html>
+<head>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"><title>G4CascadeChannelTables.cc source code [codebrowser/source/processes/hadronic/models/cascade/cascade/src/G4CascadeChannelTables.cc] - Woboq Code Browser</title>
+<link rel="stylesheet" href="../../../../../../../../../data/qtcreator.css" title="QtCreator"/>
+<link rel="alternate stylesheet" href="../../../../../../../../../data/kdevelop.css" title="KDevelop"/>
+<script type="text/javascript" src="../../../../../../../../../data/jquery/jquery.min.js"></script>
+<script type="text/javascript" src="../../../../../../../../../data/jquery/jquery-ui.min.js"></script>
+<script>var file = 'codebrowser/source/processes/hadronic/models/cascade/cascade/src/G4CascadeChannelTables.cc'; var root_path = '../../../../../../../..'; var data_path = '../../../../../../../../../data';</script>
+<script src='../../../../../../../../../data/codebrowser.js'></script>
+</head>
+<body><div id='header'><h1 id='breadcrumb'><span>Browse the source code of </span><a href='../../../../../../..'>codebrowser</a>/<a href='../../../../../..'>source</a>/<a href='../../../../..'>processes</a>/<a href='../../../..'>hadronic</a>/<a href='../../..'>models</a>/<a href='../..'>cascade</a>/<a href='..'>cascade</a>/<a href='./'>src</a>/<a href='G4CascadeChannelTables.cc.html'>G4CascadeChannelTables.cc</a></h1></div>
+<hr/><div id='content'><table class="code">
+<tr><th id="1">1</th><td><i>//</i></td></tr>
+<tr><th id="2">2</th><td><i>// ********************************************************************</i></td></tr>
+<tr><th id="3">3</th><td><i>// * License and Disclaimer                                           *</i></td></tr>
+<tr><th id="4">4</th><td><i>// *                                                                  *</i></td></tr>
+<tr><th id="5">5</th><td><i>// * The  Geant4 software  is  copyright of the Copyright Holders  of *</i></td></tr>
+<tr><th id="6">6</th><td><i>// * the Geant4 Collaboration.  It is provided  under  the terms  and *</i></td></tr>
+<tr><th id="7">7</th><td><i>// * conditions of the Geant4 Software License,  included in the file *</i></td></tr>
+<tr><th id="8">8</th><td><i>// * LICENSE and available at  <a href="http://cern.ch/geant4/license">http://cern.ch/geant4/license</a> .  These *</i></td></tr>
+<tr><th id="9">9</th><td><i>// * include a list of copyright holders.                             *</i></td></tr>
+<tr><th id="10">10</th><td><i>// *                                                                  *</i></td></tr>
+<tr><th id="11">11</th><td><i>// * Neither the authors of this software system, nor their employing *</i></td></tr>
+<tr><th id="12">12</th><td><i>// * institutes,nor the agencies providing financial support for this *</i></td></tr>
+<tr><th id="13">13</th><td><i>// * work  make  any representation or  warranty, express or implied, *</i></td></tr>
+<tr><th id="14">14</th><td><i>// * regarding  this  software system or assume any liability for its *</i></td></tr>
+<tr><th id="15">15</th><td><i>// * use.  Please see the license in the file  LICENSE  and URL above *</i></td></tr>
+<tr><th id="16">16</th><td><i>// * for the full disclaimer and the limitation of liability.         *</i></td></tr>
+<tr><th id="17">17</th><td><i>// *                                                                  *</i></td></tr>
+<tr><th id="18">18</th><td><i>// * This  code  implementation is the result of  the  scientific and *</i></td></tr>
+<tr><th id="19">19</th><td><i>// * technical work of the GEANT4 collaboration.                      *</i></td></tr>
+<tr><th id="20">20</th><td><i>// * By using,  copying,  modifying or  distributing the software (or *</i></td></tr>
+<tr><th id="21">21</th><td><i>// * any work based  on the software)  you  agree  to acknowledge its *</i></td></tr>
+<tr><th id="22">22</th><td><i>// * use  in  resulting  scientific  publications,  and indicate your *</i></td></tr>
+<tr><th id="23">23</th><td><i>// * acceptance of all terms of the Geant4 Software license.          *</i></td></tr>
+<tr><th id="24">24</th><td><i>// ********************************************************************</i></td></tr>
+<tr><th id="25">25</th><td><i>//</i></td></tr>
+<tr><th id="26">26</th><td><i>//</i></td></tr>
+<tr><th id="27">27</th><td><i>// Factory to return pointer to Bertini cross-section table based on</i></td></tr>
+<tr><th id="28">28</th><td><i>// collision initial state (hadron type codes).</i></td></tr>
+<tr><th id="29">29</th><td><i>//</i></td></tr>
+<tr><th id="30">30</th><td><i>// Author:  Michael Kelsey (SLAC)</i></td></tr>
+<tr><th id="31">31</th><td><i>//</i></td></tr>
+<tr><th id="32">32</th><td><i>// 20110729  M. Kelsey -- Use static instance() function to work around</i></td></tr>
+<tr><th id="33">33</th><td><i>//		"disappearance" bug on Linux (GCC 4.1.2).  Add diagnostics.</i></td></tr>
+<tr><th id="34">34</th><td><i>// 20110916  M. Kelsey -- Add "load on demand" to GetTable(), with full set</i></td></tr>
+<tr><th id="35">35</th><td><i>//		of channel .hh files for use with LoadTable().</i></td></tr>
+<tr><th id="36">36</th><td><i>// 20110923  M. Kelsey -- Add optional stream&amp; argument to printTable(),</i></td></tr>
+<tr><th id="37">37</th><td><i>//		pass through.</i></td></tr>
+<tr><th id="38">38</th><td><i>// 20111007  M. Kelsey -- Add new gamma-n and gamma-p tables.</i></td></tr>
+<tr><th id="39">39</th><td><i>// 20130129  M. Kelsey -- Drop load-on-demand interfaces, fill in ctor</i></td></tr>
+<tr><th id="40">40</th><td><i>// 20130429  M. Kelsey -- Change instance to thread-local pointer.</i></td></tr>
+<tr><th id="41">41</th><td><i>// 20141121  Use G4AutoDelete to avoid end-of-thread memory leaks</i></td></tr>
+<tr><th id="42">42</th><td></td></tr>
+<tr><th id="43">43</th><td><u>#include <a href="../include/G4CascadeChannelTables.hh.html">"G4CascadeChannelTables.hh"</a></u></td></tr>
+<tr><th id="44">44</th><td><u>#include <a href="../../../../../../global/management/include/G4AutoDelete.hh.html">"G4AutoDelete.hh"</a></u></td></tr>
+<tr><th id="45">45</th><td><u>#include <a href="../include/G4CascadeChannel.hh.html">"G4CascadeChannel.hh"</a></u></td></tr>
+<tr><th id="46">46</th><td><u>#include <a href="../include/G4CascadeGamNChannel.hh.html">"G4CascadeGamNChannel.hh"</a></u></td></tr>
+<tr><th id="47">47</th><td><u>#include <a href="../include/G4CascadeGamPChannel.hh.html">"G4CascadeGamPChannel.hh"</a></u></td></tr>
+<tr><th id="48">48</th><td><u>#include <a href="../include/G4CascadeKminusNChannel.hh.html">"G4CascadeKminusNChannel.hh"</a></u></td></tr>
+<tr><th id="49">49</th><td><u>#include <a href="../include/G4CascadeKminusPChannel.hh.html">"G4CascadeKminusPChannel.hh"</a></u></td></tr>
+<tr><th id="50">50</th><td><u>#include <a href="../include/G4CascadeKplusNChannel.hh.html">"G4CascadeKplusNChannel.hh"</a></u></td></tr>
+<tr><th id="51">51</th><td><u>#include <a href="../include/G4CascadeKplusPChannel.hh.html">"G4CascadeKplusPChannel.hh"</a></u></td></tr>
+<tr><th id="52">52</th><td><u>#include <a href="../include/G4CascadeKzeroBarNChannel.hh.html">"G4CascadeKzeroBarNChannel.hh"</a></u></td></tr>
+<tr><th id="53">53</th><td><u>#include <a href="../include/G4CascadeKzeroBarPChannel.hh.html">"G4CascadeKzeroBarPChannel.hh"</a></u></td></tr>
+<tr><th id="54">54</th><td><u>#include <a href="../include/G4CascadeKzeroNChannel.hh.html">"G4CascadeKzeroNChannel.hh"</a></u></td></tr>
+<tr><th id="55">55</th><td><u>#include <a href="../include/G4CascadeKzeroPChannel.hh.html">"G4CascadeKzeroPChannel.hh"</a></u></td></tr>
+<tr><th id="56">56</th><td><u>#include <a href="../include/G4CascadeLambdaNChannel.hh.html">"G4CascadeLambdaNChannel.hh"</a></u></td></tr>
+<tr><th id="57">57</th><td><u>#include <a href="../include/G4CascadeLambdaPChannel.hh.html">"G4CascadeLambdaPChannel.hh"</a></u></td></tr>
+<tr><th id="58">58</th><td><u>#include <a href="../include/G4CascadeNNChannel.hh.html">"G4CascadeNNChannel.hh"</a></u></td></tr>
+<tr><th id="59">59</th><td><u>#include <a href="../include/G4CascadeNPChannel.hh.html">"G4CascadeNPChannel.hh"</a></u></td></tr>
+<tr><th id="60">60</th><td><u>#include <a href="../include/G4CascadePPChannel.hh.html">"G4CascadePPChannel.hh"</a></u></td></tr>
+<tr><th id="61">61</th><td><u>#include <a href="../include/G4CascadePiMinusNChannel.hh.html">"G4CascadePiMinusNChannel.hh"</a></u></td></tr>
+<tr><th id="62">62</th><td><u>#include <a href="../include/G4CascadePiMinusPChannel.hh.html">"G4CascadePiMinusPChannel.hh"</a></u></td></tr>
+<tr><th id="63">63</th><td><u>#include <a href="../include/G4CascadePiPlusNChannel.hh.html">"G4CascadePiPlusNChannel.hh"</a></u></td></tr>
+<tr><th id="64">64</th><td><u>#include <a href="../include/G4CascadePiPlusPChannel.hh.html">"G4CascadePiPlusPChannel.hh"</a></u></td></tr>
+<tr><th id="65">65</th><td><u>#include <a href="../include/G4CascadePiZeroNChannel.hh.html">"G4CascadePiZeroNChannel.hh"</a></u></td></tr>
+<tr><th id="66">66</th><td><u>#include <a href="../include/G4CascadePiZeroPChannel.hh.html">"G4CascadePiZeroPChannel.hh"</a></u></td></tr>
+<tr><th id="67">67</th><td><u>#include <a href="../include/G4CascadeSigmaMinusNChannel.hh.html">"G4CascadeSigmaMinusNChannel.hh"</a></u></td></tr>
+<tr><th id="68">68</th><td><u>#include <a href="../include/G4CascadeSigmaMinusPChannel.hh.html">"G4CascadeSigmaMinusPChannel.hh"</a></u></td></tr>
+<tr><th id="69">69</th><td><u>#include <a href="../include/G4CascadeSigmaPlusNChannel.hh.html">"G4CascadeSigmaPlusNChannel.hh"</a></u></td></tr>
+<tr><th id="70">70</th><td><u>#include <a href="../include/G4CascadeSigmaPlusPChannel.hh.html">"G4CascadeSigmaPlusPChannel.hh"</a></u></td></tr>
+<tr><th id="71">71</th><td><u>#include <a href="../include/G4CascadeSigmaZeroNChannel.hh.html">"G4CascadeSigmaZeroNChannel.hh"</a></u></td></tr>
+<tr><th id="72">72</th><td><u>#include <a href="../include/G4CascadeSigmaZeroPChannel.hh.html">"G4CascadeSigmaZeroPChannel.hh"</a></u></td></tr>
+<tr><th id="73">73</th><td><u>#include <a href="../include/G4CascadeXiMinusNChannel.hh.html">"G4CascadeXiMinusNChannel.hh"</a></u></td></tr>
+<tr><th id="74">74</th><td><u>#include <a href="../include/G4CascadeXiMinusPChannel.hh.html">"G4CascadeXiMinusPChannel.hh"</a></u></td></tr>
+<tr><th id="75">75</th><td><u>#include <a href="../include/G4CascadeXiZeroNChannel.hh.html">"G4CascadeXiZeroNChannel.hh"</a></u></td></tr>
+<tr><th id="76">76</th><td><u>#include <a href="../include/G4CascadeXiZeroPChannel.hh.html">"G4CascadeXiZeroPChannel.hh"</a></u></td></tr>
+<tr><th id="77">77</th><td><u>#include <a href="../include/G4CascadeOmegaMinusNChannel.hh.html">"G4CascadeOmegaMinusNChannel.hh"</a></u></td></tr>
+<tr><th id="78">78</th><td><u>#include <a href="../include/G4CascadeOmegaMinusPChannel.hh.html">"G4CascadeOmegaMinusPChannel.hh"</a></u></td></tr>
+<tr><th id="79">79</th><td><u>#include <a href="../include/G4CascadeMuMinusPChannel.hh.html">"G4CascadeMuMinusPChannel.hh"</a></u></td></tr>
+<tr><th id="80">80</th><td><u>#include <a href="../include/G4InuclParticleNames.hh.html">"G4InuclParticleNames.hh"</a></u></td></tr>
+<tr><th id="81">81</th><td><u>#include <span class='error' title="&apos;iostream&apos; file not found">&lt;</span>iostream&gt;</u></td></tr>
+<tr><th id="82">82</th><td><u>#include &lt;map&gt;</u></td></tr>
+<tr><th id="83">83</th><td><b>using</b> <b>namespace</b> <span class="namespace">G4InuclParticleNames</span>;</td></tr>
+<tr><th id="84">84</th><td></td></tr>
+<tr><th id="85">85</th><td></td></tr>
+<tr><th id="86">86</th><td><i>// Singleton is created at first invocation</i></td></tr>
+<tr><th id="87">87</th><td></td></tr>
+<tr><th id="88">88</th><td><a class="macro" href="../../../../../../global/management/include/tls.hh.html#39" title="thread_local" data-ref="_M/G4ThreadLocal">G4ThreadLocal</a> <a class="type" href="../include/G4CascadeChannelTables.hh.html#G4CascadeChannelTables" title='G4CascadeChannelTables' data-ref="G4CascadeChannelTables">G4CascadeChannelTables</a>* <a class="type" href="../include/G4CascadeChannelTables.hh.html#G4CascadeChannelTables" title='G4CascadeChannelTables' data-ref="G4CascadeChannelTables">G4CascadeChannelTables</a>::<dfn class="decl def" id="G4CascadeChannelTables::theInstance" title='G4CascadeChannelTables::theInstance' data-ref="G4CascadeChannelTables::theInstance">theInstance</dfn> = <var>0</var>;</td></tr>
+<tr><th id="89">89</th><td></td></tr>
+<tr><th id="90">90</th><td><em>const</em> <a class="type" href="../include/G4CascadeChannelTables.hh.html#G4CascadeChannelTables" title='G4CascadeChannelTables' data-ref="G4CascadeChannelTables">G4CascadeChannelTables</a>&amp; <a class="type" href="../include/G4CascadeChannelTables.hh.html#G4CascadeChannelTables" title='G4CascadeChannelTables' data-ref="G4CascadeChannelTables">G4CascadeChannelTables</a>::<dfn class="decl def" id="_ZN22G4CascadeChannelTables8instanceEv" title='G4CascadeChannelTables::instance' data-ref="_ZN22G4CascadeChannelTables8instanceEv">instance</dfn>() {</td></tr>
+<tr><th id="91">91</th><td>  <b>if</b> (!<a class="member" href="../include/G4CascadeChannelTables.hh.html#G4CascadeChannelTables::theInstance" title='G4CascadeChannelTables::theInstance' data-ref="G4CascadeChannelTables::theInstance">theInstance</a>) {</td></tr>
+<tr><th id="92">92</th><td>    <a class="member" href="../include/G4CascadeChannelTables.hh.html#G4CascadeChannelTables::theInstance" title='G4CascadeChannelTables::theInstance' data-ref="G4CascadeChannelTables::theInstance">theInstance</a> = <b>new</b> <a class="ref fake" href="#_ZN22G4CascadeChannelTablesC1Ev" title='G4CascadeChannelTables::G4CascadeChannelTables' data-ref="_ZN22G4CascadeChannelTablesC1Ev"></a><a class="type" href="../include/G4CascadeChannelTables.hh.html#G4CascadeChannelTables" title='G4CascadeChannelTables' data-ref="G4CascadeChannelTables">G4CascadeChannelTables</a>;</td></tr>
+<tr><th id="93">93</th><td>    <span class='error' title="use of undeclared identifier &apos;G4AutoDelete&apos;">G4AutoDelete</span>::Register(<dfn class="local col4 decl" id="124theInstance" title='theInstance' data-type='int' data-ref="124theInstance">theInstance</dfn>);</td></tr>
+<tr><th id="94">94</th><td>  }</td></tr>
+<tr><th id="95">95</th><td></td></tr>
+<tr><th id="96">96</th><td>  <b>return</b> *<a class="member" href="../include/G4CascadeChannelTables.hh.html#G4CascadeChannelTables::theInstance" title='G4CascadeChannelTables::theInstance' data-ref="G4CascadeChannelTables::theInstance">theInstance</a>;</td></tr>
+<tr><th id="97">97</th><td>}</td></tr>
+<tr><th id="98">98</th><td></td></tr>
+<tr><th id="99">99</th><td></td></tr>
+<tr><th id="100">100</th><td><i>// Constructor and destructor fully populate tables</i></td></tr>
+<tr><th id="101">101</th><td></td></tr>
+<tr><th id="102">102</th><td><a class="type" href="../include/G4CascadeChannelTables.hh.html#G4CascadeChannelTables" title='G4CascadeChannelTables' data-ref="G4CascadeChannelTables">G4CascadeChannelTables</a>::<dfn class="decl def" id="_ZN22G4CascadeChannelTablesC1Ev" title='G4CascadeChannelTables::G4CascadeChannelTables' data-ref="_ZN22G4CascadeChannelTablesC1Ev">G4CascadeChannelTables</dfn>() {</td></tr>
+<tr><th id="103">103</th><td>  tables.clear();</td></tr>
+<tr><th id="104">104</th><td>  tables[gam*neu] = <b>new</b> G4CascadeGamNChannel;</td></tr>
+<tr><th id="105">105</th><td>  tables[gam*pro] = <b>new</b> G4CascadeGamPChannel;</td></tr>
+<tr><th id="106">106</th><td>  tables[k0*neu]  = <b>new</b> G4CascadeKzeroNChannel;</td></tr>
+<tr><th id="107">107</th><td>  tables[k0*pro]  = <b>new</b> G4CascadeKzeroPChannel;</td></tr>
+<tr><th id="108">108</th><td>  tables[k0b*neu] = <b>new</b> G4CascadeKzeroBarNChannel;</td></tr>
+<tr><th id="109">109</th><td>  tables[k0b*pro] = <b>new</b> G4CascadeKzeroBarPChannel;</td></tr>
+<tr><th id="110">110</th><td>  tables[kmi*neu] = <b>new</b> G4CascadeKminusNChannel;</td></tr>
+<tr><th id="111">111</th><td>  tables[kmi*pro] = <b>new</b> G4CascadeKminusPChannel;</td></tr>
+<tr><th id="112">112</th><td>  tables[kpl*neu] = <b>new</b> G4CascadeKplusNChannel;</td></tr>
+<tr><th id="113">113</th><td>  tables[kpl*pro] = <b>new</b> G4CascadeKplusPChannel;</td></tr>
+<tr><th id="114">114</th><td>  tables[lam*neu] = <b>new</b> G4CascadeLambdaNChannel;</td></tr>
+<tr><th id="115">115</th><td>  tables[lam*pro] = <b>new</b> G4CascadeLambdaPChannel;</td></tr>
+<tr><th id="116">116</th><td>  tables[neu*neu] = <b>new</b> G4CascadeNNChannel;</td></tr>
+<tr><th id="117">117</th><td>  tables[neu*pro] = <b>new</b> G4CascadeNPChannel;</td></tr>
+<tr><th id="118">118</th><td>  tables[pi0*neu] = <b>new</b> G4CascadePiZeroNChannel;</td></tr>
+<tr><th id="119">119</th><td>  tables[pi0*pro] = <b>new</b> G4CascadePiZeroPChannel;</td></tr>
+<tr><th id="120">120</th><td>  tables[pim*neu] = <b>new</b> G4CascadePiMinusNChannel;</td></tr>
+<tr><th id="121">121</th><td>  tables[pim*pro] = <b>new</b> G4CascadePiMinusPChannel;</td></tr>
+<tr><th id="122">122</th><td>  tables[pip*neu] = <b>new</b> G4CascadePiPlusNChannel;</td></tr>
+<tr><th id="123">123</th><td>  tables[pip*pro] = <b>new</b> G4CascadePiPlusPChannel;</td></tr>
+<tr><th id="124">124</th><td>  tables[pro*pro] = <b>new</b> G4CascadePPChannel;</td></tr>
+<tr><th id="125">125</th><td>  tables[s0*neu]  = <b>new</b> G4CascadeSigmaZeroNChannel;</td></tr>
+<tr><th id="126">126</th><td>  tables[s0*pro]  = <b>new</b> G4CascadeSigmaZeroPChannel;</td></tr>
+<tr><th id="127">127</th><td>  tables[sm*neu]  = <b>new</b> G4CascadeSigmaMinusNChannel;</td></tr>
+<tr><th id="128">128</th><td>  tables[sm*pro]  = <b>new</b> G4CascadeSigmaMinusPChannel;</td></tr>
+<tr><th id="129">129</th><td>  tables[sp*neu]  = <b>new</b> G4CascadeSigmaPlusNChannel;</td></tr>
+<tr><th id="130">130</th><td>  tables[sp*pro]  = <b>new</b> G4CascadeSigmaPlusPChannel;</td></tr>
+<tr><th id="131">131</th><td>  tables[xi0*neu] = <b>new</b> G4CascadeXiZeroNChannel;</td></tr>
+<tr><th id="132">132</th><td>  tables[xi0*pro] = <b>new</b> G4CascadeXiZeroPChannel;</td></tr>
+<tr><th id="133">133</th><td>  tables[xim*neu] = <b>new</b> G4CascadeXiMinusNChannel;</td></tr>
+<tr><th id="134">134</th><td>  tables[xim*pro] = <b>new</b> G4CascadeXiMinusPChannel;</td></tr>
+<tr><th id="135">135</th><td>  tables[om*neu]  = <b>new</b> G4CascadeOmegaMinusNChannel;</td></tr>
+<tr><th id="136">136</th><td>  tables[om*pro]  = <b>new</b> G4CascadeOmegaMinusPChannel;</td></tr>
+<tr><th id="137">137</th><td>  tables[mum*pro] = <b>new</b> G4CascadeMuMinusPChannel;</td></tr>
+<tr><th id="138">138</th><td>}</td></tr>
+<tr><th id="139">139</th><td></td></tr>
+<tr><th id="140">140</th><td>G4CascadeChannelTables::<span class='error' title="exception specification in declaration does not match previous declaration">~</span>G4CascadeChannelTables() {</td></tr>
+<tr><th id="141">141</th><td>  <span class='error' title="use of undeclared identifier &apos;TableMap&apos;">TableMap</span>::iterator entry;</td></tr>
+<tr><th id="142">142</th><td>  <b>for</b> (entry = tables.begin(); entry != tables.end(); ++entry) {</td></tr>
+<tr><th id="143">143</th><td>    <b>delete</b> entry-&gt;second; entry-&gt;second = <var>0</var>;</td></tr>
+<tr><th id="144">144</th><td>  }</td></tr>
+<tr><th id="145">145</th><td></td></tr>
+<tr><th id="146">146</th><td>  tables.clear();</td></tr>
+<tr><th id="147">147</th><td>}</td></tr>
+<tr><th id="148">148</th><td></td></tr>
+<tr><th id="149">149</th><td></td></tr>
+<tr><th id="150">150</th><td><i>// Argument is interaction code, product of G4InuclEP types</i></td></tr>
+<tr><th id="151">151</th><td></td></tr>
+<tr><th id="152">152</th><td><em>const</em> <a class="type" href="../include/G4CascadeChannelTables.hh.html#G4CascadeChannel" title='G4CascadeChannel' data-ref="G4CascadeChannel">G4CascadeChannel</a>* <a class="type" href="../include/G4CascadeChannelTables.hh.html#G4CascadeChannelTables" title='G4CascadeChannelTables' data-ref="G4CascadeChannelTables">G4CascadeChannelTables</a>::<dfn class="decl def" id="_ZN22G4CascadeChannelTables8GetTableEi" title='G4CascadeChannelTables::GetTable' data-ref="_ZN22G4CascadeChannelTables8GetTableEi">GetTable</dfn>(<a class="typedef" href="../../../../../../global/management/include/G4Types.hh.html#G4int" title='G4int' data-type='int' data-ref="G4int">G4int</a> <dfn class="local col5 decl" id="125initialState" title='initialState' data-type='G4int' data-ref="125initialState">initialState</dfn>) {</td></tr>
+<tr><th id="153">153</th><td>  <b>return</b> <a class="member" href="#_ZN22G4CascadeChannelTables8instanceEv" title='G4CascadeChannelTables::instance' data-ref="_ZN22G4CascadeChannelTables8instanceEv">instance</a>().<a class="member" href="#_ZNK22G4CascadeChannelTables9FindTableEi" title='G4CascadeChannelTables::FindTable' data-ref="_ZNK22G4CascadeChannelTables9FindTableEi">FindTable</a>(<a class="local col5 ref" href="#125initialState" title='initialState' data-ref="125initialState">initialState</a>);</td></tr>
+<tr><th id="154">154</th><td>}</td></tr>
+<tr><th id="155">155</th><td></td></tr>
+<tr><th id="156">156</th><td><i>// Arguments are individual G4InuclElementaryParticle types</i></td></tr>
+<tr><th id="157">157</th><td></td></tr>
+<tr><th id="158">158</th><td><em>const</em> <a class="type" href="../include/G4CascadeChannelTables.hh.html#G4CascadeChannel" title='G4CascadeChannel' data-ref="G4CascadeChannel">G4CascadeChannel</a>* </td></tr>
+<tr><th id="159">159</th><td><a class="type" href="../include/G4CascadeChannelTables.hh.html#G4CascadeChannelTables" title='G4CascadeChannelTables' data-ref="G4CascadeChannelTables">G4CascadeChannelTables</a>::<dfn class="decl def" id="_ZN22G4CascadeChannelTables8GetTableEii" title='G4CascadeChannelTables::GetTable' data-ref="_ZN22G4CascadeChannelTables8GetTableEii">GetTable</dfn>(<a class="typedef" href="../../../../../../global/management/include/G4Types.hh.html#G4int" title='G4int' data-type='int' data-ref="G4int">G4int</a> <dfn class="local col6 decl" id="126had1" title='had1' data-type='G4int' data-ref="126had1">had1</dfn>, <a class="typedef" href="../../../../../../global/management/include/G4Types.hh.html#G4int" title='G4int' data-type='int' data-ref="G4int">G4int</a> <dfn class="local col7 decl" id="127had2" title='had2' data-type='G4int' data-ref="127had2">had2</dfn>) {</td></tr>
+<tr><th id="160">160</th><td>  <b>return</b> <a class="member" href="#_ZN22G4CascadeChannelTables8GetTableEi" title='G4CascadeChannelTables::GetTable' data-ref="_ZN22G4CascadeChannelTables8GetTableEi">GetTable</a>(<a class="local col6 ref" href="#126had1" title='had1' data-ref="126had1">had1</a>*<a class="local col7 ref" href="#127had2" title='had2' data-ref="127had2">had2</a>);</td></tr>
+<tr><th id="161">161</th><td>}</td></tr>
+<tr><th id="162">162</th><td></td></tr>
+<tr><th id="163">163</th><td><i>// Return cross-section table requested by user</i></td></tr>
+<tr><th id="164">164</th><td></td></tr>
+<tr><th id="165">165</th><td><em>const</em> <a class="type" href="../include/G4CascadeChannelTables.hh.html#G4CascadeChannel" title='G4CascadeChannel' data-ref="G4CascadeChannel">G4CascadeChannel</a>* </td></tr>
+<tr><th id="166">166</th><td><a class="type" href="../include/G4CascadeChannelTables.hh.html#G4CascadeChannelTables" title='G4CascadeChannelTables' data-ref="G4CascadeChannelTables">G4CascadeChannelTables</a>::<dfn class="decl def" id="_ZNK22G4CascadeChannelTables9FindTableEi" title='G4CascadeChannelTables::FindTable' data-ref="_ZNK22G4CascadeChannelTables9FindTableEi">FindTable</dfn>(<a class="typedef" href="../../../../../../global/management/include/G4Types.hh.html#G4int" title='G4int' data-type='int' data-ref="G4int">G4int</a> <dfn class="local col8 decl" id="128initialState" title='initialState' data-type='G4int' data-ref="128initialState">initialState</dfn>) <em>const</em> {</td></tr>
+<tr><th id="167">167</th><td><u>#<span data-ppcond="167">ifdef</span> <span class="macro" data-ref="_M/G4CASCADE_DEBUG_SAMPLER">G4CASCADE_DEBUG_SAMPLER</span></u></td></tr>
+<tr><th id="168">168</th><td>  G4cout &lt;&lt; <q>"G4CascadeChannelTables::FindTable "</q> &lt;&lt; initialState &lt;&lt; G4endl;</td></tr>
+<tr><th id="169">169</th><td><u>#<span data-ppcond="167">endif</span></u></td></tr>
+<tr><th id="170">170</th><td>  <span class='error' title="use of undeclared identifier &apos;TableMap&apos;">TableMap</span>::const_iterator <dfn class="local col9 decl" id="129entry" title='entry' data-type='int' data-ref="129entry">entry</dfn> = tables.find(initialState);</td></tr>
+<tr><th id="171">171</th><td>  <b>return</b> (entry != tables.end()) ? entry-&gt;second : <var>0</var>;</td></tr>
+<tr><th id="172">172</th><td>}</td></tr>
+<tr><th id="173">173</th><td></td></tr>
+<tr><th id="174">174</th><td></td></tr>
+<tr><th id="175">175</th><td><i>// Convenience functions for diagnostic output</i></td></tr>
+<tr><th id="176">176</th><td></td></tr>
+<tr><th id="177">177</th><td><em>void</em> G4CascadeChannelTables::Print(<span class='error' title="use of undeclared identifier &apos;std&apos;">std</span>::ostream&amp; os) {</td></tr>
+<tr><th id="178">178</th><td>  <em>const</em> <span class='error' title="unknown type name &apos;TableMap&apos;">TableMap</span>&amp; theTables = instance().tables;	<i>// For convenience</i></td></tr>
+<tr><th id="179">179</th><td>  <span class='error' title="use of undeclared identifier &apos;TableMap&apos;">TableMap</span>::const_iterator entry;</td></tr>
+<tr><th id="180">180</th><td>  <b>for</b> (entry = theTables.begin(); entry != theTables.end(); ++entry) {</td></tr>
+<tr><th id="181">181</th><td>    <b>if</b> (entry-&gt;second) entry-&gt;second-&gt;printTable(os);</td></tr>
+<tr><th id="182">182</th><td>  }</td></tr>
+<tr><th id="183">183</th><td>}</td></tr>
+<tr><th id="184">184</th><td></td></tr>
+<tr><th id="185">185</th><td><em>void</em> G4CascadeChannelTables::PrintTable(G4int initialState, <span class='error' title="use of undeclared identifier &apos;std&apos;">std</span>::ostream&amp; os) {</td></tr>
+<tr><th id="186">186</th><td>  <em>const</em> G4CascadeChannel* tbl = GetTable(initialState);</td></tr>
+<tr><th id="187">187</th><td>  <b>if</b> (tbl) tbl<span class='error' title="member access into incomplete type &apos;const G4CascadeChannel&apos;">-&gt;</span>printTable(os);</td></tr>
+<tr><th id="188">188</th><td>}</td></tr>
+<tr><th id="189">189</th><td></td></tr>
+</table><hr/><p id='footer'>
+Generated on <em>2019-Aug-28</em> from project codebrowser<br />Powered by <a href='https://woboq.com'><img alt='Woboq' src='https://code.woboq.org/woboq-16.png' width='41' height='16' /></a> <a href='https://code.woboq.org'>Code Browser</a> 2.1
+<br/>Generator usage only permitted with license.</p>
+</div></body></html>

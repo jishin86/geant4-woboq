@@ -1,0 +1,766 @@
+<!doctype html>
+<html>
+<head>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"><title>G4BraggIonModel.cc source code [codebrowser/source/processes/electromagnetic/standard/src/G4BraggIonModel.cc] - Woboq Code Browser</title>
+<link rel="stylesheet" href="../../../../../../../data/qtcreator.css" title="QtCreator"/>
+<link rel="alternate stylesheet" href="../../../../../../../data/kdevelop.css" title="KDevelop"/>
+<script type="text/javascript" src="../../../../../../../data/jquery/jquery.min.js"></script>
+<script type="text/javascript" src="../../../../../../../data/jquery/jquery-ui.min.js"></script>
+<script>var file = 'codebrowser/source/processes/electromagnetic/standard/src/G4BraggIonModel.cc'; var root_path = '../../../../../..'; var data_path = '../../../../../../../data';</script>
+<script src='../../../../../../../data/codebrowser.js'></script>
+</head>
+<body><div id='header'><h1 id='breadcrumb'><span>Browse the source code of </span><a href='../../../../..'>codebrowser</a>/<a href='../../../..'>source</a>/<a href='../../..'>processes</a>/<a href='../..'>electromagnetic</a>/<a href='..'>standard</a>/<a href='./'>src</a>/<a href='G4BraggIonModel.cc.html'>G4BraggIonModel.cc</a></h1></div>
+<hr/><div id='content'><table class="code">
+<tr><th id="1">1</th><td><i>//</i></td></tr>
+<tr><th id="2">2</th><td><i>// ********************************************************************</i></td></tr>
+<tr><th id="3">3</th><td><i>// * License and Disclaimer                                           *</i></td></tr>
+<tr><th id="4">4</th><td><i>// *                                                                  *</i></td></tr>
+<tr><th id="5">5</th><td><i>// * The  Geant4 software  is  copyright of the Copyright Holders  of *</i></td></tr>
+<tr><th id="6">6</th><td><i>// * the Geant4 Collaboration.  It is provided  under  the terms  and *</i></td></tr>
+<tr><th id="7">7</th><td><i>// * conditions of the Geant4 Software License,  included in the file *</i></td></tr>
+<tr><th id="8">8</th><td><i>// * LICENSE and available at  <a href="http://cern.ch/geant4/license">http://cern.ch/geant4/license</a> .  These *</i></td></tr>
+<tr><th id="9">9</th><td><i>// * include a list of copyright holders.                             *</i></td></tr>
+<tr><th id="10">10</th><td><i>// *                                                                  *</i></td></tr>
+<tr><th id="11">11</th><td><i>// * Neither the authors of this software system, nor their employing *</i></td></tr>
+<tr><th id="12">12</th><td><i>// * institutes,nor the agencies providing financial support for this *</i></td></tr>
+<tr><th id="13">13</th><td><i>// * work  make  any representation or  warranty, express or implied, *</i></td></tr>
+<tr><th id="14">14</th><td><i>// * regarding  this  software system or assume any liability for its *</i></td></tr>
+<tr><th id="15">15</th><td><i>// * use.  Please see the license in the file  LICENSE  and URL above *</i></td></tr>
+<tr><th id="16">16</th><td><i>// * for the full disclaimer and the limitation of liability.         *</i></td></tr>
+<tr><th id="17">17</th><td><i>// *                                                                  *</i></td></tr>
+<tr><th id="18">18</th><td><i>// * This  code  implementation is the result of  the  scientific and *</i></td></tr>
+<tr><th id="19">19</th><td><i>// * technical work of the GEANT4 collaboration.                      *</i></td></tr>
+<tr><th id="20">20</th><td><i>// * By using,  copying,  modifying or  distributing the software (or *</i></td></tr>
+<tr><th id="21">21</th><td><i>// * any work based  on the software)  you  agree  to acknowledge its *</i></td></tr>
+<tr><th id="22">22</th><td><i>// * use  in  resulting  scientific  publications,  and indicate your *</i></td></tr>
+<tr><th id="23">23</th><td><i>// * acceptance of all terms of the Geant4 Software license.          *</i></td></tr>
+<tr><th id="24">24</th><td><i>// ********************************************************************</i></td></tr>
+<tr><th id="25">25</th><td><i>//</i></td></tr>
+<tr><th id="26">26</th><td><i>//</i></td></tr>
+<tr><th id="27">27</th><td><i>// -------------------------------------------------------------------</i></td></tr>
+<tr><th id="28">28</th><td><i>//</i></td></tr>
+<tr><th id="29">29</th><td><i>// GEANT4 Class file</i></td></tr>
+<tr><th id="30">30</th><td><i>//</i></td></tr>
+<tr><th id="31">31</th><td><i>//</i></td></tr>
+<tr><th id="32">32</th><td><i>// File name:   G4BraggIonModel</i></td></tr>
+<tr><th id="33">33</th><td><i>//</i></td></tr>
+<tr><th id="34">34</th><td><i>// Author:        Vladimir Ivanchenko</i></td></tr>
+<tr><th id="35">35</th><td><i>//</i></td></tr>
+<tr><th id="36">36</th><td><i>// Creation date: 13.10.2004</i></td></tr>
+<tr><th id="37">37</th><td><i>//</i></td></tr>
+<tr><th id="38">38</th><td><i>// Modifications:</i></td></tr>
+<tr><th id="39">39</th><td><i>// 11-05-05 Major optimisation of internal interfaces (V.Ivantchenko)</i></td></tr>
+<tr><th id="40">40</th><td><i>// 29-11-05 Do not use G4Alpha class (V.Ivantchenko)</i></td></tr>
+<tr><th id="41">41</th><td><i>// 15-02-06 ComputeCrossSectionPerElectron, ComputeCrossSectionPerAtom (mma)</i></td></tr>
+<tr><th id="42">42</th><td><i>// 25-04-06 Add stopping data from ASTAR (V.Ivanchenko)</i></td></tr>
+<tr><th id="43">43</th><td><i>// 23-10-06 Reduce lowestKinEnergy to 0.25 keV (V.Ivanchenko)</i></td></tr>
+<tr><th id="44">44</th><td><i>// 12-08-08 Added methods GetParticleCharge, GetChargeSquareRatio, </i></td></tr>
+<tr><th id="45">45</th><td><i>//          CorrectionsAlongStep needed for ions(V.Ivanchenko)</i></td></tr>
+<tr><th id="46">46</th><td><i>//</i></td></tr>
+<tr><th id="47">47</th><td><i></i></td></tr>
+<tr><th id="48">48</th><td><i>// Class Description:</i></td></tr>
+<tr><th id="49">49</th><td><i>//</i></td></tr>
+<tr><th id="50">50</th><td><i>// Implementation of energy loss and delta-electron production by</i></td></tr>
+<tr><th id="51">51</th><td><i>// slow charged heavy particles</i></td></tr>
+<tr><th id="52">52</th><td><i></i></td></tr>
+<tr><th id="53">53</th><td><i>// -------------------------------------------------------------------</i></td></tr>
+<tr><th id="54">54</th><td><i>//</i></td></tr>
+<tr><th id="55">55</th><td><i></i></td></tr>
+<tr><th id="56">56</th><td><i>//....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......</i></td></tr>
+<tr><th id="57">57</th><td><i>//....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......</i></td></tr>
+<tr><th id="58">58</th><td></td></tr>
+<tr><th id="59">59</th><td><u>#include <a href="../include/G4BraggIonModel.hh.html">"G4BraggIonModel.hh"</a></u></td></tr>
+<tr><th id="60">60</th><td><u>#include <a href="../../../../global/management/include/G4PhysicalConstants.hh.html">"G4PhysicalConstants.hh"</a></u></td></tr>
+<tr><th id="61">61</th><td><u>#include <a href="../../../../global/management/include/G4SystemOfUnits.hh.html">"G4SystemOfUnits.hh"</a></u></td></tr>
+<tr><th id="62">62</th><td><u>#include <a href="../../../../global/HEPRandom/include/Randomize.hh.html">"Randomize.hh"</a></u></td></tr>
+<tr><th id="63">63</th><td><u>#include <a href="../../../../particles/leptons/include/G4Electron.hh.html">"G4Electron.hh"</a></u></td></tr>
+<tr><th id="64">64</th><td><u>#include <a href="../../../../track/include/G4ParticleChangeForLoss.hh.html">"G4ParticleChangeForLoss.hh"</a></u></td></tr>
+<tr><th id="65">65</th><td><u>#include <a href="../../utils/include/G4LossTableManager.hh.html">"G4LossTableManager.hh"</a></u></td></tr>
+<tr><th id="66">66</th><td><u>#include <a href="../../utils/include/G4EmCorrections.hh.html">"G4EmCorrections.hh"</a></u></td></tr>
+<tr><th id="67">67</th><td><u>#include <a href="../include/G4DeltaAngle.hh.html">"G4DeltaAngle.hh"</a></u></td></tr>
+<tr><th id="68">68</th><td><u>#include <a href="../../../../materials/include/G4ICRU90StoppingData.hh.html">"G4ICRU90StoppingData.hh"</a></u></td></tr>
+<tr><th id="69">69</th><td><u>#include <a href="../../../../materials/include/G4NistManager.hh.html">"G4NistManager.hh"</a></u></td></tr>
+<tr><th id="70">70</th><td><u>#include <a href="../../../../global/management/include/G4Log.hh.html">"G4Log.hh"</a></u></td></tr>
+<tr><th id="71">71</th><td><u>#include <a href="../../../../global/management/include/G4Exp.hh.html">"G4Exp.hh"</a></u></td></tr>
+<tr><th id="72">72</th><td></td></tr>
+<tr><th id="73">73</th><td><i>//....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......</i></td></tr>
+<tr><th id="74">74</th><td></td></tr>
+<tr><th id="75">75</th><td><b>using</b> <b>namespace</b> <span class="namespace">std</span>;</td></tr>
+<tr><th id="76">76</th><td></td></tr>
+<tr><th id="77">77</th><td><a class="type" href="../include/G4ASTARStopping.hh.html#G4ASTARStopping" title='G4ASTARStopping' data-ref="G4ASTARStopping">G4ASTARStopping</a>* <a class="type" href="../include/G4BraggIonModel.hh.html#G4BraggIonModel" title='G4BraggIonModel' data-ref="G4BraggIonModel">G4BraggIonModel</a>::<dfn class="decl def" id="G4BraggIonModel::fASTAR" title='G4BraggIonModel::fASTAR' data-ref="G4BraggIonModel::fASTAR">fASTAR</dfn> = <b>nullptr</b>;</td></tr>
+<tr><th id="78">78</th><td></td></tr>
+<tr><th id="79">79</th><td><a class="type" href="../include/G4BraggIonModel.hh.html#G4BraggIonModel" title='G4BraggIonModel' data-ref="G4BraggIonModel">G4BraggIonModel</a>::<dfn class="decl def" id="_ZN15G4BraggIonModelC1EPK20G4ParticleDefinitionRK8G4String" title='G4BraggIonModel::G4BraggIonModel' data-ref="_ZN15G4BraggIonModelC1EPK20G4ParticleDefinitionRK8G4String">G4BraggIonModel</dfn>(<em>const</em> <a class="type" href="../../../../particles/management/include/G4ParticleDefinition.hh.html#G4ParticleDefinition" title='G4ParticleDefinition' data-ref="G4ParticleDefinition">G4ParticleDefinition</a>* <dfn class="local col1 decl" id="1p" title='p' data-type='const G4ParticleDefinition *' data-ref="1p">p</dfn>,</td></tr>
+<tr><th id="80">80</th><td>                                 <em>const</em> <a class="type" href="../../../../global/management/include/G4String.hh.html#G4String" title='G4String' data-ref="G4String">G4String</a>&amp; <dfn class="local col2 decl" id="2nam" title='nam' data-type='const G4String &amp;' data-ref="2nam">nam</dfn>)</td></tr>
+<tr><th id="81">81</th><td>  : <a class="type" href="../../utils/include/G4VEmModel.hh.html#G4VEmModel" title='G4VEmModel' data-ref="G4VEmModel">G4VEmModel</a><a class="ref" href="../../utils/include/G4VEmModel.hh.html#_ZN10G4VEmModelC1ERK8G4String" title='G4VEmModel::G4VEmModel' data-ref="_ZN10G4VEmModelC1ERK8G4String">(</a><a class="local col2 ref" href="#2nam" title='nam' data-ref="2nam">nam</a>),</td></tr>
+<tr><th id="82">82</th><td>    <a class="member" href="../include/G4BraggIonModel.hh.html#G4BraggIonModel::corr" title='G4BraggIonModel::corr' data-ref="G4BraggIonModel::corr">corr</a>(<b>nullptr</b>),</td></tr>
+<tr><th id="83">83</th><td>    <a class="member" href="../include/G4BraggIonModel.hh.html#G4BraggIonModel::particle" title='G4BraggIonModel::particle' data-ref="G4BraggIonModel::particle">particle</a>(<b>nullptr</b>),</td></tr>
+<tr><th id="84">84</th><td>    <a class="member" href="../include/G4BraggIonModel.hh.html#G4BraggIonModel::fParticleChange" title='G4BraggIonModel::fParticleChange' data-ref="G4BraggIonModel::fParticleChange">fParticleChange</a>(<b>nullptr</b>),</td></tr>
+<tr><th id="85">85</th><td>    <a class="member" href="../include/G4BraggIonModel.hh.html#G4BraggIonModel::fICRU90" title='G4BraggIonModel::fICRU90' data-ref="G4BraggIonModel::fICRU90">fICRU90</a>(<b>nullptr</b>),</td></tr>
+<tr><th id="86">86</th><td>    <a class="member" href="../include/G4BraggIonModel.hh.html#G4BraggIonModel::currentMaterial" title='G4BraggIonModel::currentMaterial' data-ref="G4BraggIonModel::currentMaterial">currentMaterial</a>(<b>nullptr</b>),</td></tr>
+<tr><th id="87">87</th><td>    <a class="member" href="../include/G4BraggIonModel.hh.html#G4BraggIonModel::baseMaterial" title='G4BraggIonModel::baseMaterial' data-ref="G4BraggIonModel::baseMaterial">baseMaterial</a>(<b>nullptr</b>),</td></tr>
+<tr><th id="88">88</th><td>    <a class="member" href="../include/G4BraggIonModel.hh.html#G4BraggIonModel::iMolecula" title='G4BraggIonModel::iMolecula' data-ref="G4BraggIonModel::iMolecula">iMolecula</a>(-<var>1</var>),</td></tr>
+<tr><th id="89">89</th><td>    <a class="member" href="../include/G4BraggIonModel.hh.html#G4BraggIonModel::iASTAR" title='G4BraggIonModel::iASTAR' data-ref="G4BraggIonModel::iASTAR">iASTAR</a>(-<var>1</var>),</td></tr>
+<tr><th id="90">90</th><td>    <a class="member" href="../include/G4BraggIonModel.hh.html#G4BraggIonModel::iICRU90" title='G4BraggIonModel::iICRU90' data-ref="G4BraggIonModel::iICRU90">iICRU90</a>(-<var>1</var>),</td></tr>
+<tr><th id="91">91</th><td>    <a class="member" href="../include/G4BraggIonModel.hh.html#G4BraggIonModel::isIon" title='G4BraggIonModel::isIon' data-ref="G4BraggIonModel::isIon">isIon</a>(<b>false</b>)</td></tr>
+<tr><th id="92">92</th><td>{</td></tr>
+<tr><th id="93">93</th><td>  <span class='error' title="cannot initialize object parameter of type &apos;G4VEmModel&apos; with an expression of type &apos;G4BraggIonModel&apos;">SetHighEnergyLimit</span>(<var>2.0</var>*MeV);</td></tr>
+<tr><th id="94">94</th><td></td></tr>
+<tr><th id="95">95</th><td>  <a class="member" href="../include/G4BraggIonModel.hh.html#G4BraggIonModel::HeMass" title='G4BraggIonModel::HeMass' data-ref="G4BraggIonModel::HeMass">HeMass</a>           = <var>3.727417</var>*<a class="ref" href="../../../../externals/clhep/include/CLHEP/Units/SystemOfUnits.h.html#CLHEP::GeV" title='CLHEP::GeV' data-ref="CLHEP::GeV">GeV</a>;</td></tr>
+<tr><th id="96">96</th><td>  <a class="member" href="../include/G4BraggIonModel.hh.html#G4BraggIonModel::rateMassHe2p" title='G4BraggIonModel::rateMassHe2p' data-ref="G4BraggIonModel::rateMassHe2p">rateMassHe2p</a>     = <a class="member" href="../include/G4BraggIonModel.hh.html#G4BraggIonModel::HeMass" title='G4BraggIonModel::HeMass' data-ref="G4BraggIonModel::HeMass">HeMass</a>/<a class="ref" href="../../../../externals/clhep/include/CLHEP/Units/PhysicalConstants.h.html#CLHEP::proton_mass_c2" title='CLHEP::proton_mass_c2' data-ref="CLHEP::proton_mass_c2">proton_mass_c2</a>;</td></tr>
+<tr><th id="97">97</th><td>  <a class="member" href="../include/G4BraggIonModel.hh.html#G4BraggIonModel::lowestKinEnergy" title='G4BraggIonModel::lowestKinEnergy' data-ref="G4BraggIonModel::lowestKinEnergy">lowestKinEnergy</a>  = <var>1.0</var>*<a class="ref" href="../../../../externals/clhep/include/CLHEP/Units/SystemOfUnits.h.html#CLHEP::keV" title='CLHEP::keV' data-ref="CLHEP::keV">keV</a>/<a class="member" href="../include/G4BraggIonModel.hh.html#G4BraggIonModel::rateMassHe2p" title='G4BraggIonModel::rateMassHe2p' data-ref="G4BraggIonModel::rateMassHe2p">rateMassHe2p</a>;</td></tr>
+<tr><th id="98">98</th><td>  <a class="member" href="../include/G4BraggIonModel.hh.html#G4BraggIonModel::massFactor" title='G4BraggIonModel::massFactor' data-ref="G4BraggIonModel::massFactor">massFactor</a>       = <var>1000.</var>*<a class="ref" href="../../../../externals/clhep/include/CLHEP/Units/PhysicalConstants.h.html#CLHEP::amu_c2" title='CLHEP::amu_c2' data-ref="CLHEP::amu_c2">amu_c2</a>/<a class="member" href="../include/G4BraggIonModel.hh.html#G4BraggIonModel::HeMass" title='G4BraggIonModel::HeMass' data-ref="G4BraggIonModel::HeMass">HeMass</a>;</td></tr>
+<tr><th id="99">99</th><td>  <a class="member" href="../include/G4BraggIonModel.hh.html#G4BraggIonModel::theZieglerFactor" title='G4BraggIonModel::theZieglerFactor' data-ref="G4BraggIonModel::theZieglerFactor">theZieglerFactor</a> = <a class="ref" href="../../../../externals/clhep/include/CLHEP/Units/SystemOfUnits.h.html#CLHEP::eV" title='CLHEP::eV' data-ref="CLHEP::eV">eV</a>*<a class="ref" href="../../../../externals/clhep/include/CLHEP/Units/SystemOfUnits.h.html#CLHEP::cm2" title='CLHEP::cm2' data-ref="CLHEP::cm2">cm2</a>*<var>1.0e-15</var>;</td></tr>
+<tr><th id="100">100</th><td>  <a class="member" href="../include/G4BraggIonModel.hh.html#G4BraggIonModel::theElectron" title='G4BraggIonModel::theElectron' data-ref="G4BraggIonModel::theElectron">theElectron</a>      = <a class="type" href="../../../../particles/leptons/include/G4Electron.hh.html#G4Electron" title='G4Electron' data-ref="G4Electron">G4Electron</a>::<a class="ref" href="../../../../particles/leptons/include/G4Electron.hh.html#_ZN10G4Electron8ElectronEv" title='G4Electron::Electron' data-ref="_ZN10G4Electron8ElectronEv">Electron</a>();</td></tr>
+<tr><th id="101">101</th><td>  <a class="member" href="../include/G4BraggIonModel.hh.html#G4BraggIonModel::corrFactor" title='G4BraggIonModel::corrFactor' data-ref="G4BraggIonModel::corrFactor">corrFactor</a>       = <var>1.0</var>;</td></tr>
+<tr><th id="102">102</th><td>  <b>if</b>(<a class="local col1 ref" href="#1p" title='p' data-ref="1p">p</a>) { <a class="member" href="../include/G4BraggIonModel.hh.html#_ZN15G4BraggIonModel11SetParticleEPK20G4ParticleDefinition" title='G4BraggIonModel::SetParticle' data-ref="_ZN15G4BraggIonModel11SetParticleEPK20G4ParticleDefinition">SetParticle</a>(<a class="local col1 ref" href="#1p" title='p' data-ref="1p">p</a>); }</td></tr>
+<tr><th id="103">103</th><td>  <b>else</b>  { <a class="member" href="../include/G4BraggIonModel.hh.html#_ZN15G4BraggIonModel11SetParticleEPK20G4ParticleDefinition" title='G4BraggIonModel::SetParticle' data-ref="_ZN15G4BraggIonModel11SetParticleEPK20G4ParticleDefinition">SetParticle</a>(<a class="member" href="../include/G4BraggIonModel.hh.html#G4BraggIonModel::theElectron" title='G4BraggIonModel::theElectron' data-ref="G4BraggIonModel::theElectron">theElectron</a>); }</td></tr>
+<tr><th id="104">104</th><td>}</td></tr>
+<tr><th id="105">105</th><td></td></tr>
+<tr><th id="106">106</th><td><i>//....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......</i></td></tr>
+<tr><th id="107">107</th><td></td></tr>
+<tr><th id="108">108</th><td>G4BraggIonModel::<span class='error' title="exception specification in declaration does not match previous declaration">~</span>G4BraggIonModel()</td></tr>
+<tr><th id="109">109</th><td>{</td></tr>
+<tr><th id="110">110</th><td>  <b>if</b>(<span class='error' title="cannot initialize object parameter of type &apos;const G4VEmModel&apos; with an expression of type &apos;G4BraggIonModel&apos;">IsMaster</span>()) { <b>delete</b> fASTAR; fASTAR = <b>nullptr</b>; }</td></tr>
+<tr><th id="111">111</th><td>}</td></tr>
+<tr><th id="112">112</th><td></td></tr>
+<tr><th id="113">113</th><td><i>//....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......</i></td></tr>
+<tr><th id="114">114</th><td></td></tr>
+<tr><th id="115">115</th><td><em>void</em> <a class="type" href="../include/G4BraggIonModel.hh.html#G4BraggIonModel" title='G4BraggIonModel' data-ref="G4BraggIonModel">G4BraggIonModel</a>::<dfn class="virtual decl def" id="_ZN15G4BraggIonModel10InitialiseEPK20G4ParticleDefinitionRK12G4DataVector" title='G4BraggIonModel::Initialise' data-ref="_ZN15G4BraggIonModel10InitialiseEPK20G4ParticleDefinitionRK12G4DataVector">Initialise</dfn>(<em>const</em> <a class="type" href="../../../../particles/management/include/G4ParticleDefinition.hh.html#G4ParticleDefinition" title='G4ParticleDefinition' data-ref="G4ParticleDefinition">G4ParticleDefinition</a>* <dfn class="local col3 decl" id="3p" title='p' data-type='const G4ParticleDefinition *' data-ref="3p">p</dfn>,</td></tr>
+<tr><th id="116">116</th><td>                                 <em>const</em> <a class="type" href="../../../../global/management/include/G4DataVector.hh.html#G4DataVector" title='G4DataVector' data-ref="G4DataVector">G4DataVector</a>&amp;)</td></tr>
+<tr><th id="117">117</th><td>{</td></tr>
+<tr><th id="118">118</th><td>  <b>if</b>(<a class="local col3 ref" href="#3p" title='p' data-ref="3p">p</a> != <a class="member" href="../include/G4BraggIonModel.hh.html#G4BraggIonModel::particle" title='G4BraggIonModel::particle' data-ref="G4BraggIonModel::particle">particle</a>) { <a class="member" href="../include/G4BraggIonModel.hh.html#_ZN15G4BraggIonModel11SetParticleEPK20G4ParticleDefinition" title='G4BraggIonModel::SetParticle' data-ref="_ZN15G4BraggIonModel11SetParticleEPK20G4ParticleDefinition">SetParticle</a>(<a class="local col3 ref" href="#3p" title='p' data-ref="3p">p</a>); }</td></tr>
+<tr><th id="119">119</th><td></td></tr>
+<tr><th id="120">120</th><td>  <a class="member" href="../include/G4BraggIonModel.hh.html#G4BraggIonModel::corrFactor" title='G4BraggIonModel::corrFactor' data-ref="G4BraggIonModel::corrFactor">corrFactor</a> = <a class="member" href="../include/G4BraggIonModel.hh.html#G4BraggIonModel::chargeSquare" title='G4BraggIonModel::chargeSquare' data-ref="G4BraggIonModel::chargeSquare">chargeSquare</a>;</td></tr>
+<tr><th id="121">121</th><td></td></tr>
+<tr><th id="122">122</th><td>  <i>// always false before the run</i></td></tr>
+<tr><th id="123">123</th><td>  <span class='error' title="cannot initialize object parameter of type &apos;G4VEmModel&apos; with an expression of type &apos;G4BraggIonModel&apos;">SetDeexcitationFlag</span>(<b>false</b>);</td></tr>
+<tr><th id="124">124</th><td></td></tr>
+<tr><th id="125">125</th><td>  <b>if</b>(<span class='error' title="cannot initialize object parameter of type &apos;const G4VEmModel&apos; with an expression of type &apos;G4BraggIonModel&apos;">IsMaster</span>()) {</td></tr>
+<tr><th id="126">126</th><td>    <b>if</b>(<b>nullptr</b> == <a class="member" href="../include/G4BraggIonModel.hh.html#G4BraggIonModel::fASTAR" title='G4BraggIonModel::fASTAR' data-ref="G4BraggIonModel::fASTAR">fASTAR</a>)  { <a class="member" href="../include/G4BraggIonModel.hh.html#G4BraggIonModel::fASTAR" title='G4BraggIonModel::fASTAR' data-ref="G4BraggIonModel::fASTAR">fASTAR</a> = <b>new</b> <a class="type" href="../include/G4ASTARStopping.hh.html#G4ASTARStopping" title='G4ASTARStopping' data-ref="G4ASTARStopping">G4ASTARStopping</a><a class="ref" href="../include/G4ASTARStopping.hh.html#_ZN15G4ASTARStoppingC1Ev" title='G4ASTARStopping::G4ASTARStopping' data-ref="_ZN15G4ASTARStoppingC1Ev">(</a>); }</td></tr>
+<tr><th id="127">127</th><td>    <b>if</b>(<a class="member" href="../include/G4BraggIonModel.hh.html#G4BraggIonModel::particle" title='G4BraggIonModel::particle' data-ref="G4BraggIonModel::particle">particle</a>-&gt;<a class="ref" href="../../../../particles/management/include/G4ParticleDefinition.hh.html#_ZNK20G4ParticleDefinition10GetPDGMassEv" title='G4ParticleDefinition::GetPDGMass' data-ref="_ZNK20G4ParticleDefinition10GetPDGMassEv">GetPDGMass</a>() &lt; <a class="ref" href="../../../../externals/clhep/include/CLHEP/Units/SystemOfUnits.h.html#CLHEP::GeV" title='CLHEP::GeV' data-ref="CLHEP::GeV">GeV</a>) { <a class="member" href="../include/G4BraggIonModel.hh.html#G4BraggIonModel::fASTAR" title='G4BraggIonModel::fASTAR' data-ref="G4BraggIonModel::fASTAR">fASTAR</a>-&gt;<a class="ref" href="../include/G4ASTARStopping.hh.html#_ZN15G4ASTARStopping10InitialiseEv" title='G4ASTARStopping::Initialise' data-ref="_ZN15G4ASTARStopping10InitialiseEv">Initialise</a>(); }</td></tr>
+<tr><th id="128">128</th><td>    <b>if</b>(<a class="type" href="../../utils/include/G4EmParameters.hh.html#G4EmParameters" title='G4EmParameters' data-ref="G4EmParameters">G4EmParameters</a>::<a class="ref" href="../../utils/include/G4EmParameters.hh.html#_ZN14G4EmParameters8InstanceEv" title='G4EmParameters::Instance' data-ref="_ZN14G4EmParameters8InstanceEv">Instance</a>()-&gt;<a class="ref" href="../../utils/include/G4EmParameters.hh.html#_ZNK14G4EmParameters13UseICRU90DataEv" title='G4EmParameters::UseICRU90Data' data-ref="_ZNK14G4EmParameters13UseICRU90DataEv">UseICRU90Data</a>()) {</td></tr>
+<tr><th id="129">129</th><td>      <b>if</b>(!<a class="member" href="../include/G4BraggIonModel.hh.html#G4BraggIonModel::fICRU90" title='G4BraggIonModel::fICRU90' data-ref="G4BraggIonModel::fICRU90">fICRU90</a>) { </td></tr>
+<tr><th id="130">130</th><td>	<a class="member" href="../include/G4BraggIonModel.hh.html#G4BraggIonModel::fICRU90" title='G4BraggIonModel::fICRU90' data-ref="G4BraggIonModel::fICRU90">fICRU90</a> = <a class="type" href="../../../../materials/include/G4NistManager.hh.html#G4NistManager" title='G4NistManager' data-ref="G4NistManager">G4NistManager</a>::<a class="ref" href="../../../../materials/include/G4NistManager.hh.html#_ZN13G4NistManager8InstanceEv" title='G4NistManager::Instance' data-ref="_ZN13G4NistManager8InstanceEv">Instance</a>()-&gt;<a class="ref" href="../../../../materials/include/G4NistManager.hh.html#_ZN13G4NistManager21GetICRU90StoppingDataEv" title='G4NistManager::GetICRU90StoppingData' data-ref="_ZN13G4NistManager21GetICRU90StoppingDataEv">GetICRU90StoppingData</a>(); </td></tr>
+<tr><th id="131">131</th><td>      } <b>else</b> <b>if</b>(<a class="member" href="../include/G4BraggIonModel.hh.html#G4BraggIonModel::particle" title='G4BraggIonModel::particle' data-ref="G4BraggIonModel::particle">particle</a>-&gt;<a class="ref" href="../../../../particles/management/include/G4ParticleDefinition.hh.html#_ZNK20G4ParticleDefinition10GetPDGMassEv" title='G4ParticleDefinition::GetPDGMass' data-ref="_ZNK20G4ParticleDefinition10GetPDGMassEv">GetPDGMass</a>() &lt; <a class="ref" href="../../../../externals/clhep/include/CLHEP/Units/SystemOfUnits.h.html#CLHEP::GeV" title='CLHEP::GeV' data-ref="CLHEP::GeV">GeV</a>) { <a class="member" href="../include/G4BraggIonModel.hh.html#G4BraggIonModel::fICRU90" title='G4BraggIonModel::fICRU90' data-ref="G4BraggIonModel::fICRU90">fICRU90</a>-&gt;<a class="ref" href="../../../../materials/include/G4ICRU90StoppingData.hh.html#_ZN20G4ICRU90StoppingData10InitialiseEv" title='G4ICRU90StoppingData::Initialise' data-ref="_ZN20G4ICRU90StoppingData10InitialiseEv">Initialise</a>(); }</td></tr>
+<tr><th id="132">132</th><td>    }</td></tr>
+<tr><th id="133">133</th><td>  }</td></tr>
+<tr><th id="134">134</th><td></td></tr>
+<tr><th id="135">135</th><td>  <b>if</b>(<b>nullptr</b> == <a class="member" href="../include/G4BraggIonModel.hh.html#G4BraggIonModel::fParticleChange" title='G4BraggIonModel::fParticleChange' data-ref="G4BraggIonModel::fParticleChange">fParticleChange</a>) {</td></tr>
+<tr><th id="136">136</th><td></td></tr>
+<tr><th id="137">137</th><td>    <b>if</b>(<span class='error' title="cannot initialize object parameter of type &apos;const G4VEmModel&apos; with an expression of type &apos;G4BraggIonModel&apos;">UseAngularGeneratorFlag</span>() &amp;&amp; !<span class='error' title="cannot initialize object parameter of type &apos;G4VEmModel&apos; with an expression of type &apos;G4BraggIonModel&apos;">GetAngularDistribution</span>()) {</td></tr>
+<tr><th id="138">138</th><td>      <span class='error' title="cannot initialize object parameter of type &apos;G4VEmModel&apos; with an expression of type &apos;G4BraggIonModel&apos;">SetAngularDistribution</span>(<b>new</b> G4DeltaAngle());</td></tr>
+<tr><th id="139">139</th><td>    }</td></tr>
+<tr><th id="140">140</th><td>    <a class="type" href="../../../../global/management/include/G4String.hh.html#G4String" title='G4String' data-ref="G4String">G4String</a> <dfn class="local col4 decl" id="4pname" title='pname' data-type='G4String' data-ref="4pname">pname</dfn> = <a class="ref fake" href="../../../../global/management/include/G4String.hh.html#_ZN8G4StringC1ERKS_" title='G4String::G4String' data-ref="_ZN8G4StringC1ERKS_"></a><a class="member" href="../include/G4BraggIonModel.hh.html#G4BraggIonModel::particle" title='G4BraggIonModel::particle' data-ref="G4BraggIonModel::particle">particle</a>-&gt;<a class="ref" href="../../../../particles/management/include/G4ParticleDefinition.hh.html#_ZNK20G4ParticleDefinition15GetParticleNameEv" title='G4ParticleDefinition::GetParticleName' data-ref="_ZNK20G4ParticleDefinition15GetParticleNameEv">GetParticleName</a>();</td></tr>
+<tr><th id="141">141</th><td>    <b>if</b>(<a class="member" href="../include/G4BraggIonModel.hh.html#G4BraggIonModel::particle" title='G4BraggIonModel::particle' data-ref="G4BraggIonModel::particle">particle</a>-&gt;<a class="ref" href="../../../../particles/management/include/G4ParticleDefinition.hh.html#_ZNK20G4ParticleDefinition15GetParticleTypeEv" title='G4ParticleDefinition::GetParticleType' data-ref="_ZNK20G4ParticleDefinition15GetParticleTypeEv">GetParticleType</a>() <a class="ref" href="../../../../global/management/include/G4String.hh.html#_ZNK8G4StringeqEPKc" title='G4String::operator==' data-ref="_ZNK8G4StringeqEPKc">==</a> <q>"nucleus"</q> &amp;&amp;</td></tr>
+<tr><th id="142">142</th><td>       <a class="local col4 ref" href="#4pname" title='pname' data-ref="4pname">pname</a> <a class="ref" href="../../../../global/management/include/G4String.hh.html#_ZNK8G4StringneEPKc" title='G4String::operator!=' data-ref="_ZNK8G4StringneEPKc">!=</a> <q>"deuteron"</q> &amp;&amp; <a class="local col4 ref" href="#4pname" title='pname' data-ref="4pname">pname</a> <a class="ref" href="../../../../global/management/include/G4String.hh.html#_ZNK8G4StringneEPKc" title='G4String::operator!=' data-ref="_ZNK8G4StringneEPKc">!=</a> <q>"triton"</q> &amp;&amp;</td></tr>
+<tr><th id="143">143</th><td>       <a class="local col4 ref" href="#4pname" title='pname' data-ref="4pname">pname</a> <a class="ref" href="../../../../global/management/include/G4String.hh.html#_ZNK8G4StringneEPKc" title='G4String::operator!=' data-ref="_ZNK8G4StringneEPKc">!=</a> <q>"alpha+"</q>   &amp;&amp; <a class="local col4 ref" href="#4pname" title='pname' data-ref="4pname">pname</a> <a class="ref" href="../../../../global/management/include/G4String.hh.html#_ZNK8G4StringneEPKc" title='G4String::operator!=' data-ref="_ZNK8G4StringneEPKc">!=</a> <q>"helium"</q> &amp;&amp;</td></tr>
+<tr><th id="144">144</th><td>       <a class="local col4 ref" href="#4pname" title='pname' data-ref="4pname">pname</a> <a class="ref" href="../../../../global/management/include/G4String.hh.html#_ZNK8G4StringneEPKc" title='G4String::operator!=' data-ref="_ZNK8G4StringneEPKc">!=</a> <q>"hydrogen"</q>) { <a class="member" href="../include/G4BraggIonModel.hh.html#G4BraggIonModel::isIon" title='G4BraggIonModel::isIon' data-ref="G4BraggIonModel::isIon">isIon</a> = <b>true</b>; }</td></tr>
+<tr><th id="145">145</th><td></td></tr>
+<tr><th id="146">146</th><td>    <a class="member" href="../include/G4BraggIonModel.hh.html#G4BraggIonModel::corr" title='G4BraggIonModel::corr' data-ref="G4BraggIonModel::corr">corr</a> = <a class="type" href="../../utils/include/G4LossTableManager.hh.html#G4LossTableManager" title='G4LossTableManager' data-ref="G4LossTableManager">G4LossTableManager</a>::<a class="ref" href="../../utils/include/G4LossTableManager.hh.html#_ZN18G4LossTableManager8InstanceEv" title='G4LossTableManager::Instance' data-ref="_ZN18G4LossTableManager8InstanceEv">Instance</a>()-&gt;<a class="ref" href="../../utils/include/G4LossTableManager.hh.html#_ZN18G4LossTableManager13EmCorrectionsEv" title='G4LossTableManager::EmCorrections' data-ref="_ZN18G4LossTableManager13EmCorrectionsEv">EmCorrections</a>();</td></tr>
+<tr><th id="147">147</th><td></td></tr>
+<tr><th id="148">148</th><td>    fParticleChange = <span class='error' title="cannot initialize object parameter of type &apos;G4VEmModel&apos; with an expression of type &apos;G4BraggIonModel&apos;">GetParticleChangeForLoss</span>();</td></tr>
+<tr><th id="149">149</th><td>  }</td></tr>
+<tr><th id="150">150</th><td>}</td></tr>
+<tr><th id="151">151</th><td></td></tr>
+<tr><th id="152">152</th><td><i>//....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......</i></td></tr>
+<tr><th id="153">153</th><td></td></tr>
+<tr><th id="154">154</th><td><a class="typedef" href="../../../../global/management/include/G4Types.hh.html#G4double" title='G4double' data-type='double' data-ref="G4double">G4double</a> <a class="type" href="../include/G4BraggIonModel.hh.html#G4BraggIonModel" title='G4BraggIonModel' data-ref="G4BraggIonModel">G4BraggIonModel</a>::<dfn class="virtual decl def" id="_ZN15G4BraggIonModel12MinEnergyCutEPK20G4ParticleDefinitionPK20G4MaterialCutsCouple" title='G4BraggIonModel::MinEnergyCut' data-ref="_ZN15G4BraggIonModel12MinEnergyCutEPK20G4ParticleDefinitionPK20G4MaterialCutsCouple">MinEnergyCut</dfn>(<em>const</em> <a class="type" href="../../../../particles/management/include/G4ParticleDefinition.hh.html#G4ParticleDefinition" title='G4ParticleDefinition' data-ref="G4ParticleDefinition">G4ParticleDefinition</a>*,</td></tr>
+<tr><th id="155">155</th><td>                                       <em>const</em> <a class="type" href="../../../cuts/include/G4MaterialCutsCouple.hh.html#G4MaterialCutsCouple" title='G4MaterialCutsCouple' data-ref="G4MaterialCutsCouple">G4MaterialCutsCouple</a>* <dfn class="local col5 decl" id="5couple" title='couple' data-type='const G4MaterialCutsCouple *' data-ref="5couple">couple</dfn>)</td></tr>
+<tr><th id="156">156</th><td>{</td></tr>
+<tr><th id="157">157</th><td>  <b>return</b> <a class="local col5 ref" href="#5couple" title='couple' data-ref="5couple">couple</a>-&gt;<a class="ref" href="../../../cuts/include/G4MaterialCutsCouple.hh.html#_ZNK20G4MaterialCutsCouple11GetMaterialEv" title='G4MaterialCutsCouple::GetMaterial' data-ref="_ZNK20G4MaterialCutsCouple11GetMaterialEv">GetMaterial</a>()-&gt;<a class="ref" href="../../../../materials/include/G4Material.hh.html#_ZNK10G4Material13GetIonisationEv" title='G4Material::GetIonisation' data-ref="_ZNK10G4Material13GetIonisationEv">GetIonisation</a>()-&gt;<a class="ref" href="../../../../materials/include/G4IonisParamMat.hh.html#_ZNK15G4IonisParamMat23GetMeanExcitationEnergyEv" title='G4IonisParamMat::GetMeanExcitationEnergy' data-ref="_ZNK15G4IonisParamMat23GetMeanExcitationEnergyEv">GetMeanExcitationEnergy</a>();</td></tr>
+<tr><th id="158">158</th><td>}</td></tr>
+<tr><th id="159">159</th><td></td></tr>
+<tr><th id="160">160</th><td><i>//....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......</i></td></tr>
+<tr><th id="161">161</th><td></td></tr>
+<tr><th id="162">162</th><td><a class="typedef" href="../../../../global/management/include/G4Types.hh.html#G4double" title='G4double' data-type='double' data-ref="G4double">G4double</a> <a class="type" href="../include/G4BraggIonModel.hh.html#G4BraggIonModel" title='G4BraggIonModel' data-ref="G4BraggIonModel">G4BraggIonModel</a>::<dfn class="virtual decl def" id="_ZN15G4BraggIonModel20GetChargeSquareRatioEPK20G4ParticleDefinitionPK10G4Materiald" title='G4BraggIonModel::GetChargeSquareRatio' data-ref="_ZN15G4BraggIonModel20GetChargeSquareRatioEPK20G4ParticleDefinitionPK10G4Materiald">GetChargeSquareRatio</dfn>(<em>const</em> <a class="type" href="../../../../particles/management/include/G4ParticleDefinition.hh.html#G4ParticleDefinition" title='G4ParticleDefinition' data-ref="G4ParticleDefinition">G4ParticleDefinition</a>* <dfn class="local col6 decl" id="6p" title='p' data-type='const G4ParticleDefinition *' data-ref="6p">p</dfn>,</td></tr>
+<tr><th id="163">163</th><td>                                               <em>const</em> <a class="type" href="../../../../materials/include/G4Material.hh.html#G4Material" title='G4Material' data-ref="G4Material">G4Material</a>* <dfn class="local col7 decl" id="7mat" title='mat' data-type='const G4Material *' data-ref="7mat">mat</dfn>,</td></tr>
+<tr><th id="164">164</th><td>                                               <a class="typedef" href="../../../../global/management/include/G4Types.hh.html#G4double" title='G4double' data-type='double' data-ref="G4double">G4double</a> <dfn class="local col8 decl" id="8kineticEnergy" title='kineticEnergy' data-type='G4double' data-ref="8kineticEnergy">kineticEnergy</dfn>)</td></tr>
+<tr><th id="165">165</th><td>{</td></tr>
+<tr><th id="166">166</th><td>  <i>//G4cout&lt;&lt;"G4BraggIonModel::GetChargeSquareRatio e= "&lt;&lt;kineticEnergy&lt;&lt;G4endl;</i></td></tr>
+<tr><th id="167">167</th><td><i>  // this method is called only for ions</i></td></tr>
+<tr><th id="168">168</th><td>  <a class="typedef" href="../../../../global/management/include/G4Types.hh.html#G4double" title='G4double' data-type='double' data-ref="G4double">G4double</a> <dfn class="local col9 decl" id="9q2" title='q2' data-type='G4double' data-ref="9q2">q2</dfn> = <a class="member" href="../include/G4BraggIonModel.hh.html#G4BraggIonModel::corr" title='G4BraggIonModel::corr' data-ref="G4BraggIonModel::corr">corr</a>-&gt;<a class="ref" href="../../utils/include/G4EmCorrections.hh.html#_ZN15G4EmCorrections26EffectiveChargeSquareRatioEPK20G4ParticleDefinitionPK10G4Materiald" title='G4EmCorrections::EffectiveChargeSquareRatio' data-ref="_ZN15G4EmCorrections26EffectiveChargeSquareRatioEPK20G4ParticleDefinitionPK10G4Materiald">EffectiveChargeSquareRatio</a>(<a class="local col6 ref" href="#6p" title='p' data-ref="6p">p</a>,<a class="local col7 ref" href="#7mat" title='mat' data-ref="7mat">mat</a>,<a class="local col8 ref" href="#8kineticEnergy" title='kineticEnergy' data-ref="8kineticEnergy">kineticEnergy</a>);</td></tr>
+<tr><th id="169">169</th><td>  <a class="member" href="../include/G4BraggIonModel.hh.html#G4BraggIonModel::corrFactor" title='G4BraggIonModel::corrFactor' data-ref="G4BraggIonModel::corrFactor">corrFactor</a>  = <a class="local col9 ref" href="#9q2" title='q2' data-ref="9q2">q2</a>*<a class="member" href="../include/G4BraggIonModel.hh.html#G4BraggIonModel::corr" title='G4BraggIonModel::corr' data-ref="G4BraggIonModel::corr">corr</a>-&gt;<a class="ref" href="../../utils/include/G4EmCorrections.hh.html#_ZN15G4EmCorrections25EffectiveChargeCorrectionEPK20G4ParticleDefinitionPK10G4Materiald" title='G4EmCorrections::EffectiveChargeCorrection' data-ref="_ZN15G4EmCorrections25EffectiveChargeCorrectionEPK20G4ParticleDefinitionPK10G4Materiald">EffectiveChargeCorrection</a>(<a class="local col6 ref" href="#6p" title='p' data-ref="6p">p</a>,<a class="local col7 ref" href="#7mat" title='mat' data-ref="7mat">mat</a>,<a class="local col8 ref" href="#8kineticEnergy" title='kineticEnergy' data-ref="8kineticEnergy">kineticEnergy</a>); </td></tr>
+<tr><th id="170">170</th><td>  <b>return</b> <a class="member" href="../include/G4BraggIonModel.hh.html#G4BraggIonModel::corrFactor" title='G4BraggIonModel::corrFactor' data-ref="G4BraggIonModel::corrFactor">corrFactor</a>;</td></tr>
+<tr><th id="171">171</th><td>}</td></tr>
+<tr><th id="172">172</th><td></td></tr>
+<tr><th id="173">173</th><td><i>//....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......</i></td></tr>
+<tr><th id="174">174</th><td></td></tr>
+<tr><th id="175">175</th><td><a class="typedef" href="../../../../global/management/include/G4Types.hh.html#G4double" title='G4double' data-type='double' data-ref="G4double">G4double</a> <a class="type" href="../include/G4BraggIonModel.hh.html#G4BraggIonModel" title='G4BraggIonModel' data-ref="G4BraggIonModel">G4BraggIonModel</a>::<dfn class="virtual decl def" id="_ZN15G4BraggIonModel17GetParticleChargeEPK20G4ParticleDefinitionPK10G4Materiald" title='G4BraggIonModel::GetParticleCharge' data-ref="_ZN15G4BraggIonModel17GetParticleChargeEPK20G4ParticleDefinitionPK10G4Materiald">GetParticleCharge</dfn>(<em>const</em> <a class="type" href="../../../../particles/management/include/G4ParticleDefinition.hh.html#G4ParticleDefinition" title='G4ParticleDefinition' data-ref="G4ParticleDefinition">G4ParticleDefinition</a>* <dfn class="local col0 decl" id="10p" title='p' data-type='const G4ParticleDefinition *' data-ref="10p">p</dfn>,</td></tr>
+<tr><th id="176">176</th><td>                                            <em>const</em> <a class="type" href="../../../../materials/include/G4Material.hh.html#G4Material" title='G4Material' data-ref="G4Material">G4Material</a>* <dfn class="local col1 decl" id="11mat" title='mat' data-type='const G4Material *' data-ref="11mat">mat</dfn>,</td></tr>
+<tr><th id="177">177</th><td>                                            <a class="typedef" href="../../../../global/management/include/G4Types.hh.html#G4double" title='G4double' data-type='double' data-ref="G4double">G4double</a> <dfn class="local col2 decl" id="12kineticEnergy" title='kineticEnergy' data-type='G4double' data-ref="12kineticEnergy">kineticEnergy</dfn>)</td></tr>
+<tr><th id="178">178</th><td>{</td></tr>
+<tr><th id="179">179</th><td>  <i>//G4cout&lt;&lt;"G4BraggIonModel::GetParticleCharge e= "&lt;&lt;kineticEnergy &lt;&lt;</i></td></tr>
+<tr><th id="180">180</th><td><i>  //  " q= " &lt;&lt;  corr-&gt;GetParticleCharge(p,mat,kineticEnergy) &lt;&lt;G4endl;</i></td></tr>
+<tr><th id="181">181</th><td><i>  // this method is called only for ions</i></td></tr>
+<tr><th id="182">182</th><td>  <b>return</b> <a class="member" href="../include/G4BraggIonModel.hh.html#G4BraggIonModel::corr" title='G4BraggIonModel::corr' data-ref="G4BraggIonModel::corr">corr</a>-&gt;<a class="ref" href="../../utils/include/G4EmCorrections.hh.html#_ZN15G4EmCorrections17GetParticleChargeEPK20G4ParticleDefinitionPK10G4Materiald" title='G4EmCorrections::GetParticleCharge' data-ref="_ZN15G4EmCorrections17GetParticleChargeEPK20G4ParticleDefinitionPK10G4Materiald">GetParticleCharge</a>(<a class="local col0 ref" href="#10p" title='p' data-ref="10p">p</a>,<a class="local col1 ref" href="#11mat" title='mat' data-ref="11mat">mat</a>,<a class="local col2 ref" href="#12kineticEnergy" title='kineticEnergy' data-ref="12kineticEnergy">kineticEnergy</a>);</td></tr>
+<tr><th id="183">183</th><td>}</td></tr>
+<tr><th id="184">184</th><td></td></tr>
+<tr><th id="185">185</th><td><i>//....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......</i></td></tr>
+<tr><th id="186">186</th><td></td></tr>
+<tr><th id="187">187</th><td><a class="typedef" href="../../../../global/management/include/G4Types.hh.html#G4double" title='G4double' data-type='double' data-ref="G4double">G4double</a> <a class="type" href="../include/G4BraggIonModel.hh.html#G4BraggIonModel" title='G4BraggIonModel' data-ref="G4BraggIonModel">G4BraggIonModel</a>::<dfn class="virtual decl def" id="_ZN15G4BraggIonModel30ComputeCrossSectionPerElectronEPK20G4ParticleDefinitionddd" title='G4BraggIonModel::ComputeCrossSectionPerElectron' data-ref="_ZN15G4BraggIonModel30ComputeCrossSectionPerElectronEPK20G4ParticleDefinitionddd">ComputeCrossSectionPerElectron</dfn>(</td></tr>
+<tr><th id="188">188</th><td>                                           <em>const</em> <a class="type" href="../../../../particles/management/include/G4ParticleDefinition.hh.html#G4ParticleDefinition" title='G4ParticleDefinition' data-ref="G4ParticleDefinition">G4ParticleDefinition</a>* <dfn class="local col3 decl" id="13p" title='p' data-type='const G4ParticleDefinition *' data-ref="13p">p</dfn>,</td></tr>
+<tr><th id="189">189</th><td>                                                 <a class="typedef" href="../../../../global/management/include/G4Types.hh.html#G4double" title='G4double' data-type='double' data-ref="G4double">G4double</a> <dfn class="local col4 decl" id="14kineticEnergy" title='kineticEnergy' data-type='G4double' data-ref="14kineticEnergy">kineticEnergy</dfn>,</td></tr>
+<tr><th id="190">190</th><td>                                                 <a class="typedef" href="../../../../global/management/include/G4Types.hh.html#G4double" title='G4double' data-type='double' data-ref="G4double">G4double</a> <dfn class="local col5 decl" id="15cutEnergy" title='cutEnergy' data-type='G4double' data-ref="15cutEnergy">cutEnergy</dfn>,</td></tr>
+<tr><th id="191">191</th><td>                                                 <a class="typedef" href="../../../../global/management/include/G4Types.hh.html#G4double" title='G4double' data-type='double' data-ref="G4double">G4double</a> <dfn class="local col6 decl" id="16maxKinEnergy" title='maxKinEnergy' data-type='G4double' data-ref="16maxKinEnergy">maxKinEnergy</dfn>)</td></tr>
+<tr><th id="192">192</th><td>{</td></tr>
+<tr><th id="193">193</th><td>  <a class="typedef" href="../../../../global/management/include/G4Types.hh.html#G4double" title='G4double' data-type='double' data-ref="G4double">G4double</a> <dfn class="local col7 decl" id="17cross" title='cross' data-type='G4double' data-ref="17cross">cross</dfn>     = <var>0.0</var>;</td></tr>
+<tr><th id="194">194</th><td>  <a class="typedef" href="../../../../global/management/include/G4Types.hh.html#G4double" title='G4double' data-type='double' data-ref="G4double">G4double</a> <dfn class="local col8 decl" id="18tmax" title='tmax' data-type='G4double' data-ref="18tmax">tmax</dfn>      = <a class="virtual member" href="../include/G4BraggIonModel.hh.html#_ZN15G4BraggIonModel18MaxSecondaryEnergyEPK20G4ParticleDefinitiond" title='G4BraggIonModel::MaxSecondaryEnergy' data-ref="_ZN15G4BraggIonModel18MaxSecondaryEnergyEPK20G4ParticleDefinitiond">MaxSecondaryEnergy</a>(<a class="local col3 ref" href="#13p" title='p' data-ref="13p">p</a>, <a class="local col4 ref" href="#14kineticEnergy" title='kineticEnergy' data-ref="14kineticEnergy">kineticEnergy</a>);</td></tr>
+<tr><th id="195">195</th><td>  <a class="typedef" href="../../../../global/management/include/G4Types.hh.html#G4double" title='G4double' data-type='double' data-ref="G4double">G4double</a> <dfn class="local col9 decl" id="19maxEnergy" title='maxEnergy' data-type='G4double' data-ref="19maxEnergy">maxEnergy</dfn> = <span class='error' title="use of undeclared identifier &apos;std&apos;">std</span>::min(tmax,maxKinEnergy);</td></tr>
+<tr><th id="196">196</th><td>  <b>if</b>(<a class="local col5 ref" href="#15cutEnergy" title='cutEnergy' data-ref="15cutEnergy">cutEnergy</a> &lt; <a class="local col8 ref" href="#18tmax" title='tmax' data-ref="18tmax">tmax</a>) {</td></tr>
+<tr><th id="197">197</th><td></td></tr>
+<tr><th id="198">198</th><td>    <a class="typedef" href="../../../../global/management/include/G4Types.hh.html#G4double" title='G4double' data-type='double' data-ref="G4double">G4double</a> <dfn class="local col0 decl" id="20energy" title='energy' data-type='G4double' data-ref="20energy">energy</dfn>  = <a class="local col4 ref" href="#14kineticEnergy" title='kineticEnergy' data-ref="14kineticEnergy">kineticEnergy</a> + <a class="member" href="../include/G4BraggIonModel.hh.html#G4BraggIonModel::mass" title='G4BraggIonModel::mass' data-ref="G4BraggIonModel::mass">mass</a>;</td></tr>
+<tr><th id="199">199</th><td>    <a class="typedef" href="../../../../global/management/include/G4Types.hh.html#G4double" title='G4double' data-type='double' data-ref="G4double">G4double</a> <dfn class="local col1 decl" id="21energy2" title='energy2' data-type='G4double' data-ref="21energy2">energy2</dfn> = <a class="local col0 ref" href="#20energy" title='energy' data-ref="20energy">energy</a>*<a class="local col0 ref" href="#20energy" title='energy' data-ref="20energy">energy</a>;</td></tr>
+<tr><th id="200">200</th><td>    <a class="typedef" href="../../../../global/management/include/G4Types.hh.html#G4double" title='G4double' data-type='double' data-ref="G4double">G4double</a> <dfn class="local col2 decl" id="22beta2" title='beta2' data-type='G4double' data-ref="22beta2">beta2</dfn>   = <a class="local col4 ref" href="#14kineticEnergy" title='kineticEnergy' data-ref="14kineticEnergy">kineticEnergy</a>*(<a class="local col4 ref" href="#14kineticEnergy" title='kineticEnergy' data-ref="14kineticEnergy">kineticEnergy</a> + <var>2.0</var>*<a class="member" href="../include/G4BraggIonModel.hh.html#G4BraggIonModel::mass" title='G4BraggIonModel::mass' data-ref="G4BraggIonModel::mass">mass</a>)/<a class="local col1 ref" href="#21energy2" title='energy2' data-ref="21energy2">energy2</a>;</td></tr>
+<tr><th id="201">201</th><td>    <a class="local col7 ref" href="#17cross" title='cross' data-ref="17cross">cross</a> = (<a class="local col9 ref" href="#19maxEnergy" title='maxEnergy' data-ref="19maxEnergy">maxEnergy</a> - <a class="local col5 ref" href="#15cutEnergy" title='cutEnergy' data-ref="15cutEnergy">cutEnergy</a>)/(<a class="local col5 ref" href="#15cutEnergy" title='cutEnergy' data-ref="15cutEnergy">cutEnergy</a>*<a class="local col9 ref" href="#19maxEnergy" title='maxEnergy' data-ref="19maxEnergy">maxEnergy</a>) </td></tr>
+<tr><th id="202">202</th><td>      - <a class="local col2 ref" href="#22beta2" title='beta2' data-ref="22beta2">beta2</a>*<a class="ref" href="../../../../global/management/include/G4Log.hh.html#_Z5G4Logd" title='G4Log' data-ref="_Z5G4Logd">G4Log</a>(<a class="local col9 ref" href="#19maxEnergy" title='maxEnergy' data-ref="19maxEnergy">maxEnergy</a>/<a class="local col5 ref" href="#15cutEnergy" title='cutEnergy' data-ref="15cutEnergy">cutEnergy</a>)/<a class="local col8 ref" href="#18tmax" title='tmax' data-ref="18tmax">tmax</a>;</td></tr>
+<tr><th id="203">203</th><td></td></tr>
+<tr><th id="204">204</th><td>    <b>if</b>( <var>0.0</var> &lt; <a class="member" href="../include/G4BraggIonModel.hh.html#G4BraggIonModel::spin" title='G4BraggIonModel::spin' data-ref="G4BraggIonModel::spin">spin</a> ) { <a class="local col7 ref" href="#17cross" title='cross' data-ref="17cross">cross</a> += <var>0.5</var>*(<a class="local col9 ref" href="#19maxEnergy" title='maxEnergy' data-ref="19maxEnergy">maxEnergy</a> - <a class="local col5 ref" href="#15cutEnergy" title='cutEnergy' data-ref="15cutEnergy">cutEnergy</a>)/<a class="local col1 ref" href="#21energy2" title='energy2' data-ref="21energy2">energy2</a>; }</td></tr>
+<tr><th id="205">205</th><td></td></tr>
+<tr><th id="206">206</th><td>    <a class="local col7 ref" href="#17cross" title='cross' data-ref="17cross">cross</a> *= <a class="ref" href="../../../../externals/clhep/include/CLHEP/Units/PhysicalConstants.h.html#CLHEP::twopi_mc2_rcl2" title='CLHEP::twopi_mc2_rcl2' data-ref="CLHEP::twopi_mc2_rcl2">twopi_mc2_rcl2</a>*<a class="member" href="../include/G4BraggIonModel.hh.html#G4BraggIonModel::chargeSquare" title='G4BraggIonModel::chargeSquare' data-ref="G4BraggIonModel::chargeSquare">chargeSquare</a>/<a class="local col2 ref" href="#22beta2" title='beta2' data-ref="22beta2">beta2</a>;</td></tr>
+<tr><th id="207">207</th><td>  }</td></tr>
+<tr><th id="208">208</th><td> <i>//   G4cout &lt;&lt; "BR: e= " &lt;&lt; kineticEnergy &lt;&lt; " tmin= " &lt;&lt; cutEnergy </i></td></tr>
+<tr><th id="209">209</th><td><i> //          &lt;&lt; " tmax= " &lt;&lt; tmax &lt;&lt; " cross= " &lt;&lt; cross &lt;&lt; G4endl;</i></td></tr>
+<tr><th id="210">210</th><td> </td></tr>
+<tr><th id="211">211</th><td>  <b>return</b> <a class="local col7 ref" href="#17cross" title='cross' data-ref="17cross">cross</a>;</td></tr>
+<tr><th id="212">212</th><td>}</td></tr>
+<tr><th id="213">213</th><td></td></tr>
+<tr><th id="214">214</th><td><i>//....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......</i></td></tr>
+<tr><th id="215">215</th><td></td></tr>
+<tr><th id="216">216</th><td><a class="typedef" href="../../../../global/management/include/G4Types.hh.html#G4double" title='G4double' data-type='double' data-ref="G4double">G4double</a> <a class="type" href="../include/G4BraggIonModel.hh.html#G4BraggIonModel" title='G4BraggIonModel' data-ref="G4BraggIonModel">G4BraggIonModel</a>::<dfn class="virtual decl def" id="_ZN15G4BraggIonModel26ComputeCrossSectionPerAtomEPK20G4ParticleDefinitionddddd" title='G4BraggIonModel::ComputeCrossSectionPerAtom' data-ref="_ZN15G4BraggIonModel26ComputeCrossSectionPerAtomEPK20G4ParticleDefinitionddddd">ComputeCrossSectionPerAtom</dfn>(</td></tr>
+<tr><th id="217">217</th><td>                                           <em>const</em> <a class="type" href="../../../../particles/management/include/G4ParticleDefinition.hh.html#G4ParticleDefinition" title='G4ParticleDefinition' data-ref="G4ParticleDefinition">G4ParticleDefinition</a>* <dfn class="local col3 decl" id="23p" title='p' data-type='const G4ParticleDefinition *' data-ref="23p">p</dfn>,</td></tr>
+<tr><th id="218">218</th><td>                                                 <a class="typedef" href="../../../../global/management/include/G4Types.hh.html#G4double" title='G4double' data-type='double' data-ref="G4double">G4double</a> <dfn class="local col4 decl" id="24kineticEnergy" title='kineticEnergy' data-type='G4double' data-ref="24kineticEnergy">kineticEnergy</dfn>,</td></tr>
+<tr><th id="219">219</th><td>                                                 <a class="typedef" href="../../../../global/management/include/G4Types.hh.html#G4double" title='G4double' data-type='double' data-ref="G4double">G4double</a> <dfn class="local col5 decl" id="25Z" title='Z' data-type='G4double' data-ref="25Z">Z</dfn>, <a class="typedef" href="../../../../global/management/include/G4Types.hh.html#G4double" title='G4double' data-type='double' data-ref="G4double">G4double</a>,</td></tr>
+<tr><th id="220">220</th><td>                                                 <a class="typedef" href="../../../../global/management/include/G4Types.hh.html#G4double" title='G4double' data-type='double' data-ref="G4double">G4double</a> <dfn class="local col6 decl" id="26cutEnergy" title='cutEnergy' data-type='G4double' data-ref="26cutEnergy">cutEnergy</dfn>,</td></tr>
+<tr><th id="221">221</th><td>                                                 <a class="typedef" href="../../../../global/management/include/G4Types.hh.html#G4double" title='G4double' data-type='double' data-ref="G4double">G4double</a> <dfn class="local col7 decl" id="27maxEnergy" title='maxEnergy' data-type='G4double' data-ref="27maxEnergy">maxEnergy</dfn>)</td></tr>
+<tr><th id="222">222</th><td>{</td></tr>
+<tr><th id="223">223</th><td>  <b>return</b></td></tr>
+<tr><th id="224">224</th><td>    <a class="local col5 ref" href="#25Z" title='Z' data-ref="25Z">Z</a>*<a class="virtual member" href="#_ZN15G4BraggIonModel30ComputeCrossSectionPerElectronEPK20G4ParticleDefinitionddd" title='G4BraggIonModel::ComputeCrossSectionPerElectron' data-ref="_ZN15G4BraggIonModel30ComputeCrossSectionPerElectronEPK20G4ParticleDefinitionddd">ComputeCrossSectionPerElectron</a>(<a class="local col3 ref" href="#23p" title='p' data-ref="23p">p</a>,<a class="local col4 ref" href="#24kineticEnergy" title='kineticEnergy' data-ref="24kineticEnergy">kineticEnergy</a>,<a class="local col6 ref" href="#26cutEnergy" title='cutEnergy' data-ref="26cutEnergy">cutEnergy</a>,<a class="local col7 ref" href="#27maxEnergy" title='maxEnergy' data-ref="27maxEnergy">maxEnergy</a>);</td></tr>
+<tr><th id="225">225</th><td>}</td></tr>
+<tr><th id="226">226</th><td></td></tr>
+<tr><th id="227">227</th><td><i>//....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......</i></td></tr>
+<tr><th id="228">228</th><td></td></tr>
+<tr><th id="229">229</th><td><a class="typedef" href="../../../../global/management/include/G4Types.hh.html#G4double" title='G4double' data-type='double' data-ref="G4double">G4double</a> <a class="type" href="../include/G4BraggIonModel.hh.html#G4BraggIonModel" title='G4BraggIonModel' data-ref="G4BraggIonModel">G4BraggIonModel</a>::<dfn class="virtual decl def" id="_ZN15G4BraggIonModel21CrossSectionPerVolumeEPK10G4MaterialPK20G4ParticleDefinitionddd" title='G4BraggIonModel::CrossSectionPerVolume' data-ref="_ZN15G4BraggIonModel21CrossSectionPerVolumeEPK10G4MaterialPK20G4ParticleDefinitionddd">CrossSectionPerVolume</dfn>(</td></tr>
+<tr><th id="230">230</th><td>                                           <em>const</em> <a class="type" href="../../../../materials/include/G4Material.hh.html#G4Material" title='G4Material' data-ref="G4Material">G4Material</a>* <dfn class="local col8 decl" id="28material" title='material' data-type='const G4Material *' data-ref="28material">material</dfn>,</td></tr>
+<tr><th id="231">231</th><td>                                           <em>const</em> <a class="type" href="../../../../particles/management/include/G4ParticleDefinition.hh.html#G4ParticleDefinition" title='G4ParticleDefinition' data-ref="G4ParticleDefinition">G4ParticleDefinition</a>* <dfn class="local col9 decl" id="29p" title='p' data-type='const G4ParticleDefinition *' data-ref="29p">p</dfn>,</td></tr>
+<tr><th id="232">232</th><td>                                                 <a class="typedef" href="../../../../global/management/include/G4Types.hh.html#G4double" title='G4double' data-type='double' data-ref="G4double">G4double</a> <dfn class="local col0 decl" id="30kineticEnergy" title='kineticEnergy' data-type='G4double' data-ref="30kineticEnergy">kineticEnergy</dfn>,</td></tr>
+<tr><th id="233">233</th><td>                                                 <a class="typedef" href="../../../../global/management/include/G4Types.hh.html#G4double" title='G4double' data-type='double' data-ref="G4double">G4double</a> <dfn class="local col1 decl" id="31cutEnergy" title='cutEnergy' data-type='G4double' data-ref="31cutEnergy">cutEnergy</dfn>,</td></tr>
+<tr><th id="234">234</th><td>                                                 <a class="typedef" href="../../../../global/management/include/G4Types.hh.html#G4double" title='G4double' data-type='double' data-ref="G4double">G4double</a> <dfn class="local col2 decl" id="32maxEnergy" title='maxEnergy' data-type='G4double' data-ref="32maxEnergy">maxEnergy</dfn>)</td></tr>
+<tr><th id="235">235</th><td>{</td></tr>
+<tr><th id="236">236</th><td>  <b>return</b> <a class="local col8 ref" href="#28material" title='material' data-ref="28material">material</a>-&gt;<a class="ref" href="../../../../materials/include/G4Material.hh.html#_ZNK10G4Material18GetElectronDensityEv" title='G4Material::GetElectronDensity' data-ref="_ZNK10G4Material18GetElectronDensityEv">GetElectronDensity</a>()</td></tr>
+<tr><th id="237">237</th><td>    *<a class="virtual member" href="#_ZN15G4BraggIonModel30ComputeCrossSectionPerElectronEPK20G4ParticleDefinitionddd" title='G4BraggIonModel::ComputeCrossSectionPerElectron' data-ref="_ZN15G4BraggIonModel30ComputeCrossSectionPerElectronEPK20G4ParticleDefinitionddd">ComputeCrossSectionPerElectron</a>(<a class="local col9 ref" href="#29p" title='p' data-ref="29p">p</a>,<a class="local col0 ref" href="#30kineticEnergy" title='kineticEnergy' data-ref="30kineticEnergy">kineticEnergy</a>,<a class="local col1 ref" href="#31cutEnergy" title='cutEnergy' data-ref="31cutEnergy">cutEnergy</a>,<a class="local col2 ref" href="#32maxEnergy" title='maxEnergy' data-ref="32maxEnergy">maxEnergy</a>);</td></tr>
+<tr><th id="238">238</th><td>}</td></tr>
+<tr><th id="239">239</th><td></td></tr>
+<tr><th id="240">240</th><td><i>//....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......</i></td></tr>
+<tr><th id="241">241</th><td></td></tr>
+<tr><th id="242">242</th><td><a class="typedef" href="../../../../global/management/include/G4Types.hh.html#G4double" title='G4double' data-type='double' data-ref="G4double">G4double</a> <a class="type" href="../include/G4BraggIonModel.hh.html#G4BraggIonModel" title='G4BraggIonModel' data-ref="G4BraggIonModel">G4BraggIonModel</a>::<dfn class="virtual decl def" id="_ZN15G4BraggIonModel20ComputeDEDXPerVolumeEPK10G4MaterialPK20G4ParticleDefinitiondd" title='G4BraggIonModel::ComputeDEDXPerVolume' data-ref="_ZN15G4BraggIonModel20ComputeDEDXPerVolumeEPK10G4MaterialPK20G4ParticleDefinitiondd">ComputeDEDXPerVolume</dfn>(<em>const</em> <a class="type" href="../../../../materials/include/G4Material.hh.html#G4Material" title='G4Material' data-ref="G4Material">G4Material</a>* <dfn class="local col3 decl" id="33material" title='material' data-type='const G4Material *' data-ref="33material">material</dfn>,</td></tr>
+<tr><th id="243">243</th><td>                                               <em>const</em> <a class="type" href="../../../../particles/management/include/G4ParticleDefinition.hh.html#G4ParticleDefinition" title='G4ParticleDefinition' data-ref="G4ParticleDefinition">G4ParticleDefinition</a>* <dfn class="local col4 decl" id="34p" title='p' data-type='const G4ParticleDefinition *' data-ref="34p">p</dfn>,</td></tr>
+<tr><th id="244">244</th><td>                                               <a class="typedef" href="../../../../global/management/include/G4Types.hh.html#G4double" title='G4double' data-type='double' data-ref="G4double">G4double</a> <dfn class="local col5 decl" id="35kineticEnergy" title='kineticEnergy' data-type='G4double' data-ref="35kineticEnergy">kineticEnergy</dfn>,</td></tr>
+<tr><th id="245">245</th><td>                                               <a class="typedef" href="../../../../global/management/include/G4Types.hh.html#G4double" title='G4double' data-type='double' data-ref="G4double">G4double</a> <dfn class="local col6 decl" id="36cutEnergy" title='cutEnergy' data-type='G4double' data-ref="36cutEnergy">cutEnergy</dfn>)</td></tr>
+<tr><th id="246">246</th><td>{</td></tr>
+<tr><th id="247">247</th><td>  <a class="typedef" href="../../../../global/management/include/G4Types.hh.html#G4double" title='G4double' data-type='double' data-ref="G4double">G4double</a> <dfn class="local col7 decl" id="37tmax" title='tmax' data-type='G4double' data-ref="37tmax">tmax</dfn>  = <a class="virtual member" href="../include/G4BraggIonModel.hh.html#_ZN15G4BraggIonModel18MaxSecondaryEnergyEPK20G4ParticleDefinitiond" title='G4BraggIonModel::MaxSecondaryEnergy' data-ref="_ZN15G4BraggIonModel18MaxSecondaryEnergyEPK20G4ParticleDefinitiond">MaxSecondaryEnergy</a>(<a class="local col4 ref" href="#34p" title='p' data-ref="34p">p</a>, <a class="local col5 ref" href="#35kineticEnergy" title='kineticEnergy' data-ref="35kineticEnergy">kineticEnergy</a>);</td></tr>
+<tr><th id="248">248</th><td>  <a class="typedef" href="../../../../global/management/include/G4Types.hh.html#G4double" title='G4double' data-type='double' data-ref="G4double">G4double</a> <dfn class="local col8 decl" id="38tmin" title='tmin' data-type='G4double' data-ref="38tmin">tmin</dfn>  = <span class='error' title="use of undeclared identifier &apos;min&apos;">min</span>(cutEnergy, tmax);</td></tr>
+<tr><th id="249">249</th><td>  <a class="typedef" href="../../../../global/management/include/G4Types.hh.html#G4double" title='G4double' data-type='double' data-ref="G4double">G4double</a> <dfn class="local col9 decl" id="39tkin" title='tkin' data-type='G4double' data-ref="39tkin">tkin</dfn>  = <a class="local col5 ref" href="#35kineticEnergy" title='kineticEnergy' data-ref="35kineticEnergy">kineticEnergy</a>/<a class="member" href="../include/G4BraggIonModel.hh.html#G4BraggIonModel::massRate" title='G4BraggIonModel::massRate' data-ref="G4BraggIonModel::massRate">massRate</a>;</td></tr>
+<tr><th id="250">250</th><td>  <a class="typedef" href="../../../../global/management/include/G4Types.hh.html#G4double" title='G4double' data-type='double' data-ref="G4double">G4double</a> <dfn class="local col0 decl" id="40dedx" title='dedx' data-type='G4double' data-ref="40dedx">dedx</dfn>  = <var>0.0</var>;</td></tr>
+<tr><th id="251">251</th><td></td></tr>
+<tr><th id="252">252</th><td>  <b>if</b>(<a class="local col9 ref" href="#39tkin" title='tkin' data-ref="39tkin">tkin</a> &lt; <a class="member" href="../include/G4BraggIonModel.hh.html#G4BraggIonModel::lowestKinEnergy" title='G4BraggIonModel::lowestKinEnergy' data-ref="G4BraggIonModel::lowestKinEnergy">lowestKinEnergy</a>) {</td></tr>
+<tr><th id="253">253</th><td>    dedx = DEDX(material, lowestKinEnergy)*<span class='error' title="use of undeclared identifier &apos;sqrt&apos;">sqrt</span>(tkin/lowestKinEnergy);</td></tr>
+<tr><th id="254">254</th><td>  } <b>else</b> {</td></tr>
+<tr><th id="255">255</th><td>    <a class="local col0 ref" href="#40dedx" title='dedx' data-ref="40dedx">dedx</a> = <a class="member" href="../include/G4BraggIonModel.hh.html#_ZN15G4BraggIonModel4DEDXEPK10G4Materiald" title='G4BraggIonModel::DEDX' data-ref="_ZN15G4BraggIonModel4DEDXEPK10G4Materiald">DEDX</a>(<a class="local col3 ref" href="#33material" title='material' data-ref="33material">material</a>, <a class="local col9 ref" href="#39tkin" title='tkin' data-ref="39tkin">tkin</a>); </td></tr>
+<tr><th id="256">256</th><td>  }</td></tr>
+<tr><th id="257">257</th><td></td></tr>
+<tr><th id="258">258</th><td>  <b>if</b> (<a class="local col6 ref" href="#36cutEnergy" title='cutEnergy' data-ref="36cutEnergy">cutEnergy</a> &lt; <a class="local col7 ref" href="#37tmax" title='tmax' data-ref="37tmax">tmax</a>) {</td></tr>
+<tr><th id="259">259</th><td></td></tr>
+<tr><th id="260">260</th><td>    <a class="typedef" href="../../../../global/management/include/G4Types.hh.html#G4double" title='G4double' data-type='double' data-ref="G4double">G4double</a> <dfn class="local col1 decl" id="41tau" title='tau' data-type='G4double' data-ref="41tau">tau</dfn>   = <a class="local col5 ref" href="#35kineticEnergy" title='kineticEnergy' data-ref="35kineticEnergy">kineticEnergy</a>/<a class="member" href="../include/G4BraggIonModel.hh.html#G4BraggIonModel::mass" title='G4BraggIonModel::mass' data-ref="G4BraggIonModel::mass">mass</a>;</td></tr>
+<tr><th id="261">261</th><td>    <a class="typedef" href="../../../../global/management/include/G4Types.hh.html#G4double" title='G4double' data-type='double' data-ref="G4double">G4double</a> <dfn class="local col2 decl" id="42gam" title='gam' data-type='G4double' data-ref="42gam">gam</dfn>   = <a class="local col1 ref" href="#41tau" title='tau' data-ref="41tau">tau</a> + <var>1.0</var>;</td></tr>
+<tr><th id="262">262</th><td>    <a class="typedef" href="../../../../global/management/include/G4Types.hh.html#G4double" title='G4double' data-type='double' data-ref="G4double">G4double</a> <dfn class="local col3 decl" id="43bg2" title='bg2' data-type='G4double' data-ref="43bg2">bg2</dfn>   = <a class="local col1 ref" href="#41tau" title='tau' data-ref="41tau">tau</a> * (<a class="local col1 ref" href="#41tau" title='tau' data-ref="41tau">tau</a>+<var>2.0</var>);</td></tr>
+<tr><th id="263">263</th><td>    <a class="typedef" href="../../../../global/management/include/G4Types.hh.html#G4double" title='G4double' data-type='double' data-ref="G4double">G4double</a> <dfn class="local col4 decl" id="44beta2" title='beta2' data-type='G4double' data-ref="44beta2">beta2</dfn> = <a class="local col3 ref" href="#43bg2" title='bg2' data-ref="43bg2">bg2</a>/(<a class="local col2 ref" href="#42gam" title='gam' data-ref="42gam">gam</a>*<a class="local col2 ref" href="#42gam" title='gam' data-ref="42gam">gam</a>);</td></tr>
+<tr><th id="264">264</th><td>    <a class="typedef" href="../../../../global/management/include/G4Types.hh.html#G4double" title='G4double' data-type='double' data-ref="G4double">G4double</a> <dfn class="local col5 decl" id="45x" title='x' data-type='G4double' data-ref="45x">x</dfn>     = <a class="local col8 ref" href="#38tmin" title='tmin' data-ref="38tmin">tmin</a>/<a class="local col7 ref" href="#37tmax" title='tmax' data-ref="37tmax">tmax</a>;</td></tr>
+<tr><th id="265">265</th><td></td></tr>
+<tr><th id="266">266</th><td>    <a class="local col0 ref" href="#40dedx" title='dedx' data-ref="40dedx">dedx</a> += (<a class="ref" href="../../../../global/management/include/G4Log.hh.html#_Z5G4Logd" title='G4Log' data-ref="_Z5G4Logd">G4Log</a>(<a class="local col5 ref" href="#45x" title='x' data-ref="45x">x</a>) + (<var>1.0</var> - <a class="local col5 ref" href="#45x" title='x' data-ref="45x">x</a>)*<a class="local col4 ref" href="#44beta2" title='beta2' data-ref="44beta2">beta2</a>) * <a class="ref" href="../../../../externals/clhep/include/CLHEP/Units/PhysicalConstants.h.html#CLHEP::twopi_mc2_rcl2" title='CLHEP::twopi_mc2_rcl2' data-ref="CLHEP::twopi_mc2_rcl2">twopi_mc2_rcl2</a></td></tr>
+<tr><th id="267">267</th><td>          * (<a class="local col3 ref" href="#33material" title='material' data-ref="33material">material</a>-&gt;<a class="ref" href="../../../../materials/include/G4Material.hh.html#_ZNK10G4Material18GetElectronDensityEv" title='G4Material::GetElectronDensity' data-ref="_ZNK10G4Material18GetElectronDensityEv">GetElectronDensity</a>())/<a class="local col4 ref" href="#44beta2" title='beta2' data-ref="44beta2">beta2</a>;</td></tr>
+<tr><th id="268">268</th><td>  }</td></tr>
+<tr><th id="269">269</th><td></td></tr>
+<tr><th id="270">270</th><td>  <i>// now compute the total ionization loss</i></td></tr>
+<tr><th id="271">271</th><td></td></tr>
+<tr><th id="272">272</th><td>  dedx = <span class='error' title="use of undeclared identifier &apos;std&apos;">std</span>::max(dedx, <var>0.0</var>);</td></tr>
+<tr><th id="273">273</th><td>  <a class="local col0 ref" href="#40dedx" title='dedx' data-ref="40dedx">dedx</a> *= <a class="member" href="../include/G4BraggIonModel.hh.html#G4BraggIonModel::chargeSquare" title='G4BraggIonModel::chargeSquare' data-ref="G4BraggIonModel::chargeSquare">chargeSquare</a>;</td></tr>
+<tr><th id="274">274</th><td>  <i>/*</i></td></tr>
+<tr><th id="275">275</th><td><i>  G4cout &lt;&lt; "Bragg: tkin(MeV) = " &lt;&lt; tkin/MeV &lt;&lt; " dedx(MeVxcm^2/g) = " </i></td></tr>
+<tr><th id="276">276</th><td><i>         &lt;&lt; dedx*gram/(MeV*cm2*material-&gt;GetDensity()) </i></td></tr>
+<tr><th id="277">277</th><td><i>         &lt;&lt; " q2 = " &lt;&lt; chargeSquare &lt;&lt;  G4endl;</i></td></tr>
+<tr><th id="278">278</th><td><i>  */</i></td></tr>
+<tr><th id="279">279</th><td>  <b>return</b> <a class="local col0 ref" href="#40dedx" title='dedx' data-ref="40dedx">dedx</a>;</td></tr>
+<tr><th id="280">280</th><td>}</td></tr>
+<tr><th id="281">281</th><td></td></tr>
+<tr><th id="282">282</th><td><i>//....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......</i></td></tr>
+<tr><th id="283">283</th><td></td></tr>
+<tr><th id="284">284</th><td><em>void</em> <a class="type" href="../include/G4BraggIonModel.hh.html#G4BraggIonModel" title='G4BraggIonModel' data-ref="G4BraggIonModel">G4BraggIonModel</a>::<dfn class="virtual decl def" id="_ZN15G4BraggIonModel20CorrectionsAlongStepEPK20G4MaterialCutsCouplePK17G4DynamicParticleRdS6_d" title='G4BraggIonModel::CorrectionsAlongStep' data-ref="_ZN15G4BraggIonModel20CorrectionsAlongStepEPK20G4MaterialCutsCouplePK17G4DynamicParticleRdS6_d">CorrectionsAlongStep</dfn>(<em>const</em> <a class="type" href="../../../cuts/include/G4MaterialCutsCouple.hh.html#G4MaterialCutsCouple" title='G4MaterialCutsCouple' data-ref="G4MaterialCutsCouple">G4MaterialCutsCouple</a>* <dfn class="local col6 decl" id="46couple" title='couple' data-type='const G4MaterialCutsCouple *' data-ref="46couple">couple</dfn>,</td></tr>
+<tr><th id="285">285</th><td>                                           <em>const</em> <a class="type" href="../../../../particles/management/include/G4DynamicParticle.hh.html#G4DynamicParticle" title='G4DynamicParticle' data-ref="G4DynamicParticle">G4DynamicParticle</a>* <dfn class="local col7 decl" id="47dp" title='dp' data-type='const G4DynamicParticle *' data-ref="47dp">dp</dfn>,</td></tr>
+<tr><th id="286">286</th><td>                                           <a class="typedef" href="../../../../global/management/include/G4Types.hh.html#G4double" title='G4double' data-type='double' data-ref="G4double">G4double</a>&amp; <dfn class="local col8 decl" id="48eloss" title='eloss' data-type='G4double &amp;' data-ref="48eloss">eloss</dfn>,</td></tr>
+<tr><th id="287">287</th><td>                                           <a class="typedef" href="../../../../global/management/include/G4Types.hh.html#G4double" title='G4double' data-type='double' data-ref="G4double">G4double</a>&amp;,</td></tr>
+<tr><th id="288">288</th><td>                                           <a class="typedef" href="../../../../global/management/include/G4Types.hh.html#G4double" title='G4double' data-type='double' data-ref="G4double">G4double</a> <i>/*length*/</i>)</td></tr>
+<tr><th id="289">289</th><td>{</td></tr>
+<tr><th id="290">290</th><td>  <i>// this method is called only for ions</i></td></tr>
+<tr><th id="291">291</th><td>  <em>const</em> <a class="type" href="../../../../particles/management/include/G4ParticleDefinition.hh.html#G4ParticleDefinition" title='G4ParticleDefinition' data-ref="G4ParticleDefinition">G4ParticleDefinition</a>* <dfn class="local col9 decl" id="49p" title='p' data-type='const G4ParticleDefinition *' data-ref="49p">p</dfn> = <a class="local col7 ref" href="#47dp" title='dp' data-ref="47dp">dp</a>-&gt;<a class="ref" href="../../../../particles/management/include/G4DynamicParticle.hh.html#_ZNK17G4DynamicParticle13GetDefinitionEv" title='G4DynamicParticle::GetDefinition' data-ref="_ZNK17G4DynamicParticle13GetDefinitionEv">GetDefinition</a>();</td></tr>
+<tr><th id="292">292</th><td>  <em>const</em> <a class="type" href="../../../../materials/include/G4Material.hh.html#G4Material" title='G4Material' data-ref="G4Material">G4Material</a>* <dfn class="local col0 decl" id="50mat" title='mat' data-type='const G4Material *' data-ref="50mat">mat</dfn> = <a class="local col6 ref" href="#46couple" title='couple' data-ref="46couple">couple</a>-&gt;<a class="ref" href="../../../cuts/include/G4MaterialCutsCouple.hh.html#_ZNK20G4MaterialCutsCouple11GetMaterialEv" title='G4MaterialCutsCouple::GetMaterial' data-ref="_ZNK20G4MaterialCutsCouple11GetMaterialEv">GetMaterial</a>();</td></tr>
+<tr><th id="293">293</th><td>  <a class="typedef" href="../../../../global/management/include/G4Types.hh.html#G4double" title='G4double' data-type='double' data-ref="G4double">G4double</a> <dfn class="local col1 decl" id="51preKinEnergy" title='preKinEnergy' data-type='G4double' data-ref="51preKinEnergy">preKinEnergy</dfn> = <a class="local col7 ref" href="#47dp" title='dp' data-ref="47dp">dp</a>-&gt;<a class="ref" href="../../../../particles/management/include/G4DynamicParticle.hh.html#_ZNK17G4DynamicParticle16GetKineticEnergyEv" title='G4DynamicParticle::GetKineticEnergy' data-ref="_ZNK17G4DynamicParticle16GetKineticEnergyEv">GetKineticEnergy</a>();</td></tr>
+<tr><th id="294">294</th><td>  <a class="typedef" href="../../../../global/management/include/G4Types.hh.html#G4double" title='G4double' data-type='double' data-ref="G4double">G4double</a> <dfn class="local col2 decl" id="52e" title='e' data-type='G4double' data-ref="52e">e</dfn> = <a class="local col1 ref" href="#51preKinEnergy" title='preKinEnergy' data-ref="51preKinEnergy">preKinEnergy</a> - <a class="local col8 ref" href="#48eloss" title='eloss' data-ref="48eloss">eloss</a>*<var>0.5</var>;</td></tr>
+<tr><th id="295">295</th><td>  <b>if</b>(<a class="local col2 ref" href="#52e" title='e' data-ref="52e">e</a> &lt; <var>0.0</var>) { <a class="local col2 ref" href="#52e" title='e' data-ref="52e">e</a> = <a class="local col1 ref" href="#51preKinEnergy" title='preKinEnergy' data-ref="51preKinEnergy">preKinEnergy</a>*<var>0.5</var>; }</td></tr>
+<tr><th id="296">296</th><td></td></tr>
+<tr><th id="297">297</th><td>  <a class="typedef" href="../../../../global/management/include/G4Types.hh.html#G4double" title='G4double' data-type='double' data-ref="G4double">G4double</a> <dfn class="local col3 decl" id="53q2" title='q2' data-type='G4double' data-ref="53q2">q2</dfn> = <a class="member" href="../include/G4BraggIonModel.hh.html#G4BraggIonModel::corr" title='G4BraggIonModel::corr' data-ref="G4BraggIonModel::corr">corr</a>-&gt;<a class="ref" href="../../utils/include/G4EmCorrections.hh.html#_ZN15G4EmCorrections26EffectiveChargeSquareRatioEPK20G4ParticleDefinitionPK10G4Materiald" title='G4EmCorrections::EffectiveChargeSquareRatio' data-ref="_ZN15G4EmCorrections26EffectiveChargeSquareRatioEPK20G4ParticleDefinitionPK10G4Materiald">EffectiveChargeSquareRatio</a>(<a class="local col9 ref" href="#49p" title='p' data-ref="49p">p</a>,<a class="local col0 ref" href="#50mat" title='mat' data-ref="50mat">mat</a>,<a class="local col2 ref" href="#52e" title='e' data-ref="52e">e</a>);</td></tr>
+<tr><th id="298">298</th><td>  <span class='error' title="cannot initialize object parameter of type &apos;G4VEmModel&apos; with an expression of type &apos;G4BraggIonModel&apos;">GetModelOfFluctuations</span>()-&gt;SetParticleAndCharge(p, q2);</td></tr>
+<tr><th id="299">299</th><td>  <a class="typedef" href="../../../../global/management/include/G4Types.hh.html#G4double" title='G4double' data-type='double' data-ref="G4double">G4double</a> <dfn class="local col4 decl" id="54qfactor" title='qfactor' data-type='G4double' data-ref="54qfactor">qfactor</dfn> = <a class="local col3 ref" href="#53q2" title='q2' data-ref="53q2">q2</a>*<a class="member" href="../include/G4BraggIonModel.hh.html#G4BraggIonModel::corr" title='G4BraggIonModel::corr' data-ref="G4BraggIonModel::corr">corr</a>-&gt;<a class="ref" href="../../utils/include/G4EmCorrections.hh.html#_ZN15G4EmCorrections25EffectiveChargeCorrectionEPK20G4ParticleDefinitionPK10G4Materiald" title='G4EmCorrections::EffectiveChargeCorrection' data-ref="_ZN15G4EmCorrections25EffectiveChargeCorrectionEPK20G4ParticleDefinitionPK10G4Materiald">EffectiveChargeCorrection</a>(<a class="local col9 ref" href="#49p" title='p' data-ref="49p">p</a>,<a class="local col0 ref" href="#50mat" title='mat' data-ref="50mat">mat</a>,<a class="local col2 ref" href="#52e" title='e' data-ref="52e">e</a>)/<a class="member" href="../include/G4BraggIonModel.hh.html#G4BraggIonModel::corrFactor" title='G4BraggIonModel::corrFactor' data-ref="G4BraggIonModel::corrFactor">corrFactor</a>; </td></tr>
+<tr><th id="300">300</th><td>  <a class="local col8 ref" href="#48eloss" title='eloss' data-ref="48eloss">eloss</a> *= <a class="local col4 ref" href="#54qfactor" title='qfactor' data-ref="54qfactor">qfactor</a>; </td></tr>
+<tr><th id="301">301</th><td></td></tr>
+<tr><th id="302">302</th><td>  <i>//G4cout &lt;&lt; "G4BraggIonModel::CorrectionsAlongStep e= " &lt;&lt;  e </i></td></tr>
+<tr><th id="303">303</th><td><i>  //         &lt;&lt; " qfactor= " &lt;&lt; qfactor &lt;&lt; " " &lt;&lt; p-&gt;GetParticleName() &lt;&lt;G4endl;</i></td></tr>
+<tr><th id="304">304</th><td>}</td></tr>
+<tr><th id="305">305</th><td></td></tr>
+<tr><th id="306">306</th><td><i  data-doc="G4BraggIonModel::SampleSecondaries">//....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......</i></td></tr>
+<tr><th id="307">307</th><td></td></tr>
+<tr><th id="308">308</th><td><em>void</em> <a class="type" href="../include/G4BraggIonModel.hh.html#G4BraggIonModel" title='G4BraggIonModel' data-ref="G4BraggIonModel">G4BraggIonModel</a>::<span class='error' title="variable has incomplete type &apos;void&apos;"><dfn class="tu decl def" id="G4BraggIonModel::SampleSecondaries" title='G4BraggIonModel::SampleSecondaries' data-type='void' data-ref="G4BraggIonModel::SampleSecondaries">SampleSecondaries</dfn></span>(<span class='error' title="use of undeclared identifier &apos;std&apos;">std</span>::vector&lt;<span class='error' title="&apos;G4DynamicParticle&apos; does not refer to a value">G4DynamicParticle</span>*<span class='error' title="expected expression">&gt;</span>* <span class='error' title="use of undeclared identifier &apos;vdp&apos;">vdp</span>,</td></tr>
+<tr><th id="309">309</th><td>                                        <span class='error' title="expected expression"><em>const</em></span> G4MaterialCutsCouple* couple,</td></tr>
+<tr><th id="310">310</th><td>                                        <span class='error' title="expected expression"><em>const</em></span> G4DynamicParticle* dp,</td></tr>
+<tr><th id="311">311</th><td>                                        <span class='error' title="unexpected type name &apos;G4double&apos;: expected expression">G4double</span> xmin,</td></tr>
+<tr><th id="312">312</th><td>                                        <span class='error' title="unexpected type name &apos;G4double&apos;: expected expression">G4double</span> maxEnergy)<span class='error' title="expected &apos;;&apos; after top level declarator"></span></td></tr>
+<tr><th id="313">313</th><td>{</td></tr>
+<tr><th id="314">314</th><td>  G4double tmax = MaxSecondaryKinEnergy(dp);</td></tr>
+<tr><th id="315">315</th><td>  G4double xmax = std::min(tmax, maxEnergy);</td></tr>
+<tr><th id="316">316</th><td>  <b>if</b>(xmin &gt;= xmax) { <b>return</b>; }</td></tr>
+<tr><th id="317">317</th><td></td></tr>
+<tr><th id="318">318</th><td>  G4double kineticEnergy = dp-&gt;GetKineticEnergy();</td></tr>
+<tr><th id="319">319</th><td>  G4double energy  = kineticEnergy + mass;</td></tr>
+<tr><th id="320">320</th><td>  G4double energy2 = energy*energy;</td></tr>
+<tr><th id="321">321</th><td>  G4double beta2   = kineticEnergy*(kineticEnergy + <var>2.0</var>*mass)/energy2;</td></tr>
+<tr><th id="322">322</th><td>  G4double grej    = <var>1.0</var>;</td></tr>
+<tr><th id="323">323</th><td>  G4double deltaKinEnergy, f;</td></tr>
+<tr><th id="324">324</th><td></td></tr>
+<tr><th id="325">325</th><td>  CLHEP::HepRandomEngine* rndmEngineMod = <a class="macro" href="../../../../global/HEPRandom/include/Randomize.hh.html#50" title="CLHEP::HepRandom" data-ref="_M/G4Random">G4Random</a>::getTheEngine();</td></tr>
+<tr><th id="326">326</th><td>  G4double rndm[<var>2</var>];</td></tr>
+<tr><th id="327">327</th><td></td></tr>
+<tr><th id="328">328</th><td>  <i>// sampling follows ...</i></td></tr>
+<tr><th id="329">329</th><td>  <b>do</b> {</td></tr>
+<tr><th id="330">330</th><td>    rndmEngineMod-&gt;flatArray(<var>2</var>, rndm);</td></tr>
+<tr><th id="331">331</th><td>    deltaKinEnergy = xmin*xmax/(xmin*(<var>1.0</var> - rndm[<var>0</var>]) + xmax*rndm[<var>0</var>]);</td></tr>
+<tr><th id="332">332</th><td></td></tr>
+<tr><th id="333">333</th><td>    f = <var>1.0</var> - beta2*deltaKinEnergy/tmax;</td></tr>
+<tr><th id="334">334</th><td></td></tr>
+<tr><th id="335">335</th><td>    <b>if</b>(f &gt; grej) {</td></tr>
+<tr><th id="336">336</th><td>        <a class="macro" href="../../../../global/management/include/G4ios.hh.html#46" title="(*_G4cout_p())" data-ref="_M/G4cout">G4cout</a> &lt;&lt; <q>"G4BraggIonModel::SampleSecondary Warning! "</q></td></tr>
+<tr><th id="337">337</th><td>               &lt;&lt; <q>"Majorant "</q> &lt;&lt; grej &lt;&lt; <q>" &lt; "</q></td></tr>
+<tr><th id="338">338</th><td>               &lt;&lt; f &lt;&lt; <q>" for e= "</q> &lt;&lt; deltaKinEnergy</td></tr>
+<tr><th id="339">339</th><td>               &lt;&lt; <a class="macro" href="../../../../global/management/include/G4ios.hh.html#60" title="std::endl" data-ref="_M/G4endl">G4endl</a>;</td></tr>
+<tr><th id="340">340</th><td>    }</td></tr>
+<tr><th id="341">341</th><td></td></tr>
+<tr><th id="342">342</th><td>    <i>// Loop checking, 03-Aug-2015, Vladimir Ivanchenko</i></td></tr>
+<tr><th id="343">343</th><td>  } <b>while</b>( grej*rndm[<var>1</var>] &gt;= f );</td></tr>
+<tr><th id="344">344</th><td></td></tr>
+<tr><th id="345">345</th><td>  G4ThreeVector deltaDirection;</td></tr>
+<tr><th id="346">346</th><td></td></tr>
+<tr><th id="347">347</th><td>  <b>if</b>(UseAngularGeneratorFlag()) {</td></tr>
+<tr><th id="348">348</th><td>    <em>const</em> G4Material* mat =  couple-&gt;GetMaterial();</td></tr>
+<tr><th id="349">349</th><td>    G4int Z = SelectRandomAtomNumber(mat);</td></tr>
+<tr><th id="350">350</th><td></td></tr>
+<tr><th id="351">351</th><td>    deltaDirection = </td></tr>
+<tr><th id="352">352</th><td>      GetAngularDistribution()-&gt;SampleDirection(dp, deltaKinEnergy, Z, mat);</td></tr>
+<tr><th id="353">353</th><td></td></tr>
+<tr><th id="354">354</th><td>  } <b>else</b> {</td></tr>
+<tr><th id="355">355</th><td> </td></tr>
+<tr><th id="356">356</th><td>    G4double deltaMomentum =</td></tr>
+<tr><th id="357">357</th><td>      sqrt(deltaKinEnergy * (deltaKinEnergy + <var>2.0</var>*electron_mass_c2));</td></tr>
+<tr><th id="358">358</th><td>    G4double cost = deltaKinEnergy * (energy + electron_mass_c2) /</td></tr>
+<tr><th id="359">359</th><td>      (deltaMomentum * dp-&gt;GetTotalMomentum());</td></tr>
+<tr><th id="360">360</th><td>    <b>if</b>(cost &gt; <var>1.0</var>) { cost = <var>1.0</var>; }</td></tr>
+<tr><th id="361">361</th><td>    G4double sint = sqrt((<var>1.0</var> - cost)*(<var>1.0</var> + cost));</td></tr>
+<tr><th id="362">362</th><td></td></tr>
+<tr><th id="363">363</th><td>    G4double phi = twopi*rndmEngineMod-&gt;flat();</td></tr>
+<tr><th id="364">364</th><td></td></tr>
+<tr><th id="365">365</th><td>    deltaDirection.set(sint*cos(phi),sint*sin(phi), cost) ;</td></tr>
+<tr><th id="366">366</th><td>    deltaDirection.rotateUz(dp-&gt;GetMomentumDirection());</td></tr>
+<tr><th id="367">367</th><td>  }  </td></tr>
+<tr><th id="368">368</th><td></td></tr>
+<tr><th id="369">369</th><td>  <i>// create G4DynamicParticle object for delta ray</i></td></tr>
+<tr><th id="370">370</th><td>  G4DynamicParticle* delta = </td></tr>
+<tr><th id="371">371</th><td>    <b>new</b> G4DynamicParticle(theElectron,deltaDirection,deltaKinEnergy);</td></tr>
+<tr><th id="372">372</th><td></td></tr>
+<tr><th id="373">373</th><td>  vdp-&gt;push_back(delta);</td></tr>
+<tr><th id="374">374</th><td></td></tr>
+<tr><th id="375">375</th><td>  <i>// Change kinematics of primary particle</i></td></tr>
+<tr><th id="376">376</th><td>  kineticEnergy -= deltaKinEnergy;</td></tr>
+<tr><th id="377">377</th><td>  G4ThreeVector finalP = dp-&gt;GetMomentum() - delta-&gt;GetMomentum();</td></tr>
+<tr><th id="378">378</th><td>  finalP               = finalP.unit();</td></tr>
+<tr><th id="379">379</th><td></td></tr>
+<tr><th id="380">380</th><td>  fParticleChange-&gt;SetProposedKineticEnergy(kineticEnergy);</td></tr>
+<tr><th id="381">381</th><td>  fParticleChange-&gt;SetProposedMomentumDirection(finalP);</td></tr>
+<tr><th id="382">382</th><td>}</td></tr>
+<tr><th id="383">383</th><td></td></tr>
+<tr><th id="384">384</th><td><i>//....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......</i></td></tr>
+<tr><th id="385">385</th><td></td></tr>
+<tr><th id="386">386</th><td>G4double G4BraggIonModel::MaxSecondaryEnergy(<em>const</em> G4ParticleDefinition* pd,</td></tr>
+<tr><th id="387">387</th><td>                                             G4double kinEnergy)</td></tr>
+<tr><th id="388">388</th><td>{</td></tr>
+<tr><th id="389">389</th><td>  <b>if</b>(pd != particle) { SetParticle(pd); }</td></tr>
+<tr><th id="390">390</th><td>  G4double tau  = kinEnergy/mass;</td></tr>
+<tr><th id="391">391</th><td>  G4double tmax = <var>2.0</var>*electron_mass_c2*tau*(tau + <var>2.</var>) /</td></tr>
+<tr><th id="392">392</th><td>                  (<var>1.</var> + <var>2.0</var>*(tau + <var>1.</var>)*ratio + ratio*ratio);</td></tr>
+<tr><th id="393">393</th><td>  <b>return</b> tmax;</td></tr>
+<tr><th id="394">394</th><td>}</td></tr>
+<tr><th id="395">395</th><td></td></tr>
+<tr><th id="396">396</th><td><i>//....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......</i></td></tr>
+<tr><th id="397">397</th><td></td></tr>
+<tr><th id="398">398</th><td><em>void</em> G4BraggIonModel::HasMaterial(<em>const</em> G4Material* mat)</td></tr>
+<tr><th id="399">399</th><td>{</td></tr>
+<tr><th id="400">400</th><td>  <em>const</em> G4String&amp; chFormula = mat-&gt;GetChemicalFormula();</td></tr>
+<tr><th id="401">401</th><td>  <b>if</b>(chFormula.empty()) { <b>return</b>; }</td></tr>
+<tr><th id="402">402</th><td></td></tr>
+<tr><th id="403">403</th><td>  <i>// ICRU Report N49, 1993. Ziegler model for He.</i></td></tr>
+<tr><th id="404">404</th><td>  </td></tr>
+<tr><th id="405">405</th><td>  <em>static</em> <em>const</em> size_t numberOfMolecula = <var>11</var>;</td></tr>
+<tr><th id="406">406</th><td>  <em>static</em> <em>const</em> G4String molName[numberOfMolecula] = {</td></tr>
+<tr><th id="407">407</th><td>    <q>"CaF_2"</q>,  <q>"Cellulose_Nitrate"</q>,  <q>"LiF"</q>, <q>"Policarbonate"</q>,  </td></tr>
+<tr><th id="408">408</th><td>    <q>"(C_2H_4)_N-Polyethylene"</q>,  <q>"(C_2H_4)_N-Polymethly_Methacralate"</q>,</td></tr>
+<tr><th id="409">409</th><td>    <q>"Polysterene"</q>, <q>"SiO_2"</q>, <q>"NaI"</q>, <q>"H_2O"</q>,</td></tr>
+<tr><th id="410">410</th><td>    <q>"Graphite"</q> };</td></tr>
+<tr><th id="411">411</th><td></td></tr>
+<tr><th id="412">412</th><td>  <i>// Search for the material in the table</i></td></tr>
+<tr><th id="413">413</th><td>  <b>for</b> (size_t i=<var>0</var>; i&lt;numberOfMolecula; ++i) {</td></tr>
+<tr><th id="414">414</th><td>    <b>if</b> (chFormula == molName[i]) {</td></tr>
+<tr><th id="415">415</th><td>      iMolecula = i;  </td></tr>
+<tr><th id="416">416</th><td>      <b>return</b>;</td></tr>
+<tr><th id="417">417</th><td>    }</td></tr>
+<tr><th id="418">418</th><td>  }</td></tr>
+<tr><th id="419">419</th><td>  <b>return</b>;</td></tr>
+<tr><th id="420">420</th><td>}</td></tr>
+<tr><th id="421">421</th><td></td></tr>
+<tr><th id="422">422</th><td><i>//....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......</i></td></tr>
+<tr><th id="423">423</th><td></td></tr>
+<tr><th id="424">424</th><td>G4double G4BraggIonModel::StoppingPower(<em>const</em> G4Material* material,</td></tr>
+<tr><th id="425">425</th><td>                                        G4double kineticEnergy) </td></tr>
+<tr><th id="426">426</th><td>{</td></tr>
+<tr><th id="427">427</th><td>  G4double ionloss = <var>0.0</var> ;</td></tr>
+<tr><th id="428">428</th><td></td></tr>
+<tr><th id="429">429</th><td>  <b>if</b> (iMolecula &gt;= <var>0</var>) {</td></tr>
+<tr><th id="430">430</th><td>  </td></tr>
+<tr><th id="431">431</th><td>    <i>// The data and the fit from: </i></td></tr>
+<tr><th id="432">432</th><td><i>    // ICRU Report N49, 1993. Ziegler's model for alpha</i></td></tr>
+<tr><th id="433">433</th><td><i>    // He energy in internal units of parametrisation formula (MeV)</i></td></tr>
+<tr><th id="434">434</th><td></td></tr>
+<tr><th id="435">435</th><td>    G4double T = kineticEnergy*rateMassHe2p/MeV ;</td></tr>
+<tr><th id="436">436</th><td></td></tr>
+<tr><th id="437">437</th><td>    <em>static</em> <em>const</em> G4float a[<var>11</var>][<var>5</var>] = {</td></tr>
+<tr><th id="438">438</th><td>       {<var>9.43672f</var>, <var>0.54398f</var>, <var>84.341f</var>,  <var>1.3705f</var>, <var>57.422f</var>},</td></tr>
+<tr><th id="439">439</th><td>       {<var>67.1503f</var>, <var>0.41409f</var>, <var>404.512f</var>, <var>148.97f</var>, <var>20.99f</var>},</td></tr>
+<tr><th id="440">440</th><td>       {<var>5.11203f</var>, <var>0.453f</var>,   <var>36.718f</var>,  <var>50.6f</var>,   <var>28.058f</var>}, </td></tr>
+<tr><th id="441">441</th><td>       {<var>61.793f</var>,  <var>0.48445f</var>, <var>361.537f</var>, <var>57.889f</var>, <var>50.674f</var>},</td></tr>
+<tr><th id="442">442</th><td>       {<var>7.83464f</var>, <var>0.49804f</var>, <var>160.452f</var>, <var>3.192f</var>,  <var>0.71922f</var>},</td></tr>
+<tr><th id="443">443</th><td>       {<var>19.729f</var>,  <var>0.52153f</var>, <var>162.341f</var>, <var>58.35f</var>,  <var>25.668f</var>}, </td></tr>
+<tr><th id="444">444</th><td>       {<var>26.4648f</var>, <var>0.50112f</var>, <var>188.913f</var>, <var>30.079f</var>, <var>16.509f</var>},</td></tr>
+<tr><th id="445">445</th><td>       {<var>7.8655f</var>,  <var>0.5205f</var>,  <var>63.96f</var>,   <var>51.32f</var>,  <var>67.775f</var>},</td></tr>
+<tr><th id="446">446</th><td>       {<var>8.8965f</var>,  <var>0.5148f</var>,  <var>339.36f</var>,  <var>1.7205f</var>, <var>0.70423f</var>},</td></tr>
+<tr><th id="447">447</th><td>       {<var>2.959f</var>,   <var>0.53255f</var>, <var>34.247f</var>,  <var>60.655f</var>, <var>15.153f</var>}, </td></tr>
+<tr><th id="448">448</th><td>       {<var>3.80133f</var>, <var>0.41590f</var>, <var>12.9966f</var>, <var>117.83f</var>, <var>242.28f</var>} };   </td></tr>
+<tr><th id="449">449</th><td></td></tr>
+<tr><th id="450">450</th><td>    <em>static</em> <em>const</em> G4double atomicWeight[<var>11</var>] = {</td></tr>
+<tr><th id="451">451</th><td>       <var>101.96128f</var>, <var>44.0098f</var>, <var>16.0426f</var>, <var>28.0536f</var>, <var>42.0804f</var>,</td></tr>
+<tr><th id="452">452</th><td>       <var>104.1512f</var>,  <var>44.665f</var>,  <var>60.0843f</var>, <var>18.0152f</var>, <var>18.0152f</var>, <var>12.0f</var>};       </td></tr>
+<tr><th id="453">453</th><td></td></tr>
+<tr><th id="454">454</th><td>    G4int i = iMolecula;</td></tr>
+<tr><th id="455">455</th><td></td></tr>
+<tr><th id="456">456</th><td>    G4double slow = (G4double)(a[i][<var>0</var>]);</td></tr>
+<tr><th id="457">457</th><td></td></tr>
+<tr><th id="458">458</th><td>    G4double x1 = (G4double)(a[i][<var>1</var>]);</td></tr>
+<tr><th id="459">459</th><td>    G4double x2 = (G4double)(a[i][<var>2</var>]);</td></tr>
+<tr><th id="460">460</th><td>    G4double x3 = (G4double)(a[i][<var>3</var>]);</td></tr>
+<tr><th id="461">461</th><td>    G4double x4 = (G4double)(a[i][<var>4</var>]);</td></tr>
+<tr><th id="462">462</th><td></td></tr>
+<tr><th id="463">463</th><td>    <i>// Free electron gas model</i></td></tr>
+<tr><th id="464">464</th><td>    <b>if</b> ( T &lt; <var>0.001</var> ) {</td></tr>
+<tr><th id="465">465</th><td>      G4double shigh = G4Log( <var>1.0</var> + x3*<var>1000.0</var> + x4*<var>0.001</var> ) *x2*<var>1000.0</var>;</td></tr>
+<tr><th id="466">466</th><td>      ionloss  = slow*shigh / (slow + shigh) ;</td></tr>
+<tr><th id="467">467</th><td>      ionloss *= sqrt(T*<var>1000.0</var>) ;</td></tr>
+<tr><th id="468">468</th><td></td></tr>
+<tr><th id="469">469</th><td>      <i>// Main parametrisation</i></td></tr>
+<tr><th id="470">470</th><td>    } <b>else</b> {</td></tr>
+<tr><th id="471">471</th><td>      slow  *= G4Exp(G4Log(T*<var>1000.0</var>)*x1) ;</td></tr>
+<tr><th id="472">472</th><td>      G4double shigh = G4Log( <var>1.0</var> + x3/T + x4*T ) * x2/T ;</td></tr>
+<tr><th id="473">473</th><td>      ionloss = slow*shigh / (slow + shigh) ;</td></tr>
+<tr><th id="474">474</th><td>       <i>/*</i></td></tr>
+<tr><th id="475">475</th><td><i>         G4cout &lt;&lt; "## " &lt;&lt; i &lt;&lt; ". T= " &lt;&lt; T &lt;&lt; " slow= " &lt;&lt; slow</i></td></tr>
+<tr><th id="476">476</th><td><i>         &lt;&lt; " a0= " &lt;&lt; a[i][0] &lt;&lt; " a1= " &lt;&lt; a[i][1] </i></td></tr>
+<tr><th id="477">477</th><td><i>         &lt;&lt; " shigh= " &lt;&lt; shigh </i></td></tr>
+<tr><th id="478">478</th><td><i>         &lt;&lt; " dedx= " &lt;&lt; ionloss &lt;&lt; " q^2= " &lt;&lt;  HeEffChargeSquare(z, T*MeV)</i></td></tr>
+<tr><th id="479">479</th><td><i>         &lt;&lt; G4endl;</i></td></tr>
+<tr><th id="480">480</th><td><i>       */</i></td></tr>
+<tr><th id="481">481</th><td>    }</td></tr>
+<tr><th id="482">482</th><td>    ionloss = std::max(ionloss, <var>0.0</var>);</td></tr>
+<tr><th id="483">483</th><td></td></tr>
+<tr><th id="484">484</th><td>    <i>// He effective charge</i></td></tr>
+<tr><th id="485">485</th><td>    G4double aa = (G4double)atomicWeight[iMolecula];</td></tr>
+<tr><th id="486">486</th><td>    ionloss /= (HeEffChargeSquare(<var>0.5</var>*aa, T)*aa);</td></tr>
+<tr><th id="487">487</th><td></td></tr>
+<tr><th id="488">488</th><td>  <i>// pure material (normally not the case for this function)</i></td></tr>
+<tr><th id="489">489</th><td>  } <b>else</b> <b>if</b>(<var>1</var> == (material-&gt;GetNumberOfElements())) {</td></tr>
+<tr><th id="490">490</th><td>    G4double z = material-&gt;GetZ() ;</td></tr>
+<tr><th id="491">491</th><td>    ionloss = ElectronicStoppingPower( z, kineticEnergy ) ;  </td></tr>
+<tr><th id="492">492</th><td>  }</td></tr>
+<tr><th id="493">493</th><td>  </td></tr>
+<tr><th id="494">494</th><td>  <b>return</b> ionloss;</td></tr>
+<tr><th id="495">495</th><td>}</td></tr>
+<tr><th id="496">496</th><td></td></tr>
+<tr><th id="497">497</th><td><i>//....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......</i></td></tr>
+<tr><th id="498">498</th><td></td></tr>
+<tr><th id="499">499</th><td>G4double G4BraggIonModel::ElectronicStoppingPower(G4double z,</td></tr>
+<tr><th id="500">500</th><td>                                                  G4double kineticEnergy) <em>const</em></td></tr>
+<tr><th id="501">501</th><td>{</td></tr>
+<tr><th id="502">502</th><td>  G4double ionloss ;</td></tr>
+<tr><th id="503">503</th><td>  G4int i = std::min(std::max(G4lrint(z)-<var>1</var>,<var>0</var>),<var>91</var>);  <i>// index of atom</i></td></tr>
+<tr><th id="504">504</th><td></td></tr>
+<tr><th id="505">505</th><td>  <i>// The data and the fit from:</i></td></tr>
+<tr><th id="506">506</th><td><i>  // ICRU Report 49, 1993. Ziegler's type of parametrisations.</i></td></tr>
+<tr><th id="507">507</th><td><i>  // Proton kinetic energy for parametrisation (keV/amu)</i></td></tr>
+<tr><th id="508">508</th><td><i></i></td></tr>
+<tr><th id="509">509</th><td><i>  // He energy in internal units of parametrisation formula (MeV)</i></td></tr>
+<tr><th id="510">510</th><td>  G4double T = kineticEnergy*rateMassHe2p/MeV ;</td></tr>
+<tr><th id="511">511</th><td></td></tr>
+<tr><th id="512">512</th><td>  <em>static</em> <em>const</em> G4float a[<var>92</var>][<var>5</var>] = {</td></tr>
+<tr><th id="513">513</th><td>    {  <var>0.35485f</var>, <var>0.6456f</var>, <var>6.01525f</var>,  <var>20.8933f</var>, <var>4.3515f</var></td></tr>
+<tr><th id="514">514</th><td>   },{ <var>0.58f</var>,    <var>0.59f</var>,   <var>6.3f</var>,      <var>130.0f</var>,   <var>44.07f</var></td></tr>
+<tr><th id="515">515</th><td>   },{ <var>1.42f</var>,    <var>0.49f</var>,   <var>12.25f</var>,    <var>32.0f</var>,    <var>9.161f</var></td></tr>
+<tr><th id="516">516</th><td>   },{ <var>2.206f</var>,   <var>0.51f</var>,   <var>15.32f</var>,    <var>0.25f</var>,    <var>8.995f</var> <i>//Be Ziegler77</i></td></tr>
+<tr><th id="517">517</th><td>       <i>// },{ 2.1895f,  0.47183,7.2362f,   134.30f,  197.96f //Be from ICRU</i></td></tr>
+<tr><th id="518">518</th><td>   },{ <var>3.691f</var>,   <var>0.4128f</var>, <var>18.48f</var>,    <var>50.72f</var>,   <var>9.0f</var></td></tr>
+<tr><th id="519">519</th><td>   },{ <var>3.83523f</var>, <var>0.42993f</var>,<var>12.6125f</var>,  <var>227.41f</var>,  <var>188.97f</var></td></tr>
+<tr><th id="520">520</th><td>       <i>// },{ 1.9259f,  0.5550f, 27.15125f, 26.0665f, 6.2768f //too many digits</i></td></tr>
+<tr><th id="521">521</th><td>   },{ <var>1.9259f</var>,  <var>0.5550f</var>, <var>27.1513f</var>,  <var>26.0665f</var>, <var>6.2768f</var></td></tr>
+<tr><th id="522">522</th><td>   },{ <var>2.81015f</var>, <var>0.4759f</var>, <var>50.0253f</var>,  <var>10.556f</var>,  <var>1.0382f</var></td></tr>
+<tr><th id="523">523</th><td>   },{ <var>1.533f</var>,   <var>0.531f</var>,  <var>40.44f</var>,    <var>18.41f</var>,   <var>2.718f</var></td></tr>
+<tr><th id="524">524</th><td>   },{ <var>2.303f</var>,   <var>0.4861f</var>, <var>37.01f</var>,    <var>37.96f</var>,   <var>5.092f</var></td></tr>
+<tr><th id="525">525</th><td>       <i>// Z= 11-20</i></td></tr>
+<tr><th id="526">526</th><td>   },{ <var>9.894f</var>,   <var>0.3081f</var>, <var>23.65f</var>,    <var>0.384f</var>,   <var>92.93f</var></td></tr>
+<tr><th id="527">527</th><td>   },{ <var>4.3f</var>,     <var>0.47f</var>,   <var>34.3f</var>,     <var>3.3f</var>,     <var>12.74f</var></td></tr>
+<tr><th id="528">528</th><td>   },{ <var>2.5f</var>,     <var>0.625f</var>,  <var>45.7f</var>,     <var>0.1f</var>,     <var>4.359f</var></td></tr>
+<tr><th id="529">529</th><td>   },{ <var>2.1f</var>,     <var>0.65f</var>,   <var>49.34f</var>,    <var>1.788f</var>,   <var>4.133f</var></td></tr>
+<tr><th id="530">530</th><td>   },{ <var>1.729f</var>,   <var>0.6562f</var>, <var>53.41f</var>,    <var>2.405f</var>,   <var>3.845f</var></td></tr>
+<tr><th id="531">531</th><td>   },{ <var>1.402f</var>,   <var>0.6791f</var>, <var>58.98f</var>,    <var>3.528f</var>,   <var>3.211f</var></td></tr>
+<tr><th id="532">532</th><td>   },{ <var>1.117f</var>,   <var>0.7044f</var>, <var>69.69f</var>,    <var>3.705f</var>,   <var>2.156f</var></td></tr>
+<tr><th id="533">533</th><td>   },{ <var>2.291f</var>,   <var>0.6284f</var>, <var>73.88f</var>,    <var>4.478f</var>,   <var>2.066f</var></td></tr>
+<tr><th id="534">534</th><td>   },{ <var>8.554f</var>,   <var>0.3817f</var>, <var>83.61f</var>,    <var>11.84f</var>,   <var>1.875f</var></td></tr>
+<tr><th id="535">535</th><td>   },{ <var>6.297f</var>,   <var>0.4622f</var>, <var>65.39f</var>,    <var>10.14f</var>,   <var>5.036f</var></td></tr>
+<tr><th id="536">536</th><td>       <i>// Z= 21-30     </i></td></tr>
+<tr><th id="537">537</th><td>   },{ <var>5.307f</var>,   <var>0.4918f</var>, <var>61.74f</var>,    <var>12.4f</var>,    <var>6.665f</var></td></tr>
+<tr><th id="538">538</th><td>   },{ <var>4.71f</var>,    <var>0.5087f</var>, <var>65.28f</var>,    <var>8.806f</var>,   <var>5.948f</var></td></tr>
+<tr><th id="539">539</th><td>   },{ <var>6.151f</var>,   <var>0.4524f</var>, <var>83.0f</var>,     <var>18.31f</var>,   <var>2.71f</var></td></tr>
+<tr><th id="540">540</th><td>   },{ <var>6.57f</var>,    <var>0.4322f</var>, <var>84.76f</var>,    <var>15.53f</var>,   <var>2.779f</var></td></tr>
+<tr><th id="541">541</th><td>   },{ <var>5.738f</var>,   <var>0.4492f</var>, <var>84.6f</var>,     <var>14.18f</var>,   <var>3.101f</var></td></tr>
+<tr><th id="542">542</th><td>   },{ <var>5.013f</var>,   <var>0.4707f</var>, <var>85.8f</var>,     <var>16.55f</var>,   <var>3.211f</var></td></tr>
+<tr><th id="543">543</th><td>   },{ <var>4.32f</var>,    <var>0.4947f</var>, <var>76.14f</var>,    <var>10.85f</var>,   <var>5.441f</var></td></tr>
+<tr><th id="544">544</th><td>   },{ <var>4.652f</var>,   <var>0.4571f</var>, <var>80.73f</var>,    <var>22.0f</var>,    <var>4.952f</var></td></tr>
+<tr><th id="545">545</th><td>   },{ <var>3.114f</var>,   <var>0.5236f</var>, <var>76.67f</var>,    <var>7.62f</var>,    <var>6.385f</var></td></tr>
+<tr><th id="546">546</th><td>   },{ <var>3.114f</var>,   <var>0.5236f</var>, <var>76.67f</var>,    <var>7.62f</var>,    <var>7.502f</var></td></tr>
+<tr><th id="547">547</th><td>       <i>// Z= 31-40</i></td></tr>
+<tr><th id="548">548</th><td>   },{ <var>3.114f</var>,   <var>0.5236f</var>, <var>76.67f</var>,    <var>7.62f</var>,    <var>8.514f</var></td></tr>
+<tr><th id="549">549</th><td>   },{ <var>5.746f</var>,   <var>0.4662f</var>, <var>79.24f</var>,    <var>1.185f</var>,   <var>7.993f</var></td></tr>
+<tr><th id="550">550</th><td>   },{ <var>2.792f</var>,   <var>0.6346f</var>, <var>106.1f</var>,    <var>0.2986f</var>,  <var>2.331f</var></td></tr>
+<tr><th id="551">551</th><td>   },{ <var>4.667f</var>,   <var>0.5095f</var>, <var>124.3f</var>,    <var>2.102f</var>,   <var>1.667f</var></td></tr>
+<tr><th id="552">552</th><td>   },{ <var>2.44f</var>,    <var>0.6346f</var>, <var>105.0f</var>,    <var>0.83f</var>,    <var>2.851f</var></td></tr>
+<tr><th id="553">553</th><td>   },{ <var>1.413f</var>,   <var>0.7377f</var>, <var>147.9f</var>,    <var>1.466f</var>,   <var>1.016f</var></td></tr>
+<tr><th id="554">554</th><td>   },{ <var>11.72f</var>,   <var>0.3826f</var>, <var>102.8f</var>,    <var>9.231f</var>,   <var>4.371f</var></td></tr>
+<tr><th id="555">555</th><td>   },{ <var>7.126f</var>,   <var>0.4804f</var>, <var>119.3f</var>,    <var>5.784f</var>,   <var>2.454f</var></td></tr>
+<tr><th id="556">556</th><td>   },{ <var>11.61f</var>,   <var>0.3955f</var>, <var>146.7f</var>,    <var>7.031f</var>,   <var>1.423f</var></td></tr>
+<tr><th id="557">557</th><td>   },{ <var>10.99f</var>,   <var>0.41f</var>,   <var>163.9f</var>,    <var>7.1f</var>,     <var>1.052f</var></td></tr>
+<tr><th id="558">558</th><td>       <i>// Z= 41-50</i></td></tr>
+<tr><th id="559">559</th><td>   },{ <var>9.241f</var>,   <var>0.4275f</var>, <var>163.1f</var>,    <var>7.954f</var>,   <var>1.102f</var></td></tr>
+<tr><th id="560">560</th><td>   },{ <var>9.276f</var>,   <var>0.418f</var>,  <var>157.1f</var>,    <var>8.038f</var>,   <var>1.29f</var></td></tr>
+<tr><th id="561">561</th><td>   },{ <var>3.999f</var>,   <var>0.6152f</var>, <var>97.6f</var>,     <var>1.297f</var>,   <var>5.792f</var></td></tr>
+<tr><th id="562">562</th><td>   },{ <var>4.306f</var>,   <var>0.5658f</var>, <var>97.99f</var>,    <var>5.514f</var>,   <var>5.754f</var></td></tr>
+<tr><th id="563">563</th><td>   },{ <var>3.615f</var>,   <var>0.6197f</var>, <var>86.26f</var>,    <var>0.333f</var>,   <var>8.689f</var></td></tr>
+<tr><th id="564">564</th><td>   },{ <var>5.8f</var>,     <var>0.49f</var>,   <var>147.2f</var>,    <var>6.903f</var>,   <var>1.289f</var></td></tr>
+<tr><th id="565">565</th><td>   },{ <var>5.6f</var>,     <var>0.49f</var>,   <var>130.0f</var>,    <var>10.0f</var>,    <var>2.844f</var></td></tr>
+<tr><th id="566">566</th><td>   },{ <var>3.55f</var>,    <var>0.6068f</var>, <var>124.7f</var>,    <var>1.112f</var>,   <var>3.119f</var></td></tr>
+<tr><th id="567">567</th><td>   },{ <var>3.6f</var>,     <var>0.62f</var>,   <var>105.8f</var>,    <var>0.1692f</var>,  <var>6.026f</var></td></tr>
+<tr><th id="568">568</th><td>   },{ <var>5.4f</var>,     <var>0.53f</var>,   <var>103.1f</var>,    <var>3.931f</var>,   <var>7.767f</var></td></tr>
+<tr><th id="569">569</th><td>       <i>// Z= 51-60</i></td></tr>
+<tr><th id="570">570</th><td>   },{ <var>3.97f</var>,    <var>0.6459f</var>, <var>131.8f</var>,    <var>0.2233f</var>,  <var>2.723f</var></td></tr>
+<tr><th id="571">571</th><td>   },{ <var>3.65f</var>,    <var>0.64f</var>,   <var>126.8f</var>,    <var>0.6834f</var>,  <var>3.411f</var></td></tr>
+<tr><th id="572">572</th><td>   },{ <var>3.118f</var>,   <var>0.6519f</var>, <var>164.9f</var>,    <var>1.208f</var>,   <var>1.51f</var></td></tr>
+<tr><th id="573">573</th><td>   },{ <var>3.949f</var>,   <var>0.6209f</var>, <var>200.5f</var>,    <var>1.878f</var>,   <var>0.9126f</var></td></tr>
+<tr><th id="574">574</th><td>   },{ <var>14.4f</var>,    <var>0.3923f</var>, <var>152.5f</var>,    <var>8.354f</var>,   <var>2.597f</var></td></tr>
+<tr><th id="575">575</th><td>   },{ <var>10.99f</var>,   <var>0.4599f</var>, <var>138.4f</var>,    <var>4.811f</var>,   <var>3.726f</var></td></tr>
+<tr><th id="576">576</th><td>   },{ <var>16.6f</var>,    <var>0.3773f</var>, <var>224.1f</var>,    <var>6.28f</var>,    <var>0.9121f</var></td></tr>
+<tr><th id="577">577</th><td>   },{ <var>10.54f</var>,   <var>0.4533f</var>, <var>159.3f</var>,    <var>4.832f</var>,   <var>2.529f</var></td></tr>
+<tr><th id="578">578</th><td>   },{ <var>10.33f</var>,   <var>0.4502f</var>, <var>162.0f</var>,    <var>5.132f</var>,   <var>2.444f</var></td></tr>
+<tr><th id="579">579</th><td>   },{ <var>10.15f</var>,   <var>0.4471f</var>, <var>165.6f</var>,    <var>5.378f</var>,   <var>2.328f</var></td></tr>
+<tr><th id="580">580</th><td>       <i>// Z= 61-70</i></td></tr>
+<tr><th id="581">581</th><td>   },{ <var>9.976f</var>,   <var>0.4439f</var>, <var>168.0f</var>,    <var>5.721f</var>,   <var>2.258f</var></td></tr>
+<tr><th id="582">582</th><td>   },{ <var>9.804f</var>,   <var>0.4408f</var>, <var>176.2f</var>,    <var>5.675f</var>,   <var>1.997f</var></td></tr>
+<tr><th id="583">583</th><td>   },{ <var>14.22f</var>,   <var>0.363f</var>,  <var>228.4f</var>,    <var>7.024f</var>,   <var>1.016f</var></td></tr>
+<tr><th id="584">584</th><td>   },{ <var>9.952f</var>,   <var>0.4318f</var>, <var>233.5f</var>,    <var>5.065f</var>,   <var>0.9244f</var></td></tr>
+<tr><th id="585">585</th><td>   },{ <var>9.272f</var>,   <var>0.4345f</var>, <var>210.0f</var>,    <var>4.911f</var>,   <var>1.258f</var></td></tr>
+<tr><th id="586">586</th><td>   },{ <var>10.13f</var>,   <var>0.4146f</var>, <var>225.7f</var>,    <var>5.525f</var>,   <var>1.055f</var></td></tr>
+<tr><th id="587">587</th><td>   },{ <var>8.949f</var>,   <var>0.4304f</var>, <var>213.3f</var>,    <var>5.071f</var>,   <var>1.221f</var></td></tr>
+<tr><th id="588">588</th><td>   },{ <var>11.94f</var>,   <var>0.3783f</var>, <var>247.2f</var>,    <var>6.655f</var>,   <var>0.849f</var></td></tr>
+<tr><th id="589">589</th><td>   },{ <var>8.472f</var>,   <var>0.4405f</var>, <var>195.5f</var>,    <var>4.051f</var>,   <var>1.604f</var></td></tr>
+<tr><th id="590">590</th><td>   },{ <var>8.301f</var>,   <var>0.4399f</var>, <var>203.7f</var>,    <var>3.667f</var>,   <var>1.459f</var></td></tr>
+<tr><th id="591">591</th><td>       <i>// Z= 71-80</i></td></tr>
+<tr><th id="592">592</th><td>   },{ <var>6.567f</var>,   <var>0.4858f</var>, <var>193.0f</var>,    <var>2.65f</var>,    <var>1.66f</var></td></tr>
+<tr><th id="593">593</th><td>   },{ <var>5.951f</var>,   <var>0.5016f</var>, <var>196.1f</var>,    <var>2.662f</var>,   <var>1.589f</var></td></tr>
+<tr><th id="594">594</th><td>   },{ <var>7.495f</var>,   <var>0.4523f</var>, <var>251.4f</var>,    <var>3.433f</var>,   <var>0.8619f</var></td></tr>
+<tr><th id="595">595</th><td>   },{ <var>6.335f</var>,   <var>0.4825f</var>, <var>255.1f</var>,    <var>2.834f</var>,   <var>0.8228f</var></td></tr>
+<tr><th id="596">596</th><td>   },{ <var>4.314f</var>,   <var>0.5558f</var>, <var>214.8f</var>,    <var>2.354f</var>,   <var>1.263f</var></td></tr>
+<tr><th id="597">597</th><td>   },{ <var>4.02f</var>,    <var>0.5681f</var>, <var>219.9f</var>,    <var>2.402f</var>,   <var>1.191f</var></td></tr>
+<tr><th id="598">598</th><td>   },{ <var>3.836f</var>,   <var>0.5765f</var>, <var>210.2f</var>,    <var>2.742f</var>,   <var>1.305f</var></td></tr>
+<tr><th id="599">599</th><td>   },{ <var>4.68f</var>,    <var>0.5247f</var>, <var>244.7f</var>,    <var>2.749f</var>,   <var>0.8962f</var></td></tr>
+<tr><th id="600">600</th><td>   },{ <var>2.892f</var>,   <var>0.6204f</var>, <var>208.6f</var>,    <var>2.415f</var>,   <var>1.416f</var> <i>//Au Z77</i></td></tr>
+<tr><th id="601">601</th><td>       <i>// },{ 3.223f,   0.5883f, 232.7f,   2.954f,    1.05  //Au ICRU</i></td></tr>
+<tr><th id="602">602</th><td>   },{ <var>2.892f</var>,   <var>0.6204f</var>, <var>208.6f</var>,    <var>2.415f</var>,   <var>1.416f</var></td></tr>
+<tr><th id="603">603</th><td>       <i>// Z= 81-90</i></td></tr>
+<tr><th id="604">604</th><td>   },{ <var>4.728f</var>,   <var>0.5522f</var>, <var>217.0f</var>,    <var>3.091f</var>,   <var>1.386f</var></td></tr>
+<tr><th id="605">605</th><td>   },{ <var>6.18f</var>,    <var>0.52f</var>,   <var>170.0f</var>,    <var>4.0f</var>,     <var>3.224f</var></td></tr>
+<tr><th id="606">606</th><td>   },{ <var>9.0f</var>,     <var>0.47f</var>,   <var>198.0f</var>,    <var>3.8f</var>,     <var>2.032f</var></td></tr>
+<tr><th id="607">607</th><td>   },{ <var>2.324f</var>,   <var>0.6997f</var>, <var>216.0f</var>,    <var>1.599f</var>,   <var>1.399f</var></td></tr>
+<tr><th id="608">608</th><td>   },{ <var>1.961f</var>,   <var>0.7286f</var>, <var>223.0f</var>,    <var>1.621f</var>,   <var>1.296f</var></td></tr>
+<tr><th id="609">609</th><td>   },{ <var>1.75f</var>,    <var>0.7427f</var>, <var>350.1f</var>,    <var>0.9789f</var>,  <var>0.5507f</var></td></tr>
+<tr><th id="610">610</th><td>   },{ <var>10.31f</var>,   <var>0.4613f</var>, <var>261.2f</var>,    <var>4.738f</var>,   <var>0.9899f</var></td></tr>
+<tr><th id="611">611</th><td>   },{ <var>7.962f</var>,   <var>0.519f</var>,  <var>235.7f</var>,    <var>4.347f</var>,   <var>1.313f</var></td></tr>
+<tr><th id="612">612</th><td>   },{ <var>6.227f</var>,   <var>0.5645f</var>, <var>231.9f</var>,    <var>3.961f</var>,   <var>1.379f</var></td></tr>
+<tr><th id="613">613</th><td>   },{ <var>5.246f</var>,   <var>0.5947f</var>, <var>228.6f</var>,    <var>4.027f</var>,   <var>1.432f</var></td></tr>
+<tr><th id="614">614</th><td>       <i>// Z= 91-92</i></td></tr>
+<tr><th id="615">615</th><td>   },{ <var>5.408f</var>,   <var>0.5811f</var>, <var>235.7f</var>,    <var>3.961f</var>,   <var>1.358f</var></td></tr>
+<tr><th id="616">616</th><td>   },{ <var>5.218f</var>,   <var>0.5828f</var>, <var>245.0f</var>,    <var>3.838f</var>,   <var>1.25f</var>}</td></tr>
+<tr><th id="617">617</th><td>  };</td></tr>
+<tr><th id="618">618</th><td></td></tr>
+<tr><th id="619">619</th><td>  G4double slow = (G4double)(a[i][<var>0</var>]);</td></tr>
+<tr><th id="620">620</th><td></td></tr>
+<tr><th id="621">621</th><td>  G4double x1 = (G4double)(a[i][<var>1</var>]);</td></tr>
+<tr><th id="622">622</th><td>  G4double x2 = (G4double)(a[i][<var>2</var>]);</td></tr>
+<tr><th id="623">623</th><td>  G4double x3 = (G4double)(a[i][<var>3</var>]);</td></tr>
+<tr><th id="624">624</th><td>  G4double x4 = (G4double)(a[i][<var>4</var>]);</td></tr>
+<tr><th id="625">625</th><td></td></tr>
+<tr><th id="626">626</th><td>  <i>// Free electron gas model</i></td></tr>
+<tr><th id="627">627</th><td>  <b>if</b> ( T &lt; <var>0.001</var> ) {</td></tr>
+<tr><th id="628">628</th><td>    G4double shigh = G4Log( <var>1.0</var> + x3*<var>1000.0</var> + x4*<var>0.001</var> )* x2*<var>1000.0</var>;</td></tr>
+<tr><th id="629">629</th><td>    ionloss  = slow*shigh*sqrt(T*<var>1000.0</var>)  / (slow + shigh) ;</td></tr>
+<tr><th id="630">630</th><td></td></tr>
+<tr><th id="631">631</th><td>  <i>// Main parametrisation</i></td></tr>
+<tr><th id="632">632</th><td>  } <b>else</b> {</td></tr>
+<tr><th id="633">633</th><td>    slow  *= G4Exp(G4Log(T*<var>1000.0</var>)*x1);</td></tr>
+<tr><th id="634">634</th><td>    G4double shigh = G4Log( <var>1.0</var> + x3/T + x4*T ) * x2/T;</td></tr>
+<tr><th id="635">635</th><td>    ionloss = slow*shigh / (slow + shigh) ;</td></tr>
+<tr><th id="636">636</th><td>    <i>/*</i></td></tr>
+<tr><th id="637">637</th><td><i>    G4cout &lt;&lt; "## " &lt;&lt; i &lt;&lt; ". T= " &lt;&lt; T &lt;&lt; " slow= " &lt;&lt; slow</i></td></tr>
+<tr><th id="638">638</th><td><i>           &lt;&lt; " a0= " &lt;&lt; a[i][0] &lt;&lt; " a1= " &lt;&lt; a[i][1] </i></td></tr>
+<tr><th id="639">639</th><td><i>           &lt;&lt; " shigh= " &lt;&lt; shigh </i></td></tr>
+<tr><th id="640">640</th><td><i>           &lt;&lt; " dedx= " &lt;&lt; ionloss &lt;&lt; " q^2= " &lt;&lt;  HeEffChargeSquare(z, T*MeV) </i></td></tr>
+<tr><th id="641">641</th><td><i>           &lt;&lt; G4endl;</i></td></tr>
+<tr><th id="642">642</th><td><i>    */</i></td></tr>
+<tr><th id="643">643</th><td>  }</td></tr>
+<tr><th id="644">644</th><td>  ionloss = std::max(ionloss, <var>0.0</var>);</td></tr>
+<tr><th id="645">645</th><td></td></tr>
+<tr><th id="646">646</th><td>  <i>// He effective charge</i></td></tr>
+<tr><th id="647">647</th><td>  ionloss /= HeEffChargeSquare(z, T);</td></tr>
+<tr><th id="648">648</th><td></td></tr>
+<tr><th id="649">649</th><td>  <b>return</b> ionloss;</td></tr>
+<tr><th id="650">650</th><td>}</td></tr>
+<tr><th id="651">651</th><td></td></tr>
+<tr><th id="652">652</th><td><i>//....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......</i></td></tr>
+<tr><th id="653">653</th><td></td></tr>
+<tr><th id="654">654</th><td>G4double G4BraggIonModel::DEDX(<em>const</em> G4Material* material,</td></tr>
+<tr><th id="655">655</th><td>                               G4double kineticEnergy)</td></tr>
+<tr><th id="656">656</th><td>{</td></tr>
+<tr><th id="657">657</th><td>  G4double eloss = <var>0.0</var>;</td></tr>
+<tr><th id="658">658</th><td>  <i>// check DB</i></td></tr>
+<tr><th id="659">659</th><td>  <b>if</b>(material != currentMaterial) {</td></tr>
+<tr><th id="660">660</th><td>    currentMaterial = material;</td></tr>
+<tr><th id="661">661</th><td>    baseMaterial = material-&gt;GetBaseMaterial() </td></tr>
+<tr><th id="662">662</th><td>      ? material-&gt;GetBaseMaterial() : material;</td></tr>
+<tr><th id="663">663</th><td>    iASTAR    = -<var>1</var>;</td></tr>
+<tr><th id="664">664</th><td>    iMolecula = -<var>1</var>;</td></tr>
+<tr><th id="665">665</th><td>    iICRU90 = fICRU90 ? fICRU90-&gt;GetIndex(baseMaterial) : -<var>1</var>;</td></tr>
+<tr><th id="666">666</th><td>    </td></tr>
+<tr><th id="667">667</th><td>    <b>if</b>(iICRU90 &lt; <var>0</var>) { </td></tr>
+<tr><th id="668">668</th><td>      iASTAR = fASTAR-&gt;GetIndex(baseMaterial); </td></tr>
+<tr><th id="669">669</th><td>      <b>if</b>(iASTAR &lt; <var>0</var>) { HasMaterial(baseMaterial); }</td></tr>
+<tr><th id="670">670</th><td>    }</td></tr>
+<tr><th id="671">671</th><td>    <i>//G4cout &lt;&lt; "%%% " &lt;&lt;material-&gt;GetName() &lt;&lt; "  iMolecula= " </i></td></tr>
+<tr><th id="672">672</th><td><i>    //       &lt;&lt; iMolecula &lt;&lt; "  iPSTAR= " &lt;&lt; iPSTAR </i></td></tr>
+<tr><th id="673">673</th><td><i>    //       &lt;&lt; "  iICRU90= " &lt;&lt; iICRU90&lt;&lt; G4endl; </i></td></tr>
+<tr><th id="674">674</th><td>  }</td></tr>
+<tr><th id="675">675</th><td>  <b>if</b>(iICRU90 &gt;= <var>0</var>) {</td></tr>
+<tr><th id="676">676</th><td>    <b>return</b> fICRU90-&gt;GetElectronicDEDXforAlpha(iICRU90, kineticEnergy)</td></tr>
+<tr><th id="677">677</th><td>      *material-&gt;GetDensity()/chargeSquare;</td></tr>
+<tr><th id="678">678</th><td>  }</td></tr>
+<tr><th id="679">679</th><td>  <b>if</b>( iASTAR &gt;= <var>0</var> ) {</td></tr>
+<tr><th id="680">680</th><td>    G4double T = kineticEnergy*rateMassHe2p;</td></tr>
+<tr><th id="681">681</th><td>    G4int zeff = G4lrint(material-&gt;GetTotNbOfElectPerVolume()/</td></tr>
+<tr><th id="682">682</th><td>                         material-&gt;GetTotNbOfAtomsPerVolume());</td></tr>
+<tr><th id="683">683</th><td>    <b>return</b> fASTAR-&gt;GetElectronicDEDX(iASTAR, T)*material-&gt;GetDensity()/</td></tr>
+<tr><th id="684">684</th><td>      HeEffChargeSquare(zeff, T/MeV);</td></tr>
+<tr><th id="685">685</th><td>  }</td></tr>
+<tr><th id="686">686</th><td></td></tr>
+<tr><th id="687">687</th><td>  <em>const</em> G4int numberOfElements = material-&gt;GetNumberOfElements();</td></tr>
+<tr><th id="688">688</th><td>  <em>const</em> G4double* theAtomicNumDensityVector =</td></tr>
+<tr><th id="689">689</th><td>                                 material-&gt;GetAtomicNumDensityVector();</td></tr>
+<tr><th id="690">690</th><td></td></tr>
+<tr><th id="691">691</th><td>  <b>if</b>(iMolecula &gt;= <var>0</var>) {</td></tr>
+<tr><th id="692">692</th><td></td></tr>
+<tr><th id="693">693</th><td>    eloss = StoppingPower(baseMaterial, kineticEnergy)*</td></tr>
+<tr><th id="694">694</th><td>      material-&gt;GetDensity()/amu;</td></tr>
+<tr><th id="695">695</th><td></td></tr>
+<tr><th id="696">696</th><td>    <i>// pure material</i></td></tr>
+<tr><th id="697">697</th><td>  } <b>else</b> <b>if</b>(<var>1</var> == numberOfElements) {</td></tr>
+<tr><th id="698">698</th><td></td></tr>
+<tr><th id="699">699</th><td>    G4double z = material-&gt;GetZ();</td></tr>
+<tr><th id="700">700</th><td>    eloss = ElectronicStoppingPower(z, kineticEnergy)</td></tr>
+<tr><th id="701">701</th><td>                               * (material-&gt;GetTotNbOfAtomsPerVolume());</td></tr>
+<tr><th id="702">702</th><td></td></tr>
+<tr><th id="703">703</th><td>  <i>// Brugg's rule calculation</i></td></tr>
+<tr><th id="704">704</th><td>  } <b>else</b> {</td></tr>
+<tr><th id="705">705</th><td>    <em>const</em> G4ElementVector* theElementVector =</td></tr>
+<tr><th id="706">706</th><td>                           material-&gt;GetElementVector() ;</td></tr>
+<tr><th id="707">707</th><td></td></tr>
+<tr><th id="708">708</th><td>    <i>//  loop for the elements in the material</i></td></tr>
+<tr><th id="709">709</th><td>    <b>for</b> (G4int i=<var>0</var>; i&lt;numberOfElements; i++)</td></tr>
+<tr><th id="710">710</th><td>    {</td></tr>
+<tr><th id="711">711</th><td>      <em>const</em> G4Element* element = (*theElementVector)[i] ;</td></tr>
+<tr><th id="712">712</th><td>      eloss   += ElectronicStoppingPower(element-&gt;GetZ(), kineticEnergy)</td></tr>
+<tr><th id="713">713</th><td>                                   * theAtomicNumDensityVector[i];</td></tr>
+<tr><th id="714">714</th><td>    }</td></tr>
+<tr><th id="715">715</th><td>  }</td></tr>
+<tr><th id="716">716</th><td>  <b>return</b> eloss*theZieglerFactor;</td></tr>
+<tr><th id="717">717</th><td>}</td></tr>
+<tr><th id="718">718</th><td></td></tr>
+<tr><th id="719">719</th><td><i>//....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......</i></td></tr>
+<tr><th id="720">720</th><td></td></tr>
+<tr><th id="721">721</th><td>G4double G4BraggIonModel::HeEffChargeSquare(G4double z, </td></tr>
+<tr><th id="722">722</th><td>                                            G4double kinEnergyHeInMeV) <em>const</em></td></tr>
+<tr><th id="723">723</th><td>{</td></tr>
+<tr><th id="724">724</th><td>  <i>// The aproximation of He effective charge from:</i></td></tr>
+<tr><th id="725">725</th><td><i>  // J.F.Ziegler, J.P. Biersack, U. Littmark</i></td></tr>
+<tr><th id="726">726</th><td><i>  // The Stopping and Range of Ions in Matter,</i></td></tr>
+<tr><th id="727">727</th><td><i>  // Vol.1, Pergamon Press, 1985</i></td></tr>
+<tr><th id="728">728</th><td></td></tr>
+<tr><th id="729">729</th><td>  <em>static</em> <em>const</em> G4double c[<var>6</var>] = {<var>0.2865</var>,  <var>0.1266</var>, -<var>0.001429</var>,</td></tr>
+<tr><th id="730">730</th><td>                                <var>0.02402</var>,-<var>0.01135</var>, <var>0.001475</var>};</td></tr>
+<tr><th id="731">731</th><td></td></tr>
+<tr><th id="732">732</th><td>  G4double e = std::max(<var>0.0</var>, G4Log(kinEnergyHeInMeV*massFactor));</td></tr>
+<tr><th id="733">733</th><td>  G4double x = c[<var>0</var>] ;</td></tr>
+<tr><th id="734">734</th><td>  G4double y = <var>1.0</var> ;</td></tr>
+<tr><th id="735">735</th><td>  <b>for</b> (G4int i=<var>1</var>; i&lt;<var>6</var>; ++i) {</td></tr>
+<tr><th id="736">736</th><td>    y *= e;</td></tr>
+<tr><th id="737">737</th><td>    x += y * c[i];</td></tr>
+<tr><th id="738">738</th><td>  }</td></tr>
+<tr><th id="739">739</th><td></td></tr>
+<tr><th id="740">740</th><td>  G4double w = <var>7.6</var> -  e ;</td></tr>
+<tr><th id="741">741</th><td>  w = <var>1.0</var> + (<var>0.007</var> + <var>0.00005</var>*z) * G4Exp( -w*w ) ;</td></tr>
+<tr><th id="742">742</th><td>  w = <var>4.0</var> * (<var>1.0</var> - G4Exp(-x)) * w * w ;</td></tr>
+<tr><th id="743">743</th><td></td></tr>
+<tr><th id="744">744</th><td>  <b>return</b> w;</td></tr>
+<tr><th id="745">745</th><td>}</td></tr>
+<tr><th id="746">746</th><td></td></tr>
+<tr><th id="747">747</th><td><i>//....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......</i></td></tr>
+<tr><th id="748">748</th><td></td></tr>
+<tr><th id="749">749</th><td></td></tr>
+</table><hr/><p id='footer'>
+Generated on <em>2019-Aug-28</em> from project codebrowser<br />Powered by <a href='https://woboq.com'><img alt='Woboq' src='https://code.woboq.org/woboq-16.png' width='41' height='16' /></a> <a href='https://code.woboq.org'>Code Browser</a> 2.1
+<br/>Generator usage only permitted with license.</p>
+</div></body></html>

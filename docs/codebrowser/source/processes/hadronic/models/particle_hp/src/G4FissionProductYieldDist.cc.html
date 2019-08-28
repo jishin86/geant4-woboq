@@ -1,0 +1,1564 @@
+<!doctype html>
+<html>
+<head>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"><title>G4FissionProductYieldDist.cc source code [codebrowser/source/processes/hadronic/models/particle_hp/src/G4FissionProductYieldDist.cc] - Woboq Code Browser</title>
+<link rel="stylesheet" href="../../../../../../../../data/qtcreator.css" title="QtCreator"/>
+<link rel="alternate stylesheet" href="../../../../../../../../data/kdevelop.css" title="KDevelop"/>
+<script type="text/javascript" src="../../../../../../../../data/jquery/jquery.min.js"></script>
+<script type="text/javascript" src="../../../../../../../../data/jquery/jquery-ui.min.js"></script>
+<script>var file = 'codebrowser/source/processes/hadronic/models/particle_hp/src/G4FissionProductYieldDist.cc'; var root_path = '../../../../../../..'; var data_path = '../../../../../../../../data';</script>
+<script src='../../../../../../../../data/codebrowser.js'></script>
+</head>
+<body><div id='header'><h1 id='breadcrumb'><span>Browse the source code of </span><a href='../../../../../..'>codebrowser</a>/<a href='../../../../..'>source</a>/<a href='../../../..'>processes</a>/<a href='../../..'>hadronic</a>/<a href='../..'>models</a>/<a href='..'>particle_hp</a>/<a href='./'>src</a>/<a href='G4FissionProductYieldDist.cc.html'>G4FissionProductYieldDist.cc</a></h1></div>
+<hr/><div id='content'><table class="code">
+<tr><th id="1">1</th><td><i>//</i></td></tr>
+<tr><th id="2">2</th><td><i>// ********************************************************************</i></td></tr>
+<tr><th id="3">3</th><td><i>// * License and Disclaimer                                           *</i></td></tr>
+<tr><th id="4">4</th><td><i>// *                                                                  *</i></td></tr>
+<tr><th id="5">5</th><td><i>// * The  Geant4 software  is  copyright of the Copyright Holders  of *</i></td></tr>
+<tr><th id="6">6</th><td><i>// * the Geant4 Collaboration.  It is provided  under  the terms  and *</i></td></tr>
+<tr><th id="7">7</th><td><i>// * conditions of the Geant4 Software License,  included in the file *</i></td></tr>
+<tr><th id="8">8</th><td><i>// * LICENSE and available at  <a href="http://cern.ch/geant4/license">http://cern.ch/geant4/license</a> .  These *</i></td></tr>
+<tr><th id="9">9</th><td><i>// * include a list of copyright holders.                             *</i></td></tr>
+<tr><th id="10">10</th><td><i>// *                                                                  *</i></td></tr>
+<tr><th id="11">11</th><td><i>// * Neither the authors of this software system, nor their employing *</i></td></tr>
+<tr><th id="12">12</th><td><i>// * institutes,nor the agencies providing financial support for this *</i></td></tr>
+<tr><th id="13">13</th><td><i>// * work  make  any representation or  warranty, express or implied, *</i></td></tr>
+<tr><th id="14">14</th><td><i>// * regarding  this  software system or assume any liability for its *</i></td></tr>
+<tr><th id="15">15</th><td><i>// * use.  Please see the license in the file  LICENSE  and URL above *</i></td></tr>
+<tr><th id="16">16</th><td><i>// * for the full disclaimer and the limitation of liability.         *</i></td></tr>
+<tr><th id="17">17</th><td><i>// *                                                                  *</i></td></tr>
+<tr><th id="18">18</th><td><i>// * This  code  implementation is the result of  the  scientific and *</i></td></tr>
+<tr><th id="19">19</th><td><i>// * technical work of the GEANT4 collaboration.                      *</i></td></tr>
+<tr><th id="20">20</th><td><i>// * By using,  copying,  modifying or  distributing the software (or *</i></td></tr>
+<tr><th id="21">21</th><td><i>// * any work based  on the software)  you  agree  to acknowledge its *</i></td></tr>
+<tr><th id="22">22</th><td><i>// * use  in  resulting  scientific  publications,  and indicate your *</i></td></tr>
+<tr><th id="23">23</th><td><i>// * acceptance of all terms of the Geant4 Software license.          *</i></td></tr>
+<tr><th id="24">24</th><td><i>// ********************************************************************</i></td></tr>
+<tr><th id="25">25</th><td><i>//</i></td></tr>
+<tr><th id="26">26</th><td><i>/*</i></td></tr>
+<tr><th id="27">27</th><td><i> * File:   G4FissionProductYieldDist.cc</i></td></tr>
+<tr><th id="28">28</th><td><i> * Author: B. Wendt (wendbryc@isu.edu)</i></td></tr>
+<tr><th id="29">29</th><td><i> *</i></td></tr>
+<tr><th id="30">30</th><td><i> * Created on May 11, 2011, 12:04 PM</i></td></tr>
+<tr><th id="31">31</th><td><i> */</i></td></tr>
+<tr><th id="32">32</th><td></td></tr>
+<tr><th id="33">33</th><td><i>/* * * * * * * * * * * * * * * *   References   * * * * * * * * * * * * * * * *</i></td></tr>
+<tr><th id="34">34</th><td><i> *                                                                            *</i></td></tr>
+<tr><th id="35">35</th><td><i> *  1.  "Systematics of fission fragment total kinetic energy release",       *</i></td></tr>
+<tr><th id="36">36</th><td><i> *      V. E. Viola, K. Kwiatkowski, and M. Walker, Physical Review C, 31.4,  *</i></td></tr>
+<tr><th id="37">37</th><td><i> *      April 1985                                                            *</i></td></tr>
+<tr><th id="38">38</th><td><i> *  2.  "Reactor Handbook", United States Atomic Energy Commission,           *</i></td></tr>
+<tr><th id="39">39</th><td><i> *      III.A:Physics, 1962                                                   *</i></td></tr>
+<tr><th id="40">40</th><td><i> *  3.  "Properties of the Alpha Particles Emitted in the Spontaneous Fission *</i></td></tr>
+<tr><th id="41">41</th><td><i> *      of Cf252", Z. Fraenkel and S. G. Thompson, Physical Review Letters,   *</i></td></tr>
+<tr><th id="42">42</th><td><i> *      13.14, October 1964                                                   *</i></td></tr>
+<tr><th id="43">43</th><td><i> *                                                                            *</i></td></tr>
+<tr><th id="44">44</th><td><i> * * * * * * * * * * * * * * * *   References   * * * * * * * * * * * * * * * */</i></td></tr>
+<tr><th id="45">45</th><td><i></i></td></tr>
+<tr><th id="46">46</th><td><i></i></td></tr>
+<tr><th id="47">47</th><td><i>//#include &lt;ios&gt;</i></td></tr>
+<tr><th id="48">48</th><td><i>//#include &lt;iostream&gt;</i></td></tr>
+<tr><th id="49">49</th><td></td></tr>
+<tr><th id="50">50</th><td><u>#include <a href="../../../../../particles/hadrons/ions/include/G4Alpha.hh.html">"G4Alpha.hh"</a></u></td></tr>
+<tr><th id="51">51</th><td><u>#include <a href="../../../../../particles/bosons/include/G4Gamma.hh.html">"G4Gamma.hh"</a></u></td></tr>
+<tr><th id="52">52</th><td><u>#include <a href="../../../../../particles/management/include/G4Ions.hh.html">"G4Ions.hh"</a></u></td></tr>
+<tr><th id="53">53</th><td><u>#include <a href="../../../../../particles/hadrons/barions/include/G4Neutron.hh.html">"G4Neutron.hh"</a></u></td></tr>
+<tr><th id="54">54</th><td><i>//#include "G4NeutronHPNames.hh"</i></td></tr>
+<tr><th id="55">55</th><td><u>#include <a href="../../../../../particles/management/include/G4NucleiProperties.hh.html">"G4NucleiProperties.hh"</a></u></td></tr>
+<tr><th id="56">56</th><td><u>#include <a href="../../../../../particles/management/include/G4ParticleTable.hh.html">"G4ParticleTable.hh"</a></u></td></tr>
+<tr><th id="57">57</th><td><u>#include <a href="../../../../../global/management/include/G4ThreeVector.hh.html">"G4ThreeVector.hh"</a></u></td></tr>
+<tr><th id="58">58</th><td><u>#include <a href="../../../../../global/HEPRandom/include/Randomize.hh.html">"Randomize.hh"</a></u></td></tr>
+<tr><th id="59">59</th><td><u>#include <a href="../../../../../intercoms/include/G4UImanager.hh.html">"G4UImanager.hh"</a></u></td></tr>
+<tr><th id="60">60</th><td><u>#include <a href="../../../../../global/management/include/globals.hh.html">"globals.hh"</a></u></td></tr>
+<tr><th id="61">61</th><td><u>#include <a href="../../../../../global/management/include/G4Exp.hh.html">"G4Exp.hh"</a></u></td></tr>
+<tr><th id="62">62</th><td><u>#include <a href="../../../../../global/management/include/G4SystemOfUnits.hh.html">"G4SystemOfUnits.hh"</a></u></td></tr>
+<tr><th id="63">63</th><td><u>#include <a href="../../../util/include/G4HadFinalState.hh.html">"G4HadFinalState.hh"</a></u></td></tr>
+<tr><th id="64">64</th><td><u>#include <a href="../../../../../particles/management/include/G4DynamicParticle.hh.html">"G4DynamicParticle.hh"</a></u></td></tr>
+<tr><th id="65">65</th><td><u>#include <a href="../../../util/include/G4DynamicParticleVector.hh.html">"G4DynamicParticleVector.hh"</a></u></td></tr>
+<tr><th id="66">66</th><td><u>#include <a href="../../../util/include/G4ReactionProduct.hh.html">"G4ReactionProduct.hh"</a></u></td></tr>
+<tr><th id="67">67</th><td></td></tr>
+<tr><th id="68">68</th><td><u>#include <a href="../include/G4ArrayOps.hh.html">"G4ArrayOps.hh"</a></u></td></tr>
+<tr><th id="69">69</th><td><u>#include <a href="../include/G4ENDFTapeRead.hh.html">"G4ENDFTapeRead.hh"</a></u></td></tr>
+<tr><th id="70">70</th><td><u>#include <a href="../include/G4ENDFYieldDataContainer.hh.html">"G4ENDFYieldDataContainer.hh"</a></u></td></tr>
+<tr><th id="71">71</th><td><u>#include <a href="../include/G4FFGDebuggingMacros.hh.html">"G4FFGDebuggingMacros.hh"</a></u></td></tr>
+<tr><th id="72">72</th><td><u>#include <a href="../include/G4FFGDefaultValues.hh.html">"G4FFGDefaultValues.hh"</a></u></td></tr>
+<tr><th id="73">73</th><td><u>#include <a href="../include/G4FFGEnumerations.hh.html">"G4FFGEnumerations.hh"</a></u></td></tr>
+<tr><th id="74">74</th><td><u>#include <a href="../include/G4FPYNubarValues.hh.html">"G4FPYNubarValues.hh"</a></u></td></tr>
+<tr><th id="75">75</th><td><u>#include <a href="../include/G4FPYSamplingOps.hh.html">"G4FPYSamplingOps.hh"</a></u></td></tr>
+<tr><th id="76">76</th><td><u>#include <a href="../include/G4FPYTreeStructures.hh.html">"G4FPYTreeStructures.hh"</a></u></td></tr>
+<tr><th id="77">77</th><td><u>#include <a href="../include/G4FissionProductYieldDist.hh.html">"G4FissionProductYieldDist.hh"</a></u></td></tr>
+<tr><th id="78">78</th><td><u>#include <a href="../../../../../global/management/include/G4Pow.hh.html">"G4Pow.hh"</a></u></td></tr>
+<tr><th id="79">79</th><td></td></tr>
+<tr><th id="80">80</th><td><b>using</b> <span class="namespace">CLHEP::</span>pi;</td></tr>
+<tr><th id="81">81</th><td></td></tr>
+<tr><th id="82">82</th><td>G4FissionProductYieldDist::</td></tr>
+<tr><th id="83">83</th><td>G4FissionProductYieldDist( G4int WhichIsotope,</td></tr>
+<tr><th id="84">84</th><td>                           G4FFGEnumerations::MetaState WhichMetaState,</td></tr>
+<tr><th id="85">85</th><td>                           G4FFGEnumerations::FissionCause WhichCause,</td></tr>
+<tr><th id="86">86</th><td>                           G4FFGEnumerations::YieldType WhichYieldType,</td></tr>
+<tr><th id="87">87</th><td>                           <span class='error' title="use of undeclared identifier &apos;std&apos;">std</span>::istringstream&amp; dataStream )</td></tr>
+<tr><th id="88">88</th><td>:   Isotope_(WhichIsotope),</td></tr>
+<tr><th id="89">89</th><td>    MetaState_(WhichMetaState),</td></tr>
+<tr><th id="90">90</th><td>    Cause_(WhichCause),</td></tr>
+<tr><th id="91">91</th><td>    YieldType_(WhichYieldType),</td></tr>
+<tr><th id="92">92</th><td>    Verbosity_(G4FFGDefaultValues::Verbosity)</td></tr>
+<tr><th id="93">93</th><td>{</td></tr>
+<tr><th id="94">94</th><td>    <a class="macro" href="../include/G4FFGDebuggingMacros.hh.html#215" title="G4FFG_DEPTH++;" data-ref="_M/G4FFG_FUNCTIONENTER__">G4FFG_FUNCTIONENTER__</a></td></tr>
+<tr><th id="95">95</th><td></td></tr>
+<tr><th id="96">96</th><td>    <b>try</b></td></tr>
+<tr><th id="97">97</th><td>    {</td></tr>
+<tr><th id="98">98</th><td>        <i>// Initialize the class</i></td></tr>
+<tr><th id="99">99</th><td>        Initialize(dataStream);</td></tr>
+<tr><th id="100">100</th><td>    } <b>catch</b> (<span class='error' title="use of undeclared identifier &apos;std&apos;">std</span>::exception&amp; e)</td></tr>
+<tr><th id="101">101</th><td>    {</td></tr>
+<tr><th id="102">102</th><td>        <a class="macro" href="../include/G4FFGDebuggingMacros.hh.html#219" title="G4FFG_DEPTH--;" data-ref="_M/G4FFG_FUNCTIONLEAVE__">G4FFG_FUNCTIONLEAVE__</a></td></tr>
+<tr><th id="103">103</th><td>        <b>throw</b> e;</td></tr>
+<tr><th id="104">104</th><td>    }</td></tr>
+<tr><th id="105">105</th><td></td></tr>
+<tr><th id="106">106</th><td>    <a class="macro" href="../include/G4FFGDebuggingMacros.hh.html#219" title="G4FFG_DEPTH--;" data-ref="_M/G4FFG_FUNCTIONLEAVE__">G4FFG_FUNCTIONLEAVE__</a></td></tr>
+<tr><th id="107">107</th><td>}</td></tr>
+<tr><th id="108">108</th><td></td></tr>
+<tr><th id="109">109</th><td>G4FissionProductYieldDist::</td></tr>
+<tr><th id="110">110</th><td>G4FissionProductYieldDist( G4int WhichIsotope,</td></tr>
+<tr><th id="111">111</th><td>                           G4FFGEnumerations::MetaState WhichMetaState,</td></tr>
+<tr><th id="112">112</th><td>                           G4FFGEnumerations::FissionCause WhichCause,</td></tr>
+<tr><th id="113">113</th><td>                           G4FFGEnumerations::YieldType WhichYieldType,</td></tr>
+<tr><th id="114">114</th><td>                           G4int Verbosity,</td></tr>
+<tr><th id="115">115</th><td>                           <span class='error' title="use of undeclared identifier &apos;std&apos;">std</span>::istringstream&amp; dataStream)</td></tr>
+<tr><th id="116">116</th><td>:   Isotope_(WhichIsotope),</td></tr>
+<tr><th id="117">117</th><td>    MetaState_(WhichMetaState),</td></tr>
+<tr><th id="118">118</th><td>    Cause_(WhichCause),</td></tr>
+<tr><th id="119">119</th><td>    YieldType_(WhichYieldType),</td></tr>
+<tr><th id="120">120</th><td>    Verbosity_(Verbosity)</td></tr>
+<tr><th id="121">121</th><td>{</td></tr>
+<tr><th id="122">122</th><td>    <a class="macro" href="../include/G4FFGDebuggingMacros.hh.html#215" title="G4FFG_DEPTH++;" data-ref="_M/G4FFG_FUNCTIONENTER__">G4FFG_FUNCTIONENTER__</a></td></tr>
+<tr><th id="123">123</th><td></td></tr>
+<tr><th id="124">124</th><td>    <b>try</b></td></tr>
+<tr><th id="125">125</th><td>    {</td></tr>
+<tr><th id="126">126</th><td>        <i>// Initialize the class</i></td></tr>
+<tr><th id="127">127</th><td>        Initialize(dataStream);</td></tr>
+<tr><th id="128">128</th><td>    } <b>catch</b> (<span class='error' title="use of undeclared identifier &apos;std&apos;">std</span>::exception&amp; e)</td></tr>
+<tr><th id="129">129</th><td>    {</td></tr>
+<tr><th id="130">130</th><td>        <a class="macro" href="../include/G4FFGDebuggingMacros.hh.html#219" title="G4FFG_DEPTH--;" data-ref="_M/G4FFG_FUNCTIONLEAVE__">G4FFG_FUNCTIONLEAVE__</a></td></tr>
+<tr><th id="131">131</th><td>        <b>throw</b> e;</td></tr>
+<tr><th id="132">132</th><td>    }</td></tr>
+<tr><th id="133">133</th><td></td></tr>
+<tr><th id="134">134</th><td>    <a class="macro" href="../include/G4FFGDebuggingMacros.hh.html#219" title="G4FFG_DEPTH--;" data-ref="_M/G4FFG_FUNCTIONLEAVE__">G4FFG_FUNCTIONLEAVE__</a></td></tr>
+<tr><th id="135">135</th><td>}</td></tr>
+<tr><th id="136">136</th><td></td></tr>
+<tr><th id="137">137</th><td><em>void</em> G4FissionProductYieldDist::</td></tr>
+<tr><th id="138">138</th><td>Initialize( <span class='error' title="use of undeclared identifier &apos;std&apos;">std</span>::istringstream&amp; dataStream )</td></tr>
+<tr><th id="139">139</th><td>{</td></tr>
+<tr><th id="140">140</th><td><a class="macro" href="../include/G4FFGDebuggingMacros.hh.html#215" title="G4FFG_DEPTH++;" data-ref="_M/G4FFG_FUNCTIONENTER__">G4FFG_FUNCTIONENTER__</a></td></tr>
+<tr><th id="141">141</th><td></td></tr>
+<tr><th id="142">142</th><td>    IncidentEnergy_ = <var>0.0</var>;</td></tr>
+<tr><th id="143">143</th><td>    TernaryProbability_ = <var>0</var>;</td></tr>
+<tr><th id="144">144</th><td>    AlphaProduction_ = <var>0</var>;</td></tr>
+<tr><th id="145">145</th><td>    SetNubar();</td></tr>
+<tr><th id="146">146</th><td></td></tr>
+<tr><th id="147">147</th><td>    <i>// Set miscellaneous variables</i></td></tr>
+<tr><th id="148">148</th><td>    AlphaDefinition_ = <b>reinterpret_cast</b>&lt;G4Ions*&gt;(G4Alpha::Definition());</td></tr>
+<tr><th id="149">149</th><td>    NeutronDefinition_ = <b>reinterpret_cast</b>&lt;G4Ions*&gt;(G4Neutron::Definition());</td></tr>
+<tr><th id="150">150</th><td>    GammaDefinition_ = G4Gamma::Definition();</td></tr>
+<tr><th id="151">151</th><td>    SmallestZ_ = SmallestA_ = LargestZ_ = LargestA_ = <span class='error' title="use of undeclared identifier &apos;NULL&apos;">NULL</span>;</td></tr>
+<tr><th id="152">152</th><td></td></tr>
+<tr><th id="153">153</th><td>    <i>// Construct G4NeutronHPNames: provides access to the element names</i></td></tr>
+<tr><th id="154">154</th><td>    ElementNames_ = <b>new</b> G4ParticleHPNames;</td></tr>
+<tr><th id="155">155</th><td>    <i>// Get the pointer to G4ParticleTable: stores all G4Ions</i></td></tr>
+<tr><th id="156">156</th><td>    IonTable_ = G4IonTable::GetIonTable();</td></tr>
+<tr><th id="157">157</th><td>    <i>// Construct the pointer to the random engine</i></td></tr>
+<tr><th id="158">158</th><td><i>    // TODO Make G4FPSamplingOps a singleton so that only one instance is used across all classes</i></td></tr>
+<tr><th id="159">159</th><td>    RandomEngine_ = <b>new</b> G4FPYSamplingOps;</td></tr>
+<tr><th id="160">160</th><td></td></tr>
+<tr><th id="161">161</th><td>    <b>try</b></td></tr>
+<tr><th id="162">162</th><td>    {</td></tr>
+<tr><th id="163">163</th><td>        <i>// Read in and sort the probability data</i></td></tr>
+<tr><th id="164">164</th><td>        ENDFData_ = <b>new</b> G4ENDFTapeRead(dataStream,</td></tr>
+<tr><th id="165">165</th><td>                                       YieldType_,</td></tr>
+<tr><th id="166">166</th><td>                                       Cause_,</td></tr>
+<tr><th id="167">167</th><td>                                       Verbosity_);</td></tr>
+<tr><th id="168">168</th><td><i>//        ENDFData_ = new G4ENDFTapeRead(MakeDirectoryName(),</i></td></tr>
+<tr><th id="169">169</th><td><i>//                                       MakeFileName(Isotope_, MetaState_),</i></td></tr>
+<tr><th id="170">170</th><td><i>//                                       YieldType_,</i></td></tr>
+<tr><th id="171">171</th><td><i>//                                       Cause_);</i></td></tr>
+<tr><th id="172">172</th><td>        YieldEnergyGroups_ = ENDFData_-&gt;G4GetNumberOfEnergyGroups();</td></tr>
+<tr><th id="173">173</th><td>        DataTotal_ = <b>new</b> G4double[YieldEnergyGroups_];</td></tr>
+<tr><th id="174">174</th><td>        MaintainNormalizedData_ = <b>new</b> G4double[YieldEnergyGroups_];</td></tr>
+<tr><th id="175">175</th><td>        YieldEnergies_ = <b>new</b> G4double[YieldEnergyGroups_];</td></tr>
+<tr><th id="176">176</th><td>        G4ArrayOps::Copy(YieldEnergyGroups_, YieldEnergies_, ENDFData_-&gt;G4GetEnergyGroupValues());</td></tr>
+<tr><th id="177">177</th><td>        MakeTrees();</td></tr>
+<tr><th id="178">178</th><td>        ReadProbabilities();</td></tr>
+<tr><th id="179">179</th><td>    } <b>catch</b> (<span class='error' title="use of undeclared identifier &apos;std&apos;">std</span>::exception&amp; e)</td></tr>
+<tr><th id="180">180</th><td>    {</td></tr>
+<tr><th id="181">181</th><td>        <b>delete</b> ElementNames_;</td></tr>
+<tr><th id="182">182</th><td>        <b>delete</b> RandomEngine_;</td></tr>
+<tr><th id="183">183</th><td></td></tr>
+<tr><th id="184">184</th><td>        <a class="macro" href="../include/G4FFGDebuggingMacros.hh.html#219" title="G4FFG_DEPTH--;" data-ref="_M/G4FFG_FUNCTIONLEAVE__">G4FFG_FUNCTIONLEAVE__</a></td></tr>
+<tr><th id="185">185</th><td>        <b>throw</b> e;</td></tr>
+<tr><th id="186">186</th><td>    }</td></tr>
+<tr><th id="187">187</th><td></td></tr>
+<tr><th id="188">188</th><td><a class="macro" href="../include/G4FFGDebuggingMacros.hh.html#219" title="G4FFG_DEPTH--;" data-ref="_M/G4FFG_FUNCTIONLEAVE__">G4FFG_FUNCTIONLEAVE__</a></td></tr>
+<tr><th id="189">189</th><td>}</td></tr>
+<tr><th id="190">190</th><td></td></tr>
+<tr><th id="191">191</th><td><span class='error' title="unknown type name &apos;G4DynamicParticleVector&apos;">G4DynamicParticleVector</span>* G4FissionProductYieldDist::</td></tr>
+<tr><th id="192">192</th><td>G4GetFission( <em>void</em> )</td></tr>
+<tr><th id="193">193</th><td>{</td></tr>
+<tr><th id="194">194</th><td><a class="macro" href="../include/G4FFGDebuggingMacros.hh.html#215" title="G4FFG_DEPTH++;" data-ref="_M/G4FFG_FUNCTIONENTER__">G4FFG_FUNCTIONENTER__</a></td></tr>
+<tr><th id="195">195</th><td></td></tr>
+<tr><th id="196">196</th><td>    <i>// Check to see if the user has set the alpha production to a somewhat</i></td></tr>
+<tr><th id="197">197</th><td><i>    // reasonable level</i></td></tr>
+<tr><th id="198">198</th><td>    CheckAlphaSanity();</td></tr>
+<tr><th id="199">199</th><td></td></tr>
+<tr><th id="200">200</th><td>    <i>// Generate the new G4DynamicParticle pointers to identify key locations in</i></td></tr>
+<tr><th id="201">201</th><td><i>    // the G4DynamicParticle chain that will be passed to the G4FissionEvent</i></td></tr>
+<tr><th id="202">202</th><td>	G4ReactionProduct* FirstDaughter = <span class='error' title="use of undeclared identifier &apos;NULL&apos;">NULL</span>;</td></tr>
+<tr><th id="203">203</th><td>	G4ReactionProduct* SecondDaughter = <span class='error' title="use of undeclared identifier &apos;NULL&apos;">NULL</span>;</td></tr>
+<tr><th id="204">204</th><td>    <span class='error' title="use of undeclared identifier &apos;std&apos;">std</span>::vector&lt; <span class='error' title="&apos;G4ReactionProduct&apos; does not refer to a value">G4ReactionProduct</span>* <span class='error' title="expected expression">&gt;</span>* <span class='error' title="use of undeclared identifier &apos;Alphas&apos;">Alphas</span> = <b>new</b> <span class='error' title="use of undeclared identifier &apos;std&apos;">std</span>::vector&lt; G4ReactionProduct* &gt;;</td></tr>
+<tr><th id="205">205</th><td>    <span class='error' title="use of undeclared identifier &apos;std&apos;">std</span>::vector&lt; <span class='error' title="&apos;G4ReactionProduct&apos; does not refer to a value">G4ReactionProduct</span>* <span class='error' title="expected expression">&gt;</span>* <span class='error' title="use of undeclared identifier &apos;Neutrons&apos;">Neutrons</span> = <b>new</b> <span class='error' title="use of undeclared identifier &apos;std&apos;">std</span>::vector&lt; G4ReactionProduct* &gt;;</td></tr>
+<tr><th id="206">206</th><td>    <span class='error' title="use of undeclared identifier &apos;std&apos;">std</span>::vector&lt; <span class='error' title="&apos;G4ReactionProduct&apos; does not refer to a value">G4ReactionProduct</span>* <span class='error' title="expected expression">&gt;</span>* <span class='error' title="use of undeclared identifier &apos;Gammas&apos;">Gammas</span> = <b>new</b> <span class='error' title="use of undeclared identifier &apos;std&apos;">std</span>::vector&lt; G4ReactionProduct* &gt;;</td></tr>
+<tr><th id="207">207</th><td></td></tr>
+<tr><th id="208">208</th><td>    <i>// Generate all the nucleonic fission products</i></td></tr>
+<tr><th id="209">209</th><td><i>        // How many nucleons do we have to work with?</i></td></tr>
+<tr><th id="210">210</th><td><i>        //TK modified 131108 </i></td></tr>
+<tr><th id="211">211</th><td><i>        //const G4int ParentA = Isotope_ % 1000;</i></td></tr>
+<tr><th id="212">212</th><td><i>        //const G4int ParentZ = (Isotope_ - ParentA) / 1000;</i></td></tr>
+<tr><th id="213">213</th><td>        <em>const</em> G4int ParentA = (Isotope_/<var>10</var>) % <var>1000</var>;</td></tr>
+<tr><th id="214">214</th><td>        <em>const</em> G4int ParentZ = ((Isotope_/<var>10</var>) - ParentA) / <var>1000</var>;</td></tr>
+<tr><th id="215">215</th><td>        RemainingA_ = ParentA;</td></tr>
+<tr><th id="216">216</th><td>        RemainingZ_ = ParentZ;</td></tr>
+<tr><th id="217">217</th><td></td></tr>
+<tr><th id="218">218</th><td>        <i>// Don't forget the extra nucleons depending on the fission cause</i></td></tr>
+<tr><th id="219">219</th><td>        <b>switch</b>(Cause_)</td></tr>
+<tr><th id="220">220</th><td>        {</td></tr>
+<tr><th id="221">221</th><td>        <b>case</b> G4FFGEnumerations::NEUTRON_INDUCED:</td></tr>
+<tr><th id="222">222</th><td>            ++RemainingA_;</td></tr>
+<tr><th id="223">223</th><td>            <b>break</b>;</td></tr>
+<tr><th id="224">224</th><td></td></tr>
+<tr><th id="225">225</th><td>        <b>case</b> G4FFGEnumerations::PROTON_INDUCED:</td></tr>
+<tr><th id="226">226</th><td>        	++RemainingZ_;</td></tr>
+<tr><th id="227">227</th><td>        	<b>break</b>;</td></tr>
+<tr><th id="228">228</th><td></td></tr>
+<tr><th id="229">229</th><td>        <b>case</b> G4FFGEnumerations::GAMMA_INDUCED:</td></tr>
+<tr><th id="230">230</th><td>        <b>case</b> G4FFGEnumerations::SPONTANEOUS:</td></tr>
+<tr><th id="231">231</th><td>        <b>default</b>:</td></tr>
+<tr><th id="232">232</th><td>        	<i>// Nothing to do here</i></td></tr>
+<tr><th id="233">233</th><td>        	<b>break</b>;</td></tr>
+<tr><th id="234">234</th><td>        }</td></tr>
+<tr><th id="235">235</th><td></td></tr>
+<tr><th id="236">236</th><td>        <i>// Ternary fission can be set by the user. Thus, it is necessary to</i></td></tr>
+<tr><th id="237">237</th><td><i>        // sample the alpha particle first and the first daughter product</i></td></tr>
+<tr><th id="238">238</th><td><i>        // second. See the discussion in</i></td></tr>
+<tr><th id="239">239</th><td><i>        // G4FissionProductYieldDist::G4GetFissionProduct() for more information</i></td></tr>
+<tr><th id="240">240</th><td><i>        // as to why the fission events are sampled this way.</i></td></tr>
+<tr><th id="241">241</th><td>        GenerateAlphas(<span class='error' title="use of undeclared identifier &apos;Alphas&apos;">Alphas</span>);</td></tr>
+<tr><th id="242">242</th><td></td></tr>
+<tr><th id="243">243</th><td>        <i>// Generate the first daughter product</i></td></tr>
+<tr><th id="244">244</th><td>        FirstDaughter = <b>new</b> G4ReactionProduct(GetFissionProduct());</td></tr>
+<tr><th id="245">245</th><td>        RemainingA_ -= FirstDaughter-&gt;GetDefinition()-&gt;GetAtomicMass();</td></tr>
+<tr><th id="246">246</th><td>        RemainingZ_ -= FirstDaughter-&gt;GetDefinition()-&gt;GetAtomicNumber();</td></tr>
+<tr><th id="247">247</th><td>        <b>if</b>(Verbosity_ &amp; G4FFGEnumerations::DAUGHTER_INFO)</td></tr>
+<tr><th id="248">248</th><td>        {</td></tr>
+<tr><th id="249">249</th><td>            <a class="macro" href="../include/G4FFGVerboseMacros.hh.html#50" title="for(G4int depth = 0; depth &lt; G4FFG_DEPTH; depth++) { (*_G4cout_p()) &lt;&lt; &quot;  &quot;; }" data-ref="_M/G4FFG_SPACING__">G4FFG_SPACING__</a></td></tr>
+<tr><th id="250">250</th><td>            <a class="macro" href="../include/G4FFGVerboseMacros.hh.html#44" title="G4String debugOutput(&quot;/home/jishin/app/geant4/1005p1/geant4.10.05.p01/source/processes/hadronic/models/particle_hp/src/G4FissionProductYieldDist.cc&quot;); debugOutput = debugOutput.substr(debugOutput.find_last_of(&apos;/&apos;) + 1); (*_G4cout_p()) &lt;&lt; G4String(__func__) + &quot;()&quot; &lt;&lt; &quot; at &quot; &lt;&lt; debugOutput &lt;&lt; &quot;:&quot; &lt;&lt; 250;" data-ref="_M/G4FFG_LOCATION__">G4FFG_LOCATION__</a></td></tr>
+<tr><th id="251">251</th><td>            </td></tr>
+<tr><th id="252">252</th><td>            <a class="macro" href="../../../../../global/management/include/G4ios.hh.html#46" title="(*_G4cout_p())" data-ref="_M/G4cout">G4cout</a> <span class='error' title="invalid operands to binary expression (&apos;int&apos; and &apos;const char *&apos;)">&lt;&lt;</span> <q>" -- First daughter product sampled"</q> &lt;&lt; <a class="macro" href="../../../../../global/management/include/G4ios.hh.html#60" title="std::endl" data-ref="_M/G4endl">G4endl</a>;</td></tr>
+<tr><th id="253">253</th><td>            <a class="macro" href="../include/G4FFGVerboseMacros.hh.html#50" title="for(G4int depth = 0; depth &lt; G4FFG_DEPTH; depth++) { (*_G4cout_p()) &lt;&lt; &quot;  &quot;; }" data-ref="_M/G4FFG_SPACING__">G4FFG_SPACING__</a></td></tr>
+<tr><th id="254">254</th><td>            <a class="macro" href="../../../../../global/management/include/G4ios.hh.html#46" title="(*_G4cout_p())" data-ref="_M/G4cout">G4cout</a> <span class='error' title="invalid operands to binary expression (&apos;int&apos; and &apos;const char *&apos;)">&lt;&lt;</span> <q>"  Name:       "</q> &lt;&lt; FirstDaughter-&gt;GetDefinition()-&gt;GetParticleName() &lt;&lt; <a class="macro" href="../../../../../global/management/include/G4ios.hh.html#60" title="std::endl" data-ref="_M/G4endl">G4endl</a>;</td></tr>
+<tr><th id="255">255</th><td>            <a class="macro" href="../include/G4FFGVerboseMacros.hh.html#50" title="for(G4int depth = 0; depth &lt; G4FFG_DEPTH; depth++) { (*_G4cout_p()) &lt;&lt; &quot;  &quot;; }" data-ref="_M/G4FFG_SPACING__">G4FFG_SPACING__</a></td></tr>
+<tr><th id="256">256</th><td>            <a class="macro" href="../../../../../global/management/include/G4ios.hh.html#46" title="(*_G4cout_p())" data-ref="_M/G4cout">G4cout</a> <span class='error' title="invalid operands to binary expression (&apos;int&apos; and &apos;const char *&apos;)">&lt;&lt;</span> <q>"  Z:          "</q> &lt;&lt; FirstDaughter-&gt;GetDefinition()-&gt;GetAtomicNumber() &lt;&lt; <a class="macro" href="../../../../../global/management/include/G4ios.hh.html#60" title="std::endl" data-ref="_M/G4endl">G4endl</a>;</td></tr>
+<tr><th id="257">257</th><td>            <a class="macro" href="../include/G4FFGVerboseMacros.hh.html#50" title="for(G4int depth = 0; depth &lt; G4FFG_DEPTH; depth++) { (*_G4cout_p()) &lt;&lt; &quot;  &quot;; }" data-ref="_M/G4FFG_SPACING__">G4FFG_SPACING__</a></td></tr>
+<tr><th id="258">258</th><td>            <a class="macro" href="../../../../../global/management/include/G4ios.hh.html#46" title="(*_G4cout_p())" data-ref="_M/G4cout">G4cout</a> <span class='error' title="invalid operands to binary expression (&apos;int&apos; and &apos;const char *&apos;)">&lt;&lt;</span> <q>"  A:          "</q> &lt;&lt; FirstDaughter-&gt;GetDefinition()-&gt;GetAtomicMass() &lt;&lt; <a class="macro" href="../../../../../global/management/include/G4ios.hh.html#60" title="std::endl" data-ref="_M/G4endl">G4endl</a>;</td></tr>
+<tr><th id="259">259</th><td>            <a class="macro" href="../include/G4FFGVerboseMacros.hh.html#50" title="for(G4int depth = 0; depth &lt; G4FFG_DEPTH; depth++) { (*_G4cout_p()) &lt;&lt; &quot;  &quot;; }" data-ref="_M/G4FFG_SPACING__">G4FFG_SPACING__</a></td></tr>
+<tr><th id="260">260</th><td>            <a class="macro" href="../../../../../global/management/include/G4ios.hh.html#46" title="(*_G4cout_p())" data-ref="_M/G4cout">G4cout</a> <span class='error' title="invalid operands to binary expression (&apos;int&apos; and &apos;const char *&apos;)">&lt;&lt;</span> <q>"  Meta State: "</q> &lt;&lt; (FirstDaughter-&gt;GetDefinition()-&gt;GetPDGEncoding() % <var>10</var>) &lt;&lt; <a class="macro" href="../../../../../global/management/include/G4ios.hh.html#60" title="std::endl" data-ref="_M/G4endl">G4endl</a>;</td></tr>
+<tr><th id="261">261</th><td>        }</td></tr>
+<tr><th id="262">262</th><td></td></tr>
+<tr><th id="263">263</th><td>        GenerateNeutrons(<span class='error' title="use of undeclared identifier &apos;Neutrons&apos;">Neutrons</span>);</td></tr>
+<tr><th id="264">264</th><td></td></tr>
+<tr><th id="265">265</th><td>        <i>// Now that all the nucleonic particles have been generated, we can</i></td></tr>
+<tr><th id="266">266</th><td><i>        // calculate the composition of the second daughter product.</i></td></tr>
+<tr><th id="267">267</th><td>        G4int NewIsotope = RemainingZ_ * <var>1000</var> + RemainingA_;</td></tr>
+<tr><th id="268">268</th><td>        SecondDaughter = <b>new</b> G4ReactionProduct(GetParticleDefinition(NewIsotope, G4FFGEnumerations::GROUND_STATE));</td></tr>
+<tr><th id="269">269</th><td>        <b>if</b>(Verbosity_ &amp; G4FFGEnumerations::DAUGHTER_INFO)</td></tr>
+<tr><th id="270">270</th><td>        {</td></tr>
+<tr><th id="271">271</th><td>            <a class="macro" href="../include/G4FFGVerboseMacros.hh.html#50" title="for(G4int depth = 0; depth &lt; G4FFG_DEPTH; depth++) { (*_G4cout_p()) &lt;&lt; &quot;  &quot;; }" data-ref="_M/G4FFG_SPACING__">G4FFG_SPACING__</a></td></tr>
+<tr><th id="272">272</th><td>            <a class="macro" href="../include/G4FFGVerboseMacros.hh.html#44" title="G4String debugOutput(&quot;/home/jishin/app/geant4/1005p1/geant4.10.05.p01/source/processes/hadronic/models/particle_hp/src/G4FissionProductYieldDist.cc&quot;); debugOutput = debugOutput.substr(debugOutput.find_last_of(&apos;/&apos;) + 1); (*_G4cout_p()) &lt;&lt; G4String(__func__) + &quot;()&quot; &lt;&lt; &quot; at &quot; &lt;&lt; debugOutput &lt;&lt; &quot;:&quot; &lt;&lt; 272;" data-ref="_M/G4FFG_LOCATION__">G4FFG_LOCATION__</a></td></tr>
+<tr><th id="273">273</th><td>            </td></tr>
+<tr><th id="274">274</th><td>            <a class="macro" href="../../../../../global/management/include/G4ios.hh.html#46" title="(*_G4cout_p())" data-ref="_M/G4cout">G4cout</a> <span class='error' title="invalid operands to binary expression (&apos;int&apos; and &apos;const char *&apos;)">&lt;&lt;</span> <q>" -- Second daughter product sampled"</q> &lt;&lt; <a class="macro" href="../../../../../global/management/include/G4ios.hh.html#60" title="std::endl" data-ref="_M/G4endl">G4endl</a>;</td></tr>
+<tr><th id="275">275</th><td>            <a class="macro" href="../include/G4FFGVerboseMacros.hh.html#50" title="for(G4int depth = 0; depth &lt; G4FFG_DEPTH; depth++) { (*_G4cout_p()) &lt;&lt; &quot;  &quot;; }" data-ref="_M/G4FFG_SPACING__">G4FFG_SPACING__</a></td></tr>
+<tr><th id="276">276</th><td>            <a class="macro" href="../../../../../global/management/include/G4ios.hh.html#46" title="(*_G4cout_p())" data-ref="_M/G4cout">G4cout</a> <span class='error' title="invalid operands to binary expression (&apos;int&apos; and &apos;const char *&apos;)">&lt;&lt;</span> <q>"  Name:       "</q> &lt;&lt; SecondDaughter-&gt;GetDefinition()-&gt;GetParticleName() &lt;&lt; <a class="macro" href="../../../../../global/management/include/G4ios.hh.html#60" title="std::endl" data-ref="_M/G4endl">G4endl</a>;</td></tr>
+<tr><th id="277">277</th><td>            <a class="macro" href="../include/G4FFGVerboseMacros.hh.html#50" title="for(G4int depth = 0; depth &lt; G4FFG_DEPTH; depth++) { (*_G4cout_p()) &lt;&lt; &quot;  &quot;; }" data-ref="_M/G4FFG_SPACING__">G4FFG_SPACING__</a></td></tr>
+<tr><th id="278">278</th><td>            <a class="macro" href="../../../../../global/management/include/G4ios.hh.html#46" title="(*_G4cout_p())" data-ref="_M/G4cout">G4cout</a> <span class='error' title="invalid operands to binary expression (&apos;int&apos; and &apos;const char *&apos;)">&lt;&lt;</span> <q>"  Z:          "</q> &lt;&lt; SecondDaughter-&gt;GetDefinition()-&gt;GetAtomicNumber() &lt;&lt; <a class="macro" href="../../../../../global/management/include/G4ios.hh.html#60" title="std::endl" data-ref="_M/G4endl">G4endl</a>;</td></tr>
+<tr><th id="279">279</th><td>            <a class="macro" href="../include/G4FFGVerboseMacros.hh.html#50" title="for(G4int depth = 0; depth &lt; G4FFG_DEPTH; depth++) { (*_G4cout_p()) &lt;&lt; &quot;  &quot;; }" data-ref="_M/G4FFG_SPACING__">G4FFG_SPACING__</a></td></tr>
+<tr><th id="280">280</th><td>            <a class="macro" href="../../../../../global/management/include/G4ios.hh.html#46" title="(*_G4cout_p())" data-ref="_M/G4cout">G4cout</a> <span class='error' title="invalid operands to binary expression (&apos;int&apos; and &apos;const char *&apos;)">&lt;&lt;</span> <q>"  A:          "</q> &lt;&lt; SecondDaughter-&gt;GetDefinition()-&gt;GetAtomicMass() &lt;&lt; <a class="macro" href="../../../../../global/management/include/G4ios.hh.html#60" title="std::endl" data-ref="_M/G4endl">G4endl</a>;</td></tr>
+<tr><th id="281">281</th><td>            <a class="macro" href="../include/G4FFGVerboseMacros.hh.html#50" title="for(G4int depth = 0; depth &lt; G4FFG_DEPTH; depth++) { (*_G4cout_p()) &lt;&lt; &quot;  &quot;; }" data-ref="_M/G4FFG_SPACING__">G4FFG_SPACING__</a></td></tr>
+<tr><th id="282">282</th><td>            <a class="macro" href="../../../../../global/management/include/G4ios.hh.html#46" title="(*_G4cout_p())" data-ref="_M/G4cout">G4cout</a> <span class='error' title="invalid operands to binary expression (&apos;int&apos; and &apos;const char *&apos;)">&lt;&lt;</span> <q>"  Meta State: "</q> &lt;&lt; (SecondDaughter-&gt;GetDefinition()-&gt;GetPDGEncoding() % <var>10</var>) &lt;&lt; <a class="macro" href="../../../../../global/management/include/G4ios.hh.html#60" title="std::endl" data-ref="_M/G4endl">G4endl</a>;</td></tr>
+<tr><th id="283">283</th><td>        }</td></tr>
+<tr><th id="284">284</th><td></td></tr>
+<tr><th id="285">285</th><td>    <i>// Calculate how much kinetic energy will be available</i></td></tr>
+<tr><th id="286">286</th><td><i>        // 195 to 205 MeV are available in a fission reaction, but about 20 MeV</i></td></tr>
+<tr><th id="287">287</th><td><i>        // are from delayed sources. We are concerned only with prompt sources,</i></td></tr>
+<tr><th id="288">288</th><td><i>        // so sample a Gaussian distribution about 20 MeV and subtract the</i></td></tr>
+<tr><th id="289">289</th><td><i>        // result from the total available energy. Also, the energy of fission</i></td></tr>
+<tr><th id="290">290</th><td><i>        // neutrinos is neglected. Fission neutrinos would add ~11 MeV</i></td></tr>
+<tr><th id="291">291</th><td><i>        // additional energy to the fission. (Ref 2)</i></td></tr>
+<tr><th id="292">292</th><td><i>        // Finally, add in the kinetic energy contribution of the fission</i></td></tr>
+<tr><th id="293">293</th><td><i>        // inducing particle, if any.</i></td></tr>
+<tr><th id="294">294</th><td>        <em>const</em> G4double TotalKE = RandomEngine_-&gt;G4SampleUniform(<var>195.0</var>, <var>205.0</var>) * MeV</td></tr>
+<tr><th id="295">295</th><td>                                 - RandomEngine_-&gt;G4SampleGaussian(<var>20.0</var>, <var>3.0</var>) * MeV</td></tr>
+<tr><th id="296">296</th><td>                                 + IncidentEnergy_;</td></tr>
+<tr><th id="297">297</th><td>        RemainingEnergy_ = TotalKE;</td></tr>
+<tr><th id="298">298</th><td></td></tr>
+<tr><th id="299">299</th><td>    <i>// Calculate the energies of the alpha particles and neutrons</i></td></tr>
+<tr><th id="300">300</th><td><i>        // Once again, since the alpha particles are user defined, we must</i></td></tr>
+<tr><th id="301">301</th><td><i>        // sample their kinetic energy first. SampleAlphaEnergies() returns the</i></td></tr>
+<tr><th id="302">302</th><td><i>        // amount of energy consumed by the alpha particles, so remove the total</i></td></tr>
+<tr><th id="303">303</th><td><i>        // energy alloted to the alpha particles from the available energy</i></td></tr>
+<tr><th id="304">304</th><td>        SampleAlphaEnergies(<span class='error' title="use of undeclared identifier &apos;Alphas&apos;">Alphas</span>);</td></tr>
+<tr><th id="305">305</th><td></td></tr>
+<tr><th id="306">306</th><td>        <i>// Second, the neutrons are sampled from the Watt fission spectrum.</i></td></tr>
+<tr><th id="307">307</th><td>        SampleNeutronEnergies(<span class='error' title="use of undeclared identifier &apos;Neutrons&apos;">Neutrons</span>);</td></tr>
+<tr><th id="308">308</th><td></td></tr>
+<tr><th id="309">309</th><td>    <i>// Calculate the total energy available to the daughter products</i></td></tr>
+<tr><th id="310">310</th><td><i>        // A Gaussian distribution about the average calculated energy with</i></td></tr>
+<tr><th id="311">311</th><td><i>        // a standard deviation of 1.5 MeV (Ref. 2) is used. Since the energy</i></td></tr>
+<tr><th id="312">312</th><td><i>        // distribution is dependant on the alpha particle generation and the</i></td></tr>
+<tr><th id="313">313</th><td><i>        // Watt fission sampling for neutrons, we only have the left-over energy</i></td></tr>
+<tr><th id="314">314</th><td><i>        // to work with for the fission daughter products.</i></td></tr>
+<tr><th id="315">315</th><td>        G4double FragmentsKE;</td></tr>
+<tr><th id="316">316</th><td>        G4int icounter=<var>0</var>;</td></tr>
+<tr><th id="317">317</th><td>        G4int icounter_max=<var>1024</var>;</td></tr>
+<tr><th id="318">318</th><td>        <b>do</b></td></tr>
+<tr><th id="319">319</th><td>        {</td></tr>
+<tr><th id="320">320</th><td>           icounter++;</td></tr>
+<tr><th id="321">321</th><td>           <b>if</b> ( icounter &gt; icounter_max ) {</td></tr>
+<tr><th id="322">322</th><td>	      <a class="macro" href="../../../../../global/management/include/G4ios.hh.html#46" title="(*_G4cout_p())" data-ref="_M/G4cout">G4cout</a> <span class='error' title="invalid operands to binary expression (&apos;int&apos; and &apos;const char *&apos;)">&lt;&lt;</span> <q>"Loop-counter exceeded the threshold value at "</q> &lt;&lt; <span class="macro" title="322" data-ref="_M/__LINE__">__LINE__</span> &lt;&lt; <q>"th line of "</q> &lt;&lt; <span class="macro" title="&quot;/home/jishin/app/geant4/1005p1/geant4.10.05.p01/source/processes/hadronic/models/particle_hp/src/G4FissionProductYieldDist.cc&quot;" data-ref="_M/__FILE__">__FILE__</span> &lt;&lt; <q>"."</q> &lt;&lt; <a class="macro" href="../../../../../global/management/include/G4ios.hh.html#60" title="std::endl" data-ref="_M/G4endl">G4endl</a>;</td></tr>
+<tr><th id="323">323</th><td>              <b>break</b>;</td></tr>
+<tr><th id="324">324</th><td>           }</td></tr>
+<tr><th id="325">325</th><td>            FragmentsKE = RandomEngine_-&gt;G4SampleGaussian(RemainingEnergy_, <var>1.5</var> *MeV);</td></tr>
+<tr><th id="326">326</th><td>        } <b>while</b>(FragmentsKE &gt; RemainingEnergy_); <i>// Loop checking, 11.05.2015, T. Koi</i></td></tr>
+<tr><th id="327">327</th><td></td></tr>
+<tr><th id="328">328</th><td>        <i>// Make sure that we don't produce any sub-gamma photons</i></td></tr>
+<tr><th id="329">329</th><td>        <b>if</b>((RemainingEnergy_ - FragmentsKE) / (<var>100</var> * keV) &lt; <var>1.0</var>)</td></tr>
+<tr><th id="330">330</th><td>        {</td></tr>
+<tr><th id="331">331</th><td>            FragmentsKE = RemainingEnergy_;</td></tr>
+<tr><th id="332">332</th><td>        }</td></tr>
+<tr><th id="333">333</th><td></td></tr>
+<tr><th id="334">334</th><td>        <i>// This energy has now been allotted to the fission fragments.</i></td></tr>
+<tr><th id="335">335</th><td><i>        // Subtract FragmentsKE from the total available fission energy.</i></td></tr>
+<tr><th id="336">336</th><td>        RemainingEnergy_ -= FragmentsKE;</td></tr>
+<tr><th id="337">337</th><td></td></tr>
+<tr><th id="338">338</th><td>    <i>// Sample the energies of the gamma rays</i></td></tr>
+<tr><th id="339">339</th><td><i>        // Assign the remainder, if any, of the energy to the gamma rays</i></td></tr>
+<tr><th id="340">340</th><td>        SampleGammaEnergies(<span class='error' title="use of undeclared identifier &apos;Gammas&apos;">Gammas</span>);</td></tr>
+<tr><th id="341">341</th><td></td></tr>
+<tr><th id="342">342</th><td>    <i>// Prepare to balance the momenta of the system</i></td></tr>
+<tr><th id="343">343</th><td><i>        // We will need these for sampling the angles and balancing the momenta</i></td></tr>
+<tr><th id="344">344</th><td><i>        // of all the fission products</i></td></tr>
+<tr><th id="345">345</th><td>        G4double NumeratorSqrt, NumeratorOther, Denominator;</td></tr>
+<tr><th id="346">346</th><td>        G4double Theta, Phi, Magnitude;</td></tr>
+<tr><th id="347">347</th><td>        G4ThreeVector Direction;</td></tr>
+<tr><th id="348">348</th><td>        G4ParticleMomentum ResultantVector(<var>0</var>, <var>0</var>, <var>0</var>);</td></tr>
+<tr><th id="349">349</th><td></td></tr>
+<tr><th id="350">350</th><td>        <b>if</b>(<span class='error' title="use of undeclared identifier &apos;Alphas&apos;">Alphas</span>-&gt;size() &gt; <var>0</var>)</td></tr>
+<tr><th id="351">351</th><td>        {</td></tr>
+<tr><th id="352">352</th><td>        <i>// Sample the angles of the alpha particles and neutrons, then calculate</i></td></tr>
+<tr><th id="353">353</th><td><i>        // the total moment contribution to the system</i></td></tr>
+<tr><th id="354">354</th><td><i>            // The average angle of the alpha particles with respect to the</i></td></tr>
+<tr><th id="355">355</th><td><i>            // light fragment is dependent on the ratio of the kinetic energies.</i></td></tr>
+<tr><th id="356">356</th><td><i>            // This equation was determined by performing a fit on data from</i></td></tr>
+<tr><th id="357">357</th><td><i>            // Ref. 3 using the website:</i></td></tr>
+<tr><th id="358">358</th><td><i>            // <a href="http://soft.arquimedex.com/linear_regression.php">http://soft.arquimedex.com/linear_regression.php</a></i></td></tr>
+<tr><th id="359">359</th><td><i>            //</i></td></tr>
+<tr><th id="360">360</th><td><i>            // RatioOfKE    Angle (rad)     Angle (degrees)</i></td></tr>
+<tr><th id="361">361</th><td><i>            // 1.05         1.257           72</i></td></tr>
+<tr><th id="362">362</th><td><i>            // 1.155        1.361           78</i></td></tr>
+<tr><th id="363">363</th><td><i>            // 1.28         1.414           81</i></td></tr>
+<tr><th id="364">364</th><td><i>            // 1.5          1.518           87</i></td></tr>
+<tr><th id="365">365</th><td><i>            // 1.75         1.606           92</i></td></tr>
+<tr><th id="366">366</th><td><i>            // 1.9          1.623           93</i></td></tr>
+<tr><th id="367">367</th><td><i>            // 2.2          1.728           99</i></td></tr>
+<tr><th id="368">368</th><td><i>            // This equation generates the angle in radians. If the RatioOfKE is</i></td></tr>
+<tr><th id="369">369</th><td><i>            // greater than 2.25 the angle defaults to 1.3963 rad (100 degrees)</i></td></tr>
+<tr><th id="370">370</th><td>            G4double MassRatio = FirstDaughter-&gt;GetDefinition()-&gt;GetPDGMass() / SecondDaughter-&gt;GetDefinition()-&gt;GetPDGMass();</td></tr>
+<tr><th id="371">371</th><td>            </td></tr>
+<tr><th id="372">372</th><td>            <i>// Invert the mass ratio if the first daughter product is the lighter fragment</i></td></tr>
+<tr><th id="373">373</th><td>            <b>if</b>(MassRatio &lt; <var>1</var>)</td></tr>
+<tr><th id="374">374</th><td>            {</td></tr>
+<tr><th id="375">375</th><td>                MassRatio = <var>1</var> / MassRatio;</td></tr>
+<tr><th id="376">376</th><td>            }</td></tr>
+<tr><th id="377">377</th><td>            </td></tr>
+<tr><th id="378">378</th><td>            <i>// The empirical equation is valid for mass ratios up to 2.75</i></td></tr>
+<tr><th id="379">379</th><td>            <b>if</b>(MassRatio &gt; <var>2.75</var>)</td></tr>
+<tr><th id="380">380</th><td>            {</td></tr>
+<tr><th id="381">381</th><td>                MassRatio = <var>2.75</var>;</td></tr>
+<tr><th id="382">382</th><td>            }</td></tr>
+<tr><th id="383">383</th><td>            <em>const</em> G4double MeanAlphaAngle = <var>0.3644</var> * MassRatio * MassRatio * MassRatio</td></tr>
+<tr><th id="384">384</th><td>                             	 	 	 	- <var>1.9766</var> * MassRatio * MassRatio</td></tr>
+<tr><th id="385">385</th><td>                             	 	 	 	+ <var>3.8207</var> * MassRatio</td></tr>
+<tr><th id="386">386</th><td>                             	 	 	 	- <var>0.9917</var>;</td></tr>
+<tr><th id="387">387</th><td></td></tr>
+<tr><th id="388">388</th><td>            <i>// Sample the directions of the alpha particles with respect to the</i></td></tr>
+<tr><th id="389">389</th><td><i>            // light fragment. For the moment we will assume that the light</i></td></tr>
+<tr><th id="390">390</th><td><i>            // fragment is traveling along the z-axis in the positive direction.</i></td></tr>
+<tr><th id="391">391</th><td>            <em>const</em> G4double MeanAlphaAngleStdDev = <var>0.0523598776</var>;</td></tr>
+<tr><th id="392">392</th><td>            G4double PlusMinus;</td></tr>
+<tr><th id="393">393</th><td></td></tr>
+<tr><th id="394">394</th><td>            <b>for</b>(<em>unsigned</em> <em>int</em> i = <var>0</var>; i &lt; <span class='error' title="use of undeclared identifier &apos;Alphas&apos;">Alphas</span>-&gt;size(); ++i)</td></tr>
+<tr><th id="395">395</th><td>            {</td></tr>
+<tr><th id="396">396</th><td>                PlusMinus = <span class='error' title="use of undeclared identifier &apos;std&apos;">std</span>::acos(RandomEngine_-&gt;G4SampleGaussian(<var>0</var>, MeanAlphaAngleStdDev)) - (pi / <var>2</var>);</td></tr>
+<tr><th id="397">397</th><td>                Theta = MeanAlphaAngle + PlusMinus;</td></tr>
+<tr><th id="398">398</th><td>                <b>if</b>(Theta &lt; <var>0</var>)</td></tr>
+<tr><th id="399">399</th><td>                {</td></tr>
+<tr><th id="400">400</th><td>                    Theta = <var>0.0</var> - Theta;</td></tr>
+<tr><th id="401">401</th><td>                } <b>else</b> <b>if</b>(Theta &gt; pi)</td></tr>
+<tr><th id="402">402</th><td>                {</td></tr>
+<tr><th id="403">403</th><td>                    Theta = (<var>2</var> * pi - Theta);</td></tr>
+<tr><th id="404">404</th><td>                }</td></tr>
+<tr><th id="405">405</th><td>                Phi = RandomEngine_-&gt;G4SampleUniform(-pi, pi);</td></tr>
+<tr><th id="406">406</th><td></td></tr>
+<tr><th id="407">407</th><td>                Direction.setRThetaPhi(<var>1.0</var>, Theta, Phi);</td></tr>
+<tr><th id="408">408</th><td>                Magnitude = <span class='error' title="use of undeclared identifier &apos;std&apos;">std</span>::sqrt(<var>2</var> * <span class='error' title="use of undeclared identifier &apos;Alphas&apos;">Alphas</span>-&gt;at(i)-&gt;GetKineticEnergy() * <span class='error' title="use of undeclared identifier &apos;Alphas&apos;">Alphas</span>-&gt;at(i)-&gt;GetDefinition()-&gt;GetPDGMass());</td></tr>
+<tr><th id="409">409</th><td>                <span class='error' title="use of undeclared identifier &apos;Alphas&apos;">Alphas</span>-&gt;at(i)-&gt;SetMomentum(Direction * Magnitude);</td></tr>
+<tr><th id="410">410</th><td>                ResultantVector += <span class='error' title="use of undeclared identifier &apos;Alphas&apos;">Alphas</span>-&gt;at(i)-&gt;GetMomentum();</td></tr>
+<tr><th id="411">411</th><td>            }</td></tr>
+<tr><th id="412">412</th><td>        }</td></tr>
+<tr><th id="413">413</th><td></td></tr>
+<tr><th id="414">414</th><td>        <i>// Sample the directions of the neutrons.</i></td></tr>
+<tr><th id="415">415</th><td>        <b>if</b>(<span class='error' title="use of undeclared identifier &apos;Neutrons&apos;">Neutrons</span>-&gt;size() != <var>0</var>)</td></tr>
+<tr><th id="416">416</th><td>        {</td></tr>
+<tr><th id="417">417</th><td>        	<b>for</b>(<em>unsigned</em> <em>int</em> i = <var>0</var>; i &lt; <span class='error' title="use of undeclared identifier &apos;Neutrons&apos;">Neutrons</span>-&gt;size(); ++i)</td></tr>
+<tr><th id="418">418</th><td>        	{</td></tr>
+<tr><th id="419">419</th><td>        	    Theta = <span class='error' title="use of undeclared identifier &apos;std&apos;">std</span>::acos(RandomEngine_-&gt;G4SampleUniform(-<var>1</var>, <var>1</var>));</td></tr>
+<tr><th id="420">420</th><td>                Phi = RandomEngine_-&gt;G4SampleUniform(-pi, pi);</td></tr>
+<tr><th id="421">421</th><td></td></tr>
+<tr><th id="422">422</th><td>                Direction.setRThetaPhi(<var>1.0</var>, Theta, Phi);</td></tr>
+<tr><th id="423">423</th><td>                Magnitude = <span class='error' title="use of undeclared identifier &apos;std&apos;">std</span>::sqrt(<var>2</var> * <span class='error' title="use of undeclared identifier &apos;Neutrons&apos;">Neutrons</span>-&gt;at(i)-&gt;GetKineticEnergy() * <span class='error' title="use of undeclared identifier &apos;Neutrons&apos;">Neutrons</span>-&gt;at(i)-&gt;GetDefinition()-&gt;GetPDGMass());</td></tr>
+<tr><th id="424">424</th><td>                <span class='error' title="use of undeclared identifier &apos;Neutrons&apos;">Neutrons</span>-&gt;at(i)-&gt;SetMomentum(Direction * Magnitude);</td></tr>
+<tr><th id="425">425</th><td>                ResultantVector += <span class='error' title="use of undeclared identifier &apos;Neutrons&apos;">Neutrons</span>-&gt;at(i)-&gt;GetMomentum();</td></tr>
+<tr><th id="426">426</th><td>            }</td></tr>
+<tr><th id="427">427</th><td>        }</td></tr>
+<tr><th id="428">428</th><td></td></tr>
+<tr><th id="429">429</th><td>        <i>// Sample the directions of the gamma rays</i></td></tr>
+<tr><th id="430">430</th><td>        <b>if</b>(<span class='error' title="use of undeclared identifier &apos;Gammas&apos;">Gammas</span>-&gt;size() != <var>0</var>)</td></tr>
+<tr><th id="431">431</th><td>		{</td></tr>
+<tr><th id="432">432</th><td>        	<b>for</b>(<em>unsigned</em> <em>int</em> i = <var>0</var>; i &lt; <span class='error' title="use of undeclared identifier &apos;Gammas&apos;">Gammas</span>-&gt;size(); ++i)</td></tr>
+<tr><th id="433">433</th><td>            {</td></tr>
+<tr><th id="434">434</th><td>                Theta = <span class='error' title="use of undeclared identifier &apos;std&apos;">std</span>::acos(RandomEngine_-&gt;G4SampleUniform(-<var>1</var>, <var>1</var>));</td></tr>
+<tr><th id="435">435</th><td>                Phi = RandomEngine_-&gt;G4SampleUniform(-pi, pi);</td></tr>
+<tr><th id="436">436</th><td></td></tr>
+<tr><th id="437">437</th><td>                Direction.setRThetaPhi(<var>1.0</var>, Theta, Phi);</td></tr>
+<tr><th id="438">438</th><td>                Magnitude = <span class='error' title="use of undeclared identifier &apos;Gammas&apos;">Gammas</span>-&gt;at(i)-&gt;GetKineticEnergy() / CLHEP::c_light;</td></tr>
+<tr><th id="439">439</th><td>                <span class='error' title="use of undeclared identifier &apos;Gammas&apos;">Gammas</span>-&gt;at(i)-&gt;SetMomentum(Direction * Magnitude);</td></tr>
+<tr><th id="440">440</th><td>                ResultantVector += <span class='error' title="use of undeclared identifier &apos;Gammas&apos;">Gammas</span>-&gt;at(i)-&gt;GetMomentum();</td></tr>
+<tr><th id="441">441</th><td>            }</td></tr>
+<tr><th id="442">442</th><td>        }</td></tr>
+<tr><th id="443">443</th><td></td></tr>
+<tr><th id="444">444</th><td>    <i>// Calculate the momenta of the two daughter products</i></td></tr>
+<tr><th id="445">445</th><td>        G4ReactionProduct* LightFragment;</td></tr>
+<tr><th id="446">446</th><td>        G4ReactionProduct* HeavyFragment;</td></tr>
+<tr><th id="447">447</th><td>        G4ThreeVector LightFragmentDirection;</td></tr>
+<tr><th id="448">448</th><td>        G4ThreeVector HeavyFragmentDirection;</td></tr>
+<tr><th id="449">449</th><td>        G4double ResultantX, ResultantY, ResultantZ;</td></tr>
+<tr><th id="450">450</th><td>        ResultantX = ResultantVector.getX();</td></tr>
+<tr><th id="451">451</th><td>        ResultantY = ResultantVector.getY();</td></tr>
+<tr><th id="452">452</th><td>        ResultantZ = ResultantVector.getZ();</td></tr>
+<tr><th id="453">453</th><td></td></tr>
+<tr><th id="454">454</th><td>        <b>if</b>(FirstDaughter-&gt;GetDefinition()-&gt;GetPDGMass() &lt; SecondDaughter-&gt;GetDefinition()-&gt;GetPDGMass())</td></tr>
+<tr><th id="455">455</th><td>        {</td></tr>
+<tr><th id="456">456</th><td>            LightFragment = FirstDaughter;</td></tr>
+<tr><th id="457">457</th><td>            HeavyFragment = SecondDaughter;</td></tr>
+<tr><th id="458">458</th><td>        } <b>else</b></td></tr>
+<tr><th id="459">459</th><td>        {</td></tr>
+<tr><th id="460">460</th><td>            LightFragment = SecondDaughter;</td></tr>
+<tr><th id="461">461</th><td>            HeavyFragment = FirstDaughter;</td></tr>
+<tr><th id="462">462</th><td>        }</td></tr>
+<tr><th id="463">463</th><td>        <em>const</em> G4double LightFragmentMass = LightFragment-&gt;GetDefinition()-&gt;GetPDGMass();</td></tr>
+<tr><th id="464">464</th><td>        <em>const</em> G4double HeavyFragmentMass = HeavyFragment-&gt;GetDefinition()-&gt;GetPDGMass();</td></tr>
+<tr><th id="465">465</th><td></td></tr>
+<tr><th id="466">466</th><td>        LightFragmentDirection.setRThetaPhi(<var>1.0</var>, <var>0</var>, <var>0</var>);</td></tr>
+<tr><th id="467">467</th><td></td></tr>
+<tr><th id="468">468</th><td>        <i>// Fit the momenta of the daughter products to the resultant vector of</i></td></tr>
+<tr><th id="469">469</th><td><i>        // the remaining fission products. This will be done in the Cartesian</i></td></tr>
+<tr><th id="470">470</th><td><i>        // coordinate system, not spherical. This is done using the following</i></td></tr>
+<tr><th id="471">471</th><td><i>        // table listing the system momenta and the corresponding equations:</i></td></tr>
+<tr><th id="472">472</th><td><i>        //              X               Y               Z</i></td></tr>
+<tr><th id="473">473</th><td><i>        //</i></td></tr>
+<tr><th id="474">474</th><td><i>        //      A       0               0               P</i></td></tr>
+<tr><th id="475">475</th><td><i>        //</i></td></tr>
+<tr><th id="476">476</th><td><i>        //      B       -R_x            -R_y            -P - R_z</i></td></tr>
+<tr><th id="477">477</th><td><i>        //</i></td></tr>
+<tr><th id="478">478</th><td><i>        //      R       R_x             R_y             R_z</i></td></tr>
+<tr><th id="479">479</th><td><i>        //</i></td></tr>
+<tr><th id="480">480</th><td><i>        // v = sqrt(2*m*k)  -&gt;  k = v^2/(2*m)</i></td></tr>
+<tr><th id="481">481</th><td><i>        // tk = k_A + k_B</i></td></tr>
+<tr><th id="482">482</th><td><i>        // k_L = P^2/(2*m_L)</i></td></tr>
+<tr><th id="483">483</th><td><i>        // k_H = ((-R_x)^2 + (-R_y)^2 + (-P - R_z)^2)/(2*m_H)</i></td></tr>
+<tr><th id="484">484</th><td><i>        // where:</i></td></tr>
+<tr><th id="485">485</th><td><i>        // P: momentum of the light daughter product</i></td></tr>
+<tr><th id="486">486</th><td><i>        // R: the remaining fission products' resultant vector</i></td></tr>
+<tr><th id="487">487</th><td><i>        // v: momentum</i></td></tr>
+<tr><th id="488">488</th><td><i>        // m: mass</i></td></tr>
+<tr><th id="489">489</th><td><i>        // k: kinetic energy</i></td></tr>
+<tr><th id="490">490</th><td><i>        // tk: total kinetic energy available to the daughter products</i></td></tr>
+<tr><th id="491">491</th><td><i>        //</i></td></tr>
+<tr><th id="492">492</th><td><i>        // Below is the solved form for P, with the solution generated using</i></td></tr>
+<tr><th id="493">493</th><td><i>        // the WolframAlpha website:</i></td></tr>
+<tr><th id="494">494</th><td><i>        // <a href="http://www.wolframalpha.com/input/?i=">http://www.wolframalpha.com/input/?i=</a></i></td></tr>
+<tr><th id="495">495</th><td><i>        // solve+((-x)^2+%2B+(-y)^2+%2B+(-P-z)^2)%2F(2*B)+%2B+L^2%2F(2*A)+%3D+k+</i></td></tr>
+<tr><th id="496">496</th><td><i>        // for+P</i></td></tr>
+<tr><th id="497">497</th><td><i>        //</i></td></tr>
+<tr><th id="498">498</th><td><i>        //</i></td></tr>
+<tr><th id="499">499</th><td><i>        // nsqrt = sqrt(m_L*(m_L*(2*m_H*tk - R_x^2 - R_y^2) +</i></td></tr>
+<tr><th id="500">500</th><td><i>        //                   m_H*(2*m_H*tk - R_x^2 - R_y^2 - R_z^2))</i></td></tr>
+<tr><th id="501">501</th><td>        NumeratorSqrt = <span class='error' title="use of undeclared identifier &apos;std&apos;">std</span>::sqrt(LightFragmentMass *</td></tr>
+<tr><th id="502">502</th><td>                            (LightFragmentMass * (<var>2</var> * HeavyFragmentMass * FragmentsKE</td></tr>
+<tr><th id="503">503</th><td>                                                  - ResultantX * ResultantX</td></tr>
+<tr><th id="504">504</th><td>                                                  - ResultantY * ResultantY)</td></tr>
+<tr><th id="505">505</th><td>                             + HeavyFragmentMass * (<var>2</var> * HeavyFragmentMass * FragmentsKE</td></tr>
+<tr><th id="506">506</th><td>                                                    - ResultantX * ResultantX</td></tr>
+<tr><th id="507">507</th><td>                                                    - ResultantY * ResultantY</td></tr>
+<tr><th id="508">508</th><td>                                                    - ResultantZ - ResultantZ)));</td></tr>
+<tr><th id="509">509</th><td></td></tr>
+<tr><th id="510">510</th><td>        <i>// nother = m_L*R_z</i></td></tr>
+<tr><th id="511">511</th><td>        NumeratorOther = LightFragmentMass * ResultantZ;</td></tr>
+<tr><th id="512">512</th><td></td></tr>
+<tr><th id="513">513</th><td>        <i>// denom = m_L + m_H</i></td></tr>
+<tr><th id="514">514</th><td>        Denominator = LightFragmentMass + HeavyFragmentMass;</td></tr>
+<tr><th id="515">515</th><td></td></tr>
+<tr><th id="516">516</th><td>        <i>// P = (nsqrt + nother) / denom</i></td></tr>
+<tr><th id="517">517</th><td>        <em>const</em> G4double LightFragmentMomentum = (NumeratorSqrt + NumeratorOther) / Denominator;</td></tr>
+<tr><th id="518">518</th><td>        <em>const</em> G4double HeavyFragmentMomentum = <span class='error' title="use of undeclared identifier &apos;std&apos;">std</span>::sqrt(ResultantX * ResultantX</td></tr>
+<tr><th id="519">519</th><td>                                                    + ResultantY * ResultantY</td></tr>
+<tr><th id="520">520</th><td>                                                    + G4Pow::GetInstance()-&gt;powN(LightFragmentMomentum + ResultantZ, <var>2</var>));</td></tr>
+<tr><th id="521">521</th><td></td></tr>
+<tr><th id="522">522</th><td>        <i>// Finally! We now have everything we need for the daughter products</i></td></tr>
+<tr><th id="523">523</th><td>        LightFragment-&gt;SetMomentum(LightFragmentDirection * LightFragmentMomentum);</td></tr>
+<tr><th id="524">524</th><td>        HeavyFragmentDirection.setX(-ResultantX);</td></tr>
+<tr><th id="525">525</th><td>        HeavyFragmentDirection.setY(-ResultantY);</td></tr>
+<tr><th id="526">526</th><td>        HeavyFragmentDirection.setZ((-LightFragmentMomentum - ResultantZ));</td></tr>
+<tr><th id="527">527</th><td>        <i>// Don't forget to normalize the vector to the unit sphere</i></td></tr>
+<tr><th id="528">528</th><td>        HeavyFragmentDirection.setR(<var>1.0</var>);</td></tr>
+<tr><th id="529">529</th><td>        HeavyFragment-&gt;SetMomentum(HeavyFragmentDirection * HeavyFragmentMomentum);</td></tr>
+<tr><th id="530">530</th><td></td></tr>
+<tr><th id="531">531</th><td>        <b>if</b>(Verbosity_ &amp; (G4FFGEnumerations::DAUGHTER_INFO | G4FFGEnumerations::MOMENTUM_INFO))</td></tr>
+<tr><th id="532">532</th><td>        {</td></tr>
+<tr><th id="533">533</th><td>            <a class="macro" href="../include/G4FFGVerboseMacros.hh.html#50" title="for(G4int depth = 0; depth &lt; G4FFG_DEPTH; depth++) { (*_G4cout_p()) &lt;&lt; &quot;  &quot;; }" data-ref="_M/G4FFG_SPACING__">G4FFG_SPACING__</a></td></tr>
+<tr><th id="534">534</th><td>            <a class="macro" href="../include/G4FFGVerboseMacros.hh.html#44" title="G4String debugOutput(&quot;/home/jishin/app/geant4/1005p1/geant4.10.05.p01/source/processes/hadronic/models/particle_hp/src/G4FissionProductYieldDist.cc&quot;); debugOutput = debugOutput.substr(debugOutput.find_last_of(&apos;/&apos;) + 1); (*_G4cout_p()) &lt;&lt; G4String(__func__) + &quot;()&quot; &lt;&lt; &quot; at &quot; &lt;&lt; debugOutput &lt;&lt; &quot;:&quot; &lt;&lt; 534;" data-ref="_M/G4FFG_LOCATION__">G4FFG_LOCATION__</a></td></tr>
+<tr><th id="535">535</th><td>            </td></tr>
+<tr><th id="536">536</th><td>            <a class="macro" href="../../../../../global/management/include/G4ios.hh.html#46" title="(*_G4cout_p())" data-ref="_M/G4cout">G4cout</a> <span class='error' title="invalid operands to binary expression (&apos;int&apos; and &apos;const char *&apos;)">&lt;&lt;</span> <q>" -- Daugher product momenta finalized"</q> &lt;&lt; <a class="macro" href="../../../../../global/management/include/G4ios.hh.html#60" title="std::endl" data-ref="_M/G4endl">G4endl</a>;</td></tr>
+<tr><th id="537">537</th><td>            <a class="macro" href="../include/G4FFGVerboseMacros.hh.html#50" title="for(G4int depth = 0; depth &lt; G4FFG_DEPTH; depth++) { (*_G4cout_p()) &lt;&lt; &quot;  &quot;; }" data-ref="_M/G4FFG_SPACING__">G4FFG_SPACING__</a></td></tr>
+<tr><th id="538">538</th><td>        }</td></tr>
+<tr><th id="539">539</th><td></td></tr>
+<tr><th id="540">540</th><td>    <i>// Load all the particles into a contiguous set</i></td></tr>
+<tr><th id="541">541</th><td><i>        //TK modifed 131108</i></td></tr>
+<tr><th id="542">542</th><td><i>        //G4DynamicParticleVector* FissionProducts = new G4DynamicParticleVector(2 + Alphas-&gt;size() + Neutrons-&gt;size() + Gammas-&gt;size());</i></td></tr>
+<tr><th id="543">543</th><td>        <span class='error' title="unknown type name &apos;G4DynamicParticleVector&apos;">G4DynamicParticleVector</span>* FissionProducts = <b>new</b> <span class='error' title="unknown type name &apos;G4DynamicParticleVector&apos;">G4DynamicParticleVector</span>();</td></tr>
+<tr><th id="544">544</th><td>        <i>// Load the fission fragments</i></td></tr>
+<tr><th id="545">545</th><td>        FissionProducts-&gt;push_back(MakeG4DynamicParticle(LightFragment));</td></tr>
+<tr><th id="546">546</th><td>        FissionProducts-&gt;push_back(MakeG4DynamicParticle(HeavyFragment));</td></tr>
+<tr><th id="547">547</th><td>        <i>// Load the neutrons</i></td></tr>
+<tr><th id="548">548</th><td>        <b>for</b>(<em>unsigned</em> <em>int</em> i = <var>0</var>; i &lt; <span class='error' title="use of undeclared identifier &apos;Neutrons&apos;">Neutrons</span>-&gt;size(); i++)</td></tr>
+<tr><th id="549">549</th><td>        {</td></tr>
+<tr><th id="550">550</th><td>            FissionProducts-&gt;push_back(MakeG4DynamicParticle(<span class='error' title="use of undeclared identifier &apos;Neutrons&apos;">Neutrons</span>-&gt;at(i)));</td></tr>
+<tr><th id="551">551</th><td>        }</td></tr>
+<tr><th id="552">552</th><td>        <i>// Load the gammas</i></td></tr>
+<tr><th id="553">553</th><td>        <b>for</b>(<em>unsigned</em> <em>int</em> i = <var>0</var>; i &lt; <span class='error' title="use of undeclared identifier &apos;Gammas&apos;">Gammas</span>-&gt;size(); i++)</td></tr>
+<tr><th id="554">554</th><td>        {</td></tr>
+<tr><th id="555">555</th><td>            FissionProducts-&gt;push_back(MakeG4DynamicParticle(<span class='error' title="use of undeclared identifier &apos;Gammas&apos;">Gammas</span>-&gt;at(i)));</td></tr>
+<tr><th id="556">556</th><td>        }</td></tr>
+<tr><th id="557">557</th><td>        <i>// Load the alphas</i></td></tr>
+<tr><th id="558">558</th><td>        <b>for</b>(<em>unsigned</em> <em>int</em> i = <var>0</var>; i &lt; <span class='error' title="use of undeclared identifier &apos;Alphas&apos;">Alphas</span>-&gt;size(); i++)</td></tr>
+<tr><th id="559">559</th><td>        {</td></tr>
+<tr><th id="560">560</th><td>            FissionProducts-&gt;push_back(MakeG4DynamicParticle(<span class='error' title="use of undeclared identifier &apos;Alphas&apos;">Alphas</span>-&gt;at(i)));</td></tr>
+<tr><th id="561">561</th><td>        }</td></tr>
+<tr><th id="562">562</th><td></td></tr>
+<tr><th id="563">563</th><td>    <i>// Rotate the system to a random location so that the light fission fragment</i></td></tr>
+<tr><th id="564">564</th><td><i>    // is not always traveling along the positive z-axis</i></td></tr>
+<tr><th id="565">565</th><td><i>        // Sample Theta and Phi.</i></td></tr>
+<tr><th id="566">566</th><td>        G4ThreeVector RotationAxis;</td></tr>
+<tr><th id="567">567</th><td></td></tr>
+<tr><th id="568">568</th><td>        Theta = <span class='error' title="use of undeclared identifier &apos;std&apos;">std</span>::acos(RandomEngine_-&gt;G4SampleUniform(-<var>1</var>, <var>1</var>));</td></tr>
+<tr><th id="569">569</th><td>        Phi = RandomEngine_-&gt;G4SampleUniform(-pi, pi);</td></tr>
+<tr><th id="570">570</th><td>        RotationAxis.setRThetaPhi(<var>1.0</var>, Theta, Phi);</td></tr>
+<tr><th id="571">571</th><td></td></tr>
+<tr><th id="572">572</th><td>        <i>// We will also check the net momenta</i></td></tr>
+<tr><th id="573">573</th><td>        ResultantVector.set(<var>0.0</var>, <var>0.0</var>, <var>0.0</var>);</td></tr>
+<tr><th id="574">574</th><td>        <b>for</b>(<em>unsigned</em> <em>int</em> i = <var>0</var>; i &lt; FissionProducts-&gt;size(); i++)</td></tr>
+<tr><th id="575">575</th><td>        {</td></tr>
+<tr><th id="576">576</th><td>        	Direction = FissionProducts-&gt;at(i)-&gt;GetMomentumDirection();</td></tr>
+<tr><th id="577">577</th><td>        	Direction.rotateUz(RotationAxis);</td></tr>
+<tr><th id="578">578</th><td>        	FissionProducts-&gt;at(i)-&gt;SetMomentumDirection(Direction);</td></tr>
+<tr><th id="579">579</th><td>            ResultantVector += FissionProducts-&gt;at(i)-&gt;GetMomentum();</td></tr>
+<tr><th id="580">580</th><td>        }</td></tr>
+<tr><th id="581">581</th><td></td></tr>
+<tr><th id="582">582</th><td>        <i>// Warn if the sum momenta of the system is not within a reasonable</i></td></tr>
+<tr><th id="583">583</th><td><i>        // tolerance</i></td></tr>
+<tr><th id="584">584</th><td>        G4double PossibleImbalance = ResultantVector.mag();</td></tr>
+<tr><th id="585">585</th><td>        <b>if</b>(PossibleImbalance &gt; <var>0.01</var>)</td></tr>
+<tr><th id="586">586</th><td>        {</td></tr>
+<tr><th id="587">587</th><td>            <span class='error' title="use of undeclared identifier &apos;std&apos;">std</span>::ostringstream Temp;</td></tr>
+<tr><th id="588">588</th><td>            Temp &lt;&lt; <q>"Momenta imbalance of "</q>;</td></tr>
+<tr><th id="589">589</th><td>            Temp &lt;&lt; PossibleImbalance / (MeV / CLHEP::c_light);</td></tr>
+<tr><th id="590">590</th><td>            Temp &lt;&lt; <q>" MeV/c in the system"</q>;</td></tr>
+<tr><th id="591">591</th><td>            G4Exception(<q>"G4FissionProductYieldDist::G4GetFission()"</q>,</td></tr>
+<tr><th id="592">592</th><td>                        Temp.str().c_str(),</td></tr>
+<tr><th id="593">593</th><td>                        JustWarning,</td></tr>
+<tr><th id="594">594</th><td>                        <q>"Results may not be valid"</q>);</td></tr>
+<tr><th id="595">595</th><td>        }</td></tr>
+<tr><th id="596">596</th><td></td></tr>
+<tr><th id="597">597</th><td>    <i>// Clean up</i></td></tr>
+<tr><th id="598">598</th><td>    <b>delete</b> FirstDaughter;</td></tr>
+<tr><th id="599">599</th><td>    <b>delete</b> SecondDaughter;</td></tr>
+<tr><th id="600">600</th><td>    G4ArrayOps::<span class='error' title="no type named &apos;DeleteVectorOfPointers&apos; in namespace &apos;G4ArrayOps&apos;">DeleteVectorOfPointers</span>(*Neutrons);</td></tr>
+<tr><th id="601">601</th><td>    G4ArrayOps::<span class='error' title="no type named &apos;DeleteVectorOfPointers&apos; in namespace &apos;G4ArrayOps&apos;">DeleteVectorOfPointers</span>(*Gammas);</td></tr>
+<tr><th id="602">602</th><td>    G4ArrayOps::<span class='error' title="no type named &apos;DeleteVectorOfPointers&apos; in namespace &apos;G4ArrayOps&apos;">DeleteVectorOfPointers</span>(*Alphas);</td></tr>
+<tr><th id="603">603</th><td></td></tr>
+<tr><th id="604">604</th><td><a class="macro" href="../include/G4FFGDebuggingMacros.hh.html#219" title="G4FFG_DEPTH--;" data-ref="_M/G4FFG_FUNCTIONLEAVE__">G4FFG_FUNCTIONLEAVE__</a></td></tr>
+<tr><th id="605">605</th><td>    <b>return</b> FissionProducts;</td></tr>
+<tr><th id="606">606</th><td>}</td></tr>
+<tr><th id="607">607</th><td></td></tr>
+<tr><th id="608">608</th><td><a class="type" href="../../../../../particles/management/include/G4Ions.hh.html#G4Ions" title='G4Ions' data-ref="G4Ions">G4Ions</a>* <a class="type" href="../include/G4FissionProductYieldDist.hh.html#G4FissionProductYieldDist" title='G4FissionProductYieldDist' data-ref="G4FissionProductYieldDist">G4FissionProductYieldDist</a>::</td></tr>
+<tr><th id="609">609</th><td><dfn class="decl def" id="_ZN25G4FissionProductYieldDist19G4GetFissionProductEv" title='G4FissionProductYieldDist::G4GetFissionProduct' data-ref="_ZN25G4FissionProductYieldDist19G4GetFissionProductEv">G4GetFissionProduct</dfn>( <em>void</em> )</td></tr>
+<tr><th id="610">610</th><td>{</td></tr>
+<tr><th id="611">611</th><td><a class="macro" href="../include/G4FFGDebuggingMacros.hh.html#215" title="G4FFG_DEPTH++;" data-ref="_M/G4FFG_FUNCTIONENTER__">G4FFG_FUNCTIONENTER__</a></td></tr>
+<tr><th id="612">612</th><td></td></tr>
+<tr><th id="613">613</th><td>    <a class="type" href="../../../../../particles/management/include/G4Ions.hh.html#G4Ions" title='G4Ions' data-ref="G4Ions">G4Ions</a>* <dfn class="local col1 decl" id="1Product" title='Product' data-type='G4Ions *' data-ref="1Product">Product</dfn> = <a class="member" href="#_ZN25G4FissionProductYieldDist12FindParticleEd" title='G4FissionProductYieldDist::FindParticle' data-ref="_ZN25G4FissionProductYieldDist12FindParticleEd">FindParticle</a>(<a class="member" href="../include/G4FissionProductYieldDist.hh.html#G4FissionProductYieldDist::RandomEngine_" title='G4FissionProductYieldDist::RandomEngine_' data-ref="G4FissionProductYieldDist::RandomEngine_">RandomEngine_</a>-&gt;<a class="ref" href="../include/G4FPYSamplingOps.hh.html#_ZN16G4FPYSamplingOps15G4SampleUniformEv" title='G4FPYSamplingOps::G4SampleUniform' data-ref="_ZN16G4FPYSamplingOps15G4SampleUniformEv">G4SampleUniform</a>());</td></tr>
+<tr><th id="614">614</th><td></td></tr>
+<tr><th id="615">615</th><td><a class="macro" href="../include/G4FFGDebuggingMacros.hh.html#219" title="G4FFG_DEPTH--;" data-ref="_M/G4FFG_FUNCTIONLEAVE__">G4FFG_FUNCTIONLEAVE__</a></td></tr>
+<tr><th id="616">616</th><td>    <b>return</b> <a class="local col1 ref" href="#1Product" title='Product' data-ref="1Product">Product</a>;</td></tr>
+<tr><th id="617">617</th><td>}</td></tr>
+<tr><th id="618">618</th><td></td></tr>
+<tr><th id="619">619</th><td><em>void</em> <a class="type" href="../include/G4FissionProductYieldDist.hh.html#G4FissionProductYieldDist" title='G4FissionProductYieldDist' data-ref="G4FissionProductYieldDist">G4FissionProductYieldDist</a>::</td></tr>
+<tr><th id="620">620</th><td><dfn class="decl def" id="_ZN25G4FissionProductYieldDist20G4SetAlphaProductionEd" title='G4FissionProductYieldDist::G4SetAlphaProduction' data-ref="_ZN25G4FissionProductYieldDist20G4SetAlphaProductionEd">G4SetAlphaProduction</dfn>(<a class="typedef" href="../../../../../global/management/include/G4Types.hh.html#G4double" title='G4double' data-type='double' data-ref="G4double">G4double</a> <dfn class="local col2 decl" id="2WhatAlphaProduction" title='WhatAlphaProduction' data-type='G4double' data-ref="2WhatAlphaProduction">WhatAlphaProduction</dfn>)</td></tr>
+<tr><th id="621">621</th><td>{</td></tr>
+<tr><th id="622">622</th><td><a class="macro" href="../include/G4FFGDebuggingMacros.hh.html#215" title="G4FFG_DEPTH++;" data-ref="_M/G4FFG_FUNCTIONENTER__">G4FFG_FUNCTIONENTER__</a></td></tr>
+<tr><th id="623">623</th><td></td></tr>
+<tr><th id="624">624</th><td>    <a class="member" href="../include/G4FissionProductYieldDist.hh.html#G4FissionProductYieldDist::AlphaProduction_" title='G4FissionProductYieldDist::AlphaProduction_' data-ref="G4FissionProductYieldDist::AlphaProduction_">AlphaProduction_</a> = <a class="local col2 ref" href="#2WhatAlphaProduction" title='WhatAlphaProduction' data-ref="2WhatAlphaProduction">WhatAlphaProduction</a>;</td></tr>
+<tr><th id="625">625</th><td></td></tr>
+<tr><th id="626">626</th><td><a class="macro" href="../include/G4FFGDebuggingMacros.hh.html#219" title="G4FFG_DEPTH--;" data-ref="_M/G4FFG_FUNCTIONLEAVE__">G4FFG_FUNCTIONLEAVE__</a></td></tr>
+<tr><th id="627">627</th><td>}</td></tr>
+<tr><th id="628">628</th><td></td></tr>
+<tr><th id="629">629</th><td><em>void</em> <a class="type" href="../include/G4FissionProductYieldDist.hh.html#G4FissionProductYieldDist" title='G4FissionProductYieldDist' data-ref="G4FissionProductYieldDist">G4FissionProductYieldDist</a>::</td></tr>
+<tr><th id="630">630</th><td><dfn class="decl def" id="_ZN25G4FissionProductYieldDist11G4SetEnergyEd" title='G4FissionProductYieldDist::G4SetEnergy' data-ref="_ZN25G4FissionProductYieldDist11G4SetEnergyEd">G4SetEnergy</dfn>( <a class="typedef" href="../../../../../global/management/include/G4Types.hh.html#G4double" title='G4double' data-type='double' data-ref="G4double">G4double</a> <dfn class="local col3 decl" id="3WhatIncidentEnergy" title='WhatIncidentEnergy' data-type='G4double' data-ref="3WhatIncidentEnergy">WhatIncidentEnergy</dfn> )</td></tr>
+<tr><th id="631">631</th><td>{</td></tr>
+<tr><th id="632">632</th><td><a class="macro" href="../include/G4FFGDebuggingMacros.hh.html#215" title="G4FFG_DEPTH++;" data-ref="_M/G4FFG_FUNCTIONENTER__">G4FFG_FUNCTIONENTER__</a></td></tr>
+<tr><th id="633">633</th><td></td></tr>
+<tr><th id="634">634</th><td>    <b>if</b>(<a class="member" href="../include/G4FissionProductYieldDist.hh.html#G4FissionProductYieldDist::Cause_" title='G4FissionProductYieldDist::Cause_' data-ref="G4FissionProductYieldDist::Cause_">Cause_</a> != <span class="namespace">G4FFGEnumerations::</span><a class="enum" href="../include/G4FFGEnumerations.hh.html#G4FFGEnumerations::FissionCause::SPONTANEOUS" title='G4FFGEnumerations::FissionCause::SPONTANEOUS' data-ref="G4FFGEnumerations::FissionCause::SPONTANEOUS">SPONTANEOUS</a>)</td></tr>
+<tr><th id="635">635</th><td>    {</td></tr>
+<tr><th id="636">636</th><td>        <a class="member" href="../include/G4FissionProductYieldDist.hh.html#G4FissionProductYieldDist::IncidentEnergy_" title='G4FissionProductYieldDist::IncidentEnergy_' data-ref="G4FissionProductYieldDist::IncidentEnergy_">IncidentEnergy_</a> = <a class="local col3 ref" href="#3WhatIncidentEnergy" title='WhatIncidentEnergy' data-ref="3WhatIncidentEnergy">WhatIncidentEnergy</a>;</td></tr>
+<tr><th id="637">637</th><td>    } <b>else</b></td></tr>
+<tr><th id="638">638</th><td>    {</td></tr>
+<tr><th id="639">639</th><td>        <a class="member" href="../include/G4FissionProductYieldDist.hh.html#G4FissionProductYieldDist::IncidentEnergy_" title='G4FissionProductYieldDist::IncidentEnergy_' data-ref="G4FissionProductYieldDist::IncidentEnergy_">IncidentEnergy_</a> = <var>0</var> * <a class="ref" href="../../../../../externals/clhep/include/CLHEP/Units/SystemOfUnits.h.html#CLHEP::GeV" title='CLHEP::GeV' data-ref="CLHEP::GeV">GeV</a>;</td></tr>
+<tr><th id="640">640</th><td>    }</td></tr>
+<tr><th id="641">641</th><td></td></tr>
+<tr><th id="642">642</th><td><a class="macro" href="../include/G4FFGDebuggingMacros.hh.html#219" title="G4FFG_DEPTH--;" data-ref="_M/G4FFG_FUNCTIONLEAVE__">G4FFG_FUNCTIONLEAVE__</a></td></tr>
+<tr><th id="643">643</th><td>}</td></tr>
+<tr><th id="644">644</th><td></td></tr>
+<tr><th id="645">645</th><td><em>void</em> <a class="type" href="../include/G4FissionProductYieldDist.hh.html#G4FissionProductYieldDist" title='G4FissionProductYieldDist' data-ref="G4FissionProductYieldDist">G4FissionProductYieldDist</a>::</td></tr>
+<tr><th id="646">646</th><td><dfn class="decl def" id="_ZN25G4FissionProductYieldDist23G4SetTernaryProbabilityEd" title='G4FissionProductYieldDist::G4SetTernaryProbability' data-ref="_ZN25G4FissionProductYieldDist23G4SetTernaryProbabilityEd">G4SetTernaryProbability</dfn>( <a class="typedef" href="../../../../../global/management/include/G4Types.hh.html#G4double" title='G4double' data-type='double' data-ref="G4double">G4double</a> <dfn class="local col4 decl" id="4WhatTernaryProbability" title='WhatTernaryProbability' data-type='G4double' data-ref="4WhatTernaryProbability">WhatTernaryProbability</dfn> )</td></tr>
+<tr><th id="647">647</th><td>{</td></tr>
+<tr><th id="648">648</th><td><a class="macro" href="../include/G4FFGDebuggingMacros.hh.html#215" title="G4FFG_DEPTH++;" data-ref="_M/G4FFG_FUNCTIONENTER__">G4FFG_FUNCTIONENTER__</a></td></tr>
+<tr><th id="649">649</th><td></td></tr>
+<tr><th id="650">650</th><td>    <a class="member" href="../include/G4FissionProductYieldDist.hh.html#G4FissionProductYieldDist::TernaryProbability_" title='G4FissionProductYieldDist::TernaryProbability_' data-ref="G4FissionProductYieldDist::TernaryProbability_">TernaryProbability_</a> = <a class="local col4 ref" href="#4WhatTernaryProbability" title='WhatTernaryProbability' data-ref="4WhatTernaryProbability">WhatTernaryProbability</a>;</td></tr>
+<tr><th id="651">651</th><td></td></tr>
+<tr><th id="652">652</th><td><a class="macro" href="../include/G4FFGDebuggingMacros.hh.html#219" title="G4FFG_DEPTH--;" data-ref="_M/G4FFG_FUNCTIONLEAVE__">G4FFG_FUNCTIONLEAVE__</a></td></tr>
+<tr><th id="653">653</th><td>}</td></tr>
+<tr><th id="654">654</th><td></td></tr>
+<tr><th id="655">655</th><td><em>void</em> <a class="type" href="../include/G4FissionProductYieldDist.hh.html#G4FissionProductYieldDist" title='G4FissionProductYieldDist' data-ref="G4FissionProductYieldDist">G4FissionProductYieldDist</a>::</td></tr>
+<tr><th id="656">656</th><td><dfn class="decl def" id="_ZN25G4FissionProductYieldDist14G4SetVerbosityEi" title='G4FissionProductYieldDist::G4SetVerbosity' data-ref="_ZN25G4FissionProductYieldDist14G4SetVerbosityEi">G4SetVerbosity</dfn>(<a class="typedef" href="../../../../../global/management/include/G4Types.hh.html#G4int" title='G4int' data-type='int' data-ref="G4int">G4int</a> <dfn class="local col5 decl" id="5Verbosity" title='Verbosity' data-type='G4int' data-ref="5Verbosity">Verbosity</dfn>)</td></tr>
+<tr><th id="657">657</th><td>{</td></tr>
+<tr><th id="658">658</th><td><a class="macro" href="../include/G4FFGDebuggingMacros.hh.html#215" title="G4FFG_DEPTH++;" data-ref="_M/G4FFG_FUNCTIONENTER__">G4FFG_FUNCTIONENTER__</a></td></tr>
+<tr><th id="659">659</th><td></td></tr>
+<tr><th id="660">660</th><td>    <a class="member" href="../include/G4FissionProductYieldDist.hh.html#G4FissionProductYieldDist::Verbosity_" title='G4FissionProductYieldDist::Verbosity_' data-ref="G4FissionProductYieldDist::Verbosity_">Verbosity_</a> = <a class="local col5 ref" href="#5Verbosity" title='Verbosity' data-ref="5Verbosity">Verbosity</a>;</td></tr>
+<tr><th id="661">661</th><td>    </td></tr>
+<tr><th id="662">662</th><td>    <a class="member" href="../include/G4FissionProductYieldDist.hh.html#G4FissionProductYieldDist::ENDFData_" title='G4FissionProductYieldDist::ENDFData_' data-ref="G4FissionProductYieldDist::ENDFData_">ENDFData_</a>-&gt;<a class="ref" href="../include/G4ENDFTapeRead.hh.html#_ZN14G4ENDFTapeRead14G4SetVerbosityEi" title='G4ENDFTapeRead::G4SetVerbosity' data-ref="_ZN14G4ENDFTapeRead14G4SetVerbosityEi">G4SetVerbosity</a>(<a class="member" href="../include/G4FissionProductYieldDist.hh.html#G4FissionProductYieldDist::Verbosity_" title='G4FissionProductYieldDist::Verbosity_' data-ref="G4FissionProductYieldDist::Verbosity_">Verbosity_</a>);</td></tr>
+<tr><th id="663">663</th><td>    <a class="member" href="../include/G4FissionProductYieldDist.hh.html#G4FissionProductYieldDist::RandomEngine_" title='G4FissionProductYieldDist::RandomEngine_' data-ref="G4FissionProductYieldDist::RandomEngine_">RandomEngine_</a>-&gt;<a class="ref" href="../include/G4FPYSamplingOps.hh.html#_ZN16G4FPYSamplingOps14G4SetVerbosityEi" title='G4FPYSamplingOps::G4SetVerbosity' data-ref="_ZN16G4FPYSamplingOps14G4SetVerbosityEi">G4SetVerbosity</a>(<a class="member" href="../include/G4FissionProductYieldDist.hh.html#G4FissionProductYieldDist::Verbosity_" title='G4FissionProductYieldDist::Verbosity_' data-ref="G4FissionProductYieldDist::Verbosity_">Verbosity_</a>);</td></tr>
+<tr><th id="664">664</th><td></td></tr>
+<tr><th id="665">665</th><td><a class="macro" href="../include/G4FFGDebuggingMacros.hh.html#219" title="G4FFG_DEPTH--;" data-ref="_M/G4FFG_FUNCTIONLEAVE__">G4FFG_FUNCTIONLEAVE__</a></td></tr>
+<tr><th id="666">666</th><td>}</td></tr>
+<tr><th id="667">667</th><td></td></tr>
+<tr><th id="668">668</th><td><em>void</em> <a class="type" href="../include/G4FissionProductYieldDist.hh.html#G4FissionProductYieldDist" title='G4FissionProductYieldDist' data-ref="G4FissionProductYieldDist">G4FissionProductYieldDist</a>::</td></tr>
+<tr><th id="669">669</th><td><dfn class="decl def" id="_ZN25G4FissionProductYieldDist16CheckAlphaSanityEv" title='G4FissionProductYieldDist::CheckAlphaSanity' data-ref="_ZN25G4FissionProductYieldDist16CheckAlphaSanityEv">CheckAlphaSanity</dfn>( <em>void</em> )</td></tr>
+<tr><th id="670">670</th><td>{</td></tr>
+<tr><th id="671">671</th><td><a class="macro" href="../include/G4FFGDebuggingMacros.hh.html#215" title="G4FFG_DEPTH++;" data-ref="_M/G4FFG_FUNCTIONENTER__">G4FFG_FUNCTIONENTER__</a></td></tr>
+<tr><th id="672">672</th><td></td></tr>
+<tr><th id="673">673</th><td>    <i>// This provides comfortable breathing room at 16 MeV per alpha</i></td></tr>
+<tr><th id="674">674</th><td>    <b>if</b>(<a class="member" href="../include/G4FissionProductYieldDist.hh.html#G4FissionProductYieldDist::AlphaProduction_" title='G4FissionProductYieldDist::AlphaProduction_' data-ref="G4FissionProductYieldDist::AlphaProduction_">AlphaProduction_</a> &gt; <var>10</var>)</td></tr>
+<tr><th id="675">675</th><td>    {</td></tr>
+<tr><th id="676">676</th><td>        <a class="member" href="../include/G4FissionProductYieldDist.hh.html#G4FissionProductYieldDist::AlphaProduction_" title='G4FissionProductYieldDist::AlphaProduction_' data-ref="G4FissionProductYieldDist::AlphaProduction_">AlphaProduction_</a> = <var>10</var>;</td></tr>
+<tr><th id="677">677</th><td>    } <b>else</b> <b>if</b>(<a class="member" href="../include/G4FissionProductYieldDist.hh.html#G4FissionProductYieldDist::AlphaProduction_" title='G4FissionProductYieldDist::AlphaProduction_' data-ref="G4FissionProductYieldDist::AlphaProduction_">AlphaProduction_</a> &lt; -<var>7</var>)</td></tr>
+<tr><th id="678">678</th><td>    {</td></tr>
+<tr><th id="679">679</th><td>        <a class="member" href="../include/G4FissionProductYieldDist.hh.html#G4FissionProductYieldDist::AlphaProduction_" title='G4FissionProductYieldDist::AlphaProduction_' data-ref="G4FissionProductYieldDist::AlphaProduction_">AlphaProduction_</a> = -<var>7</var>;</td></tr>
+<tr><th id="680">680</th><td>    }</td></tr>
+<tr><th id="681">681</th><td></td></tr>
+<tr><th id="682">682</th><td><a class="macro" href="../include/G4FFGDebuggingMacros.hh.html#219" title="G4FFG_DEPTH--;" data-ref="_M/G4FFG_FUNCTIONLEAVE__">G4FFG_FUNCTIONLEAVE__</a></td></tr>
+<tr><th id="683">683</th><td>}</td></tr>
+<tr><th id="684">684</th><td></td></tr>
+<tr><th id="685">685</th><td><a class="type" href="../../../../../particles/management/include/G4Ions.hh.html#G4Ions" title='G4Ions' data-ref="G4Ions">G4Ions</a>* <a class="type" href="../include/G4FissionProductYieldDist.hh.html#G4FissionProductYieldDist" title='G4FissionProductYieldDist' data-ref="G4FissionProductYieldDist">G4FissionProductYieldDist</a>::</td></tr>
+<tr><th id="686">686</th><td><dfn class="decl def" id="_ZN25G4FissionProductYieldDist12FindParticleEd" title='G4FissionProductYieldDist::FindParticle' data-ref="_ZN25G4FissionProductYieldDist12FindParticleEd">FindParticle</dfn>( <a class="typedef" href="../../../../../global/management/include/G4Types.hh.html#G4double" title='G4double' data-type='double' data-ref="G4double">G4double</a> <dfn class="local col6 decl" id="6RandomParticle" title='RandomParticle' data-type='G4double' data-ref="6RandomParticle">RandomParticle</dfn> )</td></tr>
+<tr><th id="687">687</th><td>{</td></tr>
+<tr><th id="688">688</th><td><a class="macro" href="../include/G4FFGDebuggingMacros.hh.html#215" title="G4FFG_DEPTH++;" data-ref="_M/G4FFG_FUNCTIONENTER__">G4FFG_FUNCTIONENTER__</a></td></tr>
+<tr><th id="689">689</th><td></td></tr>
+<tr><th id="690">690</th><td>    <i>// Determine which energy group is currently in use</i></td></tr>
+<tr><th id="691">691</th><td>    <a class="typedef" href="../../../../../global/management/include/G4Types.hh.html#G4bool" title='G4bool' data-type='bool' data-ref="G4bool">G4bool</a> <dfn class="local col7 decl" id="7isExact" title='isExact' data-type='G4bool' data-ref="7isExact">isExact</dfn> = <b>false</b>;</td></tr>
+<tr><th id="692">692</th><td>    <a class="typedef" href="../../../../../global/management/include/G4Types.hh.html#G4bool" title='G4bool' data-type='bool' data-ref="G4bool">G4bool</a> <dfn class="local col8 decl" id="8lowerExists" title='lowerExists' data-type='G4bool' data-ref="8lowerExists">lowerExists</dfn> = <b>false</b>;</td></tr>
+<tr><th id="693">693</th><td>    <a class="typedef" href="../../../../../global/management/include/G4Types.hh.html#G4bool" title='G4bool' data-type='bool' data-ref="G4bool">G4bool</a> <dfn class="local col9 decl" id="9higherExists" title='higherExists' data-type='G4bool' data-ref="9higherExists">higherExists</dfn> = <b>false</b>;</td></tr>
+<tr><th id="694">694</th><td>    <a class="typedef" href="../../../../../global/management/include/G4Types.hh.html#G4int" title='G4int' data-type='int' data-ref="G4int">G4int</a> <dfn class="local col0 decl" id="10energyGroup" title='energyGroup' data-type='G4int' data-ref="10energyGroup">energyGroup</dfn>;</td></tr>
+<tr><th id="695">695</th><td>    <b>for</b>(<a class="local col0 ref" href="#10energyGroup" title='energyGroup' data-ref="10energyGroup">energyGroup</a> = <var>0</var>; <a class="local col0 ref" href="#10energyGroup" title='energyGroup' data-ref="10energyGroup">energyGroup</a> &lt; <a class="member" href="../include/G4FissionProductYieldDist.hh.html#G4FissionProductYieldDist::YieldEnergyGroups_" title='G4FissionProductYieldDist::YieldEnergyGroups_' data-ref="G4FissionProductYieldDist::YieldEnergyGroups_">YieldEnergyGroups_</a>; <a class="local col0 ref" href="#10energyGroup" title='energyGroup' data-ref="10energyGroup">energyGroup</a>++)</td></tr>
+<tr><th id="696">696</th><td>    {</td></tr>
+<tr><th id="697">697</th><td>        <b>if</b>(<a class="member" href="../include/G4FissionProductYieldDist.hh.html#G4FissionProductYieldDist::IncidentEnergy_" title='G4FissionProductYieldDist::IncidentEnergy_' data-ref="G4FissionProductYieldDist::IncidentEnergy_">IncidentEnergy_</a> == <a class="member" href="../include/G4FissionProductYieldDist.hh.html#G4FissionProductYieldDist::YieldEnergies_" title='G4FissionProductYieldDist::YieldEnergies_' data-ref="G4FissionProductYieldDist::YieldEnergies_">YieldEnergies_</a>[<a class="local col0 ref" href="#10energyGroup" title='energyGroup' data-ref="10energyGroup">energyGroup</a>])</td></tr>
+<tr><th id="698">698</th><td>        {</td></tr>
+<tr><th id="699">699</th><td>            <a class="local col7 ref" href="#7isExact" title='isExact' data-ref="7isExact">isExact</a> = <b>true</b>;</td></tr>
+<tr><th id="700">700</th><td>            <b>break</b>;</td></tr>
+<tr><th id="701">701</th><td>        }</td></tr>
+<tr><th id="702">702</th><td></td></tr>
+<tr><th id="703">703</th><td>        <b>if</b>(<a class="local col0 ref" href="#10energyGroup" title='energyGroup' data-ref="10energyGroup">energyGroup</a> == <var>0</var> &amp;&amp; <a class="member" href="../include/G4FissionProductYieldDist.hh.html#G4FissionProductYieldDist::IncidentEnergy_" title='G4FissionProductYieldDist::IncidentEnergy_' data-ref="G4FissionProductYieldDist::IncidentEnergy_">IncidentEnergy_</a> &lt; <a class="member" href="../include/G4FissionProductYieldDist.hh.html#G4FissionProductYieldDist::YieldEnergies_" title='G4FissionProductYieldDist::YieldEnergies_' data-ref="G4FissionProductYieldDist::YieldEnergies_">YieldEnergies_</a>[<a class="local col0 ref" href="#10energyGroup" title='energyGroup' data-ref="10energyGroup">energyGroup</a>])</td></tr>
+<tr><th id="704">704</th><td>        {</td></tr>
+<tr><th id="705">705</th><td>            <i>// Break if the energy is less than the lowest energy</i></td></tr>
+<tr><th id="706">706</th><td>            <a class="local col9 ref" href="#9higherExists" title='higherExists' data-ref="9higherExists">higherExists</a> = <b>true</b>;</td></tr>
+<tr><th id="707">707</th><td>            <b>break</b>;</td></tr>
+<tr><th id="708">708</th><td>        } <b>else</b> <b>if</b>(<a class="local col0 ref" href="#10energyGroup" title='energyGroup' data-ref="10energyGroup">energyGroup</a> == <a class="member" href="../include/G4FissionProductYieldDist.hh.html#G4FissionProductYieldDist::YieldEnergyGroups_" title='G4FissionProductYieldDist::YieldEnergyGroups_' data-ref="G4FissionProductYieldDist::YieldEnergyGroups_">YieldEnergyGroups_</a> - <var>1</var>)</td></tr>
+<tr><th id="709">709</th><td>        {</td></tr>
+<tr><th id="710">710</th><td>            <i>// The energy is greater than any values in the yield data.</i></td></tr>
+<tr><th id="711">711</th><td>            <a class="local col8 ref" href="#8lowerExists" title='lowerExists' data-ref="8lowerExists">lowerExists</a> = <b>true</b>;</td></tr>
+<tr><th id="712">712</th><td>            <b>break</b>;</td></tr>
+<tr><th id="713">713</th><td>        } <b>else</b></td></tr>
+<tr><th id="714">714</th><td>        {</td></tr>
+<tr><th id="715">715</th><td>            <i>// Break if the energy is less than the lowest energy</i></td></tr>
+<tr><th id="716">716</th><td>            <b>if</b>(<a class="member" href="../include/G4FissionProductYieldDist.hh.html#G4FissionProductYieldDist::IncidentEnergy_" title='G4FissionProductYieldDist::IncidentEnergy_' data-ref="G4FissionProductYieldDist::IncidentEnergy_">IncidentEnergy_</a> &gt; <a class="member" href="../include/G4FissionProductYieldDist.hh.html#G4FissionProductYieldDist::YieldEnergies_" title='G4FissionProductYieldDist::YieldEnergies_' data-ref="G4FissionProductYieldDist::YieldEnergies_">YieldEnergies_</a>[<a class="local col0 ref" href="#10energyGroup" title='energyGroup' data-ref="10energyGroup">energyGroup</a>])</td></tr>
+<tr><th id="717">717</th><td>            {</td></tr>
+<tr><th id="718">718</th><td>                <a class="local col0 ref" href="#10energyGroup" title='energyGroup' data-ref="10energyGroup">energyGroup</a>--;</td></tr>
+<tr><th id="719">719</th><td>                <a class="local col8 ref" href="#8lowerExists" title='lowerExists' data-ref="8lowerExists">lowerExists</a> = <b>true</b>;</td></tr>
+<tr><th id="720">720</th><td>                <a class="local col9 ref" href="#9higherExists" title='higherExists' data-ref="9higherExists">higherExists</a> = <b>true</b>;</td></tr>
+<tr><th id="721">721</th><td>                <b>break</b>;</td></tr>
+<tr><th id="722">722</th><td>            }</td></tr>
+<tr><th id="723">723</th><td>        }</td></tr>
+<tr><th id="724">724</th><td>    }</td></tr>
+<tr><th id="725">725</th><td></td></tr>
+<tr><th id="726">726</th><td>    <i>// Determine which particle it is</i></td></tr>
+<tr><th id="727">727</th><td>    <a class="type" href="../../../../../particles/management/include/G4Ions.hh.html#G4Ions" title='G4Ions' data-ref="G4Ions">G4Ions</a>* <dfn class="local col1 decl" id="11FoundParticle" title='FoundParticle' data-type='G4Ions *' data-ref="11FoundParticle">FoundParticle</dfn> = <span class='error' title="use of undeclared identifier &apos;NULL&apos;">NULL</span>;</td></tr>
+<tr><th id="728">728</th><td>    <b>if</b>(<a class="local col7 ref" href="#7isExact" title='isExact' data-ref="7isExact">isExact</a> || <a class="member" href="../include/G4FissionProductYieldDist.hh.html#G4FissionProductYieldDist::YieldEnergyGroups_" title='G4FissionProductYieldDist::YieldEnergyGroups_' data-ref="G4FissionProductYieldDist::YieldEnergyGroups_">YieldEnergyGroups_</a> == <var>1</var>)</td></tr>
+<tr><th id="729">729</th><td>    {</td></tr>
+<tr><th id="730">730</th><td>        <i>// Determine which tree contains the random value</i></td></tr>
+<tr><th id="731">731</th><td>        <a class="typedef" href="../../../../../global/management/include/G4Types.hh.html#G4int" title='G4int' data-type='int' data-ref="G4int">G4int</a> <dfn class="local col2 decl" id="12tree" title='tree' data-type='G4int' data-ref="12tree">tree</dfn>;</td></tr>
+<tr><th id="732">732</th><td>        <b>for</b>(<a class="local col2 ref" href="#12tree" title='tree' data-ref="12tree">tree</a> = <var>0</var>; <a class="local col2 ref" href="#12tree" title='tree' data-ref="12tree">tree</a> &lt; <a class="member" href="../include/G4FissionProductYieldDist.hh.html#G4FissionProductYieldDist::TreeCount_" title='G4FissionProductYieldDist::TreeCount_' data-ref="G4FissionProductYieldDist::TreeCount_">TreeCount_</a>; <a class="local col2 ref" href="#12tree" title='tree' data-ref="12tree">tree</a>++)</td></tr>
+<tr><th id="733">733</th><td>        {</td></tr>
+<tr><th id="734">734</th><td>            <i>// Break if a tree is identified as containing the random particle</i></td></tr>
+<tr><th id="735">735</th><td>            <b>if</b>(<a class="local col6 ref" href="#6RandomParticle" title='RandomParticle' data-ref="6RandomParticle">RandomParticle</a> &lt;= <a class="member" href="../include/G4FissionProductYieldDist.hh.html#G4FissionProductYieldDist::Trees_" title='G4FissionProductYieldDist::Trees_' data-ref="G4FissionProductYieldDist::Trees_">Trees_</a>[<a class="local col2 ref" href="#12tree" title='tree' data-ref="12tree">tree</a>].<a class="ref" href="../include/G4FPYTreeStructures.hh.html#ProbabilityTree::ProbabilityRangeEnd" title='ProbabilityTree::ProbabilityRangeEnd' data-ref="ProbabilityTree::ProbabilityRangeEnd">ProbabilityRangeEnd</a>[<a class="local col0 ref" href="#10energyGroup" title='energyGroup' data-ref="10energyGroup">energyGroup</a>])</td></tr>
+<tr><th id="736">736</th><td>            {</td></tr>
+<tr><th id="737">737</th><td>                <b>break</b>;</td></tr>
+<tr><th id="738">738</th><td>            }</td></tr>
+<tr><th id="739">739</th><td>        }</td></tr>
+<tr><th id="740">740</th><td>        <a class="type" href="../include/G4FPYTreeStructures.hh.html#ProbabilityBranch" title='ProbabilityBranch' data-ref="ProbabilityBranch">ProbabilityBranch</a>* <dfn class="local col3 decl" id="13Branch" title='Branch' data-type='ProbabilityBranch *' data-ref="13Branch">Branch</dfn> = <a class="member" href="../include/G4FissionProductYieldDist.hh.html#G4FissionProductYieldDist::Trees_" title='G4FissionProductYieldDist::Trees_' data-ref="G4FissionProductYieldDist::Trees_">Trees_</a>[<a class="local col2 ref" href="#12tree" title='tree' data-ref="12tree">tree</a>].<a class="ref" href="../include/G4FPYTreeStructures.hh.html#ProbabilityTree::Trunk" title='ProbabilityTree::Trunk' data-ref="ProbabilityTree::Trunk">Trunk</a>;</td></tr>
+<tr><th id="741">741</th><td></td></tr>
+<tr><th id="742">742</th><td>        <i>// Iteratively traverse the tree until the particle addressed by the random</i></td></tr>
+<tr><th id="743">743</th><td><i>        // variable is found</i></td></tr>
+<tr><th id="744">744</th><td>        <a class="typedef" href="../../../../../global/management/include/G4Types.hh.html#G4bool" title='G4bool' data-type='bool' data-ref="G4bool">G4bool</a> <dfn class="local col4 decl" id="14RangeIsSmaller" title='RangeIsSmaller' data-type='G4bool' data-ref="14RangeIsSmaller">RangeIsSmaller</dfn>;</td></tr>
+<tr><th id="745">745</th><td>        <a class="typedef" href="../../../../../global/management/include/G4Types.hh.html#G4bool" title='G4bool' data-type='bool' data-ref="G4bool">G4bool</a> <dfn class="local col5 decl" id="15RangeIsGreater" title='RangeIsGreater' data-type='G4bool' data-ref="15RangeIsGreater">RangeIsGreater</dfn>;</td></tr>
+<tr><th id="746">746</th><td>        <b>while</b>((<a class="local col4 ref" href="#14RangeIsSmaller" title='RangeIsSmaller' data-ref="14RangeIsSmaller">RangeIsSmaller</a> = (<a class="local col6 ref" href="#6RandomParticle" title='RandomParticle' data-ref="6RandomParticle">RandomParticle</a> &lt; <a class="local col3 ref" href="#13Branch" title='Branch' data-ref="13Branch">Branch</a>-&gt;<a class="ref" href="../include/G4FPYTreeStructures.hh.html#ProbabilityBranch::ProbabilityRangeBottom" title='ProbabilityBranch::ProbabilityRangeBottom' data-ref="ProbabilityBranch::ProbabilityRangeBottom">ProbabilityRangeBottom</a>[<a class="local col0 ref" href="#10energyGroup" title='energyGroup' data-ref="10energyGroup">energyGroup</a>]))</td></tr>
+<tr><th id="747">747</th><td>               || (<a class="local col5 ref" href="#15RangeIsGreater" title='RangeIsGreater' data-ref="15RangeIsGreater">RangeIsGreater</a> = (<a class="local col6 ref" href="#6RandomParticle" title='RandomParticle' data-ref="6RandomParticle">RandomParticle</a> &gt; <a class="local col3 ref" href="#13Branch" title='Branch' data-ref="13Branch">Branch</a>-&gt;<a class="ref" href="../include/G4FPYTreeStructures.hh.html#ProbabilityBranch::ProbabilityRangeTop" title='ProbabilityBranch::ProbabilityRangeTop' data-ref="ProbabilityBranch::ProbabilityRangeTop">ProbabilityRangeTop</a>[<a class="local col0 ref" href="#10energyGroup" title='energyGroup' data-ref="10energyGroup">energyGroup</a>])))</td></tr>
+<tr><th id="748">748</th><td>        <i>// Loop checking, 11.05.2015, T. Koi</i></td></tr>
+<tr><th id="749">749</th><td>        {</td></tr>
+<tr><th id="750">750</th><td>            <b>if</b>(<a class="local col4 ref" href="#14RangeIsSmaller" title='RangeIsSmaller' data-ref="14RangeIsSmaller">RangeIsSmaller</a>)</td></tr>
+<tr><th id="751">751</th><td>            {</td></tr>
+<tr><th id="752">752</th><td>                <a class="local col3 ref" href="#13Branch" title='Branch' data-ref="13Branch">Branch</a> = <a class="local col3 ref" href="#13Branch" title='Branch' data-ref="13Branch">Branch</a>-&gt;<a class="ref" href="../include/G4FPYTreeStructures.hh.html#ProbabilityBranch::Left" title='ProbabilityBranch::Left' data-ref="ProbabilityBranch::Left">Left</a>;</td></tr>
+<tr><th id="753">753</th><td>            } <b>else</b> {</td></tr>
+<tr><th id="754">754</th><td>                <a class="local col3 ref" href="#13Branch" title='Branch' data-ref="13Branch">Branch</a> = <a class="local col3 ref" href="#13Branch" title='Branch' data-ref="13Branch">Branch</a>-&gt;<a class="ref" href="../include/G4FPYTreeStructures.hh.html#ProbabilityBranch::Right" title='ProbabilityBranch::Right' data-ref="ProbabilityBranch::Right">Right</a>;</td></tr>
+<tr><th id="755">755</th><td>            }</td></tr>
+<tr><th id="756">756</th><td>        }</td></tr>
+<tr><th id="757">757</th><td></td></tr>
+<tr><th id="758">758</th><td>        <a class="local col1 ref" href="#11FoundParticle" title='FoundParticle' data-ref="11FoundParticle">FoundParticle</a> = <a class="local col3 ref" href="#13Branch" title='Branch' data-ref="13Branch">Branch</a>-&gt;<a class="ref" href="../include/G4FPYTreeStructures.hh.html#ProbabilityBranch::Particle" title='ProbabilityBranch::Particle' data-ref="ProbabilityBranch::Particle">Particle</a>;</td></tr>
+<tr><th id="759">759</th><td>    } <b>else</b> <b>if</b>(<a class="local col8 ref" href="#8lowerExists" title='lowerExists' data-ref="8lowerExists">lowerExists</a> &amp;&amp; <a class="local col9 ref" href="#9higherExists" title='higherExists' data-ref="9higherExists">higherExists</a>)</td></tr>
+<tr><th id="760">760</th><td>    {</td></tr>
+<tr><th id="761">761</th><td>        <i>// We need to do some interpolation</i></td></tr>
+<tr><th id="762">762</th><td>        <a class="local col1 ref" href="#11FoundParticle" title='FoundParticle' data-ref="11FoundParticle">FoundParticle</a> = <a class="member" href="#_ZN25G4FissionProductYieldDist25FindParticleInterpolationEdi" title='G4FissionProductYieldDist::FindParticleInterpolation' data-ref="_ZN25G4FissionProductYieldDist25FindParticleInterpolationEdi">FindParticleInterpolation</a>(<a class="local col6 ref" href="#6RandomParticle" title='RandomParticle' data-ref="6RandomParticle">RandomParticle</a>, <a class="local col0 ref" href="#10energyGroup" title='energyGroup' data-ref="10energyGroup">energyGroup</a>);</td></tr>
+<tr><th id="763">763</th><td>    } <b>else</b></td></tr>
+<tr><th id="764">764</th><td>    {</td></tr>
+<tr><th id="765">765</th><td>        <i>// We need to do some extrapolation</i></td></tr>
+<tr><th id="766">766</th><td>        <a class="local col1 ref" href="#11FoundParticle" title='FoundParticle' data-ref="11FoundParticle">FoundParticle</a> = <a class="member" href="#_ZN25G4FissionProductYieldDist25FindParticleExtrapolationEdb" title='G4FissionProductYieldDist::FindParticleExtrapolation' data-ref="_ZN25G4FissionProductYieldDist25FindParticleExtrapolationEdb">FindParticleExtrapolation</a>(<a class="local col6 ref" href="#6RandomParticle" title='RandomParticle' data-ref="6RandomParticle">RandomParticle</a>, <a class="local col8 ref" href="#8lowerExists" title='lowerExists' data-ref="8lowerExists">lowerExists</a>);</td></tr>
+<tr><th id="767">767</th><td>    }</td></tr>
+<tr><th id="768">768</th><td></td></tr>
+<tr><th id="769">769</th><td>    <i>// Return the particle</i></td></tr>
+<tr><th id="770">770</th><td><a class="macro" href="../include/G4FFGDebuggingMacros.hh.html#219" title="G4FFG_DEPTH--;" data-ref="_M/G4FFG_FUNCTIONLEAVE__">G4FFG_FUNCTIONLEAVE__</a></td></tr>
+<tr><th id="771">771</th><td>    <b>return</b> <a class="local col1 ref" href="#11FoundParticle" title='FoundParticle' data-ref="11FoundParticle">FoundParticle</a>;</td></tr>
+<tr><th id="772">772</th><td>}</td></tr>
+<tr><th id="773">773</th><td></td></tr>
+<tr><th id="774">774</th><td><a class="type" href="../../../../../particles/management/include/G4Ions.hh.html#G4Ions" title='G4Ions' data-ref="G4Ions">G4Ions</a>* <a class="type" href="../include/G4FissionProductYieldDist.hh.html#G4FissionProductYieldDist" title='G4FissionProductYieldDist' data-ref="G4FissionProductYieldDist">G4FissionProductYieldDist</a>::</td></tr>
+<tr><th id="775">775</th><td><dfn class="decl def" id="_ZN25G4FissionProductYieldDist25FindParticleExtrapolationEdb" title='G4FissionProductYieldDist::FindParticleExtrapolation' data-ref="_ZN25G4FissionProductYieldDist25FindParticleExtrapolationEdb">FindParticleExtrapolation</dfn>( <a class="typedef" href="../../../../../global/management/include/G4Types.hh.html#G4double" title='G4double' data-type='double' data-ref="G4double">G4double</a> <dfn class="local col6 decl" id="16RandomParticle" title='RandomParticle' data-type='G4double' data-ref="16RandomParticle">RandomParticle</dfn>,</td></tr>
+<tr><th id="776">776</th><td>                           <a class="typedef" href="../../../../../global/management/include/G4Types.hh.html#G4bool" title='G4bool' data-type='bool' data-ref="G4bool">G4bool</a> <dfn class="local col7 decl" id="17LowerEnergyGroupExists" title='LowerEnergyGroupExists' data-type='G4bool' data-ref="17LowerEnergyGroupExists">LowerEnergyGroupExists</dfn> )</td></tr>
+<tr><th id="777">777</th><td>{</td></tr>
+<tr><th id="778">778</th><td><a class="macro" href="../include/G4FFGDebuggingMacros.hh.html#215" title="G4FFG_DEPTH++;" data-ref="_M/G4FFG_FUNCTIONENTER__">G4FFG_FUNCTIONENTER__</a></td></tr>
+<tr><th id="779">779</th><td></td></tr>
+<tr><th id="780">780</th><td>    <a class="type" href="../../../../../particles/management/include/G4Ions.hh.html#G4Ions" title='G4Ions' data-ref="G4Ions">G4Ions</a>* <dfn class="local col8 decl" id="18FoundParticle" title='FoundParticle' data-type='G4Ions *' data-ref="18FoundParticle">FoundParticle</dfn> = <span class='error' title="use of undeclared identifier &apos;NULL&apos;">NULL</span>;</td></tr>
+<tr><th id="781">781</th><td>    <a class="typedef" href="../../../../../global/management/include/G4Types.hh.html#G4int" title='G4int' data-type='int' data-ref="G4int">G4int</a> <dfn class="local col9 decl" id="19NearestEnergy" title='NearestEnergy' data-type='G4int' data-ref="19NearestEnergy">NearestEnergy</dfn>;</td></tr>
+<tr><th id="782">782</th><td>    <a class="typedef" href="../../../../../global/management/include/G4Types.hh.html#G4int" title='G4int' data-type='int' data-ref="G4int">G4int</a> <dfn class="local col0 decl" id="20NextNearestEnergy" title='NextNearestEnergy' data-type='G4int' data-ref="20NextNearestEnergy">NextNearestEnergy</dfn>;</td></tr>
+<tr><th id="783">783</th><td></td></tr>
+<tr><th id="784">784</th><td>    <i>// Check to see if we are extrapolating above or below the data set    </i></td></tr>
+<tr><th id="785">785</th><td>    <b>if</b>(<a class="local col7 ref" href="#17LowerEnergyGroupExists" title='LowerEnergyGroupExists' data-ref="17LowerEnergyGroupExists">LowerEnergyGroupExists</a> == <b>true</b>)</td></tr>
+<tr><th id="786">786</th><td>    {</td></tr>
+<tr><th id="787">787</th><td>        <a class="local col9 ref" href="#19NearestEnergy" title='NearestEnergy' data-ref="19NearestEnergy">NearestEnergy</a> = <a class="member" href="../include/G4FissionProductYieldDist.hh.html#G4FissionProductYieldDist::YieldEnergyGroups_" title='G4FissionProductYieldDist::YieldEnergyGroups_' data-ref="G4FissionProductYieldDist::YieldEnergyGroups_">YieldEnergyGroups_</a> - <var>1</var>;</td></tr>
+<tr><th id="788">788</th><td>        <a class="local col0 ref" href="#20NextNearestEnergy" title='NextNearestEnergy' data-ref="20NextNearestEnergy">NextNearestEnergy</a> = <a class="local col9 ref" href="#19NearestEnergy" title='NearestEnergy' data-ref="19NearestEnergy">NearestEnergy</a> - <var>1</var>;</td></tr>
+<tr><th id="789">789</th><td>    } <b>else</b></td></tr>
+<tr><th id="790">790</th><td>    {</td></tr>
+<tr><th id="791">791</th><td>        <a class="local col9 ref" href="#19NearestEnergy" title='NearestEnergy' data-ref="19NearestEnergy">NearestEnergy</a> = <var>0</var>;</td></tr>
+<tr><th id="792">792</th><td>        <a class="local col0 ref" href="#20NextNearestEnergy" title='NextNearestEnergy' data-ref="20NextNearestEnergy">NextNearestEnergy</a> = <var>1</var>;</td></tr>
+<tr><th id="793">793</th><td>    }</td></tr>
+<tr><th id="794">794</th><td></td></tr>
+<tr><th id="795">795</th><td>    <b>for</b>(<a class="typedef" href="../../../../../global/management/include/G4Types.hh.html#G4int" title='G4int' data-type='int' data-ref="G4int">G4int</a> <dfn class="local col1 decl" id="21Tree" title='Tree' data-type='G4int' data-ref="21Tree">Tree</dfn> = <var>0</var>; Tree &lt; TreeCount_ &amp;&amp; FoundParticle == <span class='error' title="use of undeclared identifier &apos;NULL&apos;">NULL</span>; <a class="local col1 ref" href="#21Tree" title='Tree' data-ref="21Tree">Tree</a>++)</td></tr>
+<tr><th id="796">796</th><td>    {</td></tr>
+<tr><th id="797">797</th><td>        <a class="local col8 ref" href="#18FoundParticle" title='FoundParticle' data-ref="18FoundParticle">FoundParticle</a> = <a class="member" href="#_ZN25G4FissionProductYieldDist24FindParticleBranchSearchEP17ProbabilityBranchdii" title='G4FissionProductYieldDist::FindParticleBranchSearch' data-ref="_ZN25G4FissionProductYieldDist24FindParticleBranchSearchEP17ProbabilityBranchdii">FindParticleBranchSearch</a>(<a class="member" href="../include/G4FissionProductYieldDist.hh.html#G4FissionProductYieldDist::Trees_" title='G4FissionProductYieldDist::Trees_' data-ref="G4FissionProductYieldDist::Trees_">Trees_</a>[<a class="local col1 ref" href="#21Tree" title='Tree' data-ref="21Tree">Tree</a>].<a class="ref" href="../include/G4FPYTreeStructures.hh.html#ProbabilityTree::Trunk" title='ProbabilityTree::Trunk' data-ref="ProbabilityTree::Trunk">Trunk</a>,</td></tr>
+<tr><th id="798">798</th><td>                                                 <a class="local col6 ref" href="#16RandomParticle" title='RandomParticle' data-ref="16RandomParticle">RandomParticle</a>,</td></tr>
+<tr><th id="799">799</th><td>                                                 <a class="local col9 ref" href="#19NearestEnergy" title='NearestEnergy' data-ref="19NearestEnergy">NearestEnergy</a>,</td></tr>
+<tr><th id="800">800</th><td>                                                 <a class="local col0 ref" href="#20NextNearestEnergy" title='NextNearestEnergy' data-ref="20NextNearestEnergy">NextNearestEnergy</a>);</td></tr>
+<tr><th id="801">801</th><td>    }</td></tr>
+<tr><th id="802">802</th><td></td></tr>
+<tr><th id="803">803</th><td><a class="macro" href="../include/G4FFGDebuggingMacros.hh.html#219" title="G4FFG_DEPTH--;" data-ref="_M/G4FFG_FUNCTIONLEAVE__">G4FFG_FUNCTIONLEAVE__</a></td></tr>
+<tr><th id="804">804</th><td>    <b>return</b> <a class="local col8 ref" href="#18FoundParticle" title='FoundParticle' data-ref="18FoundParticle">FoundParticle</a>;</td></tr>
+<tr><th id="805">805</th><td>}</td></tr>
+<tr><th id="806">806</th><td></td></tr>
+<tr><th id="807">807</th><td><a class="type" href="../../../../../particles/management/include/G4Ions.hh.html#G4Ions" title='G4Ions' data-ref="G4Ions">G4Ions</a>* <a class="type" href="../include/G4FissionProductYieldDist.hh.html#G4FissionProductYieldDist" title='G4FissionProductYieldDist' data-ref="G4FissionProductYieldDist">G4FissionProductYieldDist</a>::</td></tr>
+<tr><th id="808">808</th><td><dfn class="decl def" id="_ZN25G4FissionProductYieldDist25FindParticleInterpolationEdi" title='G4FissionProductYieldDist::FindParticleInterpolation' data-ref="_ZN25G4FissionProductYieldDist25FindParticleInterpolationEdi">FindParticleInterpolation</dfn>( <a class="typedef" href="../../../../../global/management/include/G4Types.hh.html#G4double" title='G4double' data-type='double' data-ref="G4double">G4double</a> <dfn class="local col2 decl" id="22RandomParticle" title='RandomParticle' data-type='G4double' data-ref="22RandomParticle">RandomParticle</dfn>,</td></tr>
+<tr><th id="809">809</th><td>                           <a class="typedef" href="../../../../../global/management/include/G4Types.hh.html#G4int" title='G4int' data-type='int' data-ref="G4int">G4int</a> <dfn class="local col3 decl" id="23LowerEnergyGroup" title='LowerEnergyGroup' data-type='G4int' data-ref="23LowerEnergyGroup">LowerEnergyGroup</dfn> )</td></tr>
+<tr><th id="810">810</th><td>{</td></tr>
+<tr><th id="811">811</th><td><a class="macro" href="../include/G4FFGDebuggingMacros.hh.html#215" title="G4FFG_DEPTH++;" data-ref="_M/G4FFG_FUNCTIONENTER__">G4FFG_FUNCTIONENTER__</a></td></tr>
+<tr><th id="812">812</th><td></td></tr>
+<tr><th id="813">813</th><td>    <a class="type" href="../../../../../particles/management/include/G4Ions.hh.html#G4Ions" title='G4Ions' data-ref="G4Ions">G4Ions</a>* <dfn class="local col4 decl" id="24FoundParticle" title='FoundParticle' data-type='G4Ions *' data-ref="24FoundParticle">FoundParticle</dfn> = <span class='error' title="use of undeclared identifier &apos;NULL&apos;">NULL</span>;</td></tr>
+<tr><th id="814">814</th><td>    <a class="typedef" href="../../../../../global/management/include/G4Types.hh.html#G4int" title='G4int' data-type='int' data-ref="G4int">G4int</a> <dfn class="local col5 decl" id="25HigherEnergyGroup" title='HigherEnergyGroup' data-type='G4int' data-ref="25HigherEnergyGroup">HigherEnergyGroup</dfn> = <a class="local col3 ref" href="#23LowerEnergyGroup" title='LowerEnergyGroup' data-ref="23LowerEnergyGroup">LowerEnergyGroup</a> + <var>1</var>;</td></tr>
+<tr><th id="815">815</th><td></td></tr>
+<tr><th id="816">816</th><td>    <b>for</b>(<a class="typedef" href="../../../../../global/management/include/G4Types.hh.html#G4int" title='G4int' data-type='int' data-ref="G4int">G4int</a> <dfn class="local col6 decl" id="26Tree" title='Tree' data-type='G4int' data-ref="26Tree">Tree</dfn> = <var>0</var>; Tree &lt; TreeCount_ &amp;&amp; FoundParticle == <span class='error' title="use of undeclared identifier &apos;NULL&apos;">NULL</span>; <a class="local col6 ref" href="#26Tree" title='Tree' data-ref="26Tree">Tree</a>++)</td></tr>
+<tr><th id="817">817</th><td>    {</td></tr>
+<tr><th id="818">818</th><td>        <a class="local col4 ref" href="#24FoundParticle" title='FoundParticle' data-ref="24FoundParticle">FoundParticle</a> = <a class="member" href="#_ZN25G4FissionProductYieldDist24FindParticleBranchSearchEP17ProbabilityBranchdii" title='G4FissionProductYieldDist::FindParticleBranchSearch' data-ref="_ZN25G4FissionProductYieldDist24FindParticleBranchSearchEP17ProbabilityBranchdii">FindParticleBranchSearch</a>(<a class="member" href="../include/G4FissionProductYieldDist.hh.html#G4FissionProductYieldDist::Trees_" title='G4FissionProductYieldDist::Trees_' data-ref="G4FissionProductYieldDist::Trees_">Trees_</a>[<a class="local col6 ref" href="#26Tree" title='Tree' data-ref="26Tree">Tree</a>].<a class="ref" href="../include/G4FPYTreeStructures.hh.html#ProbabilityTree::Trunk" title='ProbabilityTree::Trunk' data-ref="ProbabilityTree::Trunk">Trunk</a>,</td></tr>
+<tr><th id="819">819</th><td>                                                 <a class="local col2 ref" href="#22RandomParticle" title='RandomParticle' data-ref="22RandomParticle">RandomParticle</a>,</td></tr>
+<tr><th id="820">820</th><td>                                                 <a class="local col3 ref" href="#23LowerEnergyGroup" title='LowerEnergyGroup' data-ref="23LowerEnergyGroup">LowerEnergyGroup</a>,</td></tr>
+<tr><th id="821">821</th><td>                                                 <a class="local col5 ref" href="#25HigherEnergyGroup" title='HigherEnergyGroup' data-ref="25HigherEnergyGroup">HigherEnergyGroup</a>);</td></tr>
+<tr><th id="822">822</th><td>    }</td></tr>
+<tr><th id="823">823</th><td></td></tr>
+<tr><th id="824">824</th><td><a class="macro" href="../include/G4FFGDebuggingMacros.hh.html#219" title="G4FFG_DEPTH--;" data-ref="_M/G4FFG_FUNCTIONLEAVE__">G4FFG_FUNCTIONLEAVE__</a></td></tr>
+<tr><th id="825">825</th><td>    <b>return</b> <a class="local col4 ref" href="#24FoundParticle" title='FoundParticle' data-ref="24FoundParticle">FoundParticle</a>;</td></tr>
+<tr><th id="826">826</th><td>}</td></tr>
+<tr><th id="827">827</th><td></td></tr>
+<tr><th id="828">828</th><td><a class="type" href="../../../../../particles/management/include/G4Ions.hh.html#G4Ions" title='G4Ions' data-ref="G4Ions">G4Ions</a>* <a class="type" href="../include/G4FissionProductYieldDist.hh.html#G4FissionProductYieldDist" title='G4FissionProductYieldDist' data-ref="G4FissionProductYieldDist">G4FissionProductYieldDist</a>::</td></tr>
+<tr><th id="829">829</th><td><dfn class="decl def" id="_ZN25G4FissionProductYieldDist24FindParticleBranchSearchEP17ProbabilityBranchdii" title='G4FissionProductYieldDist::FindParticleBranchSearch' data-ref="_ZN25G4FissionProductYieldDist24FindParticleBranchSearchEP17ProbabilityBranchdii">FindParticleBranchSearch</dfn>( <a class="type" href="../include/G4FPYTreeStructures.hh.html#ProbabilityBranch" title='ProbabilityBranch' data-ref="ProbabilityBranch">ProbabilityBranch</a>* <dfn class="local col7 decl" id="27Branch" title='Branch' data-type='ProbabilityBranch *' data-ref="27Branch">Branch</dfn>,</td></tr>
+<tr><th id="830">830</th><td>                          <a class="typedef" href="../../../../../global/management/include/G4Types.hh.html#G4double" title='G4double' data-type='double' data-ref="G4double">G4double</a> <dfn class="local col8 decl" id="28RandomParticle" title='RandomParticle' data-type='G4double' data-ref="28RandomParticle">RandomParticle</dfn>,</td></tr>
+<tr><th id="831">831</th><td>                          <a class="typedef" href="../../../../../global/management/include/G4Types.hh.html#G4int" title='G4int' data-type='int' data-ref="G4int">G4int</a> <dfn class="local col9 decl" id="29EnergyGroup1" title='EnergyGroup1' data-type='G4int' data-ref="29EnergyGroup1">EnergyGroup1</dfn>,</td></tr>
+<tr><th id="832">832</th><td>                          <a class="typedef" href="../../../../../global/management/include/G4Types.hh.html#G4int" title='G4int' data-type='int' data-ref="G4int">G4int</a> <dfn class="local col0 decl" id="30EnergyGroup2" title='EnergyGroup2' data-type='G4int' data-ref="30EnergyGroup2">EnergyGroup2</dfn> )</td></tr>
+<tr><th id="833">833</th><td>{</td></tr>
+<tr><th id="834">834</th><td><a class="macro" href="../include/G4FFGDebuggingMacros.hh.html#217" title="" data-ref="_M/G4FFG_RECURSIVE_FUNCTIONENTER__">G4FFG_RECURSIVE_FUNCTIONENTER__</a></td></tr>
+<tr><th id="835">835</th><td></td></tr>
+<tr><th id="836">836</th><td>    <a class="type" href="../../../../../particles/management/include/G4Ions.hh.html#G4Ions" title='G4Ions' data-ref="G4Ions">G4Ions</a>* <dfn class="local col1 decl" id="31Particle" title='Particle' data-type='G4Ions *' data-ref="31Particle">Particle</dfn>;</td></tr>
+<tr><th id="837">837</th><td></td></tr>
+<tr><th id="838">838</th><td>    <i>// Verify that the branch exists</i></td></tr>
+<tr><th id="839">839</th><td>    <b>if</b>(Branch == <span class='error' title="use of undeclared identifier &apos;NULL&apos;">NULL</span>)</td></tr>
+<tr><th id="840">840</th><td>    {</td></tr>
+<tr><th id="841">841</th><td>        Particle = <span class='error' title="use of undeclared identifier &apos;NULL&apos;">NULL</span>;</td></tr>
+<tr><th id="842">842</th><td>    } <b>else</b> <b>if</b>(<a class="local col9 ref" href="#29EnergyGroup1" title='EnergyGroup1' data-ref="29EnergyGroup1">EnergyGroup1</a> &gt;= <a class="local col7 ref" href="#27Branch" title='Branch' data-ref="27Branch">Branch</a>-&gt;<a class="ref" href="../include/G4FPYTreeStructures.hh.html#ProbabilityBranch::IncidentEnergiesCount" title='ProbabilityBranch::IncidentEnergiesCount' data-ref="ProbabilityBranch::IncidentEnergiesCount">IncidentEnergiesCount</a></td></tr>
+<tr><th id="843">843</th><td>              || <a class="local col0 ref" href="#30EnergyGroup2" title='EnergyGroup2' data-ref="30EnergyGroup2">EnergyGroup2</a> &gt;= <a class="local col7 ref" href="#27Branch" title='Branch' data-ref="27Branch">Branch</a>-&gt;<a class="ref" href="../include/G4FPYTreeStructures.hh.html#ProbabilityBranch::IncidentEnergiesCount" title='ProbabilityBranch::IncidentEnergiesCount' data-ref="ProbabilityBranch::IncidentEnergiesCount">IncidentEnergiesCount</a></td></tr>
+<tr><th id="844">844</th><td>              || <a class="local col9 ref" href="#29EnergyGroup1" title='EnergyGroup1' data-ref="29EnergyGroup1">EnergyGroup1</a> == <a class="local col0 ref" href="#30EnergyGroup2" title='EnergyGroup2' data-ref="30EnergyGroup2">EnergyGroup2</a></td></tr>
+<tr><th id="845">845</th><td>              || <a class="local col7 ref" href="#27Branch" title='Branch' data-ref="27Branch">Branch</a>-&gt;<a class="ref" href="../include/G4FPYTreeStructures.hh.html#ProbabilityBranch::IncidentEnergies" title='ProbabilityBranch::IncidentEnergies' data-ref="ProbabilityBranch::IncidentEnergies">IncidentEnergies</a>[<a class="local col9 ref" href="#29EnergyGroup1" title='EnergyGroup1' data-ref="29EnergyGroup1">EnergyGroup1</a>] == <a class="local col7 ref" href="#27Branch" title='Branch' data-ref="27Branch">Branch</a>-&gt;<a class="ref" href="../include/G4FPYTreeStructures.hh.html#ProbabilityBranch::IncidentEnergies" title='ProbabilityBranch::IncidentEnergies' data-ref="ProbabilityBranch::IncidentEnergies">IncidentEnergies</a>[<a class="local col0 ref" href="#30EnergyGroup2" title='EnergyGroup2' data-ref="30EnergyGroup2">EnergyGroup2</a>])</td></tr>
+<tr><th id="846">846</th><td>    {</td></tr>
+<tr><th id="847">847</th><td>        <i>// Set NULL if any invalid conditions exist</i></td></tr>
+<tr><th id="848">848</th><td>        Particle = <span class='error' title="use of undeclared identifier &apos;NULL&apos;">NULL</span>;</td></tr>
+<tr><th id="849">849</th><td>    } <b>else</b></td></tr>
+<tr><th id="850">850</th><td>    {</td></tr>
+<tr><th id="851">851</th><td>        <i>// Everything check out - proceed</i></td></tr>
+<tr><th id="852">852</th><td>        <a class="type" href="../../../../../particles/management/include/G4Ions.hh.html#G4Ions" title='G4Ions' data-ref="G4Ions">G4Ions</a>* <dfn class="local col2 decl" id="32FoundParticle" title='FoundParticle' data-type='G4Ions *' data-ref="32FoundParticle">FoundParticle</dfn> = <span class='error' title="use of undeclared identifier &apos;NULL&apos;">NULL</span>;</td></tr>
+<tr><th id="853">853</th><td>        <a class="typedef" href="../../../../../global/management/include/G4Types.hh.html#G4double" title='G4double' data-type='double' data-ref="G4double">G4double</a> <dfn class="local col3 decl" id="33Intercept" title='Intercept' data-type='G4double' data-ref="33Intercept">Intercept</dfn>;</td></tr>
+<tr><th id="854">854</th><td>        <a class="typedef" href="../../../../../global/management/include/G4Types.hh.html#G4double" title='G4double' data-type='double' data-ref="G4double">G4double</a> <dfn class="local col4 decl" id="34Slope" title='Slope' data-type='G4double' data-ref="34Slope">Slope</dfn>;</td></tr>
+<tr><th id="855">855</th><td>        <a class="typedef" href="../../../../../global/management/include/G4Types.hh.html#G4double" title='G4double' data-type='double' data-ref="G4double">G4double</a> <dfn class="local col5 decl" id="35RangeAtIncidentEnergy" title='RangeAtIncidentEnergy' data-type='G4double' data-ref="35RangeAtIncidentEnergy">RangeAtIncidentEnergy</dfn>;</td></tr>
+<tr><th id="856">856</th><td>        <a class="typedef" href="../../../../../global/management/include/G4Types.hh.html#G4double" title='G4double' data-type='double' data-ref="G4double">G4double</a> <dfn class="local col6 decl" id="36Denominator" title='Denominator' data-type='G4double' data-ref="36Denominator">Denominator</dfn> = <a class="local col7 ref" href="#27Branch" title='Branch' data-ref="27Branch">Branch</a>-&gt;<a class="ref" href="../include/G4FPYTreeStructures.hh.html#ProbabilityBranch::IncidentEnergies" title='ProbabilityBranch::IncidentEnergies' data-ref="ProbabilityBranch::IncidentEnergies">IncidentEnergies</a>[<a class="local col9 ref" href="#29EnergyGroup1" title='EnergyGroup1' data-ref="29EnergyGroup1">EnergyGroup1</a>] - <a class="local col7 ref" href="#27Branch" title='Branch' data-ref="27Branch">Branch</a>-&gt;<a class="ref" href="../include/G4FPYTreeStructures.hh.html#ProbabilityBranch::IncidentEnergies" title='ProbabilityBranch::IncidentEnergies' data-ref="ProbabilityBranch::IncidentEnergies">IncidentEnergies</a>[<a class="local col0 ref" href="#30EnergyGroup2" title='EnergyGroup2' data-ref="30EnergyGroup2">EnergyGroup2</a>];</td></tr>
+<tr><th id="857">857</th><td>        </td></tr>
+<tr><th id="858">858</th><td>        <i>// Calculate the lower probability bounds</i></td></tr>
+<tr><th id="859">859</th><td>        <a class="local col4 ref" href="#34Slope" title='Slope' data-ref="34Slope">Slope</a> = (<a class="local col7 ref" href="#27Branch" title='Branch' data-ref="27Branch">Branch</a>-&gt;<a class="ref" href="../include/G4FPYTreeStructures.hh.html#ProbabilityBranch::ProbabilityRangeBottom" title='ProbabilityBranch::ProbabilityRangeBottom' data-ref="ProbabilityBranch::ProbabilityRangeBottom">ProbabilityRangeBottom</a>[<a class="local col9 ref" href="#29EnergyGroup1" title='EnergyGroup1' data-ref="29EnergyGroup1">EnergyGroup1</a>] - <a class="local col7 ref" href="#27Branch" title='Branch' data-ref="27Branch">Branch</a>-&gt;<a class="ref" href="../include/G4FPYTreeStructures.hh.html#ProbabilityBranch::ProbabilityRangeBottom" title='ProbabilityBranch::ProbabilityRangeBottom' data-ref="ProbabilityBranch::ProbabilityRangeBottom">ProbabilityRangeBottom</a>[<a class="local col0 ref" href="#30EnergyGroup2" title='EnergyGroup2' data-ref="30EnergyGroup2">EnergyGroup2</a>]) / <a class="local col6 ref" href="#36Denominator" title='Denominator' data-ref="36Denominator">Denominator</a>;</td></tr>
+<tr><th id="860">860</th><td>        <a class="local col3 ref" href="#33Intercept" title='Intercept' data-ref="33Intercept">Intercept</a> = <a class="local col7 ref" href="#27Branch" title='Branch' data-ref="27Branch">Branch</a>-&gt;<a class="ref" href="../include/G4FPYTreeStructures.hh.html#ProbabilityBranch::ProbabilityRangeBottom" title='ProbabilityBranch::ProbabilityRangeBottom' data-ref="ProbabilityBranch::ProbabilityRangeBottom">ProbabilityRangeBottom</a>[<a class="local col9 ref" href="#29EnergyGroup1" title='EnergyGroup1' data-ref="29EnergyGroup1">EnergyGroup1</a>] - <a class="local col4 ref" href="#34Slope" title='Slope' data-ref="34Slope">Slope</a> * <a class="local col7 ref" href="#27Branch" title='Branch' data-ref="27Branch">Branch</a>-&gt;<a class="ref" href="../include/G4FPYTreeStructures.hh.html#ProbabilityBranch::IncidentEnergies" title='ProbabilityBranch::IncidentEnergies' data-ref="ProbabilityBranch::IncidentEnergies">IncidentEnergies</a>[<a class="local col9 ref" href="#29EnergyGroup1" title='EnergyGroup1' data-ref="29EnergyGroup1">EnergyGroup1</a>];</td></tr>
+<tr><th id="861">861</th><td>        <a class="local col5 ref" href="#35RangeAtIncidentEnergy" title='RangeAtIncidentEnergy' data-ref="35RangeAtIncidentEnergy">RangeAtIncidentEnergy</a> = <a class="local col4 ref" href="#34Slope" title='Slope' data-ref="34Slope">Slope</a> * <a class="member" href="../include/G4FissionProductYieldDist.hh.html#G4FissionProductYieldDist::IncidentEnergy_" title='G4FissionProductYieldDist::IncidentEnergy_' data-ref="G4FissionProductYieldDist::IncidentEnergy_">IncidentEnergy_</a> + <a class="local col3 ref" href="#33Intercept" title='Intercept' data-ref="33Intercept">Intercept</a>;</td></tr>
+<tr><th id="862">862</th><td></td></tr>
+<tr><th id="863">863</th><td>        <i>// Go right if the particle is below the probability bounds</i></td></tr>
+<tr><th id="864">864</th><td>        <b>if</b>(<a class="local col8 ref" href="#28RandomParticle" title='RandomParticle' data-ref="28RandomParticle">RandomParticle</a> &lt; <a class="local col5 ref" href="#35RangeAtIncidentEnergy" title='RangeAtIncidentEnergy' data-ref="35RangeAtIncidentEnergy">RangeAtIncidentEnergy</a>)</td></tr>
+<tr><th id="865">865</th><td>        {</td></tr>
+<tr><th id="866">866</th><td>            <a class="local col2 ref" href="#32FoundParticle" title='FoundParticle' data-ref="32FoundParticle">FoundParticle</a> = <a class="member" href="#_ZN25G4FissionProductYieldDist24FindParticleBranchSearchEP17ProbabilityBranchdii" title='G4FissionProductYieldDist::FindParticleBranchSearch' data-ref="_ZN25G4FissionProductYieldDist24FindParticleBranchSearchEP17ProbabilityBranchdii">FindParticleBranchSearch</a>(<a class="local col7 ref" href="#27Branch" title='Branch' data-ref="27Branch">Branch</a>-&gt;<a class="ref" href="../include/G4FPYTreeStructures.hh.html#ProbabilityBranch::Left" title='ProbabilityBranch::Left' data-ref="ProbabilityBranch::Left">Left</a>,</td></tr>
+<tr><th id="867">867</th><td>                                                     <a class="local col8 ref" href="#28RandomParticle" title='RandomParticle' data-ref="28RandomParticle">RandomParticle</a>,</td></tr>
+<tr><th id="868">868</th><td>                                                     <a class="local col9 ref" href="#29EnergyGroup1" title='EnergyGroup1' data-ref="29EnergyGroup1">EnergyGroup1</a>,</td></tr>
+<tr><th id="869">869</th><td>                                                     <a class="local col0 ref" href="#30EnergyGroup2" title='EnergyGroup2' data-ref="30EnergyGroup2">EnergyGroup2</a>);</td></tr>
+<tr><th id="870">870</th><td>        } <b>else</b></td></tr>
+<tr><th id="871">871</th><td>        {</td></tr>
+<tr><th id="872">872</th><td>            <i>// Calculate the upper probability bounds</i></td></tr>
+<tr><th id="873">873</th><td>            <a class="local col4 ref" href="#34Slope" title='Slope' data-ref="34Slope">Slope</a> = (<a class="local col7 ref" href="#27Branch" title='Branch' data-ref="27Branch">Branch</a>-&gt;<a class="ref" href="../include/G4FPYTreeStructures.hh.html#ProbabilityBranch::ProbabilityRangeTop" title='ProbabilityBranch::ProbabilityRangeTop' data-ref="ProbabilityBranch::ProbabilityRangeTop">ProbabilityRangeTop</a>[<a class="local col9 ref" href="#29EnergyGroup1" title='EnergyGroup1' data-ref="29EnergyGroup1">EnergyGroup1</a>] - <a class="local col7 ref" href="#27Branch" title='Branch' data-ref="27Branch">Branch</a>-&gt;<a class="ref" href="../include/G4FPYTreeStructures.hh.html#ProbabilityBranch::ProbabilityRangeTop" title='ProbabilityBranch::ProbabilityRangeTop' data-ref="ProbabilityBranch::ProbabilityRangeTop">ProbabilityRangeTop</a>[<a class="local col0 ref" href="#30EnergyGroup2" title='EnergyGroup2' data-ref="30EnergyGroup2">EnergyGroup2</a>]) / <a class="local col6 ref" href="#36Denominator" title='Denominator' data-ref="36Denominator">Denominator</a>;</td></tr>
+<tr><th id="874">874</th><td>            <a class="local col3 ref" href="#33Intercept" title='Intercept' data-ref="33Intercept">Intercept</a> = <a class="local col7 ref" href="#27Branch" title='Branch' data-ref="27Branch">Branch</a>-&gt;<a class="ref" href="../include/G4FPYTreeStructures.hh.html#ProbabilityBranch::ProbabilityRangeTop" title='ProbabilityBranch::ProbabilityRangeTop' data-ref="ProbabilityBranch::ProbabilityRangeTop">ProbabilityRangeTop</a>[<a class="local col9 ref" href="#29EnergyGroup1" title='EnergyGroup1' data-ref="29EnergyGroup1">EnergyGroup1</a>] - <a class="local col4 ref" href="#34Slope" title='Slope' data-ref="34Slope">Slope</a> * <a class="local col7 ref" href="#27Branch" title='Branch' data-ref="27Branch">Branch</a>-&gt;<a class="ref" href="../include/G4FPYTreeStructures.hh.html#ProbabilityBranch::IncidentEnergies" title='ProbabilityBranch::IncidentEnergies' data-ref="ProbabilityBranch::IncidentEnergies">IncidentEnergies</a>[<a class="local col9 ref" href="#29EnergyGroup1" title='EnergyGroup1' data-ref="29EnergyGroup1">EnergyGroup1</a>];</td></tr>
+<tr><th id="875">875</th><td>            <a class="local col5 ref" href="#35RangeAtIncidentEnergy" title='RangeAtIncidentEnergy' data-ref="35RangeAtIncidentEnergy">RangeAtIncidentEnergy</a> = <a class="local col4 ref" href="#34Slope" title='Slope' data-ref="34Slope">Slope</a> * <a class="member" href="../include/G4FissionProductYieldDist.hh.html#G4FissionProductYieldDist::IncidentEnergy_" title='G4FissionProductYieldDist::IncidentEnergy_' data-ref="G4FissionProductYieldDist::IncidentEnergy_">IncidentEnergy_</a> + <a class="local col3 ref" href="#33Intercept" title='Intercept' data-ref="33Intercept">Intercept</a>;</td></tr>
+<tr><th id="876">876</th><td></td></tr>
+<tr><th id="877">877</th><td>            <i>// Go left if the particle is above the probability bounds</i></td></tr>
+<tr><th id="878">878</th><td>            <b>if</b>(<a class="local col8 ref" href="#28RandomParticle" title='RandomParticle' data-ref="28RandomParticle">RandomParticle</a> &gt; <a class="local col5 ref" href="#35RangeAtIncidentEnergy" title='RangeAtIncidentEnergy' data-ref="35RangeAtIncidentEnergy">RangeAtIncidentEnergy</a>)</td></tr>
+<tr><th id="879">879</th><td>            {</td></tr>
+<tr><th id="880">880</th><td>                <a class="local col2 ref" href="#32FoundParticle" title='FoundParticle' data-ref="32FoundParticle">FoundParticle</a> = <a class="member" href="#_ZN25G4FissionProductYieldDist24FindParticleBranchSearchEP17ProbabilityBranchdii" title='G4FissionProductYieldDist::FindParticleBranchSearch' data-ref="_ZN25G4FissionProductYieldDist24FindParticleBranchSearchEP17ProbabilityBranchdii">FindParticleBranchSearch</a>(<a class="local col7 ref" href="#27Branch" title='Branch' data-ref="27Branch">Branch</a>-&gt;<a class="ref" href="../include/G4FPYTreeStructures.hh.html#ProbabilityBranch::Right" title='ProbabilityBranch::Right' data-ref="ProbabilityBranch::Right">Right</a>,</td></tr>
+<tr><th id="881">881</th><td>                                                         <a class="local col8 ref" href="#28RandomParticle" title='RandomParticle' data-ref="28RandomParticle">RandomParticle</a>,</td></tr>
+<tr><th id="882">882</th><td>                                                         <a class="local col9 ref" href="#29EnergyGroup1" title='EnergyGroup1' data-ref="29EnergyGroup1">EnergyGroup1</a>,</td></tr>
+<tr><th id="883">883</th><td>                                                         <a class="local col0 ref" href="#30EnergyGroup2" title='EnergyGroup2' data-ref="30EnergyGroup2">EnergyGroup2</a>);</td></tr>
+<tr><th id="884">884</th><td>            } <b>else</b></td></tr>
+<tr><th id="885">885</th><td>            {</td></tr>
+<tr><th id="886">886</th><td>                <i>// If the particle is bounded then we found it!</i></td></tr>
+<tr><th id="887">887</th><td>                <a class="local col2 ref" href="#32FoundParticle" title='FoundParticle' data-ref="32FoundParticle">FoundParticle</a> = <a class="local col7 ref" href="#27Branch" title='Branch' data-ref="27Branch">Branch</a>-&gt;<a class="ref" href="../include/G4FPYTreeStructures.hh.html#ProbabilityBranch::Particle" title='ProbabilityBranch::Particle' data-ref="ProbabilityBranch::Particle">Particle</a>;</td></tr>
+<tr><th id="888">888</th><td>            }</td></tr>
+<tr><th id="889">889</th><td>        }</td></tr>
+<tr><th id="890">890</th><td>        </td></tr>
+<tr><th id="891">891</th><td>        <a class="local col1 ref" href="#31Particle" title='Particle' data-ref="31Particle">Particle</a> = <a class="local col2 ref" href="#32FoundParticle" title='FoundParticle' data-ref="32FoundParticle">FoundParticle</a>;</td></tr>
+<tr><th id="892">892</th><td>    }</td></tr>
+<tr><th id="893">893</th><td></td></tr>
+<tr><th id="894">894</th><td><a class="macro" href="../include/G4FFGDebuggingMacros.hh.html#221" title="" data-ref="_M/G4FFG_RECURSIVE_FUNCTIONLEAVE__">G4FFG_RECURSIVE_FUNCTIONLEAVE__</a></td></tr>
+<tr><th id="895">895</th><td>    <b>return</b> <a class="local col1 ref" href="#31Particle" title='Particle' data-ref="31Particle">Particle</a>;</td></tr>
+<tr><th id="896">896</th><td>}</td></tr>
+<tr><th id="897">897</th><td></td></tr>
+<tr><th id="898">898</th><td><em>void</em> <a class="type" href="../include/G4FissionProductYieldDist.hh.html#G4FissionProductYieldDist" title='G4FissionProductYieldDist' data-ref="G4FissionProductYieldDist">G4FissionProductYieldDist</a>::</td></tr>
+<tr><th id="899">899</th><td><span class='error' title="variable has incomplete type &apos;void&apos;"><dfn class="tu decl def" id="G4FissionProductYieldDist::GenerateAlphas" title='G4FissionProductYieldDist::GenerateAlphas' data-type='void' data-ref="G4FissionProductYieldDist::GenerateAlphas">GenerateAlphas</dfn></span>( <span class='error' title="use of undeclared identifier &apos;std&apos;">std</span>::vector&lt; <span class='error' title="&apos;G4ReactionProduct&apos; does not refer to a value">G4ReactionProduct</span>* <span class='error' title="expected expression">&gt;</span>* <span class='error' title="use of undeclared identifier &apos;Alphas&apos;">Alphas</span> )<span class='error' title="expected &apos;;&apos; after top level declarator"></span></td></tr>
+<tr><th id="900">900</th><td>{</td></tr>
+<tr><th id="901">901</th><td><a class="macro" href="../include/G4FFGDebuggingMacros.hh.html#215" title="G4FFG_DEPTH++;" data-ref="_M/G4FFG_FUNCTIONENTER__">G4FFG_FUNCTIONENTER__</a></td></tr>
+<tr><th id="902">902</th><td></td></tr>
+<tr><th id="903">903</th><td>    <i>// Throw the dice to determine if ternary fission occurs</i></td></tr>
+<tr><th id="904">904</th><td>    G4bool MakeAlphas = RandomEngine_-&gt;G4SampleUniform() &lt;= TernaryProbability_;</td></tr>
+<tr><th id="905">905</th><td>    <b>if</b>(MakeAlphas)</td></tr>
+<tr><th id="906">906</th><td>    {</td></tr>
+<tr><th id="907">907</th><td>        G4int NumberOfAlphasToProduce;</td></tr>
+<tr><th id="908">908</th><td></td></tr>
+<tr><th id="909">909</th><td>        <i>// Determine how many alpha particles to produce for the ternary fission</i></td></tr>
+<tr><th id="910">910</th><td>        <b>if</b>(AlphaProduction_ &lt; <var>0</var>)</td></tr>
+<tr><th id="911">911</th><td>        {</td></tr>
+<tr><th id="912">912</th><td>            NumberOfAlphasToProduce = RandomEngine_-&gt;G4SampleIntegerGaussian(AlphaProduction_ * -<var>1</var>,</td></tr>
+<tr><th id="913">913</th><td>                                                                             <var>1</var>,</td></tr>
+<tr><th id="914">914</th><td>                                                                             G4FFGEnumerations::POSITIVE);</td></tr>
+<tr><th id="915">915</th><td>        } <b>else</b></td></tr>
+<tr><th id="916">916</th><td>        {</td></tr>
+<tr><th id="917">917</th><td>             NumberOfAlphasToProduce = (G4int)AlphaProduction_;</td></tr>
+<tr><th id="918">918</th><td>        }</td></tr>
+<tr><th id="919">919</th><td></td></tr>
+<tr><th id="920">920</th><td>        <i>//TK modifed 131108</i></td></tr>
+<tr><th id="921">921</th><td><i>        //Alphas-&gt;resize(NumberOfAlphasToProduce);</i></td></tr>
+<tr><th id="922">922</th><td>        <b>for</b>(<em>int</em> i = <var>0</var>; i &lt; NumberOfAlphasToProduce; i++)</td></tr>
+<tr><th id="923">923</th><td>        {</td></tr>
+<tr><th id="924">924</th><td>            <i>// Set the G4Ions as an alpha particle</i></td></tr>
+<tr><th id="925">925</th><td>            Alphas-&gt;push_back(<b>new</b> G4ReactionProduct(AlphaDefinition_));</td></tr>
+<tr><th id="926">926</th><td></td></tr>
+<tr><th id="927">927</th><td>            <i>// Remove 4 nucleons (2 protons and 2 neutrons) for each alpha added</i></td></tr>
+<tr><th id="928">928</th><td>            RemainingZ_ -= <var>2</var>;</td></tr>
+<tr><th id="929">929</th><td>            RemainingA_ -= <var>4</var>;</td></tr>
+<tr><th id="930">930</th><td>        }</td></tr>
+<tr><th id="931">931</th><td>    }</td></tr>
+<tr><th id="932">932</th><td></td></tr>
+<tr><th id="933">933</th><td><a class="macro" href="../include/G4FFGDebuggingMacros.hh.html#219" title="G4FFG_DEPTH--;" data-ref="_M/G4FFG_FUNCTIONLEAVE__">G4FFG_FUNCTIONLEAVE__</a></td></tr>
+<tr><th id="934">934</th><td>}</td></tr>
+<tr><th id="935">935</th><td></td></tr>
+<tr><th id="936">936</th><td><em>void</em> G4FissionProductYieldDist::</td></tr>
+<tr><th id="937">937</th><td>GenerateNeutrons( std::vector&lt; G4ReactionProduct* &gt;* Neutrons )</td></tr>
+<tr><th id="938">938</th><td>{</td></tr>
+<tr><th id="939">939</th><td><a class="macro" href="../include/G4FFGDebuggingMacros.hh.html#215" title="G4FFG_DEPTH++;" data-ref="_M/G4FFG_FUNCTIONENTER__">G4FFG_FUNCTIONENTER__</a></td></tr>
+<tr><th id="940">940</th><td></td></tr>
+<tr><th id="941">941</th><td>    G4int NeutronProduction;</td></tr>
+<tr><th id="942">942</th><td>    NeutronProduction = RandomEngine_-&gt;G4SampleIntegerGaussian(Nubar_, NubarWidth_, G4FFGEnumerations::POSITIVE);</td></tr>
+<tr><th id="943">943</th><td></td></tr>
+<tr><th id="944">944</th><td>    <i>//TK modifed 131108</i></td></tr>
+<tr><th id="945">945</th><td><i>    //Neutrons-&gt;resize(NeutronProduction);</i></td></tr>
+<tr><th id="946">946</th><td>    <b>for</b>(<em>int</em> i = <var>0</var>; i &lt; NeutronProduction; i++)</td></tr>
+<tr><th id="947">947</th><td>    {</td></tr>
+<tr><th id="948">948</th><td>        <i>// Define the fragment as a neutron</i></td></tr>
+<tr><th id="949">949</th><td>        Neutrons-&gt;push_back(<b>new</b> G4ReactionProduct(NeutronDefinition_));</td></tr>
+<tr><th id="950">950</th><td></td></tr>
+<tr><th id="951">951</th><td>        <i>// Remove 1 nucleon for each neutron added</i></td></tr>
+<tr><th id="952">952</th><td>        RemainingA_--;</td></tr>
+<tr><th id="953">953</th><td>    }</td></tr>
+<tr><th id="954">954</th><td></td></tr>
+<tr><th id="955">955</th><td><a class="macro" href="../include/G4FFGDebuggingMacros.hh.html#219" title="G4FFG_DEPTH--;" data-ref="_M/G4FFG_FUNCTIONLEAVE__">G4FFG_FUNCTIONLEAVE__</a></td></tr>
+<tr><th id="956">956</th><td>}</td></tr>
+<tr><th id="957">957</th><td></td></tr>
+<tr><th id="958">958</th><td>G4Ions* G4FissionProductYieldDist::</td></tr>
+<tr><th id="959">959</th><td>GetParticleDefinition( G4int Product,</td></tr>
+<tr><th id="960">960</th><td>                       <i>//TK modified 131108</i></td></tr>
+<tr><th id="961">961</th><td><i>                       //G4FFGEnumerations::MetaState MetaState )</i></td></tr>
+<tr><th id="962">962</th><td>                       G4FFGEnumerations::MetaState <i>/*MetaState*/</i> )</td></tr>
+<tr><th id="963">963</th><td>{</td></tr>
+<tr><th id="964">964</th><td><a class="macro" href="../include/G4FFGDebuggingMacros.hh.html#218" title="" data-ref="_M/G4FFG_DATA_FUNCTIONENTER__">G4FFG_DATA_FUNCTIONENTER__</a></td></tr>
+<tr><th id="965">965</th><td></td></tr>
+<tr><th id="966">966</th><td>    G4Ions* Temp;</td></tr>
+<tr><th id="967">967</th><td></td></tr>
+<tr><th id="968">968</th><td>    <i>// Break Product down into its A and Z components</i></td></tr>
+<tr><th id="969">969</th><td>    G4int A = Product % <var>1000</var>; <i>// Extract A</i></td></tr>
+<tr><th id="970">970</th><td>    G4int Z = (Product - A) / <var>1000</var>; <i>// Extract Z</i></td></tr>
+<tr><th id="971">971</th><td></td></tr>
+<tr><th id="972">972</th><td>    <i>// Check to see if the particle is registered using the PDG code</i></td></tr>
+<tr><th id="973">973</th><td><i>    // TODO Add metastable state when supported by G4IonTable::GetIon()</i></td></tr>
+<tr><th id="974">974</th><td>    Temp = <b>reinterpret_cast</b>&lt;G4Ions*&gt;(IonTable_-&gt;GetIon(Z, A));</td></tr>
+<tr><th id="975">975</th><td>    </td></tr>
+<tr><th id="976">976</th><td>    <i>// Removed in favor of the G4IonTable::GetIon() method</i></td></tr>
+<tr><th id="977">977</th><td><i>//    // Register the particle if it does not exist</i></td></tr>
+<tr><th id="978">978</th><td><i>//    if(Temp == NULL)</i></td></tr>
+<tr><th id="979">979</th><td><i>//    {</i></td></tr>
+<tr><th id="980">980</th><td><i>//        // Define the particle properties</i></td></tr>
+<tr><th id="981">981</th><td><i>//        G4String Name = MakeIsotopeName(Product, MetaState);</i></td></tr>
+<tr><th id="982">982</th><td><i>//        // Calculate the rest mass using a function already in Geant4</i></td></tr>
+<tr><th id="983">983</th><td><i>//        G4double Mass = G4NucleiProperties::</i></td></tr>
+<tr><th id="984">984</th><td><i>//                        GetNuclearMass((double)A, (double)Z );</i></td></tr>
+<tr><th id="985">985</th><td><i>//        G4double Charge = Z*eplus;</i></td></tr>
+<tr><th id="986">986</th><td><i>//        G4int BaryonNum = A;</i></td></tr>
+<tr><th id="987">987</th><td><i>//        G4bool Stable = TRUE;</i></td></tr>
+<tr><th id="988">988</th><td><i>//</i></td></tr>
+<tr><th id="989">989</th><td><i>//        // I am unsure about the following properties:</i></td></tr>
+<tr><th id="990">990</th><td><i>//        //     2*Spin, Parity, C-conjugation, 2*Isospin, 2*Isospin3, G-parity.</i></td></tr>
+<tr><th id="991">991</th><td><i>//        // Perhaps is would be a good idea to have a physicist familiar with</i></td></tr>
+<tr><th id="992">992</th><td><i>//        // Geant4 nomenclature to review and correct these properties.</i></td></tr>
+<tr><th id="993">993</th><td><i>//        Temp = new G4Ions (</i></td></tr>
+<tr><th id="994">994</th><td><i>//            // Name           Mass           Width          Charge</i></td></tr>
+<tr><th id="995">995</th><td><i>//               Name,          Mass,          0.0,           Charge,</i></td></tr>
+<tr><th id="996">996</th><td><i>//</i></td></tr>
+<tr><th id="997">997</th><td><i>//            // 2*Spin         Parity         C-conjugation  2*Isospin</i></td></tr>
+<tr><th id="998">998</th><td><i>//               0,             1,             0,             0,</i></td></tr>
+<tr><th id="999">999</th><td><i>//</i></td></tr>
+<tr><th id="1000">1000</th><td><i>//            // 2*Isospin3     G-parity       Type           Lepton number</i></td></tr>
+<tr><th id="1001">1001</th><td><i>//               0,             0,             "nucleus",     0,</i></td></tr>
+<tr><th id="1002">1002</th><td><i>//</i></td></tr>
+<tr><th id="1003">1003</th><td><i>//            // Baryon number  PDG encoding   Stable         Lifetime</i></td></tr>
+<tr><th id="1004">1004</th><td><i>//               BaryonNum,     PDGCode,       Stable,        -1,</i></td></tr>
+<tr><th id="1005">1005</th><td><i>//</i></td></tr>
+<tr><th id="1006">1006</th><td><i>//            // Decay table    Shortlived     SubType        Anti_encoding</i></td></tr>
+<tr><th id="1007">1007</th><td><i>//               NULL,          FALSE,        "generic",     0,</i></td></tr>
+<tr><th id="1008">1008</th><td><i>//</i></td></tr>
+<tr><th id="1009">1009</th><td><i>//            // Excitation</i></td></tr>
+<tr><th id="1010">1010</th><td><i>//               0.0);</i></td></tr>
+<tr><th id="1011">1011</th><td><i>//        Temp-&gt;SetPDGMagneticMoment(0.0);</i></td></tr>
+<tr><th id="1012">1012</th><td><i>//</i></td></tr>
+<tr><th id="1013">1013</th><td><i>//        // Declare that there is no anti-particle</i></td></tr>
+<tr><th id="1014">1014</th><td><i>//        Temp-&gt;SetAntiPDGEncoding(0);</i></td></tr>
+<tr><th id="1015">1015</th><td><i>//</i></td></tr>
+<tr><th id="1016">1016</th><td><i>//        // Define the processes to use in transporting the particles</i></td></tr>
+<tr><th id="1017">1017</th><td><i>//        std::ostringstream osAdd;</i></td></tr>
+<tr><th id="1018">1018</th><td><i>//        osAdd &lt;&lt; "/run/particle/addProcManager " &lt;&lt; Name;</i></td></tr>
+<tr><th id="1019">1019</th><td><i>//        G4String cmdAdd = osAdd.str();</i></td></tr>
+<tr><th id="1020">1020</th><td><i>//</i></td></tr>
+<tr><th id="1021">1021</th><td><i>//        // set /control/verbose 0</i></td></tr>
+<tr><th id="1022">1022</th><td><i>//        G4int tempVerboseLevel = G4UImanager::GetUIpointer()-&gt;GetVerboseLevel();</i></td></tr>
+<tr><th id="1023">1023</th><td><i>//        G4UImanager::GetUIpointer()-&gt;SetVerboseLevel(0);</i></td></tr>
+<tr><th id="1024">1024</th><td><i>//</i></td></tr>
+<tr><th id="1025">1025</th><td><i>//        // issue /run/particle/addProcManage</i></td></tr>
+<tr><th id="1026">1026</th><td><i>//        G4UImanager::GetUIpointer()-&gt;ApplyCommand(cmdAdd);</i></td></tr>
+<tr><th id="1027">1027</th><td><i>//</i></td></tr>
+<tr><th id="1028">1028</th><td><i>//        // retrieve  /control/verbose</i></td></tr>
+<tr><th id="1029">1029</th><td><i>//        G4UImanager::GetUIpointer()-&gt;SetVerboseLevel(tempVerboseLevel);</i></td></tr>
+<tr><th id="1030">1030</th><td><i>//    }</i></td></tr>
+<tr><th id="1031">1031</th><td></td></tr>
+<tr><th id="1032">1032</th><td><a class="macro" href="../include/G4FFGDebuggingMacros.hh.html#222" title="" data-ref="_M/G4FFG_DATA_FUNCTIONLEAVE__">G4FFG_DATA_FUNCTIONLEAVE__</a></td></tr>
+<tr><th id="1033">1033</th><td>    <b>return</b> Temp;</td></tr>
+<tr><th id="1034">1034</th><td>}</td></tr>
+<tr><th id="1035">1035</th><td></td></tr>
+<tr><th id="1036">1036</th><td>G4String G4FissionProductYieldDist::</td></tr>
+<tr><th id="1037">1037</th><td>MakeDirectoryName( <em>void</em> )</td></tr>
+<tr><th id="1038">1038</th><td>{</td></tr>
+<tr><th id="1039">1039</th><td><a class="macro" href="../include/G4FFGDebuggingMacros.hh.html#215" title="G4FFG_DEPTH++;" data-ref="_M/G4FFG_FUNCTIONENTER__">G4FFG_FUNCTIONENTER__</a></td></tr>
+<tr><th id="1040">1040</th><td></td></tr>
+<tr><th id="1041">1041</th><td>    <i>// Generate the file location starting in the Geant4 data directory</i></td></tr>
+<tr><th id="1042">1042</th><td>    std::ostringstream DirectoryName;</td></tr>
+<tr><th id="1043">1043</th><td>    DirectoryName &lt;&lt; getenv(<q>"G4NEUTRONHPDATA"</q>) &lt;&lt; G4FFGDefaultValues::ENDFFissionDataLocation;</td></tr>
+<tr><th id="1044">1044</th><td></td></tr>
+<tr><th id="1045">1045</th><td>    <i>// Return the directory structure</i></td></tr>
+<tr><th id="1046">1046</th><td><a class="macro" href="../include/G4FFGDebuggingMacros.hh.html#219" title="G4FFG_DEPTH--;" data-ref="_M/G4FFG_FUNCTIONLEAVE__">G4FFG_FUNCTIONLEAVE__</a></td></tr>
+<tr><th id="1047">1047</th><td>    <b>return</b> DirectoryName.str();</td></tr>
+<tr><th id="1048">1048</th><td>}</td></tr>
+<tr><th id="1049">1049</th><td></td></tr>
+<tr><th id="1050">1050</th><td>G4String G4FissionProductYieldDist::</td></tr>
+<tr><th id="1051">1051</th><td>MakeFileName( G4int Isotope,</td></tr>
+<tr><th id="1052">1052</th><td>              G4FFGEnumerations::MetaState MetaState )</td></tr>
+<tr><th id="1053">1053</th><td>{</td></tr>
+<tr><th id="1054">1054</th><td><a class="macro" href="../include/G4FFGDebuggingMacros.hh.html#215" title="G4FFG_DEPTH++;" data-ref="_M/G4FFG_FUNCTIONENTER__">G4FFG_FUNCTIONENTER__</a></td></tr>
+<tr><th id="1055">1055</th><td></td></tr>
+<tr><th id="1056">1056</th><td></td></tr>
+<tr><th id="1057">1057</th><td>    <i>// Create the unique identifying name for the particle</i></td></tr>
+<tr><th id="1058">1058</th><td>    std::ostringstream FileName;</td></tr>
+<tr><th id="1059">1059</th><td></td></tr>
+<tr><th id="1060">1060</th><td>    <i>// Determine if a leading 0 is needed (ZZZAAA or 0ZZAAA)</i></td></tr>
+<tr><th id="1061">1061</th><td>    <b>if</b>(Isotope &lt; <var>100000</var>)</td></tr>
+<tr><th id="1062">1062</th><td>    {</td></tr>
+<tr><th id="1063">1063</th><td>        FileName &lt;&lt; <q>"0"</q>;</td></tr>
+<tr><th id="1064">1064</th><td>    }</td></tr>
+<tr><th id="1065">1065</th><td></td></tr>
+<tr><th id="1066">1066</th><td>    <i>// Add the name of the element and the extension</i></td></tr>
+<tr><th id="1067">1067</th><td>    FileName &lt;&lt; MakeIsotopeName(Isotope, MetaState) &lt;&lt; <q>".fpy"</q>;</td></tr>
+<tr><th id="1068">1068</th><td></td></tr>
+<tr><th id="1069">1069</th><td><a class="macro" href="../include/G4FFGDebuggingMacros.hh.html#219" title="G4FFG_DEPTH--;" data-ref="_M/G4FFG_FUNCTIONLEAVE__">G4FFG_FUNCTIONLEAVE__</a></td></tr>
+<tr><th id="1070">1070</th><td>    <b>return</b> FileName.str();</td></tr>
+<tr><th id="1071">1071</th><td>}</td></tr>
+<tr><th id="1072">1072</th><td></td></tr>
+<tr><th id="1073">1073</th><td>G4DynamicParticle* G4FissionProductYieldDist::</td></tr>
+<tr><th id="1074">1074</th><td>MakeG4DynamicParticle( G4ReactionProduct* ReactionProduct )</td></tr>
+<tr><th id="1075">1075</th><td>{</td></tr>
+<tr><th id="1076">1076</th><td><a class="macro" href="../include/G4FFGDebuggingMacros.hh.html#218" title="" data-ref="_M/G4FFG_DATA_FUNCTIONENTER__">G4FFG_DATA_FUNCTIONENTER__</a></td></tr>
+<tr><th id="1077">1077</th><td></td></tr>
+<tr><th id="1078">1078</th><td>	G4DynamicParticle* DynamicParticle = <b>new</b> G4DynamicParticle(ReactionProduct-&gt;GetDefinition(), ReactionProduct-&gt;GetMomentum());</td></tr>
+<tr><th id="1079">1079</th><td></td></tr>
+<tr><th id="1080">1080</th><td><a class="macro" href="../include/G4FFGDebuggingMacros.hh.html#222" title="" data-ref="_M/G4FFG_DATA_FUNCTIONLEAVE__">G4FFG_DATA_FUNCTIONLEAVE__</a></td></tr>
+<tr><th id="1081">1081</th><td>	<b>return</b> DynamicParticle;</td></tr>
+<tr><th id="1082">1082</th><td>}</td></tr>
+<tr><th id="1083">1083</th><td></td></tr>
+<tr><th id="1084">1084</th><td>G4String G4FissionProductYieldDist::</td></tr>
+<tr><th id="1085">1085</th><td>MakeIsotopeName( G4int Isotope,</td></tr>
+<tr><th id="1086">1086</th><td>                 G4FFGEnumerations::MetaState MetaState )</td></tr>
+<tr><th id="1087">1087</th><td>{</td></tr>
+<tr><th id="1088">1088</th><td><a class="macro" href="../include/G4FFGDebuggingMacros.hh.html#218" title="" data-ref="_M/G4FFG_DATA_FUNCTIONENTER__">G4FFG_DATA_FUNCTIONENTER__</a></td></tr>
+<tr><th id="1089">1089</th><td></td></tr>
+<tr><th id="1090">1090</th><td>    <i>// Break Product down into its A and Z components</i></td></tr>
+<tr><th id="1091">1091</th><td>    G4int A = Isotope % <var>1000</var>;</td></tr>
+<tr><th id="1092">1092</th><td>    G4int Z = (Isotope - A) / <var>1000</var>;</td></tr>
+<tr><th id="1093">1093</th><td></td></tr>
+<tr><th id="1094">1094</th><td>    <i>// Create the unique identifying name for the particle</i></td></tr>
+<tr><th id="1095">1095</th><td>    std::ostringstream IsotopeName;</td></tr>
+<tr><th id="1096">1096</th><td></td></tr>
+<tr><th id="1097">1097</th><td>    IsotopeName &lt;&lt; Z &lt;&lt; <q>"_"</q> &lt;&lt; A;</td></tr>
+<tr><th id="1098">1098</th><td>    </td></tr>
+<tr><th id="1099">1099</th><td>    <i>// If it is metastable then append "m" to the name</i></td></tr>
+<tr><th id="1100">1100</th><td>    <b>if</b>(MetaState != G4FFGEnumerations::GROUND_STATE)</td></tr>
+<tr><th id="1101">1101</th><td>    {</td></tr>
+<tr><th id="1102">1102</th><td>        IsotopeName &lt;&lt; <q>"m"</q>;</td></tr>
+<tr><th id="1103">1103</th><td>        </td></tr>
+<tr><th id="1104">1104</th><td>        <i>// If it is a second isomeric state then append "2" to the name</i></td></tr>
+<tr><th id="1105">1105</th><td>        <b>if</b>(MetaState == G4FFGEnumerations::META_2)</td></tr>
+<tr><th id="1106">1106</th><td>        {</td></tr>
+<tr><th id="1107">1107</th><td>            IsotopeName &lt;&lt; <q>"2"</q>;</td></tr>
+<tr><th id="1108">1108</th><td>        }</td></tr>
+<tr><th id="1109">1109</th><td>    }</td></tr>
+<tr><th id="1110">1110</th><td>    <i>// Add the name of the element and the extension</i></td></tr>
+<tr><th id="1111">1111</th><td>    IsotopeName &lt;&lt; <q>"_"</q> &lt;&lt; ElementNames_-&gt;theString[Z - <var>1</var>];</td></tr>
+<tr><th id="1112">1112</th><td></td></tr>
+<tr><th id="1113">1113</th><td><a class="macro" href="../include/G4FFGDebuggingMacros.hh.html#222" title="" data-ref="_M/G4FFG_DATA_FUNCTIONLEAVE__">G4FFG_DATA_FUNCTIONLEAVE__</a></td></tr>
+<tr><th id="1114">1114</th><td>    <b>return</b> IsotopeName.str();</td></tr>
+<tr><th id="1115">1115</th><td>}</td></tr>
+<tr><th id="1116">1116</th><td></td></tr>
+<tr><th id="1117">1117</th><td><em>void</em> G4FissionProductYieldDist::</td></tr>
+<tr><th id="1118">1118</th><td>MakeTrees( <em>void</em> )</td></tr>
+<tr><th id="1119">1119</th><td>{</td></tr>
+<tr><th id="1120">1120</th><td><a class="macro" href="../include/G4FFGDebuggingMacros.hh.html#215" title="G4FFG_DEPTH++;" data-ref="_M/G4FFG_FUNCTIONENTER__">G4FFG_FUNCTIONENTER__</a></td></tr>
+<tr><th id="1121">1121</th><td></td></tr>
+<tr><th id="1122">1122</th><td>    <i>// Allocate the space</i></td></tr>
+<tr><th id="1123">1123</th><td><i>    // We will make each tree a binary search</i></td></tr>
+<tr><th id="1124">1124</th><td><i>    // The maximum number of iterations required to find a single fission product</i></td></tr>
+<tr><th id="1125">1125</th><td><i>    // based on it's probability is defined by the following:</i></td></tr>
+<tr><th id="1126">1126</th><td><i>    //      x = number of fission products</i></td></tr>
+<tr><th id="1127">1127</th><td><i>    //      Trees       = T(x)  = ceil( ln(x) )</i></td></tr>
+<tr><th id="1128">1128</th><td><i>    //      Rows/Tree   = R(x)  = ceil(( sqrt( (8 * x / T(x)) + 1) - 1) / 2)</i></td></tr>
+<tr><th id="1129">1129</th><td><i>    //      Maximum     = M(x)  = T(x) + R(x)</i></td></tr>
+<tr><th id="1130">1130</th><td><i>    //      Results: x    =&gt;    M(x)</i></td></tr>
+<tr><th id="1131">1131</th><td><i>    //               10         5</i></td></tr>
+<tr><th id="1132">1132</th><td><i>    //               100        10</i></td></tr>
+<tr><th id="1133">1133</th><td><i>    //               1000       25</i></td></tr>
+<tr><th id="1134">1134</th><td><i>    //               10000      54</i></td></tr>
+<tr><th id="1135">1135</th><td><i>    //               100000     140</i></td></tr>
+<tr><th id="1136">1136</th><td>    TreeCount_ = (G4int)ceil((G4double)log((G4double)ENDFData_-&gt;G4GetNumberOfFissionProducts()));</td></tr>
+<tr><th id="1137">1137</th><td>    Trees_ = <b>new</b> ProbabilityTree[TreeCount_];</td></tr>
+<tr><th id="1138">1138</th><td></td></tr>
+<tr><th id="1139">1139</th><td>    <i>// Initialize the range of each node</i></td></tr>
+<tr><th id="1140">1140</th><td>    <b>for</b>(G4int i = <var>0</var>; i &lt; TreeCount_; i++)</td></tr>
+<tr><th id="1141">1141</th><td>    {</td></tr>
+<tr><th id="1142">1142</th><td>        Trees_[i].ProbabilityRangeEnd = <b>new</b> G4double[YieldEnergyGroups_];</td></tr>
+<tr><th id="1143">1143</th><td>        Trees_[i].Trunk = NULL;</td></tr>
+<tr><th id="1144">1144</th><td>        Trees_[i].BranchCount = <var>0</var>;</td></tr>
+<tr><th id="1145">1145</th><td>        Trees_[i].IsEnd = <a class="macro" href="../../../../../global/management/include/globals.hh.html#51" title="0" data-ref="_M/FALSE">FALSE</a>;</td></tr>
+<tr><th id="1146">1146</th><td>    }</td></tr>
+<tr><th id="1147">1147</th><td>    <i>// Mark the last tree as the ending tree</i></td></tr>
+<tr><th id="1148">1148</th><td>    Trees_[TreeCount_ - <var>1</var>].IsEnd = <a class="macro" href="../../../../../global/management/include/globals.hh.html#54" title="1" data-ref="_M/TRUE">TRUE</a>;</td></tr>
+<tr><th id="1149">1149</th><td></td></tr>
+<tr><th id="1150">1150</th><td><a class="macro" href="../include/G4FFGDebuggingMacros.hh.html#219" title="G4FFG_DEPTH--;" data-ref="_M/G4FFG_FUNCTIONLEAVE__">G4FFG_FUNCTIONLEAVE__</a></td></tr>
+<tr><th id="1151">1151</th><td>}</td></tr>
+<tr><th id="1152">1152</th><td></td></tr>
+<tr><th id="1153">1153</th><td><em>void</em> G4FissionProductYieldDist::</td></tr>
+<tr><th id="1154">1154</th><td>ReadProbabilities( <em>void</em> )</td></tr>
+<tr><th id="1155">1155</th><td>{</td></tr>
+<tr><th id="1156">1156</th><td><a class="macro" href="../include/G4FFGDebuggingMacros.hh.html#218" title="" data-ref="_M/G4FFG_DATA_FUNCTIONENTER__">G4FFG_DATA_FUNCTIONENTER__</a></td></tr>
+<tr><th id="1157">1157</th><td></td></tr>
+<tr><th id="1158">1158</th><td>    G4int ProductCount = ENDFData_-&gt;G4GetNumberOfFissionProducts();</td></tr>
+<tr><th id="1159">1159</th><td>    BranchCount_ = <var>0</var>;</td></tr>
+<tr><th id="1160">1160</th><td>    G4ArrayOps::Set(YieldEnergyGroups_, DataTotal_, <var>0.0</var>);</td></tr>
+<tr><th id="1161">1161</th><td></td></tr>
+<tr><th id="1162">1162</th><td>    <i>// Loop through all the products</i></td></tr>
+<tr><th id="1163">1163</th><td>    <b>for</b>(G4int i = <var>0</var>; i &lt; ProductCount; i++)</td></tr>
+<tr><th id="1164">1164</th><td>    {</td></tr>
+<tr><th id="1165">1165</th><td>        <i>// Acquire the data and sort it</i></td></tr>
+<tr><th id="1166">1166</th><td>        SortProbability(ENDFData_-&gt;G4GetYield(i));</td></tr>
+<tr><th id="1167">1167</th><td>    }</td></tr>
+<tr><th id="1168">1168</th><td></td></tr>
+<tr><th id="1169">1169</th><td>    <i>// Generate the true normalization factor, since round-off errors may result</i></td></tr>
+<tr><th id="1170">1170</th><td><i>    // in non-singular normalization of the data files. Also, reset DataTotal_</i></td></tr>
+<tr><th id="1171">1171</th><td><i>    // since it is used by Renormalize() to set the probability segments.</i></td></tr>
+<tr><th id="1172">1172</th><td>    G4ArrayOps::Divide(YieldEnergyGroups_, MaintainNormalizedData_, <var>1.0</var>, DataTotal_);</td></tr>
+<tr><th id="1173">1173</th><td>    G4ArrayOps::Set(YieldEnergyGroups_, DataTotal_, <var>0.0</var>);</td></tr>
+<tr><th id="1174">1174</th><td></td></tr>
+<tr><th id="1175">1175</th><td>    <i>// Go through all the trees one at a time</i></td></tr>
+<tr><th id="1176">1176</th><td>    <b>for</b>(G4int i = <var>0</var>; i &lt; TreeCount_; i++)</td></tr>
+<tr><th id="1177">1177</th><td>    {</td></tr>
+<tr><th id="1178">1178</th><td>        Renormalize(Trees_[i].Trunk);</td></tr>
+<tr><th id="1179">1179</th><td>        <i>// Set the max range of the tree to DataTotal</i></td></tr>
+<tr><th id="1180">1180</th><td>        G4ArrayOps::Copy(YieldEnergyGroups_, Trees_[i].ProbabilityRangeEnd, DataTotal_);</td></tr>
+<tr><th id="1181">1181</th><td>    }</td></tr>
+<tr><th id="1182">1182</th><td></td></tr>
+<tr><th id="1183">1183</th><td><a class="macro" href="../include/G4FFGDebuggingMacros.hh.html#222" title="" data-ref="_M/G4FFG_DATA_FUNCTIONLEAVE__">G4FFG_DATA_FUNCTIONLEAVE__</a></td></tr>
+<tr><th id="1184">1184</th><td>}</td></tr>
+<tr><th id="1185">1185</th><td></td></tr>
+<tr><th id="1186">1186</th><td><em>void</em> G4FissionProductYieldDist::</td></tr>
+<tr><th id="1187">1187</th><td>Renormalize( ProbabilityBranch* Branch)</td></tr>
+<tr><th id="1188">1188</th><td>{</td></tr>
+<tr><th id="1189">1189</th><td><a class="macro" href="../include/G4FFGDebuggingMacros.hh.html#217" title="" data-ref="_M/G4FFG_RECURSIVE_FUNCTIONENTER__">G4FFG_RECURSIVE_FUNCTIONENTER__</a></td></tr>
+<tr><th id="1190">1190</th><td></td></tr>
+<tr><th id="1191">1191</th><td>    <i>// Check to see if Branch exists. Branch will be a null pointer if it</i></td></tr>
+<tr><th id="1192">1192</th><td><i>    // doesn't exist</i></td></tr>
+<tr><th id="1193">1193</th><td>    <b>if</b>(Branch != NULL)</td></tr>
+<tr><th id="1194">1194</th><td>    {</td></tr>
+<tr><th id="1195">1195</th><td>        <i>// Call the lower branch to set the probability segment first, since it</i></td></tr>
+<tr><th id="1196">1196</th><td><i>        // supposed to have a lower probability segment that this node</i></td></tr>
+<tr><th id="1197">1197</th><td>        Renormalize(Branch-&gt;Left);</td></tr>
+<tr><th id="1198">1198</th><td></td></tr>
+<tr><th id="1199">1199</th><td>        <i>// Set this node as the next sequential probability segment</i></td></tr>
+<tr><th id="1200">1200</th><td>        G4ArrayOps::Copy(YieldEnergyGroups_, Branch-&gt;ProbabilityRangeBottom, DataTotal_);</td></tr>
+<tr><th id="1201">1201</th><td>        G4ArrayOps::Multiply(YieldEnergyGroups_, Branch-&gt;ProbabilityRangeTop, MaintainNormalizedData_);</td></tr>
+<tr><th id="1202">1202</th><td>        G4ArrayOps::Add(YieldEnergyGroups_, Branch-&gt;ProbabilityRangeTop, DataTotal_);</td></tr>
+<tr><th id="1203">1203</th><td>        G4ArrayOps::Copy(YieldEnergyGroups_, DataTotal_, Branch-&gt;ProbabilityRangeTop);</td></tr>
+<tr><th id="1204">1204</th><td></td></tr>
+<tr><th id="1205">1205</th><td>        <i>// Now call the upper branch to set those probability segments</i></td></tr>
+<tr><th id="1206">1206</th><td>        Renormalize(Branch-&gt;Right);</td></tr>
+<tr><th id="1207">1207</th><td>    }</td></tr>
+<tr><th id="1208">1208</th><td></td></tr>
+<tr><th id="1209">1209</th><td><a class="macro" href="../include/G4FFGDebuggingMacros.hh.html#221" title="" data-ref="_M/G4FFG_RECURSIVE_FUNCTIONLEAVE__">G4FFG_RECURSIVE_FUNCTIONLEAVE__</a></td></tr>
+<tr><th id="1210">1210</th><td>}</td></tr>
+<tr><th id="1211">1211</th><td></td></tr>
+<tr><th id="1212">1212</th><td><em>void</em> G4FissionProductYieldDist::</td></tr>
+<tr><th id="1213">1213</th><td>SampleAlphaEnergies( std::vector&lt; G4ReactionProduct* &gt;* Alphas )</td></tr>
+<tr><th id="1214">1214</th><td>{</td></tr>
+<tr><th id="1215">1215</th><td><a class="macro" href="../include/G4FFGDebuggingMacros.hh.html#215" title="G4FFG_DEPTH++;" data-ref="_M/G4FFG_FUNCTIONENTER__">G4FFG_FUNCTIONENTER__</a></td></tr>
+<tr><th id="1216">1216</th><td></td></tr>
+<tr><th id="1217">1217</th><td>    <i>// The condition of sampling more energy from the fission products than is</i></td></tr>
+<tr><th id="1218">1218</th><td><i>    // alloted is statistically unfavorable, but it could still happen. The</i></td></tr>
+<tr><th id="1219">1219</th><td><i>    // do-while loop prevents such an occurrence from happening</i></td></tr>
+<tr><th id="1220">1220</th><td>    G4double MeanAlphaEnergy = <var>16.0</var>;</td></tr>
+<tr><th id="1221">1221</th><td>    G4double TotalAlphaEnergy;</td></tr>
+<tr><th id="1222">1222</th><td></td></tr>
+<tr><th id="1223">1223</th><td>    <b>do</b></td></tr>
+<tr><th id="1224">1224</th><td>    {</td></tr>
+<tr><th id="1225">1225</th><td>        G4double AlphaEnergy;</td></tr>
+<tr><th id="1226">1226</th><td>        TotalAlphaEnergy = <var>0</var>;</td></tr>
+<tr><th id="1227">1227</th><td></td></tr>
+<tr><th id="1228">1228</th><td>        <i>// Walk through the alpha particles one at a time and sample each's</i></td></tr>
+<tr><th id="1229">1229</th><td><i>        // energy</i></td></tr>
+<tr><th id="1230">1230</th><td>        <b>for</b>(<em>unsigned</em> <em>int</em> i = <var>0</var>; i &lt; Alphas-&gt;size(); i++)</td></tr>
+<tr><th id="1231">1231</th><td>        {</td></tr>
+<tr><th id="1232">1232</th><td>            AlphaEnergy = RandomEngine_-&gt;G4SampleGaussian(MeanAlphaEnergy,</td></tr>
+<tr><th id="1233">1233</th><td>                                                          <var>2.35</var>,</td></tr>
+<tr><th id="1234">1234</th><td>                                                          G4FFGEnumerations::POSITIVE) * MeV;</td></tr>
+<tr><th id="1235">1235</th><td>            <i>// Assign the energy to the alpha particle</i></td></tr>
+<tr><th id="1236">1236</th><td>            Alphas-&gt;at(i)-&gt;SetKineticEnergy(AlphaEnergy);</td></tr>
+<tr><th id="1237">1237</th><td></td></tr>
+<tr><th id="1238">1238</th><td>            <i>// Add up the total amount of kinetic energy consumed.</i></td></tr>
+<tr><th id="1239">1239</th><td>            TotalAlphaEnergy += AlphaEnergy;</td></tr>
+<tr><th id="1240">1240</th><td>        }</td></tr>
+<tr><th id="1241">1241</th><td></td></tr>
+<tr><th id="1242">1242</th><td>        <i>// If true, decrement the mean alpha energy by 0.1 and try again.</i></td></tr>
+<tr><th id="1243">1243</th><td>        MeanAlphaEnergy -= <var>0.1</var>;</td></tr>
+<tr><th id="1244">1244</th><td>    } <b>while</b>(TotalAlphaEnergy &gt;= RemainingEnergy_); <i>// Loop checking, 11.05.2015, T. Koi</i></td></tr>
+<tr><th id="1245">1245</th><td></td></tr>
+<tr><th id="1246">1246</th><td>    <i>// Subtract the total amount of energy that was assigned.</i></td></tr>
+<tr><th id="1247">1247</th><td>    RemainingEnergy_ -= TotalAlphaEnergy;</td></tr>
+<tr><th id="1248">1248</th><td></td></tr>
+<tr><th id="1249">1249</th><td><a class="macro" href="../include/G4FFGDebuggingMacros.hh.html#219" title="G4FFG_DEPTH--;" data-ref="_M/G4FFG_FUNCTIONLEAVE__">G4FFG_FUNCTIONLEAVE__</a></td></tr>
+<tr><th id="1250">1250</th><td>}</td></tr>
+<tr><th id="1251">1251</th><td></td></tr>
+<tr><th id="1252">1252</th><td><em>void</em> G4FissionProductYieldDist::</td></tr>
+<tr><th id="1253">1253</th><td>SampleGammaEnergies( std::vector&lt; G4ReactionProduct* &gt;* Gammas )</td></tr>
+<tr><th id="1254">1254</th><td>{</td></tr>
+<tr><th id="1255">1255</th><td><a class="macro" href="../include/G4FFGDebuggingMacros.hh.html#215" title="G4FFG_DEPTH++;" data-ref="_M/G4FFG_FUNCTIONENTER__">G4FFG_FUNCTIONENTER__</a></td></tr>
+<tr><th id="1256">1256</th><td></td></tr>
+<tr><th id="1257">1257</th><td>	<i>// Make sure that there is energy to assign to the gamma rays</i></td></tr>
+<tr><th id="1258">1258</th><td>    <b>if</b>(RemainingEnergy_ != <var>0</var>)</td></tr>
+<tr><th id="1259">1259</th><td>    {</td></tr>
+<tr><th id="1260">1260</th><td>        G4double SampleEnergy;</td></tr>
+<tr><th id="1261">1261</th><td></td></tr>
+<tr><th id="1262">1262</th><td>        <i>// Sample from RemainingEnergy until it is all gone. Also,</i></td></tr>
+<tr><th id="1263">1263</th><td><i>        // RemainingEnergy should not be smaller than</i></td></tr>
+<tr><th id="1264">1264</th><td><i>        // G4FFGDefaultValues::MeanGammaEnergy. This will prevent the</i></td></tr>
+<tr><th id="1265">1265</th><td><i>        // sampling of a fractional portion of the Gaussian distribution</i></td></tr>
+<tr><th id="1266">1266</th><td><i>        // in an attempt to find a new gamma ray energy.</i></td></tr>
+<tr><th id="1267">1267</th><td>        G4int icounter=<var>0</var>;</td></tr>
+<tr><th id="1268">1268</th><td>        G4int icounter_max=<var>1024</var>;</td></tr>
+<tr><th id="1269">1269</th><td>        <b>while</b>(RemainingEnergy_ &gt;= G4FFGDefaultValues::MeanGammaEnergy ) <i>// Loop checking, 11.05.2015, T. Koi</i></td></tr>
+<tr><th id="1270">1270</th><td>        {</td></tr>
+<tr><th id="1271">1271</th><td>           icounter++;</td></tr>
+<tr><th id="1272">1272</th><td>           <b>if</b> ( icounter &gt; icounter_max ) {</td></tr>
+<tr><th id="1273">1273</th><td>	      <a class="macro" href="../../../../../global/management/include/G4ios.hh.html#46" title="(*_G4cout_p())" data-ref="_M/G4cout">G4cout</a> &lt;&lt; <q>"Loop-counter exceeded the threshold value at "</q> &lt;&lt; <span class="macro" title="1273" data-ref="_M/__LINE__">__LINE__</span> &lt;&lt; <q>"th line of "</q> &lt;&lt; <span class="macro" title="&quot;/home/jishin/app/geant4/1005p1/geant4.10.05.p01/source/processes/hadronic/models/particle_hp/src/G4FissionProductYieldDist.cc&quot;" data-ref="_M/__FILE__">__FILE__</span> &lt;&lt; <q>"."</q> &lt;&lt; <a class="macro" href="../../../../../global/management/include/G4ios.hh.html#60" title="std::endl" data-ref="_M/G4endl">G4endl</a>;</td></tr>
+<tr><th id="1274">1274</th><td>              <b>break</b>;</td></tr>
+<tr><th id="1275">1275</th><td>           }</td></tr>
+<tr><th id="1276">1276</th><td>            SampleEnergy = RandomEngine_-&gt;</td></tr>
+<tr><th id="1277">1277</th><td>                    G4SampleGaussian(G4FFGDefaultValues::MeanGammaEnergy, <var>1.0</var> * MeV, G4FFGEnumerations::POSITIVE);</td></tr>
+<tr><th id="1278">1278</th><td>            <i>// Make sure that we didn't sample more energy than was available</i></td></tr>
+<tr><th id="1279">1279</th><td>            <b>if</b>(SampleEnergy &lt;= RemainingEnergy_)</td></tr>
+<tr><th id="1280">1280</th><td>            {</td></tr>
+<tr><th id="1281">1281</th><td>                <i>// If this energy assignment would leave less energy than the</i></td></tr>
+<tr><th id="1282">1282</th><td><i>                // 'intrinsic' minimal energy of a gamma ray then just assign</i></td></tr>
+<tr><th id="1283">1283</th><td><i>                // all of the remaining energy</i></td></tr>
+<tr><th id="1284">1284</th><td>                <b>if</b>(RemainingEnergy_ - SampleEnergy &lt; <var>100</var> * keV)</td></tr>
+<tr><th id="1285">1285</th><td>                {</td></tr>
+<tr><th id="1286">1286</th><td>                    SampleEnergy = RemainingEnergy_;</td></tr>
+<tr><th id="1287">1287</th><td>                }</td></tr>
+<tr><th id="1288">1288</th><td></td></tr>
+<tr><th id="1289">1289</th><td>                <i>// Create the new particle</i></td></tr>
+<tr><th id="1290">1290</th><td>                Gammas-&gt;push_back(<b>new</b> G4ReactionProduct());</td></tr>
+<tr><th id="1291">1291</th><td></td></tr>
+<tr><th id="1292">1292</th><td>                <i>// Set the properties</i></td></tr>
+<tr><th id="1293">1293</th><td>                Gammas-&gt;back()-&gt;SetDefinition(GammaDefinition_);</td></tr>
+<tr><th id="1294">1294</th><td>                Gammas-&gt;back()-&gt;SetTotalEnergy(SampleEnergy);</td></tr>
+<tr><th id="1295">1295</th><td></td></tr>
+<tr><th id="1296">1296</th><td>                <i>// Calculate how much is left</i></td></tr>
+<tr><th id="1297">1297</th><td>                RemainingEnergy_ -= SampleEnergy;</td></tr>
+<tr><th id="1298">1298</th><td>            }</td></tr>
+<tr><th id="1299">1299</th><td>        }</td></tr>
+<tr><th id="1300">1300</th><td></td></tr>
+<tr><th id="1301">1301</th><td>        <i>// If there is anything left over, the energy must be above 100 keV but</i></td></tr>
+<tr><th id="1302">1302</th><td><i>        // less than G4FFGDefaultValues::MeanGammaEnergy. Arbitrarily assign</i></td></tr>
+<tr><th id="1303">1303</th><td><i>        // RemainingEnergy to a new particle</i></td></tr>
+<tr><th id="1304">1304</th><td>        <b>if</b>(RemainingEnergy_ &gt; <var>0</var>)</td></tr>
+<tr><th id="1305">1305</th><td>        {</td></tr>
+<tr><th id="1306">1306</th><td>        	SampleEnergy = RemainingEnergy_;</td></tr>
+<tr><th id="1307">1307</th><td>            Gammas-&gt;push_back(<b>new</b> G4ReactionProduct());</td></tr>
+<tr><th id="1308">1308</th><td></td></tr>
+<tr><th id="1309">1309</th><td>            <i>// Set the properties</i></td></tr>
+<tr><th id="1310">1310</th><td>            Gammas-&gt;back()-&gt;SetDefinition(GammaDefinition_);</td></tr>
+<tr><th id="1311">1311</th><td>            Gammas-&gt;back()-&gt;SetTotalEnergy(SampleEnergy);</td></tr>
+<tr><th id="1312">1312</th><td></td></tr>
+<tr><th id="1313">1313</th><td>            <i>// Calculate how much is left</i></td></tr>
+<tr><th id="1314">1314</th><td>            RemainingEnergy_ -= SampleEnergy;</td></tr>
+<tr><th id="1315">1315</th><td>        }</td></tr>
+<tr><th id="1316">1316</th><td>    }</td></tr>
+<tr><th id="1317">1317</th><td></td></tr>
+<tr><th id="1318">1318</th><td><a class="macro" href="../include/G4FFGDebuggingMacros.hh.html#219" title="G4FFG_DEPTH--;" data-ref="_M/G4FFG_FUNCTIONLEAVE__">G4FFG_FUNCTIONLEAVE__</a></td></tr>
+<tr><th id="1319">1319</th><td>}</td></tr>
+<tr><th id="1320">1320</th><td></td></tr>
+<tr><th id="1321">1321</th><td><em>void</em> G4FissionProductYieldDist::</td></tr>
+<tr><th id="1322">1322</th><td>SampleNeutronEnergies( std::vector&lt; G4ReactionProduct* &gt;* Neutrons )</td></tr>
+<tr><th id="1323">1323</th><td>{</td></tr>
+<tr><th id="1324">1324</th><td><a class="macro" href="../include/G4FFGDebuggingMacros.hh.html#215" title="G4FFG_DEPTH++;" data-ref="_M/G4FFG_FUNCTIONENTER__">G4FFG_FUNCTIONENTER__</a></td></tr>
+<tr><th id="1325">1325</th><td></td></tr>
+<tr><th id="1326">1326</th><td>    <i>// The condition of sampling more energy from the fission products than is</i></td></tr>
+<tr><th id="1327">1327</th><td><i>    // alloted is statistically unfavorable, but it could still happen. The</i></td></tr>
+<tr><th id="1328">1328</th><td><i>    // do-while loop prevents such an occurrence from happening</i></td></tr>
+<tr><th id="1329">1329</th><td>    G4double TotalNeutronEnergy;</td></tr>
+<tr><th id="1330">1330</th><td>	G4double NeutronEnergy;</td></tr>
+<tr><th id="1331">1331</th><td></td></tr>
+<tr><th id="1332">1332</th><td>    <i>// Make sure that we don't sample more energy than is available</i></td></tr>
+<tr><th id="1333">1333</th><td>    G4int icounter=<var>0</var>;</td></tr>
+<tr><th id="1334">1334</th><td>    G4int icounter_max=<var>1024</var>;</td></tr>
+<tr><th id="1335">1335</th><td>    <b>do</b></td></tr>
+<tr><th id="1336">1336</th><td>    {</td></tr>
+<tr><th id="1337">1337</th><td>       icounter++;</td></tr>
+<tr><th id="1338">1338</th><td>       <b>if</b> ( icounter &gt; icounter_max ) {</td></tr>
+<tr><th id="1339">1339</th><td>          <a class="macro" href="../../../../../global/management/include/G4ios.hh.html#46" title="(*_G4cout_p())" data-ref="_M/G4cout">G4cout</a> &lt;&lt; <q>"Loop-counter exceeded the threshold value at "</q> &lt;&lt; <span class="macro" title="1339" data-ref="_M/__LINE__">__LINE__</span> &lt;&lt; <q>"th line of "</q> &lt;&lt; <span class="macro" title="&quot;/home/jishin/app/geant4/1005p1/geant4.10.05.p01/source/processes/hadronic/models/particle_hp/src/G4FissionProductYieldDist.cc&quot;" data-ref="_M/__FILE__">__FILE__</span> &lt;&lt; <q>"."</q> &lt;&lt; <a class="macro" href="../../../../../global/management/include/G4ios.hh.html#60" title="std::endl" data-ref="_M/G4endl">G4endl</a>;</td></tr>
+<tr><th id="1340">1340</th><td>           <b>break</b>;</td></tr>
+<tr><th id="1341">1341</th><td>       }</td></tr>
+<tr><th id="1342">1342</th><td>        TotalNeutronEnergy = <var>0</var>;</td></tr>
+<tr><th id="1343">1343</th><td></td></tr>
+<tr><th id="1344">1344</th><td>        <i>// Walk through the neutrons one at a time and sample the energies.</i></td></tr>
+<tr><th id="1345">1345</th><td><i>        // The gamma rays have not yet been sampled, so the last neutron will</i></td></tr>
+<tr><th id="1346">1346</th><td><i>        // have a NULL value for NextFragment</i></td></tr>
+<tr><th id="1347">1347</th><td>        <b>for</b>(<em>unsigned</em> <em>int</em> i = <var>0</var>; i &lt; Neutrons-&gt;size(); i++)</td></tr>
+<tr><th id="1348">1348</th><td>        {</td></tr>
+<tr><th id="1349">1349</th><td>            <i>// Assign the energy to the neutron</i></td></tr>
+<tr><th id="1350">1350</th><td>        	NeutronEnergy = RandomEngine_-&gt;G4SampleWatt(Isotope_, Cause_, IncidentEnergy_);</td></tr>
+<tr><th id="1351">1351</th><td>        	Neutrons-&gt;at(i)-&gt;SetKineticEnergy(NeutronEnergy);</td></tr>
+<tr><th id="1352">1352</th><td></td></tr>
+<tr><th id="1353">1353</th><td>            <i>// Add up the total amount of kinetic energy consumed.</i></td></tr>
+<tr><th id="1354">1354</th><td>            TotalNeutronEnergy +=NeutronEnergy;</td></tr>
+<tr><th id="1355">1355</th><td>        }</td></tr>
+<tr><th id="1356">1356</th><td>    } <b>while</b> (TotalNeutronEnergy &gt; RemainingEnergy_); <i>// Loop checking, 11.05.2015, T. Koi</i></td></tr>
+<tr><th id="1357">1357</th><td></td></tr>
+<tr><th id="1358">1358</th><td>    <i>// Subtract the total amount of energy that was assigned.</i></td></tr>
+<tr><th id="1359">1359</th><td>    RemainingEnergy_ -= TotalNeutronEnergy;</td></tr>
+<tr><th id="1360">1360</th><td></td></tr>
+<tr><th id="1361">1361</th><td><a class="macro" href="../include/G4FFGDebuggingMacros.hh.html#219" title="G4FFG_DEPTH--;" data-ref="_M/G4FFG_FUNCTIONLEAVE__">G4FFG_FUNCTIONLEAVE__</a></td></tr>
+<tr><th id="1362">1362</th><td>}</td></tr>
+<tr><th id="1363">1363</th><td></td></tr>
+<tr><th id="1364">1364</th><td><em>void</em> G4FissionProductYieldDist::</td></tr>
+<tr><th id="1365">1365</th><td>SetNubar( <em>void</em> )</td></tr>
+<tr><th id="1366">1366</th><td>{</td></tr>
+<tr><th id="1367">1367</th><td><a class="macro" href="../include/G4FFGDebuggingMacros.hh.html#215" title="G4FFG_DEPTH++;" data-ref="_M/G4FFG_FUNCTIONENTER__">G4FFG_FUNCTIONENTER__</a></td></tr>
+<tr><th id="1368">1368</th><td></td></tr>
+<tr><th id="1369">1369</th><td>    G4int* WhichNubar;</td></tr>
+<tr><th id="1370">1370</th><td>    G4int* NubarWidth;</td></tr>
+<tr><th id="1371">1371</th><td>    G4double XFactor, BFactor;</td></tr>
+<tr><th id="1372">1372</th><td></td></tr>
+<tr><th id="1373">1373</th><td>    <b>if</b>(Cause_ == G4FFGEnumerations::SPONTANEOUS)</td></tr>
+<tr><th id="1374">1374</th><td>    {</td></tr>
+<tr><th id="1375">1375</th><td>        WhichNubar = <b>const_cast</b>&lt;G4int*&gt;(&amp;SpontaneousNubar_[<var>0</var>][<var>0</var>]);</td></tr>
+<tr><th id="1376">1376</th><td>        NubarWidth = <b>const_cast</b>&lt;G4int*&gt;(&amp;SpontaneousNubarWidth_[<var>0</var>][<var>0</var>]);</td></tr>
+<tr><th id="1377">1377</th><td>    } <b>else</b></td></tr>
+<tr><th id="1378">1378</th><td>    {</td></tr>
+<tr><th id="1379">1379</th><td>        WhichNubar = <b>const_cast</b>&lt;G4int*&gt;(&amp;NeutronInducedNubar_[<var>0</var>][<var>0</var>]);</td></tr>
+<tr><th id="1380">1380</th><td>        NubarWidth = <b>const_cast</b>&lt;G4int*&gt;(&amp;NeutronInducedNubarWidth_[<var>0</var>][<var>0</var>]);</td></tr>
+<tr><th id="1381">1381</th><td>    }</td></tr>
+<tr><th id="1382">1382</th><td></td></tr>
+<tr><th id="1383">1383</th><td>    XFactor = G4Pow::GetInstance()-&gt;powA(<var>10.0</var>, -<var>13.0</var>);</td></tr>
+<tr><th id="1384">1384</th><td>    BFactor = G4Pow::GetInstance()-&gt;powA(<var>10.0</var>, -<var>4.0</var>);</td></tr>
+<tr><th id="1385">1385</th><td>    Nubar_ = *(WhichNubar + <var>1</var>) * IncidentEnergy_ * XFactor</td></tr>
+<tr><th id="1386">1386</th><td>             + *(WhichNubar + <var>2</var>) * BFactor;</td></tr>
+<tr><th id="1387">1387</th><td>    <b>while</b>(*WhichNubar != -<var>1</var>) <i>// Loop checking, 11.05.2015, T. Koi</i></td></tr>
+<tr><th id="1388">1388</th><td>    {</td></tr>
+<tr><th id="1389">1389</th><td>        <b>if</b>(*WhichNubar == Isotope_)</td></tr>
+<tr><th id="1390">1390</th><td>        {</td></tr>
+<tr><th id="1391">1391</th><td>            Nubar_ = *(WhichNubar + <var>1</var>) * IncidentEnergy_ * XFactor</td></tr>
+<tr><th id="1392">1392</th><td>                     + *(WhichNubar + <var>2</var>) * BFactor;</td></tr>
+<tr><th id="1393">1393</th><td></td></tr>
+<tr><th id="1394">1394</th><td>            <b>break</b>;</td></tr>
+<tr><th id="1395">1395</th><td>        }</td></tr>
+<tr><th id="1396">1396</th><td>        WhichNubar += <var>3</var>;</td></tr>
+<tr><th id="1397">1397</th><td>    }</td></tr>
+<tr><th id="1398">1398</th><td></td></tr>
+<tr><th id="1399">1399</th><td>    XFactor = G4Pow::GetInstance()-&gt;powN((G4double)<var>10</var>, -<var>6</var>);</td></tr>
+<tr><th id="1400">1400</th><td>    NubarWidth_ = *(NubarWidth + <var>1</var>) * XFactor;</td></tr>
+<tr><th id="1401">1401</th><td>    <b>while</b>(*WhichNubar != -<var>1</var>) <i>// Loop checking, 11.05.2015, T. Koi</i></td></tr>
+<tr><th id="1402">1402</th><td>    {</td></tr>
+<tr><th id="1403">1403</th><td>        <b>if</b>(*WhichNubar == Isotope_)</td></tr>
+<tr><th id="1404">1404</th><td>        {</td></tr>
+<tr><th id="1405">1405</th><td>            NubarWidth_ = *(NubarWidth + <var>1</var>) * XFactor;</td></tr>
+<tr><th id="1406">1406</th><td></td></tr>
+<tr><th id="1407">1407</th><td>            <b>break</b>;</td></tr>
+<tr><th id="1408">1408</th><td>        }</td></tr>
+<tr><th id="1409">1409</th><td>        WhichNubar += <var>2</var>;</td></tr>
+<tr><th id="1410">1410</th><td>    }</td></tr>
+<tr><th id="1411">1411</th><td></td></tr>
+<tr><th id="1412">1412</th><td><a class="macro" href="../include/G4FFGDebuggingMacros.hh.html#219" title="G4FFG_DEPTH--;" data-ref="_M/G4FFG_FUNCTIONLEAVE__">G4FFG_FUNCTIONLEAVE__</a></td></tr>
+<tr><th id="1413">1413</th><td>}</td></tr>
+<tr><th id="1414">1414</th><td></td></tr>
+<tr><th id="1415">1415</th><td><em>void</em> G4FissionProductYieldDist::</td></tr>
+<tr><th id="1416">1416</th><td>SortProbability( G4ENDFYieldDataContainer* YieldData )</td></tr>
+<tr><th id="1417">1417</th><td>{</td></tr>
+<tr><th id="1418">1418</th><td><a class="macro" href="../include/G4FFGDebuggingMacros.hh.html#218" title="" data-ref="_M/G4FFG_DATA_FUNCTIONENTER__">G4FFG_DATA_FUNCTIONENTER__</a></td></tr>
+<tr><th id="1419">1419</th><td></td></tr>
+<tr><th id="1420">1420</th><td>    <i>// Initialize the new branch</i></td></tr>
+<tr><th id="1421">1421</th><td>    ProbabilityBranch* NewBranch = <b>new</b> ProbabilityBranch;</td></tr>
+<tr><th id="1422">1422</th><td>    NewBranch-&gt;IncidentEnergiesCount = YieldEnergyGroups_;</td></tr>
+<tr><th id="1423">1423</th><td>    NewBranch-&gt;Left = NULL;</td></tr>
+<tr><th id="1424">1424</th><td>    NewBranch-&gt;Right = NULL;</td></tr>
+<tr><th id="1425">1425</th><td>    NewBranch-&gt;Particle = GetParticleDefinition(YieldData-&gt;GetProduct(), YieldData-&gt;GetMetaState());</td></tr>
+<tr><th id="1426">1426</th><td>    NewBranch-&gt;IncidentEnergies = <b>new</b> G4double[YieldEnergyGroups_];</td></tr>
+<tr><th id="1427">1427</th><td>    NewBranch-&gt;ProbabilityRangeTop = <b>new</b> G4double[YieldEnergyGroups_];</td></tr>
+<tr><th id="1428">1428</th><td>    NewBranch-&gt;ProbabilityRangeBottom = <b>new</b> G4double[YieldEnergyGroups_];</td></tr>
+<tr><th id="1429">1429</th><td>    G4ArrayOps::Copy(YieldEnergyGroups_, NewBranch-&gt;ProbabilityRangeTop, YieldData-&gt;GetYieldProbability());</td></tr>
+<tr><th id="1430">1430</th><td>    G4ArrayOps::Copy(YieldEnergyGroups_, NewBranch-&gt;IncidentEnergies, YieldEnergies_);</td></tr>
+<tr><th id="1431">1431</th><td>    G4ArrayOps::Add(YieldEnergyGroups_, DataTotal_, YieldData-&gt;GetYieldProbability());</td></tr>
+<tr><th id="1432">1432</th><td></td></tr>
+<tr><th id="1433">1433</th><td>    <i>// Check to see if the this is the smallest/largest particle. First, check</i></td></tr>
+<tr><th id="1434">1434</th><td><i>    // to see if this is the first particle in the system</i></td></tr>
+<tr><th id="1435">1435</th><td>    <b>if</b>(SmallestZ_ == NULL)</td></tr>
+<tr><th id="1436">1436</th><td>    {</td></tr>
+<tr><th id="1437">1437</th><td>        SmallestZ_ = SmallestA_ = LargestZ_ = LargestA_ = NewBranch-&gt;Particle;</td></tr>
+<tr><th id="1438">1438</th><td>    } <b>else</b></td></tr>
+<tr><th id="1439">1439</th><td>    {</td></tr>
+<tr><th id="1440">1440</th><td>        G4bool IsSmallerZ = NewBranch-&gt;Particle-&gt;GetAtomicNumber() &lt; SmallestZ_-&gt;GetAtomicNumber();</td></tr>
+<tr><th id="1441">1441</th><td>        G4bool IsSmallerA = NewBranch-&gt;Particle-&gt;GetAtomicMass() &lt; SmallestA_-&gt;GetAtomicMass();</td></tr>
+<tr><th id="1442">1442</th><td>        G4bool IsLargerZ = NewBranch-&gt;Particle-&gt;GetAtomicNumber() &gt; LargestZ_-&gt;GetAtomicNumber();</td></tr>
+<tr><th id="1443">1443</th><td>        G4bool IsLargerA = NewBranch-&gt;Particle-&gt;GetAtomicMass() &gt; LargestA_-&gt;GetAtomicMass();</td></tr>
+<tr><th id="1444">1444</th><td></td></tr>
+<tr><th id="1445">1445</th><td>        <b>if</b>(IsSmallerZ)</td></tr>
+<tr><th id="1446">1446</th><td>        {</td></tr>
+<tr><th id="1447">1447</th><td>            SmallestZ_ = NewBranch-&gt;Particle;</td></tr>
+<tr><th id="1448">1448</th><td>        }</td></tr>
+<tr><th id="1449">1449</th><td>        </td></tr>
+<tr><th id="1450">1450</th><td>        <b>if</b>(IsLargerZ)</td></tr>
+<tr><th id="1451">1451</th><td>        {</td></tr>
+<tr><th id="1452">1452</th><td>            LargestA_ = NewBranch-&gt;Particle;</td></tr>
+<tr><th id="1453">1453</th><td>        }</td></tr>
+<tr><th id="1454">1454</th><td>        </td></tr>
+<tr><th id="1455">1455</th><td>        <b>if</b>(IsSmallerA)</td></tr>
+<tr><th id="1456">1456</th><td>        {</td></tr>
+<tr><th id="1457">1457</th><td>            SmallestA_ = NewBranch-&gt;Particle;</td></tr>
+<tr><th id="1458">1458</th><td>        }</td></tr>
+<tr><th id="1459">1459</th><td>        </td></tr>
+<tr><th id="1460">1460</th><td>        <b>if</b>(IsLargerA)</td></tr>
+<tr><th id="1461">1461</th><td>        {</td></tr>
+<tr><th id="1462">1462</th><td>            LargestA_ = NewBranch-&gt;Particle;</td></tr>
+<tr><th id="1463">1463</th><td>        }</td></tr>
+<tr><th id="1464">1464</th><td>    }</td></tr>
+<tr><th id="1465">1465</th><td></td></tr>
+<tr><th id="1466">1466</th><td>    <i>// Place the new branch</i></td></tr>
+<tr><th id="1467">1467</th><td><i>    // Determine which tree the new branch goes into</i></td></tr>
+<tr><th id="1468">1468</th><td>    G4int WhichTree = (G4int)floor((G4double)(BranchCount_ % TreeCount_));</td></tr>
+<tr><th id="1469">1469</th><td>    ProbabilityBranch** WhichBranch = &amp;(Trees_[WhichTree].Trunk);</td></tr>
+<tr><th id="1470">1470</th><td>    Trees_[WhichTree].BranchCount++;</td></tr>
+<tr><th id="1471">1471</th><td></td></tr>
+<tr><th id="1472">1472</th><td>    <i>// Search for the position</i></td></tr>
+<tr><th id="1473">1473</th><td><i>    // Determine where the branch goes</i></td></tr>
+<tr><th id="1474">1474</th><td>    G4int BranchPosition = (G4int)floor((G4double)(BranchCount_ / TreeCount_)) + <var>1</var>;</td></tr>
+<tr><th id="1475">1475</th><td></td></tr>
+<tr><th id="1476">1476</th><td>    <i>// Run through the tree until the end branch is reached</i></td></tr>
+<tr><th id="1477">1477</th><td>    <b>while</b>(BranchPosition &gt; <var>1</var>) <i>// Loop checking, 11.05.2015, T. Koi</i></td></tr>
+<tr><th id="1478">1478</th><td>    {</td></tr>
+<tr><th id="1479">1479</th><td>        <b>if</b>(BranchPosition &amp; <var>1</var>)</td></tr>
+<tr><th id="1480">1480</th><td>        {</td></tr>
+<tr><th id="1481">1481</th><td>            <i>// If the 1's bit is on then move to the next 'right' branch</i></td></tr>
+<tr><th id="1482">1482</th><td>            WhichBranch = &amp;((*WhichBranch)-&gt;Right);</td></tr>
+<tr><th id="1483">1483</th><td>        } <b>else</b></td></tr>
+<tr><th id="1484">1484</th><td>        {</td></tr>
+<tr><th id="1485">1485</th><td>            <i>// If the 1's bit is off then move to the next 'down' branch</i></td></tr>
+<tr><th id="1486">1486</th><td>            WhichBranch = &amp;((*WhichBranch)-&gt;Left);</td></tr>
+<tr><th id="1487">1487</th><td>        }</td></tr>
+<tr><th id="1488">1488</th><td>        </td></tr>
+<tr><th id="1489">1489</th><td>        BranchPosition &gt;&gt;= <var>1</var>;</td></tr>
+<tr><th id="1490">1490</th><td>    }</td></tr>
+<tr><th id="1491">1491</th><td></td></tr>
+<tr><th id="1492">1492</th><td>    *WhichBranch = NewBranch;</td></tr>
+<tr><th id="1493">1493</th><td>    BranchCount_++;</td></tr>
+<tr><th id="1494">1494</th><td></td></tr>
+<tr><th id="1495">1495</th><td><a class="macro" href="../include/G4FFGDebuggingMacros.hh.html#222" title="" data-ref="_M/G4FFG_DATA_FUNCTIONLEAVE__">G4FFG_DATA_FUNCTIONLEAVE__</a></td></tr>
+<tr><th id="1496">1496</th><td>}</td></tr>
+<tr><th id="1497">1497</th><td></td></tr>
+<tr><th id="1498">1498</th><td>G4FissionProductYieldDist::</td></tr>
+<tr><th id="1499">1499</th><td>~G4FissionProductYieldDist( <em>void</em> )</td></tr>
+<tr><th id="1500">1500</th><td>{</td></tr>
+<tr><th id="1501">1501</th><td><a class="macro" href="../include/G4FFGDebuggingMacros.hh.html#215" title="G4FFG_DEPTH++;" data-ref="_M/G4FFG_FUNCTIONENTER__">G4FFG_FUNCTIONENTER__</a></td></tr>
+<tr><th id="1502">1502</th><td></td></tr>
+<tr><th id="1503">1503</th><td>    <i>// Burn each tree, one by one</i></td></tr>
+<tr><th id="1504">1504</th><td>    G4int WhichTree = <var>0</var>;</td></tr>
+<tr><th id="1505">1505</th><td>    <b>while</b>(Trees_[WhichTree].IsEnd != <a class="macro" href="../../../../../global/management/include/globals.hh.html#54" title="1" data-ref="_M/TRUE">TRUE</a>) <i>// Loop checking, 11.05.2015, T. Koi</i></td></tr>
+<tr><th id="1506">1506</th><td>    {</td></tr>
+<tr><th id="1507">1507</th><td>        BurnTree(Trees_[WhichTree].Trunk);</td></tr>
+<tr><th id="1508">1508</th><td>        <b>delete</b> Trees_[WhichTree].Trunk;</td></tr>
+<tr><th id="1509">1509</th><td>        <b>delete</b>[] Trees_[WhichTree].ProbabilityRangeEnd;</td></tr>
+<tr><th id="1510">1510</th><td>        WhichTree++;</td></tr>
+<tr><th id="1511">1511</th><td>    }</td></tr>
+<tr><th id="1512">1512</th><td></td></tr>
+<tr><th id="1513">1513</th><td>    <i>// Delete each dynamically allocated variable</i></td></tr>
+<tr><th id="1514">1514</th><td>    <b>delete</b> ENDFData_;</td></tr>
+<tr><th id="1515">1515</th><td>    <b>delete</b>[] Trees_;</td></tr>
+<tr><th id="1516">1516</th><td>    <b>delete</b>[] DataTotal_;</td></tr>
+<tr><th id="1517">1517</th><td>    <b>delete</b>[] MaintainNormalizedData_;</td></tr>
+<tr><th id="1518">1518</th><td>    <b>delete</b> ElementNames_;</td></tr>
+<tr><th id="1519">1519</th><td>    <b>delete</b> RandomEngine_;</td></tr>
+<tr><th id="1520">1520</th><td></td></tr>
+<tr><th id="1521">1521</th><td><a class="macro" href="../include/G4FFGDebuggingMacros.hh.html#219" title="G4FFG_DEPTH--;" data-ref="_M/G4FFG_FUNCTIONLEAVE__">G4FFG_FUNCTIONLEAVE__</a></td></tr>
+<tr><th id="1522">1522</th><td>}</td></tr>
+<tr><th id="1523">1523</th><td></td></tr>
+<tr><th id="1524">1524</th><td><em>void</em> G4FissionProductYieldDist::</td></tr>
+<tr><th id="1525">1525</th><td>BurnTree( ProbabilityBranch* Branch )</td></tr>
+<tr><th id="1526">1526</th><td>{</td></tr>
+<tr><th id="1527">1527</th><td><a class="macro" href="../include/G4FFGDebuggingMacros.hh.html#217" title="" data-ref="_M/G4FFG_RECURSIVE_FUNCTIONENTER__">G4FFG_RECURSIVE_FUNCTIONENTER__</a></td></tr>
+<tr><th id="1528">1528</th><td></td></tr>
+<tr><th id="1529">1529</th><td>    <i>// Check to see it Branch exists. Branch will be a null pointer if it</i></td></tr>
+<tr><th id="1530">1530</th><td><i>    // doesn't exist</i></td></tr>
+<tr><th id="1531">1531</th><td>    <b>if</b>(Branch)</td></tr>
+<tr><th id="1532">1532</th><td>    {</td></tr>
+<tr><th id="1533">1533</th><td>        <i>// Burn down before you burn up</i></td></tr>
+<tr><th id="1534">1534</th><td>        BurnTree(Branch-&gt;Left);</td></tr>
+<tr><th id="1535">1535</th><td>        <b>delete</b> Branch-&gt;Left;</td></tr>
+<tr><th id="1536">1536</th><td>        BurnTree(Branch-&gt;Right);</td></tr>
+<tr><th id="1537">1537</th><td>        <b>delete</b> Branch-&gt;Right;</td></tr>
+<tr><th id="1538">1538</th><td></td></tr>
+<tr><th id="1539">1539</th><td>        <b>delete</b>[] Branch-&gt;IncidentEnergies;</td></tr>
+<tr><th id="1540">1540</th><td>        <b>delete</b>[] Branch-&gt;ProbabilityRangeTop;</td></tr>
+<tr><th id="1541">1541</th><td>        <b>delete</b>[] Branch-&gt;ProbabilityRangeBottom;</td></tr>
+<tr><th id="1542">1542</th><td>    }</td></tr>
+<tr><th id="1543">1543</th><td></td></tr>
+<tr><th id="1544">1544</th><td><a class="macro" href="../include/G4FFGDebuggingMacros.hh.html#221" title="" data-ref="_M/G4FFG_RECURSIVE_FUNCTIONLEAVE__">G4FFG_RECURSIVE_FUNCTIONLEAVE__</a></td></tr>
+<tr><th id="1545">1545</th><td>}</td></tr>
+<tr><th id="1546">1546</th><td></td></tr>
+<tr><th id="1547">1547</th><td></td></tr>
+</table><hr/><p id='footer'>
+Generated on <em>2019-Aug-28</em> from project codebrowser<br />Powered by <a href='https://woboq.com'><img alt='Woboq' src='https://code.woboq.org/woboq-16.png' width='41' height='16' /></a> <a href='https://code.woboq.org'>Code Browser</a> 2.1
+<br/>Generator usage only permitted with license.</p>
+</div></body></html>

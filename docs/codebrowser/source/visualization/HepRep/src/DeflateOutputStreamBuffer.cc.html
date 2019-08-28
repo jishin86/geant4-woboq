@@ -1,0 +1,262 @@
+<!doctype html>
+<html>
+<head>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"><title>DeflateOutputStreamBuffer.cc source code [codebrowser/source/visualization/HepRep/src/DeflateOutputStreamBuffer.cc] - Woboq Code Browser</title>
+<link rel="stylesheet" href="../../../../../../data/qtcreator.css" title="QtCreator"/>
+<link rel="alternate stylesheet" href="../../../../../../data/kdevelop.css" title="KDevelop"/>
+<script type="text/javascript" src="../../../../../../data/jquery/jquery.min.js"></script>
+<script type="text/javascript" src="../../../../../../data/jquery/jquery-ui.min.js"></script>
+<script>var file = 'codebrowser/source/visualization/HepRep/src/DeflateOutputStreamBuffer.cc'; var root_path = '../../../../..'; var data_path = '../../../../../../data';</script>
+<script src='../../../../../../data/codebrowser.js'></script>
+</head>
+<body><div id='header'><h1 id='breadcrumb'><span>Browse the source code of </span><a href='../../../..'>codebrowser</a>/<a href='../../..'>source</a>/<a href='../..'>visualization</a>/<a href='..'>HepRep</a>/<a href='./'>src</a>/<a href='DeflateOutputStreamBuffer.cc.html'>DeflateOutputStreamBuffer.cc</a></h1></div>
+<hr/><div id='content'><table class="code">
+<tr><th id="1">1</th><td><i>// Copyright FreeHEP, 2005.</i></td></tr>
+<tr><th id="2">2</th><td></td></tr>
+<tr><th id="3">3</th><td><u>#include <a href="../include/cheprep/DeflateOutputStreamBuffer.h.html">"cheprep/DeflateOutputStreamBuffer.h"</a></u></td></tr>
+<tr><th id="4">4</th><td></td></tr>
+<tr><th id="5">5</th><td><i class="doc">/**</i></td></tr>
+<tr><th id="6">6</th><td><i class="doc"> * <span class="command">@author</span> Mark Donszelmann</i></td></tr>
+<tr><th id="7">7</th><td><i class="doc"> */</i></td></tr>
+<tr><th id="8">8</th><td><b>namespace</b> <span class="namespace">cheprep</span> {</td></tr>
+<tr><th id="9">9</th><td></td></tr>
+<tr><th id="10">10</th><td>    <b>using</b> <b>namespace</b> <span class="namespace">std</span>;</td></tr>
+<tr><th id="11">11</th><td></td></tr>
+<tr><th id="12">12</th><td>    <em>unsigned</em> <em>long</em> <a class="type" href="../include/cheprep/DeflateOutputStreamBuffer.h.html#cheprep::DeflateOutputStreamBuffer" title='cheprep::DeflateOutputStreamBuffer' data-ref="cheprep::DeflateOutputStreamBuffer">DeflateOutputStreamBuffer</a>::<dfn class="decl def" id="cheprep::DeflateOutputStreamBuffer::crctable" title='cheprep::DeflateOutputStreamBuffer::crctable' data-ref="cheprep::DeflateOutputStreamBuffer::crctable">crctable</dfn>[] = {</td></tr>
+<tr><th id="13">13</th><td>        <var>0x00000000L</var>, <var>0x77073096L</var>, <var>0xEE0E612CL</var>, <var>0x990951BAL</var>,</td></tr>
+<tr><th id="14">14</th><td>        <var>0x076DC419L</var>, <var>0x706AF48FL</var>, <var>0xE963A535L</var>, <var>0x9E6495A3L</var>,</td></tr>
+<tr><th id="15">15</th><td>        <var>0x0EDB8832L</var>, <var>0x79DCB8A4L</var>, <var>0xE0D5E91EL</var>, <var>0x97D2D988L</var>,</td></tr>
+<tr><th id="16">16</th><td>        <var>0x09B64C2BL</var>, <var>0x7EB17CBDL</var>, <var>0xE7B82D07L</var>, <var>0x90BF1D91L</var>,</td></tr>
+<tr><th id="17">17</th><td>        <var>0x1DB71064L</var>, <var>0x6AB020F2L</var>, <var>0xF3B97148L</var>, <var>0x84BE41DEL</var>,</td></tr>
+<tr><th id="18">18</th><td>        <var>0x1ADAD47DL</var>, <var>0x6DDDE4EBL</var>, <var>0xF4D4B551L</var>, <var>0x83D385C7L</var>,</td></tr>
+<tr><th id="19">19</th><td>        <var>0x136C9856L</var>, <var>0x646BA8C0L</var>, <var>0xFD62F97AL</var>, <var>0x8A65C9ECL</var>,</td></tr>
+<tr><th id="20">20</th><td>        <var>0x14015C4FL</var>, <var>0x63066CD9L</var>, <var>0xFA0F3D63L</var>, <var>0x8D080DF5L</var>,</td></tr>
+<tr><th id="21">21</th><td>        <var>0x3B6E20C8L</var>, <var>0x4C69105EL</var>, <var>0xD56041E4L</var>, <var>0xA2677172L</var>,</td></tr>
+<tr><th id="22">22</th><td>        <var>0x3C03E4D1L</var>, <var>0x4B04D447L</var>, <var>0xD20D85FDL</var>, <var>0xA50AB56BL</var>,</td></tr>
+<tr><th id="23">23</th><td>        <var>0x35B5A8FAL</var>, <var>0x42B2986CL</var>, <var>0xDBBBC9D6L</var>, <var>0xACBCF940L</var>,</td></tr>
+<tr><th id="24">24</th><td>        <var>0x32D86CE3L</var>, <var>0x45DF5C75L</var>, <var>0xDCD60DCFL</var>, <var>0xABD13D59L</var>,</td></tr>
+<tr><th id="25">25</th><td>        <var>0x26D930ACL</var>, <var>0x51DE003AL</var>, <var>0xC8D75180L</var>, <var>0xBFD06116L</var>,</td></tr>
+<tr><th id="26">26</th><td>        <var>0x21B4F4B5L</var>, <var>0x56B3C423L</var>, <var>0xCFBA9599L</var>, <var>0xB8BDA50FL</var>,</td></tr>
+<tr><th id="27">27</th><td>        <var>0x2802B89EL</var>, <var>0x5F058808L</var>, <var>0xC60CD9B2L</var>, <var>0xB10BE924L</var>,</td></tr>
+<tr><th id="28">28</th><td>        <var>0x2F6F7C87L</var>, <var>0x58684C11L</var>, <var>0xC1611DABL</var>, <var>0xB6662D3DL</var>,</td></tr>
+<tr><th id="29">29</th><td>        <var>0x76DC4190L</var>, <var>0x01DB7106L</var>, <var>0x98D220BCL</var>, <var>0xEFD5102AL</var>,</td></tr>
+<tr><th id="30">30</th><td>        <var>0x71B18589L</var>, <var>0x06B6B51FL</var>, <var>0x9FBFE4A5L</var>, <var>0xE8B8D433L</var>,</td></tr>
+<tr><th id="31">31</th><td>        <var>0x7807C9A2L</var>, <var>0x0F00F934L</var>, <var>0x9609A88EL</var>, <var>0xE10E9818L</var>,</td></tr>
+<tr><th id="32">32</th><td>        <var>0x7F6A0DBBL</var>, <var>0x086D3D2DL</var>, <var>0x91646C97L</var>, <var>0xE6635C01L</var>,</td></tr>
+<tr><th id="33">33</th><td>        <var>0x6B6B51F4L</var>, <var>0x1C6C6162L</var>, <var>0x856530D8L</var>, <var>0xF262004EL</var>,</td></tr>
+<tr><th id="34">34</th><td>        <var>0x6C0695EDL</var>, <var>0x1B01A57BL</var>, <var>0x8208F4C1L</var>, <var>0xF50FC457L</var>,</td></tr>
+<tr><th id="35">35</th><td>        <var>0x65B0D9C6L</var>, <var>0x12B7E950L</var>, <var>0x8BBEB8EAL</var>, <var>0xFCB9887CL</var>,</td></tr>
+<tr><th id="36">36</th><td>        <var>0x62DD1DDFL</var>, <var>0x15DA2D49L</var>, <var>0x8CD37CF3L</var>, <var>0xFBD44C65L</var>,</td></tr>
+<tr><th id="37">37</th><td>        <var>0x4DB26158L</var>, <var>0x3AB551CEL</var>, <var>0xA3BC0074L</var>, <var>0xD4BB30E2L</var>,</td></tr>
+<tr><th id="38">38</th><td>        <var>0x4ADFA541L</var>, <var>0x3DD895D7L</var>, <var>0xA4D1C46DL</var>, <var>0xD3D6F4FBL</var>,</td></tr>
+<tr><th id="39">39</th><td>        <var>0x4369E96AL</var>, <var>0x346ED9FCL</var>, <var>0xAD678846L</var>, <var>0xDA60B8D0L</var>,</td></tr>
+<tr><th id="40">40</th><td>        <var>0x44042D73L</var>, <var>0x33031DE5L</var>, <var>0xAA0A4C5FL</var>, <var>0xDD0D7CC9L</var>,</td></tr>
+<tr><th id="41">41</th><td>        <var>0x5005713CL</var>, <var>0x270241AAL</var>, <var>0xBE0B1010L</var>, <var>0xC90C2086L</var>,</td></tr>
+<tr><th id="42">42</th><td>        <var>0x5768B525L</var>, <var>0x206F85B3L</var>, <var>0xB966D409L</var>, <var>0xCE61E49FL</var>,</td></tr>
+<tr><th id="43">43</th><td>        <var>0x5EDEF90EL</var>, <var>0x29D9C998L</var>, <var>0xB0D09822L</var>, <var>0xC7D7A8B4L</var>,</td></tr>
+<tr><th id="44">44</th><td>        <var>0x59B33D17L</var>, <var>0x2EB40D81L</var>, <var>0xB7BD5C3BL</var>, <var>0xC0BA6CADL</var>,</td></tr>
+<tr><th id="45">45</th><td>        <var>0xEDB88320L</var>, <var>0x9ABFB3B6L</var>, <var>0x03B6E20CL</var>, <var>0x74B1D29AL</var>,</td></tr>
+<tr><th id="46">46</th><td>        <var>0xEAD54739L</var>, <var>0x9DD277AFL</var>, <var>0x04DB2615L</var>, <var>0x73DC1683L</var>,</td></tr>
+<tr><th id="47">47</th><td>        <var>0xE3630B12L</var>, <var>0x94643B84L</var>, <var>0x0D6D6A3EL</var>, <var>0x7A6A5AA8L</var>,</td></tr>
+<tr><th id="48">48</th><td>        <var>0xE40ECF0BL</var>, <var>0x9309FF9DL</var>, <var>0x0A00AE27L</var>, <var>0x7D079EB1L</var>,</td></tr>
+<tr><th id="49">49</th><td>        <var>0xF00F9344L</var>, <var>0x8708A3D2L</var>, <var>0x1E01F268L</var>, <var>0x6906C2FEL</var>,</td></tr>
+<tr><th id="50">50</th><td>        <var>0xF762575DL</var>, <var>0x806567CBL</var>, <var>0x196C3671L</var>, <var>0x6E6B06E7L</var>,</td></tr>
+<tr><th id="51">51</th><td>        <var>0xFED41B76L</var>, <var>0x89D32BE0L</var>, <var>0x10DA7A5AL</var>, <var>0x67DD4ACCL</var>,</td></tr>
+<tr><th id="52">52</th><td>        <var>0xF9B9DF6FL</var>, <var>0x8EBEEFF9L</var>, <var>0x17B7BE43L</var>, <var>0x60B08ED5L</var>,</td></tr>
+<tr><th id="53">53</th><td>        <var>0xD6D6A3E8L</var>, <var>0xA1D1937EL</var>, <var>0x38D8C2C4L</var>, <var>0x4FDFF252L</var>,</td></tr>
+<tr><th id="54">54</th><td>        <var>0xD1BB67F1L</var>, <var>0xA6BC5767L</var>, <var>0x3FB506DDL</var>, <var>0x48B2364BL</var>,</td></tr>
+<tr><th id="55">55</th><td>        <var>0xD80D2BDAL</var>, <var>0xAF0A1B4CL</var>, <var>0x36034AF6L</var>, <var>0x41047A60L</var>,</td></tr>
+<tr><th id="56">56</th><td>        <var>0xDF60EFC3L</var>, <var>0xA867DF55L</var>, <var>0x316E8EEFL</var>, <var>0x4669BE79L</var>,</td></tr>
+<tr><th id="57">57</th><td>        <var>0xCB61B38CL</var>, <var>0xBC66831AL</var>, <var>0x256FD2A0L</var>, <var>0x5268E236L</var>,</td></tr>
+<tr><th id="58">58</th><td>        <var>0xCC0C7795L</var>, <var>0xBB0B4703L</var>, <var>0x220216B9L</var>, <var>0x5505262FL</var>,</td></tr>
+<tr><th id="59">59</th><td>        <var>0xC5BA3BBEL</var>, <var>0xB2BD0B28L</var>, <var>0x2BB45A92L</var>, <var>0x5CB36A04L</var>,</td></tr>
+<tr><th id="60">60</th><td>        <var>0xC2D7FFA7L</var>, <var>0xB5D0CF31L</var>, <var>0x2CD99E8BL</var>, <var>0x5BDEAE1DL</var>,</td></tr>
+<tr><th id="61">61</th><td>        <var>0x9B64C2B0L</var>, <var>0xEC63F226L</var>, <var>0x756AA39CL</var>, <var>0x026D930AL</var>,</td></tr>
+<tr><th id="62">62</th><td>        <var>0x9C0906A9L</var>, <var>0xEB0E363FL</var>, <var>0x72076785L</var>, <var>0x05005713L</var>,</td></tr>
+<tr><th id="63">63</th><td>        <var>0x95BF4A82L</var>, <var>0xE2B87A14L</var>, <var>0x7BB12BAEL</var>, <var>0x0CB61B38L</var>,</td></tr>
+<tr><th id="64">64</th><td>        <var>0x92D28E9BL</var>, <var>0xE5D5BE0DL</var>, <var>0x7CDCEFB7L</var>, <var>0x0BDBDF21L</var>,</td></tr>
+<tr><th id="65">65</th><td>        <var>0x86D3D2D4L</var>, <var>0xF1D4E242L</var>, <var>0x68DDB3F8L</var>, <var>0x1FDA836EL</var>,</td></tr>
+<tr><th id="66">66</th><td>        <var>0x81BE16CDL</var>, <var>0xF6B9265BL</var>, <var>0x6FB077E1L</var>, <var>0x18B74777L</var>,</td></tr>
+<tr><th id="67">67</th><td>        <var>0x88085AE6L</var>, <var>0xFF0F6A70L</var>, <var>0x66063BCAL</var>, <var>0x11010B5CL</var>,</td></tr>
+<tr><th id="68">68</th><td>        <var>0x8F659EFFL</var>, <var>0xF862AE69L</var>, <var>0x616BFFD3L</var>, <var>0x166CCF45L</var>,</td></tr>
+<tr><th id="69">69</th><td>        <var>0xA00AE278L</var>, <var>0xD70DD2EEL</var>, <var>0x4E048354L</var>, <var>0x3903B3C2L</var>,</td></tr>
+<tr><th id="70">70</th><td>        <var>0xA7672661L</var>, <var>0xD06016F7L</var>, <var>0x4969474DL</var>, <var>0x3E6E77DBL</var>,</td></tr>
+<tr><th id="71">71</th><td>        <var>0xAED16A4AL</var>, <var>0xD9D65ADCL</var>, <var>0x40DF0B66L</var>, <var>0x37D83BF0L</var>,</td></tr>
+<tr><th id="72">72</th><td>        <var>0xA9BCAE53L</var>, <var>0xDEBB9EC5L</var>, <var>0x47B2CF7FL</var>, <var>0x30B5FFE9L</var>,</td></tr>
+<tr><th id="73">73</th><td>        <var>0xBDBDF21CL</var>, <var>0xCABAC28AL</var>, <var>0x53B39330L</var>, <var>0x24B4A3A6L</var>,</td></tr>
+<tr><th id="74">74</th><td>        <var>0xBAD03605L</var>, <var>0xCDD70693L</var>, <var>0x54DE5729L</var>, <var>0x23D967BFL</var>,</td></tr>
+<tr><th id="75">75</th><td>        <var>0xB3667A2EL</var>, <var>0xC4614AB8L</var>, <var>0x5D681B02L</var>, <var>0x2A6F2B94L</var>,</td></tr>
+<tr><th id="76">76</th><td>        <var>0xB40BBE37L</var>, <var>0xC30C8EA1L</var>, <var>0x5A05DF1BL</var>, <var>0x2D02EF8DL</var></td></tr>
+<tr><th id="77">77</th><td>    };</td></tr>
+<tr><th id="78">78</th><td></td></tr>
+<tr><th id="79">79</th><td>    DeflateOutputStreamBuffer::DeflateOutputStreamBuffer(<span class='error' title="unknown type name &apos;streambuf&apos;">streambuf</span> *aBuffer) </td></tr>
+<tr><th id="80">80</th><td>            : buffer(aBuffer)</td></tr>
+<tr><th id="81">81</th><td>              , crc(<var>0</var>)</td></tr>
+<tr><th id="82">82</th><td>              , size(<var>0</var>)</td></tr>
+<tr><th id="83">83</th><td><u>#<span data-ppcond="83">ifndef</span> <span class="macro" data-ref="_M/CHEPREP_NO_ZLIB">CHEPREP_NO_ZLIB</span></u>               </td></tr>
+<tr><th id="84">84</th><td>              , zStreamOpen(<b>false</b>)</td></tr>
+<tr><th id="85">85</th><td>              , <span class='error' title="member initializer &apos;in&apos; does not name a non-static data member or base class">in</span>(inSize)</td></tr>
+<tr><th id="86">86</th><td>              , <span class='error' title="member initializer &apos;out&apos; does not name a non-static data member or base class">out</span>(outSize) </td></tr>
+<tr><th id="87">87</th><td><u>#<span data-ppcond="83">endif</span> // CHEPREP_NO_ZLIB</u></td></tr>
+<tr><th id="88">88</th><td>              {</td></tr>
+<tr><th id="89">89</th><td>        </td></tr>
+<tr><th id="90">90</th><td><u>#<span data-ppcond="90">ifndef</span> <span class="macro" data-ref="_M/CHEPREP_NO_ZLIB">CHEPREP_NO_ZLIB</span></u></td></tr>
+<tr><th id="91">91</th><td>        zStream.zalloc = <a class="macro" href="../../../externals/zlib/include/zlib.h.html#212" title="0" data-ref="_M/Z_NULL">Z_NULL</a>;</td></tr>
+<tr><th id="92">92</th><td>        zStream.zfree = <a class="macro" href="../../../externals/zlib/include/zlib.h.html#212" title="0" data-ref="_M/Z_NULL">Z_NULL</a>;</td></tr>
+<tr><th id="93">93</th><td>        zStream.opaque = <a class="macro" href="../../../externals/zlib/include/zlib.h.html#212" title="0" data-ref="_M/Z_NULL">Z_NULL</a>;</td></tr>
+<tr><th id="94">94</th><td>        zStream.msg = <var>0</var>;</td></tr>
+<tr><th id="95">95</th><td>        zStream.next_in = <var>0</var>;</td></tr>
+<tr><th id="96">96</th><td>        zStream.next_out = <var>0</var>;</td></tr>
+<tr><th id="97">97</th><td>        zStream.state = <var>0</var>;</td></tr>
+<tr><th id="98">98</th><td><u>#<span data-ppcond="90">endif</span> // CHEPREP_NO_ZLIB</u></td></tr>
+<tr><th id="99">99</th><td>    }</td></tr>
+<tr><th id="100">100</th><td>        </td></tr>
+<tr><th id="101">101</th><td><u>#<span data-ppcond="101">ifndef</span> <span class="macro" data-ref="_M/CHEPREP_NO_ZLIB">CHEPREP_NO_ZLIB</span></u>        </td></tr>
+<tr><th id="102">102</th><td>    <em>void</em> <a class="type" href="../include/cheprep/DeflateOutputStreamBuffer.h.html#cheprep::DeflateOutputStreamBuffer" title='cheprep::DeflateOutputStreamBuffer' data-ref="cheprep::DeflateOutputStreamBuffer">DeflateOutputStreamBuffer</a>::<dfn class="decl def" id="_ZN7cheprep25DeflateOutputStreamBuffer4initEb" title='cheprep::DeflateOutputStreamBuffer::init' data-ref="_ZN7cheprep25DeflateOutputStreamBuffer4initEb">init</dfn>(<em>bool</em> <dfn class="local col2 decl" id="12compress" title='compress' data-type='bool' data-ref="12compress">compress</dfn>) {</td></tr>
+<tr><th id="103">103</th><td></td></tr>
+<tr><th id="104">104</th><td>        <b>if</b> (<a class="local col2 ref" href="#12compress" title='compress' data-ref="12compress">compress</a>) {</td></tr>
+<tr><th id="105">105</th><td>            <b>if</b> (<a class="member" href="../include/cheprep/DeflateOutputStreamBuffer.h.html#cheprep::DeflateOutputStreamBuffer::zStreamOpen" title='cheprep::DeflateOutputStreamBuffer::zStreamOpen' data-ref="cheprep::DeflateOutputStreamBuffer::zStreamOpen">zStreamOpen</a>) <b>return</b>;</td></tr>
+<tr><th id="106">106</th><td>            </td></tr>
+<tr><th id="107">107</th><td>            zStream.next_in = <b>reinterpret_cast</b>&lt;<em>unsigned</em> <em>char</em> *&gt;(&amp;(<span class='error' title="use of undeclared identifier &apos;in&apos;">in</span>[<var>0</var>]));</td></tr>
+<tr><th id="108">108</th><td>            zStream.avail_in = <var>0</var> ;</td></tr>
+<tr><th id="109">109</th><td>    </td></tr>
+<tr><th id="110">110</th><td>            zStream.next_out = <b>reinterpret_cast</b>&lt;<em>unsigned</em> <em>char</em> *&gt;(&amp;(<span class='error' title="use of undeclared identifier &apos;out&apos;">out</span>[<var>0</var>]));</td></tr>
+<tr><th id="111">111</th><td>            zStream.avail_out = <span class='error' title="use of undeclared identifier &apos;out&apos;">out</span>.size();</td></tr>
+<tr><th id="112">112</th><td>    </td></tr>
+<tr><th id="113">113</th><td>            <b>if</b> (<a class="macro" href="../../../externals/zlib/include/zlib.h.html#1797" title="deflateInit2_((&amp;zStream),(6),(8),(-MAX_WBITS),(8), (0), &quot;1.2.11&quot;, (int)sizeof(z_stream))" data-ref="_M/deflateInit2">deflateInit2</a>(&amp;zStream, <var>6</var>, <a class="macro" href="../../../externals/zlib/include/zlib.h.html#209" title="8" data-ref="_M/Z_DEFLATED">Z_DEFLATED</a>, -<span class='error' title="use of undeclared identifier &apos;MAX_WBITS&apos;">MAX_WBITS</span>, <var>8</var>, <a class="macro" href="../../../externals/zlib/include/zlib.h.html#200" title="0" data-ref="_M/Z_DEFAULT_STRATEGY">Z_DEFAULT_STRATEGY</a> ) != <a class="macro" href="../../../externals/zlib/include/zlib.h.html#177" title="0" data-ref="_M/Z_OK">Z_OK</a>) {</td></tr>
+<tr><th id="114">114</th><td>                <span class='error' title="use of undeclared identifier &apos;cerr&apos;">cerr</span> &lt;&lt; <q>"ERROR: deflateInit2 failed"</q> &lt;&lt; <span class='error' title="use of undeclared identifier &apos;endl&apos;">endl</span>;</td></tr>
+<tr><th id="115">115</th><td>            } <b>else</b> {</td></tr>
+<tr><th id="116">116</th><td>                <a class="member" href="../include/cheprep/DeflateOutputStreamBuffer.h.html#cheprep::DeflateOutputStreamBuffer::zStreamOpen" title='cheprep::DeflateOutputStreamBuffer::zStreamOpen' data-ref="cheprep::DeflateOutputStreamBuffer::zStreamOpen">zStreamOpen</a> = <b>true</b>;</td></tr>
+<tr><th id="117">117</th><td>                setp(&amp;(<span class='error' title="use of undeclared identifier &apos;in&apos;">in</span>[<var>0</var>]), &amp;(<span class='error' title="use of undeclared identifier &apos;in&apos;">in</span>[<var>0</var>])+inSize);</td></tr>
+<tr><th id="118">118</th><td>            }</td></tr>
+<tr><th id="119">119</th><td>        }</td></tr>
+<tr><th id="120">120</th><td><u>#<span data-ppcond="101">else</span></u></td></tr>
+<tr><th id="121">121</th><td>    <em>void</em> DeflateOutputStreamBuffer::init(<em>bool</em> <i>/*compress*/</i>) {</td></tr>
+<tr><th id="122">122</th><td><u>#<span data-ppcond="101">endif</span> // CHEPREP_NO_ZLIB</u></td></tr>
+<tr><th id="123">123</th><td></td></tr>
+<tr><th id="124">124</th><td>        <a class="member" href="../include/cheprep/DeflateOutputStreamBuffer.h.html#cheprep::DeflateOutputStreamBuffer::crc" title='cheprep::DeflateOutputStreamBuffer::crc' data-ref="cheprep::DeflateOutputStreamBuffer::crc">crc</a> = <var>0</var>;</td></tr>
+<tr><th id="125">125</th><td>        <a class="member" href="../include/cheprep/DeflateOutputStreamBuffer.h.html#cheprep::DeflateOutputStreamBuffer::size" title='cheprep::DeflateOutputStreamBuffer::size' data-ref="cheprep::DeflateOutputStreamBuffer::size">size</a> = <var>0</var>;</td></tr>
+<tr><th id="126">126</th><td>    }</td></tr>
+<tr><th id="127">127</th><td>    </td></tr>
+<tr><th id="128">128</th><td>    <em>void</em> <a class="type" href="../include/cheprep/DeflateOutputStreamBuffer.h.html#cheprep::DeflateOutputStreamBuffer" title='cheprep::DeflateOutputStreamBuffer' data-ref="cheprep::DeflateOutputStreamBuffer">DeflateOutputStreamBuffer</a>::<dfn class="decl def" id="_ZN7cheprep25DeflateOutputStreamBuffer6finishEv" title='cheprep::DeflateOutputStreamBuffer::finish' data-ref="_ZN7cheprep25DeflateOutputStreamBuffer6finishEv">finish</dfn>() {</td></tr>
+<tr><th id="129">129</th><td></td></tr>
+<tr><th id="130">130</th><td><u>#<span data-ppcond="130">ifndef</span> <span class="macro" data-ref="_M/CHEPREP_NO_ZLIB">CHEPREP_NO_ZLIB</span></u>        </td></tr>
+<tr><th id="131">131</th><td>        <b>if</b> (<a class="member" href="../include/cheprep/DeflateOutputStreamBuffer.h.html#cheprep::DeflateOutputStreamBuffer::zStreamOpen" title='cheprep::DeflateOutputStreamBuffer::zStreamOpen' data-ref="cheprep::DeflateOutputStreamBuffer::zStreamOpen">zStreamOpen</a>) {</td></tr>
+<tr><th id="132">132</th><td></td></tr>
+<tr><th id="133">133</th><td>            <a class="member" href="#_ZN7cheprep25DeflateOutputStreamBuffer8overflowEi" title='cheprep::DeflateOutputStreamBuffer::overflow' data-ref="_ZN7cheprep25DeflateOutputStreamBuffer8overflowEi">overflow</a>() ;</td></tr>
+<tr><th id="134">134</th><td></td></tr>
+<tr><th id="135">135</th><td>            zStream.next_out  = <b>reinterpret_cast</b>&lt;<em>unsigned</em> <em>char</em> *&gt;(&amp;(<span class='error' title="use of undeclared identifier &apos;out&apos;">out</span>[<var>0</var>]));</td></tr>
+<tr><th id="136">136</th><td>            zStream.avail_out = outSize;</td></tr>
+<tr><th id="137">137</th><td>    </td></tr>
+<tr><th id="138">138</th><td>            <em>int</em> <dfn class="local col3 decl" id="13err" title='err' data-type='int' data-ref="13err">err</dfn> = <a class="macro" href="../../../externals/zlib/include/zlib.h.html#177" title="0" data-ref="_M/Z_OK">Z_OK</a> ;</td></tr>
+<tr><th id="139">139</th><td>            <b>while</b> ( <a class="local col3 ref" href="#13err" title='err' data-ref="13err">err</a> == <a class="macro" href="../../../externals/zlib/include/zlib.h.html#177" title="0" data-ref="_M/Z_OK">Z_OK</a> ) {</td></tr>
+<tr><th id="140">140</th><td>                <b>if</b> (zStream.avail_out == <var>0</var>) {</td></tr>
+<tr><th id="141">141</th><td>                    <a class="member" href="#_ZN7cheprep25DeflateOutputStreamBuffer8flushOutEv" title='cheprep::DeflateOutputStreamBuffer::flushOut' data-ref="_ZN7cheprep25DeflateOutputStreamBuffer8flushOutEv">flushOut</a>();</td></tr>
+<tr><th id="142">142</th><td>                }</td></tr>
+<tr><th id="143">143</th><td>                err = deflate(&amp;zStream, <a class="macro" href="../../../externals/zlib/include/zlib.h.html#172" title="4" data-ref="_M/Z_FINISH">Z_FINISH</a>);</td></tr>
+<tr><th id="144">144</th><td>            }</td></tr>
+<tr><th id="145">145</th><td>        </td></tr>
+<tr><th id="146">146</th><td>            <a class="member" href="#_ZN7cheprep25DeflateOutputStreamBuffer8flushOutEv" title='cheprep::DeflateOutputStreamBuffer::flushOut' data-ref="_ZN7cheprep25DeflateOutputStreamBuffer8flushOutEv">flushOut</a>() ;</td></tr>
+<tr><th id="147">147</th><td>    </td></tr>
+<tr><th id="148">148</th><td>            <b>if</b> (<a class="local col3 ref" href="#13err" title='err' data-ref="13err">err</a> != <a class="macro" href="../../../externals/zlib/include/zlib.h.html#178" title="1" data-ref="_M/Z_STREAM_END">Z_STREAM_END</a>) {</td></tr>
+<tr><th id="149">149</th><td>                <span class='error' title="use of undeclared identifier &apos;cerr&apos;; did you mean &apos;err&apos;?">cerr</span> <span class='error' title="invalid operands to binary expression (&apos;int&apos; and &apos;const char *&apos;)">&lt;&lt;</span> <q>"ERROR: deflation failed"</q> &lt;&lt; <span class='error' title="use of undeclared identifier &apos;endl&apos;">endl</span>;</td></tr>
+<tr><th id="150">150</th><td>            }</td></tr>
+<tr><th id="151">151</th><td>    </td></tr>
+<tr><th id="152">152</th><td>            <b>if</b> (deflateEnd(&amp;zStream) != <a class="macro" href="../../../externals/zlib/include/zlib.h.html#177" title="0" data-ref="_M/Z_OK">Z_OK</a>) {</td></tr>
+<tr><th id="153">153</th><td>                <span class='error' title="use of undeclared identifier &apos;cerr&apos;; did you mean &apos;err&apos;?">cerr</span> <span class='error' title="invalid operands to binary expression (&apos;int&apos; and &apos;const char *&apos;)">&lt;&lt;</span> <q>"ERROR: deflateEnd failed"</q> &lt;&lt; <span class='error' title="use of undeclared identifier &apos;endl&apos;">endl</span>;</td></tr>
+<tr><th id="154">154</th><td>            }</td></tr>
+<tr><th id="155">155</th><td>            </td></tr>
+<tr><th id="156">156</th><td>            <a class="member" href="../include/cheprep/DeflateOutputStreamBuffer.h.html#cheprep::DeflateOutputStreamBuffer::zStreamOpen" title='cheprep::DeflateOutputStreamBuffer::zStreamOpen' data-ref="cheprep::DeflateOutputStreamBuffer::zStreamOpen">zStreamOpen</a> = <b>false</b> ;</td></tr>
+<tr><th id="157">157</th><td>        }      </td></tr>
+<tr><th id="158">158</th><td><u>#<span data-ppcond="130">endif</span> // CHEPREP_NO_ZLIB</u></td></tr>
+<tr><th id="159">159</th><td>    }</td></tr>
+<tr><th id="160">160</th><td>                </td></tr>
+<tr><th id="161">161</th><td>    DeflateOutputStreamBuffer::<span class='error' title="exception specification in declaration does not match previous declaration">~</span>DeflateOutputStreamBuffer() {</td></tr>
+<tr><th id="162">162</th><td>    }</td></tr>
+<tr><th id="163">163</th><td></td></tr>
+<tr><th id="164">164</th><td></td></tr>
+<tr><th id="165">165</th><td><u>#<span data-ppcond="165">ifndef</span> <span class="macro" data-ref="_M/CHEPREP_NO_ZLIB">CHEPREP_NO_ZLIB</span></u>        </td></tr>
+<tr><th id="166">166</th><td>    <u>#define <dfn class="macro" id="_M/DO1" data-ref="_M/DO1">DO1</dfn> <a class="member" href="../include/cheprep/DeflateOutputStreamBuffer.h.html#cheprep::DeflateOutputStreamBuffer::crc" title='cheprep::DeflateOutputStreamBuffer::crc' data-ref="cheprep::DeflateOutputStreamBuffer::crc">crc</a> = <a class="member" href="../include/cheprep/DeflateOutputStreamBuffer.h.html#cheprep::DeflateOutputStreamBuffer::crctable" title='cheprep::DeflateOutputStreamBuffer::crctable' data-ref="cheprep::DeflateOutputStreamBuffer::crctable">crctable</a>[(<a class="member" href="../include/cheprep/DeflateOutputStreamBuffer.h.html#cheprep::DeflateOutputStreamBuffer::crc" title='cheprep::DeflateOutputStreamBuffer::crc' data-ref="cheprep::DeflateOutputStreamBuffer::crc">crc</a> ^ (*<a class="local col6 ref" href="#16buf" title='buf' data-ref="16buf">buf</a>++)) &amp; 0xff] ^ (<a class="member" href="../include/cheprep/DeflateOutputStreamBuffer.h.html#cheprep::DeflateOutputStreamBuffer::crc" title='cheprep::DeflateOutputStreamBuffer::crc' data-ref="cheprep::DeflateOutputStreamBuffer::crc">crc</a> &gt;&gt; 8)</u></td></tr>
+<tr><th id="167">167</th><td>    <u>#define <dfn class="macro" id="_M/DO8" data-ref="_M/DO8">DO8</dfn> DO1; DO1; DO1; DO1; DO1; DO1; DO1; DO1</u></td></tr>
+<tr><th id="168">168</th><td><u>#<span data-ppcond="165">endif</span> // CHEPREP_NO_ZLIB</u></td></tr>
+<tr><th id="169">169</th><td></td></tr>
+<tr><th id="170">170</th><td></td></tr>
+<tr><th id="171">171</th><td>    <em>int</em> <a class="type" href="../include/cheprep/DeflateOutputStreamBuffer.h.html#cheprep::DeflateOutputStreamBuffer" title='cheprep::DeflateOutputStreamBuffer' data-ref="cheprep::DeflateOutputStreamBuffer">DeflateOutputStreamBuffer</a>::<dfn class="decl def" id="_ZN7cheprep25DeflateOutputStreamBuffer8overflowEi" title='cheprep::DeflateOutputStreamBuffer::overflow' data-ref="_ZN7cheprep25DeflateOutputStreamBuffer8overflowEi">overflow</dfn>(<em>int</em> <dfn class="local col4 decl" id="14c" title='c' data-type='int' data-ref="14c">c</dfn>) {</td></tr>
+<tr><th id="172">172</th><td></td></tr>
+<tr><th id="173">173</th><td><u>#<span data-ppcond="173">ifndef</span> <span class="macro" data-ref="_M/CHEPREP_NO_ZLIB">CHEPREP_NO_ZLIB</span></u>        </td></tr>
+<tr><th id="174">174</th><td>        <b>if</b> (<a class="member" href="../include/cheprep/DeflateOutputStreamBuffer.h.html#cheprep::DeflateOutputStreamBuffer::zStreamOpen" title='cheprep::DeflateOutputStreamBuffer::zStreamOpen' data-ref="cheprep::DeflateOutputStreamBuffer::zStreamOpen">zStreamOpen</a>) {</td></tr>
+<tr><th id="175">175</th><td>            zStream.avail_in = <span class='error' title="use of undeclared identifier &apos;pptr&apos;">pptr</span>() - <span class='error' title="use of undeclared identifier &apos;pbase&apos;">pbase</span>() ;</td></tr>
+<tr><th id="176">176</th><td>            zStream.next_in = <b>reinterpret_cast</b>&lt;<em>unsigned</em> <em>char</em> *&gt;(&amp;(<span class='error' title="use of undeclared identifier &apos;in&apos;">in</span>[<var>0</var>]));</td></tr>
+<tr><th id="177">177</th><td>        </td></tr>
+<tr><th id="178">178</th><td>            <em>int</em> <dfn class="local col5 decl" id="15len" title='len' data-type='int' data-ref="15len">len</dfn> = zStream.avail_in;</td></tr>
+<tr><th id="179">179</th><td>            <em>unsigned</em> <em>char</em>* <dfn class="local col6 decl" id="16buf" title='buf' data-type='unsigned char *' data-ref="16buf">buf</dfn> = zStream.next_in;</td></tr>
+<tr><th id="180">180</th><td>        </td></tr>
+<tr><th id="181">181</th><td>            <a class="member" href="../include/cheprep/DeflateOutputStreamBuffer.h.html#cheprep::DeflateOutputStreamBuffer::crc" title='cheprep::DeflateOutputStreamBuffer::crc' data-ref="cheprep::DeflateOutputStreamBuffer::crc">crc</a> = <a class="member" href="../include/cheprep/DeflateOutputStreamBuffer.h.html#cheprep::DeflateOutputStreamBuffer::crc" title='cheprep::DeflateOutputStreamBuffer::crc' data-ref="cheprep::DeflateOutputStreamBuffer::crc">crc</a> ^ <var>0xffffffffUL</var>;</td></tr>
+<tr><th id="182">182</th><td>            <b>while</b> (<a class="local col5 ref" href="#15len" title='len' data-ref="15len">len</a> &gt;= <var>8</var>) {</td></tr>
+<tr><th id="183">183</th><td>                <a class="macro" href="#167" title="crc = crctable[(crc ^ (*buf++)) &amp; 0xff] ^ (crc &gt;&gt; 8); crc = crctable[(crc ^ (*buf++)) &amp; 0xff] ^ (crc &gt;&gt; 8); crc = crctable[(crc ^ (*buf++)) &amp; 0xff] ^ (crc &gt;&gt; 8); crc = crctable[(crc ^ (*buf++)) &amp; 0xff] ^ (crc &gt;&gt; 8); crc = crctable[(crc ^ (*buf++)) &amp; 0xff] ^ (crc &gt;&gt; 8); crc = crctable[(crc ^ (*buf++)) &amp; 0xff] ^ (crc &gt;&gt; 8); crc = crctable[(crc ^ (*buf++)) &amp; 0xff] ^ (crc &gt;&gt; 8); crc = crctable[(crc ^ (*buf++)) &amp; 0xff] ^ (crc &gt;&gt; 8)" data-ref="_M/DO8">DO8</a>;</td></tr>
+<tr><th id="184">184</th><td>                <a class="local col5 ref" href="#15len" title='len' data-ref="15len">len</a> -= <var>8</var>;</td></tr>
+<tr><th id="185">185</th><td>            }</td></tr>
+<tr><th id="186">186</th><td>            <b>if</b> (<a class="local col5 ref" href="#15len" title='len' data-ref="15len">len</a>) <b>do</b> {</td></tr>
+<tr><th id="187">187</th><td>                <a class="macro" href="#166" title="crc = crctable[(crc ^ (*buf++)) &amp; 0xff] ^ (crc &gt;&gt; 8)" data-ref="_M/DO1">DO1</a>;</td></tr>
+<tr><th id="188">188</th><td>            } <b>while</b> (--<a class="local col5 ref" href="#15len" title='len' data-ref="15len">len</a>);</td></tr>
+<tr><th id="189">189</th><td>            <a class="member" href="../include/cheprep/DeflateOutputStreamBuffer.h.html#cheprep::DeflateOutputStreamBuffer::crc" title='cheprep::DeflateOutputStreamBuffer::crc' data-ref="cheprep::DeflateOutputStreamBuffer::crc">crc</a> = <a class="member" href="../include/cheprep/DeflateOutputStreamBuffer.h.html#cheprep::DeflateOutputStreamBuffer::crc" title='cheprep::DeflateOutputStreamBuffer::crc' data-ref="cheprep::DeflateOutputStreamBuffer::crc">crc</a> ^ <var>0xffffffffUL</var>;</td></tr>
+<tr><th id="190">190</th><td>    </td></tr>
+<tr><th id="191">191</th><td>            size += zStream.avail_in;</td></tr>
+<tr><th id="192">192</th><td></td></tr>
+<tr><th id="193">193</th><td>            zStream.next_out  = <b>reinterpret_cast</b>&lt;<em>unsigned</em> <em>char</em> *&gt;(&amp;(<span class='error' title="use of undeclared identifier &apos;out&apos;">out</span>[<var>0</var>]));</td></tr>
+<tr><th id="194">194</th><td>            zStream.avail_out = outSize ;</td></tr>
+<tr><th id="195">195</th><td>        </td></tr>
+<tr><th id="196">196</th><td>            <em>int</em> <dfn class="local col7 decl" id="17err" title='err' data-type='int' data-ref="17err">err</dfn> = <a class="macro" href="../../../externals/zlib/include/zlib.h.html#177" title="0" data-ref="_M/Z_OK">Z_OK</a> ;</td></tr>
+<tr><th id="197">197</th><td>            <b>while</b> ((zStream.avail_in &gt; <var>0</var> || zStream.avail_out == <var>0</var>) &amp;&amp; err == <a class="macro" href="../../../externals/zlib/include/zlib.h.html#177" title="0" data-ref="_M/Z_OK">Z_OK</a>) {</td></tr>
+<tr><th id="198">198</th><td>                <b>if</b> (zStream.avail_out == <var>0</var> ) {</td></tr>
+<tr><th id="199">199</th><td>                    flushOut();</td></tr>
+<tr><th id="200">200</th><td>                }</td></tr>
+<tr><th id="201">201</th><td>                err = deflate(&amp;zStream, <a class="macro" href="../../../externals/zlib/include/zlib.h.html#168" title="0" data-ref="_M/Z_NO_FLUSH">Z_NO_FLUSH</a>);</td></tr>
+<tr><th id="202">202</th><td>            }</td></tr>
+<tr><th id="203">203</th><td></td></tr>
+<tr><th id="204">204</th><td>            <a class="member" href="#_ZN7cheprep25DeflateOutputStreamBuffer8flushOutEv" title='cheprep::DeflateOutputStreamBuffer::flushOut' data-ref="_ZN7cheprep25DeflateOutputStreamBuffer8flushOutEv">flushOut</a>();</td></tr>
+<tr><th id="205">205</th><td>        </td></tr>
+<tr><th id="206">206</th><td>            setp(&amp;(<span class='error' title="use of undeclared identifier &apos;in&apos;">in</span>[<var>0</var>]), &amp;(<span class='error' title="use of undeclared identifier &apos;in&apos;">in</span>[<var>0</var>]) + inSize);</td></tr>
+<tr><th id="207">207</th><td></td></tr>
+<tr><th id="208">208</th><td>            <b>if</b> ((<a class="local col7 ref" href="#17err" title='err' data-ref="17err">err</a> != <a class="macro" href="../../../externals/zlib/include/zlib.h.html#177" title="0" data-ref="_M/Z_OK">Z_OK</a>) &amp;&amp; (<a class="local col7 ref" href="#17err" title='err' data-ref="17err">err</a> != <a class="macro" href="../../../externals/zlib/include/zlib.h.html#178" title="1" data-ref="_M/Z_STREAM_END">Z_STREAM_END</a>)) {</td></tr>
+<tr><th id="209">209</th><td>                <span class='error' title="use of undeclared identifier &apos;cerr&apos;; did you mean &apos;err&apos;?">cerr</span> <span class='error' title="invalid operands to binary expression (&apos;int&apos; and &apos;const char *&apos;)">&lt;&lt;</span> <q>"ERROR: deflation failed"</q> &lt;&lt; <span class='error' title="use of undeclared identifier &apos;endl&apos;">endl</span>;</td></tr>
+<tr><th id="210">210</th><td>                <b>return</b> <span class='error' title="use of undeclared identifier &apos;EOF&apos;">EOF</span> ;</td></tr>
+<tr><th id="211">211</th><td>            }</td></tr>
+<tr><th id="212">212</th><td></td></tr>
+<tr><th id="213">213</th><td>            <b>if</b> ( c != <span class='error' title="use of undeclared identifier &apos;EOF&apos;">EOF</span> ) {</td></tr>
+<tr><th id="214">214</th><td>                *<span class='error' title="use of undeclared identifier &apos;pptr&apos;">pptr</span>() = c ;</td></tr>
+<tr><th id="215">215</th><td>                <span class='error' title="use of undeclared identifier &apos;pbump&apos;">pbump</span>(<var>1</var>);</td></tr>
+<tr><th id="216">216</th><td>            }</td></tr>
+<tr><th id="217">217</th><td>    </td></tr>
+<tr><th id="218">218</th><td>            <b>return</b> <var>0</var> ;</td></tr>
+<tr><th id="219">219</th><td>        } <b>else</b> {</td></tr>
+<tr><th id="220">220</th><td><u>#<span data-ppcond="173">endif</span> // CHEPREP_NO_ZLIB</u></td></tr>
+<tr><th id="221">221</th><td>            <a class="member" href="../include/cheprep/DeflateOutputStreamBuffer.h.html#cheprep::DeflateOutputStreamBuffer::crc" title='cheprep::DeflateOutputStreamBuffer::crc' data-ref="cheprep::DeflateOutputStreamBuffer::crc">crc</a> = <a class="member" href="../include/cheprep/DeflateOutputStreamBuffer.h.html#cheprep::DeflateOutputStreamBuffer::crc" title='cheprep::DeflateOutputStreamBuffer::crc' data-ref="cheprep::DeflateOutputStreamBuffer::crc">crc</a> ^ <var>0xffffffffUL</var>;</td></tr>
+<tr><th id="222">222</th><td>            <a class="member" href="../include/cheprep/DeflateOutputStreamBuffer.h.html#cheprep::DeflateOutputStreamBuffer::crc" title='cheprep::DeflateOutputStreamBuffer::crc' data-ref="cheprep::DeflateOutputStreamBuffer::crc">crc</a> = <a class="member" href="../include/cheprep/DeflateOutputStreamBuffer.h.html#cheprep::DeflateOutputStreamBuffer::crctable" title='cheprep::DeflateOutputStreamBuffer::crctable' data-ref="cheprep::DeflateOutputStreamBuffer::crctable">crctable</a>[(<a class="member" href="../include/cheprep/DeflateOutputStreamBuffer.h.html#cheprep::DeflateOutputStreamBuffer::crc" title='cheprep::DeflateOutputStreamBuffer::crc' data-ref="cheprep::DeflateOutputStreamBuffer::crc">crc</a> ^ <a class="local col4 ref" href="#14c" title='c' data-ref="14c">c</a>) &amp; <var>0xff</var>] ^ (<a class="member" href="../include/cheprep/DeflateOutputStreamBuffer.h.html#cheprep::DeflateOutputStreamBuffer::crc" title='cheprep::DeflateOutputStreamBuffer::crc' data-ref="cheprep::DeflateOutputStreamBuffer::crc">crc</a> &gt;&gt; <var>8</var>);</td></tr>
+<tr><th id="223">223</th><td>            <a class="member" href="../include/cheprep/DeflateOutputStreamBuffer.h.html#cheprep::DeflateOutputStreamBuffer::crc" title='cheprep::DeflateOutputStreamBuffer::crc' data-ref="cheprep::DeflateOutputStreamBuffer::crc">crc</a> = <a class="member" href="../include/cheprep/DeflateOutputStreamBuffer.h.html#cheprep::DeflateOutputStreamBuffer::crc" title='cheprep::DeflateOutputStreamBuffer::crc' data-ref="cheprep::DeflateOutputStreamBuffer::crc">crc</a> ^ <var>0xffffffffUL</var>;</td></tr>
+<tr><th id="224">224</th><td>            <a class="member" href="../include/cheprep/DeflateOutputStreamBuffer.h.html#cheprep::DeflateOutputStreamBuffer::size" title='cheprep::DeflateOutputStreamBuffer::size' data-ref="cheprep::DeflateOutputStreamBuffer::size">size</a>++;</td></tr>
+<tr><th id="225">225</th><td>            <b>return</b> buffer-&gt;sputc((<em>char</em>)c);</td></tr>
+<tr><th id="226">226</th><td><u>#<span data-ppcond="226">ifndef</span> <span class="macro" data-ref="_M/CHEPREP_NO_ZLIB">CHEPREP_NO_ZLIB</span></u>        </td></tr>
+<tr><th id="227">227</th><td>        }</td></tr>
+<tr><th id="228">228</th><td><u>#<span data-ppcond="226">endif</span> // CHEPREP_NO_ZLIB</u></td></tr>
+<tr><th id="229">229</th><td>    }</td></tr>
+<tr><th id="230">230</th><td>    </td></tr>
+<tr><th id="231">231</th><td></td></tr>
+<tr><th id="232">232</th><td><u>#<span data-ppcond="232">ifndef</span> <span class="macro" data-ref="_M/CHEPREP_NO_ZLIB">CHEPREP_NO_ZLIB</span></u>        </td></tr>
+<tr><th id="233">233</th><td>    <em>bool</em> <a class="type" href="../include/cheprep/DeflateOutputStreamBuffer.h.html#cheprep::DeflateOutputStreamBuffer" title='cheprep::DeflateOutputStreamBuffer' data-ref="cheprep::DeflateOutputStreamBuffer">DeflateOutputStreamBuffer</a>::<dfn class="decl def" id="_ZN7cheprep25DeflateOutputStreamBuffer8flushOutEv" title='cheprep::DeflateOutputStreamBuffer::flushOut' data-ref="_ZN7cheprep25DeflateOutputStreamBuffer8flushOutEv">flushOut</dfn>() {</td></tr>
+<tr><th id="234">234</th><td>        <em>int</em> <dfn class="local col8 decl" id="18deflatedCount" title='deflatedCount' data-type='int' data-ref="18deflatedCount">deflatedCount</dfn> = outSize - zStream.avail_out;</td></tr>
+<tr><th id="235">235</th><td>        <em>int</em> <dfn class="local col9 decl" id="19byteCount" title='byteCount' data-type='int' data-ref="19byteCount">byteCount</dfn> = buffer-&gt;sputn(&amp;(<span class='error' title="use of undeclared identifier &apos;out&apos;">out</span>[<var>0</var>]), deflatedCount);</td></tr>
+<tr><th id="236">236</th><td></td></tr>
+<tr><th id="237">237</th><td>        zStream.next_out = <b>reinterpret_cast</b>&lt;<em>unsigned</em> <em>char</em> *&gt;(&amp;(<span class='error' title="use of undeclared identifier &apos;out&apos;">out</span>[<var>0</var>]));</td></tr>
+<tr><th id="238">238</th><td>        zStream.avail_out = outSize ;</td></tr>
+<tr><th id="239">239</th><td></td></tr>
+<tr><th id="240">240</th><td>        <b>return</b> <a class="local col8 ref" href="#18deflatedCount" title='deflatedCount' data-ref="18deflatedCount">deflatedCount</a> == <a class="local col9 ref" href="#19byteCount" title='byteCount' data-ref="19byteCount">byteCount</a> ;</td></tr>
+<tr><th id="241">241</th><td>    }</td></tr>
+<tr><th id="242">242</th><td><u>#<span data-ppcond="232">endif</span> // CHEPREP_NO_ZLIB</u></td></tr>
+<tr><th id="243">243</th><td>    </td></tr>
+<tr><th id="244">244</th><td>} <i>// cheprep</i></td></tr>
+<tr><th id="245">245</th><td></td></tr>
+</table><hr/><p id='footer'>
+Generated on <em>2019-Aug-28</em> from project codebrowser<br />Powered by <a href='https://woboq.com'><img alt='Woboq' src='https://code.woboq.org/woboq-16.png' width='41' height='16' /></a> <a href='https://code.woboq.org'>Code Browser</a> 2.1
+<br/>Generator usage only permitted with license.</p>
+</div></body></html>

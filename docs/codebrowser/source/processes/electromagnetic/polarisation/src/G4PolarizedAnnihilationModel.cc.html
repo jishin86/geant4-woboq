@@ -1,0 +1,409 @@
+<!doctype html>
+<html>
+<head>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"><title>G4PolarizedAnnihilationModel.cc source code [codebrowser/source/processes/electromagnetic/polarisation/src/G4PolarizedAnnihilationModel.cc] - Woboq Code Browser</title>
+<link rel="stylesheet" href="../../../../../../../data/qtcreator.css" title="QtCreator"/>
+<link rel="alternate stylesheet" href="../../../../../../../data/kdevelop.css" title="KDevelop"/>
+<script type="text/javascript" src="../../../../../../../data/jquery/jquery.min.js"></script>
+<script type="text/javascript" src="../../../../../../../data/jquery/jquery-ui.min.js"></script>
+<script>var file = 'codebrowser/source/processes/electromagnetic/polarisation/src/G4PolarizedAnnihilationModel.cc'; var root_path = '../../../../../..'; var data_path = '../../../../../../../data';</script>
+<script src='../../../../../../../data/codebrowser.js'></script>
+</head>
+<body><div id='header'><h1 id='breadcrumb'><span>Browse the source code of </span><a href='../../../../..'>codebrowser</a>/<a href='../../../..'>source</a>/<a href='../../..'>processes</a>/<a href='../..'>electromagnetic</a>/<a href='..'>polarisation</a>/<a href='./'>src</a>/<a href='G4PolarizedAnnihilationModel.cc.html'>G4PolarizedAnnihilationModel.cc</a></h1></div>
+<hr/><div id='content'><table class="code">
+<tr><th id="1">1</th><td><i>//</i></td></tr>
+<tr><th id="2">2</th><td><i>// ********************************************************************</i></td></tr>
+<tr><th id="3">3</th><td><i>// * License and Disclaimer                                           *</i></td></tr>
+<tr><th id="4">4</th><td><i>// *                                                                  *</i></td></tr>
+<tr><th id="5">5</th><td><i>// * The  Geant4 software  is  copyright of the Copyright Holders  of *</i></td></tr>
+<tr><th id="6">6</th><td><i>// * the Geant4 Collaboration.  It is provided  under  the terms  and *</i></td></tr>
+<tr><th id="7">7</th><td><i>// * conditions of the Geant4 Software License,  included in the file *</i></td></tr>
+<tr><th id="8">8</th><td><i>// * LICENSE and available at  <a href="http://cern.ch/geant4/license">http://cern.ch/geant4/license</a> .  These *</i></td></tr>
+<tr><th id="9">9</th><td><i>// * include a list of copyright holders.                             *</i></td></tr>
+<tr><th id="10">10</th><td><i>// *                                                                  *</i></td></tr>
+<tr><th id="11">11</th><td><i>// * Neither the authors of this software system, nor their employing *</i></td></tr>
+<tr><th id="12">12</th><td><i>// * institutes,nor the agencies providing financial support for this *</i></td></tr>
+<tr><th id="13">13</th><td><i>// * work  make  any representation or  warranty, express or implied, *</i></td></tr>
+<tr><th id="14">14</th><td><i>// * regarding  this  software system or assume any liability for its *</i></td></tr>
+<tr><th id="15">15</th><td><i>// * use.  Please see the license in the file  LICENSE  and URL above *</i></td></tr>
+<tr><th id="16">16</th><td><i>// * for the full disclaimer and the limitation of liability.         *</i></td></tr>
+<tr><th id="17">17</th><td><i>// *                                                                  *</i></td></tr>
+<tr><th id="18">18</th><td><i>// * This  code  implementation is the result of  the  scientific and *</i></td></tr>
+<tr><th id="19">19</th><td><i>// * technical work of the GEANT4 collaboration.                      *</i></td></tr>
+<tr><th id="20">20</th><td><i>// * By using,  copying,  modifying or  distributing the software (or *</i></td></tr>
+<tr><th id="21">21</th><td><i>// * any work based  on the software)  you  agree  to acknowledge its *</i></td></tr>
+<tr><th id="22">22</th><td><i>// * use  in  resulting  scientific  publications,  and indicate your *</i></td></tr>
+<tr><th id="23">23</th><td><i>// * acceptance of all terms of the Geant4 Software license.          *</i></td></tr>
+<tr><th id="24">24</th><td><i>// ********************************************************************</i></td></tr>
+<tr><th id="25">25</th><td><i>//</i></td></tr>
+<tr><th id="26">26</th><td><i>//</i></td></tr>
+<tr><th id="27">27</th><td><i>// -------------------------------------------------------------------</i></td></tr>
+<tr><th id="28">28</th><td><i>//</i></td></tr>
+<tr><th id="29">29</th><td><i>// GEANT4 Class file</i></td></tr>
+<tr><th id="30">30</th><td><i>//</i></td></tr>
+<tr><th id="31">31</th><td><i>//</i></td></tr>
+<tr><th id="32">32</th><td><i>// File name:     G4PolarizedAnnihilationModel</i></td></tr>
+<tr><th id="33">33</th><td><i>//</i></td></tr>
+<tr><th id="34">34</th><td><i>// Author:        Andreas Schaelicke</i></td></tr>
+<tr><th id="35">35</th><td><i>//</i></td></tr>
+<tr><th id="36">36</th><td><i>// Creation date: 01.05.2005</i></td></tr>
+<tr><th id="37">37</th><td><i>//</i></td></tr>
+<tr><th id="38">38</th><td><i>// Modifications:</i></td></tr>
+<tr><th id="39">39</th><td><i>// 18-07-06 use newly calculated cross sections (P. Starovoitov)</i></td></tr>
+<tr><th id="40">40</th><td><i>// 21-08-06 update interface (A. Schaelicke)</i></td></tr>
+<tr><th id="41">41</th><td><i>// 17-11-06 add protection agaist e+ zero energy PostStep (V.Ivanchenko)</i></td></tr>
+<tr><th id="42">42</th><td><i>// 10-07-07 copied Initialise() method from G4eeToTwoGammaModel to provide a  </i></td></tr>
+<tr><th id="43">43</th><td><i>//          local ParticleChangeForGamma object and reduce overhead </i></td></tr>
+<tr><th id="44">44</th><td><i>//          in SampleSecondaries()  (A. Schaelicke)</i></td></tr>
+<tr><th id="45">45</th><td><i>//</i></td></tr>
+<tr><th id="46">46</th><td><i>//</i></td></tr>
+<tr><th id="47">47</th><td><i>// Class Description:</i></td></tr>
+<tr><th id="48">48</th><td><i>//</i></td></tr>
+<tr><th id="49">49</th><td><i>// Implementation of polarized gamma Annihilation scattering on free electron</i></td></tr>
+<tr><th id="50">50</th><td><i>// </i></td></tr>
+<tr><th id="51">51</th><td><i></i></td></tr>
+<tr><th id="52">52</th><td><i>// -------------------------------------------------------------------</i></td></tr>
+<tr><th id="53">53</th><td><u>#include <a href="../include/G4PolarizedAnnihilationModel.hh.html">"G4PolarizedAnnihilationModel.hh"</a></u></td></tr>
+<tr><th id="54">54</th><td><u>#include <a href="../../../../global/management/include/G4PhysicalConstants.hh.html">"G4PhysicalConstants.hh"</a></u></td></tr>
+<tr><th id="55">55</th><td><u>#include <a href="../include/G4PolarizationManager.hh.html">"G4PolarizationManager.hh"</a></u></td></tr>
+<tr><th id="56">56</th><td><u>#include <a href="../include/G4PolarizationHelper.hh.html">"G4PolarizationHelper.hh"</a></u></td></tr>
+<tr><th id="57">57</th><td><u>#include <a href="../include/G4StokesVector.hh.html">"G4StokesVector.hh"</a></u></td></tr>
+<tr><th id="58">58</th><td><u>#include <a href="../include/G4PolarizedAnnihilationCrossSection.hh.html">"G4PolarizedAnnihilationCrossSection.hh"</a></u></td></tr>
+<tr><th id="59">59</th><td><u>#include <a href="../../../../track/include/G4ParticleChangeForGamma.hh.html">"G4ParticleChangeForGamma.hh"</a></u></td></tr>
+<tr><th id="60">60</th><td><u>#include <a href="../../../../track/include/G4TrackStatus.hh.html">"G4TrackStatus.hh"</a></u></td></tr>
+<tr><th id="61">61</th><td><u>#include <a href="../../../../particles/bosons/include/G4Gamma.hh.html">"G4Gamma.hh"</a></u></td></tr>
+<tr><th id="62">62</th><td></td></tr>
+<tr><th id="63">63</th><td><a class="type" href="../include/G4PolarizedAnnihilationModel.hh.html#G4PolarizedAnnihilationModel" title='G4PolarizedAnnihilationModel' data-ref="G4PolarizedAnnihilationModel">G4PolarizedAnnihilationModel</a>::<dfn class="decl def" id="_ZN28G4PolarizedAnnihilationModelC1EPK20G4ParticleDefinitionRK8G4String" title='G4PolarizedAnnihilationModel::G4PolarizedAnnihilationModel' data-ref="_ZN28G4PolarizedAnnihilationModelC1EPK20G4ParticleDefinitionRK8G4String">G4PolarizedAnnihilationModel</dfn>(<em>const</em> <a class="type" href="../../../../particles/management/include/G4ParticleDefinition.hh.html#G4ParticleDefinition" title='G4ParticleDefinition' data-ref="G4ParticleDefinition">G4ParticleDefinition</a>* <dfn class="local col5 decl" id="25p" title='p' data-type='const G4ParticleDefinition *' data-ref="25p">p</dfn>, </td></tr>
+<tr><th id="64">64</th><td>							   <em>const</em> <a class="type" href="../../../../global/management/include/G4String.hh.html#G4String" title='G4String' data-ref="G4String">G4String</a>&amp; <dfn class="local col6 decl" id="26nam" title='nam' data-type='const G4String &amp;' data-ref="26nam">nam</dfn>)</td></tr>
+<tr><th id="65">65</th><td>  : <a class="type" href="../../standard/include/G4eeToTwoGammaModel.hh.html#G4eeToTwoGammaModel" title='G4eeToTwoGammaModel' data-ref="G4eeToTwoGammaModel">G4eeToTwoGammaModel</a><a class="ref" href="../../standard/include/G4eeToTwoGammaModel.hh.html#_ZN19G4eeToTwoGammaModelC1EPK20G4ParticleDefinitionRK8G4String" title='G4eeToTwoGammaModel::G4eeToTwoGammaModel' data-ref="_ZN19G4eeToTwoGammaModelC1EPK20G4ParticleDefinitionRK8G4String">(</a><a class="local col5 ref" href="#25p" title='p' data-ref="25p">p</a>,<a class="local col6 ref" href="#26nam" title='nam' data-ref="26nam">nam</a>),</td></tr>
+<tr><th id="66">66</th><td>    <a class="member" href="../include/G4PolarizedAnnihilationModel.hh.html#G4PolarizedAnnihilationModel::crossSectionCalculator" title='G4PolarizedAnnihilationModel::crossSectionCalculator' data-ref="G4PolarizedAnnihilationModel::crossSectionCalculator">crossSectionCalculator</a>(<b>nullptr</b>),</td></tr>
+<tr><th id="67">67</th><td>    <a class="member" href="../include/G4PolarizedAnnihilationModel.hh.html#G4PolarizedAnnihilationModel::verboseLevel" title='G4PolarizedAnnihilationModel::verboseLevel' data-ref="G4PolarizedAnnihilationModel::verboseLevel">verboseLevel</a>(<var>0</var>),</td></tr>
+<tr><th id="68">68</th><td>    <a class="member" href="../include/G4PolarizedAnnihilationModel.hh.html#G4PolarizedAnnihilationModel::gParticleChange" title='G4PolarizedAnnihilationModel::gParticleChange' data-ref="G4PolarizedAnnihilationModel::gParticleChange">gParticleChange</a>(<b>nullptr</b>)</td></tr>
+<tr><th id="69">69</th><td>{</td></tr>
+<tr><th id="70">70</th><td>  <a class="member" href="../include/G4PolarizedAnnihilationModel.hh.html#G4PolarizedAnnihilationModel::crossSectionCalculator" title='G4PolarizedAnnihilationModel::crossSectionCalculator' data-ref="G4PolarizedAnnihilationModel::crossSectionCalculator">crossSectionCalculator</a> = <b>new</b> <a class="type" href="../include/G4PolarizedAnnihilationCrossSection.hh.html#G4PolarizedAnnihilationCrossSection" title='G4PolarizedAnnihilationCrossSection' data-ref="G4PolarizedAnnihilationCrossSection">G4PolarizedAnnihilationCrossSection</a><a class="ref" href="../include/G4PolarizedAnnihilationCrossSection.hh.html#_ZN35G4PolarizedAnnihilationCrossSectionC1Ev" title='G4PolarizedAnnihilationCrossSection::G4PolarizedAnnihilationCrossSection' data-ref="_ZN35G4PolarizedAnnihilationCrossSectionC1Ev">(</a>);</td></tr>
+<tr><th id="71">71</th><td>}</td></tr>
+<tr><th id="72">72</th><td></td></tr>
+<tr><th id="73">73</th><td>G4PolarizedAnnihilationModel::<span class='error' title="exception specification in declaration does not match previous declaration">~</span>G4PolarizedAnnihilationModel()</td></tr>
+<tr><th id="74">74</th><td>{</td></tr>
+<tr><th id="75">75</th><td>  <b>delete</b> crossSectionCalculator;</td></tr>
+<tr><th id="76">76</th><td>}</td></tr>
+<tr><th id="77">77</th><td></td></tr>
+<tr><th id="78">78</th><td></td></tr>
+<tr><th id="79">79</th><td><i>//....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo....</i></td></tr>
+<tr><th id="80">80</th><td></td></tr>
+<tr><th id="81">81</th><td><em>void</em> <a class="type" href="../include/G4PolarizedAnnihilationModel.hh.html#G4PolarizedAnnihilationModel" title='G4PolarizedAnnihilationModel' data-ref="G4PolarizedAnnihilationModel">G4PolarizedAnnihilationModel</a>::<dfn class="virtual decl def" id="_ZN28G4PolarizedAnnihilationModel10InitialiseEPK20G4ParticleDefinitionRK12G4DataVector" title='G4PolarizedAnnihilationModel::Initialise' data-ref="_ZN28G4PolarizedAnnihilationModel10InitialiseEPK20G4ParticleDefinitionRK12G4DataVector">Initialise</dfn>(<em>const</em> <a class="type" href="../../../../particles/management/include/G4ParticleDefinition.hh.html#G4ParticleDefinition" title='G4ParticleDefinition' data-ref="G4ParticleDefinition">G4ParticleDefinition</a>* <dfn class="local col7 decl" id="27part" title='part' data-type='const G4ParticleDefinition *' data-ref="27part">part</dfn>,</td></tr>
+<tr><th id="82">82</th><td>                                              <em>const</em> <a class="type" href="../../../../global/management/include/G4DataVector.hh.html#G4DataVector" title='G4DataVector' data-ref="G4DataVector">G4DataVector</a>&amp; <dfn class="local col8 decl" id="28dv" title='dv' data-type='const G4DataVector &amp;' data-ref="28dv">dv</dfn>)</td></tr>
+<tr><th id="83">83</th><td>{</td></tr>
+<tr><th id="84">84</th><td>  G4eeToTwoGammaModel::<span class='error' title="cannot initialize object parameter of type &apos;G4eeToTwoGammaModel&apos; with an expression of type &apos;G4PolarizedAnnihilationModel&apos;">Initialise</span>(part, dv);</td></tr>
+<tr><th id="85">85</th><td>  <b>if</b>(<a class="member" href="../include/G4PolarizedAnnihilationModel.hh.html#G4PolarizedAnnihilationModel::gParticleChange" title='G4PolarizedAnnihilationModel::gParticleChange' data-ref="G4PolarizedAnnihilationModel::gParticleChange">gParticleChange</a>) { <b>return</b>; }</td></tr>
+<tr><th id="86">86</th><td>  gParticleChange = <span class='error' title="cannot initialize object parameter of type &apos;G4VEmModel&apos; with an expression of type &apos;G4PolarizedAnnihilationModel&apos;">GetParticleChangeForGamma</span>();</td></tr>
+<tr><th id="87">87</th><td>}</td></tr>
+<tr><th id="88">88</th><td></td></tr>
+<tr><th id="89">89</th><td><a class="typedef" href="../../../../global/management/include/G4Types.hh.html#G4double" title='G4double' data-type='double' data-ref="G4double">G4double</a> </td></tr>
+<tr><th id="90">90</th><td><a class="type" href="../include/G4PolarizedAnnihilationModel.hh.html#G4PolarizedAnnihilationModel" title='G4PolarizedAnnihilationModel' data-ref="G4PolarizedAnnihilationModel">G4PolarizedAnnihilationModel</a>::<dfn class="virtual decl def" id="_ZN28G4PolarizedAnnihilationModel30ComputeCrossSectionPerElectronEd" title='G4PolarizedAnnihilationModel::ComputeCrossSectionPerElectron' data-ref="_ZN28G4PolarizedAnnihilationModel30ComputeCrossSectionPerElectronEd">ComputeCrossSectionPerElectron</dfn>(<a class="typedef" href="../../../../global/management/include/G4Types.hh.html#G4double" title='G4double' data-type='double' data-ref="G4double">G4double</a> <dfn class="local col9 decl" id="29kinEnergy" title='kinEnergy' data-type='G4double' data-ref="29kinEnergy">kinEnergy</dfn>)</td></tr>
+<tr><th id="91">91</th><td>{</td></tr>
+<tr><th id="92">92</th><td>  <i>// cross section from base model</i></td></tr>
+<tr><th id="93">93</th><td>  <a class="typedef" href="../../../../global/management/include/G4Types.hh.html#G4double" title='G4double' data-type='double' data-ref="G4double">G4double</a> <dfn class="local col0 decl" id="30xs" title='xs' data-type='G4double' data-ref="30xs">xs</dfn> = G4eeToTwoGammaModel::<span class='error' title="cannot initialize object parameter of type &apos;G4eeToTwoGammaModel&apos; with an expression of type &apos;G4PolarizedAnnihilationModel&apos;">ComputeCrossSectionPerElectron</span>(kinEnergy);</td></tr>
+<tr><th id="94">94</th><td></td></tr>
+<tr><th id="95">95</th><td>  <a class="typedef" href="../../../../global/management/include/G4Types.hh.html#G4double" title='G4double' data-type='double' data-ref="G4double">G4double</a> <dfn class="local col1 decl" id="31polzz" title='polzz' data-type='G4double' data-ref="31polzz">polzz</dfn> = <a class="member" href="../include/G4PolarizedAnnihilationModel.hh.html#G4PolarizedAnnihilationModel::theBeamPolarization" title='G4PolarizedAnnihilationModel::theBeamPolarization' data-ref="G4PolarizedAnnihilationModel::theBeamPolarization">theBeamPolarization</a>.<a class="ref" href="../../../../externals/clhep/include/CLHEP/Vector/ThreeVector.h.html#_ZNK5CLHEP10Hep3Vector1zEv" title='CLHEP::Hep3Vector::z' data-ref="_ZNK5CLHEP10Hep3Vector1zEv">z</a>()*<a class="member" href="../include/G4PolarizedAnnihilationModel.hh.html#G4PolarizedAnnihilationModel::theTargetPolarization" title='G4PolarizedAnnihilationModel::theTargetPolarization' data-ref="G4PolarizedAnnihilationModel::theTargetPolarization">theTargetPolarization</a>.<a class="ref" href="../../../../externals/clhep/include/CLHEP/Vector/ThreeVector.h.html#_ZNK5CLHEP10Hep3Vector1zEv" title='CLHEP::Hep3Vector::z' data-ref="_ZNK5CLHEP10Hep3Vector1zEv">z</a>();</td></tr>
+<tr><th id="96">96</th><td>  <a class="typedef" href="../../../../global/management/include/G4Types.hh.html#G4double" title='G4double' data-type='double' data-ref="G4double">G4double</a> <dfn class="local col2 decl" id="32poltt" title='poltt' data-type='G4double' data-ref="32poltt">poltt</dfn> = <a class="member" href="../include/G4PolarizedAnnihilationModel.hh.html#G4PolarizedAnnihilationModel::theBeamPolarization" title='G4PolarizedAnnihilationModel::theBeamPolarization' data-ref="G4PolarizedAnnihilationModel::theBeamPolarization">theBeamPolarization</a>.<a class="ref" href="../../../../externals/clhep/include/CLHEP/Vector/ThreeVector.h.html#_ZNK5CLHEP10Hep3Vector1xEv" title='CLHEP::Hep3Vector::x' data-ref="_ZNK5CLHEP10Hep3Vector1xEv">x</a>()*<a class="member" href="../include/G4PolarizedAnnihilationModel.hh.html#G4PolarizedAnnihilationModel::theTargetPolarization" title='G4PolarizedAnnihilationModel::theTargetPolarization' data-ref="G4PolarizedAnnihilationModel::theTargetPolarization">theTargetPolarization</a>.<a class="ref" href="../../../../externals/clhep/include/CLHEP/Vector/ThreeVector.h.html#_ZNK5CLHEP10Hep3Vector1xEv" title='CLHEP::Hep3Vector::x' data-ref="_ZNK5CLHEP10Hep3Vector1xEv">x</a>() </td></tr>
+<tr><th id="97">97</th><td>                 + <a class="member" href="../include/G4PolarizedAnnihilationModel.hh.html#G4PolarizedAnnihilationModel::theBeamPolarization" title='G4PolarizedAnnihilationModel::theBeamPolarization' data-ref="G4PolarizedAnnihilationModel::theBeamPolarization">theBeamPolarization</a>.<a class="ref" href="../../../../externals/clhep/include/CLHEP/Vector/ThreeVector.h.html#_ZNK5CLHEP10Hep3Vector1yEv" title='CLHEP::Hep3Vector::y' data-ref="_ZNK5CLHEP10Hep3Vector1yEv">y</a>()*<a class="member" href="../include/G4PolarizedAnnihilationModel.hh.html#G4PolarizedAnnihilationModel::theTargetPolarization" title='G4PolarizedAnnihilationModel::theTargetPolarization' data-ref="G4PolarizedAnnihilationModel::theTargetPolarization">theTargetPolarization</a>.<a class="ref" href="../../../../externals/clhep/include/CLHEP/Vector/ThreeVector.h.html#_ZNK5CLHEP10Hep3Vector1yEv" title='CLHEP::Hep3Vector::y' data-ref="_ZNK5CLHEP10Hep3Vector1yEv">y</a>();</td></tr>
+<tr><th id="98">98</th><td>  <b>if</b> (<a class="local col1 ref" href="#31polzz" title='polzz' data-ref="31polzz">polzz</a>!=<var>0</var> || <a class="local col2 ref" href="#32poltt" title='poltt' data-ref="32poltt">poltt</a>!=<var>0</var>) {</td></tr>
+<tr><th id="99">99</th><td>    <a class="typedef" href="../../../../global/management/include/G4Types.hh.html#G4double" title='G4double' data-type='double' data-ref="G4double">G4double</a> <dfn class="local col3 decl" id="33xval" title='xval' data-type='G4double' data-ref="33xval">xval</dfn>,<dfn class="local col4 decl" id="34lasym" title='lasym' data-type='G4double' data-ref="34lasym">lasym</dfn>,<dfn class="local col5 decl" id="35tasym" title='tasym' data-type='G4double' data-ref="35tasym">tasym</dfn>;</td></tr>
+<tr><th id="100">100</th><td>    <a class="member" href="#_ZN28G4PolarizedAnnihilationModel29ComputeAsymmetriesPerElectronEdRdS0_S0_" title='G4PolarizedAnnihilationModel::ComputeAsymmetriesPerElectron' data-ref="_ZN28G4PolarizedAnnihilationModel29ComputeAsymmetriesPerElectronEdRdS0_S0_">ComputeAsymmetriesPerElectron</a>(<a class="local col9 ref" href="#29kinEnergy" title='kinEnergy' data-ref="29kinEnergy">kinEnergy</a>,<span class='refarg'><a class="local col3 ref" href="#33xval" title='xval' data-ref="33xval">xval</a></span>,<span class='refarg'><a class="local col4 ref" href="#34lasym" title='lasym' data-ref="34lasym">lasym</a></span>,<span class='refarg'><a class="local col5 ref" href="#35tasym" title='tasym' data-ref="35tasym">tasym</a></span>);</td></tr>
+<tr><th id="101">101</th><td>    <a class="local col0 ref" href="#30xs" title='xs' data-ref="30xs">xs</a>*=(<var>1.</var>+<a class="local col1 ref" href="#31polzz" title='polzz' data-ref="31polzz">polzz</a>*<a class="local col4 ref" href="#34lasym" title='lasym' data-ref="34lasym">lasym</a>+<a class="local col2 ref" href="#32poltt" title='poltt' data-ref="32poltt">poltt</a>*<a class="local col5 ref" href="#35tasym" title='tasym' data-ref="35tasym">tasym</a>);</td></tr>
+<tr><th id="102">102</th><td>  }</td></tr>
+<tr><th id="103">103</th><td></td></tr>
+<tr><th id="104">104</th><td>  <b>return</b> <a class="local col0 ref" href="#30xs" title='xs' data-ref="30xs">xs</a>;</td></tr>
+<tr><th id="105">105</th><td>}</td></tr>
+<tr><th id="106">106</th><td></td></tr>
+<tr><th id="107">107</th><td><em>void</em> <a class="type" href="../include/G4PolarizedAnnihilationModel.hh.html#G4PolarizedAnnihilationModel" title='G4PolarizedAnnihilationModel' data-ref="G4PolarizedAnnihilationModel">G4PolarizedAnnihilationModel</a>::<dfn class="decl def" id="_ZN28G4PolarizedAnnihilationModel29ComputeAsymmetriesPerElectronEdRdS0_S0_" title='G4PolarizedAnnihilationModel::ComputeAsymmetriesPerElectron' data-ref="_ZN28G4PolarizedAnnihilationModel29ComputeAsymmetriesPerElectronEdRdS0_S0_">ComputeAsymmetriesPerElectron</dfn>(<a class="typedef" href="../../../../global/management/include/G4Types.hh.html#G4double" title='G4double' data-type='double' data-ref="G4double">G4double</a> <dfn class="local col6 decl" id="36ene" title='ene' data-type='G4double' data-ref="36ene">ene</dfn>,</td></tr>
+<tr><th id="108">108</th><td>					       <a class="typedef" href="../../../../global/management/include/G4Types.hh.html#G4double" title='G4double' data-type='double' data-ref="G4double">G4double</a> &amp; <dfn class="local col7 decl" id="37valueX" title='valueX' data-type='G4double &amp;' data-ref="37valueX">valueX</dfn>,</td></tr>
+<tr><th id="109">109</th><td>					       <a class="typedef" href="../../../../global/management/include/G4Types.hh.html#G4double" title='G4double' data-type='double' data-ref="G4double">G4double</a> &amp; <dfn class="local col8 decl" id="38valueA" title='valueA' data-type='G4double &amp;' data-ref="38valueA">valueA</dfn>,</td></tr>
+<tr><th id="110">110</th><td>					       <a class="typedef" href="../../../../global/management/include/G4Types.hh.html#G4double" title='G4double' data-type='double' data-ref="G4double">G4double</a> &amp; <dfn class="local col9 decl" id="39valueT" title='valueT' data-type='G4double &amp;' data-ref="39valueT">valueT</dfn>)</td></tr>
+<tr><th id="111">111</th><td>{</td></tr>
+<tr><th id="112">112</th><td>  <i>// *** calculate asymmetries</i></td></tr>
+<tr><th id="113">113</th><td>  <a class="typedef" href="../../../../global/management/include/G4Types.hh.html#G4double" title='G4double' data-type='double' data-ref="G4double">G4double</a> <dfn class="local col0 decl" id="40gam" title='gam' data-type='G4double' data-ref="40gam">gam</dfn> = <var>1.</var> + <a class="local col6 ref" href="#36ene" title='ene' data-ref="36ene">ene</a>/<a class="ref" href="../../../../externals/clhep/include/CLHEP/Units/PhysicalConstants.h.html#CLHEP::electron_mass_c2" title='CLHEP::electron_mass_c2' data-ref="CLHEP::electron_mass_c2">electron_mass_c2</a>;</td></tr>
+<tr><th id="114">114</th><td>  <a class="typedef" href="../../../../global/management/include/G4Types.hh.html#G4double" title='G4double' data-type='double' data-ref="G4double">G4double</a> <dfn class="local col1 decl" id="41xs0" title='xs0' data-type='G4double' data-ref="41xs0">xs0</dfn>=<a class="member" href="../include/G4PolarizedAnnihilationModel.hh.html#G4PolarizedAnnihilationModel::crossSectionCalculator" title='G4PolarizedAnnihilationModel::crossSectionCalculator' data-ref="G4PolarizedAnnihilationModel::crossSectionCalculator">crossSectionCalculator</a>-&gt;<a class="virtual ref" href="../include/G4PolarizedAnnihilationCrossSection.hh.html#_ZN35G4PolarizedAnnihilationCrossSection13TotalXSectionEdddRK14G4StokesVectorS2_" title='G4PolarizedAnnihilationCrossSection::TotalXSection' data-ref="_ZN35G4PolarizedAnnihilationCrossSection13TotalXSectionEdddRK14G4StokesVectorS2_">TotalXSection</a>(<var>0.</var>,<var>1.</var>,<a class="local col0 ref" href="#40gam" title='gam' data-ref="40gam">gam</a>,</td></tr>
+<tr><th id="115">115</th><td>					       <a class="type" href="../include/G4StokesVector.hh.html#G4StokesVector" title='G4StokesVector' data-ref="G4StokesVector">G4StokesVector</a>::<a class="ref" href="../include/G4StokesVector.hh.html#G4StokesVector::ZERO" title='G4StokesVector::ZERO' data-ref="G4StokesVector::ZERO">ZERO</a>,</td></tr>
+<tr><th id="116">116</th><td>					       <a class="type" href="../include/G4StokesVector.hh.html#G4StokesVector" title='G4StokesVector' data-ref="G4StokesVector">G4StokesVector</a>::<a class="ref" href="../include/G4StokesVector.hh.html#G4StokesVector::ZERO" title='G4StokesVector::ZERO' data-ref="G4StokesVector::ZERO">ZERO</a>);</td></tr>
+<tr><th id="117">117</th><td>  <a class="typedef" href="../../../../global/management/include/G4Types.hh.html#G4double" title='G4double' data-type='double' data-ref="G4double">G4double</a> <dfn class="local col2 decl" id="42xsA" title='xsA' data-type='G4double' data-ref="42xsA">xsA</dfn>=<a class="member" href="../include/G4PolarizedAnnihilationModel.hh.html#G4PolarizedAnnihilationModel::crossSectionCalculator" title='G4PolarizedAnnihilationModel::crossSectionCalculator' data-ref="G4PolarizedAnnihilationModel::crossSectionCalculator">crossSectionCalculator</a>-&gt;<a class="virtual ref" href="../include/G4PolarizedAnnihilationCrossSection.hh.html#_ZN35G4PolarizedAnnihilationCrossSection13TotalXSectionEdddRK14G4StokesVectorS2_" title='G4PolarizedAnnihilationCrossSection::TotalXSection' data-ref="_ZN35G4PolarizedAnnihilationCrossSection13TotalXSectionEdddRK14G4StokesVectorS2_">TotalXSection</a>(<var>0.</var>,<var>1.</var>,<a class="local col0 ref" href="#40gam" title='gam' data-ref="40gam">gam</a>,</td></tr>
+<tr><th id="118">118</th><td>					       <a class="type" href="../include/G4StokesVector.hh.html#G4StokesVector" title='G4StokesVector' data-ref="G4StokesVector">G4StokesVector</a>::<a class="ref" href="../include/G4StokesVector.hh.html#G4StokesVector::P3" title='G4StokesVector::P3' data-ref="G4StokesVector::P3">P3</a>,</td></tr>
+<tr><th id="119">119</th><td>					       <a class="type" href="../include/G4StokesVector.hh.html#G4StokesVector" title='G4StokesVector' data-ref="G4StokesVector">G4StokesVector</a>::<a class="ref" href="../include/G4StokesVector.hh.html#G4StokesVector::P3" title='G4StokesVector::P3' data-ref="G4StokesVector::P3">P3</a>);</td></tr>
+<tr><th id="120">120</th><td>  <a class="typedef" href="../../../../global/management/include/G4Types.hh.html#G4double" title='G4double' data-type='double' data-ref="G4double">G4double</a> <dfn class="local col3 decl" id="43xsT1" title='xsT1' data-type='G4double' data-ref="43xsT1">xsT1</dfn>=<a class="member" href="../include/G4PolarizedAnnihilationModel.hh.html#G4PolarizedAnnihilationModel::crossSectionCalculator" title='G4PolarizedAnnihilationModel::crossSectionCalculator' data-ref="G4PolarizedAnnihilationModel::crossSectionCalculator">crossSectionCalculator</a>-&gt;<a class="virtual ref" href="../include/G4PolarizedAnnihilationCrossSection.hh.html#_ZN35G4PolarizedAnnihilationCrossSection13TotalXSectionEdddRK14G4StokesVectorS2_" title='G4PolarizedAnnihilationCrossSection::TotalXSection' data-ref="_ZN35G4PolarizedAnnihilationCrossSection13TotalXSectionEdddRK14G4StokesVectorS2_">TotalXSection</a>(<var>0.</var>,<var>1.</var>,<a class="local col0 ref" href="#40gam" title='gam' data-ref="40gam">gam</a>,</td></tr>
+<tr><th id="121">121</th><td>					       <a class="type" href="../include/G4StokesVector.hh.html#G4StokesVector" title='G4StokesVector' data-ref="G4StokesVector">G4StokesVector</a>::<a class="ref" href="../include/G4StokesVector.hh.html#G4StokesVector::P1" title='G4StokesVector::P1' data-ref="G4StokesVector::P1">P1</a>,</td></tr>
+<tr><th id="122">122</th><td>					       <a class="type" href="../include/G4StokesVector.hh.html#G4StokesVector" title='G4StokesVector' data-ref="G4StokesVector">G4StokesVector</a>::<a class="ref" href="../include/G4StokesVector.hh.html#G4StokesVector::P1" title='G4StokesVector::P1' data-ref="G4StokesVector::P1">P1</a>);</td></tr>
+<tr><th id="123">123</th><td>  <a class="typedef" href="../../../../global/management/include/G4Types.hh.html#G4double" title='G4double' data-type='double' data-ref="G4double">G4double</a> <dfn class="local col4 decl" id="44xsT2" title='xsT2' data-type='G4double' data-ref="44xsT2">xsT2</dfn>=<a class="member" href="../include/G4PolarizedAnnihilationModel.hh.html#G4PolarizedAnnihilationModel::crossSectionCalculator" title='G4PolarizedAnnihilationModel::crossSectionCalculator' data-ref="G4PolarizedAnnihilationModel::crossSectionCalculator">crossSectionCalculator</a>-&gt;<a class="virtual ref" href="../include/G4PolarizedAnnihilationCrossSection.hh.html#_ZN35G4PolarizedAnnihilationCrossSection13TotalXSectionEdddRK14G4StokesVectorS2_" title='G4PolarizedAnnihilationCrossSection::TotalXSection' data-ref="_ZN35G4PolarizedAnnihilationCrossSection13TotalXSectionEdddRK14G4StokesVectorS2_">TotalXSection</a>(<var>0.</var>,<var>1.</var>,<a class="local col0 ref" href="#40gam" title='gam' data-ref="40gam">gam</a>,</td></tr>
+<tr><th id="124">124</th><td>					       <a class="type" href="../include/G4StokesVector.hh.html#G4StokesVector" title='G4StokesVector' data-ref="G4StokesVector">G4StokesVector</a>::<a class="ref" href="../include/G4StokesVector.hh.html#G4StokesVector::P2" title='G4StokesVector::P2' data-ref="G4StokesVector::P2">P2</a>,</td></tr>
+<tr><th id="125">125</th><td>					       <a class="type" href="../include/G4StokesVector.hh.html#G4StokesVector" title='G4StokesVector' data-ref="G4StokesVector">G4StokesVector</a>::<a class="ref" href="../include/G4StokesVector.hh.html#G4StokesVector::P2" title='G4StokesVector::P2' data-ref="G4StokesVector::P2">P2</a>);</td></tr>
+<tr><th id="126">126</th><td>  <a class="typedef" href="../../../../global/management/include/G4Types.hh.html#G4double" title='G4double' data-type='double' data-ref="G4double">G4double</a> <dfn class="local col5 decl" id="45xsT" title='xsT' data-type='G4double' data-ref="45xsT">xsT</dfn>=<var>0.5</var>*(<a class="local col3 ref" href="#43xsT1" title='xsT1' data-ref="43xsT1">xsT1</a>+<a class="local col4 ref" href="#44xsT2" title='xsT2' data-ref="44xsT2">xsT2</a>);</td></tr>
+<tr><th id="127">127</th><td>  </td></tr>
+<tr><th id="128">128</th><td>  <a class="local col7 ref" href="#37valueX" title='valueX' data-ref="37valueX">valueX</a>=<a class="local col1 ref" href="#41xs0" title='xs0' data-ref="41xs0">xs0</a>;</td></tr>
+<tr><th id="129">129</th><td>  <a class="local col8 ref" href="#38valueA" title='valueA' data-ref="38valueA">valueA</a>=<a class="local col2 ref" href="#42xsA" title='xsA' data-ref="42xsA">xsA</a>/<a class="local col1 ref" href="#41xs0" title='xs0' data-ref="41xs0">xs0</a>-<var>1.</var>;</td></tr>
+<tr><th id="130">130</th><td>  <a class="local col9 ref" href="#39valueT" title='valueT' data-ref="39valueT">valueT</a>=<a class="local col5 ref" href="#45xsT" title='xsT' data-ref="45xsT">xsT</a>/<a class="local col1 ref" href="#41xs0" title='xs0' data-ref="41xs0">xs0</a>-<var>1.</var>;</td></tr>
+<tr><th id="131">131</th><td>  <i>//  G4cout&lt;&lt;valueX&lt;&lt;"\t"&lt;&lt;valueA&lt;&lt;"\t"&lt;&lt;valueT&lt;&lt;"   energy = "&lt;&lt;gam&lt;&lt;G4endl;</i></td></tr>
+<tr><th id="132">132</th><td>  <b>if</b> ( (<a class="local col8 ref" href="#38valueA" title='valueA' data-ref="38valueA">valueA</a> &lt; -<var>1</var>) || (<var>1</var> &lt; <a class="local col8 ref" href="#38valueA" title='valueA' data-ref="38valueA">valueA</a>)) {</td></tr>
+<tr><th id="133">133</th><td>    <a class="macro" href="../../../../global/management/include/G4ios.hh.html#46" title="(*_G4cout_p())" data-ref="_M/G4cout">G4cout</a><span class='error' title="invalid operands to binary expression (&apos;int&apos; and &apos;const char *&apos;)">&lt;&lt;</span> <q>" ERROR PolarizedAnnihilationPS::ComputeAsymmetries \n"</q>;</td></tr>
+<tr><th id="134">134</th><td>    <a class="macro" href="../../../../global/management/include/G4ios.hh.html#46" title="(*_G4cout_p())" data-ref="_M/G4cout">G4cout</a><span class='error' title="invalid operands to binary expression (&apos;int&apos; and &apos;const char *&apos;)">&lt;&lt;</span> <q>" something wrong in total cross section calculation (valueA)\n"</q>;</td></tr>
+<tr><th id="135">135</th><td>    <a class="macro" href="../../../../global/management/include/G4ios.hh.html#46" title="(*_G4cout_p())" data-ref="_M/G4cout">G4cout</a><span class='error' title="invalid operands to binary expression (&apos;int&apos; and &apos;const char *&apos;)">&lt;&lt;</span> <q>" LONG: "</q>&lt;&lt;valueX&lt;&lt;<q>"\t"</q>&lt;&lt;valueA&lt;&lt;<q>"\t"</q>&lt;&lt;valueT&lt;&lt;<q>"   energy = "</q>&lt;&lt;gam&lt;&lt;<a class="macro" href="../../../../global/management/include/G4ios.hh.html#60" title="std::endl" data-ref="_M/G4endl">G4endl</a>;</td></tr>
+<tr><th id="136">136</th><td>  }</td></tr>
+<tr><th id="137">137</th><td>  <b>if</b> ( (<a class="local col9 ref" href="#39valueT" title='valueT' data-ref="39valueT">valueT</a> &lt; -<var>1</var>) || (<var>1</var> &lt; <a class="local col9 ref" href="#39valueT" title='valueT' data-ref="39valueT">valueT</a>)) {</td></tr>
+<tr><th id="138">138</th><td>    <a class="macro" href="../../../../global/management/include/G4ios.hh.html#46" title="(*_G4cout_p())" data-ref="_M/G4cout">G4cout</a><span class='error' title="invalid operands to binary expression (&apos;int&apos; and &apos;const char *&apos;)">&lt;&lt;</span> <q>" ERROR PolarizedAnnihilationPS::ComputeAsymmetries \n"</q>;</td></tr>
+<tr><th id="139">139</th><td>    <a class="macro" href="../../../../global/management/include/G4ios.hh.html#46" title="(*_G4cout_p())" data-ref="_M/G4cout">G4cout</a><span class='error' title="invalid operands to binary expression (&apos;int&apos; and &apos;const char *&apos;)">&lt;&lt;</span> <q>" something wrong in total cross section calculation (valueT)\n"</q>;</td></tr>
+<tr><th id="140">140</th><td>    <a class="macro" href="../../../../global/management/include/G4ios.hh.html#46" title="(*_G4cout_p())" data-ref="_M/G4cout">G4cout</a><span class='error' title="invalid operands to binary expression (&apos;int&apos; and &apos;const char *&apos;)">&lt;&lt;</span> <q>" TRAN: "</q>&lt;&lt;valueX&lt;&lt;<q>"\t"</q>&lt;&lt;valueA&lt;&lt;<q>"\t"</q>&lt;&lt;valueT&lt;&lt;<q>"   energy = "</q>&lt;&lt;gam&lt;&lt;<a class="macro" href="../../../../global/management/include/G4ios.hh.html#60" title="std::endl" data-ref="_M/G4endl">G4endl</a>;</td></tr>
+<tr><th id="141">141</th><td>  }</td></tr>
+<tr><th id="142">142</th><td>}</td></tr>
+<tr><th id="143">143</th><td></td></tr>
+<tr><th id="144">144</th><td><em>void</em> <a class="type" href="../include/G4PolarizedAnnihilationModel.hh.html#G4PolarizedAnnihilationModel" title='G4PolarizedAnnihilationModel' data-ref="G4PolarizedAnnihilationModel">G4PolarizedAnnihilationModel</a>::<span class='error' title="variable has incomplete type &apos;void&apos;"><dfn class="tu decl def" id="G4PolarizedAnnihilationModel::SampleSecondaries" title='G4PolarizedAnnihilationModel::SampleSecondaries' data-type='void' data-ref="G4PolarizedAnnihilationModel::SampleSecondaries">SampleSecondaries</dfn></span>(<span class='error' title="use of undeclared identifier &apos;std&apos;">std</span>::vector&lt;<span class='error' title="&apos;G4DynamicParticle&apos; does not refer to a value">G4DynamicParticle</span>*<span class='error' title="expected expression">&gt;</span>* <span class='error' title="use of undeclared identifier &apos;fvect&apos;">fvect</span>,</td></tr>
+<tr><th id="145">145</th><td>						     <span class='error' title="expected expression"><em>const</em></span> G4MaterialCutsCouple*,</td></tr>
+<tr><th id="146">146</th><td>						     <span class='error' title="expected expression"><em>const</em></span> G4DynamicParticle* dp,</td></tr>
+<tr><th id="147">147</th><td>						     <span class='error' title="unexpected type name &apos;G4double&apos;: expected expression">G4double</span>, <span class='error' title="unexpected type name &apos;G4double&apos;: expected expression">G4double</span>)<span class='error' title="expected &apos;;&apos; after top level declarator"></span> </td></tr>
+<tr><th id="148">148</th><td>{</td></tr>
+<tr><th id="149">149</th><td>  <em>const</em> G4Track * aTrack = gParticleChange-&gt;GetCurrentTrack();</td></tr>
+<tr><th id="150">150</th><td></td></tr>
+<tr><th id="151">151</th><td>  <i>// kill primary </i></td></tr>
+<tr><th id="152">152</th><td>  gParticleChange-&gt;SetProposedKineticEnergy(<var>0.</var>);</td></tr>
+<tr><th id="153">153</th><td>  gParticleChange-&gt;ProposeTrackStatus(fStopAndKill);</td></tr>
+<tr><th id="154">154</th><td></td></tr>
+<tr><th id="155">155</th><td>  <i>// V.Ivanchenko add protection against zero kin energy</i></td></tr>
+<tr><th id="156">156</th><td>  G4double PositKinEnergy = dp-&gt;GetKineticEnergy();</td></tr>
+<tr><th id="157">157</th><td></td></tr>
+<tr><th id="158">158</th><td>  <b>if</b>(PositKinEnergy == <var>0.0</var>) {</td></tr>
+<tr><th id="159">159</th><td></td></tr>
+<tr><th id="160">160</th><td>    G4double cosTeta = <var>2.</var>*<a class="macro" href="../../../../global/HEPRandom/include/Randomize.hh.html#52" title="CLHEP::HepRandom::getTheEngine()-&gt;flat()" data-ref="_M/G4UniformRand">G4UniformRand</a>()-<var>1.</var>;</td></tr>
+<tr><th id="161">161</th><td>    G4double sinTeta = std::sqrt((<var>1.0</var> - cosTeta)*(<var>1.0</var> + cosTeta));</td></tr>
+<tr><th id="162">162</th><td>    G4double phi     = twopi * <a class="macro" href="../../../../global/HEPRandom/include/Randomize.hh.html#52" title="CLHEP::HepRandom::getTheEngine()-&gt;flat()" data-ref="_M/G4UniformRand">G4UniformRand</a>();</td></tr>
+<tr><th id="163">163</th><td>    G4ThreeVector dir(sinTeta*std::cos(phi), sinTeta*std::sin(phi), cosTeta);</td></tr>
+<tr><th id="164">164</th><td>    fvect-&gt;push_back( <b>new</b> G4DynamicParticle(G4Gamma::Gamma(), dir, electron_mass_c2));</td></tr>
+<tr><th id="165">165</th><td>    fvect-&gt;push_back( <b>new</b> G4DynamicParticle(G4Gamma::Gamma(),-dir, electron_mass_c2));</td></tr>
+<tr><th id="166">166</th><td>    <b>return</b>;</td></tr>
+<tr><th id="167">167</th><td>  }</td></tr>
+<tr><th id="168">168</th><td></td></tr>
+<tr><th id="169">169</th><td>  <i>// *** obtain and save target and beam polarization ***</i></td></tr>
+<tr><th id="170">170</th><td>  G4PolarizationManager * polarizationManager = G4PolarizationManager::GetInstance();</td></tr>
+<tr><th id="171">171</th><td></td></tr>
+<tr><th id="172">172</th><td>  <i>// obtain polarization of the beam</i></td></tr>
+<tr><th id="173">173</th><td>  theBeamPolarization = aTrack-&gt;GetPolarization();</td></tr>
+<tr><th id="174">174</th><td></td></tr>
+<tr><th id="175">175</th><td>  <i>// obtain polarization of the media</i></td></tr>
+<tr><th id="176">176</th><td>  G4VPhysicalVolume*  aPVolume  = aTrack-&gt;GetVolume();</td></tr>
+<tr><th id="177">177</th><td>  G4LogicalVolume*    aLVolume  = aPVolume-&gt;GetLogicalVolume();</td></tr>
+<tr><th id="178">178</th><td>  <em>const</em> G4bool targetIsPolarized = polarizationManager-&gt;IsPolarized(aLVolume);</td></tr>
+<tr><th id="179">179</th><td>  theTargetPolarization = polarizationManager-&gt;GetVolumePolarization(aLVolume);</td></tr>
+<tr><th id="180">180</th><td></td></tr>
+<tr><th id="181">181</th><td>  <b>if</b> (verboseLevel &gt;= <var>1</var>) {</td></tr>
+<tr><th id="182">182</th><td>    <a class="macro" href="../../../../global/management/include/G4ios.hh.html#46" title="(*_G4cout_p())" data-ref="_M/G4cout">G4cout</a> &lt;&lt; <q>"G4PolarizedComptonModel::SampleSecondaries in "</q></td></tr>
+<tr><th id="183">183</th><td>           &lt;&lt;  aLVolume-&gt;GetName() &lt;&lt; <a class="macro" href="../../../../global/management/include/G4ios.hh.html#60" title="std::endl" data-ref="_M/G4endl">G4endl</a>;</td></tr>
+<tr><th id="184">184</th><td>  }</td></tr>
+<tr><th id="185">185</th><td></td></tr>
+<tr><th id="186">186</th><td>  <i>// transfer target electron polarization in frame of positron</i></td></tr>
+<tr><th id="187">187</th><td>  <b>if</b> (targetIsPolarized)</td></tr>
+<tr><th id="188">188</th><td>      theTargetPolarization.rotateUz(dp-&gt;GetMomentumDirection());</td></tr>
+<tr><th id="189">189</th><td>  </td></tr>
+<tr><th id="190">190</th><td>  G4ParticleMomentum PositDirection = dp-&gt;GetMomentumDirection();</td></tr>
+<tr><th id="191">191</th><td></td></tr>
+<tr><th id="192">192</th><td>  <i>// polar asymmetry:</i></td></tr>
+<tr><th id="193">193</th><td>  G4double polarization = theBeamPolarization.p3()*theTargetPolarization.p3();</td></tr>
+<tr><th id="194">194</th><td></td></tr>
+<tr><th id="195">195</th><td>  G4double gamam1 = PositKinEnergy/electron_mass_c2;</td></tr>
+<tr><th id="196">196</th><td>  G4double gama   = gamam1+<var>1.</var> , gamap1 = gamam1+<var>2.</var>;</td></tr>
+<tr><th id="197">197</th><td>  G4double sqgrate = std::sqrt(gamam1/gamap1)/<var>2.</var> , sqg2m1 = std::sqrt(gamam1*gamap1);</td></tr>
+<tr><th id="198">198</th><td></td></tr>
+<tr><th id="199">199</th><td>  <i>// limits of the energy sampling</i></td></tr>
+<tr><th id="200">200</th><td>  G4double epsilmin = <var>0.5</var> - sqgrate , epsilmax = <var>0.5</var> + sqgrate;</td></tr>
+<tr><th id="201">201</th><td>  G4double epsilqot = epsilmax/epsilmin;</td></tr>
+<tr><th id="202">202</th><td>  </td></tr>
+<tr><th id="203">203</th><td>  <i>//</i></td></tr>
+<tr><th id="204">204</th><td><i>  // sample the energy rate of the created gammas </i></td></tr>
+<tr><th id="205">205</th><td><i>  // note: for polarized partices, the actual dicing strategy </i></td></tr>
+<tr><th id="206">206</th><td><i>  //       will depend on the energy, and the degree of polarization !!</i></td></tr>
+<tr><th id="207">207</th><td><i>  //</i></td></tr>
+<tr><th id="208">208</th><td>  G4double epsil;</td></tr>
+<tr><th id="209">209</th><td>  G4double gmax=<var>1.</var> + std::fabs(polarization); <i>// crude estimate</i></td></tr>
+<tr><th id="210">210</th><td></td></tr>
+<tr><th id="211">211</th><td>  <i>//G4bool check_range=true;</i></td></tr>
+<tr><th id="212">212</th><td></td></tr>
+<tr><th id="213">213</th><td>  crossSectionCalculator-&gt;Initialize(epsilmin, gama, <var>0.</var>,  theBeamPolarization, theTargetPolarization);</td></tr>
+<tr><th id="214">214</th><td>  <b>if</b> (crossSectionCalculator-&gt;DiceEpsilon()&lt;<var>0</var>) {</td></tr>
+<tr><th id="215">215</th><td>    <a class="macro" href="../../../../global/management/include/G4ios.hh.html#46" title="(*_G4cout_p())" data-ref="_M/G4cout">G4cout</a>&lt;&lt;<q>"ERROR in PolarizedAnnihilationPS::PostStepDoIt\n"</q></td></tr>
+<tr><th id="216">216</th><td>	  &lt;&lt;<q>"epsilmin DiceRoutine not appropriate ! "</q>&lt;&lt;crossSectionCalculator-&gt;DiceEpsilon()&lt;&lt;<a class="macro" href="../../../../global/management/include/G4ios.hh.html#60" title="std::endl" data-ref="_M/G4endl">G4endl</a>;</td></tr>
+<tr><th id="217">217</th><td>    <i>//check_range=false;</i></td></tr>
+<tr><th id="218">218</th><td>  }</td></tr>
+<tr><th id="219">219</th><td></td></tr>
+<tr><th id="220">220</th><td>  crossSectionCalculator-&gt;Initialize(epsilmax, gama, <var>0.</var>,  theBeamPolarization, theTargetPolarization);</td></tr>
+<tr><th id="221">221</th><td>  <b>if</b> (crossSectionCalculator-&gt;DiceEpsilon()&lt;<var>0</var>) {</td></tr>
+<tr><th id="222">222</th><td>    <a class="macro" href="../../../../global/management/include/G4ios.hh.html#46" title="(*_G4cout_p())" data-ref="_M/G4cout">G4cout</a>&lt;&lt;<q>"ERROR in PolarizedAnnihilationPS::PostStepDoIt\n"</q></td></tr>
+<tr><th id="223">223</th><td>	  &lt;&lt;<q>"epsilmax DiceRoutine not appropriate ! "</q>&lt;&lt;crossSectionCalculator-&gt;DiceEpsilon()&lt;&lt;<a class="macro" href="../../../../global/management/include/G4ios.hh.html#60" title="std::endl" data-ref="_M/G4endl">G4endl</a>;</td></tr>
+<tr><th id="224">224</th><td>    <i>//check_range=false;</i></td></tr>
+<tr><th id="225">225</th><td>  }</td></tr>
+<tr><th id="226">226</th><td></td></tr>
+<tr><th id="227">227</th><td>  G4int ncount=<var>0</var>;</td></tr>
+<tr><th id="228">228</th><td>  G4double trejectmax=<var>0.</var>;</td></tr>
+<tr><th id="229">229</th><td>  G4double treject;</td></tr>
+<tr><th id="230">230</th><td></td></tr>
+<tr><th id="231">231</th><td></td></tr>
+<tr><th id="232">232</th><td>  <b>do</b> {</td></tr>
+<tr><th id="233">233</th><td>    <i>// </i></td></tr>
+<tr><th id="234">234</th><td>    epsil = epsilmin*std::pow(epsilqot,<a class="macro" href="../../../../global/HEPRandom/include/Randomize.hh.html#52" title="CLHEP::HepRandom::getTheEngine()-&gt;flat()" data-ref="_M/G4UniformRand">G4UniformRand</a>());</td></tr>
+<tr><th id="235">235</th><td></td></tr>
+<tr><th id="236">236</th><td>    crossSectionCalculator-&gt;Initialize(epsil, gama, <var>0.</var>, theBeamPolarization, theTargetPolarization,<var>1</var>);</td></tr>
+<tr><th id="237">237</th><td></td></tr>
+<tr><th id="238">238</th><td>    treject = crossSectionCalculator-&gt;DiceEpsilon(); </td></tr>
+<tr><th id="239">239</th><td>    treject*=epsil;</td></tr>
+<tr><th id="240">240</th><td></td></tr>
+<tr><th id="241">241</th><td>    <b>if</b> (treject&gt;gmax  || treject&lt;<var>0.</var>) </td></tr>
+<tr><th id="242">242</th><td>      <a class="macro" href="../../../../global/management/include/G4ios.hh.html#46" title="(*_G4cout_p())" data-ref="_M/G4cout">G4cout</a>&lt;&lt;<q>"ERROR in PolarizedAnnihilationPS::PostStepDoIt\n"</q></td></tr>
+<tr><th id="243">243</th><td>	    &lt;&lt;<q>" eps ("</q>&lt;&lt;epsil&lt;&lt;<q>") rejection does not work properly: "</q>&lt;&lt;treject&lt;&lt;<a class="macro" href="../../../../global/management/include/G4ios.hh.html#60" title="std::endl" data-ref="_M/G4endl">G4endl</a>;</td></tr>
+<tr><th id="244">244</th><td>    ++ncount;</td></tr>
+<tr><th id="245">245</th><td>    <b>if</b> (treject&gt;trejectmax) trejectmax=treject;</td></tr>
+<tr><th id="246">246</th><td>    <b>if</b> (ncount&gt;<var>1000</var>) {</td></tr>
+<tr><th id="247">247</th><td>      <a class="macro" href="../../../../global/management/include/G4ios.hh.html#46" title="(*_G4cout_p())" data-ref="_M/G4cout">G4cout</a>&lt;&lt;<q>"WARNING  in PolarizedAnnihilationPS::PostStepDoIt\n"</q></td></tr>
+<tr><th id="248">248</th><td>	    &lt;&lt;<q>"eps dicing very inefficient ="</q>&lt;&lt;trejectmax/gmax</td></tr>
+<tr><th id="249">249</th><td>	    &lt;&lt;<q>", "</q>&lt;&lt;treject/gmax&lt;&lt;<q>".  For secondary energy = "</q>&lt;&lt;epsil&lt;&lt;<q>"   "</q>&lt;&lt;ncount&lt;&lt;<a class="macro" href="../../../../global/management/include/G4ios.hh.html#60" title="std::endl" data-ref="_M/G4endl">G4endl</a>;</td></tr>
+<tr><th id="250">250</th><td>      <b>break</b>;</td></tr>
+<tr><th id="251">251</th><td>    }</td></tr>
+<tr><th id="252">252</th><td></td></tr>
+<tr><th id="253">253</th><td>    <i>// Loop checking, 03-Aug-2015, Vladimir Ivanchenko</i></td></tr>
+<tr><th id="254">254</th><td>  } <b>while</b>( treject &lt; gmax*<a class="macro" href="../../../../global/HEPRandom/include/Randomize.hh.html#52" title="CLHEP::HepRandom::getTheEngine()-&gt;flat()" data-ref="_M/G4UniformRand">G4UniformRand</a>() );</td></tr>
+<tr><th id="255">255</th><td></td></tr>
+<tr><th id="256">256</th><td>  <i>//</i></td></tr>
+<tr><th id="257">257</th><td><i>  // scattered Gamma angles. ( Z - axis along the parent positron)</i></td></tr>
+<tr><th id="258">258</th><td><i>  //</i></td></tr>
+<tr><th id="259">259</th><td>   </td></tr>
+<tr><th id="260">260</th><td>  G4double cost = (epsil*gamap1-<var>1.</var>)/(epsil*sqg2m1);</td></tr>
+<tr><th id="261">261</th><td>  G4double sint = std::sqrt((<var>1.</var>+cost)*(<var>1.</var>-cost));</td></tr>
+<tr><th id="262">262</th><td>  G4double phi  = <var>0.</var>;</td></tr>
+<tr><th id="263">263</th><td>  G4double   beamTrans = std::sqrt(sqr(theBeamPolarization.p1()) + sqr(theBeamPolarization.p2()));</td></tr>
+<tr><th id="264">264</th><td>  G4double targetTrans = std::sqrt(sqr(theTargetPolarization.p1()) + sqr(theTargetPolarization.p2()));</td></tr>
+<tr><th id="265">265</th><td></td></tr>
+<tr><th id="266">266</th><td>  <i>//  G4cout&lt;&lt;"phi dicing START"&lt;&lt;G4endl;</i></td></tr>
+<tr><th id="267">267</th><td>  <b>do</b>{</td></tr>
+<tr><th id="268">268</th><td>    phi  = twopi * <a class="macro" href="../../../../global/HEPRandom/include/Randomize.hh.html#52" title="CLHEP::HepRandom::getTheEngine()-&gt;flat()" data-ref="_M/G4UniformRand">G4UniformRand</a>();</td></tr>
+<tr><th id="269">269</th><td>    crossSectionCalculator-&gt;Initialize(epsil, gama, <var>0.</var>, theBeamPolarization, theTargetPolarization,<var>2</var>);</td></tr>
+<tr><th id="270">270</th><td></td></tr>
+<tr><th id="271">271</th><td>    G4double gdiced =crossSectionCalculator-&gt;getVar(<var>0</var>);</td></tr>
+<tr><th id="272">272</th><td>    gdiced += crossSectionCalculator-&gt;getVar(<var>3</var>)*theBeamPolarization.p3()*theTargetPolarization.p3();</td></tr>
+<tr><th id="273">273</th><td>    gdiced += <var>1.</var>*(std::fabs(crossSectionCalculator-&gt;getVar(<var>1</var>)) </td></tr>
+<tr><th id="274">274</th><td>		  + std::fabs(crossSectionCalculator-&gt;getVar(<var>2</var>)))*beamTrans*targetTrans;</td></tr>
+<tr><th id="275">275</th><td>    gdiced += <var>1.</var>*std::fabs(crossSectionCalculator-&gt;getVar(<var>4</var>))</td></tr>
+<tr><th id="276">276</th><td>      *(std::fabs(theBeamPolarization.p3())*targetTrans + std::fabs(theTargetPolarization.p3())*beamTrans);</td></tr>
+<tr><th id="277">277</th><td></td></tr>
+<tr><th id="278">278</th><td>    G4double gdist = crossSectionCalculator-&gt;getVar(<var>0</var>);</td></tr>
+<tr><th id="279">279</th><td>    gdist += crossSectionCalculator-&gt;getVar(<var>3</var>)*theBeamPolarization.p3()*theTargetPolarization.p3();</td></tr>
+<tr><th id="280">280</th><td>    gdist += crossSectionCalculator-&gt;getVar(<var>1</var>)*(std::cos(phi)*theBeamPolarization.p1() </td></tr>
+<tr><th id="281">281</th><td>						+ std::sin(phi)*theBeamPolarization.p2())</td></tr>
+<tr><th id="282">282</th><td>                                              *(std::cos(phi)*theTargetPolarization.p1() </td></tr>
+<tr><th id="283">283</th><td>						+ std::sin(phi)*theTargetPolarization.p2());</td></tr>
+<tr><th id="284">284</th><td>    gdist += crossSectionCalculator-&gt;getVar(<var>2</var>)*(std::cos(phi)*theBeamPolarization.p2() </td></tr>
+<tr><th id="285">285</th><td>						- std::sin(phi)*theBeamPolarization.p1())</td></tr>
+<tr><th id="286">286</th><td>                                              *(std::cos(phi)*theTargetPolarization.p2() </td></tr>
+<tr><th id="287">287</th><td>						- std::sin(phi)*theTargetPolarization.p1());</td></tr>
+<tr><th id="288">288</th><td>    gdist += crossSectionCalculator-&gt;getVar(<var>4</var>)</td></tr>
+<tr><th id="289">289</th><td>      *(std::cos(phi)*theBeamPolarization.p3()*theTargetPolarization.p1()</td></tr>
+<tr><th id="290">290</th><td>	+ std::cos(phi)*theBeamPolarization.p1()*theTargetPolarization.p3() </td></tr>
+<tr><th id="291">291</th><td>	+ std::sin(phi)*theBeamPolarization.p3()*theTargetPolarization.p2() </td></tr>
+<tr><th id="292">292</th><td>	+ std::sin(phi)*theBeamPolarization.p2()*theTargetPolarization.p3());</td></tr>
+<tr><th id="293">293</th><td></td></tr>
+<tr><th id="294">294</th><td>    treject = gdist/gdiced;</td></tr>
+<tr><th id="295">295</th><td>    <i>//G4cout&lt;&lt;" treject = "&lt;&lt;treject&lt;&lt;" at phi = "&lt;&lt;phi&lt;&lt;G4endl;</i></td></tr>
+<tr><th id="296">296</th><td>     <b>if</b> (treject&gt;<var>1.</var>+<var>1.e-10</var> || treject&lt;<var>0</var>){</td></tr>
+<tr><th id="297">297</th><td>       <a class="macro" href="../../../../global/management/include/G4ios.hh.html#46" title="(*_G4cout_p())" data-ref="_M/G4cout">G4cout</a>&lt;&lt;<q>"!!!ERROR in PolarizedAnnihilationPS::PostStepDoIt\n"</q></td></tr>
+<tr><th id="298">298</th><td>	     &lt;&lt;<q>" phi rejection does not work properly: "</q>&lt;&lt;treject&lt;&lt;<a class="macro" href="../../../../global/management/include/G4ios.hh.html#60" title="std::endl" data-ref="_M/G4endl">G4endl</a>;</td></tr>
+<tr><th id="299">299</th><td>       <a class="macro" href="../../../../global/management/include/G4ios.hh.html#46" title="(*_G4cout_p())" data-ref="_M/G4cout">G4cout</a>&lt;&lt;<q>" gdiced = "</q>&lt;&lt;gdiced&lt;&lt;<a class="macro" href="../../../../global/management/include/G4ios.hh.html#60" title="std::endl" data-ref="_M/G4endl">G4endl</a>;</td></tr>
+<tr><th id="300">300</th><td>       <a class="macro" href="../../../../global/management/include/G4ios.hh.html#46" title="(*_G4cout_p())" data-ref="_M/G4cout">G4cout</a>&lt;&lt;<q>" gdist = "</q>&lt;&lt;gdist&lt;&lt;<a class="macro" href="../../../../global/management/include/G4ios.hh.html#60" title="std::endl" data-ref="_M/G4endl">G4endl</a>;</td></tr>
+<tr><th id="301">301</th><td>       <a class="macro" href="../../../../global/management/include/G4ios.hh.html#46" title="(*_G4cout_p())" data-ref="_M/G4cout">G4cout</a>&lt;&lt;<q>" epsil = "</q>&lt;&lt;epsil&lt;&lt;<a class="macro" href="../../../../global/management/include/G4ios.hh.html#60" title="std::endl" data-ref="_M/G4endl">G4endl</a>;</td></tr>
+<tr><th id="302">302</th><td>     }</td></tr>
+<tr><th id="303">303</th><td>     </td></tr>
+<tr><th id="304">304</th><td>     <b>if</b> (treject&lt;<var>1.e-3</var>) {</td></tr>
+<tr><th id="305">305</th><td>       <a class="macro" href="../../../../global/management/include/G4ios.hh.html#46" title="(*_G4cout_p())" data-ref="_M/G4cout">G4cout</a>&lt;&lt;<q>"!!!ERROR in PolarizedAnnihilationPS::PostStepDoIt\n"</q></td></tr>
+<tr><th id="306">306</th><td>	    &lt;&lt;<q>" phi rejection does not work properly: "</q>&lt;&lt;treject&lt;&lt;<q>"\n"</q>;</td></tr>
+<tr><th id="307">307</th><td>       <a class="macro" href="../../../../global/management/include/G4ios.hh.html#46" title="(*_G4cout_p())" data-ref="_M/G4cout">G4cout</a>&lt;&lt;<q>" gdiced="</q>&lt;&lt;gdiced&lt;&lt;<q>"   gdist="</q>&lt;&lt;gdist&lt;&lt;<q>"\n"</q>;</td></tr>
+<tr><th id="308">308</th><td>       <a class="macro" href="../../../../global/management/include/G4ios.hh.html#46" title="(*_G4cout_p())" data-ref="_M/G4cout">G4cout</a>&lt;&lt;<q>" epsil = "</q>&lt;&lt;epsil&lt;&lt;<a class="macro" href="../../../../global/management/include/G4ios.hh.html#60" title="std::endl" data-ref="_M/G4endl">G4endl</a>;</td></tr>
+<tr><th id="309">309</th><td>     }</td></tr>
+<tr><th id="310">310</th><td></td></tr>
+<tr><th id="311">311</th><td>    <i>// Loop checking, 03-Aug-2015, Vladimir Ivanchenko</i></td></tr>
+<tr><th id="312">312</th><td>  } <b>while</b>( treject &lt; <a class="macro" href="../../../../global/HEPRandom/include/Randomize.hh.html#52" title="CLHEP::HepRandom::getTheEngine()-&gt;flat()" data-ref="_M/G4UniformRand">G4UniformRand</a>() );</td></tr>
+<tr><th id="313">313</th><td>  <i>//  G4cout&lt;&lt;"phi dicing END"&lt;&lt;G4endl;</i></td></tr>
+<tr><th id="314">314</th><td></td></tr>
+<tr><th id="315">315</th><td>  G4double dirx = sint*std::cos(phi) , diry = sint*std::sin(phi) , dirz = cost;</td></tr>
+<tr><th id="316">316</th><td></td></tr>
+<tr><th id="317">317</th><td>  <i>//</i></td></tr>
+<tr><th id="318">318</th><td><i>  // kinematic of the created pair</i></td></tr>
+<tr><th id="319">319</th><td><i>  //</i></td></tr>
+<tr><th id="320">320</th><td>  G4double TotalAvailableEnergy = PositKinEnergy + <var>2</var>*electron_mass_c2;</td></tr>
+<tr><th id="321">321</th><td>  G4double Phot1Energy = epsil*TotalAvailableEnergy;</td></tr>
+<tr><th id="322">322</th><td>  G4double Phot2Energy =(<var>1.</var>-epsil)*TotalAvailableEnergy;</td></tr>
+<tr><th id="323">323</th><td></td></tr>
+<tr><th id="324">324</th><td>  <i>// *** prepare calculation of polarization transfer ***</i></td></tr>
+<tr><th id="325">325</th><td>  G4ThreeVector Phot1Direction (dirx, diry, dirz);</td></tr>
+<tr><th id="326">326</th><td></td></tr>
+<tr><th id="327">327</th><td>  <i>// get interaction frame</i></td></tr>
+<tr><th id="328">328</th><td>  G4ThreeVector  nInteractionFrame = </td></tr>
+<tr><th id="329">329</th><td>    G4PolarizationHelper::GetFrame(PositDirection,Phot1Direction);</td></tr>
+<tr><th id="330">330</th><td>     </td></tr>
+<tr><th id="331">331</th><td>  <i>// define proper in-plane and out-of-plane component of initial spins</i></td></tr>
+<tr><th id="332">332</th><td>  theBeamPolarization.InvRotateAz(nInteractionFrame,PositDirection);</td></tr>
+<tr><th id="333">333</th><td>  theTargetPolarization.InvRotateAz(nInteractionFrame,PositDirection);</td></tr>
+<tr><th id="334">334</th><td></td></tr>
+<tr><th id="335">335</th><td>  <i>// calculate spin transfere matrix</i></td></tr>
+<tr><th id="336">336</th><td></td></tr>
+<tr><th id="337">337</th><td>  crossSectionCalculator-&gt;Initialize(epsil,gama,phi,theBeamPolarization,theTargetPolarization,<var>2</var>);</td></tr>
+<tr><th id="338">338</th><td></td></tr>
+<tr><th id="339">339</th><td>  <i>// **********************************************************************</i></td></tr>
+<tr><th id="340">340</th><td></td></tr>
+<tr><th id="341">341</th><td>  Phot1Direction.rotateUz(PositDirection);   </td></tr>
+<tr><th id="342">342</th><td>  <i>// create G4DynamicParticle object for the particle1  </i></td></tr>
+<tr><th id="343">343</th><td>  G4DynamicParticle* aParticle1= <b>new</b> G4DynamicParticle (G4Gamma::Gamma(),</td></tr>
+<tr><th id="344">344</th><td>							Phot1Direction, Phot1Energy);</td></tr>
+<tr><th id="345">345</th><td>  finalGamma1Polarization=crossSectionCalculator-&gt;GetPol2();</td></tr>
+<tr><th id="346">346</th><td>  G4double n1=finalGamma1Polarization.mag2();</td></tr>
+<tr><th id="347">347</th><td>  <b>if</b> (n1&gt;<var>1</var>) {</td></tr>
+<tr><th id="348">348</th><td>    <a class="macro" href="../../../../global/management/include/G4ios.hh.html#46" title="(*_G4cout_p())" data-ref="_M/G4cout">G4cout</a>&lt;&lt;<q>"ERROR: PolarizedAnnihilation Polarization Vector at epsil = "</q></td></tr>
+<tr><th id="349">349</th><td>	  &lt;&lt;epsil&lt;&lt;<q>" is too large!!! \n"</q></td></tr>
+<tr><th id="350">350</th><td>	  &lt;&lt;<q>"annihi pol1= "</q>&lt;&lt;finalGamma1Polarization&lt;&lt;<q>", ("</q>&lt;&lt;n1&lt;&lt;<q>")\n"</q>;</td></tr>
+<tr><th id="351">351</th><td>    finalGamma1Polarization*=<var>1.</var>/std::sqrt(n1);</td></tr>
+<tr><th id="352">352</th><td>  }</td></tr>
+<tr><th id="353">353</th><td></td></tr>
+<tr><th id="354">354</th><td>  <i>// define polarization of first final state photon</i></td></tr>
+<tr><th id="355">355</th><td>  finalGamma1Polarization.SetPhoton();</td></tr>
+<tr><th id="356">356</th><td>  finalGamma1Polarization.RotateAz(nInteractionFrame,Phot1Direction);</td></tr>
+<tr><th id="357">357</th><td>  aParticle1-&gt;SetPolarization(finalGamma1Polarization.p1(),</td></tr>
+<tr><th id="358">358</th><td>			      finalGamma1Polarization.p2(),</td></tr>
+<tr><th id="359">359</th><td>			      finalGamma1Polarization.p3());</td></tr>
+<tr><th id="360">360</th><td></td></tr>
+<tr><th id="361">361</th><td>  fvect-&gt;push_back(aParticle1);</td></tr>
+<tr><th id="362">362</th><td></td></tr>
+<tr><th id="363">363</th><td></td></tr>
+<tr><th id="364">364</th><td>  <i>// **********************************************************************</i></td></tr>
+<tr><th id="365">365</th><td></td></tr>
+<tr><th id="366">366</th><td>  G4double Eratio= Phot1Energy/Phot2Energy;</td></tr>
+<tr><th id="367">367</th><td>  G4double PositP= std::sqrt(PositKinEnergy*(PositKinEnergy+<var>2.</var>*electron_mass_c2));</td></tr>
+<tr><th id="368">368</th><td>  G4ThreeVector Phot2Direction (-dirx*Eratio, -diry*Eratio,</td></tr>
+<tr><th id="369">369</th><td>				(PositP-dirz*Phot1Energy)/Phot2Energy); </td></tr>
+<tr><th id="370">370</th><td>  Phot2Direction.rotateUz(PositDirection); </td></tr>
+<tr><th id="371">371</th><td>  <i>// create G4DynamicParticle object for the particle2 </i></td></tr>
+<tr><th id="372">372</th><td>  G4DynamicParticle* aParticle2= <b>new</b> G4DynamicParticle (G4Gamma::Gamma(),</td></tr>
+<tr><th id="373">373</th><td>							Phot2Direction, Phot2Energy);</td></tr>
+<tr><th id="374">374</th><td></td></tr>
+<tr><th id="375">375</th><td>  <i>// define polarization of second final state photon</i></td></tr>
+<tr><th id="376">376</th><td>  finalGamma2Polarization=crossSectionCalculator-&gt;GetPol3();</td></tr>
+<tr><th id="377">377</th><td>  G4double n2=finalGamma2Polarization.mag2();</td></tr>
+<tr><th id="378">378</th><td>  <b>if</b> (n2&gt;<var>1</var>) {</td></tr>
+<tr><th id="379">379</th><td>    <a class="macro" href="../../../../global/management/include/G4ios.hh.html#46" title="(*_G4cout_p())" data-ref="_M/G4cout">G4cout</a>&lt;&lt;<q>"ERROR: PolarizedAnnihilation Polarization Vector at epsil = "</q>&lt;&lt;epsil&lt;&lt;<q>" is too large!!! \n"</q>;</td></tr>
+<tr><th id="380">380</th><td>    <a class="macro" href="../../../../global/management/include/G4ios.hh.html#46" title="(*_G4cout_p())" data-ref="_M/G4cout">G4cout</a>&lt;&lt;<q>"annihi pol2= "</q>&lt;&lt;finalGamma2Polarization&lt;&lt;<q>", ("</q>&lt;&lt;n2&lt;&lt;<q>")\n"</q>;</td></tr>
+<tr><th id="381">381</th><td>    </td></tr>
+<tr><th id="382">382</th><td>    finalGamma2Polarization*=<var>1.</var>/std::sqrt(n2);</td></tr>
+<tr><th id="383">383</th><td>  }</td></tr>
+<tr><th id="384">384</th><td>  finalGamma2Polarization.SetPhoton();</td></tr>
+<tr><th id="385">385</th><td>  finalGamma2Polarization.RotateAz(nInteractionFrame,Phot2Direction);</td></tr>
+<tr><th id="386">386</th><td>  aParticle2-&gt;SetPolarization(finalGamma2Polarization.p1(),</td></tr>
+<tr><th id="387">387</th><td>			      finalGamma2Polarization.p2(),</td></tr>
+<tr><th id="388">388</th><td>			      finalGamma2Polarization.p3());</td></tr>
+<tr><th id="389">389</th><td></td></tr>
+<tr><th id="390">390</th><td>  fvect-&gt;push_back(aParticle2);</td></tr>
+<tr><th id="391">391</th><td>}</td></tr>
+<tr><th id="392">392</th><td></td></tr>
+</table><hr/><p id='footer'>
+Generated on <em>2019-Aug-28</em> from project codebrowser<br />Powered by <a href='https://woboq.com'><img alt='Woboq' src='https://code.woboq.org/woboq-16.png' width='41' height='16' /></a> <a href='https://code.woboq.org'>Code Browser</a> 2.1
+<br/>Generator usage only permitted with license.</p>
+</div></body></html>

@@ -1,0 +1,364 @@
+<!doctype html>
+<html>
+<head>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"><title>G4BulirschStoer.cc source code [codebrowser/source/geometry/magneticfield/src/G4BulirschStoer.cc] - Woboq Code Browser</title>
+<link rel="stylesheet" href="../../../../../../data/qtcreator.css" title="QtCreator"/>
+<link rel="alternate stylesheet" href="../../../../../../data/kdevelop.css" title="KDevelop"/>
+<script type="text/javascript" src="../../../../../../data/jquery/jquery.min.js"></script>
+<script type="text/javascript" src="../../../../../../data/jquery/jquery-ui.min.js"></script>
+<script>var file = 'codebrowser/source/geometry/magneticfield/src/G4BulirschStoer.cc'; var root_path = '../../../../..'; var data_path = '../../../../../../data';</script>
+<script src='../../../../../../data/codebrowser.js'></script>
+</head>
+<body><div id='header'><h1 id='breadcrumb'><span>Browse the source code of </span><a href='../../../..'>codebrowser</a>/<a href='../../..'>source</a>/<a href='../..'>geometry</a>/<a href='..'>magneticfield</a>/<a href='./'>src</a>/<a href='G4BulirschStoer.cc.html'>G4BulirschStoer.cc</a></h1></div>
+<hr/><div id='content'><table class="code">
+<tr><th id="1">1</th><td><i>// ********************************************************************</i></td></tr>
+<tr><th id="2">2</th><td><i>// * License and Disclaimer                                           *</i></td></tr>
+<tr><th id="3">3</th><td><i>// *                                                                  *</i></td></tr>
+<tr><th id="4">4</th><td><i>// * The  Geant4 software  is  copyright of the Copyright Holders  of *</i></td></tr>
+<tr><th id="5">5</th><td><i>// * the Geant4 Collaboration.  It is provided  under  the terms  and *</i></td></tr>
+<tr><th id="6">6</th><td><i>// * conditions of the Geant4 Software License,  included in the file *</i></td></tr>
+<tr><th id="7">7</th><td><i>// * LICENSE and available at  <a href="http://cern.ch/geant4/license">http://cern.ch/geant4/license</a> .  These *</i></td></tr>
+<tr><th id="8">8</th><td><i>// * include a list of copyright holders.                             *</i></td></tr>
+<tr><th id="9">9</th><td><i>// *                                                                  *</i></td></tr>
+<tr><th id="10">10</th><td><i>// * Neither the authors of this software system, nor their employing *</i></td></tr>
+<tr><th id="11">11</th><td><i>// * institutes,nor the agencies providing financial support for this *</i></td></tr>
+<tr><th id="12">12</th><td><i>// * work  make  any representation or  warranty, express or implied, *</i></td></tr>
+<tr><th id="13">13</th><td><i>// * regarding  this  software system or assume any liability for its *</i></td></tr>
+<tr><th id="14">14</th><td><i>// * use.  Please see the license in the file  LICENSE  and URL above *</i></td></tr>
+<tr><th id="15">15</th><td><i>// * for the full disclaimer and the limitation of liability.         *</i></td></tr>
+<tr><th id="16">16</th><td><i>// *                                                                  *</i></td></tr>
+<tr><th id="17">17</th><td><i>// * This  code  implementation is the result of  the  scientific and *</i></td></tr>
+<tr><th id="18">18</th><td><i>// * technical work of the GEANT4 collaboration.                      *</i></td></tr>
+<tr><th id="19">19</th><td><i>// * By using,  copying,  modifying or  distributing the software (or *</i></td></tr>
+<tr><th id="20">20</th><td><i>// * any work based  on the software)  you  agree  to acknowledge its *</i></td></tr>
+<tr><th id="21">21</th><td><i>// * use  in  resulting  scientific  publications,  and indicate your *</i></td></tr>
+<tr><th id="22">22</th><td><i>// * acceptance of all terms of the Geant4 Software license.          *</i></td></tr>
+<tr><th id="23">23</th><td><i>// ********************************************************************</i></td></tr>
+<tr><th id="24">24</th><td><i>//</i></td></tr>
+<tr><th id="25">25</th><td><i>//</i></td></tr>
+<tr><th id="26">26</th><td><i>//</i></td></tr>
+<tr><th id="27">27</th><td><i>// G4BulirschStoer class implementation</i></td></tr>
+<tr><th id="28">28</th><td><i>// Based on bulirsch_stoer.hpp from boost</i></td></tr>
+<tr><th id="29">29</th><td><i>//</i></td></tr>
+<tr><th id="30">30</th><td><i>// Author: Dmitry Sorokin - GSoC 2016</i></td></tr>
+<tr><th id="31">31</th><td><i>//</i></td></tr>
+<tr><th id="32">32</th><td><i>///////////////////////////////////////////////////////////////////////////////</i></td></tr>
+<tr><th id="33">33</th><td></td></tr>
+<tr><th id="34">34</th><td><u>#include <a href="../include/G4BulirschStoer.hh.html">"G4BulirschStoer.hh"</a></u></td></tr>
+<tr><th id="35">35</th><td></td></tr>
+<tr><th id="36">36</th><td><u>#include <a href="../include/G4FieldUtils.hh.html">"G4FieldUtils.hh"</a></u></td></tr>
+<tr><th id="37">37</th><td></td></tr>
+<tr><th id="38">38</th><td><b>namespace</b></td></tr>
+<tr><th id="39">39</th><td>{</td></tr>
+<tr><th id="40">40</th><td>  <b>constexpr</b> <a class="typedef" href="../../../global/management/include/G4Types.hh.html#G4double" title='G4double' data-type='double' data-ref="G4double">G4double</a> <dfn class="tu decl def" id="(anonymousnamespace)::STEPFAC1" title='(anonymous namespace)::STEPFAC1' data-type='const G4double' data-ref="(anonymousnamespace)::STEPFAC1">STEPFAC1</dfn> = <var>0.65</var>;</td></tr>
+<tr><th id="41">41</th><td>  <b>constexpr</b> <a class="typedef" href="../../../global/management/include/G4Types.hh.html#G4double" title='G4double' data-type='double' data-ref="G4double">G4double</a> <dfn class="tu decl def" id="(anonymousnamespace)::STEPFAC2" title='(anonymous namespace)::STEPFAC2' data-type='const G4double' data-ref="(anonymousnamespace)::STEPFAC2">STEPFAC2</dfn> = <var>0.94</var>;</td></tr>
+<tr><th id="42">42</th><td>  <b>constexpr</b> <a class="typedef" href="../../../global/management/include/G4Types.hh.html#G4double" title='G4double' data-type='double' data-ref="G4double">G4double</a> <dfn class="tu decl def" id="(anonymousnamespace)::STEPFAC3" title='(anonymous namespace)::STEPFAC3' data-type='const G4double' data-ref="(anonymousnamespace)::STEPFAC3">STEPFAC3</dfn> = <var>0.02</var>;</td></tr>
+<tr><th id="43">43</th><td>  <b>constexpr</b> <a class="typedef" href="../../../global/management/include/G4Types.hh.html#G4double" title='G4double' data-type='double' data-ref="G4double">G4double</a> <dfn class="tu decl def" id="(anonymousnamespace)::STEPFAC4" title='(anonymous namespace)::STEPFAC4' data-type='const G4double' data-ref="(anonymousnamespace)::STEPFAC4">STEPFAC4</dfn> = <var>4.0</var>;</td></tr>
+<tr><th id="44">44</th><td>  <b>constexpr</b> <a class="typedef" href="../../../global/management/include/G4Types.hh.html#G4double" title='G4double' data-type='double' data-ref="G4double">G4double</a> <dfn class="tu decl def" id="(anonymousnamespace)::KFAC1" title='(anonymous namespace)::KFAC1' data-type='const G4double' data-ref="(anonymousnamespace)::KFAC1">KFAC1</dfn> = <var>0.8</var>;</td></tr>
+<tr><th id="45">45</th><td>  <b>constexpr</b> <a class="typedef" href="../../../global/management/include/G4Types.hh.html#G4double" title='G4double' data-type='double' data-ref="G4double">G4double</a> <dfn class="tu decl def" id="(anonymousnamespace)::KFAC2" title='(anonymous namespace)::KFAC2' data-type='const G4double' data-ref="(anonymousnamespace)::KFAC2">KFAC2</dfn> = <var>0.9</var>;</td></tr>
+<tr><th id="46">46</th><td>  <b>constexpr</b> <a class="typedef" href="../../../global/management/include/G4Types.hh.html#G4double" title='G4double' data-type='double' data-ref="G4double">G4double</a> <dfn class="tu decl def" id="(anonymousnamespace)::inv_STEPFAC1" title='(anonymous namespace)::inv_STEPFAC1' data-type='const G4double' data-ref="(anonymousnamespace)::inv_STEPFAC1">inv_STEPFAC1</dfn> = <var>1.0</var> / <a class="tu ref" href="#(anonymousnamespace)::STEPFAC1" title='(anonymous namespace)::STEPFAC1' data-use='r' data-ref="(anonymousnamespace)::STEPFAC1">STEPFAC1</a>;</td></tr>
+<tr><th id="47">47</th><td>  <b>constexpr</b> <a class="typedef" href="../../../global/management/include/G4Types.hh.html#G4double" title='G4double' data-type='double' data-ref="G4double">G4double</a> <dfn class="tu decl def" id="(anonymousnamespace)::inv_STEPFAC4" title='(anonymous namespace)::inv_STEPFAC4' data-type='const G4double' data-ref="(anonymousnamespace)::inv_STEPFAC4">inv_STEPFAC4</dfn> = <var>1.0</var> / <a class="tu ref" href="#(anonymousnamespace)::STEPFAC4" title='(anonymous namespace)::STEPFAC4' data-use='r' data-ref="(anonymousnamespace)::STEPFAC4">STEPFAC4</a>;</td></tr>
+<tr><th id="48">48</th><td>} <i>// namespace</i></td></tr>
+<tr><th id="49">49</th><td></td></tr>
+<tr><th id="50">50</th><td><a class="type" href="../include/G4BulirschStoer.hh.html#G4BulirschStoer" title='G4BulirschStoer' data-ref="G4BulirschStoer">G4BulirschStoer</a>::<dfn class="decl def" id="_ZN15G4BulirschStoerC1EP18G4EquationOfMotionidd" title='G4BulirschStoer::G4BulirschStoer' data-ref="_ZN15G4BulirschStoerC1EP18G4EquationOfMotionidd">G4BulirschStoer</dfn>(<a class="type" href="../include/G4EquationOfMotion.hh.html#G4EquationOfMotion" title='G4EquationOfMotion' data-ref="G4EquationOfMotion">G4EquationOfMotion</a>* <dfn class="local col5 decl" id="45equation" title='equation' data-type='G4EquationOfMotion *' data-ref="45equation">equation</dfn>,</td></tr>
+<tr><th id="51">51</th><td>                                 <a class="typedef" href="../../../global/management/include/G4Types.hh.html#G4int" title='G4int' data-type='int' data-ref="G4int">G4int</a> <dfn class="local col6 decl" id="46nvar" title='nvar' data-type='G4int' data-ref="46nvar">nvar</dfn>, <a class="typedef" href="../../../global/management/include/G4Types.hh.html#G4double" title='G4double' data-type='double' data-ref="G4double">G4double</a> <dfn class="local col7 decl" id="47eps_rel" title='eps_rel' data-type='G4double' data-ref="47eps_rel">eps_rel</dfn>, <a class="typedef" href="../../../global/management/include/G4Types.hh.html#G4double" title='G4double' data-type='double' data-ref="G4double">G4double</a> <dfn class="local col8 decl" id="48max_dt" title='max_dt' data-type='G4double' data-ref="48max_dt">max_dt</dfn>)</td></tr>
+<tr><th id="52">52</th><td>  : <a class="member" href="../include/G4BulirschStoer.hh.html#G4BulirschStoer::fnvar" title='G4BulirschStoer::fnvar' data-ref="G4BulirschStoer::fnvar">fnvar</a>(<a class="local col6 ref" href="#46nvar" title='nvar' data-ref="46nvar">nvar</a>), <a class="member" href="../include/G4BulirschStoer.hh.html#G4BulirschStoer::m_eps_rel" title='G4BulirschStoer::m_eps_rel' data-ref="G4BulirschStoer::m_eps_rel">m_eps_rel</a>(<a class="local col7 ref" href="#47eps_rel" title='eps_rel' data-ref="47eps_rel">eps_rel</a>), <a class="member" href="../include/G4BulirschStoer.hh.html#G4BulirschStoer::m_midpoint" title='G4BulirschStoer::m_midpoint' data-ref="G4BulirschStoer::m_midpoint">m_midpoint</a><a class="ref" href="../include/G4ModifiedMidpoint.hh.html#_ZN18G4ModifiedMidpointC1EP18G4EquationOfMotionii" title='G4ModifiedMidpoint::G4ModifiedMidpoint' data-ref="_ZN18G4ModifiedMidpointC1EP18G4EquationOfMotionii">(</a><a class="local col5 ref" href="#45equation" title='equation' data-ref="45equation">equation</a>,<a class="local col6 ref" href="#46nvar" title='nvar' data-ref="46nvar">nvar</a>),</td></tr>
+<tr><th id="53">53</th><td>    <a class="member" href="../include/G4BulirschStoer.hh.html#G4BulirschStoer::m_last_step_rejected" title='G4BulirschStoer::m_last_step_rejected' data-ref="G4BulirschStoer::m_last_step_rejected">m_last_step_rejected</a>(<b>false</b>), <a class="member" href="../include/G4BulirschStoer.hh.html#G4BulirschStoer::m_first" title='G4BulirschStoer::m_first' data-ref="G4BulirschStoer::m_first">m_first</a>(<b>true</b>), <a class="member" href="../include/G4BulirschStoer.hh.html#G4BulirschStoer::m_dt_last" title='G4BulirschStoer::m_dt_last' data-ref="G4BulirschStoer::m_dt_last">m_dt_last</a>(<var>0.0</var>), <a class="member" href="../include/G4BulirschStoer.hh.html#G4BulirschStoer::m_max_dt" title='G4BulirschStoer::m_max_dt' data-ref="G4BulirschStoer::m_max_dt">m_max_dt</a>(<a class="local col8 ref" href="#48max_dt" title='max_dt' data-ref="48max_dt">max_dt</a>)</td></tr>
+<tr><th id="54">54</th><td>{</td></tr>
+<tr><th id="55">55</th><td>  <i>/* initialize sequence of stage numbers and work */</i></td></tr>
+<tr><th id="56">56</th><td></td></tr>
+<tr><th id="57">57</th><td>  <b>for</b>(<a class="typedef" href="../../../global/management/include/G4Types.hh.html#G4int" title='G4int' data-type='int' data-ref="G4int">G4int</a> <dfn class="local col9 decl" id="49i" title='i' data-type='G4int' data-ref="49i">i</dfn> = <var>0</var>; <a class="local col9 ref" href="#49i" title='i' data-ref="49i">i</a> &lt; <a class="member" href="../include/G4BulirschStoer.hh.html#G4BulirschStoer::m_k_max" title='G4BulirschStoer::m_k_max' data-ref="G4BulirschStoer::m_k_max">m_k_max</a> + <var>1</var>; ++<a class="local col9 ref" href="#49i" title='i' data-ref="49i">i</a>)</td></tr>
+<tr><th id="58">58</th><td>  {</td></tr>
+<tr><th id="59">59</th><td>    <a class="member" href="../include/G4BulirschStoer.hh.html#G4BulirschStoer::m_interval_sequence" title='G4BulirschStoer::m_interval_sequence' data-ref="G4BulirschStoer::m_interval_sequence">m_interval_sequence</a>[<a class="local col9 ref" href="#49i" title='i' data-ref="49i">i</a>] = <var>2</var> * (<a class="local col9 ref" href="#49i" title='i' data-ref="49i">i</a> + <var>1</var>);</td></tr>
+<tr><th id="60">60</th><td>    <b>if</b> (<a class="local col9 ref" href="#49i" title='i' data-ref="49i">i</a> == <var>0</var>)</td></tr>
+<tr><th id="61">61</th><td>    {</td></tr>
+<tr><th id="62">62</th><td>      <a class="member" href="../include/G4BulirschStoer.hh.html#G4BulirschStoer::m_cost" title='G4BulirschStoer::m_cost' data-ref="G4BulirschStoer::m_cost">m_cost</a>[<a class="local col9 ref" href="#49i" title='i' data-ref="49i">i</a>] = <a class="member" href="../include/G4BulirschStoer.hh.html#G4BulirschStoer::m_interval_sequence" title='G4BulirschStoer::m_interval_sequence' data-ref="G4BulirschStoer::m_interval_sequence">m_interval_sequence</a>[<a class="local col9 ref" href="#49i" title='i' data-ref="49i">i</a>];</td></tr>
+<tr><th id="63">63</th><td>    }</td></tr>
+<tr><th id="64">64</th><td>    <b>else</b></td></tr>
+<tr><th id="65">65</th><td>    {</td></tr>
+<tr><th id="66">66</th><td>      <a class="member" href="../include/G4BulirschStoer.hh.html#G4BulirschStoer::m_cost" title='G4BulirschStoer::m_cost' data-ref="G4BulirschStoer::m_cost">m_cost</a>[<a class="local col9 ref" href="#49i" title='i' data-ref="49i">i</a>] = <a class="member" href="../include/G4BulirschStoer.hh.html#G4BulirschStoer::m_cost" title='G4BulirschStoer::m_cost' data-ref="G4BulirschStoer::m_cost">m_cost</a>[<a class="local col9 ref" href="#49i" title='i' data-ref="49i">i</a>-<var>1</var>] + <a class="member" href="../include/G4BulirschStoer.hh.html#G4BulirschStoer::m_interval_sequence" title='G4BulirschStoer::m_interval_sequence' data-ref="G4BulirschStoer::m_interval_sequence">m_interval_sequence</a>[<a class="local col9 ref" href="#49i" title='i' data-ref="49i">i</a>];</td></tr>
+<tr><th id="67">67</th><td>    }</td></tr>
+<tr><th id="68">68</th><td>    <b>for</b>(<a class="typedef" href="../../../global/management/include/G4Types.hh.html#G4int" title='G4int' data-type='int' data-ref="G4int">G4int</a> <dfn class="local col0 decl" id="50k" title='k' data-type='G4int' data-ref="50k">k</dfn> = <var>0</var>; <a class="local col0 ref" href="#50k" title='k' data-ref="50k">k</a> &lt; <a class="local col9 ref" href="#49i" title='i' data-ref="49i">i</a>; ++<a class="local col0 ref" href="#50k" title='k' data-ref="50k">k</a>)</td></tr>
+<tr><th id="69">69</th><td>    {</td></tr>
+<tr><th id="70">70</th><td>      <em>const</em> <a class="typedef" href="../../../global/management/include/G4Types.hh.html#G4double" title='G4double' data-type='double' data-ref="G4double">G4double</a> <dfn class="local col1 decl" id="51r" title='r' data-type='const G4double' data-ref="51r">r</dfn> = <b>static_cast</b>&lt;<a class="typedef" href="../../../global/management/include/G4Types.hh.html#G4double" title='G4double' data-type='double' data-ref="G4double">G4double</a>&gt;(<a class="member" href="../include/G4BulirschStoer.hh.html#G4BulirschStoer::m_interval_sequence" title='G4BulirschStoer::m_interval_sequence' data-ref="G4BulirschStoer::m_interval_sequence">m_interval_sequence</a>[<a class="local col9 ref" href="#49i" title='i' data-ref="49i">i</a>])</td></tr>
+<tr><th id="71">71</th><td>                       / <b>static_cast</b>&lt;<a class="typedef" href="../../../global/management/include/G4Types.hh.html#G4double" title='G4double' data-type='double' data-ref="G4double">G4double</a>&gt;(<a class="member" href="../include/G4BulirschStoer.hh.html#G4BulirschStoer::m_interval_sequence" title='G4BulirschStoer::m_interval_sequence' data-ref="G4BulirschStoer::m_interval_sequence">m_interval_sequence</a>[<a class="local col0 ref" href="#50k" title='k' data-ref="50k">k</a>]);</td></tr>
+<tr><th id="72">72</th><td>      <a class="member" href="../include/G4BulirschStoer.hh.html#G4BulirschStoer::m_coeff" title='G4BulirschStoer::m_coeff' data-ref="G4BulirschStoer::m_coeff">m_coeff</a>[<a class="local col9 ref" href="#49i" title='i' data-ref="49i">i</a>][<a class="local col0 ref" href="#50k" title='k' data-ref="50k">k</a>] = <var>1.0</var> / (<a class="local col1 ref" href="#51r" title='r' data-ref="51r">r</a> * <a class="local col1 ref" href="#51r" title='r' data-ref="51r">r</a> - <var>1.0</var>); <i>// coefficients for extrapolation</i></td></tr>
+<tr><th id="73">73</th><td>    }</td></tr>
+<tr><th id="74">74</th><td></td></tr>
+<tr><th id="75">75</th><td>    <i>// crude estimate of optimal order</i></td></tr>
+<tr><th id="76">76</th><td>    <a class="member" href="../include/G4BulirschStoer.hh.html#G4BulirschStoer::m_current_k_opt" title='G4BulirschStoer::m_current_k_opt' data-ref="G4BulirschStoer::m_current_k_opt">m_current_k_opt</a> = <var>4</var>;</td></tr>
+<tr><th id="77">77</th><td></td></tr>
+<tr><th id="78">78</th><td>    <i>// no calculation because log10 might not exist for value_type!</i></td></tr>
+<tr><th id="79">79</th><td><i></i></td></tr>
+<tr><th id="80">80</th><td><i>    //const G4double logfact = -log10(std::max(eps_rel, 1.0e-12)) * 0.6 + 0.5;</i></td></tr>
+<tr><th id="81">81</th><td><i>    //m_current_k_opt = std::max(1.,</i></td></tr>
+<tr><th id="82">82</th><td><i>    //                  std::min(static_cast&lt;G4double&gt;(m_k_max-1), logfact));</i></td></tr>
+<tr><th id="83">83</th><td>  }</td></tr>
+<tr><th id="84">84</th><td>}</td></tr>
+<tr><th id="85">85</th><td></td></tr>
+<tr><th id="86">86</th><td><a class="type" href="../include/G4BulirschStoer.hh.html#G4BulirschStoer" title='G4BulirschStoer' data-ref="G4BulirschStoer">G4BulirschStoer</a>::<a class="type" href="../include/G4BulirschStoer.hh.html#G4BulirschStoer::step_result" title='G4BulirschStoer::step_result' data-ref="G4BulirschStoer::step_result">step_result</a></td></tr>
+<tr><th id="87">87</th><td><a class="type" href="../include/G4BulirschStoer.hh.html#G4BulirschStoer" title='G4BulirschStoer' data-ref="G4BulirschStoer">G4BulirschStoer</a>::<dfn class="decl def" id="_ZN15G4BulirschStoer8try_stepEPKdS1_RdPdS2_" title='G4BulirschStoer::try_step' data-ref="_ZN15G4BulirschStoer8try_stepEPKdS1_RdPdS2_">try_step</dfn>( <em>const</em> <a class="typedef" href="../../../global/management/include/G4Types.hh.html#G4double" title='G4double' data-type='double' data-ref="G4double">G4double</a> <dfn class="local col2 decl" id="52in" title='in' data-type='const G4double *' data-ref="52in">in</dfn>[], <em>const</em> <a class="typedef" href="../../../global/management/include/G4Types.hh.html#G4double" title='G4double' data-type='double' data-ref="G4double">G4double</a> <dfn class="local col3 decl" id="53dxdt" title='dxdt' data-type='const G4double *' data-ref="53dxdt">dxdt</dfn>[],</td></tr>
+<tr><th id="88">88</th><td>                           <a class="typedef" href="../../../global/management/include/G4Types.hh.html#G4double" title='G4double' data-type='double' data-ref="G4double">G4double</a>&amp; <dfn class="local col4 decl" id="54t" title='t' data-type='G4double &amp;' data-ref="54t">t</dfn>, <a class="typedef" href="../../../global/management/include/G4Types.hh.html#G4double" title='G4double' data-type='double' data-ref="G4double">G4double</a> <dfn class="local col5 decl" id="55out" title='out' data-type='G4double *' data-ref="55out">out</dfn>[], <a class="typedef" href="../../../global/management/include/G4Types.hh.html#G4double" title='G4double' data-type='double' data-ref="G4double">G4double</a>&amp; <dfn class="local col6 decl" id="56dt" title='dt' data-type='G4double &amp;' data-ref="56dt">dt</dfn>)</td></tr>
+<tr><th id="89">89</th><td>{</td></tr>
+<tr><th id="90">90</th><td>  <b>if</b>(<a class="member" href="../include/G4BulirschStoer.hh.html#G4BulirschStoer::m_max_dt" title='G4BulirschStoer::m_max_dt' data-ref="G4BulirschStoer::m_max_dt">m_max_dt</a> &lt; <a class="local col6 ref" href="#56dt" title='dt' data-ref="56dt">dt</a>)</td></tr>
+<tr><th id="91">91</th><td>  {</td></tr>
+<tr><th id="92">92</th><td>    <i>// given step size is bigger then max_dt set limit and return fail</i></td></tr>
+<tr><th id="93">93</th><td><i>    //</i></td></tr>
+<tr><th id="94">94</th><td>    <a class="local col6 ref" href="#56dt" title='dt' data-ref="56dt">dt</a> = <a class="member" href="../include/G4BulirschStoer.hh.html#G4BulirschStoer::m_max_dt" title='G4BulirschStoer::m_max_dt' data-ref="G4BulirschStoer::m_max_dt">m_max_dt</a>;</td></tr>
+<tr><th id="95">95</th><td>    <b>return</b> <a class="type" href="../include/G4BulirschStoer.hh.html#G4BulirschStoer::step_result" title='G4BulirschStoer::step_result' data-ref="G4BulirschStoer::step_result">step_result</a>::<a class="enum" href="../include/G4BulirschStoer.hh.html#G4BulirschStoer::step_result::fail" title='G4BulirschStoer::step_result::fail' data-ref="G4BulirschStoer::step_result::fail">fail</a>;</td></tr>
+<tr><th id="96">96</th><td>  }</td></tr>
+<tr><th id="97">97</th><td></td></tr>
+<tr><th id="98">98</th><td>  <b>if</b> (<a class="local col6 ref" href="#56dt" title='dt' data-ref="56dt">dt</a> != <a class="member" href="../include/G4BulirschStoer.hh.html#G4BulirschStoer::m_dt_last" title='G4BulirschStoer::m_dt_last' data-ref="G4BulirschStoer::m_dt_last">m_dt_last</a>)</td></tr>
+<tr><th id="99">99</th><td>  {</td></tr>
+<tr><th id="100">100</th><td>    <a class="member" href="#_ZN15G4BulirschStoer5resetEv" title='G4BulirschStoer::reset' data-ref="_ZN15G4BulirschStoer5resetEv">reset</a>(); <i>// step size changed from outside -&gt; reset</i></td></tr>
+<tr><th id="101">101</th><td>  }</td></tr>
+<tr><th id="102">102</th><td></td></tr>
+<tr><th id="103">103</th><td>  <a class="typedef" href="../../../global/management/include/G4Types.hh.html#G4bool" title='G4bool' data-type='bool' data-ref="G4bool">G4bool</a> <dfn class="local col7 decl" id="57reject" title='reject' data-type='G4bool' data-ref="57reject">reject</dfn> = <b>true</b>;</td></tr>
+<tr><th id="104">104</th><td></td></tr>
+<tr><th id="105">105</th><td>  <a class="typedef" href="../../../global/management/include/G4Types.hh.html#G4double" title='G4double' data-type='double' data-ref="G4double">G4double</a> <dfn class="local col8 decl" id="58new_h" title='new_h' data-type='G4double' data-ref="58new_h">new_h</dfn> = <a class="local col6 ref" href="#56dt" title='dt' data-ref="56dt">dt</a>;</td></tr>
+<tr><th id="106">106</th><td></td></tr>
+<tr><th id="107">107</th><td>  <i>/* m_current_k_opt is the estimated current optimal stage number */</i></td></tr>
+<tr><th id="108">108</th><td></td></tr>
+<tr><th id="109">109</th><td>  <b>for</b>(<a class="typedef" href="../../../global/management/include/G4Types.hh.html#G4int" title='G4int' data-type='int' data-ref="G4int">G4int</a> <dfn class="local col9 decl" id="59k" title='k' data-type='G4int' data-ref="59k">k</dfn> = <var>0</var>; <a class="local col9 ref" href="#59k" title='k' data-ref="59k">k</a> &lt;= <a class="member" href="../include/G4BulirschStoer.hh.html#G4BulirschStoer::m_current_k_opt" title='G4BulirschStoer::m_current_k_opt' data-ref="G4BulirschStoer::m_current_k_opt">m_current_k_opt</a>+<var>1</var>; ++<a class="local col9 ref" href="#59k" title='k' data-ref="59k">k</a>)</td></tr>
+<tr><th id="110">110</th><td>  {</td></tr>
+<tr><th id="111">111</th><td>    <i>// the stage counts are stored in m_interval_sequence</i></td></tr>
+<tr><th id="112">112</th><td><i>    //</i></td></tr>
+<tr><th id="113">113</th><td>    <a class="member" href="../include/G4BulirschStoer.hh.html#G4BulirschStoer::m_midpoint" title='G4BulirschStoer::m_midpoint' data-ref="G4BulirschStoer::m_midpoint">m_midpoint</a>.<a class="ref" href="../include/G4ModifiedMidpoint.icc.html#_ZN18G4ModifiedMidpoint8SetStepsEi" title='G4ModifiedMidpoint::SetSteps' data-ref="_ZN18G4ModifiedMidpoint8SetStepsEi">SetSteps</a>(<a class="member" href="../include/G4BulirschStoer.hh.html#G4BulirschStoer::m_interval_sequence" title='G4BulirschStoer::m_interval_sequence' data-ref="G4BulirschStoer::m_interval_sequence">m_interval_sequence</a>[<a class="local col9 ref" href="#59k" title='k' data-ref="59k">k</a>]);</td></tr>
+<tr><th id="114">114</th><td>    <b>if</b>(<a class="local col9 ref" href="#59k" title='k' data-ref="59k">k</a> == <var>0</var>)</td></tr>
+<tr><th id="115">115</th><td>    {</td></tr>
+<tr><th id="116">116</th><td>      <a class="member" href="../include/G4BulirschStoer.hh.html#G4BulirschStoer::m_midpoint" title='G4BulirschStoer::m_midpoint' data-ref="G4BulirschStoer::m_midpoint">m_midpoint</a>.<a class="ref" href="../include/G4ModifiedMidpoint.hh.html#_ZNK18G4ModifiedMidpoint6DoStepEPKdS1_Pdd" title='G4ModifiedMidpoint::DoStep' data-ref="_ZNK18G4ModifiedMidpoint6DoStepEPKdS1_Pdd">DoStep</a>(<a class="local col2 ref" href="#52in" title='in' data-ref="52in">in</a>, <a class="local col3 ref" href="#53dxdt" title='dxdt' data-ref="53dxdt">dxdt</a>, <a class="local col5 ref" href="#55out" title='out' data-ref="55out">out</a>, <a class="local col6 ref" href="#56dt" title='dt' data-ref="56dt">dt</a>);</td></tr>
+<tr><th id="117">117</th><td>      <i>/* the first step, nothing more to do */</i></td></tr>
+<tr><th id="118">118</th><td>    }</td></tr>
+<tr><th id="119">119</th><td>    <b>else</b></td></tr>
+<tr><th id="120">120</th><td>    {</td></tr>
+<tr><th id="121">121</th><td>      <a class="member" href="../include/G4BulirschStoer.hh.html#G4BulirschStoer::m_midpoint" title='G4BulirschStoer::m_midpoint' data-ref="G4BulirschStoer::m_midpoint">m_midpoint</a>.<a class="ref" href="../include/G4ModifiedMidpoint.hh.html#_ZNK18G4ModifiedMidpoint6DoStepEPKdS1_Pdd" title='G4ModifiedMidpoint::DoStep' data-ref="_ZNK18G4ModifiedMidpoint6DoStepEPKdS1_Pdd">DoStep</a>(<a class="local col2 ref" href="#52in" title='in' data-ref="52in">in</a>, <a class="local col3 ref" href="#53dxdt" title='dxdt' data-ref="53dxdt">dxdt</a>, <a class="member" href="../include/G4BulirschStoer.hh.html#G4BulirschStoer::m_table" title='G4BulirschStoer::m_table' data-ref="G4BulirschStoer::m_table">m_table</a>[<a class="local col9 ref" href="#59k" title='k' data-ref="59k">k</a>-<var>1</var>], <a class="local col6 ref" href="#56dt" title='dt' data-ref="56dt">dt</a>);</td></tr>
+<tr><th id="122">122</th><td>      extrapolate(k, out);</td></tr>
+<tr><th id="123">123</th><td>      <i>// get error estimate</i></td></tr>
+<tr><th id="124">124</th><td>      <b>for</b> (<a class="typedef" href="../../../global/management/include/G4Types.hh.html#G4int" title='G4int' data-type='int' data-ref="G4int">G4int</a> <dfn class="local col0 decl" id="60i" title='i' data-type='G4int' data-ref="60i">i</dfn> = <var>0</var>; <a class="local col0 ref" href="#60i" title='i' data-ref="60i">i</a> &lt; <a class="member" href="../include/G4BulirschStoer.hh.html#G4BulirschStoer::fnvar" title='G4BulirschStoer::fnvar' data-ref="G4BulirschStoer::fnvar">fnvar</a>; ++<a class="local col0 ref" href="#60i" title='i' data-ref="60i">i</a>)</td></tr>
+<tr><th id="125">125</th><td>      {</td></tr>
+<tr><th id="126">126</th><td>        <a class="member" href="../include/G4BulirschStoer.hh.html#G4BulirschStoer::m_err" title='G4BulirschStoer::m_err' data-ref="G4BulirschStoer::m_err">m_err</a>[<a class="local col0 ref" href="#60i" title='i' data-ref="60i">i</a>] = <a class="local col5 ref" href="#55out" title='out' data-ref="55out">out</a>[<a class="local col0 ref" href="#60i" title='i' data-ref="60i">i</a>] - <a class="member" href="../include/G4BulirschStoer.hh.html#G4BulirschStoer::m_table" title='G4BulirschStoer::m_table' data-ref="G4BulirschStoer::m_table">m_table</a>[<var>0</var>][<a class="local col0 ref" href="#60i" title='i' data-ref="60i">i</a>];</td></tr>
+<tr><th id="127">127</th><td>      }</td></tr>
+<tr><th id="128">128</th><td>      <em>const</em> <a class="typedef" href="../../../global/management/include/G4Types.hh.html#G4double" title='G4double' data-type='double' data-ref="G4double">G4double</a> <dfn class="local col1 decl" id="61error" title='error' data-type='const G4double' data-ref="61error">error</dfn> =</td></tr>
+<tr><th id="129">129</th><td>            <span class="namespace">field_utils::</span><a class="ref" href="../include/G4FieldUtils.hh.html#_ZN11field_utils13relativeErrorEPKdS1_dd" title='field_utils::relativeError' data-ref="_ZN11field_utils13relativeErrorEPKdS1_dd">relativeError</a>(<a class="local col5 ref" href="#55out" title='out' data-ref="55out">out</a>, <a class="member" href="../include/G4BulirschStoer.hh.html#G4BulirschStoer::m_err" title='G4BulirschStoer::m_err' data-ref="G4BulirschStoer::m_err">m_err</a>, <a class="local col6 ref" href="#56dt" title='dt' data-ref="56dt">dt</a>, <a class="member" href="../include/G4BulirschStoer.hh.html#G4BulirschStoer::m_eps_rel" title='G4BulirschStoer::m_eps_rel' data-ref="G4BulirschStoer::m_eps_rel">m_eps_rel</a>);</td></tr>
+<tr><th id="130">130</th><td>      h_opt[k] = calc_h_opt(dt, error, k);</td></tr>
+<tr><th id="131">131</th><td>      <a class="member" href="../include/G4BulirschStoer.hh.html#G4BulirschStoer::work" title='G4BulirschStoer::work' data-ref="G4BulirschStoer::work">work</a>[<a class="local col9 ref" href="#59k" title='k' data-ref="59k">k</a>] = <b>static_cast</b>&lt;<a class="typedef" href="../../../global/management/include/G4Types.hh.html#G4double" title='G4double' data-type='double' data-ref="G4double">G4double</a>&gt;(<a class="member" href="../include/G4BulirschStoer.hh.html#G4BulirschStoer::m_cost" title='G4BulirschStoer::m_cost' data-ref="G4BulirschStoer::m_cost">m_cost</a>[<a class="local col9 ref" href="#59k" title='k' data-ref="59k">k</a>]) / <a class="member" href="../include/G4BulirschStoer.hh.html#G4BulirschStoer::h_opt" title='G4BulirschStoer::h_opt' data-ref="G4BulirschStoer::h_opt">h_opt</a>[<a class="local col9 ref" href="#59k" title='k' data-ref="59k">k</a>];</td></tr>
+<tr><th id="132">132</th><td></td></tr>
+<tr><th id="133">133</th><td>      <b>if</b>( (<a class="local col9 ref" href="#59k" title='k' data-ref="59k">k</a> == <a class="member" href="../include/G4BulirschStoer.hh.html#G4BulirschStoer::m_current_k_opt" title='G4BulirschStoer::m_current_k_opt' data-ref="G4BulirschStoer::m_current_k_opt">m_current_k_opt</a>-<var>1</var>) || <a class="member" href="../include/G4BulirschStoer.hh.html#G4BulirschStoer::m_first" title='G4BulirschStoer::m_first' data-ref="G4BulirschStoer::m_first">m_first</a>)  <i>// convergence before k_opt ?</i></td></tr>
+<tr><th id="134">134</th><td>      {</td></tr>
+<tr><th id="135">135</th><td>        <b>if</b>(<a class="local col1 ref" href="#61error" title='error' data-ref="61error">error</a> &lt; <var>1.0</var>)</td></tr>
+<tr><th id="136">136</th><td>        {</td></tr>
+<tr><th id="137">137</th><td>          <i>// convergence</i></td></tr>
+<tr><th id="138">138</th><td>          <a class="local col7 ref" href="#57reject" title='reject' data-ref="57reject">reject</a> = <b>false</b>;</td></tr>
+<tr><th id="139">139</th><td>          <b>if</b>( (<a class="member" href="../include/G4BulirschStoer.hh.html#G4BulirschStoer::work" title='G4BulirschStoer::work' data-ref="G4BulirschStoer::work">work</a>[<a class="local col9 ref" href="#59k" title='k' data-ref="59k">k</a>] &lt; <a class="tu ref" href="#(anonymousnamespace)::KFAC2" title='(anonymous namespace)::KFAC2' data-use='r' data-ref="(anonymousnamespace)::KFAC2">KFAC2</a> * <a class="member" href="../include/G4BulirschStoer.hh.html#G4BulirschStoer::work" title='G4BulirschStoer::work' data-ref="G4BulirschStoer::work">work</a>[<a class="local col9 ref" href="#59k" title='k' data-ref="59k">k</a>-<var>1</var>]) || (<a class="member" href="../include/G4BulirschStoer.hh.html#G4BulirschStoer::m_current_k_opt" title='G4BulirschStoer::m_current_k_opt' data-ref="G4BulirschStoer::m_current_k_opt">m_current_k_opt</a> &lt;= <var>2</var>) )</td></tr>
+<tr><th id="140">140</th><td>          {</td></tr>
+<tr><th id="141">141</th><td>            <i>// leave order as is (except we were in first round)</i></td></tr>
+<tr><th id="142">142</th><td>            m_current_k_opt = <span class='error' title="use of undeclared identifier &apos;std&apos;">std</span>::min(m_k_max - <var>1</var> , <span class='error' title="use of undeclared identifier &apos;std&apos;">std</span>::max(<var>2</var> , k + <var>1</var>));</td></tr>
+<tr><th id="143">143</th><td>            <a class="local col8 ref" href="#58new_h" title='new_h' data-ref="58new_h">new_h</a> = <a class="member" href="../include/G4BulirschStoer.hh.html#G4BulirschStoer::h_opt" title='G4BulirschStoer::h_opt' data-ref="G4BulirschStoer::h_opt">h_opt</a>[<a class="local col9 ref" href="#59k" title='k' data-ref="59k">k</a>];</td></tr>
+<tr><th id="144">144</th><td>            <a class="local col8 ref" href="#58new_h" title='new_h' data-ref="58new_h">new_h</a> *= <b>static_cast</b>&lt;<a class="typedef" href="../../../global/management/include/G4Types.hh.html#G4double" title='G4double' data-type='double' data-ref="G4double">G4double</a>&gt;(<a class="member" href="../include/G4BulirschStoer.hh.html#G4BulirschStoer::m_cost" title='G4BulirschStoer::m_cost' data-ref="G4BulirschStoer::m_cost">m_cost</a>[<a class="local col9 ref" href="#59k" title='k' data-ref="59k">k</a> + <var>1</var>])</td></tr>
+<tr><th id="145">145</th><td>                   / <b>static_cast</b>&lt;<a class="typedef" href="../../../global/management/include/G4Types.hh.html#G4double" title='G4double' data-type='double' data-ref="G4double">G4double</a>&gt;(<a class="member" href="../include/G4BulirschStoer.hh.html#G4BulirschStoer::m_cost" title='G4BulirschStoer::m_cost' data-ref="G4BulirschStoer::m_cost">m_cost</a>[<a class="local col9 ref" href="#59k" title='k' data-ref="59k">k</a>]);</td></tr>
+<tr><th id="146">146</th><td>          }</td></tr>
+<tr><th id="147">147</th><td>          <b>else</b></td></tr>
+<tr><th id="148">148</th><td>          {</td></tr>
+<tr><th id="149">149</th><td>            m_current_k_opt = <span class='error' title="use of undeclared identifier &apos;std&apos;">std</span>::min(m_k_max - <var>1</var>, <span class='error' title="use of undeclared identifier &apos;std&apos;">std</span>::max(<var>2</var>, k));</td></tr>
+<tr><th id="150">150</th><td>            <a class="local col8 ref" href="#58new_h" title='new_h' data-ref="58new_h">new_h</a> = <a class="member" href="../include/G4BulirschStoer.hh.html#G4BulirschStoer::h_opt" title='G4BulirschStoer::h_opt' data-ref="G4BulirschStoer::h_opt">h_opt</a>[<a class="local col9 ref" href="#59k" title='k' data-ref="59k">k</a>];</td></tr>
+<tr><th id="151">151</th><td>          }</td></tr>
+<tr><th id="152">152</th><td>          <b>break</b>;</td></tr>
+<tr><th id="153">153</th><td>        }</td></tr>
+<tr><th id="154">154</th><td>        <b>else</b> <b>if</b>(<a class="member" href="#_ZNK15G4BulirschStoer13should_rejectEdi" title='G4BulirschStoer::should_reject' data-ref="_ZNK15G4BulirschStoer13should_rejectEdi">should_reject</a>(<a class="local col1 ref" href="#61error" title='error' data-ref="61error">error</a> , <a class="local col9 ref" href="#59k" title='k' data-ref="59k">k</a>) &amp;&amp; !<a class="member" href="../include/G4BulirschStoer.hh.html#G4BulirschStoer::m_first" title='G4BulirschStoer::m_first' data-ref="G4BulirschStoer::m_first">m_first</a>)</td></tr>
+<tr><th id="155">155</th><td>        {</td></tr>
+<tr><th id="156">156</th><td>          <a class="local col7 ref" href="#57reject" title='reject' data-ref="57reject">reject</a> = <b>true</b>;</td></tr>
+<tr><th id="157">157</th><td>          <a class="local col8 ref" href="#58new_h" title='new_h' data-ref="58new_h">new_h</a> = <a class="member" href="../include/G4BulirschStoer.hh.html#G4BulirschStoer::h_opt" title='G4BulirschStoer::h_opt' data-ref="G4BulirschStoer::h_opt">h_opt</a>[<a class="local col9 ref" href="#59k" title='k' data-ref="59k">k</a>];</td></tr>
+<tr><th id="158">158</th><td>          <b>break</b>;</td></tr>
+<tr><th id="159">159</th><td>        }</td></tr>
+<tr><th id="160">160</th><td>      }</td></tr>
+<tr><th id="161">161</th><td>      <b>if</b>(<a class="local col9 ref" href="#59k" title='k' data-ref="59k">k</a> == <a class="member" href="../include/G4BulirschStoer.hh.html#G4BulirschStoer::m_current_k_opt" title='G4BulirschStoer::m_current_k_opt' data-ref="G4BulirschStoer::m_current_k_opt">m_current_k_opt</a>)  <i>// convergence at k_opt ?</i></td></tr>
+<tr><th id="162">162</th><td>      {</td></tr>
+<tr><th id="163">163</th><td>        <b>if</b>(<a class="local col1 ref" href="#61error" title='error' data-ref="61error">error</a> &lt; <var>1.0</var>)</td></tr>
+<tr><th id="164">164</th><td>        {</td></tr>
+<tr><th id="165">165</th><td>          <i>// convergence</i></td></tr>
+<tr><th id="166">166</th><td>          <a class="local col7 ref" href="#57reject" title='reject' data-ref="57reject">reject</a> = <b>false</b>;</td></tr>
+<tr><th id="167">167</th><td>          <b>if</b>(<a class="member" href="../include/G4BulirschStoer.hh.html#G4BulirschStoer::work" title='G4BulirschStoer::work' data-ref="G4BulirschStoer::work">work</a>[<a class="local col9 ref" href="#59k" title='k' data-ref="59k">k</a>-<var>1</var>] &lt; <a class="tu ref" href="#(anonymousnamespace)::KFAC2" title='(anonymous namespace)::KFAC2' data-use='r' data-ref="(anonymousnamespace)::KFAC2">KFAC2</a> * <a class="member" href="../include/G4BulirschStoer.hh.html#G4BulirschStoer::work" title='G4BulirschStoer::work' data-ref="G4BulirschStoer::work">work</a>[<a class="local col9 ref" href="#59k" title='k' data-ref="59k">k</a>])</td></tr>
+<tr><th id="168">168</th><td>          {</td></tr>
+<tr><th id="169">169</th><td>            m_current_k_opt = <span class='error' title="use of undeclared identifier &apos;std&apos;">std</span>::max( <var>2</var> , m_current_k_opt-<var>1</var> );</td></tr>
+<tr><th id="170">170</th><td>            <a class="local col8 ref" href="#58new_h" title='new_h' data-ref="58new_h">new_h</a> = <a class="member" href="../include/G4BulirschStoer.hh.html#G4BulirschStoer::h_opt" title='G4BulirschStoer::h_opt' data-ref="G4BulirschStoer::h_opt">h_opt</a>[<a class="member" href="../include/G4BulirschStoer.hh.html#G4BulirschStoer::m_current_k_opt" title='G4BulirschStoer::m_current_k_opt' data-ref="G4BulirschStoer::m_current_k_opt">m_current_k_opt</a>];</td></tr>
+<tr><th id="171">171</th><td>          }</td></tr>
+<tr><th id="172">172</th><td>          <b>else</b> <b>if</b>( (<a class="member" href="../include/G4BulirschStoer.hh.html#G4BulirschStoer::work" title='G4BulirschStoer::work' data-ref="G4BulirschStoer::work">work</a>[<a class="local col9 ref" href="#59k" title='k' data-ref="59k">k</a>] &lt; <a class="tu ref" href="#(anonymousnamespace)::KFAC2" title='(anonymous namespace)::KFAC2' data-use='r' data-ref="(anonymousnamespace)::KFAC2">KFAC2</a> * <a class="member" href="../include/G4BulirschStoer.hh.html#G4BulirschStoer::work" title='G4BulirschStoer::work' data-ref="G4BulirschStoer::work">work</a>[<a class="local col9 ref" href="#59k" title='k' data-ref="59k">k</a>-<var>1</var>]) &amp;&amp; !<a class="member" href="../include/G4BulirschStoer.hh.html#G4BulirschStoer::m_last_step_rejected" title='G4BulirschStoer::m_last_step_rejected' data-ref="G4BulirschStoer::m_last_step_rejected">m_last_step_rejected</a> )</td></tr>
+<tr><th id="173">173</th><td>          {</td></tr>
+<tr><th id="174">174</th><td>            m_current_k_opt = <span class='error' title="use of undeclared identifier &apos;std&apos;">std</span>::min(m_k_max - <var>1</var>, m_current_k_opt + <var>1</var>);</td></tr>
+<tr><th id="175">175</th><td>            <a class="local col8 ref" href="#58new_h" title='new_h' data-ref="58new_h">new_h</a> = <a class="member" href="../include/G4BulirschStoer.hh.html#G4BulirschStoer::h_opt" title='G4BulirschStoer::h_opt' data-ref="G4BulirschStoer::h_opt">h_opt</a>[<a class="local col9 ref" href="#59k" title='k' data-ref="59k">k</a>];</td></tr>
+<tr><th id="176">176</th><td>            <a class="local col8 ref" href="#58new_h" title='new_h' data-ref="58new_h">new_h</a> *= <b>static_cast</b>&lt;<a class="typedef" href="../../../global/management/include/G4Types.hh.html#G4double" title='G4double' data-type='double' data-ref="G4double">G4double</a>&gt;(<a class="member" href="../include/G4BulirschStoer.hh.html#G4BulirschStoer::m_cost" title='G4BulirschStoer::m_cost' data-ref="G4BulirschStoer::m_cost">m_cost</a>[<a class="member" href="../include/G4BulirschStoer.hh.html#G4BulirschStoer::m_current_k_opt" title='G4BulirschStoer::m_current_k_opt' data-ref="G4BulirschStoer::m_current_k_opt">m_current_k_opt</a>])</td></tr>
+<tr><th id="177">177</th><td>                   / <b>static_cast</b>&lt;<a class="typedef" href="../../../global/management/include/G4Types.hh.html#G4double" title='G4double' data-type='double' data-ref="G4double">G4double</a>&gt;(<a class="member" href="../include/G4BulirschStoer.hh.html#G4BulirschStoer::m_cost" title='G4BulirschStoer::m_cost' data-ref="G4BulirschStoer::m_cost">m_cost</a>[<a class="local col9 ref" href="#59k" title='k' data-ref="59k">k</a>]);</td></tr>
+<tr><th id="178">178</th><td>          }</td></tr>
+<tr><th id="179">179</th><td>          <b>else</b></td></tr>
+<tr><th id="180">180</th><td>          {</td></tr>
+<tr><th id="181">181</th><td>            <a class="local col8 ref" href="#58new_h" title='new_h' data-ref="58new_h">new_h</a> = <a class="member" href="../include/G4BulirschStoer.hh.html#G4BulirschStoer::h_opt" title='G4BulirschStoer::h_opt' data-ref="G4BulirschStoer::h_opt">h_opt</a>[<a class="member" href="../include/G4BulirschStoer.hh.html#G4BulirschStoer::m_current_k_opt" title='G4BulirschStoer::m_current_k_opt' data-ref="G4BulirschStoer::m_current_k_opt">m_current_k_opt</a>];</td></tr>
+<tr><th id="182">182</th><td>          }</td></tr>
+<tr><th id="183">183</th><td>          <b>break</b>;</td></tr>
+<tr><th id="184">184</th><td>        }</td></tr>
+<tr><th id="185">185</th><td>        <b>else</b> <b>if</b>(<a class="member" href="#_ZNK15G4BulirschStoer13should_rejectEdi" title='G4BulirschStoer::should_reject' data-ref="_ZNK15G4BulirschStoer13should_rejectEdi">should_reject</a>(<a class="local col1 ref" href="#61error" title='error' data-ref="61error">error</a>, <a class="local col9 ref" href="#59k" title='k' data-ref="59k">k</a>))</td></tr>
+<tr><th id="186">186</th><td>        {</td></tr>
+<tr><th id="187">187</th><td>          <a class="local col7 ref" href="#57reject" title='reject' data-ref="57reject">reject</a> = <b>true</b>;</td></tr>
+<tr><th id="188">188</th><td>          <a class="local col8 ref" href="#58new_h" title='new_h' data-ref="58new_h">new_h</a> = <a class="member" href="../include/G4BulirschStoer.hh.html#G4BulirschStoer::h_opt" title='G4BulirschStoer::h_opt' data-ref="G4BulirschStoer::h_opt">h_opt</a>[<a class="member" href="../include/G4BulirschStoer.hh.html#G4BulirschStoer::m_current_k_opt" title='G4BulirschStoer::m_current_k_opt' data-ref="G4BulirschStoer::m_current_k_opt">m_current_k_opt</a>];</td></tr>
+<tr><th id="189">189</th><td>          <b>break</b>;</td></tr>
+<tr><th id="190">190</th><td>        }</td></tr>
+<tr><th id="191">191</th><td>      }</td></tr>
+<tr><th id="192">192</th><td>      <b>if</b>(<a class="local col9 ref" href="#59k" title='k' data-ref="59k">k</a> == <a class="member" href="../include/G4BulirschStoer.hh.html#G4BulirschStoer::m_current_k_opt" title='G4BulirschStoer::m_current_k_opt' data-ref="G4BulirschStoer::m_current_k_opt">m_current_k_opt</a> + <var>1</var>)  <i>// convergence at k_opt+1 ?</i></td></tr>
+<tr><th id="193">193</th><td>      {</td></tr>
+<tr><th id="194">194</th><td>        <b>if</b>(<a class="local col1 ref" href="#61error" title='error' data-ref="61error">error</a> &lt; <var>1.0</var>)  <i>// convergence</i></td></tr>
+<tr><th id="195">195</th><td>        {</td></tr>
+<tr><th id="196">196</th><td>          <a class="local col7 ref" href="#57reject" title='reject' data-ref="57reject">reject</a> = <b>false</b>;</td></tr>
+<tr><th id="197">197</th><td>          <b>if</b>(<a class="member" href="../include/G4BulirschStoer.hh.html#G4BulirschStoer::work" title='G4BulirschStoer::work' data-ref="G4BulirschStoer::work">work</a>[<a class="local col9 ref" href="#59k" title='k' data-ref="59k">k</a>-<var>2</var>] &lt; <a class="tu ref" href="#(anonymousnamespace)::KFAC2" title='(anonymous namespace)::KFAC2' data-use='r' data-ref="(anonymousnamespace)::KFAC2">KFAC2</a> * <a class="member" href="../include/G4BulirschStoer.hh.html#G4BulirschStoer::work" title='G4BulirschStoer::work' data-ref="G4BulirschStoer::work">work</a>[<a class="local col9 ref" href="#59k" title='k' data-ref="59k">k</a>-<var>1</var>])</td></tr>
+<tr><th id="198">198</th><td>          {</td></tr>
+<tr><th id="199">199</th><td>            m_current_k_opt = <span class='error' title="use of undeclared identifier &apos;std&apos;">std</span>::max(<var>2</var>, m_current_k_opt - <var>1</var>);</td></tr>
+<tr><th id="200">200</th><td>          }</td></tr>
+<tr><th id="201">201</th><td>          <b>if</b>((<a class="member" href="../include/G4BulirschStoer.hh.html#G4BulirschStoer::work" title='G4BulirschStoer::work' data-ref="G4BulirschStoer::work">work</a>[<a class="local col9 ref" href="#59k" title='k' data-ref="59k">k</a>] &lt; <a class="tu ref" href="#(anonymousnamespace)::KFAC2" title='(anonymous namespace)::KFAC2' data-use='r' data-ref="(anonymousnamespace)::KFAC2">KFAC2</a> * <a class="member" href="../include/G4BulirschStoer.hh.html#G4BulirschStoer::work" title='G4BulirschStoer::work' data-ref="G4BulirschStoer::work">work</a>[<a class="member" href="../include/G4BulirschStoer.hh.html#G4BulirschStoer::m_current_k_opt" title='G4BulirschStoer::m_current_k_opt' data-ref="G4BulirschStoer::m_current_k_opt">m_current_k_opt</a>]) &amp;&amp; !<a class="member" href="../include/G4BulirschStoer.hh.html#G4BulirschStoer::m_last_step_rejected" title='G4BulirschStoer::m_last_step_rejected' data-ref="G4BulirschStoer::m_last_step_rejected">m_last_step_rejected</a>)</td></tr>
+<tr><th id="202">202</th><td>          {</td></tr>
+<tr><th id="203">203</th><td>            m_current_k_opt = <span class='error' title="use of undeclared identifier &apos;std&apos;">std</span>::min(m_k_max - <var>1</var> , k);</td></tr>
+<tr><th id="204">204</th><td>          }</td></tr>
+<tr><th id="205">205</th><td>          <a class="local col8 ref" href="#58new_h" title='new_h' data-ref="58new_h">new_h</a> = <a class="member" href="../include/G4BulirschStoer.hh.html#G4BulirschStoer::h_opt" title='G4BulirschStoer::h_opt' data-ref="G4BulirschStoer::h_opt">h_opt</a>[<a class="member" href="../include/G4BulirschStoer.hh.html#G4BulirschStoer::m_current_k_opt" title='G4BulirschStoer::m_current_k_opt' data-ref="G4BulirschStoer::m_current_k_opt">m_current_k_opt</a>];</td></tr>
+<tr><th id="206">206</th><td>        }</td></tr>
+<tr><th id="207">207</th><td>        <b>else</b></td></tr>
+<tr><th id="208">208</th><td>        {</td></tr>
+<tr><th id="209">209</th><td>          <a class="local col7 ref" href="#57reject" title='reject' data-ref="57reject">reject</a> = <b>true</b>;</td></tr>
+<tr><th id="210">210</th><td>          <a class="local col8 ref" href="#58new_h" title='new_h' data-ref="58new_h">new_h</a> = <a class="member" href="../include/G4BulirschStoer.hh.html#G4BulirschStoer::h_opt" title='G4BulirschStoer::h_opt' data-ref="G4BulirschStoer::h_opt">h_opt</a>[<a class="member" href="../include/G4BulirschStoer.hh.html#G4BulirschStoer::m_current_k_opt" title='G4BulirschStoer::m_current_k_opt' data-ref="G4BulirschStoer::m_current_k_opt">m_current_k_opt</a>];</td></tr>
+<tr><th id="211">211</th><td>        }</td></tr>
+<tr><th id="212">212</th><td>        <b>break</b>;</td></tr>
+<tr><th id="213">213</th><td>      }</td></tr>
+<tr><th id="214">214</th><td>    }</td></tr>
+<tr><th id="215">215</th><td>  }</td></tr>
+<tr><th id="216">216</th><td></td></tr>
+<tr><th id="217">217</th><td>  <b>if</b>(!<a class="local col7 ref" href="#57reject" title='reject' data-ref="57reject">reject</a>)</td></tr>
+<tr><th id="218">218</th><td>  {</td></tr>
+<tr><th id="219">219</th><td>    <a class="local col4 ref" href="#54t" title='t' data-ref="54t">t</a> += <a class="local col6 ref" href="#56dt" title='dt' data-ref="56dt">dt</a>;</td></tr>
+<tr><th id="220">220</th><td>  }</td></tr>
+<tr><th id="221">221</th><td></td></tr>
+<tr><th id="222">222</th><td>  <b>if</b>(!<a class="member" href="../include/G4BulirschStoer.hh.html#G4BulirschStoer::m_last_step_rejected" title='G4BulirschStoer::m_last_step_rejected' data-ref="G4BulirschStoer::m_last_step_rejected">m_last_step_rejected</a> || <a class="local col8 ref" href="#58new_h" title='new_h' data-ref="58new_h">new_h</a> &lt; <a class="local col6 ref" href="#56dt" title='dt' data-ref="56dt">dt</a>)</td></tr>
+<tr><th id="223">223</th><td>  {</td></tr>
+<tr><th id="224">224</th><td>    <i>// limit step size</i></td></tr>
+<tr><th id="225">225</th><td>    new_h = <span class='error' title="use of undeclared identifier &apos;std&apos;">std</span>::min(m_max_dt, new_h);</td></tr>
+<tr><th id="226">226</th><td>    <a class="member" href="../include/G4BulirschStoer.hh.html#G4BulirschStoer::m_dt_last" title='G4BulirschStoer::m_dt_last' data-ref="G4BulirschStoer::m_dt_last">m_dt_last</a> = <a class="local col8 ref" href="#58new_h" title='new_h' data-ref="58new_h">new_h</a>;</td></tr>
+<tr><th id="227">227</th><td>    <a class="local col6 ref" href="#56dt" title='dt' data-ref="56dt">dt</a> = <a class="local col8 ref" href="#58new_h" title='new_h' data-ref="58new_h">new_h</a>;</td></tr>
+<tr><th id="228">228</th><td>  }</td></tr>
+<tr><th id="229">229</th><td></td></tr>
+<tr><th id="230">230</th><td>  <a class="member" href="../include/G4BulirschStoer.hh.html#G4BulirschStoer::m_last_step_rejected" title='G4BulirschStoer::m_last_step_rejected' data-ref="G4BulirschStoer::m_last_step_rejected">m_last_step_rejected</a> = <a class="local col7 ref" href="#57reject" title='reject' data-ref="57reject">reject</a>;</td></tr>
+<tr><th id="231">231</th><td>  <a class="member" href="../include/G4BulirschStoer.hh.html#G4BulirschStoer::m_first" title='G4BulirschStoer::m_first' data-ref="G4BulirschStoer::m_first">m_first</a> = <b>false</b>;</td></tr>
+<tr><th id="232">232</th><td></td></tr>
+<tr><th id="233">233</th><td>  <b>return</b> <a class="local col7 ref" href="#57reject" title='reject' data-ref="57reject">reject</a> ? <a class="type" href="../include/G4BulirschStoer.hh.html#G4BulirschStoer::step_result" title='G4BulirschStoer::step_result' data-ref="G4BulirschStoer::step_result">step_result</a>::<a class="enum" href="../include/G4BulirschStoer.hh.html#G4BulirschStoer::step_result::fail" title='G4BulirschStoer::step_result::fail' data-ref="G4BulirschStoer::step_result::fail">fail</a> : <a class="type" href="../include/G4BulirschStoer.hh.html#G4BulirschStoer::step_result" title='G4BulirschStoer::step_result' data-ref="G4BulirschStoer::step_result">step_result</a>::<a class="enum" href="../include/G4BulirschStoer.hh.html#G4BulirschStoer::step_result::success" title='G4BulirschStoer::step_result::success' data-ref="G4BulirschStoer::step_result::success">success</a>;</td></tr>
+<tr><th id="234">234</th><td>}</td></tr>
+<tr><th id="235">235</th><td></td></tr>
+<tr><th id="236">236</th><td><em>void</em> <a class="type" href="../include/G4BulirschStoer.hh.html#G4BulirschStoer" title='G4BulirschStoer' data-ref="G4BulirschStoer">G4BulirschStoer</a>::<dfn class="decl def" id="_ZN15G4BulirschStoer5resetEv" title='G4BulirschStoer::reset' data-ref="_ZN15G4BulirschStoer5resetEv">reset</dfn>()</td></tr>
+<tr><th id="237">237</th><td>{</td></tr>
+<tr><th id="238">238</th><td>  <a class="member" href="../include/G4BulirschStoer.hh.html#G4BulirschStoer::m_first" title='G4BulirschStoer::m_first' data-ref="G4BulirschStoer::m_first">m_first</a> = <b>true</b>;</td></tr>
+<tr><th id="239">239</th><td>  <a class="member" href="../include/G4BulirschStoer.hh.html#G4BulirschStoer::m_last_step_rejected" title='G4BulirschStoer::m_last_step_rejected' data-ref="G4BulirschStoer::m_last_step_rejected">m_last_step_rejected</a> = <b>false</b>;</td></tr>
+<tr><th id="240">240</th><td>}</td></tr>
+<tr><th id="241">241</th><td></td></tr>
+<tr><th id="242">242</th><td><em>void</em> G4BulirschStoer::extrapolate(<span class='error' title="unknown type name &apos;size_t&apos;">size_t</span> k , G4double xest[])</td></tr>
+<tr><th id="243">243</th><td>{</td></tr>
+<tr><th id="244">244</th><td>  <i>/* polynomial extrapolation, see <a href="http://www.nr.com/webnotes/nr3web21.pdf">http://www.nr.com/webnotes/nr3web21.pdf</a></i></td></tr>
+<tr><th id="245">245</th><td><i>   * uses the obtained intermediate results to extrapolate to dt-&gt;0 */</i></td></tr>
+<tr><th id="246">246</th><td></td></tr>
+<tr><th id="247">247</th><td>  <b>for</b>(G4int j = k - <var>1</var> ; j &gt; <var>0</var>; --j)</td></tr>
+<tr><th id="248">248</th><td>  {</td></tr>
+<tr><th id="249">249</th><td>    <b>for</b> (G4int i = <var>0</var>; i &lt; fnvar; ++i)</td></tr>
+<tr><th id="250">250</th><td>    {</td></tr>
+<tr><th id="251">251</th><td>      m_table[j-<var>1</var>][i] = m_table[j][i] * (<var>1.</var> + m_coeff[k][j])</td></tr>
+<tr><th id="252">252</th><td>                      - m_table[j-<var>1</var>][i] * m_coeff[k][j];</td></tr>
+<tr><th id="253">253</th><td>    }</td></tr>
+<tr><th id="254">254</th><td>  }</td></tr>
+<tr><th id="255">255</th><td>  <b>for</b> (G4int i = <var>0</var>; i &lt; fnvar; ++i)</td></tr>
+<tr><th id="256">256</th><td>  {</td></tr>
+<tr><th id="257">257</th><td>    xest[i] = m_table[<var>0</var>][i] * (<var>1.</var> + m_coeff[k][<var>0</var>]) - xest[i] * m_coeff[k][<var>0</var>];</td></tr>
+<tr><th id="258">258</th><td>  }</td></tr>
+<tr><th id="259">259</th><td>}</td></tr>
+<tr><th id="260">260</th><td></td></tr>
+<tr><th id="261">261</th><td>G4double</td></tr>
+<tr><th id="262">262</th><td>G4BulirschStoer::calc_h_opt(G4double h , G4double error , <span class='error' title="unknown type name &apos;size_t&apos;">size_t</span> k) <em>const</em></td></tr>
+<tr><th id="263">263</th><td>{</td></tr>
+<tr><th id="264">264</th><td>  <i>/* calculates the optimal step size for a given error and stage number */</i></td></tr>
+<tr><th id="265">265</th><td></td></tr>
+<tr><th id="266">266</th><td>  <em>const</em> G4double expo =  <var>1.0</var> / (<var>2</var> * k + <var>1</var>);</td></tr>
+<tr><th id="267">267</th><td>  <em>const</em> G4double facmin = <span class='error' title="use of undeclared identifier &apos;std&apos;">std</span>::pow(STEPFAC3, expo);</td></tr>
+<tr><th id="268">268</th><td>  G4double fac;</td></tr>
+<tr><th id="269">269</th><td></td></tr>
+<tr><th id="270">270</th><td>  G4double facminInv= <var>1.0</var> / facmin;</td></tr>
+<tr><th id="271">271</th><td>  <b>if</b> (error == <var>0.0</var>)</td></tr>
+<tr><th id="272">272</th><td>  {</td></tr>
+<tr><th id="273">273</th><td>    fac = facminInv;</td></tr>
+<tr><th id="274">274</th><td>  }</td></tr>
+<tr><th id="275">275</th><td>  <b>else</b></td></tr>
+<tr><th id="276">276</th><td>  {</td></tr>
+<tr><th id="277">277</th><td>    fac = STEPFAC2 * <span class='error' title="use of undeclared identifier &apos;std&apos;">std</span>::pow(error * inv_STEPFAC1 , -expo);</td></tr>
+<tr><th id="278">278</th><td>    fac = <span class='error' title="use of undeclared identifier &apos;std&apos;">std</span>::max(facmin * inv_STEPFAC4, <span class='error' title="use of undeclared identifier &apos;std&apos;">std</span>::min( facminInv, fac));</td></tr>
+<tr><th id="279">279</th><td>  }</td></tr>
+<tr><th id="280">280</th><td></td></tr>
+<tr><th id="281">281</th><td>  <b>return</b> h * fac;</td></tr>
+<tr><th id="282">282</th><td>}</td></tr>
+<tr><th id="283">283</th><td></td></tr>
+<tr><th id="284">284</th><td><i>//why is not used!!??</i></td></tr>
+<tr><th id="285">285</th><td>G4bool G4BulirschStoer::set_k_opt(<span class='error' title="unknown type name &apos;size_t&apos;">size_t</span> k, G4double&amp; dt)</td></tr>
+<tr><th id="286">286</th><td>{</td></tr>
+<tr><th id="287">287</th><td>  <i>/* calculates the optimal stage number */</i></td></tr>
+<tr><th id="288">288</th><td></td></tr>
+<tr><th id="289">289</th><td>  <b>if</b>(k == <var>1</var>)</td></tr>
+<tr><th id="290">290</th><td>  {</td></tr>
+<tr><th id="291">291</th><td>    m_current_k_opt = <var>2</var>;</td></tr>
+<tr><th id="292">292</th><td>    <b>return</b> <b>true</b>;</td></tr>
+<tr><th id="293">293</th><td>  }</td></tr>
+<tr><th id="294">294</th><td>  <b>if</b>( (work[k-<var>1</var>] &lt; KFAC1 * work[k]) || (k == m_k_max) )   <i>// order decrease</i></td></tr>
+<tr><th id="295">295</th><td>  {</td></tr>
+<tr><th id="296">296</th><td>    m_current_k_opt = k - <var>1</var>;</td></tr>
+<tr><th id="297">297</th><td>    dt = h_opt[ m_current_k_opt ];</td></tr>
+<tr><th id="298">298</th><td>    <b>return</b> <b>true</b>;</td></tr>
+<tr><th id="299">299</th><td>  }</td></tr>
+<tr><th id="300">300</th><td>  <b>else</b> <b>if</b>( (work[k] &lt; KFAC2 * work[k-<var>1</var>])</td></tr>
+<tr><th id="301">301</th><td>          || m_last_step_rejected || (k == m_k_max-<var>1</var>) )</td></tr>
+<tr><th id="302">302</th><td>  {  <i>// same order - also do this if last step got rejected</i></td></tr>
+<tr><th id="303">303</th><td>    m_current_k_opt = k;</td></tr>
+<tr><th id="304">304</th><td>    dt = h_opt[m_current_k_opt];</td></tr>
+<tr><th id="305">305</th><td>    <b>return</b> <b>true</b>;</td></tr>
+<tr><th id="306">306</th><td>  }</td></tr>
+<tr><th id="307">307</th><td>  <b>else</b> {   <i>// order increase - only if last step was not rejected</i></td></tr>
+<tr><th id="308">308</th><td>    m_current_k_opt = k + <var>1</var>;</td></tr>
+<tr><th id="309">309</th><td>    dt = h_opt[m_current_k_opt - <var>1</var>] * m_cost[m_current_k_opt]</td></tr>
+<tr><th id="310">310</th><td>       / m_cost[m_current_k_opt - <var>1</var>];</td></tr>
+<tr><th id="311">311</th><td>    <b>return</b> <b>true</b>;</td></tr>
+<tr><th id="312">312</th><td>  }</td></tr>
+<tr><th id="313">313</th><td>}</td></tr>
+<tr><th id="314">314</th><td></td></tr>
+<tr><th id="315">315</th><td><a class="typedef" href="../../../global/management/include/G4Types.hh.html#G4bool" title='G4bool' data-type='bool' data-ref="G4bool">G4bool</a> <a class="type" href="../include/G4BulirschStoer.hh.html#G4BulirschStoer" title='G4BulirschStoer' data-ref="G4BulirschStoer">G4BulirschStoer</a>::<dfn class="decl def" id="_ZNK15G4BulirschStoer21in_convergence_windowEi" title='G4BulirschStoer::in_convergence_window' data-ref="_ZNK15G4BulirschStoer21in_convergence_windowEi">in_convergence_window</dfn>(<a class="typedef" href="../../../global/management/include/G4Types.hh.html#G4int" title='G4int' data-type='int' data-ref="G4int">G4int</a> <dfn class="local col2 decl" id="62k" title='k' data-type='G4int' data-ref="62k">k</dfn>) <em>const</em></td></tr>
+<tr><th id="316">316</th><td>{</td></tr>
+<tr><th id="317">317</th><td>  <b>if</b>( (<a class="local col2 ref" href="#62k" title='k' data-ref="62k">k</a> == <a class="member" href="../include/G4BulirschStoer.hh.html#G4BulirschStoer::m_current_k_opt" title='G4BulirschStoer::m_current_k_opt' data-ref="G4BulirschStoer::m_current_k_opt">m_current_k_opt</a> - <var>1</var>) &amp;&amp; !<a class="member" href="../include/G4BulirschStoer.hh.html#G4BulirschStoer::m_last_step_rejected" title='G4BulirschStoer::m_last_step_rejected' data-ref="G4BulirschStoer::m_last_step_rejected">m_last_step_rejected</a> )</td></tr>
+<tr><th id="318">318</th><td>  {</td></tr>
+<tr><th id="319">319</th><td>    <b>return</b> <b>true</b>; <i>// decrease stepsize only if last step was not rejected</i></td></tr>
+<tr><th id="320">320</th><td>  }</td></tr>
+<tr><th id="321">321</th><td>  <b>return</b> (<a class="local col2 ref" href="#62k" title='k' data-ref="62k">k</a> == <a class="member" href="../include/G4BulirschStoer.hh.html#G4BulirschStoer::m_current_k_opt" title='G4BulirschStoer::m_current_k_opt' data-ref="G4BulirschStoer::m_current_k_opt">m_current_k_opt</a>) || (<a class="local col2 ref" href="#62k" title='k' data-ref="62k">k</a> == <a class="member" href="../include/G4BulirschStoer.hh.html#G4BulirschStoer::m_current_k_opt" title='G4BulirschStoer::m_current_k_opt' data-ref="G4BulirschStoer::m_current_k_opt">m_current_k_opt</a> + <var>1</var>);</td></tr>
+<tr><th id="322">322</th><td>}</td></tr>
+<tr><th id="323">323</th><td></td></tr>
+<tr><th id="324">324</th><td></td></tr>
+<tr><th id="325">325</th><td><a class="typedef" href="../../../global/management/include/G4Types.hh.html#G4bool" title='G4bool' data-type='bool' data-ref="G4bool">G4bool</a> <a class="type" href="../include/G4BulirschStoer.hh.html#G4BulirschStoer" title='G4BulirschStoer' data-ref="G4BulirschStoer">G4BulirschStoer</a>::<dfn class="decl def" id="_ZNK15G4BulirschStoer13should_rejectEdi" title='G4BulirschStoer::should_reject' data-ref="_ZNK15G4BulirschStoer13should_rejectEdi">should_reject</dfn>(<a class="typedef" href="../../../global/management/include/G4Types.hh.html#G4double" title='G4double' data-type='double' data-ref="G4double">G4double</a> <dfn class="local col3 decl" id="63error" title='error' data-type='G4double' data-ref="63error">error</dfn>, <a class="typedef" href="../../../global/management/include/G4Types.hh.html#G4int" title='G4int' data-type='int' data-ref="G4int">G4int</a> <dfn class="local col4 decl" id="64k" title='k' data-type='G4int' data-ref="64k">k</dfn>) <em>const</em></td></tr>
+<tr><th id="326">326</th><td>{</td></tr>
+<tr><th id="327">327</th><td>  <b>if</b>(<a class="local col4 ref" href="#64k" title='k' data-ref="64k">k</a> == <a class="member" href="../include/G4BulirschStoer.hh.html#G4BulirschStoer::m_current_k_opt" title='G4BulirschStoer::m_current_k_opt' data-ref="G4BulirschStoer::m_current_k_opt">m_current_k_opt</a> - <var>1</var>)</td></tr>
+<tr><th id="328">328</th><td>  {</td></tr>
+<tr><th id="329">329</th><td>    <em>const</em> <a class="typedef" href="../../../global/management/include/G4Types.hh.html#G4double" title='G4double' data-type='double' data-ref="G4double">G4double</a> <dfn class="local col5 decl" id="65d" title='d' data-type='const G4double' data-ref="65d">d</dfn> = <a class="typedef" href="../../../global/management/include/G4Types.hh.html#G4double" title='G4double' data-type='double' data-ref="G4double">G4double</a>(<a class="member" href="../include/G4BulirschStoer.hh.html#G4BulirschStoer::m_interval_sequence" title='G4BulirschStoer::m_interval_sequence' data-ref="G4BulirschStoer::m_interval_sequence">m_interval_sequence</a>[<a class="member" href="../include/G4BulirschStoer.hh.html#G4BulirschStoer::m_current_k_opt" title='G4BulirschStoer::m_current_k_opt' data-ref="G4BulirschStoer::m_current_k_opt">m_current_k_opt</a>]</td></tr>
+<tr><th id="330">330</th><td>                              * <a class="member" href="../include/G4BulirschStoer.hh.html#G4BulirschStoer::m_interval_sequence" title='G4BulirschStoer::m_interval_sequence' data-ref="G4BulirschStoer::m_interval_sequence">m_interval_sequence</a>[<a class="member" href="../include/G4BulirschStoer.hh.html#G4BulirschStoer::m_current_k_opt" title='G4BulirschStoer::m_current_k_opt' data-ref="G4BulirschStoer::m_current_k_opt">m_current_k_opt</a>+<var>1</var>]);</td></tr>
+<tr><th id="331">331</th><td>    <em>const</em> <a class="typedef" href="../../../global/management/include/G4Types.hh.html#G4double" title='G4double' data-type='double' data-ref="G4double">G4double</a> <dfn class="local col6 decl" id="66e" title='e' data-type='const G4double' data-ref="66e">e</dfn> = <a class="typedef" href="../../../global/management/include/G4Types.hh.html#G4double" title='G4double' data-type='double' data-ref="G4double">G4double</a>(<a class="member" href="../include/G4BulirschStoer.hh.html#G4BulirschStoer::m_interval_sequence" title='G4BulirschStoer::m_interval_sequence' data-ref="G4BulirschStoer::m_interval_sequence">m_interval_sequence</a>[<var>0</var>]);</td></tr>
+<tr><th id="332">332</th><td>    <em>const</em> <a class="typedef" href="../../../global/management/include/G4Types.hh.html#G4double" title='G4double' data-type='double' data-ref="G4double">G4double</a> <dfn class="local col7 decl" id="67e2" title='e2' data-type='const G4double' data-ref="67e2">e2</dfn> = <a class="local col6 ref" href="#66e" title='e' data-ref="66e">e</a>*<a class="local col6 ref" href="#66e" title='e' data-ref="66e">e</a>; </td></tr>
+<tr><th id="333">333</th><td>    <i>// step will fail, criterion 17.3.17 in NR</i></td></tr>
+<tr><th id="334">334</th><td>    <b>return</b> <a class="local col3 ref" href="#63error" title='error' data-ref="63error">error</a> * <a class="local col7 ref" href="#67e2" title='e2' data-ref="67e2">e2</a> * <a class="local col7 ref" href="#67e2" title='e2' data-ref="67e2">e2</a> &gt; <a class="local col5 ref" href="#65d" title='d' data-ref="65d">d</a> * <a class="local col5 ref" href="#65d" title='d' data-ref="65d">d</a>;  <i>//  was return error &gt; dOld * dOld; (where dOld= d/e; )</i></td></tr>
+<tr><th id="335">335</th><td>  }</td></tr>
+<tr><th id="336">336</th><td>  <b>else</b> <b>if</b>(<a class="local col4 ref" href="#64k" title='k' data-ref="64k">k</a> == <a class="member" href="../include/G4BulirschStoer.hh.html#G4BulirschStoer::m_current_k_opt" title='G4BulirschStoer::m_current_k_opt' data-ref="G4BulirschStoer::m_current_k_opt">m_current_k_opt</a>)</td></tr>
+<tr><th id="337">337</th><td>  {</td></tr>
+<tr><th id="338">338</th><td>    <em>const</em> <a class="typedef" href="../../../global/management/include/G4Types.hh.html#G4double" title='G4double' data-type='double' data-ref="G4double">G4double</a> <dfn class="local col8 decl" id="68d" title='d' data-type='const G4double' data-ref="68d">d</dfn> = <a class="typedef" href="../../../global/management/include/G4Types.hh.html#G4double" title='G4double' data-type='double' data-ref="G4double">G4double</a>(<a class="member" href="../include/G4BulirschStoer.hh.html#G4BulirschStoer::m_interval_sequence" title='G4BulirschStoer::m_interval_sequence' data-ref="G4BulirschStoer::m_interval_sequence">m_interval_sequence</a>[<a class="member" href="../include/G4BulirschStoer.hh.html#G4BulirschStoer::m_current_k_opt" title='G4BulirschStoer::m_current_k_opt' data-ref="G4BulirschStoer::m_current_k_opt">m_current_k_opt</a>]);</td></tr>
+<tr><th id="339">339</th><td>    <em>const</em> <a class="typedef" href="../../../global/management/include/G4Types.hh.html#G4double" title='G4double' data-type='double' data-ref="G4double">G4double</a> <dfn class="local col9 decl" id="69e" title='e' data-type='const G4double' data-ref="69e">e</dfn> = <a class="typedef" href="../../../global/management/include/G4Types.hh.html#G4double" title='G4double' data-type='double' data-ref="G4double">G4double</a>(<a class="member" href="../include/G4BulirschStoer.hh.html#G4BulirschStoer::m_interval_sequence" title='G4BulirschStoer::m_interval_sequence' data-ref="G4BulirschStoer::m_interval_sequence">m_interval_sequence</a>[<var>0</var>]);</td></tr>
+<tr><th id="340">340</th><td>    <b>return</b> <a class="local col3 ref" href="#63error" title='error' data-ref="63error">error</a> * <a class="local col9 ref" href="#69e" title='e' data-ref="69e">e</a> * <a class="local col9 ref" href="#69e" title='e' data-ref="69e">e</a> &gt; <a class="local col8 ref" href="#68d" title='d' data-ref="68d">d</a> * <a class="local col8 ref" href="#68d" title='d' data-ref="68d">d</a>; <i>//  was return error &gt; dOld * dOld; (where dOld= d/e; )</i></td></tr>
+<tr><th id="341">341</th><td>  }</td></tr>
+<tr><th id="342">342</th><td>  <b>else</b></td></tr>
+<tr><th id="343">343</th><td>  {</td></tr>
+<tr><th id="344">344</th><td>    <b>return</b> <a class="local col3 ref" href="#63error" title='error' data-ref="63error">error</a> &gt; <var>1.0</var>;</td></tr>
+<tr><th id="345">345</th><td>  }</td></tr>
+<tr><th id="346">346</th><td>}</td></tr>
+<tr><th id="347">347</th><td></td></tr>
+</table><hr/><p id='footer'>
+Generated on <em>2019-Aug-28</em> from project codebrowser<br />Powered by <a href='https://woboq.com'><img alt='Woboq' src='https://code.woboq.org/woboq-16.png' width='41' height='16' /></a> <a href='https://code.woboq.org'>Code Browser</a> 2.1
+<br/>Generator usage only permitted with license.</p>
+</div></body></html>

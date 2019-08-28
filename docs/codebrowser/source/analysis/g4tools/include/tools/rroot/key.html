@@ -1,0 +1,625 @@
+<!doctype html>
+<html>
+<head>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"><title>key source code [codebrowser/source/analysis/g4tools/include/tools/rroot/key] - Woboq Code Browser</title>
+<meta name="woboq:interestingDefinitions" content="tools::rroot::key "/>
+<link rel="stylesheet" href="../../../../../../../../data/qtcreator.css" title="QtCreator"/>
+<link rel="alternate stylesheet" href="../../../../../../../../data/kdevelop.css" title="KDevelop"/>
+<script type="text/javascript" src="../../../../../../../../data/jquery/jquery.min.js"></script>
+<script type="text/javascript" src="../../../../../../../../data/jquery/jquery-ui.min.js"></script>
+<script>var file = 'codebrowser/source/analysis/g4tools/include/tools/rroot/key'; var root_path = '../../../../../../..'; var data_path = '../../../../../../../../data';</script>
+<script src='../../../../../../../../data/codebrowser.js'></script>
+</head>
+<body><div id='header'><h1 id='breadcrumb'><span>Browse the source code of </span><a href='../../../../../..'>codebrowser</a>/<a href='../../../../..'>source</a>/<a href='../../../..'>analysis</a>/<a href='../../..'>g4tools</a>/<a href='../..'>include</a>/<a href='..'>tools</a>/<a href='./'>rroot</a>/<a href='key.html'>key</a></h1></div>
+<hr/><div id='content'><table class="code">
+<tr><th id="1">1</th><td><i>// Copyright (C) 2010, Guy Barrand. All rights reserved.</i></td></tr>
+<tr><th id="2">2</th><td><i>// See the file tools.license for terms.</i></td></tr>
+<tr><th id="3">3</th><td></td></tr>
+<tr><th id="4">4</th><td><u>#<span data-ppcond="4">ifndef</span> <span class="macro" data-ref="_M/tools_rroot_key">tools_rroot_key</span></u></td></tr>
+<tr><th id="5">5</th><td><u>#define <dfn class="macro" id="_M/tools_rroot_key" data-ref="_M/tools_rroot_key">tools_rroot_key</dfn></u></td></tr>
+<tr><th id="6">6</th><td></td></tr>
+<tr><th id="7">7</th><td><u>#include <a href="rbuf.html">"rbuf"</a></u></td></tr>
+<tr><th id="8">8</th><td><u>#include <a href="seek.html">"seek"</a></u></td></tr>
+<tr><th id="9">9</th><td><u>#include <a href="date.html">"date"</a></u></td></tr>
+<tr><th id="10">10</th><td><u>#include <a href="ifile.html">"ifile"</a></u></td></tr>
+<tr><th id="11">11</th><td><u>#include <a href="../sout.html">"../sout"</a></u></td></tr>
+<tr><th id="12">12</th><td></td></tr>
+<tr><th id="13">13</th><td><u>#<span data-ppcond="13">ifdef</span> <span class="macro" data-ref="_M/TOOLS_MEM">TOOLS_MEM</span></u></td></tr>
+<tr><th id="14">14</th><td><u>#include "../mem"</u></td></tr>
+<tr><th id="15">15</th><td><u>#<span data-ppcond="13">endif</span></u></td></tr>
+<tr><th id="16">16</th><td></td></tr>
+<tr><th id="17">17</th><td><u>#include <span class='error' title="&apos;map&apos; file not found">&lt;</span>map&gt;</u></td></tr>
+<tr><th id="18">18</th><td><u>#include &lt;ostream&gt;</u></td></tr>
+<tr><th id="19">19</th><td><u>#include &lt;cstring&gt; //memcpy</u></td></tr>
+<tr><th id="20">20</th><td></td></tr>
+<tr><th id="21">21</th><td><i>//#include &lt;zlib.h&gt;</i></td></tr>
+<tr><th id="22">22</th><td></td></tr>
+<tr><th id="23">23</th><td><u>#<span data-ppcond="23">ifdef</span> <span class="macro" data-ref="_M/TOOLS_USE_CSZ">TOOLS_USE_CSZ</span></u></td></tr>
+<tr><th id="24">24</th><td><i>// CSZ code where used as default compressor in old CERN-ROOT, then it may be needed</i></td></tr>
+<tr><th id="25">25</th><td><i>// to read old file (as the pawdemo.root one).</i></td></tr>
+<tr><th id="26">26</th><td><i>//FIXME : arrange to have csz coming from the "outside" (as zip).</i></td></tr>
+<tr><th id="27">27</th><td><b>extern</b> <q>"C"</q> {</td></tr>
+<tr><th id="28">28</th><td>  <em>void</em> csz__Init_Inflate(<em>long</em>,<em>unsigned</em> <em>char</em>*,<em>long</em>,<em>unsigned</em> <em>char</em>*);</td></tr>
+<tr><th id="29">29</th><td>  <em>int</em> csz__Inflate();</td></tr>
+<tr><th id="30">30</th><td>  <em>unsigned</em> <em>char</em>* csz__obufptr();</td></tr>
+<tr><th id="31">31</th><td>}</td></tr>
+<tr><th id="32">32</th><td><u>#<span data-ppcond="23">endif</span></u></td></tr>
+<tr><th id="33">33</th><td></td></tr>
+<tr><th id="34">34</th><td><b>namespace</b> <span class="namespace">tools</span> {</td></tr>
+<tr><th id="35">35</th><td><b>namespace</b> <span class="namespace">rroot</span> {</td></tr>
+<tr><th id="36">36</th><td></td></tr>
+<tr><th id="37">37</th><td><b>class</b> <dfn class="type def" id="tools::rroot::key" title='tools::rroot::key' data-ref="tools::rroot::key">key</dfn> {</td></tr>
+<tr><th id="38">38</th><td>  <em>static</em> <a class="typedef" href="../typedefs.html#tools::uint32" title='tools::uint32' data-type='unsigned int' data-ref="tools::uint32">uint32</a> <dfn class="decl def" id="_ZN5tools5rroot3key13class_versionEv" title='tools::rroot::key::class_version' data-ref="_ZN5tools5rroot3key13class_versionEv">class_version</dfn>() {<b>return</b> <var>2</var>;}</td></tr>
+<tr><th id="39">39</th><td><b>public</b>:</td></tr>
+<tr><th id="40">40</th><td>  <em>static</em> <a class="typedef" href="../typedefs.html#tools::uint32" title='tools::uint32' data-type='unsigned int' data-ref="tools::uint32">uint32</a> <dfn class="decl def" id="_ZN5tools5rroot3key22std_string_record_sizeERKi" title='tools::rroot::key::std_string_record_size' data-ref="_ZN5tools5rroot3key22std_string_record_sizeERKi">std_string_record_size</dfn>(<em>const</em> <span class='error' title="use of undeclared identifier &apos;std&apos;">std</span>::string&amp; <dfn class="local col4 decl" id="224x" title='x' data-type='const int &amp;' data-ref="224x">x</dfn>) {</td></tr>
+<tr><th id="41">41</th><td>    <i>// Returns size string will occupy on I/O buffer.</i></td></tr>
+<tr><th id="42">42</th><td>    <b>if</b> (x.size() &gt; <var>254</var>)</td></tr>
+<tr><th id="43">43</th><td>      <b>return</b> uint32(x.size()+<b>sizeof</b>(<em>unsigned</em> <em>char</em>)+<b>sizeof</b>(<em>int</em>));</td></tr>
+<tr><th id="44">44</th><td>    <b>else</b></td></tr>
+<tr><th id="45">45</th><td>      <b>return</b> uint32(x.size()+<b>sizeof</b>(<em>unsigned</em> <em>char</em>));</td></tr>
+<tr><th id="46">46</th><td>  }</td></tr>
+<tr><th id="47">47</th><td></td></tr>
+<tr><th id="48">48</th><td><b>public</b>:</td></tr>
+<tr><th id="49">49</th><td>  <dfn class="decl def" id="_ZN5tools5rroot3keyC1ERi" title='tools::rroot::key::key' data-ref="_ZN5tools5rroot3keyC1ERi">key</dfn>(<span class='error' title="use of undeclared identifier &apos;std&apos;">std</span>::ostream&amp; <dfn class="local col5 decl" id="225a_out" title='a_out' data-type='int &amp;' data-ref="225a_out">a_out</dfn>)</td></tr>
+<tr><th id="50">50</th><td>  :m_out(a_out)</td></tr>
+<tr><th id="51">51</th><td>  ,<a class="member" href="#tools::rroot::key::m_buf_size" title='tools::rroot::key::m_buf_size' data-ref="tools::rroot::key::m_buf_size">m_buf_size</a>(<var>0</var>)</td></tr>
+<tr><th id="52">52</th><td>  ,<a class="member" href="#tools::rroot::key::m_buffer" title='tools::rroot::key::m_buffer' data-ref="tools::rroot::key::m_buffer">m_buffer</a>(<var>0</var>)</td></tr>
+<tr><th id="53">53</th><td>  <i>// Record :</i></td></tr>
+<tr><th id="54">54</th><td>  ,<a class="member" href="#tools::rroot::key::m_nbytes" title='tools::rroot::key::m_nbytes' data-ref="tools::rroot::key::m_nbytes">m_nbytes</a>(<var>0</var>)</td></tr>
+<tr><th id="55">55</th><td>  ,<a class="member" href="#tools::rroot::key::m_version" title='tools::rroot::key::m_version' data-ref="tools::rroot::key::m_version">m_version</a>(<a class="member" href="#_ZN5tools5rroot3key13class_versionEv" title='tools::rroot::key::class_version' data-ref="_ZN5tools5rroot3key13class_versionEv">class_version</a>())</td></tr>
+<tr><th id="56">56</th><td>  ,<a class="member" href="#tools::rroot::key::m_object_size" title='tools::rroot::key::m_object_size' data-ref="tools::rroot::key::m_object_size">m_object_size</a>(<var>0</var>)</td></tr>
+<tr><th id="57">57</th><td>  ,<a class="member" href="#tools::rroot::key::m_date" title='tools::rroot::key::m_date' data-ref="tools::rroot::key::m_date">m_date</a>(<var>0</var>)</td></tr>
+<tr><th id="58">58</th><td>  ,<a class="member" href="#tools::rroot::key::m_key_length" title='tools::rroot::key::m_key_length' data-ref="tools::rroot::key::m_key_length">m_key_length</a>(<var>0</var>)</td></tr>
+<tr><th id="59">59</th><td>  ,<a class="member" href="#tools::rroot::key::m_cycle" title='tools::rroot::key::m_cycle' data-ref="tools::rroot::key::m_cycle">m_cycle</a>(<var>0</var>)</td></tr>
+<tr><th id="60">60</th><td>  ,<a class="member" href="#tools::rroot::key::m_seek_key" title='tools::rroot::key::m_seek_key' data-ref="tools::rroot::key::m_seek_key">m_seek_key</a>(<var>0</var>)</td></tr>
+<tr><th id="61">61</th><td>  ,<a class="member" href="#tools::rroot::key::m_seek_parent_dir" title='tools::rroot::key::m_seek_parent_dir' data-ref="tools::rroot::key::m_seek_parent_dir">m_seek_parent_dir</a>(<var>0</var>)</td></tr>
+<tr><th id="62">62</th><td>  <i>//,m_object_class</i></td></tr>
+<tr><th id="63">63</th><td><i>  //,m_object_name</i></td></tr>
+<tr><th id="64">64</th><td><i>  //,m_object_title</i></td></tr>
+<tr><th id="65">65</th><td>  {</td></tr>
+<tr><th id="66">66</th><td><u>#<span data-ppcond="66">ifdef</span> <span class="macro" data-ref="_M/TOOLS_MEM">TOOLS_MEM</span></u></td></tr>
+<tr><th id="67">67</th><td>    mem::increment(s_class().c_str());</td></tr>
+<tr><th id="68">68</th><td><u>#<span data-ppcond="66">endif</span></u></td></tr>
+<tr><th id="69">69</th><td>    <a class="member" href="#tools::rroot::key::m_key_length" title='tools::rroot::key::m_key_length' data-ref="tools::rroot::key::m_key_length">m_key_length</a> = <a class="member" href="#_ZNK5tools5rroot3key11record_sizeEj" title='tools::rroot::key::record_size' data-ref="_ZNK5tools5rroot3key11record_sizeEj">record_size</a>(<a class="member" href="#tools::rroot::key::m_version" title='tools::rroot::key::m_version' data-ref="tools::rroot::key::m_version">m_version</a>);</td></tr>
+<tr><th id="70">70</th><td>    <i>//fDate.setDate(0);</i></td></tr>
+<tr><th id="71">71</th><td>  }</td></tr>
+<tr><th id="72">72</th><td></td></tr>
+<tr><th id="73">73</th><td>  key(<span class='error' title="use of undeclared identifier &apos;std&apos;">std</span>::ostream&amp; a_out,seek a_pos,uint32 a_nbytes)</td></tr>
+<tr><th id="74">74</th><td>  :m_out(a_out)</td></tr>
+<tr><th id="75">75</th><td>  ,m_buf_size(<var>0</var>)</td></tr>
+<tr><th id="76">76</th><td>  ,m_buffer(<var>0</var>)</td></tr>
+<tr><th id="77">77</th><td>  <i>// Record :</i></td></tr>
+<tr><th id="78">78</th><td>  ,m_nbytes(a_nbytes) <i>//key len + compressed object size</i></td></tr>
+<tr><th id="79">79</th><td>  ,m_version(class_version())</td></tr>
+<tr><th id="80">80</th><td>  ,m_object_size(<var>0</var>)</td></tr>
+<tr><th id="81">81</th><td>  ,m_date(<var>0</var>)</td></tr>
+<tr><th id="82">82</th><td>  ,m_key_length(<var>0</var>)</td></tr>
+<tr><th id="83">83</th><td>  ,m_cycle(<var>0</var>)</td></tr>
+<tr><th id="84">84</th><td>  ,m_seek_key(a_pos)</td></tr>
+<tr><th id="85">85</th><td>  ,m_seek_parent_dir(<var>0</var>)</td></tr>
+<tr><th id="86">86</th><td>  <i>//,m_object_class</i></td></tr>
+<tr><th id="87">87</th><td><i>  //,m_object_name</i></td></tr>
+<tr><th id="88">88</th><td><i>  //,m_object_title</i></td></tr>
+<tr><th id="89">89</th><td>  {</td></tr>
+<tr><th id="90">90</th><td><u>#<span data-ppcond="90">ifdef</span> <span class="macro" data-ref="_M/TOOLS_MEM">TOOLS_MEM</span></u></td></tr>
+<tr><th id="91">91</th><td>    mem::increment(s_class().c_str());</td></tr>
+<tr><th id="92">92</th><td><u>#<span data-ppcond="90">endif</span></u></td></tr>
+<tr><th id="93">93</th><td>    <b>if</b>(a_pos&gt;START_BIG_FILE) m_version += big_file_version_tag();</td></tr>
+<tr><th id="94">94</th><td>    m_buffer = <b>new</b> <em>char</em>[a_nbytes];</td></tr>
+<tr><th id="95">95</th><td>    <b>if</b>(!m_buffer) {</td></tr>
+<tr><th id="96">96</th><td>      m_out &lt;&lt; <q>"tools::rroot::key::key(cpcstor) :"</q></td></tr>
+<tr><th id="97">97</th><td>                   &lt;&lt; <q>" can't alloc "</q> &lt;&lt; a_nbytes &lt;&lt; <q>"."</q> </td></tr>
+<tr><th id="98">98</th><td>                   &lt;&lt; <span class='error' title="use of undeclared identifier &apos;std&apos;">std</span>::endl;</td></tr>
+<tr><th id="99">99</th><td>    } <b>else</b> {</td></tr>
+<tr><th id="100">100</th><td>      m_buf_size = a_nbytes;</td></tr>
+<tr><th id="101">101</th><td>    }</td></tr>
+<tr><th id="102">102</th><td>  }</td></tr>
+<tr><th id="103">103</th><td>  <b>virtual</b> <dfn class="virtual decl def" id="_ZN5tools5rroot3keyD1Ev" title='tools::rroot::key::~key' data-ref="_ZN5tools5rroot3keyD1Ev">~key</dfn>(){</td></tr>
+<tr><th id="104">104</th><td>    <b>delete</b> [] <a class="member" href="#tools::rroot::key::m_buffer" title='tools::rroot::key::m_buffer' data-ref="tools::rroot::key::m_buffer">m_buffer</a>;</td></tr>
+<tr><th id="105">105</th><td><u>#<span data-ppcond="105">ifdef</span> <span class="macro" data-ref="_M/TOOLS_MEM">TOOLS_MEM</span></u></td></tr>
+<tr><th id="106">106</th><td>    mem::decrement(s_class().c_str());</td></tr>
+<tr><th id="107">107</th><td><u>#<span data-ppcond="105">endif</span></u></td></tr>
+<tr><th id="108">108</th><td>  }</td></tr>
+<tr><th id="109">109</th><td><b>protected</b>:</td></tr>
+<tr><th id="110">110</th><td>  <dfn class="decl def" id="_ZN5tools5rroot3keyC1ERKS1_" title='tools::rroot::key::key' data-ref="_ZN5tools5rroot3keyC1ERKS1_">key</dfn>(<em>const</em> <a class="type" href="#tools::rroot::key" title='tools::rroot::key' data-ref="tools::rroot::key">key</a>&amp; <dfn class="local col6 decl" id="226a_from" title='a_from' data-type='const tools::rroot::key &amp;' data-ref="226a_from">a_from</dfn>)</td></tr>
+<tr><th id="111">111</th><td>  :m_out(a_from.m_out)</td></tr>
+<tr><th id="112">112</th><td>  ,<a class="member" href="#tools::rroot::key::m_buf_size" title='tools::rroot::key::m_buf_size' data-ref="tools::rroot::key::m_buf_size">m_buf_size</a>(<var>0</var>)</td></tr>
+<tr><th id="113">113</th><td>  ,<a class="member" href="#tools::rroot::key::m_buffer" title='tools::rroot::key::m_buffer' data-ref="tools::rroot::key::m_buffer">m_buffer</a>(<var>0</var>)</td></tr>
+<tr><th id="114">114</th><td>  ,<a class="member" href="#tools::rroot::key::m_nbytes" title='tools::rroot::key::m_nbytes' data-ref="tools::rroot::key::m_nbytes">m_nbytes</a>(<a class="local col6 ref" href="#226a_from" title='a_from' data-ref="226a_from">a_from</a>.<a class="member" href="#tools::rroot::key::m_nbytes" title='tools::rroot::key::m_nbytes' data-ref="tools::rroot::key::m_nbytes">m_nbytes</a>)</td></tr>
+<tr><th id="115">115</th><td>  ,<a class="member" href="#tools::rroot::key::m_version" title='tools::rroot::key::m_version' data-ref="tools::rroot::key::m_version">m_version</a>(<a class="local col6 ref" href="#226a_from" title='a_from' data-ref="226a_from">a_from</a>.<a class="member" href="#tools::rroot::key::m_version" title='tools::rroot::key::m_version' data-ref="tools::rroot::key::m_version">m_version</a>)</td></tr>
+<tr><th id="116">116</th><td>  ,<a class="member" href="#tools::rroot::key::m_object_size" title='tools::rroot::key::m_object_size' data-ref="tools::rroot::key::m_object_size">m_object_size</a>(<a class="local col6 ref" href="#226a_from" title='a_from' data-ref="226a_from">a_from</a>.<a class="member" href="#tools::rroot::key::m_object_size" title='tools::rroot::key::m_object_size' data-ref="tools::rroot::key::m_object_size">m_object_size</a>)</td></tr>
+<tr><th id="117">117</th><td>  ,<a class="member" href="#tools::rroot::key::m_date" title='tools::rroot::key::m_date' data-ref="tools::rroot::key::m_date">m_date</a>(<a class="local col6 ref" href="#226a_from" title='a_from' data-ref="226a_from">a_from</a>.<a class="member" href="#tools::rroot::key::m_date" title='tools::rroot::key::m_date' data-ref="tools::rroot::key::m_date">m_date</a>)</td></tr>
+<tr><th id="118">118</th><td>  ,<a class="member" href="#tools::rroot::key::m_key_length" title='tools::rroot::key::m_key_length' data-ref="tools::rroot::key::m_key_length">m_key_length</a>(<a class="local col6 ref" href="#226a_from" title='a_from' data-ref="226a_from">a_from</a>.<a class="member" href="#tools::rroot::key::m_key_length" title='tools::rroot::key::m_key_length' data-ref="tools::rroot::key::m_key_length">m_key_length</a>)</td></tr>
+<tr><th id="119">119</th><td>  ,<a class="member" href="#tools::rroot::key::m_cycle" title='tools::rroot::key::m_cycle' data-ref="tools::rroot::key::m_cycle">m_cycle</a>(<a class="local col6 ref" href="#226a_from" title='a_from' data-ref="226a_from">a_from</a>.<a class="member" href="#tools::rroot::key::m_cycle" title='tools::rroot::key::m_cycle' data-ref="tools::rroot::key::m_cycle">m_cycle</a>)</td></tr>
+<tr><th id="120">120</th><td>  ,<a class="member" href="#tools::rroot::key::m_seek_key" title='tools::rroot::key::m_seek_key' data-ref="tools::rroot::key::m_seek_key">m_seek_key</a>(<a class="local col6 ref" href="#226a_from" title='a_from' data-ref="226a_from">a_from</a>.<a class="member" href="#tools::rroot::key::m_seek_key" title='tools::rroot::key::m_seek_key' data-ref="tools::rroot::key::m_seek_key">m_seek_key</a>)</td></tr>
+<tr><th id="121">121</th><td>  ,<a class="member" href="#tools::rroot::key::m_seek_parent_dir" title='tools::rroot::key::m_seek_parent_dir' data-ref="tools::rroot::key::m_seek_parent_dir">m_seek_parent_dir</a>(<a class="local col6 ref" href="#226a_from" title='a_from' data-ref="226a_from">a_from</a>.<a class="member" href="#tools::rroot::key::m_seek_parent_dir" title='tools::rroot::key::m_seek_parent_dir' data-ref="tools::rroot::key::m_seek_parent_dir">m_seek_parent_dir</a>)</td></tr>
+<tr><th id="122">122</th><td>  ,m_object_class(a_from.m_object_class)</td></tr>
+<tr><th id="123">123</th><td>  ,m_object_name(a_from.m_object_name)</td></tr>
+<tr><th id="124">124</th><td>  ,m_object_title(a_from.m_object_title)</td></tr>
+<tr><th id="125">125</th><td>  {</td></tr>
+<tr><th id="126">126</th><td><u>#<span data-ppcond="126">ifdef</span> <span class="macro" data-ref="_M/TOOLS_MEM">TOOLS_MEM</span></u></td></tr>
+<tr><th id="127">127</th><td>    mem::increment(s_class().c_str());</td></tr>
+<tr><th id="128">128</th><td><u>#<span data-ppcond="126">endif</span></u></td></tr>
+<tr><th id="129">129</th><td>    <b>if</b>(<a class="local col6 ref" href="#226a_from" title='a_from' data-ref="226a_from">a_from</a>.<a class="member" href="#tools::rroot::key::m_buf_size" title='tools::rroot::key::m_buf_size' data-ref="tools::rroot::key::m_buf_size">m_buf_size</a> &amp;&amp; <a class="local col6 ref" href="#226a_from" title='a_from' data-ref="226a_from">a_from</a>.<a class="member" href="#tools::rroot::key::m_buffer" title='tools::rroot::key::m_buffer' data-ref="tools::rroot::key::m_buffer">m_buffer</a>) {</td></tr>
+<tr><th id="130">130</th><td>      <a class="member" href="#tools::rroot::key::m_buffer" title='tools::rroot::key::m_buffer' data-ref="tools::rroot::key::m_buffer">m_buffer</a> = <b>new</b> <em>char</em>[<a class="local col6 ref" href="#226a_from" title='a_from' data-ref="226a_from">a_from</a>.<a class="member" href="#tools::rroot::key::m_buf_size" title='tools::rroot::key::m_buf_size' data-ref="tools::rroot::key::m_buf_size">m_buf_size</a>];</td></tr>
+<tr><th id="131">131</th><td>      <b>if</b>(!<a class="member" href="#tools::rroot::key::m_buffer" title='tools::rroot::key::m_buffer' data-ref="tools::rroot::key::m_buffer">m_buffer</a>) {</td></tr>
+<tr><th id="132">132</th><td>        m_out &lt;&lt; <q>"tools::rroot::key::key(cpcstor) :"</q></td></tr>
+<tr><th id="133">133</th><td>                     &lt;&lt; <q>" can't alloc "</q> &lt;&lt; a_from.m_buf_size &lt;&lt; <q>"."</q> </td></tr>
+<tr><th id="134">134</th><td>                     &lt;&lt; <span class='error' title="use of undeclared identifier &apos;std&apos;">std</span>::endl;</td></tr>
+<tr><th id="135">135</th><td>      } <b>else</b> {</td></tr>
+<tr><th id="136">136</th><td>        <a class="member" href="#tools::rroot::key::m_buf_size" title='tools::rroot::key::m_buf_size' data-ref="tools::rroot::key::m_buf_size">m_buf_size</a> = <a class="local col6 ref" href="#226a_from" title='a_from' data-ref="226a_from">a_from</a>.<a class="member" href="#tools::rroot::key::m_buf_size" title='tools::rroot::key::m_buf_size' data-ref="tools::rroot::key::m_buf_size">m_buf_size</a>;</td></tr>
+<tr><th id="137">137</th><td>        ::<span class='error' title="no member named &apos;memcpy&apos; in the global namespace">memcpy</span>(m_buffer,a_from.m_buffer,a_from.m_buf_size);</td></tr>
+<tr><th id="138">138</th><td>      }</td></tr>
+<tr><th id="139">139</th><td>    }</td></tr>
+<tr><th id="140">140</th><td>  }</td></tr>
+<tr><th id="141">141</th><td><b>public</b>:</td></tr>
+<tr><th id="142">142</th><td>  <a class="type" href="#tools::rroot::key" title='tools::rroot::key' data-ref="tools::rroot::key">key</a>&amp; <dfn class="decl def" id="_ZN5tools5rroot3keyaSERKS1_" title='tools::rroot::key::operator=' data-ref="_ZN5tools5rroot3keyaSERKS1_"><b>operator</b>=</dfn>(<em>const</em> <a class="type" href="#tools::rroot::key" title='tools::rroot::key' data-ref="tools::rroot::key">key</a>&amp; <dfn class="local col7 decl" id="227a_from" title='a_from' data-type='const tools::rroot::key &amp;' data-ref="227a_from">a_from</dfn>){</td></tr>
+<tr><th id="143">143</th><td>    <b>if</b>(&amp;<a class="local col7 ref" href="#227a_from" title='a_from' data-ref="227a_from">a_from</a>==<b>this</b>) <b>return</b> *<b>this</b>;</td></tr>
+<tr><th id="144">144</th><td>    <a class="member" href="#tools::rroot::key::m_nbytes" title='tools::rroot::key::m_nbytes' data-ref="tools::rroot::key::m_nbytes">m_nbytes</a> = <a class="local col7 ref" href="#227a_from" title='a_from' data-ref="227a_from">a_from</a>.<a class="member" href="#tools::rroot::key::m_nbytes" title='tools::rroot::key::m_nbytes' data-ref="tools::rroot::key::m_nbytes">m_nbytes</a>;</td></tr>
+<tr><th id="145">145</th><td>    <a class="member" href="#tools::rroot::key::m_version" title='tools::rroot::key::m_version' data-ref="tools::rroot::key::m_version">m_version</a> = <a class="local col7 ref" href="#227a_from" title='a_from' data-ref="227a_from">a_from</a>.<a class="member" href="#tools::rroot::key::m_version" title='tools::rroot::key::m_version' data-ref="tools::rroot::key::m_version">m_version</a>;</td></tr>
+<tr><th id="146">146</th><td>    <a class="member" href="#tools::rroot::key::m_object_size" title='tools::rroot::key::m_object_size' data-ref="tools::rroot::key::m_object_size">m_object_size</a> = <a class="local col7 ref" href="#227a_from" title='a_from' data-ref="227a_from">a_from</a>.<a class="member" href="#tools::rroot::key::m_object_size" title='tools::rroot::key::m_object_size' data-ref="tools::rroot::key::m_object_size">m_object_size</a>;</td></tr>
+<tr><th id="147">147</th><td>    <a class="member" href="#tools::rroot::key::m_date" title='tools::rroot::key::m_date' data-ref="tools::rroot::key::m_date">m_date</a> = <a class="local col7 ref" href="#227a_from" title='a_from' data-ref="227a_from">a_from</a>.<a class="member" href="#tools::rroot::key::m_date" title='tools::rroot::key::m_date' data-ref="tools::rroot::key::m_date">m_date</a>;</td></tr>
+<tr><th id="148">148</th><td>    <a class="member" href="#tools::rroot::key::m_key_length" title='tools::rroot::key::m_key_length' data-ref="tools::rroot::key::m_key_length">m_key_length</a> = <a class="local col7 ref" href="#227a_from" title='a_from' data-ref="227a_from">a_from</a>.<a class="member" href="#tools::rroot::key::m_key_length" title='tools::rroot::key::m_key_length' data-ref="tools::rroot::key::m_key_length">m_key_length</a>;</td></tr>
+<tr><th id="149">149</th><td>    <a class="member" href="#tools::rroot::key::m_cycle" title='tools::rroot::key::m_cycle' data-ref="tools::rroot::key::m_cycle">m_cycle</a> = <a class="local col7 ref" href="#227a_from" title='a_from' data-ref="227a_from">a_from</a>.<a class="member" href="#tools::rroot::key::m_cycle" title='tools::rroot::key::m_cycle' data-ref="tools::rroot::key::m_cycle">m_cycle</a>;</td></tr>
+<tr><th id="150">150</th><td>    <a class="member" href="#tools::rroot::key::m_seek_key" title='tools::rroot::key::m_seek_key' data-ref="tools::rroot::key::m_seek_key">m_seek_key</a> = <a class="local col7 ref" href="#227a_from" title='a_from' data-ref="227a_from">a_from</a>.<a class="member" href="#tools::rroot::key::m_seek_key" title='tools::rroot::key::m_seek_key' data-ref="tools::rroot::key::m_seek_key">m_seek_key</a>;</td></tr>
+<tr><th id="151">151</th><td>    <a class="member" href="#tools::rroot::key::m_seek_parent_dir" title='tools::rroot::key::m_seek_parent_dir' data-ref="tools::rroot::key::m_seek_parent_dir">m_seek_parent_dir</a> = <a class="local col7 ref" href="#227a_from" title='a_from' data-ref="227a_from">a_from</a>.<a class="member" href="#tools::rroot::key::m_seek_parent_dir" title='tools::rroot::key::m_seek_parent_dir' data-ref="tools::rroot::key::m_seek_parent_dir">m_seek_parent_dir</a>;</td></tr>
+<tr><th id="152">152</th><td>    m_object_class = a_from.m_object_class;</td></tr>
+<tr><th id="153">153</th><td>    m_object_name = a_from.m_object_name;</td></tr>
+<tr><th id="154">154</th><td>    m_object_title = a_from.m_object_title;</td></tr>
+<tr><th id="155">155</th><td></td></tr>
+<tr><th id="156">156</th><td>    <b>delete</b> [] <a class="member" href="#tools::rroot::key::m_buffer" title='tools::rroot::key::m_buffer' data-ref="tools::rroot::key::m_buffer">m_buffer</a>;</td></tr>
+<tr><th id="157">157</th><td>    <a class="member" href="#tools::rroot::key::m_buffer" title='tools::rroot::key::m_buffer' data-ref="tools::rroot::key::m_buffer">m_buffer</a> = <var>0</var>;</td></tr>
+<tr><th id="158">158</th><td>    <a class="member" href="#tools::rroot::key::m_buf_size" title='tools::rroot::key::m_buf_size' data-ref="tools::rroot::key::m_buf_size">m_buf_size</a> = <var>0</var>;</td></tr>
+<tr><th id="159">159</th><td></td></tr>
+<tr><th id="160">160</th><td>    <b>if</b>(<a class="local col7 ref" href="#227a_from" title='a_from' data-ref="227a_from">a_from</a>.<a class="member" href="#tools::rroot::key::m_buf_size" title='tools::rroot::key::m_buf_size' data-ref="tools::rroot::key::m_buf_size">m_buf_size</a> &amp;&amp; <a class="local col7 ref" href="#227a_from" title='a_from' data-ref="227a_from">a_from</a>.<a class="member" href="#tools::rroot::key::m_buffer" title='tools::rroot::key::m_buffer' data-ref="tools::rroot::key::m_buffer">m_buffer</a>) {</td></tr>
+<tr><th id="161">161</th><td>      <a class="member" href="#tools::rroot::key::m_buffer" title='tools::rroot::key::m_buffer' data-ref="tools::rroot::key::m_buffer">m_buffer</a> = <b>new</b> <em>char</em>[<a class="local col7 ref" href="#227a_from" title='a_from' data-ref="227a_from">a_from</a>.<a class="member" href="#tools::rroot::key::m_buf_size" title='tools::rroot::key::m_buf_size' data-ref="tools::rroot::key::m_buf_size">m_buf_size</a>];</td></tr>
+<tr><th id="162">162</th><td>      <b>if</b>(!<a class="member" href="#tools::rroot::key::m_buffer" title='tools::rroot::key::m_buffer' data-ref="tools::rroot::key::m_buffer">m_buffer</a>) {</td></tr>
+<tr><th id="163">163</th><td>        m_out &lt;&lt; <q>"tools::rroot::key::operator=() :"</q></td></tr>
+<tr><th id="164">164</th><td>                     &lt;&lt; <q>" can't alloc "</q> &lt;&lt; a_from.m_buf_size &lt;&lt; <q>"."</q> </td></tr>
+<tr><th id="165">165</th><td>                     &lt;&lt; <span class='error' title="use of undeclared identifier &apos;std&apos;">std</span>::endl;</td></tr>
+<tr><th id="166">166</th><td>      } <b>else</b> {</td></tr>
+<tr><th id="167">167</th><td>        <a class="member" href="#tools::rroot::key::m_buf_size" title='tools::rroot::key::m_buf_size' data-ref="tools::rroot::key::m_buf_size">m_buf_size</a> = <a class="local col7 ref" href="#227a_from" title='a_from' data-ref="227a_from">a_from</a>.<a class="member" href="#tools::rroot::key::m_buf_size" title='tools::rroot::key::m_buf_size' data-ref="tools::rroot::key::m_buf_size">m_buf_size</a>;</td></tr>
+<tr><th id="168">168</th><td>        ::<span class='error' title="no member named &apos;memcpy&apos; in the global namespace">memcpy</span>(m_buffer,a_from.m_buffer,a_from.m_buf_size);</td></tr>
+<tr><th id="169">169</th><td>      }</td></tr>
+<tr><th id="170">170</th><td>    }</td></tr>
+<tr><th id="171">171</th><td></td></tr>
+<tr><th id="172">172</th><td>    <b>return</b> *<b>this</b>;</td></tr>
+<tr><th id="173">173</th><td>  }</td></tr>
+<tr><th id="174">174</th><td></td></tr>
+<tr><th id="175">175</th><td><b>public</b>:</td></tr>
+<tr><th id="176">176</th><td>  <span class='error' title="use of undeclared identifier &apos;std&apos;">std</span>::ostream&amp; <dfn class="decl def" id="_ZNK5tools5rroot3key3outEv" title='tools::rroot::key::out' data-ref="_ZNK5tools5rroot3key3outEv">out</dfn>() <em>const</em> {<b>return</b> m_out;}</td></tr>
+<tr><th id="177">177</th><td></td></tr>
+<tr><th id="178">178</th><td>  <a class="typedef" href="../typedefs.html#tools::uint32" title='tools::uint32' data-type='unsigned int' data-ref="tools::uint32">uint32</a> <dfn class="decl def" id="_ZNK5tools5rroot3key6nbytesEv" title='tools::rroot::key::nbytes' data-ref="_ZNK5tools5rroot3key6nbytesEv">nbytes</dfn>() <em>const</em> {<b>return</b> <a class="member" href="#tools::rroot::key::m_nbytes" title='tools::rroot::key::m_nbytes' data-ref="tools::rroot::key::m_nbytes">m_nbytes</a>;}</td></tr>
+<tr><th id="179">179</th><td>  <a class="typedef" href="seek.html#tools::rroot::seek" title='tools::rroot::seek' data-type='int64' data-ref="tools::rroot::seek">seek</a> <dfn class="decl def" id="_ZNK5tools5rroot3key8seek_keyEv" title='tools::rroot::key::seek_key' data-ref="_ZNK5tools5rroot3key8seek_keyEv">seek_key</dfn>() <em>const</em> {<b>return</b> <a class="member" href="#tools::rroot::key::m_seek_key" title='tools::rroot::key::m_seek_key' data-ref="tools::rroot::key::m_seek_key">m_seek_key</a>;}</td></tr>
+<tr><th id="180">180</th><td>  <a class="typedef" href="../typedefs.html#tools::uint32" title='tools::uint32' data-type='unsigned int' data-ref="tools::uint32">uint32</a> <dfn class="decl def" id="_ZNK5tools5rroot3key11object_sizeEv" title='tools::rroot::key::object_size' data-ref="_ZNK5tools5rroot3key11object_sizeEv">object_size</dfn>() <em>const</em> {<b>return</b> <a class="member" href="#tools::rroot::key::m_object_size" title='tools::rroot::key::m_object_size' data-ref="tools::rroot::key::m_object_size">m_object_size</a>;}</td></tr>
+<tr><th id="181">181</th><td></td></tr>
+<tr><th id="182">182</th><td>  <em>const</em> <span class='error' title="use of undeclared identifier &apos;std&apos;">std</span>::string&amp; <dfn class="decl def" id="_ZNK5tools5rroot3key11object_nameEv" title='tools::rroot::key::object_name' data-ref="_ZNK5tools5rroot3key11object_nameEv">object_name</dfn>() <em>const</em> {<b>return</b> m_object_name;}</td></tr>
+<tr><th id="183">183</th><td>  <em>const</em> <span class='error' title="use of undeclared identifier &apos;std&apos;">std</span>::string&amp; <dfn class="decl def" id="_ZNK5tools5rroot3key12object_titleEv" title='tools::rroot::key::object_title' data-ref="_ZNK5tools5rroot3key12object_titleEv">object_title</dfn>() <em>const</em> {<b>return</b> m_object_title;}</td></tr>
+<tr><th id="184">184</th><td>  <em>const</em> <span class='error' title="use of undeclared identifier &apos;std&apos;">std</span>::string&amp; <dfn class="decl def" id="_ZNK5tools5rroot3key12object_classEv" title='tools::rroot::key::object_class' data-ref="_ZNK5tools5rroot3key12object_classEv">object_class</dfn>() <em>const</em> {<b>return</b> m_object_class;}</td></tr>
+<tr><th id="185">185</th><td></td></tr>
+<tr><th id="186">186</th><td>  <em>bool</em> <dfn class="decl def" id="_ZN5tools5rroot3key9read_fileERNS0_5ifileE" title='tools::rroot::key::read_file' data-ref="_ZN5tools5rroot3key9read_fileERNS0_5ifileE">read_file</dfn>(<a class="type" href="ifile.html#tools::rroot::ifile" title='tools::rroot::ifile' data-ref="tools::rroot::ifile">ifile</a>&amp; <dfn class="local col8 decl" id="228a_file" title='a_file' data-type='tools::rroot::ifile &amp;' data-ref="228a_file">a_file</dfn>){</td></tr>
+<tr><th id="187">187</th><td>    <i>// Read the key structure from the file.</i></td></tr>
+<tr><th id="188">188</th><td>    <b>if</b>(!<a class="local col8 ref" href="#228a_file" title='a_file' data-ref="228a_file">a_file</a>.<a class="virtual ref" href="ifile.html#_ZN5tools5rroot5ifile7set_posElNS1_4fromE" title='tools::rroot::ifile::set_pos' data-ref="_ZN5tools5rroot5ifile7set_posElNS1_4fromE">set_pos</a>(<a class="member" href="#tools::rroot::key::m_seek_key" title='tools::rroot::key::m_seek_key' data-ref="tools::rroot::key::m_seek_key">m_seek_key</a>)) <b>return</b> <b>false</b>;</td></tr>
+<tr><th id="189">189</th><td>    <b>if</b>(!<a class="local col8 ref" href="#228a_file" title='a_file' data-ref="228a_file">a_file</a>.<a class="virtual ref" href="ifile.html#_ZN5tools5rroot5ifile11read_bufferEPcj" title='tools::rroot::ifile::read_buffer' data-ref="_ZN5tools5rroot5ifile11read_bufferEPcj">read_buffer</a>(<a class="member" href="#tools::rroot::key::m_buffer" title='tools::rroot::key::m_buffer' data-ref="tools::rroot::key::m_buffer">m_buffer</a>,<a class="member" href="#tools::rroot::key::m_nbytes" title='tools::rroot::key::m_nbytes' data-ref="tools::rroot::key::m_nbytes">m_nbytes</a>)) <b>return</b> <b>false</b>;</td></tr>
+<tr><th id="190">190</th><td>    <b>if</b>(<a class="local col8 ref" href="#228a_file" title='a_file' data-ref="228a_file">a_file</a>.<a class="virtual ref" href="ifile.html#_ZNK5tools5rroot5ifile7verboseEv" title='tools::rroot::ifile::verbose' data-ref="_ZNK5tools5rroot5ifile7verboseEv">verbose</a>()) {</td></tr>
+<tr><th id="191">191</th><td>      m_out &lt;&lt; <q>"tools::rroot::key::read_file :"</q></td></tr>
+<tr><th id="192">192</th><td>                   &lt;&lt; <q>" reading "</q> &lt;&lt; m_nbytes &lt;&lt; <q>" bytes"</q></td></tr>
+<tr><th id="193">193</th><td>                   &lt;&lt; <q>" at position "</q> &lt;&lt; m_seek_key</td></tr>
+<tr><th id="194">194</th><td>                   &lt;&lt; <q>"."</q> </td></tr>
+<tr><th id="195">195</th><td>                   &lt;&lt; <span class='error' title="use of undeclared identifier &apos;std&apos;">std</span>::endl;</td></tr>
+<tr><th id="196">196</th><td>    }</td></tr>
+<tr><th id="197">197</th><td>    <b>return</b> <b>true</b>;</td></tr>
+<tr><th id="198">198</th><td>  }</td></tr>
+<tr><th id="199">199</th><td></td></tr>
+<tr><th id="200">200</th><td>  <em>char</em>* <dfn class="decl def" id="_ZNK5tools5rroot3key3bufEv" title='tools::rroot::key::buf' data-ref="_ZNK5tools5rroot3key3bufEv">buf</dfn>() <em>const</em> {<b>return</b> <a class="member" href="#tools::rroot::key::m_buffer" title='tools::rroot::key::m_buffer' data-ref="tools::rroot::key::m_buffer">m_buffer</a>;}</td></tr>
+<tr><th id="201">201</th><td>  <em>char</em>* <dfn class="decl def" id="_ZNK5tools5rroot3key11data_bufferEv" title='tools::rroot::key::data_buffer' data-ref="_ZNK5tools5rroot3key11data_bufferEv">data_buffer</dfn>() <em>const</em> {<b>return</b> <a class="member" href="#tools::rroot::key::m_buffer" title='tools::rroot::key::m_buffer' data-ref="tools::rroot::key::m_buffer">m_buffer</a> + <a class="member" href="#tools::rroot::key::m_key_length" title='tools::rroot::key::m_key_length' data-ref="tools::rroot::key::m_key_length">m_key_length</a>;}</td></tr>
+<tr><th id="202">202</th><td>  <em>const</em> <em>char</em>* <dfn class="decl def" id="_ZNK5tools5rroot3key3eobEv" title='tools::rroot::key::eob' data-ref="_ZNK5tools5rroot3key3eobEv">eob</dfn>() <em>const</em> {<b>return</b> <a class="member" href="#tools::rroot::key::m_buffer" title='tools::rroot::key::m_buffer' data-ref="tools::rroot::key::m_buffer">m_buffer</a> + <a class="member" href="#tools::rroot::key::m_buf_size" title='tools::rroot::key::m_buf_size' data-ref="tools::rroot::key::m_buf_size">m_buf_size</a>;}</td></tr>
+<tr><th id="203">203</th><td>  <a class="typedef" href="../typedefs.html#tools::uint32" title='tools::uint32' data-type='unsigned int' data-ref="tools::uint32">uint32</a> <dfn class="decl def" id="_ZNK5tools5rroot3key8buf_sizeEv" title='tools::rroot::key::buf_size' data-ref="_ZNK5tools5rroot3key8buf_sizeEv">buf_size</dfn>() <em>const</em> {<b>return</b> <a class="member" href="#tools::rroot::key::m_buf_size" title='tools::rroot::key::m_buf_size' data-ref="tools::rroot::key::m_buf_size">m_buf_size</a>;}</td></tr>
+<tr><th id="204">204</th><td>  <a class="typedef" href="../typedefs.html#tools::uint32" title='tools::uint32' data-type='unsigned int' data-ref="tools::uint32">uint32</a> <dfn class="decl def" id="_ZNK5tools5rroot3key10key_lengthEv" title='tools::rroot::key::key_length' data-ref="_ZNK5tools5rroot3key10key_lengthEv">key_length</dfn>() <em>const</em> {<b>return</b> <a class="member" href="#tools::rroot::key::m_key_length" title='tools::rroot::key::m_key_length' data-ref="tools::rroot::key::m_key_length">m_key_length</a>;}</td></tr>
+<tr><th id="205">205</th><td></td></tr>
+<tr><th id="206">206</th><td>  <em>bool</em> <dfn class="decl def" id="_ZN5tools5rroot3key11from_bufferEbPKcRPcb" title='tools::rroot::key::from_buffer' data-ref="_ZN5tools5rroot3key11from_bufferEbPKcRPcb">from_buffer</dfn>(<em>bool</em> <dfn class="local col9 decl" id="229a_byte_swap" title='a_byte_swap' data-type='bool' data-ref="229a_byte_swap">a_byte_swap</dfn>,<em>const</em> <em>char</em>* <dfn class="local col0 decl" id="230aEOB" title='aEOB' data-type='const char *' data-ref="230aEOB">aEOB</dfn>,<em>char</em>*&amp; <dfn class="local col1 decl" id="231a_pos" title='a_pos' data-type='char *&amp;' data-ref="231a_pos">a_pos</dfn>,<em>bool</em> <dfn class="local col2 decl" id="232a_verbose" title='a_verbose' data-type='bool' data-ref="232a_verbose">a_verbose</dfn>) {</td></tr>
+<tr><th id="207">207</th><td>    <a class="type" href="rbuf.html#tools::rroot::rbuf" title='tools::rroot::rbuf' data-ref="tools::rroot::rbuf">rbuf</a> <dfn class="local col3 decl" id="233rb" title='rb' data-type='tools::rroot::rbuf' data-ref="233rb">rb</dfn>(m_out,a_byte_swap,aEOB,a_pos);</td></tr>
+<tr><th id="208">208</th><td>    <em>int</em> <dfn class="local col4 decl" id="234_nbytes" title='_nbytes' data-type='int' data-ref="234_nbytes">_nbytes</dfn>;</td></tr>
+<tr><th id="209">209</th><td>    <b>if</b>(!<a class="local col3 ref" href="#233rb" title='rb' data-ref="233rb">rb</a>.<a class="ref" href="rbuf.html#_ZN5tools5rroot4rbuf4readERi" title='tools::rroot::rbuf::read' data-ref="_ZN5tools5rroot4rbuf4readERi">read</a>(<span class='refarg'><a class="local col4 ref" href="#234_nbytes" title='_nbytes' data-ref="234_nbytes">_nbytes</a></span>)) <b>return</b> <b>false</b>;</td></tr>
+<tr><th id="210">210</th><td><i>/*</i></td></tr>
+<tr><th id="211">211</th><td><i>    if(m_nbytes) {</i></td></tr>
+<tr><th id="212">212</th><td><i>      if(_nbytes!=int(m_nbytes)) {</i></td></tr>
+<tr><th id="213">213</th><td><i>        out &lt;&lt; "tools::rroot::key::from_buffer :"</i></td></tr>
+<tr><th id="214">214</th><td><i>            &lt;&lt; " nbytes not consistent."</i></td></tr>
+<tr><th id="215">215</th><td><i>            &lt;&lt; " read " &lt;&lt; _nbytes</i></td></tr>
+<tr><th id="216">216</th><td><i>            &lt;&lt; ", expected " &lt;&lt; m_nbytes</i></td></tr>
+<tr><th id="217">217</th><td><i>            &lt;&lt; ". Continue with " &lt;&lt; _nbytes</i></td></tr>
+<tr><th id="218">218</th><td><i>            &lt;&lt; std::endl;</i></td></tr>
+<tr><th id="219">219</th><td><i>        m_nbytes = _nbytes;</i></td></tr>
+<tr><th id="220">220</th><td><i>      }</i></td></tr>
+<tr><th id="221">221</th><td><i>    } else {</i></td></tr>
+<tr><th id="222">222</th><td><i>*/</i></td></tr>
+<tr><th id="223">223</th><td>    <a class="member" href="#tools::rroot::key::m_nbytes" title='tools::rroot::key::m_nbytes' data-ref="tools::rroot::key::m_nbytes">m_nbytes</a> = <a class="local col4 ref" href="#234_nbytes" title='_nbytes' data-ref="234_nbytes">_nbytes</a>;</td></tr>
+<tr><th id="224">224</th><td>    <i>//}</i></td></tr>
+<tr><th id="225">225</th><td>    <em>short</em> <dfn class="local col5 decl" id="235version" title='version' data-type='short' data-ref="235version">version</dfn>;</td></tr>
+<tr><th id="226">226</th><td>    <b>if</b>(!<a class="local col3 ref" href="#233rb" title='rb' data-ref="233rb">rb</a>.<a class="ref" href="rbuf.html#_ZN5tools5rroot4rbuf4readERs" title='tools::rroot::rbuf::read' data-ref="_ZN5tools5rroot4rbuf4readERs">read</a>(<span class='refarg'><a class="local col5 ref" href="#235version" title='version' data-ref="235version">version</a></span>)) <b>return</b> <b>false</b>;</td></tr>
+<tr><th id="227">227</th><td>    <a class="member" href="#tools::rroot::key::m_version" title='tools::rroot::key::m_version' data-ref="tools::rroot::key::m_version">m_version</a> = <a class="local col5 ref" href="#235version" title='version' data-ref="235version">version</a>;</td></tr>
+<tr><th id="228">228</th><td>   {<em>int</em> <dfn class="local col6 decl" id="236v" title='v' data-type='int' data-ref="236v">v</dfn>;</td></tr>
+<tr><th id="229">229</th><td>    <b>if</b>(!<a class="local col3 ref" href="#233rb" title='rb' data-ref="233rb">rb</a>.<a class="ref" href="rbuf.html#_ZN5tools5rroot4rbuf4readERi" title='tools::rroot::rbuf::read' data-ref="_ZN5tools5rroot4rbuf4readERi">read</a>(<span class='refarg'><a class="local col6 ref" href="#236v" title='v' data-ref="236v">v</a></span>)) <b>return</b> <b>false</b>;</td></tr>
+<tr><th id="230">230</th><td>    <a class="member" href="#tools::rroot::key::m_object_size" title='tools::rroot::key::m_object_size' data-ref="tools::rroot::key::m_object_size">m_object_size</a> = <a class="local col6 ref" href="#236v" title='v' data-ref="236v">v</a>;}</td></tr>
+<tr><th id="231">231</th><td>    <em>unsigned</em> <em>int</em> <dfn class="local col7 decl" id="237_date" title='_date' data-type='unsigned int' data-ref="237_date">_date</dfn>;</td></tr>
+<tr><th id="232">232</th><td>    <b>if</b>(!<a class="local col3 ref" href="#233rb" title='rb' data-ref="233rb">rb</a>.<a class="ref" href="rbuf.html#_ZN5tools5rroot4rbuf4readERj" title='tools::rroot::rbuf::read' data-ref="_ZN5tools5rroot4rbuf4readERj">read</a>(<span class='refarg'><a class="local col7 ref" href="#237_date" title='_date' data-ref="237_date">_date</a></span>)) <b>return</b> <b>false</b>;</td></tr>
+<tr><th id="233">233</th><td>    <i>//fDate.setDate(_date);</i></td></tr>
+<tr><th id="234">234</th><td>   {<em>short</em> <dfn class="local col8 decl" id="238v" title='v' data-type='short' data-ref="238v">v</dfn>;</td></tr>
+<tr><th id="235">235</th><td>    <b>if</b>(!<a class="local col3 ref" href="#233rb" title='rb' data-ref="233rb">rb</a>.<a class="ref" href="rbuf.html#_ZN5tools5rroot4rbuf4readERs" title='tools::rroot::rbuf::read' data-ref="_ZN5tools5rroot4rbuf4readERs">read</a>(<span class='refarg'><a class="local col8 ref" href="#238v" title='v' data-ref="238v">v</a></span>)) <b>return</b> <b>false</b>;</td></tr>
+<tr><th id="236">236</th><td>    <a class="member" href="#tools::rroot::key::m_key_length" title='tools::rroot::key::m_key_length' data-ref="tools::rroot::key::m_key_length">m_key_length</a> = <a class="local col8 ref" href="#238v" title='v' data-ref="238v">v</a>;}</td></tr>
+<tr><th id="237">237</th><td>   {<em>short</em> <dfn class="local col9 decl" id="239v" title='v' data-type='short' data-ref="239v">v</dfn>;</td></tr>
+<tr><th id="238">238</th><td>    <b>if</b>(!<a class="local col3 ref" href="#233rb" title='rb' data-ref="233rb">rb</a>.<a class="ref" href="rbuf.html#_ZN5tools5rroot4rbuf4readERs" title='tools::rroot::rbuf::read' data-ref="_ZN5tools5rroot4rbuf4readERs">read</a>(<span class='refarg'><a class="local col9 ref" href="#239v" title='v' data-ref="239v">v</a></span>)) <b>return</b> <b>false</b>;</td></tr>
+<tr><th id="239">239</th><td>    <a class="member" href="#tools::rroot::key::m_cycle" title='tools::rroot::key::m_cycle' data-ref="tools::rroot::key::m_cycle">m_cycle</a> = <a class="local col9 ref" href="#239v" title='v' data-ref="239v">v</a>;}</td></tr>
+<tr><th id="240">240</th><td>    <b>if</b>(<a class="local col5 ref" href="#235version" title='version' data-ref="235version">version</a>&gt;(<em>short</em>)<a class="ref" href="seek.html#_ZN5tools5rroot20big_file_version_tagEv" title='tools::rroot::big_file_version_tag' data-ref="_ZN5tools5rroot20big_file_version_tagEv">big_file_version_tag</a>()) {</td></tr>
+<tr><th id="241">241</th><td>      <b>if</b>(!<a class="local col3 ref" href="#233rb" title='rb' data-ref="233rb">rb</a>.<a class="ref" href="rbuf.html#_ZN5tools5rroot4rbuf4readERl" title='tools::rroot::rbuf::read' data-ref="_ZN5tools5rroot4rbuf4readERl">read</a>(<span class='refarg'><a class="member" href="#tools::rroot::key::m_seek_key" title='tools::rroot::key::m_seek_key' data-ref="tools::rroot::key::m_seek_key">m_seek_key</a></span>)) <b>return</b> <b>false</b>;</td></tr>
+<tr><th id="242">242</th><td>      <b>if</b>(!<a class="local col3 ref" href="#233rb" title='rb' data-ref="233rb">rb</a>.<a class="ref" href="rbuf.html#_ZN5tools5rroot4rbuf4readERl" title='tools::rroot::rbuf::read' data-ref="_ZN5tools5rroot4rbuf4readERl">read</a>(<span class='refarg'><a class="member" href="#tools::rroot::key::m_seek_parent_dir" title='tools::rroot::key::m_seek_parent_dir' data-ref="tools::rroot::key::m_seek_parent_dir">m_seek_parent_dir</a></span>)) <b>return</b> <b>false</b>;</td></tr>
+<tr><th id="243">243</th><td>    } <b>else</b> {</td></tr>
+<tr><th id="244">244</th><td>     {<a class="typedef" href="seek.html#tools::rroot::seek32" title='tools::rroot::seek32' data-type='int' data-ref="tools::rroot::seek32">seek32</a> <dfn class="local col0 decl" id="240i" title='i' data-type='seek32' data-ref="240i">i</dfn>;</td></tr>
+<tr><th id="245">245</th><td>      <b>if</b>(!<a class="local col3 ref" href="#233rb" title='rb' data-ref="233rb">rb</a>.<a class="ref" href="rbuf.html#_ZN5tools5rroot4rbuf4readERi" title='tools::rroot::rbuf::read' data-ref="_ZN5tools5rroot4rbuf4readERi">read</a>(<span class='refarg'><a class="local col0 ref" href="#240i" title='i' data-ref="240i">i</a></span>)) <b>return</b> <b>false</b>;</td></tr>
+<tr><th id="246">246</th><td>      <a class="member" href="#tools::rroot::key::m_seek_key" title='tools::rroot::key::m_seek_key' data-ref="tools::rroot::key::m_seek_key">m_seek_key</a> = <a class="local col0 ref" href="#240i" title='i' data-ref="240i">i</a>;}    </td></tr>
+<tr><th id="247">247</th><td>     {<a class="typedef" href="seek.html#tools::rroot::seek32" title='tools::rroot::seek32' data-type='int' data-ref="tools::rroot::seek32">seek32</a> <dfn class="local col1 decl" id="241i" title='i' data-type='seek32' data-ref="241i">i</dfn>;</td></tr>
+<tr><th id="248">248</th><td>      <b>if</b>(!<a class="local col3 ref" href="#233rb" title='rb' data-ref="233rb">rb</a>.<a class="ref" href="rbuf.html#_ZN5tools5rroot4rbuf4readERi" title='tools::rroot::rbuf::read' data-ref="_ZN5tools5rroot4rbuf4readERi">read</a>(<span class='refarg'><a class="local col1 ref" href="#241i" title='i' data-ref="241i">i</a></span>)) <b>return</b> <b>false</b>;</td></tr>
+<tr><th id="249">249</th><td>      <a class="member" href="#tools::rroot::key::m_seek_parent_dir" title='tools::rroot::key::m_seek_parent_dir' data-ref="tools::rroot::key::m_seek_parent_dir">m_seek_parent_dir</a> = <a class="local col1 ref" href="#241i" title='i' data-ref="241i">i</a>;}</td></tr>
+<tr><th id="250">250</th><td>    }</td></tr>
+<tr><th id="251">251</th><td>    <b>if</b>(!rb.read(m_object_class)) <b>return</b> <b>false</b>;</td></tr>
+<tr><th id="252">252</th><td>    <b>if</b>(!rb.read(m_object_name)) <b>return</b> <b>false</b>;</td></tr>
+<tr><th id="253">253</th><td>    <b>if</b>(!rb.read(m_object_title)) <b>return</b> <b>false</b>;</td></tr>
+<tr><th id="254">254</th><td>    <b>if</b>(<a class="local col2 ref" href="#232a_verbose" title='a_verbose' data-ref="232a_verbose">a_verbose</a>) {</td></tr>
+<tr><th id="255">255</th><td>      m_out &lt;&lt; <q>"tools::rroot::key::from_buffer :"</q></td></tr>
+<tr><th id="256">256</th><td>                   &lt;&lt; <q>" nbytes : "</q> &lt;&lt; m_nbytes</td></tr>
+<tr><th id="257">257</th><td>                   &lt;&lt; <q>", object class : "</q> &lt;&lt; sout(m_object_class)</td></tr>
+<tr><th id="258">258</th><td>                   &lt;&lt; <q>", object name : "</q> &lt;&lt; sout(m_object_name)</td></tr>
+<tr><th id="259">259</th><td>                   &lt;&lt; <q>", object title : "</q> &lt;&lt; sout(m_object_title)</td></tr>
+<tr><th id="260">260</th><td>                   &lt;&lt; <q>", object size : "</q> &lt;&lt; m_object_size</td></tr>
+<tr><th id="261">261</th><td>                   &lt;&lt; <q>"."</q> </td></tr>
+<tr><th id="262">262</th><td>                   &lt;&lt; <span class='error' title="use of undeclared identifier &apos;std&apos;">std</span>::endl;</td></tr>
+<tr><th id="263">263</th><td>    }</td></tr>
+<tr><th id="264">264</th><td>    <b>return</b> <b>true</b>;</td></tr>
+<tr><th id="265">265</th><td>  }</td></tr>
+<tr><th id="266">266</th><td></td></tr>
+<tr><th id="267">267</th><td>  <em>char</em>* <dfn class="decl def" id="_ZN5tools5rroot3key17get_object_bufferERNS0_5ifileERj" title='tools::rroot::key::get_object_buffer' data-ref="_ZN5tools5rroot3key17get_object_bufferERNS0_5ifileERj">get_object_buffer</dfn>(<a class="type" href="ifile.html#tools::rroot::ifile" title='tools::rroot::ifile' data-ref="tools::rroot::ifile">ifile</a>&amp; <dfn class="local col2 decl" id="242a_file" title='a_file' data-type='tools::rroot::ifile &amp;' data-ref="242a_file">a_file</dfn>,<a class="typedef" href="../typedefs.html#tools::uint32" title='tools::uint32' data-type='unsigned int' data-ref="tools::uint32">uint32</a>&amp; <dfn class="local col3 decl" id="243a_size" title='a_size' data-type='uint32 &amp;' data-ref="243a_size">a_size</dfn>) {</td></tr>
+<tr><th id="268">268</th><td>    <b>if</b>(!<a class="member" href="#tools::rroot::key::m_key_length" title='tools::rroot::key::m_key_length' data-ref="tools::rroot::key::m_key_length">m_key_length</a>) {</td></tr>
+<tr><th id="269">269</th><td>      m_out &lt;&lt; <q>"tools::rroot::key::get_object_buffer :"</q> </td></tr>
+<tr><th id="270">270</th><td>                   &lt;&lt; <q>" WARNING : m_key_length is zero."</q></td></tr>
+<tr><th id="271">271</th><td>                   &lt;&lt; <span class='error' title="use of undeclared identifier &apos;std&apos;">std</span>::endl;</td></tr>
+<tr><th id="272">272</th><td>      <i>//delete [] m_buffer;</i></td></tr>
+<tr><th id="273">273</th><td><i>      //m_buffer = 0;</i></td></tr>
+<tr><th id="274">274</th><td><i>      //m_buf_size = 0;</i></td></tr>
+<tr><th id="275">275</th><td><i>      //a_size = 0;</i></td></tr>
+<tr><th id="276">276</th><td><i>      //return 0;</i></td></tr>
+<tr><th id="277">277</th><td>    }</td></tr>
+<tr><th id="278">278</th><td>    <b>if</b>(!<a class="member" href="#tools::rroot::key::m_nbytes" title='tools::rroot::key::m_nbytes' data-ref="tools::rroot::key::m_nbytes">m_nbytes</a>) {</td></tr>
+<tr><th id="279">279</th><td>      m_out &lt;&lt; <q>"tools::rroot::key::get_object_buffer :"</q> </td></tr>
+<tr><th id="280">280</th><td>                   &lt;&lt; <q>" m_nbytes is zero."</q></td></tr>
+<tr><th id="281">281</th><td>                   &lt;&lt; <span class='error' title="use of undeclared identifier &apos;std&apos;">std</span>::endl;</td></tr>
+<tr><th id="282">282</th><td>      <b>delete</b> [] <a class="member" href="#tools::rroot::key::m_buffer" title='tools::rroot::key::m_buffer' data-ref="tools::rroot::key::m_buffer">m_buffer</a>;</td></tr>
+<tr><th id="283">283</th><td>      <a class="member" href="#tools::rroot::key::m_buffer" title='tools::rroot::key::m_buffer' data-ref="tools::rroot::key::m_buffer">m_buffer</a> = <var>0</var>;</td></tr>
+<tr><th id="284">284</th><td>      <a class="member" href="#tools::rroot::key::m_buf_size" title='tools::rroot::key::m_buf_size' data-ref="tools::rroot::key::m_buf_size">m_buf_size</a> = <var>0</var>;</td></tr>
+<tr><th id="285">285</th><td>      <a class="local col3 ref" href="#243a_size" title='a_size' data-ref="243a_size">a_size</a> = <var>0</var>;</td></tr>
+<tr><th id="286">286</th><td>      <b>return</b> <var>0</var>;</td></tr>
+<tr><th id="287">287</th><td>    }</td></tr>
+<tr><th id="288">288</th><td>    <b>if</b>(!<a class="member" href="#tools::rroot::key::m_object_size" title='tools::rroot::key::m_object_size' data-ref="tools::rroot::key::m_object_size">m_object_size</a>) {</td></tr>
+<tr><th id="289">289</th><td>      m_out &lt;&lt; <q>"tools::rroot::key::get_object_buffer :"</q> </td></tr>
+<tr><th id="290">290</th><td>                   &lt;&lt; <q>" WARNING : m_object_size is zero."</q></td></tr>
+<tr><th id="291">291</th><td>                   &lt;&lt; <span class='error' title="use of undeclared identifier &apos;std&apos;">std</span>::endl;</td></tr>
+<tr><th id="292">292</th><td>    }</td></tr>
+<tr><th id="293">293</th><td></td></tr>
+<tr><th id="294">294</th><td>    <b>if</b>(<a class="local col2 ref" href="#242a_file" title='a_file' data-ref="242a_file">a_file</a>.<a class="virtual ref" href="ifile.html#_ZNK5tools5rroot5ifile7verboseEv" title='tools::rroot::ifile::verbose' data-ref="_ZNK5tools5rroot5ifile7verboseEv">verbose</a>()) {</td></tr>
+<tr><th id="295">295</th><td>      m_out &lt;&lt; <q>"tools::rroot::key::get_object_buffer :"</q> </td></tr>
+<tr><th id="296">296</th><td>                   &lt;&lt; <q>" m_nbytes : "</q> &lt;&lt; m_nbytes</td></tr>
+<tr><th id="297">297</th><td>                   &lt;&lt; <q>" m_key_length : "</q> &lt;&lt; m_key_length</td></tr>
+<tr><th id="298">298</th><td>                   &lt;&lt; <q>" m_object_size : "</q> &lt;&lt; m_object_size &lt;&lt; <q>"."</q></td></tr>
+<tr><th id="299">299</th><td>                   &lt;&lt; <q>" m_seek_key : "</q> &lt;&lt; m_seek_key &lt;&lt; <q>"."</q></td></tr>
+<tr><th id="300">300</th><td>                   &lt;&lt; <span class='error' title="use of undeclared identifier &apos;std&apos;">std</span>::endl;</td></tr>
+<tr><th id="301">301</th><td>    }</td></tr>
+<tr><th id="302">302</th><td></td></tr>
+<tr><th id="303">303</th><td>    <b>if</b>(<a class="member" href="#tools::rroot::key::m_object_size" title='tools::rroot::key::m_object_size' data-ref="tools::rroot::key::m_object_size">m_object_size</a> &lt;= (<a class="member" href="#tools::rroot::key::m_nbytes" title='tools::rroot::key::m_nbytes' data-ref="tools::rroot::key::m_nbytes">m_nbytes</a>-<a class="member" href="#tools::rroot::key::m_key_length" title='tools::rroot::key::m_key_length' data-ref="tools::rroot::key::m_key_length">m_key_length</a>)) {</td></tr>
+<tr><th id="304">304</th><td>      <b>delete</b> [] <a class="member" href="#tools::rroot::key::m_buffer" title='tools::rroot::key::m_buffer' data-ref="tools::rroot::key::m_buffer">m_buffer</a>;</td></tr>
+<tr><th id="305">305</th><td>      <a class="member" href="#tools::rroot::key::m_buf_size" title='tools::rroot::key::m_buf_size' data-ref="tools::rroot::key::m_buf_size">m_buf_size</a> = <a class="member" href="#tools::rroot::key::m_key_length" title='tools::rroot::key::m_key_length' data-ref="tools::rroot::key::m_key_length">m_key_length</a>+<a class="member" href="#tools::rroot::key::m_object_size" title='tools::rroot::key::m_object_size' data-ref="tools::rroot::key::m_object_size">m_object_size</a>;</td></tr>
+<tr><th id="306">306</th><td>      <b>if</b>(<a class="member" href="#tools::rroot::key::m_buf_size" title='tools::rroot::key::m_buf_size' data-ref="tools::rroot::key::m_buf_size">m_buf_size</a>&lt;<a class="member" href="#tools::rroot::key::m_nbytes" title='tools::rroot::key::m_nbytes' data-ref="tools::rroot::key::m_nbytes">m_nbytes</a>) {</td></tr>
+<tr><th id="307">307</th><td>        m_out &lt;&lt; <q>"tools::rroot::key::get_object_buffer :"</q> </td></tr>
+<tr><th id="308">308</th><td>                     &lt;&lt; <q>" WARNING : m_buf_size&lt;m_nbytes."</q></td></tr>
+<tr><th id="309">309</th><td>                     &lt;&lt; <q>" m_buf_size "</q> &lt;&lt; m_buf_size</td></tr>
+<tr><th id="310">310</th><td>                     &lt;&lt; <q>" m_nbytes "</q> &lt;&lt; m_nbytes</td></tr>
+<tr><th id="311">311</th><td>                     &lt;&lt; <q>". Raise m_buf_size to "</q> &lt;&lt; m_nbytes &lt;&lt; <q>"."</q></td></tr>
+<tr><th id="312">312</th><td>                     &lt;&lt; <span class='error' title="use of undeclared identifier &apos;std&apos;">std</span>::endl;</td></tr>
+<tr><th id="313">313</th><td>        <a class="member" href="#tools::rroot::key::m_buf_size" title='tools::rroot::key::m_buf_size' data-ref="tools::rroot::key::m_buf_size">m_buf_size</a> = <a class="member" href="#tools::rroot::key::m_nbytes" title='tools::rroot::key::m_nbytes' data-ref="tools::rroot::key::m_nbytes">m_nbytes</a>; <i>//for read_file()</i></td></tr>
+<tr><th id="314">314</th><td>      }</td></tr>
+<tr><th id="315">315</th><td>      <a class="member" href="#tools::rroot::key::m_buffer" title='tools::rroot::key::m_buffer' data-ref="tools::rroot::key::m_buffer">m_buffer</a> = <b>new</b> <em>char</em>[<a class="member" href="#tools::rroot::key::m_buf_size" title='tools::rroot::key::m_buf_size' data-ref="tools::rroot::key::m_buf_size">m_buf_size</a>];</td></tr>
+<tr><th id="316">316</th><td>      <b>if</b>(!<a class="member" href="#tools::rroot::key::m_buffer" title='tools::rroot::key::m_buffer' data-ref="tools::rroot::key::m_buffer">m_buffer</a>) {</td></tr>
+<tr><th id="317">317</th><td>        m_out &lt;&lt; <q>"tools::rroot::key::get_object_buffer :"</q> </td></tr>
+<tr><th id="318">318</th><td>                     &lt;&lt; <q>" can't alloc "</q> &lt;&lt; m_buf_size</td></tr>
+<tr><th id="319">319</th><td>                     &lt;&lt; <span class='error' title="use of undeclared identifier &apos;std&apos;">std</span>::endl;</td></tr>
+<tr><th id="320">320</th><td>        <a class="member" href="#tools::rroot::key::m_buffer" title='tools::rroot::key::m_buffer' data-ref="tools::rroot::key::m_buffer">m_buffer</a> = <var>0</var>;</td></tr>
+<tr><th id="321">321</th><td>        <a class="member" href="#tools::rroot::key::m_buf_size" title='tools::rroot::key::m_buf_size' data-ref="tools::rroot::key::m_buf_size">m_buf_size</a> = <var>0</var>;</td></tr>
+<tr><th id="322">322</th><td>        <a class="local col3 ref" href="#243a_size" title='a_size' data-ref="243a_size">a_size</a> = <var>0</var>;</td></tr>
+<tr><th id="323">323</th><td>        <b>return</b> <var>0</var>;</td></tr>
+<tr><th id="324">324</th><td>      }</td></tr>
+<tr><th id="325">325</th><td></td></tr>
+<tr><th id="326">326</th><td>      <b>if</b>(!<a class="member" href="#_ZN5tools5rroot3key9read_fileERNS0_5ifileE" title='tools::rroot::key::read_file' data-ref="_ZN5tools5rroot3key9read_fileERNS0_5ifileE">read_file</a>(<span class='refarg'><a class="local col2 ref" href="#242a_file" title='a_file' data-ref="242a_file">a_file</a></span>)) {</td></tr>
+<tr><th id="327">327</th><td>        <b>delete</b> [] <a class="member" href="#tools::rroot::key::m_buffer" title='tools::rroot::key::m_buffer' data-ref="tools::rroot::key::m_buffer">m_buffer</a>;</td></tr>
+<tr><th id="328">328</th><td>        <a class="member" href="#tools::rroot::key::m_buffer" title='tools::rroot::key::m_buffer' data-ref="tools::rroot::key::m_buffer">m_buffer</a> = <var>0</var>;</td></tr>
+<tr><th id="329">329</th><td>        <a class="member" href="#tools::rroot::key::m_buf_size" title='tools::rroot::key::m_buf_size' data-ref="tools::rroot::key::m_buf_size">m_buf_size</a> = <var>0</var>;</td></tr>
+<tr><th id="330">330</th><td>        <a class="local col3 ref" href="#243a_size" title='a_size' data-ref="243a_size">a_size</a> = <var>0</var>;</td></tr>
+<tr><th id="331">331</th><td>        <b>return</b> <var>0</var>;</td></tr>
+<tr><th id="332">332</th><td>      }</td></tr>
+<tr><th id="333">333</th><td></td></tr>
+<tr><th id="334">334</th><td>    } <b>else</b> {</td></tr>
+<tr><th id="335">335</th><td>      <i>// have to decompress. Need a second buffer.</i></td></tr>
+<tr><th id="336">336</th><td></td></tr>
+<tr><th id="337">337</th><td>      <a class="typedef" href="../typedefs.html#tools::uint32" title='tools::uint32' data-type='unsigned int' data-ref="tools::uint32">uint32</a> <dfn class="local col4 decl" id="244decsiz" title='decsiz' data-type='uint32' data-ref="244decsiz">decsiz</dfn> = <a class="member" href="#tools::rroot::key::m_key_length" title='tools::rroot::key::m_key_length' data-ref="tools::rroot::key::m_key_length">m_key_length</a>+<a class="member" href="#tools::rroot::key::m_object_size" title='tools::rroot::key::m_object_size' data-ref="tools::rroot::key::m_object_size">m_object_size</a>;</td></tr>
+<tr><th id="338">338</th><td>      <em>char</em>* <dfn class="local col5 decl" id="245decbuf" title='decbuf' data-type='char *' data-ref="245decbuf">decbuf</dfn> = <b>new</b> <em>char</em>[<a class="local col4 ref" href="#244decsiz" title='decsiz' data-ref="244decsiz">decsiz</a>];</td></tr>
+<tr><th id="339">339</th><td>      <b>if</b>(!<a class="local col5 ref" href="#245decbuf" title='decbuf' data-ref="245decbuf">decbuf</a>) {</td></tr>
+<tr><th id="340">340</th><td>        m_out &lt;&lt; <q>"tools::rroot::key::get_object_buffer :"</q> </td></tr>
+<tr><th id="341">341</th><td>                     &lt;&lt; <q>" can't alloc "</q> &lt;&lt; decsiz</td></tr>
+<tr><th id="342">342</th><td>                     &lt;&lt; <span class='error' title="use of undeclared identifier &apos;std&apos;">std</span>::endl;</td></tr>
+<tr><th id="343">343</th><td>        <a class="local col3 ref" href="#243a_size" title='a_size' data-ref="243a_size">a_size</a> = <var>0</var>;</td></tr>
+<tr><th id="344">344</th><td>        <b>return</b> <var>0</var>;</td></tr>
+<tr><th id="345">345</th><td>      }</td></tr>
+<tr><th id="346">346</th><td></td></tr>
+<tr><th id="347">347</th><td>      <b>delete</b> [] <a class="member" href="#tools::rroot::key::m_buffer" title='tools::rroot::key::m_buffer' data-ref="tools::rroot::key::m_buffer">m_buffer</a>;</td></tr>
+<tr><th id="348">348</th><td>      <a class="member" href="#tools::rroot::key::m_buffer" title='tools::rroot::key::m_buffer' data-ref="tools::rroot::key::m_buffer">m_buffer</a> = <b>new</b> <em>char</em>[<a class="member" href="#tools::rroot::key::m_nbytes" title='tools::rroot::key::m_nbytes' data-ref="tools::rroot::key::m_nbytes">m_nbytes</a>];</td></tr>
+<tr><th id="349">349</th><td>      <a class="member" href="#tools::rroot::key::m_buf_size" title='tools::rroot::key::m_buf_size' data-ref="tools::rroot::key::m_buf_size">m_buf_size</a> = <a class="member" href="#tools::rroot::key::m_nbytes" title='tools::rroot::key::m_nbytes' data-ref="tools::rroot::key::m_nbytes">m_nbytes</a>;</td></tr>
+<tr><th id="350">350</th><td>      <b>if</b>(!<a class="member" href="#_ZN5tools5rroot3key9read_fileERNS0_5ifileE" title='tools::rroot::key::read_file' data-ref="_ZN5tools5rroot3key9read_fileERNS0_5ifileE">read_file</a>(<span class='refarg'><a class="local col2 ref" href="#242a_file" title='a_file' data-ref="242a_file">a_file</a></span>)) {</td></tr>
+<tr><th id="351">351</th><td>        <b>delete</b> [] <a class="local col5 ref" href="#245decbuf" title='decbuf' data-ref="245decbuf">decbuf</a>;</td></tr>
+<tr><th id="352">352</th><td>        <a class="local col5 ref" href="#245decbuf" title='decbuf' data-ref="245decbuf">decbuf</a> = <var>0</var>;</td></tr>
+<tr><th id="353">353</th><td>        <b>delete</b> [] <a class="member" href="#tools::rroot::key::m_buffer" title='tools::rroot::key::m_buffer' data-ref="tools::rroot::key::m_buffer">m_buffer</a>;</td></tr>
+<tr><th id="354">354</th><td>        <a class="member" href="#tools::rroot::key::m_buffer" title='tools::rroot::key::m_buffer' data-ref="tools::rroot::key::m_buffer">m_buffer</a> = <var>0</var>;</td></tr>
+<tr><th id="355">355</th><td>        <a class="member" href="#tools::rroot::key::m_buf_size" title='tools::rroot::key::m_buf_size' data-ref="tools::rroot::key::m_buf_size">m_buf_size</a> = <var>0</var>;</td></tr>
+<tr><th id="356">356</th><td>        <a class="local col3 ref" href="#243a_size" title='a_size' data-ref="243a_size">a_size</a> = <var>0</var>;</td></tr>
+<tr><th id="357">357</th><td>        <b>return</b> <var>0</var>;</td></tr>
+<tr><th id="358">358</th><td>      }</td></tr>
+<tr><th id="359">359</th><td></td></tr>
+<tr><th id="360">360</th><td>      ::<span class='error' title="no member named &apos;memcpy&apos; in the global namespace">memcpy</span>(decbuf,m_buffer,m_key_length);</td></tr>
+<tr><th id="361">361</th><td></td></tr>
+<tr><th id="362">362</th><td>      <i>// decompress :</i></td></tr>
+<tr><th id="363">363</th><td>      <em>unsigned</em> <em>char</em>* <dfn class="local col6 decl" id="246objbuf" title='objbuf' data-type='unsigned char *' data-ref="246objbuf">objbuf</dfn> = (<em>unsigned</em> <em>char</em>*)(<a class="local col5 ref" href="#245decbuf" title='decbuf' data-ref="245decbuf">decbuf</a>+<a class="member" href="#tools::rroot::key::m_key_length" title='tools::rroot::key::m_key_length' data-ref="tools::rroot::key::m_key_length">m_key_length</a>);</td></tr>
+<tr><th id="364">364</th><td>      <em>unsigned</em> <em>char</em>* <dfn class="local col7 decl" id="247bufcur" title='bufcur' data-type='unsigned char *' data-ref="247bufcur">bufcur</dfn> = (<em>unsigned</em> <em>char</em>*)(<a class="member" href="#tools::rroot::key::m_buffer" title='tools::rroot::key::m_buffer' data-ref="tools::rroot::key::m_buffer">m_buffer</a>+<a class="member" href="#tools::rroot::key::m_key_length" title='tools::rroot::key::m_key_length' data-ref="tools::rroot::key::m_key_length">m_key_length</a>);</td></tr>
+<tr><th id="365">365</th><td>      <em>int</em> <dfn class="local col8 decl" id="248nout" title='nout' data-type='int' data-ref="248nout">nout</dfn> = <var>0</var>;</td></tr>
+<tr><th id="366">366</th><td>      <a class="typedef" href="../typedefs.html#tools::uint32" title='tools::uint32' data-type='unsigned int' data-ref="tools::uint32">uint32</a> <dfn class="local col9 decl" id="249noutot" title='noutot' data-type='uint32' data-ref="249noutot">noutot</dfn> = <var>0</var>;</td></tr>
+<tr><th id="367">367</th><td>      <b>while</b>(<b>true</b>) {</td></tr>
+<tr><th id="368">368</th><td>        <em>int</em> <dfn class="local col0 decl" id="250nin" title='nin' data-type='int' data-ref="250nin">nin</dfn> = <var>9</var> + ((<em>int</em>)<a class="local col7 ref" href="#247bufcur" title='bufcur' data-ref="247bufcur">bufcur</a>[<var>3</var>] | ((<em>int</em>)<a class="local col7 ref" href="#247bufcur" title='bufcur' data-ref="247bufcur">bufcur</a>[<var>4</var>] &lt;&lt; <var>8</var>) | ((<em>int</em>)<a class="local col7 ref" href="#247bufcur" title='bufcur' data-ref="247bufcur">bufcur</a>[<var>5</var>] &lt;&lt; <var>16</var>));</td></tr>
+<tr><th id="369">369</th><td>        <em>int</em> <dfn class="local col1 decl" id="251nbuf" title='nbuf' data-type='int' data-ref="251nbuf">nbuf</dfn> = (<em>int</em>)<a class="local col7 ref" href="#247bufcur" title='bufcur' data-ref="247bufcur">bufcur</a>[<var>6</var>] | ((<em>int</em>)<a class="local col7 ref" href="#247bufcur" title='bufcur' data-ref="247bufcur">bufcur</a>[<var>7</var>] &lt;&lt; <var>8</var>) | ((<em>int</em>)<a class="local col7 ref" href="#247bufcur" title='bufcur' data-ref="247bufcur">bufcur</a>[<var>8</var>] &lt;&lt; <var>16</var>);</td></tr>
+<tr><th id="370">370</th><td>        <b>if</b>(!unzip(m_out,a_file,nin,bufcur,nbuf,objbuf,nout)) <b>break</b>;</td></tr>
+<tr><th id="371">371</th><td>        <b>if</b>(!<a class="local col8 ref" href="#248nout" title='nout' data-ref="248nout">nout</a>) <b>break</b>;</td></tr>
+<tr><th id="372">372</th><td>        <a class="local col9 ref" href="#249noutot" title='noutot' data-ref="249noutot">noutot</a> += <a class="local col8 ref" href="#248nout" title='nout' data-ref="248nout">nout</a>;</td></tr>
+<tr><th id="373">373</th><td>        <b>if</b>(<a class="local col9 ref" href="#249noutot" title='noutot' data-ref="249noutot">noutot</a> &gt;= <a class="member" href="#tools::rroot::key::m_object_size" title='tools::rroot::key::m_object_size' data-ref="tools::rroot::key::m_object_size">m_object_size</a>) <b>break</b>;</td></tr>
+<tr><th id="374">374</th><td>        <a class="local col7 ref" href="#247bufcur" title='bufcur' data-ref="247bufcur">bufcur</a> += <a class="local col0 ref" href="#250nin" title='nin' data-ref="250nin">nin</a>;</td></tr>
+<tr><th id="375">375</th><td>        <a class="local col6 ref" href="#246objbuf" title='objbuf' data-ref="246objbuf">objbuf</a> += <a class="local col8 ref" href="#248nout" title='nout' data-ref="248nout">nout</a>;</td></tr>
+<tr><th id="376">376</th><td>      }</td></tr>
+<tr><th id="377">377</th><td></td></tr>
+<tr><th id="378">378</th><td>      <b>delete</b> [] <a class="member" href="#tools::rroot::key::m_buffer" title='tools::rroot::key::m_buffer' data-ref="tools::rroot::key::m_buffer">m_buffer</a>;</td></tr>
+<tr><th id="379">379</th><td>      <a class="member" href="#tools::rroot::key::m_buffer" title='tools::rroot::key::m_buffer' data-ref="tools::rroot::key::m_buffer">m_buffer</a> = <var>0</var>;</td></tr>
+<tr><th id="380">380</th><td>      <a class="member" href="#tools::rroot::key::m_buf_size" title='tools::rroot::key::m_buf_size' data-ref="tools::rroot::key::m_buf_size">m_buf_size</a> = <var>0</var>;</td></tr>
+<tr><th id="381">381</th><td></td></tr>
+<tr><th id="382">382</th><td>      <b>if</b>(!<a class="local col9 ref" href="#249noutot" title='noutot' data-ref="249noutot">noutot</a>) {</td></tr>
+<tr><th id="383">383</th><td>        m_out &lt;&lt; <q>"tools::rroot::key::get_object_buffer :"</q></td></tr>
+<tr><th id="384">384</th><td>                     &lt;&lt; <q>" nothing from decompression."</q></td></tr>
+<tr><th id="385">385</th><td>                     &lt;&lt; <span class='error' title="use of undeclared identifier &apos;std&apos;">std</span>::endl;</td></tr>
+<tr><th id="386">386</th><td>        <b>delete</b> [] <a class="local col5 ref" href="#245decbuf" title='decbuf' data-ref="245decbuf">decbuf</a>;</td></tr>
+<tr><th id="387">387</th><td>        <a class="local col5 ref" href="#245decbuf" title='decbuf' data-ref="245decbuf">decbuf</a> = <var>0</var>;</td></tr>
+<tr><th id="388">388</th><td>        <a class="local col3 ref" href="#243a_size" title='a_size' data-ref="243a_size">a_size</a> = <var>0</var>;</td></tr>
+<tr><th id="389">389</th><td>        <b>return</b> <var>0</var>;</td></tr>
+<tr><th id="390">390</th><td>      }</td></tr>
+<tr><th id="391">391</th><td>      <b>if</b>(<a class="local col9 ref" href="#249noutot" title='noutot' data-ref="249noutot">noutot</a>!=<a class="member" href="#tools::rroot::key::m_object_size" title='tools::rroot::key::m_object_size' data-ref="tools::rroot::key::m_object_size">m_object_size</a>) {</td></tr>
+<tr><th id="392">392</th><td>        m_out &lt;&lt; <q>"tools::rroot::key::get_object_buffer :"</q> </td></tr>
+<tr><th id="393">393</th><td>                     &lt;&lt; <q>" decompression mismatch."</q></td></tr>
+<tr><th id="394">394</th><td>                     &lt;&lt; <q>" noutot "</q> &lt;&lt; noutot</td></tr>
+<tr><th id="395">395</th><td>                     &lt;&lt; <q>" m_object_size "</q> &lt;&lt; m_object_size</td></tr>
+<tr><th id="396">396</th><td>                     &lt;&lt; <span class='error' title="use of undeclared identifier &apos;std&apos;">std</span>::endl;</td></tr>
+<tr><th id="397">397</th><td>        <b>delete</b> [] <a class="local col5 ref" href="#245decbuf" title='decbuf' data-ref="245decbuf">decbuf</a>;</td></tr>
+<tr><th id="398">398</th><td>        <a class="local col5 ref" href="#245decbuf" title='decbuf' data-ref="245decbuf">decbuf</a> = <var>0</var>;</td></tr>
+<tr><th id="399">399</th><td>        <a class="local col3 ref" href="#243a_size" title='a_size' data-ref="243a_size">a_size</a> = <var>0</var>;</td></tr>
+<tr><th id="400">400</th><td>        <b>return</b> <var>0</var>;</td></tr>
+<tr><th id="401">401</th><td>      }</td></tr>
+<tr><th id="402">402</th><td></td></tr>
+<tr><th id="403">403</th><td>      <a class="member" href="#tools::rroot::key::m_buffer" title='tools::rroot::key::m_buffer' data-ref="tools::rroot::key::m_buffer">m_buffer</a> = <a class="local col5 ref" href="#245decbuf" title='decbuf' data-ref="245decbuf">decbuf</a>;</td></tr>
+<tr><th id="404">404</th><td>      <a class="member" href="#tools::rroot::key::m_buf_size" title='tools::rroot::key::m_buf_size' data-ref="tools::rroot::key::m_buf_size">m_buf_size</a> = <a class="local col4 ref" href="#244decsiz" title='decsiz' data-ref="244decsiz">decsiz</a>;</td></tr>
+<tr><th id="405">405</th><td></td></tr>
+<tr><th id="406">406</th><td>    }</td></tr>
+<tr><th id="407">407</th><td>    <a class="local col3 ref" href="#243a_size" title='a_size' data-ref="243a_size">a_size</a> = <a class="member" href="#tools::rroot::key::m_object_size" title='tools::rroot::key::m_object_size' data-ref="tools::rroot::key::m_object_size">m_object_size</a>;</td></tr>
+<tr><th id="408">408</th><td>    <b>return</b> <a class="member" href="#tools::rroot::key::m_buffer" title='tools::rroot::key::m_buffer' data-ref="tools::rroot::key::m_buffer">m_buffer</a>+<a class="member" href="#tools::rroot::key::m_key_length" title='tools::rroot::key::m_key_length' data-ref="tools::rroot::key::m_key_length">m_key_length</a>;</td></tr>
+<tr><th id="409">409</th><td>  }</td></tr>
+<tr><th id="410">410</th><td>  <i>//NOTE : print is a Python keyword.</i></td></tr>
+<tr><th id="411">411</th><td>  <em>void</em> <dfn class="decl def" id="_ZNK5tools5rroot3key4dumpERi" title='tools::rroot::key::dump' data-ref="_ZNK5tools5rroot3key4dumpERi">dump</dfn>(<span class='error' title="use of undeclared identifier &apos;std&apos;">std</span>::ostream&amp; <dfn class="local col2 decl" id="252a_out" title='a_out' data-type='int &amp;' data-ref="252a_out">a_out</dfn>) <em>const</em> {</td></tr>
+<tr><th id="412">412</th><td>    a_out &lt;&lt; <q>"class : "</q> &lt;&lt; sout(m_object_class)</td></tr>
+<tr><th id="413">413</th><td>          &lt;&lt; <q>", name : "</q> &lt;&lt; sout(m_object_name)</td></tr>
+<tr><th id="414">414</th><td>          &lt;&lt; <q>", title : "</q> &lt;&lt; sout(m_object_title)</td></tr>
+<tr><th id="415">415</th><td>          &lt;&lt; <q>", size : "</q> &lt;&lt; m_object_size</td></tr>
+<tr><th id="416">416</th><td>          &lt;&lt; <q>"."</q> </td></tr>
+<tr><th id="417">417</th><td>          &lt;&lt; <span class='error' title="use of undeclared identifier &apos;std&apos;">std</span>::endl;</td></tr>
+<tr><th id="418">418</th><td>  }</td></tr>
+<tr><th id="419">419</th><td></td></tr>
+<tr><th id="420">420</th><td><b>protected</b>:</td></tr>
+<tr><th id="421">421</th><td>  <em>static</em> <em>const</em> <a class="typedef" href="../typedefs.html#tools::uint32" title='tools::uint32' data-type='unsigned int' data-ref="tools::uint32">uint32</a> <dfn class="decl" id="tools::rroot::key::START_BIG_FILE" title='tools::rroot::key::START_BIG_FILE' data-ref="tools::rroot::key::START_BIG_FILE">START_BIG_FILE</dfn> = <var>2000000000</var>;</td></tr>
+<tr><th id="422">422</th><td><b>protected</b>:</td></tr>
+<tr><th id="423">423</th><td>  <a class="typedef" href="../typedefs.html#tools::uint32" title='tools::uint32' data-type='unsigned int' data-ref="tools::uint32">uint32</a> <dfn class="decl def" id="_ZNK5tools5rroot3key11record_sizeEj" title='tools::rroot::key::record_size' data-ref="_ZNK5tools5rroot3key11record_sizeEj">record_size</dfn>(<a class="typedef" href="../typedefs.html#tools::uint32" title='tools::uint32' data-type='unsigned int' data-ref="tools::uint32">uint32</a> <dfn class="local col3 decl" id="253a_version" title='a_version' data-type='uint32' data-ref="253a_version">a_version</dfn>) <em>const</em> {</td></tr>
+<tr><th id="424">424</th><td>    <i>// Return the size in bytes of the key header structure.</i></td></tr>
+<tr><th id="425">425</th><td>    <a class="typedef" href="../typedefs.html#tools::uint32" title='tools::uint32' data-type='unsigned int' data-ref="tools::uint32">uint32</a> <dfn class="local col4 decl" id="254_nbytes" title='_nbytes' data-type='uint32' data-ref="254_nbytes">_nbytes</dfn> = <b>sizeof</b>(<a class="member" href="#tools::rroot::key::m_nbytes" title='tools::rroot::key::m_nbytes' data-ref="tools::rroot::key::m_nbytes">m_nbytes</a>);</td></tr>
+<tr><th id="426">426</th><td>    <a class="local col4 ref" href="#254_nbytes" title='_nbytes' data-ref="254_nbytes">_nbytes</a> += <b>sizeof</b>(<em>short</em>);         <i>//2</i></td></tr>
+<tr><th id="427">427</th><td>    <a class="local col4 ref" href="#254_nbytes" title='_nbytes' data-ref="254_nbytes">_nbytes</a> += <b>sizeof</b>(<a class="member" href="#tools::rroot::key::m_object_size" title='tools::rroot::key::m_object_size' data-ref="tools::rroot::key::m_object_size">m_object_size</a>);</td></tr>
+<tr><th id="428">428</th><td>    <a class="local col4 ref" href="#254_nbytes" title='_nbytes' data-ref="254_nbytes">_nbytes</a> += <b>sizeof</b>(<a class="typedef" href="date.html#tools::rroot::date" title='tools::rroot::date' data-type='unsigned int' data-ref="tools::rroot::date">date</a>);</td></tr>
+<tr><th id="429">429</th><td>    <a class="local col4 ref" href="#254_nbytes" title='_nbytes' data-ref="254_nbytes">_nbytes</a> += <b>sizeof</b>(<a class="member" href="#tools::rroot::key::m_key_length" title='tools::rroot::key::m_key_length' data-ref="tools::rroot::key::m_key_length">m_key_length</a>);</td></tr>
+<tr><th id="430">430</th><td>    <a class="local col4 ref" href="#254_nbytes" title='_nbytes' data-ref="254_nbytes">_nbytes</a> += <b>sizeof</b>(<a class="member" href="#tools::rroot::key::m_cycle" title='tools::rroot::key::m_cycle' data-ref="tools::rroot::key::m_cycle">m_cycle</a>);       <i>//2+4*4=18</i></td></tr>
+<tr><th id="431">431</th><td>    <b>if</b>(<a class="local col3 ref" href="#253a_version" title='a_version' data-ref="253a_version">a_version</a>&gt;<a class="ref" href="seek.html#_ZN5tools5rroot20big_file_version_tagEv" title='tools::rroot::big_file_version_tag' data-ref="_ZN5tools5rroot20big_file_version_tagEv">big_file_version_tag</a>()) {</td></tr>
+<tr><th id="432">432</th><td>      <a class="local col4 ref" href="#254_nbytes" title='_nbytes' data-ref="254_nbytes">_nbytes</a> += <b>sizeof</b>(<a class="typedef" href="seek.html#tools::rroot::seek" title='tools::rroot::seek' data-type='int64' data-ref="tools::rroot::seek">seek</a>);</td></tr>
+<tr><th id="433">433</th><td>      <a class="local col4 ref" href="#254_nbytes" title='_nbytes' data-ref="254_nbytes">_nbytes</a> += <b>sizeof</b>(<a class="typedef" href="seek.html#tools::rroot::seek" title='tools::rroot::seek' data-type='int64' data-ref="tools::rroot::seek">seek</a>);        <i>//18+2*8=34</i></td></tr>
+<tr><th id="434">434</th><td>    } <b>else</b> {</td></tr>
+<tr><th id="435">435</th><td>      <a class="local col4 ref" href="#254_nbytes" title='_nbytes' data-ref="254_nbytes">_nbytes</a> += <b>sizeof</b>(<a class="typedef" href="seek.html#tools::rroot::seek32" title='tools::rroot::seek32' data-type='int' data-ref="tools::rroot::seek32">seek32</a>); </td></tr>
+<tr><th id="436">436</th><td>      <a class="local col4 ref" href="#254_nbytes" title='_nbytes' data-ref="254_nbytes">_nbytes</a> += <b>sizeof</b>(<a class="typedef" href="seek.html#tools::rroot::seek32" title='tools::rroot::seek32' data-type='int' data-ref="tools::rroot::seek32">seek32</a>);      <i>//18+2*4=26</i></td></tr>
+<tr><th id="437">437</th><td>    }</td></tr>
+<tr><th id="438">438</th><td>    _nbytes += std_string_record_size(m_object_class);</td></tr>
+<tr><th id="439">439</th><td>    _nbytes += std_string_record_size(m_object_name);</td></tr>
+<tr><th id="440">440</th><td>    _nbytes += std_string_record_size(m_object_title);</td></tr>
+<tr><th id="441">441</th><td>    <i>//::printf("debug : record_size %d\n",_nbytes);   </i></td></tr>
+<tr><th id="442">442</th><td>    <b>return</b> <a class="local col4 ref" href="#254_nbytes" title='_nbytes' data-ref="254_nbytes">_nbytes</a>;</td></tr>
+<tr><th id="443">443</th><td>  }</td></tr>
+<tr><th id="444">444</th><td></td></tr>
+<tr><th id="445">445</th><td>  <em>bool</em> <dfn class="decl def" id="_ZN5tools5rroot3key5unzipERiRNS0_5ifileEiPhiS5_S2_" title='tools::rroot::key::unzip' data-ref="_ZN5tools5rroot3key5unzipERiRNS0_5ifileEiPhiS5_S2_">unzip</dfn>(<span class='error' title="use of undeclared identifier &apos;std&apos;">std</span>::ostream&amp; <dfn class="local col5 decl" id="255a_out" title='a_out' data-type='int &amp;' data-ref="255a_out">a_out</dfn>,<a class="type" href="ifile.html#tools::rroot::ifile" title='tools::rroot::ifile' data-ref="tools::rroot::ifile">ifile</a>&amp; <dfn class="local col6 decl" id="256a_file" title='a_file' data-type='tools::rroot::ifile &amp;' data-ref="256a_file">a_file</dfn>,</td></tr>
+<tr><th id="446">446</th><td>             <em>int</em> <dfn class="local col7 decl" id="257a_srcsize" title='a_srcsize' data-type='int' data-ref="257a_srcsize">a_srcsize</dfn>,<em>unsigned</em> <em>char</em>* <dfn class="local col8 decl" id="258a_src" title='a_src' data-type='unsigned char *' data-ref="258a_src">a_src</dfn>,<em>int</em> <dfn class="local col9 decl" id="259a_tgtsize" title='a_tgtsize' data-type='int' data-ref="259a_tgtsize">a_tgtsize</dfn>,<em>unsigned</em> <em>char</em>* <dfn class="local col0 decl" id="260a_tgt" title='a_tgt' data-type='unsigned char *' data-ref="260a_tgt">a_tgt</dfn>,<em>int</em>&amp; <dfn class="local col1 decl" id="261a_irep" title='a_irep' data-type='int &amp;' data-ref="261a_irep">a_irep</dfn>) {</td></tr>
+<tr><th id="447">447</th><td></td></tr>
+<tr><th id="448">448</th><td>    <i>// Author: E.Chernyaev (IHEP/Protvino)</i></td></tr>
+<tr><th id="449">449</th><td><i>    // Input: scrsize - size of input buffer</i></td></tr>
+<tr><th id="450">450</th><td><i>    //       src     - input buffer</i></td></tr>
+<tr><th id="451">451</th><td><i>    //       tgtsize - size of target buffer</i></td></tr>
+<tr><th id="452">452</th><td><i>    //</i></td></tr>
+<tr><th id="453">453</th><td><i>    // Output: tgt - target buffer (decompressed)</i></td></tr>
+<tr><th id="454">454</th><td><i>    //        irep - size of decompressed data</i></td></tr>
+<tr><th id="455">455</th><td><i>    //        0 - if error</i></td></tr>
+<tr><th id="456">456</th><td></td></tr>
+<tr><th id="457">457</th><td>    <a class="local col1 ref" href="#261a_irep" title='a_irep' data-ref="261a_irep">a_irep</a> = <var>0</var>;</td></tr>
+<tr><th id="458">458</th><td></td></tr>
+<tr><th id="459">459</th><td>    <i>// C H E C K   H E A D E R</i></td></tr>
+<tr><th id="460">460</th><td>    <em>const</em> <em>int</em> <dfn class="local col2 decl" id="262HDRSIZE" title='HDRSIZE' data-type='const int' data-ref="262HDRSIZE">HDRSIZE</dfn> = <var>9</var>;</td></tr>
+<tr><th id="461">461</th><td></td></tr>
+<tr><th id="462">462</th><td>    <b>if</b> (<a class="local col7 ref" href="#257a_srcsize" title='a_srcsize' data-ref="257a_srcsize">a_srcsize</a> &lt; <a class="local col2 ref" href="#262HDRSIZE" title='HDRSIZE' data-ref="262HDRSIZE">HDRSIZE</a>) {</td></tr>
+<tr><th id="463">463</th><td>      a_out &lt;&lt; <q>"tools::rroot::key::unzip : too small source"</q> &lt;&lt; <span class='error' title="use of undeclared identifier &apos;std&apos;">std</span>::endl;</td></tr>
+<tr><th id="464">464</th><td>      <b>return</b> <b>false</b>;</td></tr>
+<tr><th id="465">465</th><td>    }</td></tr>
+<tr><th id="466">466</th><td></td></tr>
+<tr><th id="467">467</th><td>    <em>unsigned</em> <em>char</em> <dfn class="local col3 decl" id="263DEFLATE" title='DEFLATE' data-type='unsigned char' data-ref="263DEFLATE">DEFLATE</dfn> = <var>8</var>;</td></tr>
+<tr><th id="468">468</th><td></td></tr>
+<tr><th id="469">469</th><td>    <b>if</b> ((<a class="local col8 ref" href="#258a_src" title='a_src' data-ref="258a_src">a_src</a>[<var>0</var>] != <kbd>'C'</kbd> &amp;&amp; <a class="local col8 ref" href="#258a_src" title='a_src' data-ref="258a_src">a_src</a>[<var>0</var>] != <kbd>'Z'</kbd>) ||</td></tr>
+<tr><th id="470">470</th><td>        (<a class="local col8 ref" href="#258a_src" title='a_src' data-ref="258a_src">a_src</a>[<var>1</var>] != <kbd>'S'</kbd> &amp;&amp; <a class="local col8 ref" href="#258a_src" title='a_src' data-ref="258a_src">a_src</a>[<var>1</var>] != <kbd>'L'</kbd>) ||</td></tr>
+<tr><th id="471">471</th><td>        <a class="local col8 ref" href="#258a_src" title='a_src' data-ref="258a_src">a_src</a>[<var>2</var>] != <a class="local col3 ref" href="#263DEFLATE" title='DEFLATE' data-ref="263DEFLATE">DEFLATE</a>) {</td></tr>
+<tr><th id="472">472</th><td>      a_out &lt;&lt; <q>"tools::rroot::key::unzip : error in header"</q> &lt;&lt; <span class='error' title="use of undeclared identifier &apos;std&apos;">std</span>::endl;</td></tr>
+<tr><th id="473">473</th><td>      <b>return</b> <b>false</b>;</td></tr>
+<tr><th id="474">474</th><td>    }</td></tr>
+<tr><th id="475">475</th><td></td></tr>
+<tr><th id="476">476</th><td>    <em>long</em> <dfn class="local col4 decl" id="264_ibufcnt" title='_ibufcnt' data-type='long' data-ref="264_ibufcnt">_ibufcnt</dfn> = (<em>long</em>)<a class="local col8 ref" href="#258a_src" title='a_src' data-ref="258a_src">a_src</a>[<var>3</var>] | ((<em>long</em>)<a class="local col8 ref" href="#258a_src" title='a_src' data-ref="258a_src">a_src</a>[<var>4</var>] &lt;&lt; <var>8</var>) | ((<em>long</em>)<a class="local col8 ref" href="#258a_src" title='a_src' data-ref="258a_src">a_src</a>[<var>5</var>] &lt;&lt; <var>16</var>);</td></tr>
+<tr><th id="477">477</th><td>    <em>long</em> <dfn class="local col5 decl" id="265isize" title='isize' data-type='long' data-ref="265isize">isize</dfn> = (<em>long</em>)<a class="local col8 ref" href="#258a_src" title='a_src' data-ref="258a_src">a_src</a>[<var>6</var>] | ((<em>long</em>)<a class="local col8 ref" href="#258a_src" title='a_src' data-ref="258a_src">a_src</a>[<var>7</var>] &lt;&lt; <var>8</var>) | ((<em>long</em>)<a class="local col8 ref" href="#258a_src" title='a_src' data-ref="258a_src">a_src</a>[<var>8</var>] &lt;&lt; <var>16</var>);</td></tr>
+<tr><th id="478">478</th><td></td></tr>
+<tr><th id="479">479</th><td>    <b>if</b>(<a class="local col9 ref" href="#259a_tgtsize" title='a_tgtsize' data-ref="259a_tgtsize">a_tgtsize</a>&lt;<a class="local col5 ref" href="#265isize" title='isize' data-ref="265isize">isize</a>) {</td></tr>
+<tr><th id="480">480</th><td>      a_out &lt;&lt; <q>"tools::rroot::key::unzip : too small target."</q> &lt;&lt; <span class='error' title="use of undeclared identifier &apos;std&apos;">std</span>::endl;</td></tr>
+<tr><th id="481">481</th><td>      <b>return</b> <b>false</b>;</td></tr>
+<tr><th id="482">482</th><td>    }</td></tr>
+<tr><th id="483">483</th><td></td></tr>
+<tr><th id="484">484</th><td>    <b>if</b>(<a class="local col4 ref" href="#264_ibufcnt" title='_ibufcnt' data-ref="264_ibufcnt">_ibufcnt</a> + <a class="local col2 ref" href="#262HDRSIZE" title='HDRSIZE' data-ref="262HDRSIZE">HDRSIZE</a> != <a class="local col7 ref" href="#257a_srcsize" title='a_srcsize' data-ref="257a_srcsize">a_srcsize</a>) {</td></tr>
+<tr><th id="485">485</th><td>      a_out &lt;&lt; <q>"tools::rroot::key::unzip :"</q></td></tr>
+<tr><th id="486">486</th><td>            &lt;&lt; <q>" discrepancy in source length."</q> &lt;&lt; <span class='error' title="use of undeclared identifier &apos;std&apos;">std</span>::endl;</td></tr>
+<tr><th id="487">487</th><td>      <b>return</b> <b>false</b>;</td></tr>
+<tr><th id="488">488</th><td>    }</td></tr>
+<tr><th id="489">489</th><td></td></tr>
+<tr><th id="490">490</th><td>    <i>// D E C O M P R E S S   D A T A</i></td></tr>
+<tr><th id="491">491</th><td></td></tr>
+<tr><th id="492">492</th><td>    <b>if</b> (<a class="local col8 ref" href="#258a_src" title='a_src' data-ref="258a_src">a_src</a>[<var>0</var>] == <kbd>'Z'</kbd> &amp;&amp; <a class="local col8 ref" href="#258a_src" title='a_src' data-ref="258a_src">a_src</a>[<var>1</var>] == <kbd>'L'</kbd>) { <i>//compressed with zlib.</i></td></tr>
+<tr><th id="493">493</th><td>      <a class="typedef" href="../press_func.html#tools::decompress_func" title='tools::decompress_func' data-type='bool (*)(int &amp;, unsigned int, const char *, unsigned int, char *, unsigned int &amp;)' data-ref="tools::decompress_func">decompress_func</a> <dfn class="local col6 decl" id="266func" title='func' data-type='decompress_func' data-ref="266func">func</dfn>;</td></tr>
+<tr><th id="494">494</th><td>      <b>if</b>(!<a class="local col6 ref" href="#256a_file" title='a_file' data-ref="256a_file">a_file</a>.<a class="virtual ref" href="ifile.html#_ZNK5tools5rroot5ifile7unziperEcRPFbRijPKcjPcRjE" title='tools::rroot::ifile::unziper' data-ref="_ZNK5tools5rroot5ifile7unziperEcRPFbRijPKcjPcRjE">unziper</a>(<kbd>'Z'</kbd>,<span class='refarg'><a class="local col6 ref" href="#266func" title='func' data-ref="266func">func</a></span>)) {</td></tr>
+<tr><th id="495">495</th><td>        a_out &lt;&lt; <q>"tools::rroot::key::unzip : "</q></td></tr>
+<tr><th id="496">496</th><td>              &lt;&lt; <q>" zlib unziper not found."</q> &lt;&lt; <span class='error' title="use of undeclared identifier &apos;std&apos;">std</span>::endl;</td></tr>
+<tr><th id="497">497</th><td>        <b>return</b> <b>false</b>;</td></tr>
+<tr><th id="498">498</th><td>      }</td></tr>
+<tr><th id="499">499</th><td>  </td></tr>
+<tr><th id="500">500</th><td>      <em>unsigned</em> <em>int</em> <dfn class="local col7 decl" id="267irep" title='irep' data-type='unsigned int' data-ref="267irep">irep</dfn>;</td></tr>
+<tr><th id="501">501</th><td>      <em>char</em>* <dfn class="local col8 decl" id="268src" title='src' data-type='char *' data-ref="268src">src</dfn> = (<em>char</em>*)(<a class="local col8 ref" href="#258a_src" title='a_src' data-ref="258a_src">a_src</a> + <a class="local col2 ref" href="#262HDRSIZE" title='HDRSIZE' data-ref="262HDRSIZE">HDRSIZE</a>);</td></tr>
+<tr><th id="502">502</th><td>      <b>if</b>(!func(a_out,</td></tr>
+<tr><th id="503">503</th><td>               (<em>unsigned</em> <em>int</em>)a_srcsize,src,</td></tr>
+<tr><th id="504">504</th><td>               (<em>unsigned</em> <em>int</em>)a_tgtsize,(<em>char</em>*)a_tgt,irep)) {</td></tr>
+<tr><th id="505">505</th><td>        a_out &lt;&lt; <q>"tools::rroot::key::unzip : "</q></td></tr>
+<tr><th id="506">506</th><td>              &lt;&lt; <q>" unzip function failed."</q> &lt;&lt; <span class='error' title="use of undeclared identifier &apos;std&apos;">std</span>::endl;</td></tr>
+<tr><th id="507">507</th><td>        <a class="local col1 ref" href="#261a_irep" title='a_irep' data-ref="261a_irep">a_irep</a> = <var>0</var>;</td></tr>
+<tr><th id="508">508</th><td>        <b>return</b> <b>false</b>;</td></tr>
+<tr><th id="509">509</th><td>      }</td></tr>
+<tr><th id="510">510</th><td>      <a class="local col1 ref" href="#261a_irep" title='a_irep' data-ref="261a_irep">a_irep</a> = <a class="local col7 ref" href="#267irep" title='irep' data-ref="267irep">irep</a>;</td></tr>
+<tr><th id="511">511</th><td></td></tr>
+<tr><th id="512">512</th><td><u>#<span data-ppcond="512">ifdef</span> <span class="macro" data-ref="_M/TOOLS_USE_CSZ">TOOLS_USE_CSZ</span></u></td></tr>
+<tr><th id="513">513</th><td>    } <b>else</b> <b>if</b> (a_src[<var>0</var>] == <kbd>'C'</kbd> &amp;&amp; a_src[<var>1</var>] == <kbd>'S'</kbd>) {</td></tr>
+<tr><th id="514">514</th><td>      <i>//compressed with Chernyaev &amp; Smirnov</i></td></tr>
+<tr><th id="515">515</th><td>      </td></tr>
+<tr><th id="516">516</th><td>      csz__Init_Inflate(_ibufcnt,a_src + HDRSIZE,a_tgtsize,a_tgt);</td></tr>
+<tr><th id="517">517</th><td></td></tr>
+<tr><th id="518">518</th><td>      <b>if</b> (csz__Inflate()) {</td></tr>
+<tr><th id="519">519</th><td>        a_out &lt;&lt; <q>"tools::rroot::key::unzip :"</q></td></tr>
+<tr><th id="520">520</th><td>              &lt;&lt; <q>" error during decompression."</q> &lt;&lt; std::endl;</td></tr>
+<tr><th id="521">521</th><td>        <b>return</b> <b>false</b>;</td></tr>
+<tr><th id="522">522</th><td>      }</td></tr>
+<tr><th id="523">523</th><td></td></tr>
+<tr><th id="524">524</th><td>      <em>unsigned</em> <em>char</em>* obufptr = csz__obufptr();</td></tr>
+<tr><th id="525">525</th><td></td></tr>
+<tr><th id="526">526</th><td>      <i>// if (obufptr - a_tgt != isize) {</i></td></tr>
+<tr><th id="527">527</th><td><i>      // There are some rare cases when a few more bytes are required</i></td></tr>
+<tr><th id="528">528</th><td>      <b>if</b> (obufptr - a_tgt &gt; a_tgtsize) {</td></tr>
+<tr><th id="529">529</th><td>        a_out &lt;&lt; <q>"tools::rroot::key::_unzip :"</q></td></tr>
+<tr><th id="530">530</th><td>              &lt;&lt; <q>" discrepancy "</q> &lt;&lt; (<em>int</em>)(obufptr - a_tgt)</td></tr>
+<tr><th id="531">531</th><td>              &lt;&lt; <q>" with initial size: "</q> &lt;&lt; (<em>int</em>)isize</td></tr>
+<tr><th id="532">532</th><td>              &lt;&lt; <q>", tgtsize= "</q> &lt;&lt; a_tgtsize</td></tr>
+<tr><th id="533">533</th><td>              &lt;&lt; std::endl;</td></tr>
+<tr><th id="534">534</th><td>        a_irep = <em>int</em>(obufptr - a_tgt);</td></tr>
+<tr><th id="535">535</th><td>        <i>//return false;</i></td></tr>
+<tr><th id="536">536</th><td>      }</td></tr>
+<tr><th id="537">537</th><td>      a_irep = isize;</td></tr>
+<tr><th id="538">538</th><td></td></tr>
+<tr><th id="539">539</th><td>      <i>//a_out &lt;&lt; "tools::rroot::key::unzip : CS : ok "</i></td></tr>
+<tr><th id="540">540</th><td><i>      //        &lt;&lt; a_irep &lt;&lt; std::endl;</i></td></tr>
+<tr><th id="541">541</th><td><u>#<span data-ppcond="512">endif</span></u></td></tr>
+<tr><th id="542">542</th><td>    } <b>else</b> {</td></tr>
+<tr><th id="543">543</th><td>      a_out &lt;&lt; <q>"tools::rroot::key::_unzip : unknown a_src[0,1]."</q></td></tr>
+<tr><th id="544">544</th><td>            &lt;&lt; <q>" [0] = "</q> &lt;&lt; a_src[<var>0</var>] &lt;&lt; <q>", [1] = "</q> &lt;&lt; a_src[<var>1</var>]</td></tr>
+<tr><th id="545">545</th><td>            &lt;&lt; <span class='error' title="use of undeclared identifier &apos;std&apos;">std</span>::endl;</td></tr>
+<tr><th id="546">546</th><td>      <a class="local col1 ref" href="#261a_irep" title='a_irep' data-ref="261a_irep">a_irep</a> = <var>0</var>;</td></tr>
+<tr><th id="547">547</th><td>      <b>return</b> <b>false</b>;</td></tr>
+<tr><th id="548">548</th><td>    }</td></tr>
+<tr><th id="549">549</th><td>    <b>return</b> <b>true</b>;</td></tr>
+<tr><th id="550">550</th><td>  }</td></tr>
+<tr><th id="551">551</th><td></td></tr>
+<tr><th id="552">552</th><td>  <em>static</em> <em>const</em> <span class='error' title="use of undeclared identifier &apos;std&apos;">std</span>::string&amp; <dfn class="decl def" id="_ZN5tools5rroot3key7s_classEv" title='tools::rroot::key::s_class' data-ref="_ZN5tools5rroot3key7s_classEv">s_class</dfn>() {</td></tr>
+<tr><th id="553">553</th><td>    <em>static</em> <em>const</em> <span class='error' title="use of undeclared identifier &apos;std&apos;">std</span>::string <dfn class="local col9 decl" id="269s_v" title='s_v' data-type='const int' data-ref="269s_v">s_v</dfn>(<q>"tools::rroot::key"</q>);</td></tr>
+<tr><th id="554">554</th><td>    <b>return</b> s_v;</td></tr>
+<tr><th id="555">555</th><td>  }</td></tr>
+<tr><th id="556">556</th><td><b>protected</b>:</td></tr>
+<tr><th id="557">557</th><td>  <span class='error' title="use of undeclared identifier &apos;std&apos;">std</span>::ostream&amp; <dfn class="decl" id="tools::rroot::key::m_out" title='tools::rroot::key::m_out' data-ref="tools::rroot::key::m_out">m_out</dfn>;</td></tr>
+<tr><th id="558">558</th><td>  <a class="typedef" href="../typedefs.html#tools::uint32" title='tools::uint32' data-type='unsigned int' data-ref="tools::uint32">uint32</a> <dfn class="decl" id="tools::rroot::key::m_buf_size" title='tools::rroot::key::m_buf_size' data-ref="tools::rroot::key::m_buf_size">m_buf_size</dfn>;</td></tr>
+<tr><th id="559">559</th><td>  <em>char</em>* <dfn class="decl" id="tools::rroot::key::m_buffer" title='tools::rroot::key::m_buffer' data-ref="tools::rroot::key::m_buffer">m_buffer</dfn>;</td></tr>
+<tr><th id="560">560</th><td>  <i>// Record (stored in file) :</i></td></tr>
+<tr><th id="561">561</th><td>  <a class="typedef" href="../typedefs.html#tools::uint32" title='tools::uint32' data-type='unsigned int' data-ref="tools::uint32">uint32</a> <dfn class="decl" id="tools::rroot::key::m_nbytes" title='tools::rroot::key::m_nbytes' data-ref="tools::rroot::key::m_nbytes">m_nbytes</dfn>;               <i>//Number of bytes for the object on file</i></td></tr>
+<tr><th id="562">562</th><td>  <a class="typedef" href="../typedefs.html#tools::uint32" title='tools::uint32' data-type='unsigned int' data-ref="tools::uint32">uint32</a> <dfn class="decl" id="tools::rroot::key::m_version" title='tools::rroot::key::m_version' data-ref="tools::rroot::key::m_version">m_version</dfn>;              <i>//Key version identifier</i></td></tr>
+<tr><th id="563">563</th><td>  <a class="typedef" href="../typedefs.html#tools::uint32" title='tools::uint32' data-type='unsigned int' data-ref="tools::uint32">uint32</a> <dfn class="decl" id="tools::rroot::key::m_object_size" title='tools::rroot::key::m_object_size' data-ref="tools::rroot::key::m_object_size">m_object_size</dfn>;          <i>//Length of uncompressed object in bytes</i></td></tr>
+<tr><th id="564">564</th><td>  <a class="typedef" href="date.html#tools::rroot::date" title='tools::rroot::date' data-type='unsigned int' data-ref="tools::rroot::date">date</a> <dfn class="decl" id="tools::rroot::key::m_date" title='tools::rroot::key::m_date' data-ref="tools::rroot::key::m_date">m_date</dfn>;                <i>//Date/Time of insertion in file</i></td></tr>
+<tr><th id="565">565</th><td>  <a class="typedef" href="../typedefs.html#tools::uint16" title='tools::uint16' data-type='unsigned short' data-ref="tools::uint16">uint16</a> <dfn class="decl" id="tools::rroot::key::m_key_length" title='tools::rroot::key::m_key_length' data-ref="tools::rroot::key::m_key_length">m_key_length</dfn>;         <i>//Number of bytes for the key itself</i></td></tr>
+<tr><th id="566">566</th><td>  <a class="typedef" href="../typedefs.html#tools::uint16" title='tools::uint16' data-type='unsigned short' data-ref="tools::uint16">uint16</a> <dfn class="decl" id="tools::rroot::key::m_cycle" title='tools::rroot::key::m_cycle' data-ref="tools::rroot::key::m_cycle">m_cycle</dfn>;              <i>//Cycle number</i></td></tr>
+<tr><th id="567">567</th><td>  <a class="typedef" href="seek.html#tools::rroot::seek" title='tools::rroot::seek' data-type='int64' data-ref="tools::rroot::seek">seek</a> <dfn class="decl" id="tools::rroot::key::m_seek_key" title='tools::rroot::key::m_seek_key' data-ref="tools::rroot::key::m_seek_key">m_seek_key</dfn>;            <i>//Location of object on file</i></td></tr>
+<tr><th id="568">568</th><td>  <a class="typedef" href="seek.html#tools::rroot::seek" title='tools::rroot::seek' data-type='int64' data-ref="tools::rroot::seek">seek</a> <dfn class="decl" id="tools::rroot::key::m_seek_parent_dir" title='tools::rroot::key::m_seek_parent_dir' data-ref="tools::rroot::key::m_seek_parent_dir">m_seek_parent_dir</dfn>;     <i>//Location of parent directory on file</i></td></tr>
+<tr><th id="569">569</th><td>  <span class='error' title="use of undeclared identifier &apos;std&apos;">std</span>::string <dfn class="decl" id="tools::rroot::key::m_object_class" title='tools::rroot::key::m_object_class' data-ref="tools::rroot::key::m_object_class">m_object_class</dfn>; <i>//Object Class name.</i></td></tr>
+<tr><th id="570">570</th><td>  <span class='error' title="use of undeclared identifier &apos;std&apos;">std</span>::string <dfn class="decl" id="tools::rroot::key::m_object_name" title='tools::rroot::key::m_object_name' data-ref="tools::rroot::key::m_object_name">m_object_name</dfn>;  <i>//name of the object.</i></td></tr>
+<tr><th id="571">571</th><td>  <span class='error' title="use of undeclared identifier &apos;std&apos;">std</span>::string <dfn class="decl" id="tools::rroot::key::m_object_title" title='tools::rroot::key::m_object_title' data-ref="tools::rroot::key::m_object_title">m_object_title</dfn>; <i>//title of the object.</i></td></tr>
+<tr><th id="572">572</th><td>};</td></tr>
+<tr><th id="573">573</th><td></td></tr>
+<tr><th id="574">574</th><td>}}</td></tr>
+<tr><th id="575">575</th><td></td></tr>
+<tr><th id="576">576</th><td><u>#<span data-ppcond="4">endif</span></u></td></tr>
+<tr><th id="577">577</th><td></td></tr>
+<tr><th id="578">578</th><td><i>//doc :</i></td></tr>
+<tr><th id="579">579</th><td><i>//////////////////////////////////////////////////////////////////////////</i></td></tr>
+<tr><th id="580">580</th><td><i>//                                                                      //</i></td></tr>
+<tr><th id="581">581</th><td><i>//  The Key class includes functions to book space on a file,           //</i></td></tr>
+<tr><th id="582">582</th><td><i>//   to create I/O buffers, to fill these buffers                       //</i></td></tr>
+<tr><th id="583">583</th><td><i>//   to compress/uncompress data buffers.                               //</i></td></tr>
+<tr><th id="584">584</th><td><i>//                                                                      //</i></td></tr>
+<tr><th id="585">585</th><td><i>//  Before saving (making persistent) an object on a file, a key must   //</i></td></tr>
+<tr><th id="586">586</th><td><i>//  be created. The key structure contains all the information to       //</i></td></tr>
+<tr><th id="587">587</th><td><i>//  uniquely identify a persistent object on a file.                    //</i></td></tr>
+<tr><th id="588">588</th><td><i>//     fNbytes    = number of bytes for the compressed object+key       //</i></td></tr>
+<tr><th id="589">589</th><td><i>//     version of the Key class                                         //</i></td></tr>
+<tr><th id="590">590</th><td><i>//     fObjlen    = Length of uncompressed object                       //</i></td></tr>
+<tr><th id="591">591</th><td><i>//     fDatime    = Date/Time when the object was written               //</i></td></tr>
+<tr><th id="592">592</th><td><i>//     fKeylen    = number of bytes for the key structure               //</i></td></tr>
+<tr><th id="593">593</th><td><i>//     fCycle     = cycle number of the object                          //</i></td></tr>
+<tr><th id="594">594</th><td><i>//     fSeekKey   = Address of the object on file (points to fNbytes)   //</i></td></tr>
+<tr><th id="595">595</th><td><i>//                  This is a redundant information used to cross-check //</i></td></tr>
+<tr><th id="596">596</th><td><i>//                  the data base integrity.                            //</i></td></tr>
+<tr><th id="597">597</th><td><i>//     fSeekPdir  = Pointer to the directory supporting this object     //</i></td></tr>
+<tr><th id="598">598</th><td><i>//     fClassName = Object class name                                   //</i></td></tr>
+<tr><th id="599">599</th><td><i>//     fName      = name of the object                                  //</i></td></tr>
+<tr><th id="600">600</th><td><i>//     fTitle     = title of the object                                 //</i></td></tr>
+<tr><th id="601">601</th><td><i>//                                                                      //</i></td></tr>
+<tr><th id="602">602</th><td><i>//  The Key class is used by ROOT to:                                   //</i></td></tr>
+<tr><th id="603">603</th><td><i>//    - to write an object in the Current Directory                     //</i></td></tr>
+<tr><th id="604">604</th><td><i>//    - to write a new ntuple buffer                                    //</i></td></tr>
+<tr><th id="605">605</th><td><i>//                                                                      //</i></td></tr>
+<tr><th id="606">606</th><td><i>//////////////////////////////////////////////////////////////////////////</i></td></tr>
+<tr><th id="607">607</th><td></td></tr>
+</table><hr/><p id='footer'>
+Generated while processing <a href='../../../../root/src/G4RootAnalysisReader.cc.html'>codebrowser/source/analysis/root/src/G4RootAnalysisReader.cc</a><br/>Generated on <em>2019-Aug-28</em> from project codebrowser<br />Powered by <a href='https://woboq.com'><img alt='Woboq' src='https://code.woboq.org/woboq-16.png' width='41' height='16' /></a> <a href='https://code.woboq.org'>Code Browser</a> 2.1
+<br/>Generator usage only permitted with license.</p>
+</div></body></html>

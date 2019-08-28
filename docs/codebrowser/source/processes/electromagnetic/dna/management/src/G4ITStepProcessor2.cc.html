@@ -1,0 +1,967 @@
+<!doctype html>
+<html>
+<head>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"><title>G4ITStepProcessor2.cc source code [codebrowser/source/processes/electromagnetic/dna/management/src/G4ITStepProcessor2.cc] - Woboq Code Browser</title>
+<link rel="stylesheet" href="../../../../../../../../data/qtcreator.css" title="QtCreator"/>
+<link rel="alternate stylesheet" href="../../../../../../../../data/kdevelop.css" title="KDevelop"/>
+<script type="text/javascript" src="../../../../../../../../data/jquery/jquery.min.js"></script>
+<script type="text/javascript" src="../../../../../../../../data/jquery/jquery-ui.min.js"></script>
+<script>var file = 'codebrowser/source/processes/electromagnetic/dna/management/src/G4ITStepProcessor2.cc'; var root_path = '../../../../../../..'; var data_path = '../../../../../../../../data';</script>
+<script src='../../../../../../../../data/codebrowser.js'></script>
+</head>
+<body><div id='header'><h1 id='breadcrumb'><span>Browse the source code of </span><a href='../../../../../..'>codebrowser</a>/<a href='../../../../..'>source</a>/<a href='../../../..'>processes</a>/<a href='../../..'>electromagnetic</a>/<a href='../..'>dna</a>/<a href='..'>management</a>/<a href='./'>src</a>/<a href='G4ITStepProcessor2.cc.html'>G4ITStepProcessor2.cc</a></h1></div>
+<hr/><div id='content'><table class="code">
+<tr><th id="1">1</th><td><i>//</i></td></tr>
+<tr><th id="2">2</th><td><i>// ********************************************************************</i></td></tr>
+<tr><th id="3">3</th><td><i>// * License and Disclaimer                                           *</i></td></tr>
+<tr><th id="4">4</th><td><i>// *                                                                  *</i></td></tr>
+<tr><th id="5">5</th><td><i>// * The  Geant4 software  is  copyright of the Copyright Holders  of *</i></td></tr>
+<tr><th id="6">6</th><td><i>// * the Geant4 Collaboration.  It is provided  under  the terms  and *</i></td></tr>
+<tr><th id="7">7</th><td><i>// * conditions of the Geant4 Software License,  included in the file *</i></td></tr>
+<tr><th id="8">8</th><td><i>// * LICENSE and available at  <a href="http://cern.ch/geant4/license">http://cern.ch/geant4/license</a> .  These *</i></td></tr>
+<tr><th id="9">9</th><td><i>// * include a list of copyright holders.                             *</i></td></tr>
+<tr><th id="10">10</th><td><i>// *                                                                  *</i></td></tr>
+<tr><th id="11">11</th><td><i>// * Neither the authors of this software system, nor their employing *</i></td></tr>
+<tr><th id="12">12</th><td><i>// * institutes,nor the agencies providing financial support for this *</i></td></tr>
+<tr><th id="13">13</th><td><i>// * work  make  any representation or  warranty, express or implied, *</i></td></tr>
+<tr><th id="14">14</th><td><i>// * regarding  this  software system or assume any liability for its *</i></td></tr>
+<tr><th id="15">15</th><td><i>// * use.  Please see the license in the file  LICENSE  and URL above *</i></td></tr>
+<tr><th id="16">16</th><td><i>// * for the full disclaimer and the limitation of liability.         *</i></td></tr>
+<tr><th id="17">17</th><td><i>// *                                                                  *</i></td></tr>
+<tr><th id="18">18</th><td><i>// * This  code  implementation is the result of  the  scientific and *</i></td></tr>
+<tr><th id="19">19</th><td><i>// * technical work of the GEANT4 collaboration.                      *</i></td></tr>
+<tr><th id="20">20</th><td><i>// * By using,  copying,  modifying or  distributing the software (or *</i></td></tr>
+<tr><th id="21">21</th><td><i>// * any work based  on the software)  you  agree  to acknowledge its *</i></td></tr>
+<tr><th id="22">22</th><td><i>// * use  in  resulting  scientific  publications,  and indicate your *</i></td></tr>
+<tr><th id="23">23</th><td><i>// * acceptance of all terms of the Geant4 Software license.          *</i></td></tr>
+<tr><th id="24">24</th><td><i>// ********************************************************************</i></td></tr>
+<tr><th id="25">25</th><td><i>//</i></td></tr>
+<tr><th id="26">26</th><td><i>//</i></td></tr>
+<tr><th id="27">27</th><td><i>// Author: Mathieu Karamitros (kara (AT) cenbg . in2p3 . fr) </i></td></tr>
+<tr><th id="28">28</th><td><i>//</i></td></tr>
+<tr><th id="29">29</th><td><i>// History:</i></td></tr>
+<tr><th id="30">30</th><td><i>// -----------</i></td></tr>
+<tr><th id="31">31</th><td><i>// 10 Oct 2011 M.Karamitros created</i></td></tr>
+<tr><th id="32">32</th><td><i>//</i></td></tr>
+<tr><th id="33">33</th><td><i>// -------------------------------------------------------------------</i></td></tr>
+<tr><th id="34">34</th><td></td></tr>
+<tr><th id="35">35</th><td><u>#include <a href="../include/G4ITStepProcessor.hh.html">"G4ITStepProcessor.hh"</a></u></td></tr>
+<tr><th id="36">36</th><td><u>#include <a href="../../../utils/include/G4LossTableManager.hh.html">"G4LossTableManager.hh"</a></u></td></tr>
+<tr><th id="37">37</th><td><u>#include <a href="../../../utils/include/G4EnergyLossTables.hh.html">"G4EnergyLossTables.hh"</a></u></td></tr>
+<tr><th id="38">38</th><td><u>#include <a href="../../../../cuts/include/G4ProductionCuts.hh.html">"G4ProductionCuts.hh"</a></u></td></tr>
+<tr><th id="39">39</th><td><u>#include <a href="../../../../cuts/include/G4ProductionCutsTable.hh.html">"G4ProductionCutsTable.hh"</a></u></td></tr>
+<tr><th id="40">40</th><td><u>#include <a href="../include/G4VITProcess.hh.html">"G4VITProcess.hh"</a></u></td></tr>
+<tr><th id="41">41</th><td><u>#include <a href="../include/G4TrackingInformation.hh.html">"G4TrackingInformation.hh"</a></u></td></tr>
+<tr><th id="42">42</th><td><u>#include <a href="../include/G4IT.hh.html">"G4IT.hh"</a></u></td></tr>
+<tr><th id="43">43</th><td><u>#include <a href="../include/G4ITTrackingManager.hh.html">"G4ITTrackingManager.hh"</a></u></td></tr>
+<tr><th id="44">44</th><td><u>#include <a href="../include/G4ITTransportation.hh.html">"G4ITTransportation.hh"</a></u></td></tr>
+<tr><th id="45">45</th><td></td></tr>
+<tr><th id="46">46</th><td><u>#include <a href="../include/G4ITNavigator.hh.html">"G4ITNavigator.hh"</a>             // Include from 'geometry'</u></td></tr>
+<tr><th id="47">47</th><td></td></tr>
+<tr><th id="48">48</th><td><u>#include <a href="../include/G4ITSteppingVerbose.hh.html">"G4ITSteppingVerbose.hh"</a></u></td></tr>
+<tr><th id="49">49</th><td><u>#include <a href="../include/G4VITSteppingVerbose.hh.html">"G4VITSteppingVerbose.hh"</a></u></td></tr>
+<tr><th id="50">50</th><td></td></tr>
+<tr><th id="51">51</th><td><u>#include <a href="../include/G4ITTrackHolder.hh.html">"G4ITTrackHolder.hh"</a></u></td></tr>
+<tr><th id="52">52</th><td><u>#include <a href="../include/G4ITReaction.hh.html">"G4ITReaction.hh"</a></u></td></tr>
+<tr><th id="53">53</th><td></td></tr>
+<tr><th id="54">54</th><td><u>#include <a href="../include/G4TrackingInformation.hh.html">"G4TrackingInformation.hh"</a></u></td></tr>
+<tr><th id="55">55</th><td></td></tr>
+<tr><th id="56">56</th><td><i>//#define DEBUG_MEM 1</i></td></tr>
+<tr><th id="57">57</th><td></td></tr>
+<tr><th id="58">58</th><td><u>#<span data-ppcond="58">ifdef</span> <span class="macro" data-ref="_M/DEBUG_MEM">DEBUG_MEM</span></u></td></tr>
+<tr><th id="59">59</th><td><u>#include "G4MemStat.hh"</u></td></tr>
+<tr><th id="60">60</th><td><b>using</b> <b>namespace</b> G4MemStat;</td></tr>
+<tr><th id="61">61</th><td><b>using</b> G4MemStat::MemStat;</td></tr>
+<tr><th id="62">62</th><td><u>#<span data-ppcond="58">endif</span></u></td></tr>
+<tr><th id="63">63</th><td></td></tr>
+<tr><th id="64">64</th><td><em>void</em> <a class="type" href="../include/G4ITStepProcessor.hh.html#G4ITStepProcessor" title='G4ITStepProcessor' data-ref="G4ITStepProcessor">G4ITStepProcessor</a>::<dfn class="decl def" id="_ZN17G4ITStepProcessor19DealWithSecondariesERi" title='G4ITStepProcessor::DealWithSecondaries' data-ref="_ZN17G4ITStepProcessor19DealWithSecondariesERi">DealWithSecondaries</dfn>(<a class="typedef" href="../../../../../global/management/include/G4Types.hh.html#G4int" title='G4int' data-type='int' data-ref="G4int">G4int</a>&amp; <dfn class="local col1 decl" id="1counter" title='counter' data-type='G4int &amp;' data-ref="1counter">counter</dfn>)</td></tr>
+<tr><th id="65">65</th><td>{</td></tr>
+<tr><th id="66">66</th><td>  <i>// Now Store the secondaries from ParticleChange to SecondaryList</i></td></tr>
+<tr><th id="67">67</th><td>  <a class="type" href="../../../../../track/include/G4Track.hh.html#G4Track" title='G4Track' data-ref="G4Track">G4Track</a>* <dfn class="local col2 decl" id="2tempSecondaryTrack" title='tempSecondaryTrack' data-type='G4Track *' data-ref="2tempSecondaryTrack">tempSecondaryTrack</dfn>;</td></tr>
+<tr><th id="68">68</th><td></td></tr>
+<tr><th id="69">69</th><td>  <b>for</b>(<a class="typedef" href="../../../../../global/management/include/G4Types.hh.html#G4int" title='G4int' data-type='int' data-ref="G4int">G4int</a> <dfn class="local col3 decl" id="3DSecLoop" title='DSecLoop' data-type='G4int' data-ref="3DSecLoop">DSecLoop</dfn> = <var>0</var>; <a class="local col3 ref" href="#3DSecLoop" title='DSecLoop' data-ref="3DSecLoop">DSecLoop</a> &lt; <a class="member" href="../include/G4ITStepProcessor.hh.html#G4ITStepProcessor::fpParticleChange" title='G4ITStepProcessor::fpParticleChange' data-ref="G4ITStepProcessor::fpParticleChange">fpParticleChange</a>-&gt;<a class="ref" href="../../../../../track/include/G4VParticleChange.hh.html#_ZNK17G4VParticleChange22GetNumberOfSecondariesEv" title='G4VParticleChange::GetNumberOfSecondaries' data-ref="_ZNK17G4VParticleChange22GetNumberOfSecondariesEv">GetNumberOfSecondaries</a>();</td></tr>
+<tr><th id="70">70</th><td>      <a class="local col3 ref" href="#3DSecLoop" title='DSecLoop' data-ref="3DSecLoop">DSecLoop</a>++)</td></tr>
+<tr><th id="71">71</th><td>  {</td></tr>
+<tr><th id="72">72</th><td>    <a class="local col2 ref" href="#2tempSecondaryTrack" title='tempSecondaryTrack' data-ref="2tempSecondaryTrack">tempSecondaryTrack</a> = <a class="member" href="../include/G4ITStepProcessor.hh.html#G4ITStepProcessor::fpParticleChange" title='G4ITStepProcessor::fpParticleChange' data-ref="G4ITStepProcessor::fpParticleChange">fpParticleChange</a>-&gt;<a class="ref" href="../../../../../track/include/G4VParticleChange.hh.html#_ZNK17G4VParticleChange12GetSecondaryEi" title='G4VParticleChange::GetSecondary' data-ref="_ZNK17G4VParticleChange12GetSecondaryEi">GetSecondary</a>(<a class="local col3 ref" href="#3DSecLoop" title='DSecLoop' data-ref="3DSecLoop">DSecLoop</a>);</td></tr>
+<tr><th id="73">73</th><td></td></tr>
+<tr><th id="74">74</th><td>    <b>if</b>(<a class="local col2 ref" href="#2tempSecondaryTrack" title='tempSecondaryTrack' data-ref="2tempSecondaryTrack">tempSecondaryTrack</a>-&gt;<a class="ref" href="../../../../../track/include/G4Track.hh.html#_ZNK7G4Track13GetDefinitionEv" title='G4Track::GetDefinition' data-ref="_ZNK7G4Track13GetDefinitionEv">GetDefinition</a>()-&gt;<a class="ref" href="../../../../../particles/management/include/G4ParticleDefinition.hh.html#_ZNK20G4ParticleDefinition16GetApplyCutsFlagEv" title='G4ParticleDefinition::GetApplyCutsFlag' data-ref="_ZNK20G4ParticleDefinition16GetApplyCutsFlagEv">GetApplyCutsFlag</a>())</td></tr>
+<tr><th id="75">75</th><td>    {</td></tr>
+<tr><th id="76">76</th><td>      <a class="member" href="#_ZN17G4ITStepProcessor18ApplyProductionCutEP7G4Track" title='G4ITStepProcessor::ApplyProductionCut' data-ref="_ZN17G4ITStepProcessor18ApplyProductionCutEP7G4Track">ApplyProductionCut</a>(<a class="local col2 ref" href="#2tempSecondaryTrack" title='tempSecondaryTrack' data-ref="2tempSecondaryTrack">tempSecondaryTrack</a>);</td></tr>
+<tr><th id="77">77</th><td>    }</td></tr>
+<tr><th id="78">78</th><td></td></tr>
+<tr><th id="79">79</th><td>    <i>// Set parentID</i></td></tr>
+<tr><th id="80">80</th><td>    <a class="local col2 ref" href="#2tempSecondaryTrack" title='tempSecondaryTrack' data-ref="2tempSecondaryTrack">tempSecondaryTrack</a>-&gt;<a class="ref" href="../../../../../track/include/G4Track.hh.html#_ZN7G4Track11SetParentIDEi" title='G4Track::SetParentID' data-ref="_ZN7G4Track11SetParentIDEi">SetParentID</a>(<a class="member" href="../include/G4ITStepProcessor.hh.html#G4ITStepProcessor::fpTrack" title='G4ITStepProcessor::fpTrack' data-ref="G4ITStepProcessor::fpTrack">fpTrack</a>-&gt;<a class="ref" href="../../../../../track/include/G4Track.hh.html#_ZNK7G4Track10GetTrackIDEv" title='G4Track::GetTrackID' data-ref="_ZNK7G4Track10GetTrackIDEv">GetTrackID</a>());</td></tr>
+<tr><th id="81">81</th><td></td></tr>
+<tr><th id="82">82</th><td>    <i>// Set the process pointer which created this track</i></td></tr>
+<tr><th id="83">83</th><td>    tempSecondaryTrack-&gt;SetCreatorProcess(<span class='error' title="cannot initialize a parameter of type &apos;const G4VProcess *&apos; with an lvalue of type &apos;G4VITProcess *&apos;">fpCurrentProcess</span>);</td></tr>
+<tr><th id="84">84</th><td></td></tr>
+<tr><th id="85">85</th><td>    <i>// If this 2ndry particle has 'zero' kinetic energy, make sure</i></td></tr>
+<tr><th id="86">86</th><td><i>    // it invokes a rest process at the beginning of the tracking</i></td></tr>
+<tr><th id="87">87</th><td>    <b>if</b>(tempSecondaryTrack-&gt;GetKineticEnergy() &lt;= <a class="macro" href="../../../../../global/management/include/templates.hh.html#74" title="std::numeric_limits&lt;double&gt;::min()" data-ref="_M/DBL_MIN">DBL_MIN</a>)</td></tr>
+<tr><th id="88">88</th><td>    {</td></tr>
+<tr><th id="89">89</th><td>      <a class="type" href="../../../../management/include/G4ProcessManager.hh.html#G4ProcessManager" title='G4ProcessManager' data-ref="G4ProcessManager">G4ProcessManager</a>* <dfn class="local col4 decl" id="4pm" title='pm' data-type='G4ProcessManager *' data-ref="4pm">pm</dfn> = <a class="local col2 ref" href="#2tempSecondaryTrack" title='tempSecondaryTrack' data-ref="2tempSecondaryTrack">tempSecondaryTrack</a>-&gt;<a class="ref" href="../../../../../track/include/G4Track.hh.html#_ZNK7G4Track13GetDefinitionEv" title='G4Track::GetDefinition' data-ref="_ZNK7G4Track13GetDefinitionEv">GetDefinition</a>()-&gt;<a class="ref" href="../../../../../particles/management/include/G4ParticleDefinition.hh.html#_ZNK20G4ParticleDefinition17GetProcessManagerEv" title='G4ParticleDefinition::GetProcessManager' data-ref="_ZNK20G4ParticleDefinition17GetProcessManagerEv">GetProcessManager</a>();</td></tr>
+<tr><th id="90">90</th><td>      <b>if</b> (<a class="local col4 ref" href="#4pm" title='pm' data-ref="4pm">pm</a>-&gt;<a class="ref" href="../../../../management/include/G4ProcessManager.hh.html#_ZNK16G4ProcessManager22GetAtRestProcessVectorE24G4ProcessVectorTypeIndex" title='G4ProcessManager::GetAtRestProcessVector' data-ref="_ZNK16G4ProcessManager22GetAtRestProcessVectorE24G4ProcessVectorTypeIndex">GetAtRestProcessVector</a>()-&gt;<a class="ref" href="../../../../management/include/G4ProcessVector.hh.html#_ZNK15G4ProcessVector7entriesEv" title='G4ProcessVector::entries' data-ref="_ZNK15G4ProcessVector7entriesEv">entries</a>()&gt;<var>0</var>)</td></tr>
+<tr><th id="91">91</th><td>      {</td></tr>
+<tr><th id="92">92</th><td>        <a class="local col2 ref" href="#2tempSecondaryTrack" title='tempSecondaryTrack' data-ref="2tempSecondaryTrack">tempSecondaryTrack</a>-&gt;<a class="ref" href="../../../../../track/include/G4Track.hh.html#_ZN7G4Track14SetTrackStatusE13G4TrackStatus" title='G4Track::SetTrackStatus' data-ref="_ZN7G4Track14SetTrackStatusE13G4TrackStatus">SetTrackStatus</a>( <a class="enum" href="../../../../../track/include/G4TrackStatus.hh.html#G4TrackStatus::fStopButAlive" title='G4TrackStatus::fStopButAlive' data-ref="G4TrackStatus::fStopButAlive">fStopButAlive</a> );</td></tr>
+<tr><th id="93">93</th><td>        fpSecondary-&gt;push_back( tempSecondaryTrack );</td></tr>
+<tr><th id="94">94</th><td>        <a class="member" href="../include/G4ITStepProcessor.hh.html#G4ITStepProcessor::fN2ndariesAtRestDoIt" title='G4ITStepProcessor::fN2ndariesAtRestDoIt' data-ref="G4ITStepProcessor::fN2ndariesAtRestDoIt">fN2ndariesAtRestDoIt</a>++;</td></tr>
+<tr><th id="95">95</th><td>      }</td></tr>
+<tr><th id="96">96</th><td>      <b>else</b></td></tr>
+<tr><th id="97">97</th><td>      {</td></tr>
+<tr><th id="98">98</th><td>        <b>delete</b> <a class="local col2 ref" href="#2tempSecondaryTrack" title='tempSecondaryTrack' data-ref="2tempSecondaryTrack">tempSecondaryTrack</a>;</td></tr>
+<tr><th id="99">99</th><td>      }</td></tr>
+<tr><th id="100">100</th><td>    }</td></tr>
+<tr><th id="101">101</th><td>    <b>else</b></td></tr>
+<tr><th id="102">102</th><td>    {</td></tr>
+<tr><th id="103">103</th><td>      fpSecondary-&gt;push_back( tempSecondaryTrack );</td></tr>
+<tr><th id="104">104</th><td>      <a class="local col1 ref" href="#1counter" title='counter' data-ref="1counter">counter</a>++;</td></tr>
+<tr><th id="105">105</th><td>    }</td></tr>
+<tr><th id="106">106</th><td>  } <i>//end of loop on secondary</i></td></tr>
+<tr><th id="107">107</th><td>}</td></tr>
+<tr><th id="108">108</th><td></td></tr>
+<tr><th id="109">109</th><td><i>//_________________________________________________________________________</i></td></tr>
+<tr><th id="110">110</th><td></td></tr>
+<tr><th id="111">111</th><td><em>void</em> <a class="type" href="../include/G4ITStepProcessor.hh.html#G4ITStepProcessor" title='G4ITStepProcessor' data-ref="G4ITStepProcessor">G4ITStepProcessor</a>::<dfn class="decl def" id="_ZN17G4ITStepProcessor4DoItEd" title='G4ITStepProcessor::DoIt' data-ref="_ZN17G4ITStepProcessor4DoItEd">DoIt</dfn>(<em>double</em> <dfn class="local col5 decl" id="5timeStep" title='timeStep' data-type='double' data-ref="5timeStep">timeStep</dfn>)</td></tr>
+<tr><th id="112">112</th><td></td></tr>
+<tr><th id="113">113</th><td><i>// Call the process having the min step length or just propagate the track on the given time step</i></td></tr>
+<tr><th id="114">114</th><td><i></i></td></tr>
+<tr><th id="115">115</th><td><i>// If the track is "leading the step" (ie one of its process has been selected</i></td></tr>
+<tr><th id="116">116</th><td><i>// as the one having the minimum time step over all tracks and processes),</i></td></tr>
+<tr><th id="117">117</th><td><i>// it will undergo its selected processes. Otherwise, it will just propagate the track</i></td></tr>
+<tr><th id="118">118</th><td><i>// on the given time step.</i></td></tr>
+<tr><th id="119">119</th><td></td></tr>
+<tr><th id="120">120</th><td>{</td></tr>
+<tr><th id="121">121</th><td>  <b>if</b>(<a class="member" href="../include/G4ITStepProcessor.hh.html#G4ITStepProcessor::fpVerbose" title='G4ITStepProcessor::fpVerbose' data-ref="G4ITStepProcessor::fpVerbose">fpVerbose</a>) <a class="member" href="../include/G4ITStepProcessor.hh.html#G4ITStepProcessor::fpVerbose" title='G4ITStepProcessor::fpVerbose' data-ref="G4ITStepProcessor::fpVerbose">fpVerbose</a>-&gt;<a class="virtual ref" href="../include/G4VITSteppingVerbose.hh.html#_ZN20G4VITSteppingVerbose11DoItStartedEv" title='G4VITSteppingVerbose::DoItStarted' data-ref="_ZN20G4VITSteppingVerbose11DoItStartedEv">DoItStarted</a>();</td></tr>
+<tr><th id="122">122</th><td></td></tr>
+<tr><th id="123">123</th><td>  <a class="typedef" href="../include/G4TrackList.hh.html#G4TrackManyList" title='G4TrackManyList' data-type='G4ManyFastLists&lt;G4Track&gt;' data-ref="G4TrackManyList">G4TrackManyList</a>* <dfn class="local col6 decl" id="6mainList" title='mainList' data-type='G4TrackManyList *' data-ref="6mainList">mainList</dfn> = <a class="member" href="../include/G4ITStepProcessor.hh.html#G4ITStepProcessor::fpTrackContainer" title='G4ITStepProcessor::fpTrackContainer' data-ref="G4ITStepProcessor::fpTrackContainer">fpTrackContainer</a>-&gt;<a class="ref" href="../include/G4ITTrackHolder.hh.html#_ZN15G4ITTrackHolder11GetMainListEv" title='G4ITTrackHolder::GetMainList' data-ref="_ZN15G4ITTrackHolder11GetMainListEv">GetMainList</a>();</td></tr>
+<tr><th id="124">124</th><td>  <a class="typedef" href="../include/G4TrackList.hh.html#G4TrackManyList" title='G4TrackManyList' data-type='G4ManyFastLists&lt;G4Track&gt;' data-ref="G4TrackManyList">G4TrackManyList</a>::<a class="typedef" href="../include/G4ManyFastLists.hh.html#G4ManyFastLists{G4Track}::iterator" title='G4ManyFastLists&lt;G4Track&gt;::iterator' data-type='G4ManyFastLists_iterator&lt;G4Track&gt;' data-ref="G4ManyFastLists{G4Track}::iterator">iterator</a> <dfn class="local col7 decl" id="7it" title='it' data-type='G4TrackManyList::iterator' data-ref="7it">it</dfn> = <a class="local col6 ref" href="#6mainList" title='mainList' data-ref="6mainList">mainList</a>-&gt;<a class="ref" href="../include/G4ManyFastLists.hh.html#_ZN15G4ManyFastLists3endEv" title='G4ManyFastLists::end' data-ref="_ZN15G4ManyFastLists3endEv">end</a>();</td></tr>
+<tr><th id="125">125</th><td>  <a class="local col7 ref" href="#7it" title='it' data-ref="7it">it</a><a class="ref" href="../include/G4ManyFastLists.hh.html#_ZN24G4ManyFastLists_iteratormmEi" title='G4ManyFastLists_iterator::operator--' data-ref="_ZN24G4ManyFastLists_iteratormmEi">--</a>;</td></tr>
+<tr><th id="126">126</th><td>  <span class='error' title="unknown type name &apos;size_t&apos;">size_t</span> <dfn class="local col8 decl" id="8initialSize" title='initialSize' data-type='int' data-ref="8initialSize">initialSize</dfn> = mainList-&gt;<span class='error' title="no member named &apos;size&apos; in &apos;G4ManyFastLists&lt;G4Track&gt;&apos;">size</span>();</td></tr>
+<tr><th id="127">127</th><td></td></tr>
+<tr><th id="128">128</th><td>  <i>//  G4cout &lt;&lt; "initialSize = " &lt;&lt; initialSize &lt;&lt; G4endl;</i></td></tr>
+<tr><th id="129">129</th><td></td></tr>
+<tr><th id="130">130</th><td>  <b>for</b>(<span class='error' title="unknown type name &apos;size_t&apos;">size_t</span> <dfn class="local col9 decl" id="9i" title='i' data-type='int' data-ref="9i">i</dfn> = <var>0</var> ; i &lt; initialSize ; ++i)</td></tr>
+<tr><th id="131">131</th><td>  {</td></tr>
+<tr><th id="132">132</th><td></td></tr>
+<tr><th id="133">133</th><td>    <i>//  G4cout &lt;&lt; "i = " &lt;&lt; i &lt;&lt; G4endl;</i></td></tr>
+<tr><th id="134">134</th><td></td></tr>
+<tr><th id="135">135</th><td>    <a class="type" href="../../../../../track/include/G4Track.hh.html#G4Track" title='G4Track' data-ref="G4Track">G4Track</a>* <dfn class="local col0 decl" id="10track" title='track' data-type='G4Track *' data-ref="10track">track</dfn> = <a class="ref" href="../include/G4ManyFastLists.hh.html#_ZN24G4ManyFastLists_iteratordeEv" title='G4ManyFastLists_iterator::operator*' data-ref="_ZN24G4ManyFastLists_iteratordeEv">*</a><a class="local col7 ref" href="#7it" title='it' data-ref="7it">it</a>;</td></tr>
+<tr><th id="136">136</th><td>    <b>if</b> (!<a class="local col0 ref" href="#10track" title='track' data-ref="10track">track</a>)</td></tr>
+<tr><th id="137">137</th><td>    {</td></tr>
+<tr><th id="138">138</th><td>      <a class="typedef" href="../../../../../global/management/include/G4Exception.hh.html#G4ExceptionDescription" title='G4ExceptionDescription' data-type='int' data-ref="G4ExceptionDescription">G4ExceptionDescription</a> <dfn class="local col1 decl" id="11exceptionDescription" title='exceptionDescription' data-type='G4ExceptionDescription' data-ref="11exceptionDescription">exceptionDescription</dfn>;</td></tr>
+<tr><th id="139">139</th><td>      exceptionDescription <span class='error' title="invalid operands to binary expression (&apos;G4ExceptionDescription&apos; (aka &apos;int&apos;) and &apos;const char *&apos;)">&lt;&lt;</span> <q>"No track was pop back the main track list."</q>;</td></tr>
+<tr><th id="140">140</th><td>      <a class="ref" href="../../../../../global/management/include/G4Exception.hh.html#_Z11G4ExceptionPKcS0_19G4ExceptionSeverityRi" title='G4Exception' data-ref="_Z11G4ExceptionPKcS0_19G4ExceptionSeverityRi">G4Exception</a>(<q>"G4ITStepProcessor::DoIt"</q>, <q>"NO_TRACK"</q>,</td></tr>
+<tr><th id="141">141</th><td>                  <a class="enum" href="../../../../../global/management/include/G4ExceptionSeverity.hh.html#G4ExceptionSeverity::FatalException" title='G4ExceptionSeverity::FatalException' data-ref="G4ExceptionSeverity::FatalException">FatalException</a>, <span class='refarg'><a class="local col1 ref" href="#11exceptionDescription" title='exceptionDescription' data-ref="11exceptionDescription">exceptionDescription</a></span>);</td></tr>
+<tr><th id="142">142</th><td>    }</td></tr>
+<tr><th id="143">143</th><td>    <i>// G4TrackManyList::iterator next_it (it);</i></td></tr>
+<tr><th id="144">144</th><td><i>    // next_it--;</i></td></tr>
+<tr><th id="145">145</th><td><i>    // it = next_it;</i></td></tr>
+<tr><th id="146">146</th><td></td></tr>
+<tr><th id="147">147</th><td>    <a class="local col7 ref" href="#7it" title='it' data-ref="7it">it</a><a class="ref" href="../include/G4ManyFastLists.hh.html#_ZN24G4ManyFastLists_iteratormmEi" title='G4ManyFastLists_iterator::operator--' data-ref="_ZN24G4ManyFastLists_iteratormmEi">--</a>;</td></tr>
+<tr><th id="148">148</th><td>    <i>// Must be called before EndTracking(track)</i></td></tr>
+<tr><th id="149">149</th><td><i>    // Otherwise the iterator will point to the list of killed tracks</i></td></tr>
+<tr><th id="150">150</th><td></td></tr>
+<tr><th id="151">151</th><td>    <b>if</b>(<a class="local col0 ref" href="#10track" title='track' data-ref="10track">track</a>-&gt;<a class="ref" href="../../../../../track/include/G4Track.hh.html#_ZNK7G4Track14GetTrackStatusEv" title='G4Track::GetTrackStatus' data-ref="_ZNK7G4Track14GetTrackStatusEv">GetTrackStatus</a>() == <a class="enum" href="../../../../../track/include/G4TrackStatus.hh.html#G4TrackStatus::fStopAndKill" title='G4TrackStatus::fStopAndKill' data-ref="G4TrackStatus::fStopAndKill">fStopAndKill</a>)</td></tr>
+<tr><th id="152">152</th><td>    {</td></tr>
+<tr><th id="153">153</th><td>      <a class="member" href="../include/G4ITStepProcessor.hh.html#G4ITStepProcessor::fpTrackingManager" title='G4ITStepProcessor::fpTrackingManager' data-ref="G4ITStepProcessor::fpTrackingManager">fpTrackingManager</a>-&gt;<a class="ref" href="../include/G4ITTrackingManager.hh.html#_ZN19G4ITTrackingManager11EndTrackingEP7G4Track" title='G4ITTrackingManager::EndTracking' data-ref="_ZN19G4ITTrackingManager11EndTrackingEP7G4Track">EndTracking</a>(<a class="local col0 ref" href="#10track" title='track' data-ref="10track">track</a>);</td></tr>
+<tr><th id="154">154</th><td><i>//      G4cout &lt;&lt; GetIT(track)-&gt;GetName() &lt;&lt; G4endl;</i></td></tr>
+<tr><th id="155">155</th><td><i>//      G4cout &lt;&lt; " ************************ CONTINUE ********************" &lt;&lt; G4endl;</i></td></tr>
+<tr><th id="156">156</th><td>      <b>continue</b>;</td></tr>
+<tr><th id="157">157</th><td>    }</td></tr>
+<tr><th id="158">158</th><td></td></tr>
+<tr><th id="159">159</th><td><u>#<span data-ppcond="159">if</span> defined (<span class="macro" data-ref="_M/DEBUG_MEM">DEBUG_MEM</span>) &amp;&amp; defined (<span class="macro" data-ref="_M/DEBUG_MEM_DOIT">DEBUG_MEM_DOIT</span>)</u></td></tr>
+<tr><th id="160">160</th><td>    MemStat mem_first, mem_second, mem_diff;</td></tr>
+<tr><th id="161">161</th><td>    mem_first = MemoryUsage();</td></tr>
+<tr><th id="162">162</th><td><u>#<span data-ppcond="159">endif</span></u></td></tr>
+<tr><th id="163">163</th><td></td></tr>
+<tr><th id="164">164</th><td>    <a class="member" href="#_ZN17G4ITStepProcessor8SteppingEP7G4TrackRKd" title='G4ITStepProcessor::Stepping' data-ref="_ZN17G4ITStepProcessor8SteppingEP7G4TrackRKd">Stepping</a>(<a class="local col0 ref" href="#10track" title='track' data-ref="10track">track</a>, <a class="local col5 ref" href="#5timeStep" title='timeStep' data-ref="5timeStep">timeStep</a>);</td></tr>
+<tr><th id="165">165</th><td></td></tr>
+<tr><th id="166">166</th><td><u>#<span data-ppcond="166">if</span> defined (<span class="macro" data-ref="_M/DEBUG_MEM">DEBUG_MEM</span>) &amp;&amp; defined (<span class="macro" data-ref="_M/DEBUG_MEM_DOIT">DEBUG_MEM_DOIT</span>)</u></td></tr>
+<tr><th id="167">167</th><td>    MemStat mem_intermediaire = MemoryUsage();</td></tr>
+<tr><th id="168">168</th><td>    mem_diff = mem_intermediaire-mem_first;</td></tr>
+<tr><th id="169">169</th><td>    G4cout &lt;&lt; <q>"\t\t &gt;&gt; || MEM || In DoIT with track "</q></td></tr>
+<tr><th id="170">170</th><td>        &lt;&lt; track-&gt;GetTrackID() &lt;&lt; <q>", diff is : "</q> &lt;&lt; mem_diff &lt;&lt; G4endl;</td></tr>
+<tr><th id="171">171</th><td><u>#<span data-ppcond="166">endif</span></u></td></tr>
+<tr><th id="172">172</th><td></td></tr>
+<tr><th id="173">173</th><td>    <a class="member" href="#_ZN17G4ITStepProcessor15ExtractDoItDataEv" title='G4ITStepProcessor::ExtractDoItData' data-ref="_ZN17G4ITStepProcessor15ExtractDoItDataEv">ExtractDoItData</a>();</td></tr>
+<tr><th id="174">174</th><td></td></tr>
+<tr><th id="175">175</th><td><u>#<span data-ppcond="175">if</span> defined (<span class="macro" data-ref="_M/DEBUG_MEM">DEBUG_MEM</span>) &amp;&amp; defined (<span class="macro" data-ref="_M/DEBUG_MEM_DOIT">DEBUG_MEM_DOIT</span>)</u></td></tr>
+<tr><th id="176">176</th><td>    mem_second = MemoryUsage();</td></tr>
+<tr><th id="177">177</th><td>    mem_diff = mem_second-mem_first;</td></tr>
+<tr><th id="178">178</th><td>    G4cout &lt;&lt; <q>"\t &gt;&gt; || MEM || In DoIT with track "</q></td></tr>
+<tr><th id="179">179</th><td>        &lt;&lt; track-&gt;GetTrackID()</td></tr>
+<tr><th id="180">180</th><td>        &lt;&lt; <q>", diff is : "</q> &lt;&lt; mem_diff &lt;&lt; G4endl;</td></tr>
+<tr><th id="181">181</th><td><u>#<span data-ppcond="175">endif</span></u></td></tr>
+<tr><th id="182">182</th><td>  }</td></tr>
+<tr><th id="183">183</th><td></td></tr>
+<tr><th id="184">184</th><td></td></tr>
+<tr><th id="185">185</th><td>  <a class="member" href="../include/G4ITStepProcessor.hh.html#G4ITStepProcessor::fpTrackContainer" title='G4ITStepProcessor::fpTrackContainer' data-ref="G4ITStepProcessor::fpTrackContainer">fpTrackContainer</a>-&gt;<a class="ref" href="../include/G4ITTrackHolder.hh.html#_ZN15G4ITTrackHolder28MergeSecondariesWithMainListEv" title='G4ITTrackHolder::MergeSecondariesWithMainList' data-ref="_ZN15G4ITTrackHolder28MergeSecondariesWithMainListEv">MergeSecondariesWithMainList</a>();</td></tr>
+<tr><th id="186">186</th><td>  <a class="member" href="../include/G4ITStepProcessor.hh.html#G4ITStepProcessor::fpTrackContainer" title='G4ITStepProcessor::fpTrackContainer' data-ref="G4ITStepProcessor::fpTrackContainer">fpTrackContainer</a>-&gt;<a class="ref" href="../include/G4ITTrackHolder.hh.html#_ZN15G4ITTrackHolder10KillTracksEv" title='G4ITTrackHolder::KillTracks' data-ref="_ZN15G4ITTrackHolder10KillTracksEv">KillTracks</a>(); <i>// (18-06-15 : MK) Remove it ?</i></td></tr>
+<tr><th id="187">187</th><td>  <a class="member" href="../include/G4ITStepProcessor.hh.html#G4ITStepProcessor::fLeadingTracks" title='G4ITStepProcessor::fLeadingTracks' data-ref="G4ITStepProcessor::fLeadingTracks">fLeadingTracks</a>.<a class="ref" href="../include/G4ITLeadingTracks.hh.html#_ZN17G4ITLeadingTracks5ResetEv" title='G4ITLeadingTracks::Reset' data-ref="_ZN17G4ITLeadingTracks5ResetEv">Reset</a>();</td></tr>
+<tr><th id="188">188</th><td>}</td></tr>
+<tr><th id="189">189</th><td></td></tr>
+<tr><th id="190">190</th><td><i>//_________________________________________________________________________</i></td></tr>
+<tr><th id="191">191</th><td></td></tr>
+<tr><th id="192">192</th><td><em>void</em> <a class="type" href="../include/G4ITStepProcessor.hh.html#G4ITStepProcessor" title='G4ITStepProcessor' data-ref="G4ITStepProcessor">G4ITStepProcessor</a>::<dfn class="decl def" id="_ZN17G4ITStepProcessor15ExtractDoItDataEv" title='G4ITStepProcessor::ExtractDoItData' data-ref="_ZN17G4ITStepProcessor15ExtractDoItDataEv">ExtractDoItData</dfn>()</td></tr>
+<tr><th id="193">193</th><td>{</td></tr>
+<tr><th id="194">194</th><td>  <b>if</b> (!<a class="member" href="../include/G4ITStepProcessor.hh.html#G4ITStepProcessor::fpTrack" title='G4ITStepProcessor::fpTrack' data-ref="G4ITStepProcessor::fpTrack">fpTrack</a>)</td></tr>
+<tr><th id="195">195</th><td>  {</td></tr>
+<tr><th id="196">196</th><td>    <a class="member" href="../include/G4ITStepProcessor.hh.html#_ZN17G4ITStepProcessor14CleanProcessorEv" title='G4ITStepProcessor::CleanProcessor' data-ref="_ZN17G4ITStepProcessor14CleanProcessorEv">CleanProcessor</a>();</td></tr>
+<tr><th id="197">197</th><td>    <b>return</b>;</td></tr>
+<tr><th id="198">198</th><td>  }</td></tr>
+<tr><th id="199">199</th><td></td></tr>
+<tr><th id="200">200</th><td>  <a class="type" href="../../../../../track/include/G4TrackStatus.hh.html#G4TrackStatus" title='G4TrackStatus' data-ref="G4TrackStatus">G4TrackStatus</a> <dfn class="local col2 decl" id="12status" title='status' data-type='G4TrackStatus' data-ref="12status">status</dfn> = <a class="member" href="../include/G4ITStepProcessor.hh.html#G4ITStepProcessor::fpTrack" title='G4ITStepProcessor::fpTrack' data-ref="G4ITStepProcessor::fpTrack">fpTrack</a>-&gt;<a class="ref" href="../../../../../track/include/G4Track.hh.html#_ZNK7G4Track14GetTrackStatusEv" title='G4Track::GetTrackStatus' data-ref="_ZNK7G4Track14GetTrackStatusEv">GetTrackStatus</a>();</td></tr>
+<tr><th id="201">201</th><td></td></tr>
+<tr><th id="202">202</th><td>  <b>switch</b> (<a class="local col2 ref" href="#12status" title='status' data-ref="12status">status</a>)</td></tr>
+<tr><th id="203">203</th><td>  {</td></tr>
+<tr><th id="204">204</th><td>    <b>case</b> <a class="enum" href="../../../../../track/include/G4TrackStatus.hh.html#G4TrackStatus::fAlive" title='G4TrackStatus::fAlive' data-ref="G4TrackStatus::fAlive">fAlive</a>:</td></tr>
+<tr><th id="205">205</th><td>    <b>case</b> <a class="enum" href="../../../../../track/include/G4TrackStatus.hh.html#G4TrackStatus::fStopButAlive" title='G4TrackStatus::fStopButAlive' data-ref="G4TrackStatus::fStopButAlive">fStopButAlive</a>:</td></tr>
+<tr><th id="206">206</th><td>    <b>case</b> <a class="enum" href="../../../../../track/include/G4TrackStatus.hh.html#G4TrackStatus::fSuspend" title='G4TrackStatus::fSuspend' data-ref="G4TrackStatus::fSuspend">fSuspend</a>:</td></tr>
+<tr><th id="207">207</th><td>    <b>case</b> <a class="enum" href="../../../../../track/include/G4TrackStatus.hh.html#G4TrackStatus::fPostponeToNextEvent" title='G4TrackStatus::fPostponeToNextEvent' data-ref="G4TrackStatus::fPostponeToNextEvent">fPostponeToNextEvent</a>:</td></tr>
+<tr><th id="208">208</th><td>    <b>default</b>:</td></tr>
+<tr><th id="209">209</th><td>      <a class="member" href="#_ZN17G4ITStepProcessor15PushSecondariesEv" title='G4ITStepProcessor::PushSecondaries' data-ref="_ZN17G4ITStepProcessor15PushSecondariesEv">PushSecondaries</a>();</td></tr>
+<tr><th id="210">210</th><td>      <b>break</b>;</td></tr>
+<tr><th id="211">211</th><td></td></tr>
+<tr><th id="212">212</th><td>    <b>case</b> <a class="enum" href="../../../../../track/include/G4TrackStatus.hh.html#G4TrackStatus::fStopAndKill" title='G4TrackStatus::fStopAndKill' data-ref="G4TrackStatus::fStopAndKill">fStopAndKill</a>:</td></tr>
+<tr><th id="213">213</th><td>      <a class="type" href="../include/G4ITReaction.hh.html#G4ITReactionSet" title='G4ITReactionSet' data-ref="G4ITReactionSet">G4ITReactionSet</a>::<a class="ref" href="../include/G4ITReaction.hh.html#_ZN15G4ITReactionSet8InstanceEv" title='G4ITReactionSet::Instance' data-ref="_ZN15G4ITReactionSet8InstanceEv">Instance</a>()-&gt;<a class="ref" href="../include/G4ITReaction.hh.html#_ZN15G4ITReactionSet17RemoveReactionSetEP7G4Track" title='G4ITReactionSet::RemoveReactionSet' data-ref="_ZN15G4ITReactionSet17RemoveReactionSetEP7G4Track">RemoveReactionSet</a>(<a class="member" href="../include/G4ITStepProcessor.hh.html#G4ITStepProcessor::fpTrack" title='G4ITStepProcessor::fpTrack' data-ref="G4ITStepProcessor::fpTrack">fpTrack</a>);</td></tr>
+<tr><th id="214">214</th><td>      <a class="member" href="#_ZN17G4ITStepProcessor15PushSecondariesEv" title='G4ITStepProcessor::PushSecondaries' data-ref="_ZN17G4ITStepProcessor15PushSecondariesEv">PushSecondaries</a>();</td></tr>
+<tr><th id="215">215</th><td><i>//      G4TrackList::Pop(fpTrack);</i></td></tr>
+<tr><th id="216">216</th><td>      <a class="member" href="../include/G4ITStepProcessor.hh.html#G4ITStepProcessor::fpTrackingManager" title='G4ITStepProcessor::fpTrackingManager' data-ref="G4ITStepProcessor::fpTrackingManager">fpTrackingManager</a>-&gt;<a class="ref" href="../include/G4ITTrackingManager.hh.html#_ZN19G4ITTrackingManager11EndTrackingEP7G4Track" title='G4ITTrackingManager::EndTracking' data-ref="_ZN19G4ITTrackingManager11EndTrackingEP7G4Track">EndTracking</a>(<a class="member" href="../include/G4ITStepProcessor.hh.html#G4ITStepProcessor::fpTrack" title='G4ITStepProcessor::fpTrack' data-ref="G4ITStepProcessor::fpTrack">fpTrack</a>);</td></tr>
+<tr><th id="217">217</th><td><i>//      fTrackContainer-&gt;PushToKill(fpTrack);</i></td></tr>
+<tr><th id="218">218</th><td>      <b>break</b>;</td></tr>
+<tr><th id="219">219</th><td></td></tr>
+<tr><th id="220">220</th><td>    <b>case</b> <a class="enum" href="../../../../../track/include/G4TrackStatus.hh.html#G4TrackStatus::fKillTrackAndSecondaries" title='G4TrackStatus::fKillTrackAndSecondaries' data-ref="G4TrackStatus::fKillTrackAndSecondaries">fKillTrackAndSecondaries</a>:</td></tr>
+<tr><th id="221">221</th><td>      <a class="type" href="../include/G4ITReaction.hh.html#G4ITReactionSet" title='G4ITReactionSet' data-ref="G4ITReactionSet">G4ITReactionSet</a>::<a class="ref" href="../include/G4ITReaction.hh.html#_ZN15G4ITReactionSet8InstanceEv" title='G4ITReactionSet::Instance' data-ref="_ZN15G4ITReactionSet8InstanceEv">Instance</a>()-&gt;<a class="ref" href="../include/G4ITReaction.hh.html#_ZN15G4ITReactionSet17RemoveReactionSetEP7G4Track" title='G4ITReactionSet::RemoveReactionSet' data-ref="_ZN15G4ITReactionSet17RemoveReactionSetEP7G4Track">RemoveReactionSet</a>(<a class="member" href="../include/G4ITStepProcessor.hh.html#G4ITStepProcessor::fpTrack" title='G4ITStepProcessor::fpTrack' data-ref="G4ITStepProcessor::fpTrack">fpTrack</a>);</td></tr>
+<tr><th id="222">222</th><td>      <b>if</b> (fpSecondary)</td></tr>
+<tr><th id="223">223</th><td>      {</td></tr>
+<tr><th id="224">224</th><td>        <b>for</b> (<span class='error' title="unknown type name &apos;size_t&apos;">size_t</span> <dfn class="local col3 decl" id="13i" title='i' data-type='int' data-ref="13i">i</dfn> = <var>0</var>; i &lt; fpSecondary-&gt;size(); ++i)</td></tr>
+<tr><th id="225">225</th><td>        {</td></tr>
+<tr><th id="226">226</th><td>          <b>delete</b> (*fpSecondary)[i];</td></tr>
+<tr><th id="227">227</th><td>        }</td></tr>
+<tr><th id="228">228</th><td>        fpSecondary-&gt;clear();</td></tr>
+<tr><th id="229">229</th><td>      }</td></tr>
+<tr><th id="230">230</th><td><i>//      G4TrackList::Pop(fpTrack);</i></td></tr>
+<tr><th id="231">231</th><td>      <a class="member" href="../include/G4ITStepProcessor.hh.html#G4ITStepProcessor::fpTrackingManager" title='G4ITStepProcessor::fpTrackingManager' data-ref="G4ITStepProcessor::fpTrackingManager">fpTrackingManager</a>-&gt;<a class="ref" href="../include/G4ITTrackingManager.hh.html#_ZN19G4ITTrackingManager11EndTrackingEP7G4Track" title='G4ITTrackingManager::EndTracking' data-ref="_ZN19G4ITTrackingManager11EndTrackingEP7G4Track">EndTracking</a>(<a class="member" href="../include/G4ITStepProcessor.hh.html#G4ITStepProcessor::fpTrack" title='G4ITStepProcessor::fpTrack' data-ref="G4ITStepProcessor::fpTrack">fpTrack</a>);</td></tr>
+<tr><th id="232">232</th><td><i>//      fTrackContainer-&gt;PushToKill(fpTrack);</i></td></tr>
+<tr><th id="233">233</th><td>      <b>break</b>;</td></tr>
+<tr><th id="234">234</th><td>  }</td></tr>
+<tr><th id="235">235</th><td></td></tr>
+<tr><th id="236">236</th><td>  <a class="member" href="../include/G4ITStepProcessor.hh.html#_ZN17G4ITStepProcessor14CleanProcessorEv" title='G4ITStepProcessor::CleanProcessor' data-ref="_ZN17G4ITStepProcessor14CleanProcessorEv">CleanProcessor</a>();</td></tr>
+<tr><th id="237">237</th><td>}</td></tr>
+<tr><th id="238">238</th><td></td></tr>
+<tr><th id="239">239</th><td><i>//_________________________________________________________________________</i></td></tr>
+<tr><th id="240">240</th><td></td></tr>
+<tr><th id="241">241</th><td><em>void</em> <a class="type" href="../include/G4ITStepProcessor.hh.html#G4ITStepProcessor" title='G4ITStepProcessor' data-ref="G4ITStepProcessor">G4ITStepProcessor</a>::<dfn class="decl def" id="_ZN17G4ITStepProcessor15PushSecondariesEv" title='G4ITStepProcessor::PushSecondaries' data-ref="_ZN17G4ITStepProcessor15PushSecondariesEv">PushSecondaries</dfn>()</td></tr>
+<tr><th id="242">242</th><td>{</td></tr>
+<tr><th id="243">243</th><td>  <b>if</b> (!fpSecondary || fpSecondary-&gt;empty())</td></tr>
+<tr><th id="244">244</th><td>  {</td></tr>
+<tr><th id="245">245</th><td>    <i>// DEBUG</i></td></tr>
+<tr><th id="246">246</th><td><i>    //      G4cout &lt;&lt; "NO SECONDARIES !!! " &lt;&lt; G4endl;</i></td></tr>
+<tr><th id="247">247</th><td>    <b>return</b>;</td></tr>
+<tr><th id="248">248</th><td>  }</td></tr>
+<tr><th id="249">249</th><td></td></tr>
+<tr><th id="250">250</th><td>  <i>// DEBUG</i></td></tr>
+<tr><th id="251">251</th><td><i>  //    G4cout &lt;&lt; "There are secondaries : "&lt;&lt; secondaries -&gt; size() &lt;&lt; G4endl ;</i></td></tr>
+<tr><th id="252">252</th><td></td></tr>
+<tr><th id="253">253</th><td>  <span class='error' title="use of undeclared identifier &apos;G4TrackVector&apos;">G4TrackVector</span>::iterator <dfn class="local col4 decl" id="14secondaries_i" title='secondaries_i' data-type='int' data-ref="14secondaries_i">secondaries_i</dfn> = fpSecondary-&gt;begin();</td></tr>
+<tr><th id="254">254</th><td></td></tr>
+<tr><th id="255">255</th><td>  <b>for</b> (; secondaries_i != fpSecondary-&gt;end(); ++secondaries_i)</td></tr>
+<tr><th id="256">256</th><td>  {</td></tr>
+<tr><th id="257">257</th><td>    <a class="type" href="../../../../../track/include/G4Track.hh.html#G4Track" title='G4Track' data-ref="G4Track">G4Track</a>* <dfn class="local col5 decl" id="15secondary" title='secondary' data-type='G4Track *' data-ref="15secondary">secondary</dfn> = *secondaries_i;</td></tr>
+<tr><th id="258">258</th><td>    <a class="member" href="../include/G4ITStepProcessor.hh.html#G4ITStepProcessor::fpTrackContainer" title='G4ITStepProcessor::fpTrackContainer' data-ref="G4ITStepProcessor::fpTrackContainer">fpTrackContainer</a>-&gt;<a class="ref" href="../include/G4ITTrackHolder.hh.html#_ZN15G4ITTrackHolder10_PushTrackEP7G4Track" title='G4ITTrackHolder::_PushTrack' data-ref="_ZN15G4ITTrackHolder10_PushTrackEP7G4Track">_PushTrack</a>(<a class="local col5 ref" href="#15secondary" title='secondary' data-ref="15secondary">secondary</a>);</td></tr>
+<tr><th id="259">259</th><td>  }</td></tr>
+<tr><th id="260">260</th><td>}</td></tr>
+<tr><th id="261">261</th><td></td></tr>
+<tr><th id="262">262</th><td><i>//______________________________________________________________________________</i></td></tr>
+<tr><th id="263">263</th><td></td></tr>
+<tr><th id="264">264</th><td><em>void</em> <a class="type" href="../include/G4ITStepProcessor.hh.html#G4ITStepProcessor" title='G4ITStepProcessor' data-ref="G4ITStepProcessor">G4ITStepProcessor</a>::<dfn class="decl def" id="_ZN17G4ITStepProcessor8SteppingEP7G4TrackRKd" title='G4ITStepProcessor::Stepping' data-ref="_ZN17G4ITStepProcessor8SteppingEP7G4TrackRKd">Stepping</dfn>(<a class="type" href="../../../../../track/include/G4Track.hh.html#G4Track" title='G4Track' data-ref="G4Track">G4Track</a>* <dfn class="local col6 decl" id="16track" title='track' data-type='G4Track *' data-ref="16track">track</dfn>, <em>const</em> <em>double</em> &amp; <dfn class="local col7 decl" id="17timeStep" title='timeStep' data-type='const double &amp;' data-ref="17timeStep">timeStep</dfn>)</td></tr>
+<tr><th id="265">265</th><td>{</td></tr>
+<tr><th id="266">266</th><td></td></tr>
+<tr><th id="267">267</th><td><u>#<span data-ppcond="267">ifdef</span> <span class="macro" data-ref="_M/DEBUG_MEM">DEBUG_MEM</span></u></td></tr>
+<tr><th id="268">268</th><td>  MemStat mem_first, mem_second, mem_diff;</td></tr>
+<tr><th id="269">269</th><td><u>#<span data-ppcond="267">endif</span></u></td></tr>
+<tr><th id="270">270</th><td></td></tr>
+<tr><th id="271">271</th><td><u>#<span data-ppcond="271">ifdef</span> <span class="macro" data-ref="_M/DEBUG_MEM">DEBUG_MEM</span></u></td></tr>
+<tr><th id="272">272</th><td>  mem_first = MemoryUsage();</td></tr>
+<tr><th id="273">273</th><td><u>#<span data-ppcond="271">endif</span></u></td></tr>
+<tr><th id="274">274</th><td></td></tr>
+<tr><th id="275">275</th><td>  <a class="member" href="../include/G4ITStepProcessor.hh.html#_ZN17G4ITStepProcessor14CleanProcessorEv" title='G4ITStepProcessor::CleanProcessor' data-ref="_ZN17G4ITStepProcessor14CleanProcessorEv">CleanProcessor</a>();</td></tr>
+<tr><th id="276">276</th><td></td></tr>
+<tr><th id="277">277</th><td><u>#<span data-ppcond="277">ifdef</span> <span class="macro" data-ref="_M/DEBUG_MEM">DEBUG_MEM</span></u></td></tr>
+<tr><th id="278">278</th><td>  MemStat mem_intermediaire = MemoryUsage();</td></tr>
+<tr><th id="279">279</th><td>  mem_diff = mem_intermediaire-mem_first;</td></tr>
+<tr><th id="280">280</th><td>  G4cout &lt;&lt; <q>"\t\t\t &gt;&gt; || MEM || After CleanProcessor "</q> &lt;&lt; track-&gt;GetTrackID() &lt;&lt; <q>", diff is : "</q> &lt;&lt; mem_diff &lt;&lt; G4endl;</td></tr>
+<tr><th id="281">281</th><td><u>#<span data-ppcond="277">endif</span></u></td></tr>
+<tr><th id="282">282</th><td></td></tr>
+<tr><th id="283">283</th><td>  <b>if</b>(<a class="local col6 ref" href="#16track" title='track' data-ref="16track">track</a> == <var>0</var>) <b>return</b>; <i>// maybe put an exception here</i></td></tr>
+<tr><th id="284">284</th><td>  <a class="member" href="../include/G4ITStepProcessor.hh.html#G4ITStepProcessor::fTimeStep" title='G4ITStepProcessor::fTimeStep' data-ref="G4ITStepProcessor::fTimeStep">fTimeStep</a> = <a class="local col7 ref" href="#17timeStep" title='timeStep' data-ref="17timeStep">timeStep</a>;</td></tr>
+<tr><th id="285">285</th><td>  <a class="member" href="../include/G4ITStepProcessor.hh.html#_ZN17G4ITStepProcessor8SetTrackEP7G4Track" title='G4ITStepProcessor::SetTrack' data-ref="_ZN17G4ITStepProcessor8SetTrackEP7G4Track">SetTrack</a>(<a class="local col6 ref" href="#16track" title='track' data-ref="16track">track</a>);</td></tr>
+<tr><th id="286">286</th><td>  <a class="member" href="#_ZN17G4ITStepProcessor10DoSteppingEv" title='G4ITStepProcessor::DoStepping' data-ref="_ZN17G4ITStepProcessor10DoSteppingEv">DoStepping</a>();</td></tr>
+<tr><th id="287">287</th><td>}</td></tr>
+<tr><th id="288">288</th><td><i>//______________________________________________________________________________</i></td></tr>
+<tr><th id="289">289</th><td><i></i></td></tr>
+<tr><th id="290">290</th><td><i>// ************************************************************************</i></td></tr>
+<tr><th id="291">291</th><td><i>//  Stepping</i></td></tr>
+<tr><th id="292">292</th><td><i>// ************************************************************************</i></td></tr>
+<tr><th id="293">293</th><td><em>void</em> <a class="type" href="../include/G4ITStepProcessor.hh.html#G4ITStepProcessor" title='G4ITStepProcessor' data-ref="G4ITStepProcessor">G4ITStepProcessor</a>::<dfn class="decl def" id="_ZN17G4ITStepProcessor10DoSteppingEv" title='G4ITStepProcessor::DoStepping' data-ref="_ZN17G4ITStepProcessor10DoSteppingEv">DoStepping</dfn>()</td></tr>
+<tr><th id="294">294</th><td>{</td></tr>
+<tr><th id="295">295</th><td>  <a class="member" href="../include/G4ITStepProcessor.hh.html#_ZN17G4ITStepProcessor12SetupMembersEv" title='G4ITStepProcessor::SetupMembers' data-ref="_ZN17G4ITStepProcessor12SetupMembersEv">SetupMembers</a>();</td></tr>
+<tr><th id="296">296</th><td></td></tr>
+<tr><th id="297">297</th><td><u>#<span data-ppcond="297">ifdef</span> <span class="macro" data-ref="_M/DEBUG_MEM">DEBUG_MEM</span></u></td></tr>
+<tr><th id="298">298</th><td>  MemStat mem_first, mem_second, mem_diff;</td></tr>
+<tr><th id="299">299</th><td><u>#<span data-ppcond="297">endif</span></u></td></tr>
+<tr><th id="300">300</th><td></td></tr>
+<tr><th id="301">301</th><td><u>#<span data-ppcond="301">ifdef</span> <span class="macro" data-ref="_M/DEBUG_MEM">DEBUG_MEM</span></u></td></tr>
+<tr><th id="302">302</th><td>  mem_first = MemoryUsage();</td></tr>
+<tr><th id="303">303</th><td><u>#<span data-ppcond="301">endif</span></u></td></tr>
+<tr><th id="304">304</th><td></td></tr>
+<tr><th id="305">305</th><td><u>#<span data-ppcond="305">ifdef</span> <span class="macro" data-ref="_M/G4VERBOSE">G4VERBOSE</span></u></td></tr>
+<tr><th id="306">306</th><td>    <b>if</b>(<a class="member" href="../include/G4ITStepProcessor.hh.html#G4ITStepProcessor::fpVerbose" title='G4ITStepProcessor::fpVerbose' data-ref="G4ITStepProcessor::fpVerbose">fpVerbose</a>) <a class="member" href="../include/G4ITStepProcessor.hh.html#G4ITStepProcessor::fpVerbose" title='G4ITStepProcessor::fpVerbose' data-ref="G4ITStepProcessor::fpVerbose">fpVerbose</a>-&gt;<a class="virtual ref" href="../include/G4VITSteppingVerbose.hh.html#_ZN20G4VITSteppingVerbose14PreStepVerboseEP7G4Track" title='G4VITSteppingVerbose::PreStepVerbose' data-ref="_ZN20G4VITSteppingVerbose14PreStepVerboseEP7G4Track">PreStepVerbose</a>(<a class="member" href="../include/G4ITStepProcessor.hh.html#G4ITStepProcessor::fpTrack" title='G4ITStepProcessor::fpTrack' data-ref="G4ITStepProcessor::fpTrack">fpTrack</a>);</td></tr>
+<tr><th id="307">307</th><td><u>#<span data-ppcond="305">endif</span></u></td></tr>
+<tr><th id="308">308</th><td></td></tr>
+<tr><th id="309">309</th><td>  <b>if</b>(!<a class="member" href="../include/G4ITStepProcessor.hh.html#G4ITStepProcessor::fpProcessInfo" title='G4ITStepProcessor::fpProcessInfo' data-ref="G4ITStepProcessor::fpProcessInfo">fpProcessInfo</a>)</td></tr>
+<tr><th id="310">310</th><td>  {</td></tr>
+<tr><th id="311">311</th><td>    <a class="typedef" href="../../../../../global/management/include/G4Exception.hh.html#G4ExceptionDescription" title='G4ExceptionDescription' data-type='int' data-ref="G4ExceptionDescription">G4ExceptionDescription</a> <dfn class="local col8 decl" id="18exceptionDescription" title='exceptionDescription' data-type='G4ExceptionDescription' data-ref="18exceptionDescription">exceptionDescription</dfn>;</td></tr>
+<tr><th id="312">312</th><td>    exceptionDescription <span class='error' title="invalid operands to binary expression (&apos;G4ExceptionDescription&apos; (aka &apos;int&apos;) and &apos;const char *&apos;)">&lt;&lt;</span> <q>"No process info found for particle :"</q></td></tr>
+<tr><th id="313">313</th><td>                         &lt;&lt; fpTrack-&gt;GetDefinition()-&gt;GetParticleName();</td></tr>
+<tr><th id="314">314</th><td>    <a class="ref" href="../../../../../global/management/include/G4Exception.hh.html#_Z11G4ExceptionPKcS0_19G4ExceptionSeverityRi" title='G4Exception' data-ref="_Z11G4ExceptionPKcS0_19G4ExceptionSeverityRi">G4Exception</a>(<q>"G4ITStepProcessor::DoStepping"</q>,</td></tr>
+<tr><th id="315">315</th><td>                <q>"ITStepProcessor0012"</q>,</td></tr>
+<tr><th id="316">316</th><td>                <a class="enum" href="../../../../../global/management/include/G4ExceptionSeverity.hh.html#G4ExceptionSeverity::FatalErrorInArgument" title='G4ExceptionSeverity::FatalErrorInArgument' data-ref="G4ExceptionSeverity::FatalErrorInArgument">FatalErrorInArgument</a>,</td></tr>
+<tr><th id="317">317</th><td>                <span class='refarg'><a class="local col8 ref" href="#18exceptionDescription" title='exceptionDescription' data-ref="18exceptionDescription">exceptionDescription</a></span>);</td></tr>
+<tr><th id="318">318</th><td>    <b>return</b>;</td></tr>
+<tr><th id="319">319</th><td>  }</td></tr>
+<tr><th id="320">320</th><td><i>//  else if(fpTrack-&gt;GetTrackStatus() == fStopAndKill)</i></td></tr>
+<tr><th id="321">321</th><td><i>//  {</i></td></tr>
+<tr><th id="322">322</th><td><i>//    fpState-&gt;fStepStatus = fUndefined;</i></td></tr>
+<tr><th id="323">323</th><td><i>//    return;</i></td></tr>
+<tr><th id="324">324</th><td><i>//  }</i></td></tr>
+<tr><th id="325">325</th><td></td></tr>
+<tr><th id="326">326</th><td>  <b>if</b>(fpProcessInfo-&gt;MAXofPostStepLoops == <var>0</var> &amp;&amp;</td></tr>
+<tr><th id="327">327</th><td>      fpProcessInfo-&gt;MAXofAlongStepLoops == <var>0</var></td></tr>
+<tr><th id="328">328</th><td>     &amp;&amp; fpProcessInfo-&gt;MAXofAtRestLoops == <var>0</var>)</td></tr>
+<tr><th id="329">329</th><td>  {</td></tr>
+<tr><th id="330">330</th><td>    <a class="typedef" href="../../../../../global/management/include/G4Exception.hh.html#G4ExceptionDescription" title='G4ExceptionDescription' data-type='int' data-ref="G4ExceptionDescription">G4ExceptionDescription</a> <dfn class="local col9 decl" id="19exceptionDescription" title='exceptionDescription' data-type='G4ExceptionDescription' data-ref="19exceptionDescription">exceptionDescription</dfn>;</td></tr>
+<tr><th id="331">331</th><td>    exceptionDescription <span class='error' title="invalid operands to binary expression (&apos;G4ExceptionDescription&apos; (aka &apos;int&apos;) and &apos;const char *&apos;)">&lt;&lt;</span> <q>"No process was found for particle :"</q></td></tr>
+<tr><th id="332">332</th><td>                         &lt;&lt; fpTrack-&gt;GetDefinition()-&gt;GetParticleName();</td></tr>
+<tr><th id="333">333</th><td>    <a class="ref" href="../../../../../global/management/include/G4Exception.hh.html#_Z11G4ExceptionPKcS0_19G4ExceptionSeverityRi" title='G4Exception' data-ref="_Z11G4ExceptionPKcS0_19G4ExceptionSeverityRi">G4Exception</a>(<q>"G4ITStepProcessor::DoStepping"</q>,</td></tr>
+<tr><th id="334">334</th><td>                <q>"ITStepProcessorNoProcess"</q>,</td></tr>
+<tr><th id="335">335</th><td>                <a class="enum" href="../../../../../global/management/include/G4ExceptionSeverity.hh.html#G4ExceptionSeverity::JustWarning" title='G4ExceptionSeverity::JustWarning' data-ref="G4ExceptionSeverity::JustWarning">JustWarning</a>,</td></tr>
+<tr><th id="336">336</th><td>                <span class='refarg'><a class="local col9 ref" href="#19exceptionDescription" title='exceptionDescription' data-ref="19exceptionDescription">exceptionDescription</a></span>);</td></tr>
+<tr><th id="337">337</th><td></td></tr>
+<tr><th id="338">338</th><td>    <a class="member" href="../include/G4ITStepProcessor.hh.html#G4ITStepProcessor::fpTrack" title='G4ITStepProcessor::fpTrack' data-ref="G4ITStepProcessor::fpTrack">fpTrack</a>-&gt;<a class="ref" href="../../../../../track/include/G4Track.hh.html#_ZN7G4Track14SetTrackStatusE13G4TrackStatus" title='G4Track::SetTrackStatus' data-ref="_ZN7G4Track14SetTrackStatusE13G4TrackStatus">SetTrackStatus</a>(<a class="enum" href="../../../../../track/include/G4TrackStatus.hh.html#G4TrackStatus::fStopAndKill" title='G4TrackStatus::fStopAndKill' data-ref="G4TrackStatus::fStopAndKill">fStopAndKill</a>);</td></tr>
+<tr><th id="339">339</th><td>    <a class="member" href="../include/G4ITStepProcessor.hh.html#G4ITStepProcessor::fpState" title='G4ITStepProcessor::fpState' data-ref="G4ITStepProcessor::fpState">fpState</a>-&gt;<a class="ref" href="../include/G4ITStepProcessor.hh.html#G4ITStepProcessorState::fStepStatus" title='G4ITStepProcessorState::fStepStatus' data-ref="G4ITStepProcessorState::fStepStatus">fStepStatus</a> = <a class="enum" href="../../../../../track/include/G4StepStatus.hh.html#G4StepStatus::fUndefined" title='G4StepStatus::fUndefined' data-ref="G4StepStatus::fUndefined">fUndefined</a>;</td></tr>
+<tr><th id="340">340</th><td>    <b>return</b>;</td></tr>
+<tr><th id="341">341</th><td>  }</td></tr>
+<tr><th id="342">342</th><td></td></tr>
+<tr><th id="343">343</th><td>  <i>//--------</i></td></tr>
+<tr><th id="344">344</th><td><i>  // Prelude</i></td></tr>
+<tr><th id="345">345</th><td><i>  //--------</i></td></tr>
+<tr><th id="346">346</th><td><u>#<span data-ppcond="346">ifdef</span> <span class="macro" data-ref="_M/G4VERBOSE">G4VERBOSE</span></u></td></tr>
+<tr><th id="347">347</th><td>  <i>// !!!!! Verbose</i></td></tr>
+<tr><th id="348">348</th><td>  <b>if</b>(<a class="member" href="../include/G4ITStepProcessor.hh.html#G4ITStepProcessor::fpVerbose" title='G4ITStepProcessor::fpVerbose' data-ref="G4ITStepProcessor::fpVerbose">fpVerbose</a>) <a class="member" href="../include/G4ITStepProcessor.hh.html#G4ITStepProcessor::fpVerbose" title='G4ITStepProcessor::fpVerbose' data-ref="G4ITStepProcessor::fpVerbose">fpVerbose</a>-&gt;<a class="virtual ref" href="../include/G4VITSteppingVerbose.hh.html#_ZN20G4VITSteppingVerbose7NewStepEv" title='G4VITSteppingVerbose::NewStep' data-ref="_ZN20G4VITSteppingVerbose7NewStepEv">NewStep</a>();</td></tr>
+<tr><th id="349">349</th><td><u>#<span data-ppcond="346">endif</span></u></td></tr>
+<tr><th id="350">350</th><td></td></tr>
+<tr><th id="351">351</th><td>  <i>//---------------------------------</i></td></tr>
+<tr><th id="352">352</th><td><i>  // AtRestStep, AlongStep and PostStep Processes</i></td></tr>
+<tr><th id="353">353</th><td><i>  //---------------------------------</i></td></tr>
+<tr><th id="354">354</th><td></td></tr>
+<tr><th id="355">355</th><td>  <a class="member" href="../include/G4ITStepProcessor.hh.html#G4ITStepProcessor::fpNavigator" title='G4ITStepProcessor::fpNavigator' data-ref="G4ITStepProcessor::fpNavigator">fpNavigator</a>-&gt;<a class="ref" href="../include/G4ITNavigator2.hh.html#_ZN13G4ITNavigator17SetNavigatorStateEP23G4ITNavigatorState_Lock" title='G4ITNavigator::SetNavigatorState' data-ref="_ZN13G4ITNavigator17SetNavigatorStateEP23G4ITNavigatorState_Lock">SetNavigatorState</a>(<a class="member" href="../include/G4ITStepProcessor.hh.html#G4ITStepProcessor::fpITrack" title='G4ITStepProcessor::fpITrack' data-ref="G4ITStepProcessor::fpITrack">fpITrack</a>-&gt;<a class="ref" href="../include/G4IT.hh.html#_ZN4G4IT15GetTrackingInfoEv" title='G4IT::GetTrackingInfo' data-ref="_ZN4G4IT15GetTrackingInfoEv">GetTrackingInfo</a>()-&gt;<a class="ref" href="../include/G4TrackingInformation.hh.html#_ZNK21G4TrackingInformation17GetNavigatorStateEv" title='G4TrackingInformation::GetNavigatorState' data-ref="_ZNK21G4TrackingInformation17GetNavigatorStateEv">GetNavigatorState</a>());</td></tr>
+<tr><th id="356">356</th><td><i>//        fpNavigator-&gt;ResetHierarchyAndLocate( fpTrack-&gt;GetPosition(),</i></td></tr>
+<tr><th id="357">357</th><td><i>//                                              fpTrack-&gt;GetMomentumDirection(),</i></td></tr>
+<tr><th id="358">358</th><td><i>//                                              *((G4TouchableHistory*)fpTrack-&gt;GetTouchableHandle()()) );</i></td></tr>
+<tr><th id="359">359</th><td><i>//        fpNavigator-&gt;SetNavigatorState(fpITrack-&gt;GetTrackingInfo()-&gt;GetNavigatorState());</i></td></tr>
+<tr><th id="360">360</th><td><i>  // We reset the navigator state before checking for AtRest</i></td></tr>
+<tr><th id="361">361</th><td><i>  // in case a AtRest processe would use a navigator info</i></td></tr>
+<tr><th id="362">362</th><td></td></tr>
+<tr><th id="363">363</th><td><u>#<span data-ppcond="363">ifdef</span> <span class="macro" data-ref="_M/DEBUG_MEM">DEBUG_MEM</span></u></td></tr>
+<tr><th id="364">364</th><td>  MemStat mem_intermediaire = MemoryUsage();</td></tr>
+<tr><th id="365">365</th><td>  mem_diff = mem_intermediaire-mem_first;</td></tr>
+<tr><th id="366">366</th><td>  G4cout &lt;&lt; <q>"\t\t\t &gt;&gt; || MEM || G4ITStepProcessor::DoStepping || After dealing with navigator with "</q> &lt;&lt; fpTrack-&gt;GetTrackID() &lt;&lt; <q>", diff is : "</q> &lt;&lt; mem_diff &lt;&lt; G4endl;</td></tr>
+<tr><th id="367">367</th><td><u>#<span data-ppcond="363">endif</span></u></td></tr>
+<tr><th id="368">368</th><td></td></tr>
+<tr><th id="369">369</th><td>  <b>if</b>(<a class="member" href="../include/G4ITStepProcessor.hh.html#G4ITStepProcessor::fpTrack" title='G4ITStepProcessor::fpTrack' data-ref="G4ITStepProcessor::fpTrack">fpTrack</a>-&gt;<a class="ref" href="../../../../../track/include/G4Track.hh.html#_ZNK7G4Track14GetTrackStatusEv" title='G4Track::GetTrackStatus' data-ref="_ZNK7G4Track14GetTrackStatusEv">GetTrackStatus</a>() == <a class="enum" href="../../../../../track/include/G4TrackStatus.hh.html#G4TrackStatus::fStopButAlive" title='G4TrackStatus::fStopButAlive' data-ref="G4TrackStatus::fStopButAlive">fStopButAlive</a>)</td></tr>
+<tr><th id="370">370</th><td>  {</td></tr>
+<tr><th id="371">371</th><td>    <b>if</b>(fpProcessInfo-&gt;MAXofAtRestLoops &gt; <var>0</var> &amp;&amp; fpProcessInfo-&gt;fpAtRestDoItVector</td></tr>
+<tr><th id="372">372</th><td>        != <var>0</var>) <i>// second condition to make coverity happy</i></td></tr>
+<tr><th id="373">373</th><td>    {</td></tr>
+<tr><th id="374">374</th><td>      <i>//-----------------</i></td></tr>
+<tr><th id="375">375</th><td><i>      // AtRestStepDoIt</i></td></tr>
+<tr><th id="376">376</th><td><i>      //-----------------</i></td></tr>
+<tr><th id="377">377</th><td>      <a class="member" href="#_ZN17G4ITStepProcessor21InvokeAtRestDoItProcsEv" title='G4ITStepProcessor::InvokeAtRestDoItProcs' data-ref="_ZN17G4ITStepProcessor21InvokeAtRestDoItProcsEv">InvokeAtRestDoItProcs</a>();</td></tr>
+<tr><th id="378">378</th><td>      <a class="member" href="../include/G4ITStepProcessor.hh.html#G4ITStepProcessor::fpState" title='G4ITStepProcessor::fpState' data-ref="G4ITStepProcessor::fpState">fpState</a>-&gt;<a class="ref" href="../include/G4ITStepProcessor.hh.html#G4ITStepProcessorState::fStepStatus" title='G4ITStepProcessorState::fStepStatus' data-ref="G4ITStepProcessorState::fStepStatus">fStepStatus</a> = <a class="enum" href="../../../../../track/include/G4StepStatus.hh.html#G4StepStatus::fAtRestDoItProc" title='G4StepStatus::fAtRestDoItProc' data-ref="G4StepStatus::fAtRestDoItProc">fAtRestDoItProc</a>;</td></tr>
+<tr><th id="379">379</th><td>      <a class="member" href="../include/G4ITStepProcessor.hh.html#G4ITStepProcessor::fpStep" title='G4ITStepProcessor::fpStep' data-ref="G4ITStepProcessor::fpStep">fpStep</a>-&gt;<a class="ref" href="../../../../../track/include/G4Step.hh.html#_ZNK6G4Step16GetPostStepPointEv" title='G4Step::GetPostStepPoint' data-ref="_ZNK6G4Step16GetPostStepPointEv">GetPostStepPoint</a>()-&gt;<a class="ref" href="../../../../../track/include/G4StepPoint.hh.html#_ZN11G4StepPoint13SetStepStatusE12G4StepStatus" title='G4StepPoint::SetStepStatus' data-ref="_ZN11G4StepPoint13SetStepStatusE12G4StepStatus">SetStepStatus</a>(<a class="member" href="../include/G4ITStepProcessor.hh.html#G4ITStepProcessor::fpState" title='G4ITStepProcessor::fpState' data-ref="G4ITStepProcessor::fpState">fpState</a>-&gt;<a class="ref" href="../include/G4ITStepProcessor.hh.html#G4ITStepProcessorState::fStepStatus" title='G4ITStepProcessorState::fStepStatus' data-ref="G4ITStepProcessorState::fStepStatus">fStepStatus</a>);</td></tr>
+<tr><th id="380">380</th><td></td></tr>
+<tr><th id="381">381</th><td><u>#<span data-ppcond="381">ifdef</span> <span class="macro" data-ref="_M/G4VERBOSE">G4VERBOSE</span></u></td></tr>
+<tr><th id="382">382</th><td>            <i>// !!!!! Verbose</i></td></tr>
+<tr><th id="383">383</th><td>      <b>if</b>(<a class="member" href="../include/G4ITStepProcessor.hh.html#G4ITStepProcessor::fpVerbose" title='G4ITStepProcessor::fpVerbose' data-ref="G4ITStepProcessor::fpVerbose">fpVerbose</a>) <a class="member" href="../include/G4ITStepProcessor.hh.html#G4ITStepProcessor::fpVerbose" title='G4ITStepProcessor::fpVerbose' data-ref="G4ITStepProcessor::fpVerbose">fpVerbose</a>-&gt;<a class="virtual ref" href="../include/G4VITSteppingVerbose.hh.html#_ZN20G4VITSteppingVerbose17AtRestDoItInvokedEv" title='G4VITSteppingVerbose::AtRestDoItInvoked' data-ref="_ZN20G4VITSteppingVerbose17AtRestDoItInvokedEv">AtRestDoItInvoked</a>();</td></tr>
+<tr><th id="384">384</th><td><u>#<span data-ppcond="381">endif</span></u></td></tr>
+<tr><th id="385">385</th><td></td></tr>
+<tr><th id="386">386</th><td>    }</td></tr>
+<tr><th id="387">387</th><td>    <i>// Make sure the track is killed</i></td></tr>
+<tr><th id="388">388</th><td><i>    // fpTrack-&gt;SetTrackStatus(fStopAndKill);</i></td></tr>
+<tr><th id="389">389</th><td>  }</td></tr>
+<tr><th id="390">390</th><td>  <b>else</b> <i>// if(fTimeStep &gt; 0.) // Bye, because PostStepIL can return 0 =&gt; time =0</i></td></tr>
+<tr><th id="391">391</th><td>  {</td></tr>
+<tr><th id="392">392</th><td>    <b>if</b>(<a class="member" href="../include/G4ITStepProcessor.hh.html#G4ITStepProcessor::fpITrack" title='G4ITStepProcessor::fpITrack' data-ref="G4ITStepProcessor::fpITrack">fpITrack</a> == <var>0</var>)</td></tr>
+<tr><th id="393">393</th><td>    {</td></tr>
+<tr><th id="394">394</th><td>      <a class="typedef" href="../../../../../global/management/include/G4Exception.hh.html#G4ExceptionDescription" title='G4ExceptionDescription' data-type='int' data-ref="G4ExceptionDescription">G4ExceptionDescription</a> <dfn class="local col0 decl" id="20exceptionDescription" title='exceptionDescription' data-type='G4ExceptionDescription' data-ref="20exceptionDescription">exceptionDescription</dfn>;</td></tr>
+<tr><th id="395">395</th><td>      exceptionDescription <span class='error' title="invalid operands to binary expression (&apos;G4ExceptionDescription&apos; (aka &apos;int&apos;) and &apos;const char *&apos;)">&lt;&lt;</span> <q>" !!! TrackID : "</q> &lt;&lt; fpTrack-&gt;GetTrackID()</td></tr>
+<tr><th id="396">396</th><td>                           &lt;&lt; <a class="macro" href="../../../../../global/management/include/G4ios.hh.html#60" title="std::endl" data-ref="_M/G4endl">G4endl</a>&lt;&lt; <q>" !!! Track status : "</q>&lt;&lt; fpTrack-&gt;GetTrackStatus() &lt;&lt; <a class="macro" href="../../../../../global/management/include/G4ios.hh.html#60" title="std::endl" data-ref="_M/G4endl">G4endl</a></td></tr>
+<tr><th id="397">397</th><td>      &lt;&lt; <q>" !!! Particle Name : "</q>&lt;&lt; fpTrack -&gt; GetDefinition() -&gt; GetParticleName() &lt;&lt; <a class="macro" href="../../../../../global/management/include/G4ios.hh.html#60" title="std::endl" data-ref="_M/G4endl">G4endl</a></td></tr>
+<tr><th id="398">398</th><td>      &lt;&lt; <q>"No G4ITStepProcessor::fpITrack found"</q> &lt;&lt; <a class="macro" href="../../../../../global/management/include/G4ios.hh.html#60" title="std::endl" data-ref="_M/G4endl">G4endl</a>;</td></tr>
+<tr><th id="399">399</th><td></td></tr>
+<tr><th id="400">400</th><td>      <a class="ref" href="../../../../../global/management/include/G4Exception.hh.html#_Z11G4ExceptionPKcS0_19G4ExceptionSeverityRi" title='G4Exception' data-ref="_Z11G4ExceptionPKcS0_19G4ExceptionSeverityRi">G4Exception</a>(<q>"G4ITStepProcessor::DoStepping"</q>,</td></tr>
+<tr><th id="401">401</th><td>                  <q>"ITStepProcessor0013"</q>,</td></tr>
+<tr><th id="402">402</th><td>                  <a class="enum" href="../../../../../global/management/include/G4ExceptionSeverity.hh.html#G4ExceptionSeverity::FatalErrorInArgument" title='G4ExceptionSeverity::FatalErrorInArgument' data-ref="G4ExceptionSeverity::FatalErrorInArgument">FatalErrorInArgument</a>,</td></tr>
+<tr><th id="403">403</th><td>                  <span class='refarg'><a class="local col0 ref" href="#20exceptionDescription" title='exceptionDescription' data-ref="20exceptionDescription">exceptionDescription</a></span>);</td></tr>
+<tr><th id="404">404</th><td>      <b>return</b>; <i>// to make coverity happy</i></td></tr>
+<tr><th id="405">405</th><td>    }</td></tr>
+<tr><th id="406">406</th><td></td></tr>
+<tr><th id="407">407</th><td>    <b>if</b>(<a class="member" href="../include/G4ITStepProcessor.hh.html#G4ITStepProcessor::fpITrack" title='G4ITStepProcessor::fpITrack' data-ref="G4ITStepProcessor::fpITrack">fpITrack</a>-&gt;<a class="ref" href="../include/G4IT.hh.html#_ZN4G4IT15GetTrackingInfoEv" title='G4IT::GetTrackingInfo' data-ref="_ZN4G4IT15GetTrackingInfoEv">GetTrackingInfo</a>()-&gt;<a class="ref" href="../include/G4TrackingInformation.hh.html#_ZN21G4TrackingInformation13IsLeadingStepEv" title='G4TrackingInformation::IsLeadingStep' data-ref="_ZN21G4TrackingInformation13IsLeadingStepEv">IsLeadingStep</a>() == <b>false</b>)</td></tr>
+<tr><th id="408">408</th><td>    {</td></tr>
+<tr><th id="409">409</th><td>      <i>// In case the track has NOT the minimum step length</i></td></tr>
+<tr><th id="410">410</th><td><i>      // Given the final step time, the transportation</i></td></tr>
+<tr><th id="411">411</th><td><i>      // will compute the final position of the particle</i></td></tr>
+<tr><th id="412">412</th><td>      <a class="member" href="../include/G4ITStepProcessor.hh.html#G4ITStepProcessor::fpState" title='G4ITStepProcessor::fpState' data-ref="G4ITStepProcessor::fpState">fpState</a>-&gt;<a class="ref" href="../include/G4ITStepProcessor.hh.html#G4ITStepProcessorState::fStepStatus" title='G4ITStepProcessorState::fStepStatus' data-ref="G4ITStepProcessorState::fStepStatus">fStepStatus</a> = <a class="enum" href="../../../../../track/include/G4StepStatus.hh.html#G4StepStatus::fPostStepDoItProc" title='G4StepStatus::fPostStepDoItProc' data-ref="G4StepStatus::fPostStepDoItProc">fPostStepDoItProc</a>;</td></tr>
+<tr><th id="413">413</th><td>      fpStep-&gt;GetPostStepPoint()-&gt;SetProcessDefinedStep(<span class='error' title="cannot initialize a parameter of type &apos;const G4VProcess *&apos; with an lvalue of type &apos;G4ITTransportation *&apos;">fpTransportation</span>);</td></tr>
+<tr><th id="414">414</th><td>      <a class="member" href="#_ZN17G4ITStepProcessor22FindTransportationStepEv" title='G4ITStepProcessor::FindTransportationStep' data-ref="_ZN17G4ITStepProcessor22FindTransportationStepEv">FindTransportationStep</a>();</td></tr>
+<tr><th id="415">415</th><td>    }</td></tr>
+<tr><th id="416">416</th><td></td></tr>
+<tr><th id="417">417</th><td><u>#<span data-ppcond="417">ifdef</span> <span class="macro" data-ref="_M/DEBUG_MEM">DEBUG_MEM</span></u></td></tr>
+<tr><th id="418">418</th><td>    mem_intermediaire = MemoryUsage();</td></tr>
+<tr><th id="419">419</th><td>    mem_diff = mem_intermediaire-mem_first;</td></tr>
+<tr><th id="420">420</th><td>    G4cout &lt;&lt; <q>"\t\t\t &gt;&gt; || MEM || G4ITStepProcessor::DoStepping || After FindTransportationStep() with "</q> &lt;&lt; fpTrack-&gt;GetTrackID() &lt;&lt; <q>", diff is : "</q> &lt;&lt; mem_diff &lt;&lt; G4endl;</td></tr>
+<tr><th id="421">421</th><td><u>#<span data-ppcond="417">endif</span></u></td></tr>
+<tr><th id="422">422</th><td></td></tr>
+<tr><th id="423">423</th><td>    <i>// Store the Step length (geometrical length) to G4Step and G4Track</i></td></tr>
+<tr><th id="424">424</th><td>    <a class="member" href="../include/G4ITStepProcessor.hh.html#G4ITStepProcessor::fpTrack" title='G4ITStepProcessor::fpTrack' data-ref="G4ITStepProcessor::fpTrack">fpTrack</a>-&gt;<a class="ref" href="../../../../../track/include/G4Track.hh.html#_ZN7G4Track13SetStepLengthEd" title='G4Track::SetStepLength' data-ref="_ZN7G4Track13SetStepLengthEd">SetStepLength</a>(<a class="member" href="../include/G4ITStepProcessor.hh.html#G4ITStepProcessor::fpState" title='G4ITStepProcessor::fpState' data-ref="G4ITStepProcessor::fpState">fpState</a>-&gt;<a class="ref" href="../include/G4ITStepProcessor.hh.html#G4ITStepProcessorState::fPhysicalStep" title='G4ITStepProcessorState::fPhysicalStep' data-ref="G4ITStepProcessorState::fPhysicalStep">fPhysicalStep</a>);</td></tr>
+<tr><th id="425">425</th><td>    <a class="member" href="../include/G4ITStepProcessor.hh.html#G4ITStepProcessor::fpStep" title='G4ITStepProcessor::fpStep' data-ref="G4ITStepProcessor::fpStep">fpStep</a>-&gt;<a class="ref" href="../../../../../track/include/G4Step.hh.html#_ZN6G4Step13SetStepLengthEd" title='G4Step::SetStepLength' data-ref="_ZN6G4Step13SetStepLengthEd">SetStepLength</a>(<a class="member" href="../include/G4ITStepProcessor.hh.html#G4ITStepProcessor::fpState" title='G4ITStepProcessor::fpState' data-ref="G4ITStepProcessor::fpState">fpState</a>-&gt;<a class="ref" href="../include/G4ITStepProcessor.hh.html#G4ITStepProcessorState::fPhysicalStep" title='G4ITStepProcessorState::fPhysicalStep' data-ref="G4ITStepProcessorState::fPhysicalStep">fPhysicalStep</a>);</td></tr>
+<tr><th id="426">426</th><td></td></tr>
+<tr><th id="427">427</th><td>    <a class="typedef" href="../../../../../global/management/include/G4Types.hh.html#G4double" title='G4double' data-type='double' data-ref="G4double">G4double</a> <dfn class="local col1 decl" id="21GeomStepLength" title='GeomStepLength' data-type='G4double' data-ref="21GeomStepLength">GeomStepLength</dfn> = <a class="member" href="../include/G4ITStepProcessor.hh.html#G4ITStepProcessor::fpState" title='G4ITStepProcessor::fpState' data-ref="G4ITStepProcessor::fpState">fpState</a>-&gt;<a class="ref" href="../include/G4ITStepProcessor.hh.html#G4ITStepProcessorState::fPhysicalStep" title='G4ITStepProcessorState::fPhysicalStep' data-ref="G4ITStepProcessorState::fPhysicalStep">fPhysicalStep</a>;</td></tr>
+<tr><th id="428">428</th><td></td></tr>
+<tr><th id="429">429</th><td>    <i>// Store StepStatus to PostStepPoint</i></td></tr>
+<tr><th id="430">430</th><td>    <a class="member" href="../include/G4ITStepProcessor.hh.html#G4ITStepProcessor::fpStep" title='G4ITStepProcessor::fpStep' data-ref="G4ITStepProcessor::fpStep">fpStep</a>-&gt;<a class="ref" href="../../../../../track/include/G4Step.hh.html#_ZNK6G4Step16GetPostStepPointEv" title='G4Step::GetPostStepPoint' data-ref="_ZNK6G4Step16GetPostStepPointEv">GetPostStepPoint</a>()-&gt;<a class="ref" href="../../../../../track/include/G4StepPoint.hh.html#_ZN11G4StepPoint13SetStepStatusE12G4StepStatus" title='G4StepPoint::SetStepStatus' data-ref="_ZN11G4StepPoint13SetStepStatusE12G4StepStatus">SetStepStatus</a>(<a class="member" href="../include/G4ITStepProcessor.hh.html#G4ITStepProcessor::fpState" title='G4ITStepProcessor::fpState' data-ref="G4ITStepProcessor::fpState">fpState</a>-&gt;<a class="ref" href="../include/G4ITStepProcessor.hh.html#G4ITStepProcessorState::fStepStatus" title='G4ITStepProcessorState::fStepStatus' data-ref="G4ITStepProcessorState::fStepStatus">fStepStatus</a>);</td></tr>
+<tr><th id="431">431</th><td></td></tr>
+<tr><th id="432">432</th><td>    <i>// Invoke AlongStepDoIt</i></td></tr>
+<tr><th id="433">433</th><td>    <a class="member" href="#_ZN17G4ITStepProcessor24InvokeAlongStepDoItProcsEv" title='G4ITStepProcessor::InvokeAlongStepDoItProcs' data-ref="_ZN17G4ITStepProcessor24InvokeAlongStepDoItProcsEv">InvokeAlongStepDoItProcs</a>();</td></tr>
+<tr><th id="434">434</th><td></td></tr>
+<tr><th id="435">435</th><td><u>#<span data-ppcond="435">ifdef</span> <span class="macro" data-ref="_M/DEBUG_MEM">DEBUG_MEM</span></u></td></tr>
+<tr><th id="436">436</th><td>    mem_intermediaire = MemoryUsage();</td></tr>
+<tr><th id="437">437</th><td>    mem_diff = mem_intermediaire-mem_first;</td></tr>
+<tr><th id="438">438</th><td>    G4cout &lt;&lt; <q>"\t\t\t &gt;&gt; || MEM || G4ITStepProcessor::DoStepping || After InvokeAlongStepDoItProcs() with "</q> &lt;&lt; fpTrack-&gt;GetTrackID() &lt;&lt; <q>", diff is : "</q> &lt;&lt; mem_diff &lt;&lt; G4endl;</td></tr>
+<tr><th id="439">439</th><td><u>#<span data-ppcond="435">endif</span></u></td></tr>
+<tr><th id="440">440</th><td></td></tr>
+<tr><th id="441">441</th><td><u>#<span data-ppcond="441">ifdef</span> <span class="macro" data-ref="_M/G4VERBOSE">G4VERBOSE</span></u></td></tr>
+<tr><th id="442">442</th><td>    <i>// !!!!! Verbose</i></td></tr>
+<tr><th id="443">443</th><td>    <b>if</b>(<a class="member" href="../include/G4ITStepProcessor.hh.html#G4ITStepProcessor::fpVerbose" title='G4ITStepProcessor::fpVerbose' data-ref="G4ITStepProcessor::fpVerbose">fpVerbose</a>) <a class="member" href="../include/G4ITStepProcessor.hh.html#G4ITStepProcessor::fpVerbose" title='G4ITStepProcessor::fpVerbose' data-ref="G4ITStepProcessor::fpVerbose">fpVerbose</a>-&gt;<a class="virtual ref" href="../include/G4VITSteppingVerbose.hh.html#_ZN20G4VITSteppingVerbose20AlongStepDoItAllDoneEv" title='G4VITSteppingVerbose::AlongStepDoItAllDone' data-ref="_ZN20G4VITSteppingVerbose20AlongStepDoItAllDoneEv">AlongStepDoItAllDone</a>();</td></tr>
+<tr><th id="444">444</th><td><u>#<span data-ppcond="441">endif</span></u></td></tr>
+<tr><th id="445">445</th><td></td></tr>
+<tr><th id="446">446</th><td>    <i>// Update track by taking into account all changes by AlongStepDoIt</i></td></tr>
+<tr><th id="447">447</th><td><i>    // fpStep-&gt;UpdateTrack(); // done in InvokeAlongStepDoItProcs</i></td></tr>
+<tr><th id="448">448</th><td><i></i></td></tr>
+<tr><th id="449">449</th><td><i>    // Update safety after invocation of all AlongStepDoIts</i></td></tr>
+<tr><th id="450">450</th><td>    <a class="member" href="../include/G4ITStepProcessor.hh.html#G4ITStepProcessor::fpState" title='G4ITStepProcessor::fpState' data-ref="G4ITStepProcessor::fpState">fpState</a>-&gt;<a class="ref" href="../include/G4ITStepProcessor.hh.html#G4ITStepProcessorState::fEndpointSafOrigin" title='G4ITStepProcessorState::fEndpointSafOrigin' data-ref="G4ITStepProcessorState::fEndpointSafOrigin">fEndpointSafOrigin</a> <a class="ref" href="../../../../../externals/clhep/include/CLHEP/Vector/ThreeVector.h.html#_ZN5CLHEP10Hep3VectoraSERKS0_" title='CLHEP::Hep3Vector::operator=' data-ref="_ZN5CLHEP10Hep3VectoraSERKS0_">=</a> <a class="member" href="../include/G4ITStepProcessor.hh.html#G4ITStepProcessor::fpPostStepPoint" title='G4ITStepProcessor::fpPostStepPoint' data-ref="G4ITStepProcessor::fpPostStepPoint">fpPostStepPoint</a>-&gt;<a class="ref" href="../../../../../track/include/G4StepPoint.hh.html#_ZNK11G4StepPoint11GetPositionEv" title='G4StepPoint::GetPosition' data-ref="_ZNK11G4StepPoint11GetPositionEv">GetPosition</a>();</td></tr>
+<tr><th id="451">451</th><td></td></tr>
+<tr><th id="452">452</th><td>    fpState-&gt;fEndpointSafety =</td></tr>
+<tr><th id="453">453</th><td>        <span class='error' title="use of undeclared identifier &apos;std&apos;">std</span>::max(fpState-&gt;fProposedSafety - GeomStepLength, kCarTolerance);</td></tr>
+<tr><th id="454">454</th><td></td></tr>
+<tr><th id="455">455</th><td>    <a class="member" href="../include/G4ITStepProcessor.hh.html#G4ITStepProcessor::fpStep" title='G4ITStepProcessor::fpStep' data-ref="G4ITStepProcessor::fpStep">fpStep</a>-&gt;<a class="ref" href="../../../../../track/include/G4Step.hh.html#_ZNK6G4Step16GetPostStepPointEv" title='G4Step::GetPostStepPoint' data-ref="_ZNK6G4Step16GetPostStepPointEv">GetPostStepPoint</a>()-&gt;<a class="ref" href="../../../../../track/include/G4StepPoint.hh.html#_ZN11G4StepPoint9SetSafetyEd" title='G4StepPoint::SetSafety' data-ref="_ZN11G4StepPoint9SetSafetyEd">SetSafety</a>(<a class="member" href="../include/G4ITStepProcessor.hh.html#G4ITStepProcessor::fpState" title='G4ITStepProcessor::fpState' data-ref="G4ITStepProcessor::fpState">fpState</a>-&gt;<a class="ref" href="../include/G4ITStepProcessor.hh.html#G4ITStepProcessorState::fEndpointSafety" title='G4ITStepProcessorState::fEndpointSafety' data-ref="G4ITStepProcessorState::fEndpointSafety">fEndpointSafety</a>);</td></tr>
+<tr><th id="456">456</th><td></td></tr>
+<tr><th id="457">457</th><td>    <b>if</b>(<a class="ref" href="../include/G4IT.hh.html#_Z5GetITPK7G4Track" title='GetIT' data-ref="_Z5GetITPK7G4Track">GetIT</a>(<a class="member" href="../include/G4ITStepProcessor.hh.html#G4ITStepProcessor::fpTrack" title='G4ITStepProcessor::fpTrack' data-ref="G4ITStepProcessor::fpTrack">fpTrack</a>)-&gt;<a class="ref" href="../include/G4IT.hh.html#_ZN4G4IT15GetTrackingInfoEv" title='G4IT::GetTrackingInfo' data-ref="_ZN4G4IT15GetTrackingInfoEv">GetTrackingInfo</a>()-&gt;<a class="ref" href="../include/G4TrackingInformation.hh.html#_ZN21G4TrackingInformation13IsLeadingStepEv" title='G4TrackingInformation::IsLeadingStep' data-ref="_ZN21G4TrackingInformation13IsLeadingStepEv">IsLeadingStep</a>())</td></tr>
+<tr><th id="458">458</th><td>    {</td></tr>
+<tr><th id="459">459</th><td>      <i>// Invoke PostStepDoIt including G4ITTransportation::PSDI</i></td></tr>
+<tr><th id="460">460</th><td>      <a class="member" href="#_ZN17G4ITStepProcessor23InvokePostStepDoItProcsEv" title='G4ITStepProcessor::InvokePostStepDoItProcs' data-ref="_ZN17G4ITStepProcessor23InvokePostStepDoItProcsEv">InvokePostStepDoItProcs</a>();</td></tr>
+<tr><th id="461">461</th><td></td></tr>
+<tr><th id="462">462</th><td><u>#<span data-ppcond="462">ifdef</span> <span class="macro" data-ref="_M/DEBUG_MEM">DEBUG_MEM</span></u></td></tr>
+<tr><th id="463">463</th><td>      mem_intermediaire = MemoryUsage();</td></tr>
+<tr><th id="464">464</th><td>      mem_diff = mem_intermediaire-mem_first;</td></tr>
+<tr><th id="465">465</th><td>      G4cout &lt;&lt; <q>"\t\t\t &gt;&gt; || MEM || G4ITStepProcessor::DoStepping || After InvokePostStepDoItProcs() with "</q> &lt;&lt; fpTrack-&gt;GetTrackID() &lt;&lt; <q>", diff is : "</q> &lt;&lt; mem_diff &lt;&lt; G4endl;</td></tr>
+<tr><th id="466">466</th><td><u>#<span data-ppcond="462">endif</span></u></td></tr>
+<tr><th id="467">467</th><td><u>#<span data-ppcond="467">ifdef</span> <span class="macro" data-ref="_M/G4VERBOSE">G4VERBOSE</span></u></td></tr>
+<tr><th id="468">468</th><td>    <i>// !!!!! Verbose</i></td></tr>
+<tr><th id="469">469</th><td>    <b>if</b>(<a class="member" href="../include/G4ITStepProcessor.hh.html#G4ITStepProcessor::fpVerbose" title='G4ITStepProcessor::fpVerbose' data-ref="G4ITStepProcessor::fpVerbose">fpVerbose</a>) <a class="member" href="../include/G4ITStepProcessor.hh.html#G4ITStepProcessor::fpVerbose" title='G4ITStepProcessor::fpVerbose' data-ref="G4ITStepProcessor::fpVerbose">fpVerbose</a>-&gt;<a class="virtual ref" href="../include/G4VITSteppingVerbose.hh.html#_ZN20G4VITSteppingVerbose23StepInfoForLeadingTrackEv" title='G4VITSteppingVerbose::StepInfoForLeadingTrack' data-ref="_ZN20G4VITSteppingVerbose23StepInfoForLeadingTrackEv">StepInfoForLeadingTrack</a>();</td></tr>
+<tr><th id="470">470</th><td><u>#<span data-ppcond="467">endif</span></u></td></tr>
+<tr><th id="471">471</th><td>    }</td></tr>
+<tr><th id="472">472</th><td>    <b>else</b></td></tr>
+<tr><th id="473">473</th><td>    {</td></tr>
+<tr><th id="474">474</th><td>      <i>// Only invoke transportation and all other forced processes</i></td></tr>
+<tr><th id="475">475</th><td>      <a class="member" href="#_ZN17G4ITStepProcessor24InvokeTransportationProcEv" title='G4ITStepProcessor::InvokeTransportationProc' data-ref="_ZN17G4ITStepProcessor24InvokeTransportationProcEv">InvokeTransportationProc</a>();</td></tr>
+<tr><th id="476">476</th><td>      fpStep-&gt;GetPostStepPoint()-&gt;SetProcessDefinedStep(<span class='error' title="cannot initialize a parameter of type &apos;const G4VProcess *&apos; with an lvalue of type &apos;G4ITTransportation *&apos;">fpTransportation</span>);</td></tr>
+<tr><th id="477">477</th><td></td></tr>
+<tr><th id="478">478</th><td><u>#<span data-ppcond="478">ifdef</span> <span class="macro" data-ref="_M/DEBUG_MEM">DEBUG_MEM</span></u></td></tr>
+<tr><th id="479">479</th><td>      mem_intermediaire = MemoryUsage();</td></tr>
+<tr><th id="480">480</th><td>      mem_diff = mem_intermediaire-mem_first;</td></tr>
+<tr><th id="481">481</th><td>      G4cout &lt;&lt; <q>"\t\t\t &gt;&gt; || MEM || G4ITStepProcessor::DoStepping || After InvokeTransportationProc() with "</q> &lt;&lt; fpTrack-&gt;GetTrackID() &lt;&lt; <q>", diff is : "</q> &lt;&lt; mem_diff &lt;&lt; G4endl;</td></tr>
+<tr><th id="482">482</th><td><u>#<span data-ppcond="478">endif</span></u></td></tr>
+<tr><th id="483">483</th><td>    }</td></tr>
+<tr><th id="484">484</th><td></td></tr>
+<tr><th id="485">485</th><td><u>#<span data-ppcond="485">ifdef</span> <span class="macro" data-ref="_M/G4VERBOSE">G4VERBOSE</span></u></td></tr>
+<tr><th id="486">486</th><td>    <i>// !!!!! Verbose</i></td></tr>
+<tr><th id="487">487</th><td>    <b>if</b>(<a class="member" href="../include/G4ITStepProcessor.hh.html#G4ITStepProcessor::fpVerbose" title='G4ITStepProcessor::fpVerbose' data-ref="G4ITStepProcessor::fpVerbose">fpVerbose</a>) <a class="member" href="../include/G4ITStepProcessor.hh.html#G4ITStepProcessor::fpVerbose" title='G4ITStepProcessor::fpVerbose' data-ref="G4ITStepProcessor::fpVerbose">fpVerbose</a>-&gt;<a class="virtual ref" href="../include/G4VITSteppingVerbose.hh.html#_ZN20G4VITSteppingVerbose19PostStepDoItAllDoneEv" title='G4VITSteppingVerbose::PostStepDoItAllDone' data-ref="_ZN20G4VITSteppingVerbose19PostStepDoItAllDoneEv">PostStepDoItAllDone</a>();</td></tr>
+<tr><th id="488">488</th><td><u>#<span data-ppcond="485">endif</span></u></td></tr>
+<tr><th id="489">489</th><td>  }</td></tr>
+<tr><th id="490">490</th><td></td></tr>
+<tr><th id="491">491</th><td>  <a class="member" href="../include/G4ITStepProcessor.hh.html#G4ITStepProcessor::fpNavigator" title='G4ITStepProcessor::fpNavigator' data-ref="G4ITStepProcessor::fpNavigator">fpNavigator</a>-&gt;<a class="ref" href="../include/G4ITNavigator2.hh.html#_ZN13G4ITNavigator19ResetNavigatorStateEv" title='G4ITNavigator::ResetNavigatorState' data-ref="_ZN13G4ITNavigator19ResetNavigatorStateEv">ResetNavigatorState</a>();</td></tr>
+<tr><th id="492">492</th><td></td></tr>
+<tr><th id="493">493</th><td><u>#<span data-ppcond="493">ifdef</span> <span class="macro" data-ref="_M/DEBUG_MEM">DEBUG_MEM</span></u></td></tr>
+<tr><th id="494">494</th><td>  mem_intermediaire = MemoryUsage();</td></tr>
+<tr><th id="495">495</th><td>  mem_diff = mem_intermediaire-mem_first;</td></tr>
+<tr><th id="496">496</th><td>  G4cout &lt;&lt; <q>"\t\t\t &gt;&gt; || MEM || G4ITStepProcessor::DoStepping || After fpNavigator-&gt;SetNavigatorState with "</q> &lt;&lt; fpTrack-&gt;GetTrackID() &lt;&lt; <q>", diff is : "</q> &lt;&lt; mem_diff &lt;&lt; G4endl;</td></tr>
+<tr><th id="497">497</th><td><u>#<span data-ppcond="493">endif</span></u></td></tr>
+<tr><th id="498">498</th><td></td></tr>
+<tr><th id="499">499</th><td>  <i>//-------</i></td></tr>
+<tr><th id="500">500</th><td><i>  // Finale</i></td></tr>
+<tr><th id="501">501</th><td><i>  //-------</i></td></tr>
+<tr><th id="502">502</th><td><i></i></td></tr>
+<tr><th id="503">503</th><td><i>  // Update 'TrackLength' and remeber the Step length of the current Step</i></td></tr>
+<tr><th id="504">504</th><td>  <a class="member" href="../include/G4ITStepProcessor.hh.html#G4ITStepProcessor::fpTrack" title='G4ITStepProcessor::fpTrack' data-ref="G4ITStepProcessor::fpTrack">fpTrack</a>-&gt;<a class="ref" href="../../../../../track/include/G4Track.hh.html#_ZN7G4Track14AddTrackLengthEd" title='G4Track::AddTrackLength' data-ref="_ZN7G4Track14AddTrackLengthEd">AddTrackLength</a>(<a class="member" href="../include/G4ITStepProcessor.hh.html#G4ITStepProcessor::fpStep" title='G4ITStepProcessor::fpStep' data-ref="G4ITStepProcessor::fpStep">fpStep</a>-&gt;<a class="ref" href="../../../../../track/include/G4Step.hh.html#_ZNK6G4Step13GetStepLengthEv" title='G4Step::GetStepLength' data-ref="_ZNK6G4Step13GetStepLengthEv">GetStepLength</a>());</td></tr>
+<tr><th id="505">505</th><td>  <a class="member" href="../include/G4ITStepProcessor.hh.html#G4ITStepProcessor::fpTrack" title='G4ITStepProcessor::fpTrack' data-ref="G4ITStepProcessor::fpTrack">fpTrack</a>-&gt;<a class="ref" href="../../../../../track/include/G4Track.hh.html#_ZN7G4Track26IncrementCurrentStepNumberEv" title='G4Track::IncrementCurrentStepNumber' data-ref="_ZN7G4Track26IncrementCurrentStepNumberEv">IncrementCurrentStepNumber</a>();</td></tr>
+<tr><th id="506">506</th><td></td></tr>
+<tr><th id="507">507</th><td><i>//#ifdef G4VERBOSE</i></td></tr>
+<tr><th id="508">508</th><td><i>// //    !!!!! Verbose</i></td></tr>
+<tr><th id="509">509</th><td><i>//  if(fpVerbose) fpVerbose-&gt;StepInfo();</i></td></tr>
+<tr><th id="510">510</th><td><i>//#endif</i></td></tr>
+<tr><th id="511">511</th><td></td></tr>
+<tr><th id="512">512</th><td><u>#<span data-ppcond="512">ifdef</span> <span class="macro" data-ref="_M/G4VERBOSE">G4VERBOSE</span></u></td></tr>
+<tr><th id="513">513</th><td>    <b>if</b>(<a class="member" href="../include/G4ITStepProcessor.hh.html#G4ITStepProcessor::fpVerbose" title='G4ITStepProcessor::fpVerbose' data-ref="G4ITStepProcessor::fpVerbose">fpVerbose</a>) <a class="member" href="../include/G4ITStepProcessor.hh.html#G4ITStepProcessor::fpVerbose" title='G4ITStepProcessor::fpVerbose' data-ref="G4ITStepProcessor::fpVerbose">fpVerbose</a>-&gt;<a class="virtual ref" href="../include/G4VITSteppingVerbose.hh.html#_ZN20G4VITSteppingVerbose15PostStepVerboseEP7G4Track" title='G4VITSteppingVerbose::PostStepVerbose' data-ref="_ZN20G4VITSteppingVerbose15PostStepVerboseEP7G4Track">PostStepVerbose</a>(<a class="member" href="../include/G4ITStepProcessor.hh.html#G4ITStepProcessor::fpTrack" title='G4ITStepProcessor::fpTrack' data-ref="G4ITStepProcessor::fpTrack">fpTrack</a>);</td></tr>
+<tr><th id="514">514</th><td><u>#<span data-ppcond="512">endif</span></u></td></tr>
+<tr><th id="515">515</th><td></td></tr>
+<tr><th id="516">516</th><td><i>//    G4cout &lt;&lt; " G4ITStepProcessor::DoStepping  -- " &lt;&lt;fpTrack-&gt;GetTrackID() &lt;&lt; " tps = " &lt;&lt; fpTrack-&gt;GetGlobalTime() &lt;&lt; G4endl;</i></td></tr>
+<tr><th id="517">517</th><td><i></i></td></tr>
+<tr><th id="518">518</th><td><i>  // Send G4Step information to Hit/Dig if the volume is sensitive</i></td></tr>
+<tr><th id="519">519</th><td>  <i>/***</i></td></tr>
+<tr><th id="520">520</th><td><i>   fpCurrentVolume = fpStep-&gt;GetPreStepPoint()-&gt;GetPhysicalVolume();</i></td></tr>
+<tr><th id="521">521</th><td><i>   StepControlFlag =  fpStep-&gt;GetControlFlag();</i></td></tr>
+<tr><th id="522">522</th><td><i></i></td></tr>
+<tr><th id="523">523</th><td><i>   if( fpCurrentVolume != 0 &amp;&amp; StepControlFlag != AvoidHitInvocation)</i></td></tr>
+<tr><th id="524">524</th><td><i>   {</i></td></tr>
+<tr><th id="525">525</th><td><i>   fpSensitive = fpStep-&gt;GetPreStepPoint()-&gt;</i></td></tr>
+<tr><th id="526">526</th><td><i>   GetSensitiveDetector();</i></td></tr>
+<tr><th id="527">527</th><td><i>   if( fpSensitive != 0 )</i></td></tr>
+<tr><th id="528">528</th><td><i>   {</i></td></tr>
+<tr><th id="529">529</th><td><i>   fpSensitive-&gt;Hit(fpStep);</i></td></tr>
+<tr><th id="530">530</th><td><i>   }</i></td></tr>
+<tr><th id="531">531</th><td><i>   }</i></td></tr>
+<tr><th id="532">532</th><td><i></i></td></tr>
+<tr><th id="533">533</th><td><i>   User intervention process.</i></td></tr>
+<tr><th id="534">534</th><td><i>   if( fpUserSteppingAction != 0 )</i></td></tr>
+<tr><th id="535">535</th><td><i>   {</i></td></tr>
+<tr><th id="536">536</th><td><i>   fpUserSteppingAction-&gt;UserSteppingAction(fpStep);</i></td></tr>
+<tr><th id="537">537</th><td><i>   }</i></td></tr>
+<tr><th id="538">538</th><td><i>   G4UserSteppingAction* regionalAction</i></td></tr>
+<tr><th id="539">539</th><td><i>   = fpStep-&gt;GetPreStepPoint()-&gt;GetPhysicalVolume()-&gt;GetLogicalVolume()-&gt;GetRegion()</i></td></tr>
+<tr><th id="540">540</th><td><i>   -&gt;GetRegionalSteppingAction();</i></td></tr>
+<tr><th id="541">541</th><td><i>   if( regionalAction ) regionalAction-&gt;UserSteppingAction(fpStep);</i></td></tr>
+<tr><th id="542">542</th><td><i>   ***/</i></td></tr>
+<tr><th id="543">543</th><td>  <a class="member" href="../include/G4ITStepProcessor.hh.html#G4ITStepProcessor::fpTrackingManager" title='G4ITStepProcessor::fpTrackingManager' data-ref="G4ITStepProcessor::fpTrackingManager">fpTrackingManager</a>-&gt;<a class="ref" href="../include/G4ITTrackingManager.hh.html#_ZN19G4ITTrackingManager10AppendStepEP7G4TrackP6G4Step" title='G4ITTrackingManager::AppendStep' data-ref="_ZN19G4ITTrackingManager10AppendStepEP7G4TrackP6G4Step">AppendStep</a>(<a class="member" href="../include/G4ITStepProcessor.hh.html#G4ITStepProcessor::fpTrack" title='G4ITStepProcessor::fpTrack' data-ref="G4ITStepProcessor::fpTrack">fpTrack</a>, <a class="member" href="../include/G4ITStepProcessor.hh.html#G4ITStepProcessor::fpStep" title='G4ITStepProcessor::fpStep' data-ref="G4ITStepProcessor::fpStep">fpStep</a>);</td></tr>
+<tr><th id="544">544</th><td>  <i>// Stepping process finish. Return the value of the StepStatus.</i></td></tr>
+<tr><th id="545">545</th><td></td></tr>
+<tr><th id="546">546</th><td><u>#<span data-ppcond="546">ifdef</span> <span class="macro" data-ref="_M/DEBUG_MEM">DEBUG_MEM</span></u></td></tr>
+<tr><th id="547">547</th><td>  MemStat mem_intermediaire = MemoryUsage();</td></tr>
+<tr><th id="548">548</th><td>  mem_diff = mem_intermediaire-mem_first;</td></tr>
+<tr><th id="549">549</th><td>  G4cout &lt;&lt; <q>"\t\t\t &gt;&gt; || MEM || End of DoStepping() with "</q> &lt;&lt; fpTrack-&gt;GetTrackID() &lt;&lt; <q>", diff is : "</q> &lt;&lt; mem_diff &lt;&lt; G4endl;</td></tr>
+<tr><th id="550">550</th><td><u>#<span data-ppcond="546">endif</span></u></td></tr>
+<tr><th id="551">551</th><td></td></tr>
+<tr><th id="552">552</th><td>  <i>//    return fpState-&gt;fStepStatus;</i></td></tr>
+<tr><th id="553">553</th><td>}</td></tr>
+<tr><th id="554">554</th><td></td></tr>
+<tr><th id="555">555</th><td><i>//______________________________________________________________________________</i></td></tr>
+<tr><th id="556">556</th><td><i></i></td></tr>
+<tr><th id="557">557</th><td><i>// ************************************************************************</i></td></tr>
+<tr><th id="558">558</th><td><i>//  AtRestDoIt</i></td></tr>
+<tr><th id="559">559</th><td><i>// ************************************************************************</i></td></tr>
+<tr><th id="560">560</th><td></td></tr>
+<tr><th id="561">561</th><td><em>void</em> <a class="type" href="../include/G4ITStepProcessor.hh.html#G4ITStepProcessor" title='G4ITStepProcessor' data-ref="G4ITStepProcessor">G4ITStepProcessor</a>::<dfn class="decl def" id="_ZN17G4ITStepProcessor21InvokeAtRestDoItProcsEv" title='G4ITStepProcessor::InvokeAtRestDoItProcs' data-ref="_ZN17G4ITStepProcessor21InvokeAtRestDoItProcsEv">InvokeAtRestDoItProcs</dfn>()</td></tr>
+<tr><th id="562">562</th><td>{</td></tr>
+<tr><th id="563">563</th><td>  <a class="member" href="../include/G4ITStepProcessor.hh.html#G4ITStepProcessor::fpStep" title='G4ITStepProcessor::fpStep' data-ref="G4ITStepProcessor::fpStep">fpStep</a>-&gt;<a class="ref" href="../../../../../track/include/G4Step.hh.html#_ZN6G4Step13SetStepLengthEd" title='G4Step::SetStepLength' data-ref="_ZN6G4Step13SetStepLengthEd">SetStepLength</a>(<var>0.</var>);  <i>//the particle has stopped</i></td></tr>
+<tr><th id="564">564</th><td>  <a class="member" href="../include/G4ITStepProcessor.hh.html#G4ITStepProcessor::fpTrack" title='G4ITStepProcessor::fpTrack' data-ref="G4ITStepProcessor::fpTrack">fpTrack</a>-&gt;<a class="ref" href="../../../../../track/include/G4Track.hh.html#_ZN7G4Track13SetStepLengthEd" title='G4Track::SetStepLength' data-ref="_ZN7G4Track13SetStepLengthEd">SetStepLength</a>(<var>0.</var>);</td></tr>
+<tr><th id="565">565</th><td></td></tr>
+<tr><th id="566">566</th><td>  <span class='error' title="unknown type name &apos;G4SelectedAtRestDoItVector&apos;">G4SelectedAtRestDoItVector</span>&amp; <dfn class="local col2 decl" id="22selectedAtRestDoItVector" title='selectedAtRestDoItVector' data-type='int &amp;' data-ref="22selectedAtRestDoItVector">selectedAtRestDoItVector</dfn> =</td></tr>
+<tr><th id="567">567</th><td>      fpState-&gt;fSelectedAtRestDoItVector;</td></tr>
+<tr><th id="568">568</th><td></td></tr>
+<tr><th id="569">569</th><td>  <i>// invoke selected process</i></td></tr>
+<tr><th id="570">570</th><td>  <b>for</b>(<span class='error' title="unknown type name &apos;size_t&apos;">size_t</span> <dfn class="local col3 decl" id="23np" title='np' data-type='int' data-ref="23np">np</dfn> = <var>0</var>; np &lt; fpProcessInfo-&gt;MAXofAtRestLoops; np++)</td></tr>
+<tr><th id="571">571</th><td>  {</td></tr>
+<tr><th id="572">572</th><td>    <i>//</i></td></tr>
+<tr><th id="573">573</th><td><i>    // Note: DoItVector has inverse order against GetPhysIntVector</i></td></tr>
+<tr><th id="574">574</th><td><i>    //       and SelectedAtRestDoItVector.</i></td></tr>
+<tr><th id="575">575</th><td><i>    //</i></td></tr>
+<tr><th id="576">576</th><td>    <b>if</b>(selectedAtRestDoItVector[fpProcessInfo-&gt;MAXofAtRestLoops - np - <var>1</var>] != InActivated)</td></tr>
+<tr><th id="577">577</th><td>    {</td></tr>
+<tr><th id="578">578</th><td>      fpCurrentProcess =</td></tr>
+<tr><th id="579">579</th><td>          (G4VITProcess*) (*fpProcessInfo-&gt;fpAtRestDoItVector)[np];</td></tr>
+<tr><th id="580">580</th><td></td></tr>
+<tr><th id="581">581</th><td><i>//      G4cout &lt;&lt; " Invoke : "</i></td></tr>
+<tr><th id="582">582</th><td><i>//             &lt;&lt; fpCurrentProcess-&gt;GetProcessName()</i></td></tr>
+<tr><th id="583">583</th><td><i>//             &lt;&lt; G4endl;</i></td></tr>
+<tr><th id="584">584</th><td><i></i></td></tr>
+<tr><th id="585">585</th><td><i>      //  if(fpVerbose)</i></td></tr>
+<tr><th id="586">586</th><td><i>      //  {</i></td></tr>
+<tr><th id="587">587</th><td><i>      //    fpVerbose-&gt;AtRestDoItOneByOne();</i></td></tr>
+<tr><th id="588">588</th><td><i>      //  }</i></td></tr>
+<tr><th id="589">589</th><td></td></tr>
+<tr><th id="590">590</th><td>      fpCurrentProcess-&gt;<span class='error' title="no member named &apos;SetProcessState&apos; in &apos;G4VITProcess&apos;">SetProcessState</span>(fpTrackingInfo-&gt;<span class='error' title="no member named &apos;GetProcessState&apos; in &apos;G4TrackingInformation&apos;">GetProcessState</span>(fpCurrentProcess</td></tr>
+<tr><th id="591">591</th><td>          -&gt;GetProcessID()));</td></tr>
+<tr><th id="592">592</th><td>      fpParticleChange = <span class='error' title="cannot initialize object parameter of type &apos;G4VProcess&apos; with an expression of type &apos;G4VITProcess&apos;">fpCurrentProcess</span>-&gt;AtRestDoIt(*fpTrack, *fpStep);</td></tr>
+<tr><th id="593">593</th><td>      fpCurrentProcess-&gt;<span class='error' title="no member named &apos;ResetProcessState&apos; in &apos;G4VITProcess&apos;">ResetProcessState</span>();</td></tr>
+<tr><th id="594">594</th><td></td></tr>
+<tr><th id="595">595</th><td>      <i>// Set the current process as a process which defined this Step length</i></td></tr>
+<tr><th id="596">596</th><td>      fpStep-&gt;GetPostStepPoint()-&gt;SetProcessDefinedStep(<span class='error' title="cannot initialize a parameter of type &apos;const G4VProcess *&apos; with an lvalue of type &apos;G4VITProcess *&apos;">fpCurrentProcess</span>);</td></tr>
+<tr><th id="597">597</th><td></td></tr>
+<tr><th id="598">598</th><td>      <i>// Update Step</i></td></tr>
+<tr><th id="599">599</th><td>      <a class="member" href="../include/G4ITStepProcessor.hh.html#G4ITStepProcessor::fpParticleChange" title='G4ITStepProcessor::fpParticleChange' data-ref="G4ITStepProcessor::fpParticleChange">fpParticleChange</a>-&gt;<a class="virtual ref" href="../../../../../track/include/G4VParticleChange.hh.html#_ZN17G4VParticleChange19UpdateStepForAtRestEP6G4Step" title='G4VParticleChange::UpdateStepForAtRest' data-ref="_ZN17G4VParticleChange19UpdateStepForAtRestEP6G4Step">UpdateStepForAtRest</a>(<a class="member" href="../include/G4ITStepProcessor.hh.html#G4ITStepProcessor::fpStep" title='G4ITStepProcessor::fpStep' data-ref="G4ITStepProcessor::fpStep">fpStep</a>);</td></tr>
+<tr><th id="600">600</th><td></td></tr>
+<tr><th id="601">601</th><td>      <i>// Now Store the secondaries from ParticleChange to SecondaryList</i></td></tr>
+<tr><th id="602">602</th><td>      <a class="member" href="#_ZN17G4ITStepProcessor19DealWithSecondariesERi" title='G4ITStepProcessor::DealWithSecondaries' data-ref="_ZN17G4ITStepProcessor19DealWithSecondariesERi">DealWithSecondaries</a>(<span class='refarg'><a class="member" href="../include/G4ITStepProcessor.hh.html#G4ITStepProcessor::fN2ndariesAtRestDoIt" title='G4ITStepProcessor::fN2ndariesAtRestDoIt' data-ref="G4ITStepProcessor::fN2ndariesAtRestDoIt">fN2ndariesAtRestDoIt</a></span>);</td></tr>
+<tr><th id="603">603</th><td></td></tr>
+<tr><th id="604">604</th><td>      <i>// Set the track status according to what the process defined</i></td></tr>
+<tr><th id="605">605</th><td><i>      // if kinetic energy &gt;0, otherwise set  fStopButAlive</i></td></tr>
+<tr><th id="606">606</th><td>      <a class="member" href="../include/G4ITStepProcessor.hh.html#G4ITStepProcessor::fpTrack" title='G4ITStepProcessor::fpTrack' data-ref="G4ITStepProcessor::fpTrack">fpTrack</a>-&gt;<a class="ref" href="../../../../../track/include/G4Track.hh.html#_ZN7G4Track14SetTrackStatusE13G4TrackStatus" title='G4Track::SetTrackStatus' data-ref="_ZN7G4Track14SetTrackStatusE13G4TrackStatus">SetTrackStatus</a>(<a class="member" href="../include/G4ITStepProcessor.hh.html#G4ITStepProcessor::fpParticleChange" title='G4ITStepProcessor::fpParticleChange' data-ref="G4ITStepProcessor::fpParticleChange">fpParticleChange</a>-&gt;<a class="ref" href="../../../../../track/include/G4VParticleChange.hh.html#_ZNK17G4VParticleChange14GetTrackStatusEv" title='G4VParticleChange::GetTrackStatus' data-ref="_ZNK17G4VParticleChange14GetTrackStatusEv">GetTrackStatus</a>());</td></tr>
+<tr><th id="607">607</th><td></td></tr>
+<tr><th id="608">608</th><td>      <i>// clear ParticleChange</i></td></tr>
+<tr><th id="609">609</th><td>      <a class="member" href="../include/G4ITStepProcessor.hh.html#G4ITStepProcessor::fpParticleChange" title='G4ITStepProcessor::fpParticleChange' data-ref="G4ITStepProcessor::fpParticleChange">fpParticleChange</a>-&gt;<a class="ref" href="../../../../../track/include/G4VParticleChange.hh.html#_ZN17G4VParticleChange5ClearEv" title='G4VParticleChange::Clear' data-ref="_ZN17G4VParticleChange5ClearEv">Clear</a>();</td></tr>
+<tr><th id="610">610</th><td></td></tr>
+<tr><th id="611">611</th><td>    } <i>//if(fSelectedAtRestDoItVector[np] != InActivated){</i></td></tr>
+<tr><th id="612">612</th><td>  } <i>//for(size_t np=0; np &lt; MAXofAtRestLoops; np++){</i></td></tr>
+<tr><th id="613">613</th><td>  <a class="member" href="../include/G4ITStepProcessor.hh.html#G4ITStepProcessor::fpStep" title='G4ITStepProcessor::fpStep' data-ref="G4ITStepProcessor::fpStep">fpStep</a>-&gt;<a class="ref" href="../../../../../track/include/G4Step.hh.html#_ZN6G4Step11UpdateTrackEv" title='G4Step::UpdateTrack' data-ref="_ZN6G4Step11UpdateTrackEv">UpdateTrack</a>();</td></tr>
+<tr><th id="614">614</th><td></td></tr>
+<tr><th id="615">615</th><td>  <i>// Modification par rapport au transport standard :</i></td></tr>
+<tr><th id="616">616</th><td><i>  // fStopAndKill doit etre propose par le modele</i></td></tr>
+<tr><th id="617">617</th><td><i>  // sinon d autres processus AtRest seront appeles</i></td></tr>
+<tr><th id="618">618</th><td><i>  // au pas suivant</i></td></tr>
+<tr><th id="619">619</th><td><i>  // fpTrack-&gt;SetTrackStatus(fStopAndKill);</i></td></tr>
+<tr><th id="620">620</th><td>}</td></tr>
+<tr><th id="621">621</th><td></td></tr>
+<tr><th id="622">622</th><td><i>//______________________________________________________________________________</i></td></tr>
+<tr><th id="623">623</th><td><i></i></td></tr>
+<tr><th id="624">624</th><td><i>// ************************************************************************</i></td></tr>
+<tr><th id="625">625</th><td><i>//  AlongStepDoIt</i></td></tr>
+<tr><th id="626">626</th><td><i>// ************************************************************************</i></td></tr>
+<tr><th id="627">627</th><td></td></tr>
+<tr><th id="628">628</th><td><em>void</em> <a class="type" href="../include/G4ITStepProcessor.hh.html#G4ITStepProcessor" title='G4ITStepProcessor' data-ref="G4ITStepProcessor">G4ITStepProcessor</a>::<dfn class="decl def" id="_ZN17G4ITStepProcessor24InvokeAlongStepDoItProcsEv" title='G4ITStepProcessor::InvokeAlongStepDoItProcs' data-ref="_ZN17G4ITStepProcessor24InvokeAlongStepDoItProcsEv">InvokeAlongStepDoItProcs</dfn>()</td></tr>
+<tr><th id="629">629</th><td>{</td></tr>
+<tr><th id="630">630</th><td></td></tr>
+<tr><th id="631">631</th><td><u>#<span data-ppcond="631">ifdef</span> <span class="macro" data-ref="_M/DEBUG_MEM">DEBUG_MEM</span></u></td></tr>
+<tr><th id="632">632</th><td>  MemStat mem_first, mem_second, mem_diff;</td></tr>
+<tr><th id="633">633</th><td><u>#<span data-ppcond="631">endif</span></u></td></tr>
+<tr><th id="634">634</th><td></td></tr>
+<tr><th id="635">635</th><td><u>#<span data-ppcond="635">ifdef</span> <span class="macro" data-ref="_M/DEBUG_MEM">DEBUG_MEM</span></u></td></tr>
+<tr><th id="636">636</th><td>  mem_first = MemoryUsage();</td></tr>
+<tr><th id="637">637</th><td><u>#<span data-ppcond="635">endif</span></u></td></tr>
+<tr><th id="638">638</th><td></td></tr>
+<tr><th id="639">639</th><td>  <i>// If the current Step is defined by a 'ExclusivelyForced'</i></td></tr>
+<tr><th id="640">640</th><td><i>  // PostStepDoIt, then don't invoke any AlongStepDoIt</i></td></tr>
+<tr><th id="641">641</th><td>  <b>if</b>(<a class="member" href="../include/G4ITStepProcessor.hh.html#G4ITStepProcessor::fpState" title='G4ITStepProcessor::fpState' data-ref="G4ITStepProcessor::fpState">fpState</a>-&gt;<a class="ref" href="../include/G4ITStepProcessor.hh.html#G4ITStepProcessorState::fStepStatus" title='G4ITStepProcessorState::fStepStatus' data-ref="G4ITStepProcessorState::fStepStatus">fStepStatus</a> == <a class="enum" href="../../../../../track/include/G4StepStatus.hh.html#G4StepStatus::fExclusivelyForcedProc" title='G4StepStatus::fExclusivelyForcedProc' data-ref="G4StepStatus::fExclusivelyForcedProc">fExclusivelyForcedProc</a>)</td></tr>
+<tr><th id="642">642</th><td>  {</td></tr>
+<tr><th id="643">643</th><td>    <b>return</b>;               <i>// Take note 'return' at here !!!</i></td></tr>
+<tr><th id="644">644</th><td>  }</td></tr>
+<tr><th id="645">645</th><td></td></tr>
+<tr><th id="646">646</th><td>  <i>// Invoke the all active continuous processes</i></td></tr>
+<tr><th id="647">647</th><td>  <b>for</b>(<span class='error' title="unknown type name &apos;size_t&apos;">size_t</span> <dfn class="local col4 decl" id="24ci" title='ci' data-type='int' data-ref="24ci">ci</dfn> = <var>0</var>; ci &lt; fpProcessInfo-&gt;MAXofAlongStepLoops; ci++)</td></tr>
+<tr><th id="648">648</th><td>  {</td></tr>
+<tr><th id="649">649</th><td>    fpCurrentProcess =</td></tr>
+<tr><th id="650">650</th><td>        (G4VITProcess*) (*fpProcessInfo-&gt;fpAlongStepDoItVector)[ci];</td></tr>
+<tr><th id="651">651</th><td>    <b>if</b>(<a class="member" href="../include/G4ITStepProcessor.hh.html#G4ITStepProcessor::fpCurrentProcess" title='G4ITStepProcessor::fpCurrentProcess' data-ref="G4ITStepProcessor::fpCurrentProcess">fpCurrentProcess</a> == <var>0</var>) <b>continue</b>;</td></tr>
+<tr><th id="652">652</th><td>    <i>// NULL means the process is inactivated by a user on fly.</i></td></tr>
+<tr><th id="653">653</th><td></td></tr>
+<tr><th id="654">654</th><td>    fpCurrentProcess-&gt;<span class='error' title="no member named &apos;SetProcessState&apos; in &apos;G4VITProcess&apos;">SetProcessState</span>(fpTrackingInfo-&gt;<span class='error' title="no member named &apos;GetProcessState&apos; in &apos;G4TrackingInformation&apos;">GetProcessState</span>(fpCurrentProcess</td></tr>
+<tr><th id="655">655</th><td>        -&gt;GetProcessID()));</td></tr>
+<tr><th id="656">656</th><td>    fpParticleChange = <span class='error' title="cannot initialize object parameter of type &apos;G4VProcess&apos; with an expression of type &apos;G4VITProcess&apos;">fpCurrentProcess</span>-&gt;AlongStepDoIt(*fpTrack, *fpStep);</td></tr>
+<tr><th id="657">657</th><td></td></tr>
+<tr><th id="658">658</th><td><u>#<span data-ppcond="658">ifdef</span> <span class="macro" data-ref="_M/DEBUG_MEM">DEBUG_MEM</span></u></td></tr>
+<tr><th id="659">659</th><td>    MemStat mem_intermediaire = MemoryUsage();</td></tr>
+<tr><th id="660">660</th><td>    mem_diff = mem_intermediaire-mem_first;</td></tr>
+<tr><th id="661">661</th><td>    G4cout &lt;&lt; <q>"\t\t\t &gt;&gt; || MEM || After calling AlongStepDoIt for "</q> &lt;&lt; fpCurrentProcess-&gt;GetProcessName() &lt;&lt; <q>" and track "</q>&lt;&lt; fpTrack-&gt;GetTrackID() &lt;&lt; <q>", diff is : "</q> &lt;&lt; mem_diff &lt;&lt; G4endl;</td></tr>
+<tr><th id="662">662</th><td><u>#<span data-ppcond="658">endif</span></u></td></tr>
+<tr><th id="663">663</th><td></td></tr>
+<tr><th id="664">664</th><td><i>//        fpCurrentProcess-&gt;SetProcessState(0);</i></td></tr>
+<tr><th id="665">665</th><td>    fpCurrentProcess-&gt;<span class='error' title="no member named &apos;ResetProcessState&apos; in &apos;G4VITProcess&apos;">ResetProcessState</span>();</td></tr>
+<tr><th id="666">666</th><td>    <i>// Update the PostStepPoint of Step according to ParticleChange</i></td></tr>
+<tr><th id="667">667</th><td></td></tr>
+<tr><th id="668">668</th><td>    <a class="member" href="../include/G4ITStepProcessor.hh.html#G4ITStepProcessor::fpParticleChange" title='G4ITStepProcessor::fpParticleChange' data-ref="G4ITStepProcessor::fpParticleChange">fpParticleChange</a>-&gt;<a class="virtual ref" href="../../../../../track/include/G4VParticleChange.hh.html#_ZN17G4VParticleChange22UpdateStepForAlongStepEP6G4Step" title='G4VParticleChange::UpdateStepForAlongStep' data-ref="_ZN17G4VParticleChange22UpdateStepForAlongStepEP6G4Step">UpdateStepForAlongStep</a>(<a class="member" href="../include/G4ITStepProcessor.hh.html#G4ITStepProcessor::fpStep" title='G4ITStepProcessor::fpStep' data-ref="G4ITStepProcessor::fpStep">fpStep</a>);</td></tr>
+<tr><th id="669">669</th><td></td></tr>
+<tr><th id="670">670</th><td><u>#<span data-ppcond="670">ifdef</span> <span class="macro" data-ref="_M/G4VERBOSE">G4VERBOSE</span></u></td></tr>
+<tr><th id="671">671</th><td>    <i>// !!!!! Verbose</i></td></tr>
+<tr><th id="672">672</th><td>    <b>if</b>(<a class="member" href="../include/G4ITStepProcessor.hh.html#G4ITStepProcessor::fpVerbose" title='G4ITStepProcessor::fpVerbose' data-ref="G4ITStepProcessor::fpVerbose">fpVerbose</a>) <a class="member" href="../include/G4ITStepProcessor.hh.html#G4ITStepProcessor::fpVerbose" title='G4ITStepProcessor::fpVerbose' data-ref="G4ITStepProcessor::fpVerbose">fpVerbose</a>-&gt;<a class="virtual ref" href="../include/G4VITSteppingVerbose.hh.html#_ZN20G4VITSteppingVerbose21AlongStepDoItOneByOneEv" title='G4VITSteppingVerbose::AlongStepDoItOneByOne' data-ref="_ZN20G4VITSteppingVerbose21AlongStepDoItOneByOneEv">AlongStepDoItOneByOne</a>();</td></tr>
+<tr><th id="673">673</th><td><u>#<span data-ppcond="670">endif</span></u></td></tr>
+<tr><th id="674">674</th><td></td></tr>
+<tr><th id="675">675</th><td>    <i>// Now Store the secondaries from ParticleChange to SecondaryList</i></td></tr>
+<tr><th id="676">676</th><td>    <a class="member" href="#_ZN17G4ITStepProcessor19DealWithSecondariesERi" title='G4ITStepProcessor::DealWithSecondaries' data-ref="_ZN17G4ITStepProcessor19DealWithSecondariesERi">DealWithSecondaries</a>(<span class='refarg'><a class="member" href="../include/G4ITStepProcessor.hh.html#G4ITStepProcessor::fN2ndariesAlongStepDoIt" title='G4ITStepProcessor::fN2ndariesAlongStepDoIt' data-ref="G4ITStepProcessor::fN2ndariesAlongStepDoIt">fN2ndariesAlongStepDoIt</a></span>);</td></tr>
+<tr><th id="677">677</th><td></td></tr>
+<tr><th id="678">678</th><td>    <i>// Set the track status according to what the process defined</i></td></tr>
+<tr><th id="679">679</th><td><i>    // if kinetic energy &gt;0, otherwise set  fStopButAlive</i></td></tr>
+<tr><th id="680">680</th><td>    <a class="member" href="../include/G4ITStepProcessor.hh.html#G4ITStepProcessor::fpTrack" title='G4ITStepProcessor::fpTrack' data-ref="G4ITStepProcessor::fpTrack">fpTrack</a>-&gt;<a class="ref" href="../../../../../track/include/G4Track.hh.html#_ZN7G4Track14SetTrackStatusE13G4TrackStatus" title='G4Track::SetTrackStatus' data-ref="_ZN7G4Track14SetTrackStatusE13G4TrackStatus">SetTrackStatus</a>(<a class="member" href="../include/G4ITStepProcessor.hh.html#G4ITStepProcessor::fpParticleChange" title='G4ITStepProcessor::fpParticleChange' data-ref="G4ITStepProcessor::fpParticleChange">fpParticleChange</a>-&gt;<a class="ref" href="../../../../../track/include/G4VParticleChange.hh.html#_ZNK17G4VParticleChange14GetTrackStatusEv" title='G4VParticleChange::GetTrackStatus' data-ref="_ZNK17G4VParticleChange14GetTrackStatusEv">GetTrackStatus</a>());</td></tr>
+<tr><th id="681">681</th><td></td></tr>
+<tr><th id="682">682</th><td>    <i>// clear ParticleChange</i></td></tr>
+<tr><th id="683">683</th><td>    <a class="member" href="../include/G4ITStepProcessor.hh.html#G4ITStepProcessor::fpParticleChange" title='G4ITStepProcessor::fpParticleChange' data-ref="G4ITStepProcessor::fpParticleChange">fpParticleChange</a>-&gt;<a class="ref" href="../../../../../track/include/G4VParticleChange.hh.html#_ZN17G4VParticleChange5ClearEv" title='G4VParticleChange::Clear' data-ref="_ZN17G4VParticleChange5ClearEv">Clear</a>();</td></tr>
+<tr><th id="684">684</th><td>  }</td></tr>
+<tr><th id="685">685</th><td></td></tr>
+<tr><th id="686">686</th><td><u>#<span data-ppcond="686">ifdef</span> <span class="macro" data-ref="_M/DEBUG_MEM">DEBUG_MEM</span></u></td></tr>
+<tr><th id="687">687</th><td>  MemStat mem_intermediaire = MemoryUsage();</td></tr>
+<tr><th id="688">688</th><td>  mem_diff = mem_intermediaire-mem_first;</td></tr>
+<tr><th id="689">689</th><td>  G4cout &lt;&lt; <q>"\t\t\t &gt;&gt; || MEM || After looping on processes with "</q> &lt;&lt; fpTrack-&gt;GetTrackID() &lt;&lt; <q>", diff is : "</q> &lt;&lt; mem_diff &lt;&lt; G4endl;</td></tr>
+<tr><th id="690">690</th><td><u>#<span data-ppcond="686">endif</span></u></td></tr>
+<tr><th id="691">691</th><td></td></tr>
+<tr><th id="692">692</th><td>  <a class="member" href="../include/G4ITStepProcessor.hh.html#G4ITStepProcessor::fpStep" title='G4ITStepProcessor::fpStep' data-ref="G4ITStepProcessor::fpStep">fpStep</a>-&gt;<a class="ref" href="../../../../../track/include/G4Step.hh.html#_ZN6G4Step11UpdateTrackEv" title='G4Step::UpdateTrack' data-ref="_ZN6G4Step11UpdateTrackEv">UpdateTrack</a>();</td></tr>
+<tr><th id="693">693</th><td></td></tr>
+<tr><th id="694">694</th><td>  <a class="type" href="../../../../../track/include/G4TrackStatus.hh.html#G4TrackStatus" title='G4TrackStatus' data-ref="G4TrackStatus">G4TrackStatus</a> <dfn class="local col5 decl" id="25fNewStatus" title='fNewStatus' data-type='G4TrackStatus' data-ref="25fNewStatus">fNewStatus</dfn> = <a class="member" href="../include/G4ITStepProcessor.hh.html#G4ITStepProcessor::fpTrack" title='G4ITStepProcessor::fpTrack' data-ref="G4ITStepProcessor::fpTrack">fpTrack</a>-&gt;<a class="ref" href="../../../../../track/include/G4Track.hh.html#_ZNK7G4Track14GetTrackStatusEv" title='G4Track::GetTrackStatus' data-ref="_ZNK7G4Track14GetTrackStatusEv">GetTrackStatus</a>();</td></tr>
+<tr><th id="695">695</th><td></td></tr>
+<tr><th id="696">696</th><td>  <b>if</b>(fNewStatus == fAlive &amp;&amp; fpTrack-&gt;GetKineticEnergy() &lt;= <a class="macro" href="../../../../../global/management/include/templates.hh.html#74" title="std::numeric_limits&lt;double&gt;::min()" data-ref="_M/DBL_MIN">DBL_MIN</a>)</td></tr>
+<tr><th id="697">697</th><td>  {</td></tr>
+<tr><th id="698">698</th><td>    <i>//        G4cout &lt;&lt; "G4ITStepProcessor::InvokeAlongStepDoItProcs : Track will be killed" &lt;&lt; G4endl;</i></td></tr>
+<tr><th id="699">699</th><td>    <b>if</b>(fpProcessInfo-&gt;MAXofAtRestLoops&gt;<var>0</var>) <a class="local col5 ref" href="#25fNewStatus" title='fNewStatus' data-ref="25fNewStatus">fNewStatus</a> = <a class="enum" href="../../../../../track/include/G4TrackStatus.hh.html#G4TrackStatus::fStopButAlive" title='G4TrackStatus::fStopButAlive' data-ref="G4TrackStatus::fStopButAlive">fStopButAlive</a>;</td></tr>
+<tr><th id="700">700</th><td>    <b>else</b> <a class="local col5 ref" href="#25fNewStatus" title='fNewStatus' data-ref="25fNewStatus">fNewStatus</a> = <a class="enum" href="../../../../../track/include/G4TrackStatus.hh.html#G4TrackStatus::fStopAndKill" title='G4TrackStatus::fStopAndKill' data-ref="G4TrackStatus::fStopAndKill">fStopAndKill</a>;</td></tr>
+<tr><th id="701">701</th><td>    <a class="member" href="../include/G4ITStepProcessor.hh.html#G4ITStepProcessor::fpTrack" title='G4ITStepProcessor::fpTrack' data-ref="G4ITStepProcessor::fpTrack">fpTrack</a>-&gt;<a class="ref" href="../../../../../track/include/G4Track.hh.html#_ZN7G4Track14SetTrackStatusE13G4TrackStatus" title='G4Track::SetTrackStatus' data-ref="_ZN7G4Track14SetTrackStatusE13G4TrackStatus">SetTrackStatus</a>( <a class="local col5 ref" href="#25fNewStatus" title='fNewStatus' data-ref="25fNewStatus">fNewStatus</a> );</td></tr>
+<tr><th id="702">702</th><td>  }</td></tr>
+<tr><th id="703">703</th><td></td></tr>
+<tr><th id="704">704</th><td>}</td></tr>
+<tr><th id="705">705</th><td></td></tr>
+<tr><th id="706">706</th><td><i>//______________________________________________________________________________</i></td></tr>
+<tr><th id="707">707</th><td><i></i></td></tr>
+<tr><th id="708">708</th><td><i>// ************************************************************************</i></td></tr>
+<tr><th id="709">709</th><td><i>//  PostStepDoIt</i></td></tr>
+<tr><th id="710">710</th><td><i>// ************************************************************************</i></td></tr>
+<tr><th id="711">711</th><td></td></tr>
+<tr><th id="712">712</th><td><em>void</em> <a class="type" href="../include/G4ITStepProcessor.hh.html#G4ITStepProcessor" title='G4ITStepProcessor' data-ref="G4ITStepProcessor">G4ITStepProcessor</a>::<dfn class="decl def" id="_ZN17G4ITStepProcessor23InvokePostStepDoItProcsEv" title='G4ITStepProcessor::InvokePostStepDoItProcs' data-ref="_ZN17G4ITStepProcessor23InvokePostStepDoItProcsEv">InvokePostStepDoItProcs</dfn>()</td></tr>
+<tr><th id="713">713</th><td>{</td></tr>
+<tr><th id="714">714</th><td>  <span class='error' title="unknown type name &apos;size_t&apos;">size_t</span> <dfn class="local col6 decl" id="26_MAXofPostStepLoops" title='_MAXofPostStepLoops' data-type='int' data-ref="26_MAXofPostStepLoops">_MAXofPostStepLoops</dfn> = fpProcessInfo-&gt;MAXofPostStepLoops;</td></tr>
+<tr><th id="715">715</th><td>  <span class='error' title="unknown type name &apos;G4SelectedPostStepDoItVector&apos;">G4SelectedPostStepDoItVector</span>&amp; <dfn class="local col7 decl" id="27selectedPostStepDoItVector" title='selectedPostStepDoItVector' data-type='int &amp;' data-ref="27selectedPostStepDoItVector">selectedPostStepDoItVector</dfn> = fpState</td></tr>
+<tr><th id="716">716</th><td>      -&gt;fSelectedPostStepDoItVector;</td></tr>
+<tr><th id="717">717</th><td>  <a class="type" href="../../../../../track/include/G4StepStatus.hh.html#G4StepStatus" title='G4StepStatus' data-ref="G4StepStatus">G4StepStatus</a>&amp; <dfn class="local col8 decl" id="28stepStatus" title='stepStatus' data-type='G4StepStatus &amp;' data-ref="28stepStatus">stepStatus</dfn> = <a class="member" href="../include/G4ITStepProcessor.hh.html#G4ITStepProcessor::fpState" title='G4ITStepProcessor::fpState' data-ref="G4ITStepProcessor::fpState">fpState</a>-&gt;<a class="ref" href="../include/G4ITStepProcessor.hh.html#G4ITStepProcessorState::fStepStatus" title='G4ITStepProcessorState::fStepStatus' data-ref="G4ITStepProcessorState::fStepStatus">fStepStatus</a>;</td></tr>
+<tr><th id="718">718</th><td></td></tr>
+<tr><th id="719">719</th><td>  <i>// Invoke the specified discrete processes</i></td></tr>
+<tr><th id="720">720</th><td>  <b>for</b>(<span class='error' title="unknown type name &apos;size_t&apos;">size_t</span> <dfn class="local col9 decl" id="29np" title='np' data-type='int' data-ref="29np">np</dfn> = <var>0</var>; np &lt; _MAXofPostStepLoops; np++)</td></tr>
+<tr><th id="721">721</th><td>  {</td></tr>
+<tr><th id="722">722</th><td>    <i>//</i></td></tr>
+<tr><th id="723">723</th><td><i>    // Note: DoItVector has inverse order against GetPhysIntVector</i></td></tr>
+<tr><th id="724">724</th><td><i>    //       and SelectedPostStepDoItVector.</i></td></tr>
+<tr><th id="725">725</th><td><i>    //</i></td></tr>
+<tr><th id="726">726</th><td>    <a class="typedef" href="../../../../../global/management/include/G4Types.hh.html#G4int" title='G4int' data-type='int' data-ref="G4int">G4int</a> <dfn class="local col0 decl" id="30Cond" title='Cond' data-type='G4int' data-ref="30Cond">Cond</dfn> = selectedPostStepDoItVector[_MAXofPostStepLoops</td></tr>
+<tr><th id="727">727</th><td>                                            - np - <var>1</var>];</td></tr>
+<tr><th id="728">728</th><td>    <b>if</b>(<a class="local col0 ref" href="#30Cond" title='Cond' data-ref="30Cond">Cond</a> != <a class="enum" href="../../../../../track/include/G4ForceCondition.hh.html#G4ForceCondition::InActivated" title='G4ForceCondition::InActivated' data-ref="G4ForceCondition::InActivated">InActivated</a>)</td></tr>
+<tr><th id="729">729</th><td>    {</td></tr>
+<tr><th id="730">730</th><td>      <b>if</b>(((<a class="local col0 ref" href="#30Cond" title='Cond' data-ref="30Cond">Cond</a> == <a class="enum" href="../../../../../track/include/G4ForceCondition.hh.html#G4ForceCondition::NotForced" title='G4ForceCondition::NotForced' data-ref="G4ForceCondition::NotForced">NotForced</a>) &amp;&amp; (<a class="local col8 ref" href="#28stepStatus" title='stepStatus' data-ref="28stepStatus">stepStatus</a> == <a class="enum" href="../../../../../track/include/G4StepStatus.hh.html#G4StepStatus::fPostStepDoItProc" title='G4StepStatus::fPostStepDoItProc' data-ref="G4StepStatus::fPostStepDoItProc">fPostStepDoItProc</a>)) ||</td></tr>
+<tr><th id="731">731</th><td>          ((<a class="local col0 ref" href="#30Cond" title='Cond' data-ref="30Cond">Cond</a> == <a class="enum" href="../../../../../track/include/G4ForceCondition.hh.html#G4ForceCondition::Forced" title='G4ForceCondition::Forced' data-ref="G4ForceCondition::Forced">Forced</a>) &amp;&amp; (<a class="local col8 ref" href="#28stepStatus" title='stepStatus' data-ref="28stepStatus">stepStatus</a> != <a class="enum" href="../../../../../track/include/G4StepStatus.hh.html#G4StepStatus::fExclusivelyForcedProc" title='G4StepStatus::fExclusivelyForcedProc' data-ref="G4StepStatus::fExclusivelyForcedProc">fExclusivelyForcedProc</a>))</td></tr>
+<tr><th id="732">732</th><td>         ||</td></tr>
+<tr><th id="733">733</th><td>         <i>// ((Cond == Conditionally) &amp;&amp; (stepStatus == fAlongStepDoItProc)) ||</i></td></tr>
+<tr><th id="734">734</th><td>         ((<a class="local col0 ref" href="#30Cond" title='Cond' data-ref="30Cond">Cond</a> == <a class="enum" href="../../../../../track/include/G4ForceCondition.hh.html#G4ForceCondition::ExclusivelyForced" title='G4ForceCondition::ExclusivelyForced' data-ref="G4ForceCondition::ExclusivelyForced">ExclusivelyForced</a>) &amp;&amp; (<a class="local col8 ref" href="#28stepStatus" title='stepStatus' data-ref="28stepStatus">stepStatus</a> == <a class="enum" href="../../../../../track/include/G4StepStatus.hh.html#G4StepStatus::fExclusivelyForcedProc" title='G4StepStatus::fExclusivelyForcedProc' data-ref="G4StepStatus::fExclusivelyForcedProc">fExclusivelyForcedProc</a>))</td></tr>
+<tr><th id="735">735</th><td>         || ((<a class="local col0 ref" href="#30Cond" title='Cond' data-ref="30Cond">Cond</a> == <a class="enum" href="../../../../../track/include/G4ForceCondition.hh.html#G4ForceCondition::StronglyForced" title='G4ForceCondition::StronglyForced' data-ref="G4ForceCondition::StronglyForced">StronglyForced</a>)))</td></tr>
+<tr><th id="736">736</th><td>      {</td></tr>
+<tr><th id="737">737</th><td></td></tr>
+<tr><th id="738">738</th><td>        InvokePSDIP(np);</td></tr>
+<tr><th id="739">739</th><td>      }</td></tr>
+<tr><th id="740">740</th><td>    } <i>//if(*fSelectedPostStepDoItVector(np)........</i></td></tr>
+<tr><th id="741">741</th><td></td></tr>
+<tr><th id="742">742</th><td>    <i>// Exit from PostStepLoop if the track has been killed,</i></td></tr>
+<tr><th id="743">743</th><td><i>    // but extra treatment for processes with Strongly Forced flag</i></td></tr>
+<tr><th id="744">744</th><td>    <b>if</b>(<a class="member" href="../include/G4ITStepProcessor.hh.html#G4ITStepProcessor::fpTrack" title='G4ITStepProcessor::fpTrack' data-ref="G4ITStepProcessor::fpTrack">fpTrack</a>-&gt;<a class="ref" href="../../../../../track/include/G4Track.hh.html#_ZNK7G4Track14GetTrackStatusEv" title='G4Track::GetTrackStatus' data-ref="_ZNK7G4Track14GetTrackStatusEv">GetTrackStatus</a>() == <a class="enum" href="../../../../../track/include/G4TrackStatus.hh.html#G4TrackStatus::fStopAndKill" title='G4TrackStatus::fStopAndKill' data-ref="G4TrackStatus::fStopAndKill">fStopAndKill</a>)</td></tr>
+<tr><th id="745">745</th><td>    {</td></tr>
+<tr><th id="746">746</th><td>      <b>for</b>(<span class='error' title="unknown type name &apos;size_t&apos;">size_t</span> <dfn class="local col1 decl" id="31np1" title='np1' data-type='int' data-ref="31np1">np1</dfn> = np + <var>1</var>; np1 &lt; _MAXofPostStepLoops; np1++)</td></tr>
+<tr><th id="747">747</th><td>      {</td></tr>
+<tr><th id="748">748</th><td>        <a class="typedef" href="../../../../../global/management/include/G4Types.hh.html#G4int" title='G4int' data-type='int' data-ref="G4int">G4int</a> <dfn class="local col2 decl" id="32Cond2" title='Cond2' data-type='G4int' data-ref="32Cond2">Cond2</dfn> = selectedPostStepDoItVector[_MAXofPostStepLoops</td></tr>
+<tr><th id="749">749</th><td>                                                 - np1 - <var>1</var>];</td></tr>
+<tr><th id="750">750</th><td>        <b>if</b>(<a class="local col2 ref" href="#32Cond2" title='Cond2' data-ref="32Cond2">Cond2</a> == <a class="enum" href="../../../../../track/include/G4ForceCondition.hh.html#G4ForceCondition::StronglyForced" title='G4ForceCondition::StronglyForced' data-ref="G4ForceCondition::StronglyForced">StronglyForced</a>)</td></tr>
+<tr><th id="751">751</th><td>        {</td></tr>
+<tr><th id="752">752</th><td>          InvokePSDIP(np1);</td></tr>
+<tr><th id="753">753</th><td>        }</td></tr>
+<tr><th id="754">754</th><td>      }</td></tr>
+<tr><th id="755">755</th><td>      <b>break</b>;</td></tr>
+<tr><th id="756">756</th><td>    }</td></tr>
+<tr><th id="757">757</th><td>  } <i>//for(size_t np=0; np &lt; MAXofPostStepLoops; np++){</i></td></tr>
+<tr><th id="758">758</th><td>}</td></tr>
+<tr><th id="759">759</th><td></td></tr>
+<tr><th id="760">760</th><td><i>//______________________________________________________________________________</i></td></tr>
+<tr><th id="761">761</th><td></td></tr>
+<tr><th id="762">762</th><td><em>void</em> G4ITStepProcessor::InvokePSDIP(<span class='error' title="unknown type name &apos;size_t&apos;">size_t</span> np)</td></tr>
+<tr><th id="763">763</th><td>{</td></tr>
+<tr><th id="764">764</th><td>  fpCurrentProcess = (G4VITProcess*) (*fpProcessInfo-&gt;fpPostStepDoItVector)[np];</td></tr>
+<tr><th id="765">765</th><td></td></tr>
+<tr><th id="766">766</th><td>  fpCurrentProcess-&gt;<span class='error' title="no member named &apos;SetProcessState&apos; in &apos;G4VITProcess&apos;">SetProcessState</span>(fpTrackingInfo-&gt;<span class='error' title="no member named &apos;GetProcessState&apos; in &apos;G4TrackingInformation&apos;">GetProcessState</span>(fpCurrentProcess</td></tr>
+<tr><th id="767">767</th><td>      -&gt;GetProcessID()));</td></tr>
+<tr><th id="768">768</th><td>  fpParticleChange = <span class='error' title="cannot initialize object parameter of type &apos;G4VProcess&apos; with an expression of type &apos;G4VITProcess&apos;">fpCurrentProcess</span>-&gt;PostStepDoIt(*fpTrack, *fpStep);</td></tr>
+<tr><th id="769">769</th><td><i>//    fpCurrentProcess-&gt;SetProcessState(0);</i></td></tr>
+<tr><th id="770">770</th><td>  fpCurrentProcess-&gt;<span class='error' title="no member named &apos;ResetProcessState&apos; in &apos;G4VITProcess&apos;">ResetProcessState</span>();</td></tr>
+<tr><th id="771">771</th><td></td></tr>
+<tr><th id="772">772</th><td>  <i>// Update PostStepPoint of Step according to ParticleChange</i></td></tr>
+<tr><th id="773">773</th><td>  fpParticleChange-&gt;UpdateStepForPostStep(fpStep);</td></tr>
+<tr><th id="774">774</th><td></td></tr>
+<tr><th id="775">775</th><td><u>#<span data-ppcond="775">ifdef</span> <span class="macro" data-ref="_M/G4VERBOSE">G4VERBOSE</span></u></td></tr>
+<tr><th id="776">776</th><td>  <i>// !!!!! Verbose</i></td></tr>
+<tr><th id="777">777</th><td>  <b>if</b>(fpVerbose) fpVerbose-&gt;PostStepDoItOneByOne();</td></tr>
+<tr><th id="778">778</th><td><u>#<span data-ppcond="775">endif</span></u></td></tr>
+<tr><th id="779">779</th><td></td></tr>
+<tr><th id="780">780</th><td>  <i>// Update G4Track according to ParticleChange after each PostStepDoIt</i></td></tr>
+<tr><th id="781">781</th><td>  fpStep-&gt;UpdateTrack();</td></tr>
+<tr><th id="782">782</th><td></td></tr>
+<tr><th id="783">783</th><td>  <i>// Update safety after each invocation of PostStepDoIts</i></td></tr>
+<tr><th id="784">784</th><td>  fpStep-&gt;GetPostStepPoint()-&gt;SetSafety(CalculateSafety());</td></tr>
+<tr><th id="785">785</th><td></td></tr>
+<tr><th id="786">786</th><td>  <i>// Now Store the secondaries from ParticleChange to SecondaryList</i></td></tr>
+<tr><th id="787">787</th><td>  DealWithSecondaries(fN2ndariesPostStepDoIt);</td></tr>
+<tr><th id="788">788</th><td></td></tr>
+<tr><th id="789">789</th><td>  <i>// Set the track status according to what the process defined</i></td></tr>
+<tr><th id="790">790</th><td>  fpTrack-&gt;SetTrackStatus(fpParticleChange-&gt;GetTrackStatus());</td></tr>
+<tr><th id="791">791</th><td></td></tr>
+<tr><th id="792">792</th><td>  <i>// clear ParticleChange</i></td></tr>
+<tr><th id="793">793</th><td>  fpParticleChange-&gt;Clear();</td></tr>
+<tr><th id="794">794</th><td>}</td></tr>
+<tr><th id="795">795</th><td></td></tr>
+<tr><th id="796">796</th><td><i>//______________________________________________________________________________</i></td></tr>
+<tr><th id="797">797</th><td><i></i></td></tr>
+<tr><th id="798">798</th><td><i>// ************************************************************************</i></td></tr>
+<tr><th id="799">799</th><td><i>//  Transport on a given time</i></td></tr>
+<tr><th id="800">800</th><td><i>// ************************************************************************</i></td></tr>
+<tr><th id="801">801</th><td></td></tr>
+<tr><th id="802">802</th><td><em>void</em> <a class="type" href="../include/G4ITStepProcessor.hh.html#G4ITStepProcessor" title='G4ITStepProcessor' data-ref="G4ITStepProcessor">G4ITStepProcessor</a>::<dfn class="decl def" id="_ZN17G4ITStepProcessor22FindTransportationStepEv" title='G4ITStepProcessor::FindTransportationStep' data-ref="_ZN17G4ITStepProcessor22FindTransportationStepEv">FindTransportationStep</dfn>()</td></tr>
+<tr><th id="803">803</th><td>{</td></tr>
+<tr><th id="804">804</th><td>  <em>double</em> <dfn class="local col3 decl" id="33physicalStep" title='physicalStep' data-type='double' data-ref="33physicalStep">physicalStep</dfn>(<var>0.</var>);</td></tr>
+<tr><th id="805">805</th><td></td></tr>
+<tr><th id="806">806</th><td>  <a class="member" href="../include/G4ITStepProcessor.hh.html#G4ITStepProcessor::fpTransportation" title='G4ITStepProcessor::fpTransportation' data-ref="G4ITStepProcessor::fpTransportation">fpTransportation</a> = <a class="member" href="../include/G4ITStepProcessor.hh.html#G4ITStepProcessor::fpProcessInfo" title='G4ITStepProcessor::fpProcessInfo' data-ref="G4ITStepProcessor::fpProcessInfo">fpProcessInfo</a>-&gt;<a class="ref" href="../include/G4ITStepProcessor.hh.html#ProcessGeneralInfo::fpTransportation" title='ProcessGeneralInfo::fpTransportation' data-ref="ProcessGeneralInfo::fpTransportation">fpTransportation</a>;</td></tr>
+<tr><th id="807">807</th><td>  <i>// dynamic_cast&lt;G4ITTransportation*&gt;((fpProcessInfo-&gt;fpAlongStepGetPhysIntVector)[MAXofAlongStepLoops-1]);</i></td></tr>
+<tr><th id="808">808</th><td></td></tr>
+<tr><th id="809">809</th><td>  <b>if</b>(!<a class="member" href="../include/G4ITStepProcessor.hh.html#G4ITStepProcessor::fpTrack" title='G4ITStepProcessor::fpTrack' data-ref="G4ITStepProcessor::fpTrack">fpTrack</a>)</td></tr>
+<tr><th id="810">810</th><td>  {</td></tr>
+<tr><th id="811">811</th><td>    <a class="typedef" href="../../../../../global/management/include/G4Exception.hh.html#G4ExceptionDescription" title='G4ExceptionDescription' data-type='int' data-ref="G4ExceptionDescription">G4ExceptionDescription</a> <dfn class="local col4 decl" id="34exceptionDescription" title='exceptionDescription' data-type='G4ExceptionDescription' data-ref="34exceptionDescription">exceptionDescription</dfn>;</td></tr>
+<tr><th id="812">812</th><td>    exceptionDescription <span class='error' title="invalid operands to binary expression (&apos;G4ExceptionDescription&apos; (aka &apos;int&apos;) and &apos;const char *&apos;)">&lt;&lt;</span> <q>"No G4ITStepProcessor::fpTrack found"</q>;</td></tr>
+<tr><th id="813">813</th><td>    <a class="ref" href="../../../../../global/management/include/G4Exception.hh.html#_Z11G4ExceptionPKcS0_19G4ExceptionSeverityRi" title='G4Exception' data-ref="_Z11G4ExceptionPKcS0_19G4ExceptionSeverityRi">G4Exception</a>(<q>"G4ITStepProcessor::FindTransportationStep"</q>,</td></tr>
+<tr><th id="814">814</th><td>                <q>"ITStepProcessor0013"</q>,</td></tr>
+<tr><th id="815">815</th><td>                <a class="enum" href="../../../../../global/management/include/G4ExceptionSeverity.hh.html#G4ExceptionSeverity::FatalErrorInArgument" title='G4ExceptionSeverity::FatalErrorInArgument' data-ref="G4ExceptionSeverity::FatalErrorInArgument">FatalErrorInArgument</a>,</td></tr>
+<tr><th id="816">816</th><td>                <span class='refarg'><a class="local col4 ref" href="#34exceptionDescription" title='exceptionDescription' data-ref="34exceptionDescription">exceptionDescription</a></span>);</td></tr>
+<tr><th id="817">817</th><td>    <b>return</b>;</td></tr>
+<tr><th id="818">818</th><td></td></tr>
+<tr><th id="819">819</th><td>  }</td></tr>
+<tr><th id="820">820</th><td>  <b>if</b>(!<a class="member" href="../include/G4ITStepProcessor.hh.html#G4ITStepProcessor::fpITrack" title='G4ITStepProcessor::fpITrack' data-ref="G4ITStepProcessor::fpITrack">fpITrack</a>)</td></tr>
+<tr><th id="821">821</th><td>  {</td></tr>
+<tr><th id="822">822</th><td>    <a class="typedef" href="../../../../../global/management/include/G4Exception.hh.html#G4ExceptionDescription" title='G4ExceptionDescription' data-type='int' data-ref="G4ExceptionDescription">G4ExceptionDescription</a> <dfn class="local col5 decl" id="35exceptionDescription" title='exceptionDescription' data-type='G4ExceptionDescription' data-ref="35exceptionDescription">exceptionDescription</dfn>;</td></tr>
+<tr><th id="823">823</th><td>    exceptionDescription <span class='error' title="invalid operands to binary expression (&apos;G4ExceptionDescription&apos; (aka &apos;int&apos;) and &apos;const char *&apos;)">&lt;&lt;</span> <q>"No G4ITStepProcessor::fITrack"</q>;</td></tr>
+<tr><th id="824">824</th><td>    <a class="ref" href="../../../../../global/management/include/G4Exception.hh.html#_Z11G4ExceptionPKcS0_19G4ExceptionSeverityRi" title='G4Exception' data-ref="_Z11G4ExceptionPKcS0_19G4ExceptionSeverityRi">G4Exception</a>(<q>"G4ITStepProcessor::FindTransportationStep"</q>,</td></tr>
+<tr><th id="825">825</th><td>                <q>"ITStepProcessor0014"</q>,</td></tr>
+<tr><th id="826">826</th><td>                <a class="enum" href="../../../../../global/management/include/G4ExceptionSeverity.hh.html#G4ExceptionSeverity::FatalErrorInArgument" title='G4ExceptionSeverity::FatalErrorInArgument' data-ref="G4ExceptionSeverity::FatalErrorInArgument">FatalErrorInArgument</a>,</td></tr>
+<tr><th id="827">827</th><td>                <span class='refarg'><a class="local col5 ref" href="#35exceptionDescription" title='exceptionDescription' data-ref="35exceptionDescription">exceptionDescription</a></span>);</td></tr>
+<tr><th id="828">828</th><td>    <b>return</b>;</td></tr>
+<tr><th id="829">829</th><td>  }</td></tr>
+<tr><th id="830">830</th><td>  <b>if</b>(!(<a class="member" href="../include/G4ITStepProcessor.hh.html#G4ITStepProcessor::fpITrack" title='G4ITStepProcessor::fpITrack' data-ref="G4ITStepProcessor::fpITrack">fpITrack</a>-&gt;<a class="ref" href="../include/G4IT.hh.html#_ZN4G4IT8GetTrackEv" title='G4IT::GetTrack' data-ref="_ZN4G4IT8GetTrackEv">GetTrack</a>()))</td></tr>
+<tr><th id="831">831</th><td>  {</td></tr>
+<tr><th id="832">832</th><td>    <a class="typedef" href="../../../../../global/management/include/G4Exception.hh.html#G4ExceptionDescription" title='G4ExceptionDescription' data-type='int' data-ref="G4ExceptionDescription">G4ExceptionDescription</a> <dfn class="local col6 decl" id="36exceptionDescription" title='exceptionDescription' data-type='G4ExceptionDescription' data-ref="36exceptionDescription">exceptionDescription</dfn>;</td></tr>
+<tr><th id="833">833</th><td>    exceptionDescription <span class='error' title="invalid operands to binary expression (&apos;G4ExceptionDescription&apos; (aka &apos;int&apos;) and &apos;const char *&apos;)">&lt;&lt;</span> <q>"No G4ITStepProcessor::fITrack-&gt;GetTrack()"</q>;</td></tr>
+<tr><th id="834">834</th><td>    <a class="ref" href="../../../../../global/management/include/G4Exception.hh.html#_Z11G4ExceptionPKcS0_19G4ExceptionSeverityRi" title='G4Exception' data-ref="_Z11G4ExceptionPKcS0_19G4ExceptionSeverityRi">G4Exception</a>(<q>"G4ITStepProcessor::FindTransportationStep"</q>,</td></tr>
+<tr><th id="835">835</th><td>                <q>"ITStepProcessor0015"</q>,</td></tr>
+<tr><th id="836">836</th><td>                <a class="enum" href="../../../../../global/management/include/G4ExceptionSeverity.hh.html#G4ExceptionSeverity::FatalErrorInArgument" title='G4ExceptionSeverity::FatalErrorInArgument' data-ref="G4ExceptionSeverity::FatalErrorInArgument">FatalErrorInArgument</a>,</td></tr>
+<tr><th id="837">837</th><td>                <span class='refarg'><a class="local col6 ref" href="#36exceptionDescription" title='exceptionDescription' data-ref="36exceptionDescription">exceptionDescription</a></span>);</td></tr>
+<tr><th id="838">838</th><td>    <b>return</b>;</td></tr>
+<tr><th id="839">839</th><td>  }</td></tr>
+<tr><th id="840">840</th><td></td></tr>
+<tr><th id="841">841</th><td>  <b>if</b>(<a class="member" href="../include/G4ITStepProcessor.hh.html#G4ITStepProcessor::fpTransportation" title='G4ITStepProcessor::fpTransportation' data-ref="G4ITStepProcessor::fpTransportation">fpTransportation</a>)</td></tr>
+<tr><th id="842">842</th><td>  {</td></tr>
+<tr><th id="843">843</th><td>    fpTransportation-&gt;<span class='error' title="no member named &apos;SetProcessState&apos; in &apos;G4ITTransportation&apos;">SetProcessState</span>(fpTrackingInfo-&gt;<span class='error' title="no member named &apos;GetProcessState&apos; in &apos;G4TrackingInformation&apos;">GetProcessState</span>(fpTransportation</td></tr>
+<tr><th id="844">844</th><td>        -&gt;GetProcessID()));</td></tr>
+<tr><th id="845">845</th><td>    <a class="member" href="../include/G4ITStepProcessor.hh.html#G4ITStepProcessor::fpTransportation" title='G4ITStepProcessor::fpTransportation' data-ref="G4ITStepProcessor::fpTransportation">fpTransportation</a>-&gt;<a class="virtual ref" href="../include/G4ITTransportation.hh.html#_ZN18G4ITTransportation11ComputeStepERK7G4TrackRK6G4StepdRd" title='G4ITTransportation::ComputeStep' data-ref="_ZN18G4ITTransportation11ComputeStepERK7G4TrackRK6G4StepdRd">ComputeStep</a>(*<a class="member" href="../include/G4ITStepProcessor.hh.html#G4ITStepProcessor::fpTrack" title='G4ITStepProcessor::fpTrack' data-ref="G4ITStepProcessor::fpTrack">fpTrack</a>, *<a class="member" href="../include/G4ITStepProcessor.hh.html#G4ITStepProcessor::fpStep" title='G4ITStepProcessor::fpStep' data-ref="G4ITStepProcessor::fpStep">fpStep</a>, <a class="member" href="../include/G4ITStepProcessor.hh.html#G4ITStepProcessor::fTimeStep" title='G4ITStepProcessor::fTimeStep' data-ref="G4ITStepProcessor::fTimeStep">fTimeStep</a>, <span class='refarg'><a class="local col3 ref" href="#33physicalStep" title='physicalStep' data-ref="33physicalStep">physicalStep</a></span>);</td></tr>
+<tr><th id="846">846</th><td></td></tr>
+<tr><th id="847">847</th><td><i>//        fpTransportation-&gt;SetProcessState(0);</i></td></tr>
+<tr><th id="848">848</th><td>    fpTransportation-&gt;<span class='error' title="no member named &apos;ResetProcessState&apos; in &apos;G4ITTransportation&apos;">ResetProcessState</span>();</td></tr>
+<tr><th id="849">849</th><td>  }</td></tr>
+<tr><th id="850">850</th><td></td></tr>
+<tr><th id="851">851</th><td>  <b>if</b>(physicalStep &gt;= <a class="macro" href="../../../../../global/management/include/templates.hh.html#82" title="std::numeric_limits&lt;double&gt;::max()" data-ref="_M/DBL_MAX">DBL_MAX</a>)</td></tr>
+<tr><th id="852">852</th><td>  {</td></tr>
+<tr><th id="853">853</th><td><i>//    G4cout &lt;&lt; "---- 2) Setting stop and kill for " &lt;&lt; GetIT(fpTrack)-&gt;GetName() &lt;&lt; G4endl;</i></td></tr>
+<tr><th id="854">854</th><td>    <a class="member" href="../include/G4ITStepProcessor.hh.html#G4ITStepProcessor::fpTrack" title='G4ITStepProcessor::fpTrack' data-ref="G4ITStepProcessor::fpTrack">fpTrack</a> -&gt; <a class="ref" href="../../../../../track/include/G4Track.hh.html#_ZN7G4Track14SetTrackStatusE13G4TrackStatus" title='G4Track::SetTrackStatus' data-ref="_ZN7G4Track14SetTrackStatusE13G4TrackStatus">SetTrackStatus</a>(<a class="enum" href="../../../../../track/include/G4TrackStatus.hh.html#G4TrackStatus::fStopAndKill" title='G4TrackStatus::fStopAndKill' data-ref="G4TrackStatus::fStopAndKill">fStopAndKill</a>);</td></tr>
+<tr><th id="855">855</th><td>    <b>return</b>;</td></tr>
+<tr><th id="856">856</th><td>  }</td></tr>
+<tr><th id="857">857</th><td></td></tr>
+<tr><th id="858">858</th><td>  <a class="member" href="../include/G4ITStepProcessor.hh.html#G4ITStepProcessor::fpState" title='G4ITStepProcessor::fpState' data-ref="G4ITStepProcessor::fpState">fpState</a>-&gt;<a class="ref" href="../include/G4ITStepProcessor.hh.html#G4ITStepProcessorState::fPhysicalStep" title='G4ITStepProcessorState::fPhysicalStep' data-ref="G4ITStepProcessorState::fPhysicalStep">fPhysicalStep</a> = <a class="local col3 ref" href="#33physicalStep" title='physicalStep' data-ref="33physicalStep">physicalStep</a>;</td></tr>
+<tr><th id="859">859</th><td>}</td></tr>
+<tr><th id="860">860</th><td></td></tr>
+<tr><th id="861">861</th><td><i>//______________________________________________________________________________</i></td></tr>
+<tr><th id="862">862</th><td></td></tr>
+<tr><th id="863">863</th><td><em>void</em> <a class="type" href="../include/G4ITStepProcessor.hh.html#G4ITStepProcessor" title='G4ITStepProcessor' data-ref="G4ITStepProcessor">G4ITStepProcessor</a>::<dfn class="decl def" id="_ZN17G4ITStepProcessor24InvokeTransportationProcEv" title='G4ITStepProcessor::InvokeTransportationProc' data-ref="_ZN17G4ITStepProcessor24InvokeTransportationProcEv">InvokeTransportationProc</dfn>()</td></tr>
+<tr><th id="864">864</th><td>{</td></tr>
+<tr><th id="865">865</th><td>  <span class='error' title="unknown type name &apos;size_t&apos;">size_t</span> <dfn class="local col7 decl" id="37_MAXofPostStepLoops" title='_MAXofPostStepLoops' data-type='int' data-ref="37_MAXofPostStepLoops">_MAXofPostStepLoops</dfn> = fpProcessInfo-&gt;MAXofPostStepLoops;</td></tr>
+<tr><th id="866">866</th><td>  <span class='error' title="unknown type name &apos;G4SelectedPostStepDoItVector&apos;">G4SelectedPostStepDoItVector</span>&amp; <dfn class="local col8 decl" id="38selectedPostStepDoItVector" title='selectedPostStepDoItVector' data-type='int &amp;' data-ref="38selectedPostStepDoItVector">selectedPostStepDoItVector</dfn> = fpState</td></tr>
+<tr><th id="867">867</th><td>      -&gt;fSelectedPostStepDoItVector;</td></tr>
+<tr><th id="868">868</th><td>  <a class="type" href="../../../../../track/include/G4StepStatus.hh.html#G4StepStatus" title='G4StepStatus' data-ref="G4StepStatus">G4StepStatus</a>&amp; <dfn class="local col9 decl" id="39stepStatus" title='stepStatus' data-type='G4StepStatus &amp;' data-ref="39stepStatus">stepStatus</dfn> = <a class="member" href="../include/G4ITStepProcessor.hh.html#G4ITStepProcessor::fpState" title='G4ITStepProcessor::fpState' data-ref="G4ITStepProcessor::fpState">fpState</a>-&gt;<a class="ref" href="../include/G4ITStepProcessor.hh.html#G4ITStepProcessorState::fStepStatus" title='G4ITStepProcessorState::fStepStatus' data-ref="G4ITStepProcessorState::fStepStatus">fStepStatus</a>;</td></tr>
+<tr><th id="869">869</th><td></td></tr>
+<tr><th id="870">870</th><td>  <i>// Invoke the specified discrete processes</i></td></tr>
+<tr><th id="871">871</th><td>  <b>for</b>(<span class='error' title="unknown type name &apos;size_t&apos;">size_t</span> <dfn class="local col0 decl" id="40np" title='np' data-type='int' data-ref="40np">np</dfn> = <var>0</var>; np &lt; _MAXofPostStepLoops; np++)</td></tr>
+<tr><th id="872">872</th><td>  {</td></tr>
+<tr><th id="873">873</th><td>    <i>//</i></td></tr>
+<tr><th id="874">874</th><td><i>    // Note: DoItVector has inverse order against GetPhysIntVector</i></td></tr>
+<tr><th id="875">875</th><td><i>    //       and SelectedPostStepDoItVector.</i></td></tr>
+<tr><th id="876">876</th><td><i>    //</i></td></tr>
+<tr><th id="877">877</th><td>    <a class="typedef" href="../../../../../global/management/include/G4Types.hh.html#G4int" title='G4int' data-type='int' data-ref="G4int">G4int</a> <dfn class="local col1 decl" id="41Cond" title='Cond' data-type='G4int' data-ref="41Cond">Cond</dfn> = selectedPostStepDoItVector[_MAXofPostStepLoops - np - <var>1</var>];</td></tr>
+<tr><th id="878">878</th><td>    <b>if</b>(<a class="local col1 ref" href="#41Cond" title='Cond' data-ref="41Cond">Cond</a> != <a class="enum" href="../../../../../track/include/G4ForceCondition.hh.html#G4ForceCondition::InActivated" title='G4ForceCondition::InActivated' data-ref="G4ForceCondition::InActivated">InActivated</a>)</td></tr>
+<tr><th id="879">879</th><td>    {</td></tr>
+<tr><th id="880">880</th><td>      <b>if</b>(((<a class="local col1 ref" href="#41Cond" title='Cond' data-ref="41Cond">Cond</a> == <a class="enum" href="../../../../../track/include/G4ForceCondition.hh.html#G4ForceCondition::Forced" title='G4ForceCondition::Forced' data-ref="G4ForceCondition::Forced">Forced</a>) &amp;&amp; (<a class="local col9 ref" href="#39stepStatus" title='stepStatus' data-ref="39stepStatus">stepStatus</a> != <a class="enum" href="../../../../../track/include/G4StepStatus.hh.html#G4StepStatus::fExclusivelyForcedProc" title='G4StepStatus::fExclusivelyForcedProc' data-ref="G4StepStatus::fExclusivelyForcedProc">fExclusivelyForcedProc</a>)) ||</td></tr>
+<tr><th id="881">881</th><td>      <i>// ((Cond == Conditionally) &amp;&amp; (stepStatus == fAlongStepDoItProc)) ||</i></td></tr>
+<tr><th id="882">882</th><td>      ((<a class="local col1 ref" href="#41Cond" title='Cond' data-ref="41Cond">Cond</a> == <a class="enum" href="../../../../../track/include/G4ForceCondition.hh.html#G4ForceCondition::ExclusivelyForced" title='G4ForceCondition::ExclusivelyForced' data-ref="G4ForceCondition::ExclusivelyForced">ExclusivelyForced</a>) &amp;&amp; (<a class="local col9 ref" href="#39stepStatus" title='stepStatus' data-ref="39stepStatus">stepStatus</a> == <a class="enum" href="../../../../../track/include/G4StepStatus.hh.html#G4StepStatus::fExclusivelyForcedProc" title='G4StepStatus::fExclusivelyForcedProc' data-ref="G4StepStatus::fExclusivelyForcedProc">fExclusivelyForcedProc</a>))</td></tr>
+<tr><th id="883">883</th><td>         || ((<a class="local col1 ref" href="#41Cond" title='Cond' data-ref="41Cond">Cond</a> == <a class="enum" href="../../../../../track/include/G4ForceCondition.hh.html#G4ForceCondition::StronglyForced" title='G4ForceCondition::StronglyForced' data-ref="G4ForceCondition::StronglyForced">StronglyForced</a>)))</td></tr>
+<tr><th id="884">884</th><td>      {</td></tr>
+<tr><th id="885">885</th><td></td></tr>
+<tr><th id="886">886</th><td>        InvokePSDIP(np);</td></tr>
+<tr><th id="887">887</th><td>      }</td></tr>
+<tr><th id="888">888</th><td>    } <i>//if(Cond != InActivated)</i></td></tr>
+<tr><th id="889">889</th><td></td></tr>
+<tr><th id="890">890</th><td>    <i>// Exit from PostStepLoop if the track has been killed,</i></td></tr>
+<tr><th id="891">891</th><td><i>    // but extra treatment for processes with Strongly Forced flag</i></td></tr>
+<tr><th id="892">892</th><td>    <b>if</b>(<a class="member" href="../include/G4ITStepProcessor.hh.html#G4ITStepProcessor::fpTrack" title='G4ITStepProcessor::fpTrack' data-ref="G4ITStepProcessor::fpTrack">fpTrack</a>-&gt;<a class="ref" href="../../../../../track/include/G4Track.hh.html#_ZNK7G4Track14GetTrackStatusEv" title='G4Track::GetTrackStatus' data-ref="_ZNK7G4Track14GetTrackStatusEv">GetTrackStatus</a>() == <a class="enum" href="../../../../../track/include/G4TrackStatus.hh.html#G4TrackStatus::fStopAndKill" title='G4TrackStatus::fStopAndKill' data-ref="G4TrackStatus::fStopAndKill">fStopAndKill</a>)</td></tr>
+<tr><th id="893">893</th><td>    {</td></tr>
+<tr><th id="894">894</th><td>      <b>for</b>(<span class='error' title="unknown type name &apos;size_t&apos;">size_t</span> <dfn class="local col2 decl" id="42np1" title='np1' data-type='int' data-ref="42np1">np1</dfn> = np + <var>1</var>; np1 &lt; _MAXofPostStepLoops; np1++)</td></tr>
+<tr><th id="895">895</th><td>      {</td></tr>
+<tr><th id="896">896</th><td>        <a class="typedef" href="../../../../../global/management/include/G4Types.hh.html#G4int" title='G4int' data-type='int' data-ref="G4int">G4int</a> <dfn class="local col3 decl" id="43Cond2" title='Cond2' data-type='G4int' data-ref="43Cond2">Cond2</dfn> = selectedPostStepDoItVector[_MAXofPostStepLoops - np1 - <var>1</var>];</td></tr>
+<tr><th id="897">897</th><td>        <b>if</b>(<a class="local col3 ref" href="#43Cond2" title='Cond2' data-ref="43Cond2">Cond2</a> == <a class="enum" href="../../../../../track/include/G4ForceCondition.hh.html#G4ForceCondition::StronglyForced" title='G4ForceCondition::StronglyForced' data-ref="G4ForceCondition::StronglyForced">StronglyForced</a>)</td></tr>
+<tr><th id="898">898</th><td>        {</td></tr>
+<tr><th id="899">899</th><td>          InvokePSDIP(np1);</td></tr>
+<tr><th id="900">900</th><td>        }</td></tr>
+<tr><th id="901">901</th><td>      }</td></tr>
+<tr><th id="902">902</th><td>      <b>break</b>;</td></tr>
+<tr><th id="903">903</th><td>    }</td></tr>
+<tr><th id="904">904</th><td>  }</td></tr>
+<tr><th id="905">905</th><td>}</td></tr>
+<tr><th id="906">906</th><td></td></tr>
+<tr><th id="907">907</th><td><i>//______________________________________________________________________________</i></td></tr>
+<tr><th id="908">908</th><td><i></i></td></tr>
+<tr><th id="909">909</th><td><i>// ************************************************************************</i></td></tr>
+<tr><th id="910">910</th><td><i>//  Apply cuts</i></td></tr>
+<tr><th id="911">911</th><td><i>// ************************************************************************</i></td></tr>
+<tr><th id="912">912</th><td></td></tr>
+<tr><th id="913">913</th><td><em>void</em> <a class="type" href="../include/G4ITStepProcessor.hh.html#G4ITStepProcessor" title='G4ITStepProcessor' data-ref="G4ITStepProcessor">G4ITStepProcessor</a>::<dfn class="decl def" id="_ZN17G4ITStepProcessor18ApplyProductionCutEP7G4Track" title='G4ITStepProcessor::ApplyProductionCut' data-ref="_ZN17G4ITStepProcessor18ApplyProductionCutEP7G4Track">ApplyProductionCut</dfn>(<a class="type" href="../../../../../track/include/G4Track.hh.html#G4Track" title='G4Track' data-ref="G4Track">G4Track</a>* <dfn class="local col4 decl" id="44aSecondary" title='aSecondary' data-type='G4Track *' data-ref="44aSecondary">aSecondary</dfn>)</td></tr>
+<tr><th id="914">914</th><td>{</td></tr>
+<tr><th id="915">915</th><td>  <a class="typedef" href="../../../../../global/management/include/G4Types.hh.html#G4bool" title='G4bool' data-type='bool' data-ref="G4bool">G4bool</a> <dfn class="local col5 decl" id="45tBelowCutEnergyAndSafety" title='tBelowCutEnergyAndSafety' data-type='G4bool' data-ref="45tBelowCutEnergyAndSafety">tBelowCutEnergyAndSafety</dfn> = <b>false</b>;</td></tr>
+<tr><th id="916">916</th><td>  <a class="typedef" href="../../../../../global/management/include/G4Types.hh.html#G4int" title='G4int' data-type='int' data-ref="G4int">G4int</a> <dfn class="local col6 decl" id="46tPtclIdx" title='tPtclIdx' data-type='G4int' data-ref="46tPtclIdx">tPtclIdx</dfn> = <a class="type" href="../../../../cuts/include/G4ProductionCuts.hh.html#G4ProductionCuts" title='G4ProductionCuts' data-ref="G4ProductionCuts">G4ProductionCuts</a>::<a class="ref" href="../../../../cuts/include/G4ProductionCuts.hh.html#_ZN16G4ProductionCuts8GetIndexEPK20G4ParticleDefinition" title='G4ProductionCuts::GetIndex' data-ref="_ZN16G4ProductionCuts8GetIndexEPK20G4ParticleDefinition">GetIndex</a>(<a class="local col4 ref" href="#44aSecondary" title='aSecondary' data-ref="44aSecondary">aSecondary</a>-&gt;<a class="ref" href="../../../../../track/include/G4Track.hh.html#_ZNK7G4Track13GetDefinitionEv" title='G4Track::GetDefinition' data-ref="_ZNK7G4Track13GetDefinitionEv">GetDefinition</a>());</td></tr>
+<tr><th id="917">917</th><td>  <b>if</b>(<a class="local col6 ref" href="#46tPtclIdx" title='tPtclIdx' data-ref="46tPtclIdx">tPtclIdx</a> &lt; <var>0</var>)</td></tr>
+<tr><th id="918">918</th><td>  {</td></tr>
+<tr><th id="919">919</th><td>    <b>return</b>;</td></tr>
+<tr><th id="920">920</th><td>  }</td></tr>
+<tr><th id="921">921</th><td>  <a class="type" href="../../../../cuts/include/G4ProductionCutsTable.hh.html#G4ProductionCutsTable" title='G4ProductionCutsTable' data-ref="G4ProductionCutsTable">G4ProductionCutsTable</a>* <dfn class="local col7 decl" id="47tCutsTbl" title='tCutsTbl' data-type='G4ProductionCutsTable *' data-ref="47tCutsTbl">tCutsTbl</dfn> =</td></tr>
+<tr><th id="922">922</th><td>      <a class="type" href="../../../../cuts/include/G4ProductionCutsTable.hh.html#G4ProductionCutsTable" title='G4ProductionCutsTable' data-ref="G4ProductionCutsTable">G4ProductionCutsTable</a>::<a class="ref" href="../../../../cuts/include/G4ProductionCutsTable.hh.html#_ZN21G4ProductionCutsTable22GetProductionCutsTableEv" title='G4ProductionCutsTable::GetProductionCutsTable' data-ref="_ZN21G4ProductionCutsTable22GetProductionCutsTableEv">GetProductionCutsTable</a>();</td></tr>
+<tr><th id="923">923</th><td>  <a class="typedef" href="../../../../../global/management/include/G4Types.hh.html#G4int" title='G4int' data-type='int' data-ref="G4int">G4int</a> <dfn class="local col8 decl" id="48tCoupleIdx" title='tCoupleIdx' data-type='G4int' data-ref="48tCoupleIdx">tCoupleIdx</dfn> = <a class="local col7 ref" href="#47tCutsTbl" title='tCutsTbl' data-ref="47tCutsTbl">tCutsTbl</a>-&gt;<a class="ref" href="../../../../cuts/include/G4ProductionCutsTable.hh.html#_ZNK21G4ProductionCutsTable14GetCoupleIndexEPK20G4MaterialCutsCouple" title='G4ProductionCutsTable::GetCoupleIndex' data-ref="_ZNK21G4ProductionCutsTable14GetCoupleIndexEPK20G4MaterialCutsCouple">GetCoupleIndex</a>(<a class="member" href="../include/G4ITStepProcessor.hh.html#G4ITStepProcessor::fpPreStepPoint" title='G4ITStepProcessor::fpPreStepPoint' data-ref="G4ITStepProcessor::fpPreStepPoint">fpPreStepPoint</a></td></tr>
+<tr><th id="924">924</th><td>      -&gt;<a class="ref" href="../../../../../track/include/G4StepPoint.hh.html#_ZNK11G4StepPoint21GetMaterialCutsCoupleEv" title='G4StepPoint::GetMaterialCutsCouple' data-ref="_ZNK11G4StepPoint21GetMaterialCutsCoupleEv">GetMaterialCutsCouple</a>());</td></tr>
+<tr><th id="925">925</th><td>  <a class="typedef" href="../../../../../global/management/include/G4Types.hh.html#G4double" title='G4double' data-type='double' data-ref="G4double">G4double</a> <dfn class="local col9 decl" id="49tProdThreshold" title='tProdThreshold' data-type='G4double' data-ref="49tProdThreshold">tProdThreshold</dfn> =</td></tr>
+<tr><th id="926">926</th><td>      (*(tCutsTbl-&gt;<span class='error' title="no member named &apos;GetEnergyCutsVector&apos; in &apos;G4ProductionCutsTable&apos;">GetEnergyCutsVector</span>(tPtclIdx)))[tCoupleIdx];</td></tr>
+<tr><th id="927">927</th><td>  <b>if</b>(<a class="local col4 ref" href="#44aSecondary" title='aSecondary' data-ref="44aSecondary">aSecondary</a>-&gt;<a class="ref" href="../../../../../track/include/G4Track.hh.html#_ZNK7G4Track16GetKineticEnergyEv" title='G4Track::GetKineticEnergy' data-ref="_ZNK7G4Track16GetKineticEnergyEv">GetKineticEnergy</a>() &lt; <a class="local col9 ref" href="#49tProdThreshold" title='tProdThreshold' data-ref="49tProdThreshold">tProdThreshold</a>)</td></tr>
+<tr><th id="928">928</th><td>  {</td></tr>
+<tr><th id="929">929</th><td>    <a class="local col5 ref" href="#45tBelowCutEnergyAndSafety" title='tBelowCutEnergyAndSafety' data-ref="45tBelowCutEnergyAndSafety">tBelowCutEnergyAndSafety</a> = <b>true</b>;</td></tr>
+<tr><th id="930">930</th><td>    <b>if</b>(<span class='error' title="use of undeclared identifier &apos;std&apos;">std</span>::abs(aSecondary-&gt;GetDynamicParticle()-&gt;GetCharge()) &gt; <a class="macro" href="../../../../../global/management/include/templates.hh.html#74" title="std::numeric_limits&lt;double&gt;::min()" data-ref="_M/DBL_MIN">DBL_MIN</a>)</td></tr>
+<tr><th id="931">931</th><td>    {</td></tr>
+<tr><th id="932">932</th><td>      <a class="typedef" href="../../../../../global/management/include/G4Types.hh.html#G4double" title='G4double' data-type='double' data-ref="G4double">G4double</a> <dfn class="local col0 decl" id="50currentRange" title='currentRange' data-type='G4double' data-ref="50currentRange">currentRange</dfn></td></tr>
+<tr><th id="933">933</th><td>      = <a class="type" href="../../../utils/include/G4LossTableManager.hh.html#G4LossTableManager" title='G4LossTableManager' data-ref="G4LossTableManager">G4LossTableManager</a>::<a class="ref" href="../../../utils/include/G4LossTableManager.hh.html#_ZN18G4LossTableManager8InstanceEv" title='G4LossTableManager::Instance' data-ref="_ZN18G4LossTableManager8InstanceEv">Instance</a>()-&gt;<a class="ref" href="../../../utils/include/G4LossTableManager.hh.html#_ZN18G4LossTableManager8GetRangeEPK20G4ParticleDefinitiondPK20G4MaterialCutsCouple" title='G4LossTableManager::GetRange' data-ref="_ZN18G4LossTableManager8GetRangeEPK20G4ParticleDefinitiondPK20G4MaterialCutsCouple">GetRange</a>(<a class="local col4 ref" href="#44aSecondary" title='aSecondary' data-ref="44aSecondary">aSecondary</a>-&gt;<a class="ref" href="../../../../../track/include/G4Track.hh.html#_ZNK7G4Track13GetDefinitionEv" title='G4Track::GetDefinition' data-ref="_ZNK7G4Track13GetDefinitionEv">GetDefinition</a>(),</td></tr>
+<tr><th id="934">934</th><td>          <a class="local col4 ref" href="#44aSecondary" title='aSecondary' data-ref="44aSecondary">aSecondary</a>-&gt;<a class="ref" href="../../../../../track/include/G4Track.hh.html#_ZNK7G4Track16GetKineticEnergyEv" title='G4Track::GetKineticEnergy' data-ref="_ZNK7G4Track16GetKineticEnergyEv">GetKineticEnergy</a>(),</td></tr>
+<tr><th id="935">935</th><td>          <a class="member" href="../include/G4ITStepProcessor.hh.html#G4ITStepProcessor::fpPreStepPoint" title='G4ITStepProcessor::fpPreStepPoint' data-ref="G4ITStepProcessor::fpPreStepPoint">fpPreStepPoint</a>-&gt;<a class="ref" href="../../../../../track/include/G4StepPoint.hh.html#_ZNK11G4StepPoint21GetMaterialCutsCoupleEv" title='G4StepPoint::GetMaterialCutsCouple' data-ref="_ZNK11G4StepPoint21GetMaterialCutsCoupleEv">GetMaterialCutsCouple</a>());</td></tr>
+<tr><th id="936">936</th><td>      <a class="local col5 ref" href="#45tBelowCutEnergyAndSafety" title='tBelowCutEnergyAndSafety' data-ref="45tBelowCutEnergyAndSafety">tBelowCutEnergyAndSafety</a> = (<a class="local col0 ref" href="#50currentRange" title='currentRange' data-ref="50currentRange">currentRange</a> &lt; <a class="member" href="../include/G4ITStepProcessor.hh.html#_ZN17G4ITStepProcessor15CalculateSafetyEv" title='G4ITStepProcessor::CalculateSafety' data-ref="_ZN17G4ITStepProcessor15CalculateSafetyEv">CalculateSafety</a>() );</td></tr>
+<tr><th id="937">937</th><td>    }</td></tr>
+<tr><th id="938">938</th><td>  }</td></tr>
+<tr><th id="939">939</th><td></td></tr>
+<tr><th id="940">940</th><td>  <b>if</b>(<a class="local col5 ref" href="#45tBelowCutEnergyAndSafety" title='tBelowCutEnergyAndSafety' data-ref="45tBelowCutEnergyAndSafety">tBelowCutEnergyAndSafety</a>)</td></tr>
+<tr><th id="941">941</th><td>  {</td></tr>
+<tr><th id="942">942</th><td>    <b>if</b>(!(<a class="local col4 ref" href="#44aSecondary" title='aSecondary' data-ref="44aSecondary">aSecondary</a>-&gt;<a class="ref" href="../../../../../track/include/G4Track.hh.html#_ZNK7G4Track17IsGoodForTrackingEv" title='G4Track::IsGoodForTracking' data-ref="_ZNK7G4Track17IsGoodForTrackingEv">IsGoodForTracking</a>()))</td></tr>
+<tr><th id="943">943</th><td>    {</td></tr>
+<tr><th id="944">944</th><td>      <i>// Add kinetic energy to the total energy deposit</i></td></tr>
+<tr><th id="945">945</th><td>      <a class="member" href="../include/G4ITStepProcessor.hh.html#G4ITStepProcessor::fpStep" title='G4ITStepProcessor::fpStep' data-ref="G4ITStepProcessor::fpStep">fpStep</a>-&gt;<a class="ref" href="../../../../../track/include/G4Step.hh.html#_ZN6G4Step21AddTotalEnergyDepositEd" title='G4Step::AddTotalEnergyDeposit' data-ref="_ZN6G4Step21AddTotalEnergyDepositEd">AddTotalEnergyDeposit</a>(<a class="local col4 ref" href="#44aSecondary" title='aSecondary' data-ref="44aSecondary">aSecondary</a>-&gt;<a class="ref" href="../../../../../track/include/G4Track.hh.html#_ZNK7G4Track16GetKineticEnergyEv" title='G4Track::GetKineticEnergy' data-ref="_ZNK7G4Track16GetKineticEnergyEv">GetKineticEnergy</a>());</td></tr>
+<tr><th id="946">946</th><td>      <a class="local col4 ref" href="#44aSecondary" title='aSecondary' data-ref="44aSecondary">aSecondary</a>-&gt;<a class="ref" href="../../../../../track/include/G4Track.hh.html#_ZN7G4Track16SetKineticEnergyEd" title='G4Track::SetKineticEnergy' data-ref="_ZN7G4Track16SetKineticEnergyEd">SetKineticEnergy</a>(<var>0.0</var>);</td></tr>
+<tr><th id="947">947</th><td>    }</td></tr>
+<tr><th id="948">948</th><td>  }</td></tr>
+<tr><th id="949">949</th><td>}</td></tr>
+<tr><th id="950">950</th><td></td></tr>
+</table><hr/><p id='footer'>
+Generated on <em>2019-Aug-28</em> from project codebrowser<br />Powered by <a href='https://woboq.com'><img alt='Woboq' src='https://code.woboq.org/woboq-16.png' width='41' height='16' /></a> <a href='https://code.woboq.org'>Code Browser</a> 2.1
+<br/>Generator usage only permitted with license.</p>
+</div></body></html>

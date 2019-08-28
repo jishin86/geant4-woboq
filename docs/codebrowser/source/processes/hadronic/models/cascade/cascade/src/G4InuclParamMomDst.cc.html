@@ -1,0 +1,98 @@
+<!doctype html>
+<html>
+<head>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"><title>G4InuclParamMomDst.cc source code [codebrowser/source/processes/hadronic/models/cascade/cascade/src/G4InuclParamMomDst.cc] - Woboq Code Browser</title>
+<link rel="stylesheet" href="../../../../../../../../../data/qtcreator.css" title="QtCreator"/>
+<link rel="alternate stylesheet" href="../../../../../../../../../data/kdevelop.css" title="KDevelop"/>
+<script type="text/javascript" src="../../../../../../../../../data/jquery/jquery.min.js"></script>
+<script type="text/javascript" src="../../../../../../../../../data/jquery/jquery-ui.min.js"></script>
+<script>var file = 'codebrowser/source/processes/hadronic/models/cascade/cascade/src/G4InuclParamMomDst.cc'; var root_path = '../../../../../../../..'; var data_path = '../../../../../../../../../data';</script>
+<script src='../../../../../../../../../data/codebrowser.js'></script>
+</head>
+<body><div id='header'><h1 id='breadcrumb'><span>Browse the source code of </span><a href='../../../../../../..'>codebrowser</a>/<a href='../../../../../..'>source</a>/<a href='../../../../..'>processes</a>/<a href='../../../..'>hadronic</a>/<a href='../../..'>models</a>/<a href='../..'>cascade</a>/<a href='..'>cascade</a>/<a href='./'>src</a>/<a href='G4InuclParamMomDst.cc.html'>G4InuclParamMomDst.cc</a></h1></div>
+<hr/><div id='content'><table class="code">
+<tr><th id="1">1</th><td><i>//</i></td></tr>
+<tr><th id="2">2</th><td><i>// ********************************************************************</i></td></tr>
+<tr><th id="3">3</th><td><i>// * License and Disclaimer                                           *</i></td></tr>
+<tr><th id="4">4</th><td><i>// *                                                                  *</i></td></tr>
+<tr><th id="5">5</th><td><i>// * The  Geant4 software  is  copyright of the Copyright Holders  of *</i></td></tr>
+<tr><th id="6">6</th><td><i>// * the Geant4 Collaboration.  It is provided  under  the terms  and *</i></td></tr>
+<tr><th id="7">7</th><td><i>// * conditions of the Geant4 Software License,  included in the file *</i></td></tr>
+<tr><th id="8">8</th><td><i>// * LICENSE and available at  <a href="http://cern.ch/geant4/license">http://cern.ch/geant4/license</a> .  These *</i></td></tr>
+<tr><th id="9">9</th><td><i>// * include a list of copyright holders.                             *</i></td></tr>
+<tr><th id="10">10</th><td><i>// *                                                                  *</i></td></tr>
+<tr><th id="11">11</th><td><i>// * Neither the authors of this software system, nor their employing *</i></td></tr>
+<tr><th id="12">12</th><td><i>// * institutes,nor the agencies providing financial support for this *</i></td></tr>
+<tr><th id="13">13</th><td><i>// * work  make  any representation or  warranty, express or implied, *</i></td></tr>
+<tr><th id="14">14</th><td><i>// * regarding  this  software system or assume any liability for its *</i></td></tr>
+<tr><th id="15">15</th><td><i>// * use.  Please see the license in the file  LICENSE  and URL above *</i></td></tr>
+<tr><th id="16">16</th><td><i>// * for the full disclaimer and the limitation of liability.         *</i></td></tr>
+<tr><th id="17">17</th><td><i>// *                                                                  *</i></td></tr>
+<tr><th id="18">18</th><td><i>// * This  code  implementation is the result of  the  scientific and *</i></td></tr>
+<tr><th id="19">19</th><td><i>// * technical work of the GEANT4 collaboration.                      *</i></td></tr>
+<tr><th id="20">20</th><td><i>// * By using,  copying,  modifying or  distributing the software (or *</i></td></tr>
+<tr><th id="21">21</th><td><i>// * any work based  on the software)  you  agree  to acknowledge its *</i></td></tr>
+<tr><th id="22">22</th><td><i>// * use  in  resulting  scientific  publications,  and indicate your *</i></td></tr>
+<tr><th id="23">23</th><td><i>// * acceptance of all terms of the Geant4 Software license.          *</i></td></tr>
+<tr><th id="24">24</th><td><i>// ********************************************************************</i></td></tr>
+<tr><th id="25">25</th><td><i>//</i></td></tr>
+<tr><th id="26">26</th><td><i>// Author:  Michael Kelsey (SLAC)</i></td></tr>
+<tr><th id="27">27</th><td><i>// Date:    7 March 2013</i></td></tr>
+<tr><th id="28">28</th><td><i>//</i></td></tr>
+<tr><th id="29">29</th><td><i>// Description: intermediate base class for INUCL parametrizations of</i></td></tr>
+<tr><th id="30">30</th><td><i>//		final-state momentum distributions in Bertini-style cascade</i></td></tr>
+<tr><th id="31">31</th><td><i>//</i></td></tr>
+<tr><th id="32">32</th><td><i>// 20130308  M. Kelsey -- Move PQ,PR calculation to G4InuclSpecialFunctions.</i></td></tr>
+<tr><th id="33">33</th><td><i>// 20130924  M. Kelsey -- Replace std::pow with G4Pow::powN() for CPU speed</i></td></tr>
+<tr><th id="34">34</th><td></td></tr>
+<tr><th id="35">35</th><td><u>#include <a href="../include/G4InuclParamMomDst.hh.html">"G4InuclParamMomDst.hh"</a></u></td></tr>
+<tr><th id="36">36</th><td><u>#include <a href="../include/G4InuclSpecialFunctions.hh.html">"G4InuclSpecialFunctions.hh"</a></u></td></tr>
+<tr><th id="37">37</th><td><u>#include <a href="../include/G4InuclParticleNames.hh.html">"G4InuclParticleNames.hh"</a></u></td></tr>
+<tr><th id="38">38</th><td><u>#include <a href="../../../../../../global/management/include/G4Pow.hh.html">"G4Pow.hh"</a></u></td></tr>
+<tr><th id="39">39</th><td><u>#include <a href="../../../../../../global/HEPRandom/include/Randomize.hh.html">"Randomize.hh"</a></u></td></tr>
+<tr><th id="40">40</th><td></td></tr>
+<tr><th id="41">41</th><td><b>using</b> <b>namespace</b> <span class="namespace">G4InuclSpecialFunctions</span>;</td></tr>
+<tr><th id="42">42</th><td><b>using</b> <b>namespace</b> <span class="namespace">G4InuclParticleNames</span>;</td></tr>
+<tr><th id="43">43</th><td></td></tr>
+<tr><th id="44">44</th><td></td></tr>
+<tr><th id="45">45</th><td><i>// Use coefficients in power expansion of random fraction</i></td></tr>
+<tr><th id="46">46</th><td></td></tr>
+<tr><th id="47">47</th><td><a class="typedef" href="../../../../../../global/management/include/G4Types.hh.html#G4double" title='G4double' data-type='double' data-ref="G4double">G4double</a> </td></tr>
+<tr><th id="48">48</th><td><a class="type" href="../include/G4InuclParamMomDst.hh.html#G4InuclParamMomDst" title='G4InuclParamMomDst' data-ref="G4InuclParamMomDst">G4InuclParamMomDst</a>::<dfn class="virtual decl def" id="_ZNK18G4InuclParamMomDst11GetMomentumEiRKd" title='G4InuclParamMomDst::GetMomentum' data-ref="_ZNK18G4InuclParamMomDst11GetMomentumEiRKd">GetMomentum</dfn>(<a class="typedef" href="../../../../../../global/management/include/G4Types.hh.html#G4int" title='G4int' data-type='int' data-ref="G4int">G4int</a> <dfn class="local col1 decl" id="1ptype" title='ptype' data-type='G4int' data-ref="1ptype">ptype</dfn>, <em>const</em> <a class="typedef" href="../../../../../../global/management/include/G4Types.hh.html#G4double" title='G4double' data-type='double' data-ref="G4double">G4double</a>&amp; <dfn class="local col2 decl" id="2ekin" title='ekin' data-type='const G4double &amp;' data-ref="2ekin">ekin</dfn>) <em>const</em> {</td></tr>
+<tr><th id="49">49</th><td>  <b>if</b> (<a class="member" href="../include/G4VMultiBodyMomDst.hh.html#G4VMultiBodyMomDst::verboseLevel" title='G4VMultiBodyMomDst::verboseLevel' data-ref="G4VMultiBodyMomDst::verboseLevel">verboseLevel</a>&gt;<var>3</var>) {</td></tr>
+<tr><th id="50">50</th><td>    <a class="macro" href="../../../../../../global/management/include/G4ios.hh.html#46" title="(*_G4cout_p())" data-ref="_M/G4cout">G4cout</a> <span class='error' title="invalid operands to binary expression (&apos;int&apos; and &apos;const G4String&apos;)">&lt;&lt;</span> theName &lt;&lt; <q>"::GetMomentum: ptype "</q> &lt;&lt; ptype &lt;&lt; <q>" ekin "</q> &lt;&lt; ekin</td></tr>
+<tr><th id="51">51</th><td>	   &lt;&lt; <a class="macro" href="../../../../../../global/management/include/G4ios.hh.html#60" title="std::endl" data-ref="_M/G4endl">G4endl</a>;</td></tr>
+<tr><th id="52">52</th><td>  }</td></tr>
+<tr><th id="53">53</th><td></td></tr>
+<tr><th id="54">54</th><td>  <a class="typedef" href="../../../../../../global/management/include/G4Types.hh.html#G4int" title='G4int' data-type='int' data-ref="G4int">G4int</a> <dfn class="local col3 decl" id="3JK" title='JK' data-type='G4int' data-ref="3JK">JK</dfn> = (<a class="local col1 ref" href="#1ptype" title='ptype' data-ref="1ptype">ptype</a>==<a class="enum" href="../include/G4InuclParticleNames.hh.html#G4InuclParticleNames::Short::pro" title='G4InuclParticleNames::Short::pro' data-ref="G4InuclParticleNames::Short::pro">pro</a> || <a class="local col1 ref" href="#1ptype" title='ptype' data-ref="1ptype">ptype</a>==<a class="enum" href="../include/G4InuclParticleNames.hh.html#G4InuclParticleNames::Short::neu" title='G4InuclParticleNames::Short::neu' data-ref="G4InuclParticleNames::Short::neu">neu</a>) ? <var>0</var> : <var>1</var>;	<i>// nucleon vs. other</i></td></tr>
+<tr><th id="55">55</th><td></td></tr>
+<tr><th id="56">56</th><td>  <b>if</b> (verboseLevel &gt; <var>3</var>) <a class="macro" href="../../../../../../global/management/include/G4ios.hh.html#46" title="(*_G4cout_p())" data-ref="_M/G4cout">G4cout</a> <span class='error' title="invalid operands to binary expression (&apos;int&apos; and &apos;const char *&apos;)">&lt;&lt;</span> <q>" JK "</q> &lt;&lt; JK &lt;&lt; <a class="macro" href="../../../../../../global/management/include/G4ios.hh.html#60" title="std::endl" data-ref="_M/G4endl">G4endl</a>;</td></tr>
+<tr><th id="57">57</th><td></td></tr>
+<tr><th id="58">58</th><td>  <a class="type" href="../../../../../../global/management/include/G4Pow.hh.html#G4Pow" title='G4Pow' data-ref="G4Pow">G4Pow</a>* <dfn class="local col4 decl" id="4theG4Pow" title='theG4Pow' data-type='G4Pow *' data-ref="4theG4Pow">theG4Pow</dfn> = <a class="type" href="../../../../../../global/management/include/G4Pow.hh.html#G4Pow" title='G4Pow' data-ref="G4Pow">G4Pow</a>::<a class="ref" href="../../../../../../global/management/include/G4Pow.hh.html#_ZN5G4Pow11GetInstanceEv" title='G4Pow::GetInstance' data-ref="_ZN5G4Pow11GetInstanceEv">GetInstance</a>();	<i>// For convenience</i></td></tr>
+<tr><th id="59">59</th><td></td></tr>
+<tr><th id="60">60</th><td>  <a class="typedef" href="../../../../../../global/management/include/G4Types.hh.html#G4double" title='G4double' data-type='double' data-ref="G4double">G4double</a> <dfn class="local col5 decl" id="5Spow" title='Spow' data-type='G4double' data-ref="5Spow">Spow</dfn> = <a class="ref" href="../include/G4InuclSpecialFunctions.hh.html#_ZN23G4InuclSpecialFunctions17randomInuclPowersEdRA4_A4_Kd" title='G4InuclSpecialFunctions::randomInuclPowers' data-ref="_ZN23G4InuclSpecialFunctions17randomInuclPowersEdRA4_A4_Kd">randomInuclPowers</a>(<a class="local col2 ref" href="#2ekin" title='ekin' data-ref="2ekin">ekin</a>, <a class="member" href="../include/G4InuclParamMomDst.hh.html#G4InuclParamMomDst::coeffPR" title='G4InuclParamMomDst::coeffPR' data-ref="G4InuclParamMomDst::coeffPR">coeffPR</a>[<a class="local col3 ref" href="#3JK" title='JK' data-ref="3JK">JK</a>]);</td></tr>
+<tr><th id="61">61</th><td></td></tr>
+<tr><th id="62">62</th><td>  <a class="typedef" href="../../../../../../global/management/include/G4Types.hh.html#G4double" title='G4double' data-type='double' data-ref="G4double">G4double</a> <dfn class="local col6 decl" id="6C" title='C' data-type='G4double' data-ref="6C">C</dfn>=<var>0.</var>, <dfn class="local col7 decl" id="7PS" title='PS' data-type='G4double' data-ref="7PS">PS</dfn>=<var>0.</var>;</td></tr>
+<tr><th id="63">63</th><td>  <b>for</b>(<a class="typedef" href="../../../../../../global/management/include/G4Types.hh.html#G4int" title='G4int' data-type='int' data-ref="G4int">G4int</a> <dfn class="local col8 decl" id="8im" title='im' data-type='G4int' data-ref="8im">im</dfn> = <var>0</var>; <a class="local col8 ref" href="#8im" title='im' data-ref="8im">im</a> &lt; <var>3</var>; <a class="local col8 ref" href="#8im" title='im' data-ref="8im">im</a>++) {</td></tr>
+<tr><th id="64">64</th><td>    <a class="local col6 ref" href="#6C" title='C' data-ref="6C">C</a> = <a class="member" href="../include/G4InuclParamMomDst.hh.html#G4InuclParamMomDst::coeffPS" title='G4InuclParamMomDst::coeffPS' data-ref="G4InuclParamMomDst::coeffPS">coeffPS</a>[<a class="local col3 ref" href="#3JK" title='JK' data-ref="3JK">JK</a>][<a class="local col8 ref" href="#8im" title='im' data-ref="8im">im</a>];</td></tr>
+<tr><th id="65">65</th><td>    <a class="local col7 ref" href="#7PS" title='PS' data-ref="7PS">PS</a> += <a class="local col6 ref" href="#6C" title='C' data-ref="6C">C</a> * <a class="local col4 ref" href="#4theG4Pow" title='theG4Pow' data-ref="4theG4Pow">theG4Pow</a>-&gt;<a class="ref" href="../../../../../../global/management/include/G4Pow.hh.html#_ZNK5G4Pow4powNEdi" title='G4Pow::powN' data-ref="_ZNK5G4Pow4powNEdi">powN</a>(<a class="local col2 ref" href="#2ekin" title='ekin' data-ref="2ekin">ekin</a>, <a class="local col8 ref" href="#8im" title='im' data-ref="8im">im</a>);</td></tr>
+<tr><th id="66">66</th><td></td></tr>
+<tr><th id="67">67</th><td>    <b>if</b> (<a class="member" href="../include/G4VMultiBodyMomDst.hh.html#G4VMultiBodyMomDst::verboseLevel" title='G4VMultiBodyMomDst::verboseLevel' data-ref="G4VMultiBodyMomDst::verboseLevel">verboseLevel</a> &gt;<var>3</var>) {</td></tr>
+<tr><th id="68">68</th><td>      <a class="macro" href="../../../../../../global/management/include/G4ios.hh.html#46" title="(*_G4cout_p())" data-ref="_M/G4cout">G4cout</a> <span class='error' title="invalid operands to binary expression (&apos;int&apos; and &apos;const char *&apos;)">&lt;&lt;</span> <q>" im "</q> &lt;&lt; im &lt;&lt; <q>" : coeffPS[JK][im] "</q> &lt;&lt; C</td></tr>
+<tr><th id="69">69</th><td>	     &lt;&lt; <q>" ekin^im "</q> &lt;&lt; theG4Pow-&gt;powN(ekin, im) &lt;&lt; <a class="macro" href="../../../../../../global/management/include/G4ios.hh.html#60" title="std::endl" data-ref="_M/G4endl">G4endl</a>;</td></tr>
+<tr><th id="70">70</th><td>    }</td></tr>
+<tr><th id="71">71</th><td>  }</td></tr>
+<tr><th id="72">72</th><td>  </td></tr>
+<tr><th id="73">73</th><td>  <a class="typedef" href="../../../../../../global/management/include/G4Types.hh.html#G4double" title='G4double' data-type='double' data-ref="G4double">G4double</a> <dfn class="local col9 decl" id="9PRA" title='PRA' data-type='G4double' data-ref="9PRA">PRA</dfn> = <a class="local col7 ref" href="#7PS" title='PS' data-ref="7PS">PS</a> * <a class="local col5 ref" href="#5Spow" title='Spow' data-ref="5Spow">Spow</a>;</td></tr>
+<tr><th id="74">74</th><td></td></tr>
+<tr><th id="75">75</th><td>  <b>if</b> (verboseLevel &gt; <var>3</var>) </td></tr>
+<tr><th id="76">76</th><td>    <a class="macro" href="../../../../../../global/management/include/G4ios.hh.html#46" title="(*_G4cout_p())" data-ref="_M/G4cout">G4cout</a> <span class='error' title="invalid operands to binary expression (&apos;int&apos; and &apos;const char *&apos;)">&lt;&lt;</span> <q>" PS "</q> &lt;&lt; PS &lt;&lt; <q>" Spow = sqrt(S)*(PR+(1-PQ)*S^4) "</q> &lt;&lt; Spow</td></tr>
+<tr><th id="77">77</th><td>	   &lt;&lt; <q>" PRA = PS*Spow "</q> &lt;&lt; PRA &lt;&lt; <a class="macro" href="../../../../../../global/management/include/G4ios.hh.html#60" title="std::endl" data-ref="_M/G4endl">G4endl</a>;</td></tr>
+<tr><th id="78">78</th><td></td></tr>
+<tr><th id="79">79</th><td>  <b>return</b> <span class='error' title="use of undeclared identifier &apos;std&apos;">std</span>::fabs(PRA);</td></tr>
+<tr><th id="80">80</th><td>}</td></tr>
+<tr><th id="81">81</th><td></td></tr>
+</table><hr/><p id='footer'>
+Generated on <em>2019-Aug-28</em> from project codebrowser<br />Powered by <a href='https://woboq.com'><img alt='Woboq' src='https://code.woboq.org/woboq-16.png' width='41' height='16' /></a> <a href='https://code.woboq.org'>Code Browser</a> 2.1
+<br/>Generator usage only permitted with license.</p>
+</div></body></html>

@@ -1,0 +1,411 @@
+<!doctype html>
+<html>
+<head>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"><title>G4ParticleHPNames.cc source code [codebrowser/source/processes/hadronic/models/particle_hp/src/G4ParticleHPNames.cc] - Woboq Code Browser</title>
+<link rel="stylesheet" href="../../../../../../../../data/qtcreator.css" title="QtCreator"/>
+<link rel="alternate stylesheet" href="../../../../../../../../data/kdevelop.css" title="KDevelop"/>
+<script type="text/javascript" src="../../../../../../../../data/jquery/jquery.min.js"></script>
+<script type="text/javascript" src="../../../../../../../../data/jquery/jquery-ui.min.js"></script>
+<script>var file = 'codebrowser/source/processes/hadronic/models/particle_hp/src/G4ParticleHPNames.cc'; var root_path = '../../../../../../..'; var data_path = '../../../../../../../../data';</script>
+<script src='../../../../../../../../data/codebrowser.js'></script>
+</head>
+<body><div id='header'><h1 id='breadcrumb'><span>Browse the source code of </span><a href='../../../../../..'>codebrowser</a>/<a href='../../../../..'>source</a>/<a href='../../../..'>processes</a>/<a href='../../..'>hadronic</a>/<a href='../..'>models</a>/<a href='..'>particle_hp</a>/<a href='./'>src</a>/<a href='G4ParticleHPNames.cc.html'>G4ParticleHPNames.cc</a></h1></div>
+<hr/><div id='content'><table class="code">
+<tr><th id="1">1</th><td><i>//</i></td></tr>
+<tr><th id="2">2</th><td><i>// ********************************************************************</i></td></tr>
+<tr><th id="3">3</th><td><i>// * License and Disclaimer                                           *</i></td></tr>
+<tr><th id="4">4</th><td><i>// *                                                                  *</i></td></tr>
+<tr><th id="5">5</th><td><i>// * The  Geant4 software  is  copyright of the Copyright Holders  of *</i></td></tr>
+<tr><th id="6">6</th><td><i>// * the Geant4 Collaboration.  It is provided  under  the terms  and *</i></td></tr>
+<tr><th id="7">7</th><td><i>// * conditions of the Geant4 Software License,  included in the file *</i></td></tr>
+<tr><th id="8">8</th><td><i>// * LICENSE and available at  <a href="http://cern.ch/geant4/license">http://cern.ch/geant4/license</a> .  These *</i></td></tr>
+<tr><th id="9">9</th><td><i>// * include a list of copyright holders.                             *</i></td></tr>
+<tr><th id="10">10</th><td><i>// *                                                                  *</i></td></tr>
+<tr><th id="11">11</th><td><i>// * Neither the authors of this software system, nor their employing *</i></td></tr>
+<tr><th id="12">12</th><td><i>// * institutes,nor the agencies providing financial support for this *</i></td></tr>
+<tr><th id="13">13</th><td><i>// * work  make  any representation or  warranty, express or implied, *</i></td></tr>
+<tr><th id="14">14</th><td><i>// * regarding  this  software system or assume any liability for its *</i></td></tr>
+<tr><th id="15">15</th><td><i>// * use.  Please see the license in the file  LICENSE  and URL above *</i></td></tr>
+<tr><th id="16">16</th><td><i>// * for the full disclaimer and the limitation of liability.         *</i></td></tr>
+<tr><th id="17">17</th><td><i>// *                                                                  *</i></td></tr>
+<tr><th id="18">18</th><td><i>// * This  code  implementation is the result of  the  scientific and *</i></td></tr>
+<tr><th id="19">19</th><td><i>// * technical work of the GEANT4 collaboration.                      *</i></td></tr>
+<tr><th id="20">20</th><td><i>// * By using,  copying,  modifying or  distributing the software (or *</i></td></tr>
+<tr><th id="21">21</th><td><i>// * any work based  on the software)  you  agree  to acknowledge its *</i></td></tr>
+<tr><th id="22">22</th><td><i>// * use  in  resulting  scientific  publications,  and indicate your *</i></td></tr>
+<tr><th id="23">23</th><td><i>// * acceptance of all terms of the Geant4 Software license.          *</i></td></tr>
+<tr><th id="24">24</th><td><i>// ********************************************************************</i></td></tr>
+<tr><th id="25">25</th><td><i>//</i></td></tr>
+<tr><th id="26">26</th><td><i>// neutron_hp -- source file</i></td></tr>
+<tr><th id="27">27</th><td><i>// J.P. Wellisch, Nov-1996</i></td></tr>
+<tr><th id="28">28</th><td><i>// A prototype of the low energy neutron transport model.</i></td></tr>
+<tr><th id="29">29</th><td><i>//</i></td></tr>
+<tr><th id="30">30</th><td><i>// 24-Jan-07 Enable to use exact data only and add warnig when substitute file is used T. Koi</i></td></tr>
+<tr><th id="31">31</th><td><i>// 30-Jan-07 Modified method of searching substitute isotope data by T. Koi</i></td></tr>
+<tr><th id="32">32</th><td><i>// 07-06-12 fix memory leaking by T. Koi</i></td></tr>
+<tr><th id="33">33</th><td><i>// 07-06-25 Change data selection logic when G4NEUTRONHP_SKIP_MISSING_ISOTOPES is turn on</i></td></tr>
+<tr><th id="34">34</th><td><i>//          Natural Abundance data are allowed. by T. Koi</i></td></tr>
+<tr><th id="35">35</th><td><i>// 07-07-06 Allow _nat_ final state even for isotoped cross sections by T. Koi</i></td></tr>
+<tr><th id="36">36</th><td><i>// 08-09-01 Add protection that deuteron data do not selected for hydrogen and so on by T. Koi</i></td></tr>
+<tr><th id="37">37</th><td><i>//</i></td></tr>
+<tr><th id="38">38</th><td><i>// P. Arce, June-2014 Conversion neutron_hp to particle_hp</i></td></tr>
+<tr><th id="39">39</th><td><i>//</i></td></tr>
+<tr><th id="40">40</th><td><u>#include <a href="../include/G4ParticleHPNames.hh.html">"G4ParticleHPNames.hh"</a></u></td></tr>
+<tr><th id="41">41</th><td><u>#include <a href="../include/G4ParticleHPManager.hh.html">"G4ParticleHPManager.hh"</a></u></td></tr>
+<tr><th id="42">42</th><td><u>#include <a href="../../../../../materials/include/G4SandiaTable.hh.html">"G4SandiaTable.hh"</a></u></td></tr>
+<tr><th id="43">43</th><td><u>#include <a href="../../../util/include/G4HadronicException.hh.html">"G4HadronicException.hh"</a></u></td></tr>
+<tr><th id="44">44</th><td><u>#include <span class='error' title="&apos;fstream&apos; file not found">&lt;</span>fstream&gt;</u></td></tr>
+<tr><th id="45">45</th><td></td></tr>
+<tr><th id="46">46</th><td>  <em>const</em> <a class="type" href="../../../../../global/management/include/G4String.hh.html#G4String" title='G4String' data-ref="G4String">G4String</a> <a class="type" href="../include/G4ParticleHPNames.hh.html#G4ParticleHPNames" title='G4ParticleHPNames' data-ref="G4ParticleHPNames">G4ParticleHPNames</a>::<dfn class="decl def" id="G4ParticleHPNames::theString" title='G4ParticleHPNames::theString' data-ref="G4ParticleHPNames::theString">theString</dfn>[<var>100</var>] = {<a class="ref fake" href="../../../../../global/management/include/G4String.hh.html#_ZN8G4StringC1EPKc" title='G4String::G4String' data-ref="_ZN8G4StringC1EPKc"></a><q>"Hydrogen"</q>, <a class="ref fake" href="../../../../../global/management/include/G4String.hh.html#_ZN8G4StringC1EPKc" title='G4String::G4String' data-ref="_ZN8G4StringC1EPKc"></a><q>"Helium"</q>,</td></tr>
+<tr><th id="47">47</th><td> <a class="ref fake" href="../../../../../global/management/include/G4String.hh.html#_ZN8G4StringC1EPKc" title='G4String::G4String' data-ref="_ZN8G4StringC1EPKc"></a><q>"Lithium"</q>, <a class="ref fake" href="../../../../../global/management/include/G4String.hh.html#_ZN8G4StringC1EPKc" title='G4String::G4String' data-ref="_ZN8G4StringC1EPKc"></a><q>"Berylium"</q>, <a class="ref fake" href="../../../../../global/management/include/G4String.hh.html#_ZN8G4StringC1EPKc" title='G4String::G4String' data-ref="_ZN8G4StringC1EPKc"></a><q>"Boron"</q>, <a class="ref fake" href="../../../../../global/management/include/G4String.hh.html#_ZN8G4StringC1EPKc" title='G4String::G4String' data-ref="_ZN8G4StringC1EPKc"></a><q>"Carbon"</q>, <a class="ref fake" href="../../../../../global/management/include/G4String.hh.html#_ZN8G4StringC1EPKc" title='G4String::G4String' data-ref="_ZN8G4StringC1EPKc"></a><q>"Nitrogen"</q>, <a class="ref fake" href="../../../../../global/management/include/G4String.hh.html#_ZN8G4StringC1EPKc" title='G4String::G4String' data-ref="_ZN8G4StringC1EPKc"></a><q>"Oxygen"</q>, <a class="ref fake" href="../../../../../global/management/include/G4String.hh.html#_ZN8G4StringC1EPKc" title='G4String::G4String' data-ref="_ZN8G4StringC1EPKc"></a><q>"Fluorine"</q>,</td></tr>
+<tr><th id="48">48</th><td> <a class="ref fake" href="../../../../../global/management/include/G4String.hh.html#_ZN8G4StringC1EPKc" title='G4String::G4String' data-ref="_ZN8G4StringC1EPKc"></a><q>"Neon"</q>, <a class="ref fake" href="../../../../../global/management/include/G4String.hh.html#_ZN8G4StringC1EPKc" title='G4String::G4String' data-ref="_ZN8G4StringC1EPKc"></a><q>"Sodium"</q>, <a class="ref fake" href="../../../../../global/management/include/G4String.hh.html#_ZN8G4StringC1EPKc" title='G4String::G4String' data-ref="_ZN8G4StringC1EPKc"></a><q>"Magnesium"</q>, <a class="ref fake" href="../../../../../global/management/include/G4String.hh.html#_ZN8G4StringC1EPKc" title='G4String::G4String' data-ref="_ZN8G4StringC1EPKc"></a><q>"Aluminum"</q>, <a class="ref fake" href="../../../../../global/management/include/G4String.hh.html#_ZN8G4StringC1EPKc" title='G4String::G4String' data-ref="_ZN8G4StringC1EPKc"></a><q>"Silicon"</q>, <a class="ref fake" href="../../../../../global/management/include/G4String.hh.html#_ZN8G4StringC1EPKc" title='G4String::G4String' data-ref="_ZN8G4StringC1EPKc"></a><q>"Phosphorous"</q>, </td></tr>
+<tr><th id="49">49</th><td> <a class="ref fake" href="../../../../../global/management/include/G4String.hh.html#_ZN8G4StringC1EPKc" title='G4String::G4String' data-ref="_ZN8G4StringC1EPKc"></a><q>"Sulfur"</q>, <a class="ref fake" href="../../../../../global/management/include/G4String.hh.html#_ZN8G4StringC1EPKc" title='G4String::G4String' data-ref="_ZN8G4StringC1EPKc"></a><q>"Chlorine"</q>, <a class="ref fake" href="../../../../../global/management/include/G4String.hh.html#_ZN8G4StringC1EPKc" title='G4String::G4String' data-ref="_ZN8G4StringC1EPKc"></a><q>"Argon"</q>, <a class="ref fake" href="../../../../../global/management/include/G4String.hh.html#_ZN8G4StringC1EPKc" title='G4String::G4String' data-ref="_ZN8G4StringC1EPKc"></a><q>"Potassium"</q>, <a class="ref fake" href="../../../../../global/management/include/G4String.hh.html#_ZN8G4StringC1EPKc" title='G4String::G4String' data-ref="_ZN8G4StringC1EPKc"></a><q>"Calcium"</q>, <a class="ref fake" href="../../../../../global/management/include/G4String.hh.html#_ZN8G4StringC1EPKc" title='G4String::G4String' data-ref="_ZN8G4StringC1EPKc"></a><q>"Scandium"</q>,</td></tr>
+<tr><th id="50">50</th><td> <a class="ref fake" href="../../../../../global/management/include/G4String.hh.html#_ZN8G4StringC1EPKc" title='G4String::G4String' data-ref="_ZN8G4StringC1EPKc"></a><q>"Titanium"</q>, <a class="ref fake" href="../../../../../global/management/include/G4String.hh.html#_ZN8G4StringC1EPKc" title='G4String::G4String' data-ref="_ZN8G4StringC1EPKc"></a><q>"Vanadium"</q>, <a class="ref fake" href="../../../../../global/management/include/G4String.hh.html#_ZN8G4StringC1EPKc" title='G4String::G4String' data-ref="_ZN8G4StringC1EPKc"></a><q>"Chromium"</q>, <a class="ref fake" href="../../../../../global/management/include/G4String.hh.html#_ZN8G4StringC1EPKc" title='G4String::G4String' data-ref="_ZN8G4StringC1EPKc"></a><q>"Manganese"</q>, <a class="ref fake" href="../../../../../global/management/include/G4String.hh.html#_ZN8G4StringC1EPKc" title='G4String::G4String' data-ref="_ZN8G4StringC1EPKc"></a><q>"Iron"</q>, <a class="ref fake" href="../../../../../global/management/include/G4String.hh.html#_ZN8G4StringC1EPKc" title='G4String::G4String' data-ref="_ZN8G4StringC1EPKc"></a><q>"Cobalt"</q>, <a class="ref fake" href="../../../../../global/management/include/G4String.hh.html#_ZN8G4StringC1EPKc" title='G4String::G4String' data-ref="_ZN8G4StringC1EPKc"></a><q>"Nickel"</q>,</td></tr>
+<tr><th id="51">51</th><td> <a class="ref fake" href="../../../../../global/management/include/G4String.hh.html#_ZN8G4StringC1EPKc" title='G4String::G4String' data-ref="_ZN8G4StringC1EPKc"></a><q>"Copper"</q>, <a class="ref fake" href="../../../../../global/management/include/G4String.hh.html#_ZN8G4StringC1EPKc" title='G4String::G4String' data-ref="_ZN8G4StringC1EPKc"></a><q>"Zinc"</q>, <a class="ref fake" href="../../../../../global/management/include/G4String.hh.html#_ZN8G4StringC1EPKc" title='G4String::G4String' data-ref="_ZN8G4StringC1EPKc"></a><q>"Gallium"</q>, <a class="ref fake" href="../../../../../global/management/include/G4String.hh.html#_ZN8G4StringC1EPKc" title='G4String::G4String' data-ref="_ZN8G4StringC1EPKc"></a><q>"Germanium"</q>, <a class="ref fake" href="../../../../../global/management/include/G4String.hh.html#_ZN8G4StringC1EPKc" title='G4String::G4String' data-ref="_ZN8G4StringC1EPKc"></a><q>"Arsenic"</q>, <a class="ref fake" href="../../../../../global/management/include/G4String.hh.html#_ZN8G4StringC1EPKc" title='G4String::G4String' data-ref="_ZN8G4StringC1EPKc"></a><q>"Selenium"</q>, <a class="ref fake" href="../../../../../global/management/include/G4String.hh.html#_ZN8G4StringC1EPKc" title='G4String::G4String' data-ref="_ZN8G4StringC1EPKc"></a><q>"Bromine"</q>,</td></tr>
+<tr><th id="52">52</th><td> <a class="ref fake" href="../../../../../global/management/include/G4String.hh.html#_ZN8G4StringC1EPKc" title='G4String::G4String' data-ref="_ZN8G4StringC1EPKc"></a><q>"Krypton"</q>, <a class="ref fake" href="../../../../../global/management/include/G4String.hh.html#_ZN8G4StringC1EPKc" title='G4String::G4String' data-ref="_ZN8G4StringC1EPKc"></a><q>"Rubidium"</q>, <a class="ref fake" href="../../../../../global/management/include/G4String.hh.html#_ZN8G4StringC1EPKc" title='G4String::G4String' data-ref="_ZN8G4StringC1EPKc"></a><q>"Strontium"</q>, <a class="ref fake" href="../../../../../global/management/include/G4String.hh.html#_ZN8G4StringC1EPKc" title='G4String::G4String' data-ref="_ZN8G4StringC1EPKc"></a><q>"Yttrium"</q>, <a class="ref fake" href="../../../../../global/management/include/G4String.hh.html#_ZN8G4StringC1EPKc" title='G4String::G4String' data-ref="_ZN8G4StringC1EPKc"></a><q>"Zirconium"</q>, <a class="ref fake" href="../../../../../global/management/include/G4String.hh.html#_ZN8G4StringC1EPKc" title='G4String::G4String' data-ref="_ZN8G4StringC1EPKc"></a><q>"Niobium"</q>,</td></tr>
+<tr><th id="53">53</th><td> <a class="ref fake" href="../../../../../global/management/include/G4String.hh.html#_ZN8G4StringC1EPKc" title='G4String::G4String' data-ref="_ZN8G4StringC1EPKc"></a><q>"Molybdenum"</q>, <a class="ref fake" href="../../../../../global/management/include/G4String.hh.html#_ZN8G4StringC1EPKc" title='G4String::G4String' data-ref="_ZN8G4StringC1EPKc"></a><q>"Technetium"</q>, <a class="ref fake" href="../../../../../global/management/include/G4String.hh.html#_ZN8G4StringC1EPKc" title='G4String::G4String' data-ref="_ZN8G4StringC1EPKc"></a><q>"Ruthenium"</q>, <a class="ref fake" href="../../../../../global/management/include/G4String.hh.html#_ZN8G4StringC1EPKc" title='G4String::G4String' data-ref="_ZN8G4StringC1EPKc"></a><q>"Rhodium"</q>, <a class="ref fake" href="../../../../../global/management/include/G4String.hh.html#_ZN8G4StringC1EPKc" title='G4String::G4String' data-ref="_ZN8G4StringC1EPKc"></a><q>"Palladium"</q>, <a class="ref fake" href="../../../../../global/management/include/G4String.hh.html#_ZN8G4StringC1EPKc" title='G4String::G4String' data-ref="_ZN8G4StringC1EPKc"></a><q>"Silver"</q>,</td></tr>
+<tr><th id="54">54</th><td> <a class="ref fake" href="../../../../../global/management/include/G4String.hh.html#_ZN8G4StringC1EPKc" title='G4String::G4String' data-ref="_ZN8G4StringC1EPKc"></a><q>"Cadmium"</q>, <a class="ref fake" href="../../../../../global/management/include/G4String.hh.html#_ZN8G4StringC1EPKc" title='G4String::G4String' data-ref="_ZN8G4StringC1EPKc"></a><q>"Indium"</q>, <a class="ref fake" href="../../../../../global/management/include/G4String.hh.html#_ZN8G4StringC1EPKc" title='G4String::G4String' data-ref="_ZN8G4StringC1EPKc"></a><q>"Tin"</q>, <a class="ref fake" href="../../../../../global/management/include/G4String.hh.html#_ZN8G4StringC1EPKc" title='G4String::G4String' data-ref="_ZN8G4StringC1EPKc"></a><q>"Antimony"</q>, <a class="ref fake" href="../../../../../global/management/include/G4String.hh.html#_ZN8G4StringC1EPKc" title='G4String::G4String' data-ref="_ZN8G4StringC1EPKc"></a><q>"Tellurium"</q>, <a class="ref fake" href="../../../../../global/management/include/G4String.hh.html#_ZN8G4StringC1EPKc" title='G4String::G4String' data-ref="_ZN8G4StringC1EPKc"></a><q>"Iodine"</q>, <a class="ref fake" href="../../../../../global/management/include/G4String.hh.html#_ZN8G4StringC1EPKc" title='G4String::G4String' data-ref="_ZN8G4StringC1EPKc"></a><q>"Xenon"</q>,</td></tr>
+<tr><th id="55">55</th><td> <a class="ref fake" href="../../../../../global/management/include/G4String.hh.html#_ZN8G4StringC1EPKc" title='G4String::G4String' data-ref="_ZN8G4StringC1EPKc"></a><q>"Cesium"</q>, <a class="ref fake" href="../../../../../global/management/include/G4String.hh.html#_ZN8G4StringC1EPKc" title='G4String::G4String' data-ref="_ZN8G4StringC1EPKc"></a><q>"Barium"</q>, <a class="ref fake" href="../../../../../global/management/include/G4String.hh.html#_ZN8G4StringC1EPKc" title='G4String::G4String' data-ref="_ZN8G4StringC1EPKc"></a><q>"Lanthanum"</q>, <a class="ref fake" href="../../../../../global/management/include/G4String.hh.html#_ZN8G4StringC1EPKc" title='G4String::G4String' data-ref="_ZN8G4StringC1EPKc"></a><q>"Cerium"</q>, <a class="ref fake" href="../../../../../global/management/include/G4String.hh.html#_ZN8G4StringC1EPKc" title='G4String::G4String' data-ref="_ZN8G4StringC1EPKc"></a><q>"Praseodymium"</q>, <a class="ref fake" href="../../../../../global/management/include/G4String.hh.html#_ZN8G4StringC1EPKc" title='G4String::G4String' data-ref="_ZN8G4StringC1EPKc"></a><q>"Neodymium"</q>,</td></tr>
+<tr><th id="56">56</th><td> <a class="ref fake" href="../../../../../global/management/include/G4String.hh.html#_ZN8G4StringC1EPKc" title='G4String::G4String' data-ref="_ZN8G4StringC1EPKc"></a><q>"Promethium"</q>, <a class="ref fake" href="../../../../../global/management/include/G4String.hh.html#_ZN8G4StringC1EPKc" title='G4String::G4String' data-ref="_ZN8G4StringC1EPKc"></a><q>"Samarium"</q>, <a class="ref fake" href="../../../../../global/management/include/G4String.hh.html#_ZN8G4StringC1EPKc" title='G4String::G4String' data-ref="_ZN8G4StringC1EPKc"></a><q>"Europium"</q>, <a class="ref fake" href="../../../../../global/management/include/G4String.hh.html#_ZN8G4StringC1EPKc" title='G4String::G4String' data-ref="_ZN8G4StringC1EPKc"></a><q>"Gadolinium"</q>, <a class="ref fake" href="../../../../../global/management/include/G4String.hh.html#_ZN8G4StringC1EPKc" title='G4String::G4String' data-ref="_ZN8G4StringC1EPKc"></a><q>"Terbium"</q>, <a class="ref fake" href="../../../../../global/management/include/G4String.hh.html#_ZN8G4StringC1EPKc" title='G4String::G4String' data-ref="_ZN8G4StringC1EPKc"></a><q>"Dysprosium"</q>,</td></tr>
+<tr><th id="57">57</th><td> <a class="ref fake" href="../../../../../global/management/include/G4String.hh.html#_ZN8G4StringC1EPKc" title='G4String::G4String' data-ref="_ZN8G4StringC1EPKc"></a><q>"Holmium"</q>, <a class="ref fake" href="../../../../../global/management/include/G4String.hh.html#_ZN8G4StringC1EPKc" title='G4String::G4String' data-ref="_ZN8G4StringC1EPKc"></a><q>"Erbium"</q>, <a class="ref fake" href="../../../../../global/management/include/G4String.hh.html#_ZN8G4StringC1EPKc" title='G4String::G4String' data-ref="_ZN8G4StringC1EPKc"></a><q>"Thulium"</q>, <a class="ref fake" href="../../../../../global/management/include/G4String.hh.html#_ZN8G4StringC1EPKc" title='G4String::G4String' data-ref="_ZN8G4StringC1EPKc"></a><q>"Ytterbium"</q>, <a class="ref fake" href="../../../../../global/management/include/G4String.hh.html#_ZN8G4StringC1EPKc" title='G4String::G4String' data-ref="_ZN8G4StringC1EPKc"></a><q>"Lutetium"</q>, <a class="ref fake" href="../../../../../global/management/include/G4String.hh.html#_ZN8G4StringC1EPKc" title='G4String::G4String' data-ref="_ZN8G4StringC1EPKc"></a><q>"Hafnium"</q>,</td></tr>
+<tr><th id="58">58</th><td> <a class="ref fake" href="../../../../../global/management/include/G4String.hh.html#_ZN8G4StringC1EPKc" title='G4String::G4String' data-ref="_ZN8G4StringC1EPKc"></a><q>"Tantalum"</q>, <a class="ref fake" href="../../../../../global/management/include/G4String.hh.html#_ZN8G4StringC1EPKc" title='G4String::G4String' data-ref="_ZN8G4StringC1EPKc"></a><q>"Tungsten"</q>, <a class="ref fake" href="../../../../../global/management/include/G4String.hh.html#_ZN8G4StringC1EPKc" title='G4String::G4String' data-ref="_ZN8G4StringC1EPKc"></a><q>"Rhenium"</q>, <a class="ref fake" href="../../../../../global/management/include/G4String.hh.html#_ZN8G4StringC1EPKc" title='G4String::G4String' data-ref="_ZN8G4StringC1EPKc"></a><q>"Osmium"</q>, <a class="ref fake" href="../../../../../global/management/include/G4String.hh.html#_ZN8G4StringC1EPKc" title='G4String::G4String' data-ref="_ZN8G4StringC1EPKc"></a><q>"Iridium"</q>, <a class="ref fake" href="../../../../../global/management/include/G4String.hh.html#_ZN8G4StringC1EPKc" title='G4String::G4String' data-ref="_ZN8G4StringC1EPKc"></a><q>"Platinium"</q>, <a class="ref fake" href="../../../../../global/management/include/G4String.hh.html#_ZN8G4StringC1EPKc" title='G4String::G4String' data-ref="_ZN8G4StringC1EPKc"></a><q>"Gold"</q>,</td></tr>
+<tr><th id="59">59</th><td> <a class="ref fake" href="../../../../../global/management/include/G4String.hh.html#_ZN8G4StringC1EPKc" title='G4String::G4String' data-ref="_ZN8G4StringC1EPKc"></a><q>"Mercury"</q>, <a class="ref fake" href="../../../../../global/management/include/G4String.hh.html#_ZN8G4StringC1EPKc" title='G4String::G4String' data-ref="_ZN8G4StringC1EPKc"></a><q>"Thallium"</q>, <a class="ref fake" href="../../../../../global/management/include/G4String.hh.html#_ZN8G4StringC1EPKc" title='G4String::G4String' data-ref="_ZN8G4StringC1EPKc"></a><q>"Lead"</q>, <a class="ref fake" href="../../../../../global/management/include/G4String.hh.html#_ZN8G4StringC1EPKc" title='G4String::G4String' data-ref="_ZN8G4StringC1EPKc"></a><q>"Bismuth"</q>, <a class="ref fake" href="../../../../../global/management/include/G4String.hh.html#_ZN8G4StringC1EPKc" title='G4String::G4String' data-ref="_ZN8G4StringC1EPKc"></a><q>"Polonium"</q>, <a class="ref fake" href="../../../../../global/management/include/G4String.hh.html#_ZN8G4StringC1EPKc" title='G4String::G4String' data-ref="_ZN8G4StringC1EPKc"></a><q>"Astatine"</q>, <a class="ref fake" href="../../../../../global/management/include/G4String.hh.html#_ZN8G4StringC1EPKc" title='G4String::G4String' data-ref="_ZN8G4StringC1EPKc"></a><q>"Radon"</q>, </td></tr>
+<tr><th id="60">60</th><td> <a class="ref fake" href="../../../../../global/management/include/G4String.hh.html#_ZN8G4StringC1EPKc" title='G4String::G4String' data-ref="_ZN8G4StringC1EPKc"></a><q>"Francium"</q>, <a class="ref fake" href="../../../../../global/management/include/G4String.hh.html#_ZN8G4StringC1EPKc" title='G4String::G4String' data-ref="_ZN8G4StringC1EPKc"></a><q>"Radium"</q>, <a class="ref fake" href="../../../../../global/management/include/G4String.hh.html#_ZN8G4StringC1EPKc" title='G4String::G4String' data-ref="_ZN8G4StringC1EPKc"></a><q>"Actinium"</q>, <a class="ref fake" href="../../../../../global/management/include/G4String.hh.html#_ZN8G4StringC1EPKc" title='G4String::G4String' data-ref="_ZN8G4StringC1EPKc"></a><q>"Thorium"</q>, <a class="ref fake" href="../../../../../global/management/include/G4String.hh.html#_ZN8G4StringC1EPKc" title='G4String::G4String' data-ref="_ZN8G4StringC1EPKc"></a><q>"Protactinium"</q>, <a class="ref fake" href="../../../../../global/management/include/G4String.hh.html#_ZN8G4StringC1EPKc" title='G4String::G4String' data-ref="_ZN8G4StringC1EPKc"></a><q>"Uranium"</q>, </td></tr>
+<tr><th id="61">61</th><td> <a class="ref fake" href="../../../../../global/management/include/G4String.hh.html#_ZN8G4StringC1EPKc" title='G4String::G4String' data-ref="_ZN8G4StringC1EPKc"></a><q>"Neptunium"</q>, <a class="ref fake" href="../../../../../global/management/include/G4String.hh.html#_ZN8G4StringC1EPKc" title='G4String::G4String' data-ref="_ZN8G4StringC1EPKc"></a><q>"Plutonium"</q>, <a class="ref fake" href="../../../../../global/management/include/G4String.hh.html#_ZN8G4StringC1EPKc" title='G4String::G4String' data-ref="_ZN8G4StringC1EPKc"></a><q>"Americium"</q>, <a class="ref fake" href="../../../../../global/management/include/G4String.hh.html#_ZN8G4StringC1EPKc" title='G4String::G4String' data-ref="_ZN8G4StringC1EPKc"></a><q>"Curium"</q>, <a class="ref fake" href="../../../../../global/management/include/G4String.hh.html#_ZN8G4StringC1EPKc" title='G4String::G4String' data-ref="_ZN8G4StringC1EPKc"></a><q>"Berkelium"</q>, <a class="ref fake" href="../../../../../global/management/include/G4String.hh.html#_ZN8G4StringC1EPKc" title='G4String::G4String' data-ref="_ZN8G4StringC1EPKc"></a><q>"Californium"</q>,</td></tr>
+<tr><th id="62">62</th><td> <a class="ref fake" href="../../../../../global/management/include/G4String.hh.html#_ZN8G4StringC1EPKc" title='G4String::G4String' data-ref="_ZN8G4StringC1EPKc"></a><q>"Einsteinium"</q>,<a class="ref fake" href="../../../../../global/management/include/G4String.hh.html#_ZN8G4StringC1EPKc" title='G4String::G4String' data-ref="_ZN8G4StringC1EPKc"></a><q>"Fermium"</q>};</td></tr>
+<tr><th id="63">63</th><td></td></tr>
+<tr><th id="64">64</th><td></td></tr>
+<tr><th id="65">65</th><td>  <a class="type" href="../../../../../global/management/include/G4String.hh.html#G4String" title='G4String' data-ref="G4String">G4String</a> <a class="type" href="../include/G4ParticleHPNames.hh.html#G4ParticleHPNames" title='G4ParticleHPNames' data-ref="G4ParticleHPNames">G4ParticleHPNames</a>::<dfn class="decl def" id="_ZN17G4ParticleHPNames7GetNameEi" title='G4ParticleHPNames::GetName' data-ref="_ZN17G4ParticleHPNames7GetNameEi">GetName</dfn>(<a class="typedef" href="../../../../../global/management/include/G4Types.hh.html#G4int" title='G4int' data-type='int' data-ref="G4int">G4int</a> <dfn class="local col1 decl" id="1i" title='i' data-type='G4int' data-ref="1i">i</dfn>) { <b>return</b> <a class="ref fake" href="../../../../../global/management/include/G4String.hh.html#_ZN8G4StringC1ERKS_" title='G4String::G4String' data-ref="_ZN8G4StringC1ERKS_"></a><a class="member" href="../include/G4ParticleHPNames.hh.html#G4ParticleHPNames::theString" title='G4ParticleHPNames::theString' data-ref="G4ParticleHPNames::theString">theString</a>[<a class="local col1 ref" href="#1i" title='i' data-ref="1i">i</a>]; }</td></tr>
+<tr><th id="66">66</th><td></td></tr>
+<tr><th id="67">67</th><td><i>//G4ParticleHPDataUsed G4ParticleHPNames::GetName(G4int A, G4int Z, G4String base, G4String rest, G4bool &amp; aFlag)</i></td></tr>
+<tr><th id="68">68</th><td><a class="type" href="../include/G4ParticleHPDataUsed.hh.html#G4ParticleHPDataUsed" title='G4ParticleHPDataUsed' data-ref="G4ParticleHPDataUsed">G4ParticleHPDataUsed</a> <a class="type" href="../include/G4ParticleHPNames.hh.html#G4ParticleHPNames" title='G4ParticleHPNames' data-ref="G4ParticleHPNames">G4ParticleHPNames</a>::<dfn class="decl def" id="_ZN17G4ParticleHPNames7GetNameEiii8G4StringS0_Rb" title='G4ParticleHPNames::GetName' data-ref="_ZN17G4ParticleHPNames7GetNameEiii8G4StringS0_Rb">GetName</dfn>(<a class="typedef" href="../../../../../global/management/include/G4Types.hh.html#G4int" title='G4int' data-type='int' data-ref="G4int">G4int</a> <dfn class="local col2 decl" id="2A" title='A' data-type='G4int' data-ref="2A">A</dfn>, <a class="typedef" href="../../../../../global/management/include/G4Types.hh.html#G4int" title='G4int' data-type='int' data-ref="G4int">G4int</a> <dfn class="local col3 decl" id="3Z" title='Z' data-type='G4int' data-ref="3Z">Z</dfn>, <a class="typedef" href="../../../../../global/management/include/G4Types.hh.html#G4int" title='G4int' data-type='int' data-ref="G4int">G4int</a> <dfn class="local col4 decl" id="4M" title='M' data-type='G4int' data-ref="4M">M</dfn>, <a class="type" href="../../../../../global/management/include/G4String.hh.html#G4String" title='G4String' data-ref="G4String">G4String</a> <dfn class="local col5 decl" id="5base" title='base' data-type='G4String' data-ref="5base">base</dfn>, <a class="type" href="../../../../../global/management/include/G4String.hh.html#G4String" title='G4String' data-ref="G4String">G4String</a> <dfn class="local col6 decl" id="6rest" title='rest' data-type='G4String' data-ref="6rest">rest</dfn>, <a class="typedef" href="../../../../../global/management/include/G4Types.hh.html#G4bool" title='G4bool' data-type='bool' data-ref="G4bool">G4bool</a> &amp; <dfn class="local col7 decl" id="7aFlag" title='aFlag' data-type='G4bool &amp;' data-ref="7aFlag">aFlag</dfn>)</td></tr>
+<tr><th id="69">69</th><td>{</td></tr>
+<tr><th id="70">70</th><td></td></tr>
+<tr><th id="71">71</th><td>   <a class="typedef" href="../../../../../global/management/include/G4Types.hh.html#G4int" title='G4int' data-type='int' data-ref="G4int">G4int</a> <dfn class="local col8 decl" id="8verboseLevel" title='verboseLevel' data-type='G4int' data-ref="8verboseLevel">verboseLevel</dfn> = <a class="type" href="../include/G4ParticleHPManager.hh.html#G4ParticleHPManager" title='G4ParticleHPManager' data-ref="G4ParticleHPManager">G4ParticleHPManager</a>::<a class="ref" href="../include/G4ParticleHPManager.hh.html#_ZN19G4ParticleHPManager11GetInstanceEv" title='G4ParticleHPManager::GetInstance' data-ref="_ZN19G4ParticleHPManager11GetInstanceEv">GetInstance</a>()-&gt;<a class="ref" href="../include/G4ParticleHPManager.hh.html#_ZN19G4ParticleHPManager15GetVerboseLevelEv" title='G4ParticleHPManager::GetVerboseLevel' data-ref="_ZN19G4ParticleHPManager15GetVerboseLevelEv">GetVerboseLevel</a>();</td></tr>
+<tr><th id="72">72</th><td></td></tr>
+<tr><th id="73">73</th><td>   <i>//G4cout &lt;&lt; Z &lt;&lt; " " &lt;&lt; A &lt;&lt; " " &lt;&lt; M &lt;&lt; " " &lt;&lt; base &lt;&lt; " " &lt;&lt; rest &lt;&lt; G4endl;</i></td></tr>
+<tr><th id="74">74</th><td><i></i></td></tr>
+<tr><th id="75">75</th><td><i>   //Excited isomer indicator</i></td></tr>
+<tr><th id="76">76</th><td>   <span class='error' title="use of undeclared identifier &apos;std&apos;">std</span>::stringstream <dfn class="local col9 decl" id="9ss" title='ss' data-type='int' data-ref="9ss">ss</dfn>;</td></tr>
+<tr><th id="77">77</th><td>   <a class="type" href="../../../../../global/management/include/G4String.hh.html#G4String" title='G4String' data-ref="G4String">G4String</a> <a class="ref fake" href="../../../../../global/management/include/G4String.hh.html#_ZN8G4StringC1Ev" title='G4String::G4String' data-ref="_ZN8G4StringC1Ev"></a><dfn class="local col0 decl" id="10sM" title='sM' data-type='G4String' data-ref="10sM">sM</dfn>;</td></tr>
+<tr><th id="78">78</th><td>   <b>if</b> ( <a class="local col4 ref" href="#4M" title='M' data-ref="4M">M</a> &gt; <var>0</var> ) </td></tr>
+<tr><th id="79">79</th><td>   {</td></tr>
+<tr><th id="80">80</th><td>      ss &lt;&lt; <q>"m"</q>;</td></tr>
+<tr><th id="81">81</th><td>      ss &lt;&lt; M;</td></tr>
+<tr><th id="82">82</th><td>      ss &gt;&gt; sM;</td></tr>
+<tr><th id="83">83</th><td>      ss.clear();</td></tr>
+<tr><th id="84">84</th><td>   }</td></tr>
+<tr><th id="85">85</th><td></td></tr>
+<tr><th id="86">86</th><td>   <a class="type" href="../include/G4ParticleHPDataUsed.hh.html#G4ParticleHPDataUsed" title='G4ParticleHPDataUsed' data-ref="G4ParticleHPDataUsed">G4ParticleHPDataUsed</a> <a class="ref fake" href="../include/G4ParticleHPDataUsed.hh.html#_ZN20G4ParticleHPDataUsedC1Ev" title='G4ParticleHPDataUsed::G4ParticleHPDataUsed' data-ref="_ZN20G4ParticleHPDataUsedC1Ev"></a><dfn class="local col1 decl" id="11result" title='result' data-type='G4ParticleHPDataUsed' data-ref="11result">result</dfn>;</td></tr>
+<tr><th id="87">87</th><td>   <a class="local col7 ref" href="#7aFlag" title='aFlag' data-ref="7aFlag">aFlag</a> = <b>true</b>;</td></tr>
+<tr><th id="88">88</th><td><b>if</b>(<span class='error' title="use of undeclared identifier &apos;getenv&apos;">getenv</span>(<q>"NeutronHPNames"</q>)) <a class="macro" href="../../../../../global/management/include/G4ios.hh.html#46" title="(*_G4cout_p())" data-ref="_M/G4cout">G4cout</a> <span class='error' title="invalid operands to binary expression (&apos;int&apos; and &apos;const char *&apos;)">&lt;&lt;</span> <q>"Names::GetName entered for Z = "</q> &lt;&lt; Z &lt;&lt; <q>", A = "</q> &lt;&lt; A &lt;&lt;<a class="macro" href="../../../../../global/management/include/G4ios.hh.html#60" title="std::endl" data-ref="_M/G4endl">G4endl</a>;</td></tr>
+<tr><th id="89">89</th><td></td></tr>
+<tr><th id="90">90</th><td>    <a class="typedef" href="../../../../../global/management/include/G4Types.hh.html#G4int" title='G4int' data-type='int' data-ref="G4int">G4int</a> <dfn class="local col2 decl" id="12myA" title='myA' data-type='G4int' data-ref="12myA">myA</dfn> = <a class="local col2 ref" href="#2A" title='A' data-ref="2A">A</a>;</td></tr>
+<tr><th id="91">91</th><td>    <a class="typedef" href="../../../../../global/management/include/G4Types.hh.html#G4int" title='G4int' data-type='int' data-ref="G4int">G4int</a> <dfn class="local col3 decl" id="13myZ" title='myZ' data-type='G4int' data-ref="13myZ">myZ</dfn> = <a class="local col3 ref" href="#3Z" title='Z' data-ref="3Z">Z</a>;</td></tr>
+<tr><th id="92">92</th><td></td></tr>
+<tr><th id="93">93</th><td>    <b>if</b>(Z&gt;<var>92.5</var>&amp;&amp;!<span class='error' title="use of undeclared identifier &apos;getenv&apos;">getenv</span>(<q>"AllowForHeavyElements"</q>) ) </td></tr>
+<tr><th id="94">94</th><td>    {</td></tr>
+<tr><th id="95">95</th><td>      <i>//G4cerr &lt;&lt; "Please contact Hans-Peter.Wellisch@cern.ch"&lt;&lt;G4endl;</i></td></tr>
+<tr><th id="96">96</th><td>      <a class="macro" href="../../../../../global/management/include/G4ios.hh.html#47" title="(*_G4cerr_p())" data-ref="_M/G4cerr">G4cerr</a> <span class='error' title="invalid operands to binary expression (&apos;int&apos; and &apos;const char *&apos;)">&lt;&lt;</span> <q>"Please contact Geant4 Hadron Group Coordinator"</q>&lt;&lt;<a class="macro" href="../../../../../global/management/include/G4ios.hh.html#60" title="std::endl" data-ref="_M/G4endl">G4endl</a>;</td></tr>
+<tr><th id="97">97</th><td>      <b>throw</b> <a class="type" href="../../../util/include/G4HadronicException.hh.html#G4HadronicException" title='G4HadronicException' data-ref="G4HadronicException">G4HadronicException</a><a class="ref" href="../../../util/include/G4HadronicException.hh.html#_ZN19G4HadronicExceptionC1E8G4StringiS0_" title='G4HadronicException::G4HadronicException' data-ref="_ZN19G4HadronicExceptionC1E8G4StringiS0_">(</a><span class="macro" title="&quot;/home/jishin/app/geant4/1005p1/geant4.10.05.p01/source/processes/hadronic/models/particle_hp/src/G4ParticleHPNames.cc&quot;" data-ref="_M/__FILE__">__FILE__</span>, <span class="macro" title="97" data-ref="_M/__LINE__">__LINE__</span>, <a class="ref fake" href="../../../../../global/management/include/G4String.hh.html#_ZN8G4StringC1EPKc" title='G4String::G4String' data-ref="_ZN8G4StringC1EPKc"></a><q>"G4ParticleHPNames::GetName - data with Z&gt;92 are not provided"</q>);</td></tr>
+<tr><th id="98">98</th><td>    }</td></tr>
+<tr><th id="99">99</th><td></td></tr>
+<tr><th id="100">100</th><td>    <a class="type" href="../../../../../global/management/include/G4String.hh.html#G4String" title='G4String' data-ref="G4String">G4String</a> * <dfn class="local col4 decl" id="14theName" title='theName' data-type='G4String *' data-ref="14theName">theName</dfn> = <var>0</var>;</td></tr>
+<tr><th id="101">101</th><td>    <a class="type" href="../../../../../global/management/include/G4String.hh.html#G4String" title='G4String' data-ref="G4String">G4String</a> <dfn class="local col5 decl" id="15theFileName" title='theFileName' data-type='G4String' data-ref="15theFileName">theFileName</dfn><a class="ref" href="../../../../../global/management/include/G4String.hh.html#_ZN8G4StringC1EPKc" title='G4String::G4String' data-ref="_ZN8G4StringC1EPKc">(</a><q>""</q>);</td></tr>
+<tr><th id="102">102</th><td></td></tr>
+<tr><th id="103">103</th><td><i>//    G4int inc = 1;</i></td></tr>
+<tr><th id="104">104</th><td></td></tr>
+<tr><th id="105">105</th><td>    <a class="typedef" href="../../../../../global/management/include/G4Types.hh.html#G4int" title='G4int' data-type='int' data-ref="G4int">G4int</a> <dfn class="local col6 decl" id="16flip_Z" title='flip_Z' data-type='G4int' data-ref="16flip_Z">flip_Z</dfn> = <var>1</var>;</td></tr>
+<tr><th id="106">106</th><td>    <a class="typedef" href="../../../../../global/management/include/G4Types.hh.html#G4int" title='G4int' data-type='int' data-ref="G4int">G4int</a> <dfn class="local col7 decl" id="17delta_Z" title='delta_Z' data-type='G4int' data-ref="17delta_Z">delta_Z</dfn> = <var>0</var>;</td></tr>
+<tr><th id="107">107</th><td></td></tr>
+<tr><th id="108">108</th><td>    <a class="typedef" href="../../../../../global/management/include/G4Types.hh.html#G4int" title='G4int' data-type='int' data-ref="G4int">G4int</a> <dfn class="local col8 decl" id="18flip_A" title='flip_A' data-type='G4int' data-ref="18flip_A">flip_A</dfn> = <var>1</var>;</td></tr>
+<tr><th id="109">109</th><td>    <a class="typedef" href="../../../../../global/management/include/G4Types.hh.html#G4int" title='G4int' data-type='int' data-ref="G4int">G4int</a> <dfn class="local col9 decl" id="19delta_A" title='delta_A' data-type='G4int' data-ref="19delta_A">delta_A</dfn> = <var>0</var>;</td></tr>
+<tr><th id="110">110</th><td>    </td></tr>
+<tr><th id="111">111</th><td>    <i>//std::ifstream * check = new std::ifstream(".dummy");</i></td></tr>
+<tr><th id="112">112</th><td>    <span class='error' title="use of undeclared identifier &apos;std&apos;">std</span>::istringstream* <dfn class="local col0 decl" id="20check" title='check' data-type='int *' data-ref="20check">check</dfn> = <span class='error' title="use of undeclared identifier &apos;NULL&apos;">NULL</span>;</td></tr>
+<tr><th id="113">113</th><td>    <a class="typedef" href="../../../../../global/management/include/G4Types.hh.html#G4bool" title='G4bool' data-type='bool' data-ref="G4bool">G4bool</a> <dfn class="local col1 decl" id="21first" title='first' data-type='G4bool' data-ref="21first">first</dfn> = <b>true</b>;</td></tr>
+<tr><th id="114">114</th><td><b>if</b>(<span class='error' title="use of undeclared identifier &apos;getenv&apos;">getenv</span>(<q>"NeutronHPNames"</q>))  <a class="macro" href="../../../../../global/management/include/G4ios.hh.html#46" title="(*_G4cout_p())" data-ref="_M/G4cout">G4cout</a> <span class='error' title="invalid operands to binary expression (&apos;int&apos; and &apos;const char *&apos;)">&lt;&lt;</span> <q>"entered GetName!!!"</q>&lt;&lt;<a class="macro" href="../../../../../global/management/include/G4ios.hh.html#60" title="std::endl" data-ref="_M/G4endl">G4endl</a>;</td></tr>
+<tr><th id="115">115</th><td>    <b>do</b>   </td></tr>
+<tr><th id="116">116</th><td>    {</td></tr>
+<tr><th id="117">117</th><td>       aFlag = <b>true</b>;</td></tr>
+<tr><th id="118">118</th><td>       G4String * biff = <b>new</b> G4String(); <i>// delete here as theName</i></td></tr>
+<tr><th id="119">119</th><td>       *biff = base<span class='error' title="invalid operands to binary expression (&apos;G4String&apos; and &apos;const char *&apos;)">+</span><q>"/CrossSection/"</q>+itoa(myZ)+<q>"_"</q>+itoa(myA)+sM+<q>"_"</q>+theString[myZ-<var>1</var>];</td></tr>
+<tr><th id="120">120</th><td>      </td></tr>
+<tr><th id="121">121</th><td>       <b>if</b>(theName!=<var>0</var>) <b>delete</b> theName;</td></tr>
+<tr><th id="122">122</th><td>       theName = biff;</td></tr>
+<tr><th id="123">123</th><td>       result.SetName(*theName);</td></tr>
+<tr><th id="124">124</th><td>       result.SetA(myA);</td></tr>
+<tr><th id="125">125</th><td>       result.SetZ(myZ);</td></tr>
+<tr><th id="126">126</th><td>       result.SetM(M);</td></tr>
+<tr><th id="127">127</th><td><b>if</b>(<span class='error' title="use of undeclared identifier &apos;getenv&apos;">getenv</span>(<q>"NeutronHPNames"</q>)) <a class="macro" href="../../../../../global/management/include/G4ios.hh.html#46" title="(*_G4cout_p())" data-ref="_M/G4cout">G4cout</a> <span class='error' title="invalid operands to binary expression (&apos;int&apos; and &apos;const char *&apos;)">&lt;&lt;</span><q>"HPWD 1 "</q>&lt;&lt;*theName&lt;&lt;<a class="macro" href="../../../../../global/management/include/G4ios.hh.html#60" title="std::endl" data-ref="_M/G4endl">G4endl</a>;</td></tr>
+<tr><th id="128">128</th><td></td></tr>
+<tr><th id="129">129</th><td>     <i>// T.K. debug for memory leak</i></td></tr>
+<tr><th id="130">130</th><td>     <b>if</b> ( check != <span class='error' title="use of undeclared identifier &apos;NULL&apos;">NULL</span> ) {</td></tr>
+<tr><th id="131">131</th><td>        <i>//check-&gt;close();</i></td></tr>
+<tr><th id="132">132</th><td>        <b>delete</b> check;</td></tr>
+<tr><th id="133">133</th><td>     } </td></tr>
+<tr><th id="134">134</th><td></td></tr>
+<tr><th id="135">135</th><td>       <i>//check = new std::ifstream(*theName);</i></td></tr>
+<tr><th id="136">136</th><td>       check = <b>new</b> <span class='error' title="use of undeclared identifier &apos;std&apos;">std</span>::istringstream(std::ios::in);</td></tr>
+<tr><th id="137">137</th><td>       G4ParticleHPManager::GetInstance()-&gt;GetDataStream2(*theName,*check);</td></tr>
+<tr><th id="138">138</th><td>       <b>if</b> ( !(*check) ) </td></tr>
+<tr><th id="139">139</th><td>       {</td></tr>
+<tr><th id="140">140</th><td>	  <i>//check-&gt;close();</i></td></tr>
+<tr><th id="141">141</th><td>	  <b>delete</b> check;</td></tr>
+<tr><th id="142">142</th><td>          check = <var>0</var>;</td></tr>
+<tr><th id="143">143</th><td>          aFlag = <b>false</b>;</td></tr>
+<tr><th id="144">144</th><td>          <b>if</b> ( first )</td></tr>
+<tr><th id="145">145</th><td>          {</td></tr>
+<tr><th id="146">146</th><td>             aFlag = <b>true</b>;</td></tr>
+<tr><th id="147">147</th><td>             first = <b>false</b>;</td></tr>
+<tr><th id="148">148</th><td>             biff = <b>new</b> G4String(); <i>// delete here as theName</i></td></tr>
+<tr><th id="149">149</th><td>             *biff = base<span class='error' title="invalid operands to binary expression (&apos;G4String&apos; and &apos;const char *&apos;)">+</span><q>"/CrossSection/"</q>+itoa(myZ)+<q>"_"</q>+<q>"nat"</q>+<q>"_"</q>+theString[myZ-<var>1</var>];</td></tr>
+<tr><th id="150">150</th><td>             <b>delete</b> theName;</td></tr>
+<tr><th id="151">151</th><td>             theName = biff;</td></tr>
+<tr><th id="152">152</th><td><b>if</b>(<span class='error' title="use of undeclared identifier &apos;getenv&apos;">getenv</span>(<q>"NeutronHPNames"</q>))    <a class="macro" href="../../../../../global/management/include/G4ios.hh.html#46" title="(*_G4cout_p())" data-ref="_M/G4cout">G4cout</a> <span class='error' title="invalid operands to binary expression (&apos;int&apos; and &apos;const char *&apos;)">&lt;&lt;</span><q>"HPWD 2 "</q>&lt;&lt;*theName&lt;&lt;<a class="macro" href="../../../../../global/management/include/G4ios.hh.html#60" title="std::endl" data-ref="_M/G4endl">G4endl</a>;</td></tr>
+<tr><th id="153">153</th><td>             result.SetName(*theName);</td></tr>
+<tr><th id="154">154</th><td>             G4double natA = myZ/G4SandiaTable::GetZtoA(myZ);</td></tr>
+<tr><th id="155">155</th><td>             result.SetA(natA);</td></tr>
+<tr><th id="156">156</th><td>             result.SetZ(myZ);</td></tr>
+<tr><th id="157">157</th><td>             result.SetM(M);</td></tr>
+<tr><th id="158">158</th><td>             <i>//check = new std::ifstream(*theName);</i></td></tr>
+<tr><th id="159">159</th><td>             check = <b>new</b> <span class='error' title="use of undeclared identifier &apos;std&apos;">std</span>::istringstream(std::ios::in);</td></tr>
+<tr><th id="160">160</th><td>             G4ParticleHPManager::GetInstance()-&gt;GetDataStream2(*theName,*check);</td></tr>
+<tr><th id="161">161</th><td>             <b>if</b> ( !(*check) ) </td></tr>
+<tr><th id="162">162</th><td>             {</td></tr>
+<tr><th id="163">163</th><td>                <i>//check-&gt;close();</i></td></tr>
+<tr><th id="164">164</th><td>	        <b>delete</b> check;</td></tr>
+<tr><th id="165">165</th><td>                check = <var>0</var>;</td></tr>
+<tr><th id="166">166</th><td>                aFlag = <b>false</b>;</td></tr>
+<tr><th id="167">167</th><td>             }</td></tr>
+<tr><th id="168">168</th><td>             <b>else</b></td></tr>
+<tr><th id="169">169</th><td>             {</td></tr>
+<tr><th id="170">170</th><td>                biff = <b>new</b> G4String(); <i>// delete here as theName</i></td></tr>
+<tr><th id="171">171</th><td>                *biff = base<span class='error' title="invalid operands to binary expression (&apos;G4String&apos; and &apos;const char *&apos;)">+</span><q>"/"</q>+rest+<q>"/"</q>+itoa(myZ)+<q>"_"</q>+<q>"nat"</q>+<q>"_"</q>+theString[myZ-<var>1</var>];  </td></tr>
+<tr><th id="172">172</th><td>                <b>if</b> ( rest==<q>"/CrossSection"</q> ) *biff = base<span class='error' title="invalid operands to binary expression (&apos;G4String&apos; and &apos;G4String&apos;)">+</span>rest+<q>"/"</q>+itoa(myZ)+<q>"_"</q>+<q>"nat"</q>+<q>"_"</q>+theString[myZ-<var>1</var>];  </td></tr>
+<tr><th id="173">173</th><td>                <b>delete</b> theName;</td></tr>
+<tr><th id="174">174</th><td>                theName = biff;</td></tr>
+<tr><th id="175">175</th><td><b>if</b>(<span class='error' title="use of undeclared identifier &apos;getenv&apos;">getenv</span>(<q>"NeutronHPNames"</q>))    <a class="macro" href="../../../../../global/management/include/G4ios.hh.html#46" title="(*_G4cout_p())" data-ref="_M/G4cout">G4cout</a> <span class='error' title="invalid operands to binary expression (&apos;int&apos; and &apos;const char *&apos;)">&lt;&lt;</span><q>"HPWD 3 "</q>&lt;&lt;*theName&lt;&lt;<a class="macro" href="../../../../../global/management/include/G4ios.hh.html#60" title="std::endl" data-ref="_M/G4endl">G4endl</a>;</td></tr>
+<tr><th id="176">176</th><td>                result.SetName(*theName);</td></tr>
+<tr><th id="177">177</th><td>                natA = myZ/G4SandiaTable::GetZtoA(myZ);</td></tr>
+<tr><th id="178">178</th><td>                result.SetA(natA);</td></tr>
+<tr><th id="179">179</th><td>                result.SetZ(myZ);</td></tr>
+<tr><th id="180">180</th><td>                result.SetM(M);</td></tr>
+<tr><th id="181">181</th><td>                result.SetNaturalAbundanceFlag();</td></tr>
+<tr><th id="182">182</th><td>             }</td></tr>
+<tr><th id="183">183</th><td>          }</td></tr>
+<tr><th id="184">184</th><td>       }</td></tr>
+<tr><th id="185">185</th><td>       <b>else</b></td></tr>
+<tr><th id="186">186</th><td>       {</td></tr>
+<tr><th id="187">187</th><td><i>// 070706 T. Koi Modified </i></td></tr>
+<tr><th id="188">188</th><td><i>/*</i></td></tr>
+<tr><th id="189">189</th><td><i>          biff = new G4String(); // delete here as theName</i></td></tr>
+<tr><th id="190">190</th><td><i>          *biff = base+"/"+rest+itoa(myZ)+"_"+itoa(myA)+"_"+theString[myZ-1];  </i></td></tr>
+<tr><th id="191">191</th><td><i>          if(theName!=0) delete theName;</i></td></tr>
+<tr><th id="192">192</th><td><i>          theName = biff;</i></td></tr>
+<tr><th id="193">193</th><td><i>if(getenv("NeutronHPNames"))    G4cout &lt;&lt;"HPWD 4 "&lt;&lt;*theName&lt;&lt;G4endl;</i></td></tr>
+<tr><th id="194">194</th><td><i>          result.SetName(*theName);</i></td></tr>
+<tr><th id="195">195</th><td><i>          result.SetA(myA);</i></td></tr>
+<tr><th id="196">196</th><td><i>          result.SetZ(myZ);</i></td></tr>
+<tr><th id="197">197</th><td><i>*/</i></td></tr>
+<tr><th id="198">198</th><td></td></tr>
+<tr><th id="199">199</th><td>          G4double tmpA = myA;</td></tr>
+<tr><th id="200">200</th><td>          <i>//std::ifstream* file = NULL;</i></td></tr>
+<tr><th id="201">201</th><td>          <span class='error' title="use of undeclared identifier &apos;std&apos;">std</span>::istringstream* file = <span class='error' title="use of undeclared identifier &apos;NULL&apos;">NULL</span>;</td></tr>
+<tr><th id="202">202</th><td>          G4String fileName;</td></tr>
+<tr><th id="203">203</th><td></td></tr>
+<tr><th id="204">204</th><td>          <b>if</b> ( rest == <q>"/CrossSection"</q> )</td></tr>
+<tr><th id="205">205</th><td>          {</td></tr>
+<tr><th id="206">206</th><td></td></tr>
+<tr><th id="207">207</th><td>             <i>//fileName = base+"/"+rest+"/"+itoa(myZ)+"_"+itoa(myA)+sM+"_"+theString[myZ-1];</i></td></tr>
+<tr><th id="208">208</th><td>             fileName = base<span class='error' title="invalid operands to binary expression (&apos;G4String&apos; and &apos;G4String&apos;)">+</span>rest+<q>"/"</q>+itoa(myZ)+<q>"_"</q>+itoa(myA)+sM+<q>"_"</q>+theString[myZ-<var>1</var>];</td></tr>
+<tr><th id="209">209</th><td><b>if</b>(<span class='error' title="use of undeclared identifier &apos;getenv&apos;">getenv</span>(<q>"NeutronHPNames"</q>))    <a class="macro" href="../../../../../global/management/include/G4ios.hh.html#46" title="(*_G4cout_p())" data-ref="_M/G4cout">G4cout</a> <span class='error' title="invalid operands to binary expression (&apos;int&apos; and &apos;const char *&apos;)">&lt;&lt;</span><q>"HPWD 4a "</q>&lt;&lt;*theName&lt;&lt;<a class="macro" href="../../../../../global/management/include/G4ios.hh.html#60" title="std::endl" data-ref="_M/G4endl">G4endl</a>;</td></tr>
+<tr><th id="210">210</th><td></td></tr>
+<tr><th id="211">211</th><td>          }</td></tr>
+<tr><th id="212">212</th><td>          <b>else</b></td></tr>
+<tr><th id="213">213</th><td>          {</td></tr>
+<tr><th id="214">214</th><td></td></tr>
+<tr><th id="215">215</th><td><i>// For FS</i></td></tr>
+<tr><th id="216">216</th><td>             fileName = base<span class='error' title="invalid operands to binary expression (&apos;G4String&apos; and &apos;const char *&apos;)">+</span><q>"/"</q>+rest+<q>"/"</q>+itoa(myZ)+<q>"_"</q>+itoa(myA)+sM+<q>"_"</q>+theString[myZ-<var>1</var>];</td></tr>
+<tr><th id="217">217</th><td>             <i>//file = new std::ifstream(fileName);</i></td></tr>
+<tr><th id="218">218</th><td>             file = <b>new</b> <span class='error' title="use of undeclared identifier &apos;std&apos;">std</span>::istringstream(std::ios::in);</td></tr>
+<tr><th id="219">219</th><td>             G4ParticleHPManager::GetInstance()-&gt;GetDataStream2(fileName,*file);</td></tr>
+<tr><th id="220">220</th><td></td></tr>
+<tr><th id="221">221</th><td>             <b>if</b> ( *file )</td></tr>
+<tr><th id="222">222</th><td>             {</td></tr>
+<tr><th id="223">223</th><td></td></tr>
+<tr><th id="224">224</th><td><i>// isotope FS</i></td></tr>
+<tr><th id="225">225</th><td><b>if</b>(<span class='error' title="use of undeclared identifier &apos;getenv&apos;">getenv</span>(<q>"NeutronHPNames"</q>))    <a class="macro" href="../../../../../global/management/include/G4ios.hh.html#46" title="(*_G4cout_p())" data-ref="_M/G4cout">G4cout</a> <span class='error' title="invalid operands to binary expression (&apos;int&apos; and &apos;const char *&apos;)">&lt;&lt;</span><q>"HPWD 4b1 "</q>&lt;&lt;*theName&lt;&lt;<a class="macro" href="../../../../../global/management/include/G4ios.hh.html#60" title="std::endl" data-ref="_M/G4endl">G4endl</a>;</td></tr>
+<tr><th id="226">226</th><td>             }</td></tr>
+<tr><th id="227">227</th><td>             <b>else</b></td></tr>
+<tr><th id="228">228</th><td>             {</td></tr>
+<tr><th id="229">229</th><td></td></tr>
+<tr><th id="230">230</th><td><i>// _nat_ FS</i></td></tr>
+<tr><th id="231">231</th><td>                fileName  = base<span class='error' title="invalid operands to binary expression (&apos;G4String&apos; and &apos;const char *&apos;)">+</span><q>"/"</q>+rest+<q>"/"</q>+itoa(myZ)+<q>"_"</q>+<q>"nat"</q>+<q>"_"</q>+theString[myZ-<var>1</var>];</td></tr>
+<tr><th id="232">232</th><td></td></tr>
+<tr><th id="233">233</th><td>                <b>delete</b> file;</td></tr>
+<tr><th id="234">234</th><td>                <i>//file = new std::ifstream(fileName);</i></td></tr>
+<tr><th id="235">235</th><td>                file = <b>new</b> <span class='error' title="use of undeclared identifier &apos;std&apos;">std</span>::istringstream(std::ios::in);</td></tr>
+<tr><th id="236">236</th><td>                G4ParticleHPManager::GetInstance()-&gt;GetDataStream2(fileName,*file);</td></tr>
+<tr><th id="237">237</th><td>                <b>if</b> ( *file )</td></tr>
+<tr><th id="238">238</th><td>                {</td></tr>
+<tr><th id="239">239</th><td></td></tr>
+<tr><th id="240">240</th><td><i>// FS neither isotope nor _nat_</i></td></tr>
+<tr><th id="241">241</th><td><b>if</b>(<span class='error' title="use of undeclared identifier &apos;getenv&apos;">getenv</span>(<q>"NeutronHPNames"</q>))    <a class="macro" href="../../../../../global/management/include/G4ios.hh.html#46" title="(*_G4cout_p())" data-ref="_M/G4cout">G4cout</a> <span class='error' title="invalid operands to binary expression (&apos;int&apos; and &apos;const char *&apos;)">&lt;&lt;</span><q>"HPWD 4b2a "</q>&lt;&lt;*theName&lt;&lt;<a class="macro" href="../../../../../global/management/include/G4ios.hh.html#60" title="std::endl" data-ref="_M/G4endl">G4endl</a>;</td></tr>
+<tr><th id="242">242</th><td>                   G4double natA = myZ/G4SandiaTable::GetZtoA(myZ);</td></tr>
+<tr><th id="243">243</th><td>                   tmpA = natA;</td></tr>
+<tr><th id="244">244</th><td>                }</td></tr>
+<tr><th id="245">245</th><td>                <b>else</b></td></tr>
+<tr><th id="246">246</th><td>                {</td></tr>
+<tr><th id="247">247</th><td><b>if</b>(<span class='error' title="use of undeclared identifier &apos;getenv&apos;">getenv</span>(<q>"NeutronHPNames"</q>))    <a class="macro" href="../../../../../global/management/include/G4ios.hh.html#46" title="(*_G4cout_p())" data-ref="_M/G4cout">G4cout</a> <span class='error' title="invalid operands to binary expression (&apos;int&apos; and &apos;const char *&apos;)">&lt;&lt;</span><q>"HPWD 4b2c "</q>&lt;&lt;*theName&lt;&lt;<a class="macro" href="../../../../../global/management/include/G4ios.hh.html#60" title="std::endl" data-ref="_M/G4endl">G4endl</a>;</td></tr>
+<tr><th id="248">248</th><td>                   fileName=<q>"INVALID"</q>;</td></tr>
+<tr><th id="249">249</th><td>                }</td></tr>
+<tr><th id="250">250</th><td>             }</td></tr>
+<tr><th id="251">251</th><td></td></tr>
+<tr><th id="252">252</th><td>             <b>delete</b> file;</td></tr>
+<tr><th id="253">253</th><td></td></tr>
+<tr><th id="254">254</th><td>          }</td></tr>
+<tr><th id="255">255</th><td></td></tr>
+<tr><th id="256">256</th><td>          result.SetName(fileName);</td></tr>
+<tr><th id="257">257</th><td>          result.SetA(tmpA);</td></tr>
+<tr><th id="258">258</th><td>          result.SetZ(myZ);</td></tr>
+<tr><th id="259">259</th><td>          result.SetM(M);</td></tr>
+<tr><th id="260">260</th><td></td></tr>
+<tr><th id="261">261</th><td>       }</td></tr>
+<tr><th id="262">262</th><td></td></tr>
+<tr><th id="263">263</th><td>       <b>do</b> </td></tr>
+<tr><th id="264">264</th><td>       {</td></tr>
+<tr><th id="265">265</th><td><i>//        if (std::abs(myZ-Z)&gt;theMaxOffSet||myZ==0||myA==0)</i></td></tr>
+<tr><th id="266">266</th><td>          <b>if</b> ( delta_Z &gt; theMaxOffSet )</td></tr>
+<tr><th id="267">267</th><td>          { </td></tr>
+<tr><th id="268">268</th><td>             <i>//if ( inc &gt; 0 )</i></td></tr>
+<tr><th id="269">269</th><td><i>             //{</i></td></tr>
+<tr><th id="270">270</th><td><i>             //   inc*= -1;</i></td></tr>
+<tr><th id="271">271</th><td><i>             //   myZ = Z;</i></td></tr>
+<tr><th id="272">272</th><td><i>             //   myA = A;</i></td></tr>
+<tr><th id="273">273</th><td><i>             //}</i></td></tr>
+<tr><th id="274">274</th><td><i>             //else</i></td></tr>
+<tr><th id="275">275</th><td><i>             //{</i></td></tr>
+<tr><th id="276">276</th><td>                <a class="macro" href="../../../../../global/management/include/G4ios.hh.html#46" title="(*_G4cout_p())" data-ref="_M/G4cout">G4cout</a> <span class='error' title="invalid operands to binary expression (&apos;int&apos; and &apos;const char *&apos;)">&lt;&lt;</span><q>"G4ParticleHPNames: Sorry, this material does not come near to any data."</q>&lt;&lt;<a class="macro" href="../../../../../global/management/include/G4ios.hh.html#60" title="std::endl" data-ref="_M/G4endl">G4endl</a>;</td></tr>
+<tr><th id="277">277</th><td>                <a class="macro" href="../../../../../global/management/include/G4ios.hh.html#46" title="(*_G4cout_p())" data-ref="_M/G4cout">G4cout</a> <span class='error' title="invalid operands to binary expression (&apos;int&apos; and &apos;const char *&apos;)">&lt;&lt;</span><q>"G4ParticleHPNames: Please make sure G4NEUTRONHPDATA points to the"</q> &lt;&lt; <a class="macro" href="../../../../../global/management/include/G4ios.hh.html#60" title="std::endl" data-ref="_M/G4endl">G4endl</a>;</td></tr>
+<tr><th id="278">278</th><td>                <a class="macro" href="../../../../../global/management/include/G4ios.hh.html#46" title="(*_G4cout_p())" data-ref="_M/G4cout">G4cout</a> <span class='error' title="invalid operands to binary expression (&apos;int&apos; and &apos;const char *&apos;)">&lt;&lt;</span><q>"                  directory, the neutron scattering data are located in."</q> &lt;&lt; <a class="macro" href="../../../../../global/management/include/G4ios.hh.html#60" title="std::endl" data-ref="_M/G4endl">G4endl</a>;</td></tr>
+<tr><th id="279">279</th><td>                <a class="macro" href="../../../../../global/management/include/G4ios.hh.html#46" title="(*_G4cout_p())" data-ref="_M/G4cout">G4cout</a> <span class='error' title="invalid operands to binary expression (&apos;int&apos; and &apos;const char *&apos;)">&lt;&lt;</span> <q>"G4ParticleHPNames: The material was: A="</q>&lt;&lt;A&lt;&lt;<q>", Z="</q>&lt;&lt;Z&lt;&lt;<a class="macro" href="../../../../../global/management/include/G4ios.hh.html#60" title="std::endl" data-ref="_M/G4endl">G4endl</a>;</td></tr>
+<tr><th id="280">280</th><td>                <i>//throw G4HadronicException(__FILE__, __LINE__, "In case the data sets are at present not available in the neutron data library, please contact Hans-Peter.Wellisch@cern.ch");</i></td></tr>
+<tr><th id="281">281</th><td>                <b>throw</b> G4HadronicException(<span class="macro" title="&quot;/home/jishin/app/geant4/1005p1/geant4.10.05.p01/source/processes/hadronic/models/particle_hp/src/G4ParticleHPNames.cc&quot;" data-ref="_M/__FILE__">__FILE__</span>, <span class="macro" title="281" data-ref="_M/__LINE__">__LINE__</span>, <q>"In case the data sets are at present not available in the neutron data library, please contact Hadron Group Coordinator"</q>);</td></tr>
+<tr><th id="282">282</th><td><i>/*</i></td></tr>
+<tr><th id="283">283</th><td><i>160910 TK makes commented out sructurally dead code</i></td></tr>
+<tr><th id="284">284</th><td><i>                delete theName;</i></td></tr>
+<tr><th id="285">285</th><td><i>                theFileName = "";</i></td></tr>
+<tr><th id="286">286</th><td><i>                return result;</i></td></tr>
+<tr><th id="287">287</th><td><i>*/</i></td></tr>
+<tr><th id="288">288</th><td><i>             //}</i></td></tr>
+<tr><th id="289">289</th><td>          }</td></tr>
+<tr><th id="290">290</th><td></td></tr>
+<tr><th id="291">291</th><td>          <i>//if ( std::abs( myA - A ) &gt; theMaxOffSet )</i></td></tr>
+<tr><th id="292">292</th><td>          <b>if</b> ( delta_A &gt; <var>2</var>*theMaxOffSet )</td></tr>
+<tr><th id="293">293</th><td>          {</td></tr>
+<tr><th id="294">294</th><td>             delta_A = <var>0</var>;</td></tr>
+<tr><th id="295">295</th><td>             flip_A = <var>1</var>;</td></tr>
+<tr><th id="296">296</th><td></td></tr>
+<tr><th id="297">297</th><td>             first = <b>true</b>;</td></tr>
+<tr><th id="298">298</th><td></td></tr>
+<tr><th id="299">299</th><td>             <b>if</b> ( flip_Z &gt; <var>0</var> ) </td></tr>
+<tr><th id="300">300</th><td>             {</td></tr>
+<tr><th id="301">301</th><td>                delta_Z +=<var>1</var>; </td></tr>
+<tr><th id="302">302</th><td>             }</td></tr>
+<tr><th id="303">303</th><td>             myZ = Z + flip_Z * delta_Z;</td></tr>
+<tr><th id="304">304</th><td>             flip_Z *= -<var>1</var>;</td></tr>
+<tr><th id="305">305</th><td>             </td></tr>
+<tr><th id="306">306</th><td>             myA = A;</td></tr>
+<tr><th id="307">307</th><td>             <b>if</b> ( myZ &gt; <var>100</var> ) </td></tr>
+<tr><th id="308">308</th><td>             {</td></tr>
+<tr><th id="309">309</th><td>                myZ = <var>100</var>;</td></tr>
+<tr><th id="310">310</th><td>             }</td></tr>
+<tr><th id="311">311</th><td>             <b>if</b> ( myZ &lt; <var>1</var> ) </td></tr>
+<tr><th id="312">312</th><td>             {</td></tr>
+<tr><th id="313">313</th><td>                myZ = <var>1</var>;</td></tr>
+<tr><th id="314">314</th><td>             }</td></tr>
+<tr><th id="315">315</th><td>              </td></tr>
+<tr><th id="316">316</th><td><i>//             myZ += inc;</i></td></tr>
+<tr><th id="317">317</th><td>          }</td></tr>
+<tr><th id="318">318</th><td>          <b>else</b></td></tr>
+<tr><th id="319">319</th><td>          {</td></tr>
+<tr><th id="320">320</th><td>             <b>if</b> ( flip_A &gt; <var>0</var> )</td></tr>
+<tr><th id="321">321</th><td>             {</td></tr>
+<tr><th id="322">322</th><td>                delta_A += <var>1</var>;</td></tr>
+<tr><th id="323">323</th><td>             }</td></tr>
+<tr><th id="324">324</th><td>             myA = A + flip_A * delta_A; </td></tr>
+<tr><th id="325">325</th><td>             flip_A *= -<var>1</var>;</td></tr>
+<tr><th id="326">326</th><td></td></tr>
+<tr><th id="327">327</th><td>             <b>if</b> ( myA &lt; <var>1</var> ) </td></tr>
+<tr><th id="328">328</th><td>             {</td></tr>
+<tr><th id="329">329</th><td>                myA = <var>1</var>;</td></tr>
+<tr><th id="330">330</th><td>             }</td></tr>
+<tr><th id="331">331</th><td>              </td></tr>
+<tr><th id="332">332</th><td><i>//             myA += inc;</i></td></tr>
+<tr><th id="333">333</th><td>          }</td></tr>
+<tr><th id="334">334</th><td></td></tr>
+<tr><th id="335">335</th><td>       }</td></tr>
+<tr><th id="336">336</th><td>       <b>while</b>( myZ == <var>0</var> || myA == <var>0</var> );  <i>// No meaning // Loop checking, 11.05.2015, T. Koi</i></td></tr>
+<tr><th id="337">337</th><td></td></tr>
+<tr><th id="338">338</th><td>    }</td></tr>
+<tr><th id="339">339</th><td>    <b>while</b>((!check) || (!(*check))); <i>// Loop checking, 11.05.2015, T. Koi</i></td></tr>
+<tr><th id="340">340</th><td></td></tr>
+<tr><th id="341">341</th><td>    <b>if</b>(<span class='error' title="use of undeclared identifier &apos;getenv&apos;">getenv</span>(<q>"NeutronHPNamesLogging"</q>) || <span class='error' title="use of undeclared identifier &apos;getenv&apos;">getenv</span>(<q>"NeutronHPNames"</q>)) </td></tr>
+<tr><th id="342">342</th><td>    {</td></tr>
+<tr><th id="343">343</th><td>      <a class="macro" href="../../../../../global/management/include/G4ios.hh.html#46" title="(*_G4cout_p())" data-ref="_M/G4cout">G4cout</a> <span class='error' title="invalid operands to binary expression (&apos;int&apos; and &apos;const char *&apos;)">&lt;&lt;</span> <q>"Names::GetName: last theName proposal = "</q>&lt;&lt; <a class="macro" href="../../../../../global/management/include/G4ios.hh.html#60" title="std::endl" data-ref="_M/G4endl">G4endl</a>;</td></tr>
+<tr><th id="344">344</th><td>      <a class="macro" href="../../../../../global/management/include/G4ios.hh.html#46" title="(*_G4cout_p())" data-ref="_M/G4cout">G4cout</a> <span class='error' title="invalid operands to binary expression (&apos;int&apos; and &apos;G4String&apos;)">&lt;&lt;</span> *theName &lt;&lt;<q>" "</q>&lt;&lt;A&lt;&lt;<q>" "</q>&lt;&lt;Z&lt;&lt;<q>" "</q>&lt;&lt;result.GetName()&lt;&lt;<a class="macro" href="../../../../../global/management/include/G4ios.hh.html#60" title="std::endl" data-ref="_M/G4endl">G4endl</a>;</td></tr>
+<tr><th id="345">345</th><td>    }</td></tr>
+<tr><th id="346">346</th><td></td></tr>
+<tr><th id="347">347</th><td><i>// administration and anouncement for lacking of exact data in NDL </i></td></tr>
+<tr><th id="348">348</th><td>    <b>if</b> ( <a class="local col3 ref" href="#3Z" title='Z' data-ref="3Z">Z</a> != <a class="local col1 ref" href="#11result" title='result' data-ref="11result">result</a>.<a class="ref" href="../include/G4ParticleHPDataUsed.hh.html#_ZN20G4ParticleHPDataUsed4GetZEv" title='G4ParticleHPDataUsed::GetZ' data-ref="_ZN20G4ParticleHPDataUsed4GetZEv">GetZ</a>() || <a class="local col2 ref" href="#2A" title='A' data-ref="2A">A</a> != <a class="local col1 ref" href="#11result" title='result' data-ref="11result">result</a>.<a class="ref" href="../include/G4ParticleHPDataUsed.hh.html#_ZN20G4ParticleHPDataUsed4GetAEv" title='G4ParticleHPDataUsed::GetA' data-ref="_ZN20G4ParticleHPDataUsed4GetAEv">GetA</a>() )</td></tr>
+<tr><th id="349">349</th><td>    {</td></tr>
+<tr><th id="350">350</th><td>       <b>if</b> ( <a class="local col6 ref" href="#6rest" title='rest' data-ref="6rest">rest</a> <a class="ref" href="../../../../../global/management/include/G4String.hh.html#_ZNK8G4StringeqEPKc" title='G4String::operator==' data-ref="_ZNK8G4StringeqEPKc">==</a> <q>"/CrossSection"</q> )</td></tr>
+<tr><th id="351">351</th><td>       {</td></tr>
+<tr><th id="352">352</th><td>          <a class="type" href="../../../../../global/management/include/G4String.hh.html#G4String" title='G4String' data-ref="G4String">G4String</a> <dfn class="local col2 decl" id="22reac" title='reac' data-type='G4String' data-ref="22reac">reac</dfn> = <a class="ref fake" href="../../../../../global/management/include/G4String.hh.html#_ZN8G4StringC1ERKS_" title='G4String::G4String' data-ref="_ZN8G4StringC1ERKS_"></a><a class="local col5 ref" href="#5base" title='base' data-ref="5base">base</a>;</td></tr>
+<tr><th id="353">353</th><td>          <a class="type" href="../../../../../global/management/include/G4String.hh.html#G4String" title='G4String' data-ref="G4String">G4String</a> <dfn class="local col3 decl" id="23dir" title='dir' data-type='G4String' data-ref="23dir">dir</dfn> = <span class='error' title="use of undeclared identifier &apos;getenv&apos;">getenv</span>(<q>"G4NEUTRONHPDATA"</q>); </td></tr>
+<tr><th id="354">354</th><td>          reac.<span class='error' title="no member named &apos;erase&apos; in &apos;G4String&apos;">erase</span> ( <var>0</var> , dir.<span class='error' title="no member named &apos;length&apos; in &apos;G4String&apos;">length</span>() );</td></tr>
+<tr><th id="355">355</th><td>          <b>if</b> ( <a class="type" href="../include/G4ParticleHPManager.hh.html#G4ParticleHPManager" title='G4ParticleHPManager' data-ref="G4ParticleHPManager">G4ParticleHPManager</a>::<a class="ref" href="../include/G4ParticleHPManager.hh.html#_ZN19G4ParticleHPManager11GetInstanceEv" title='G4ParticleHPManager::GetInstance' data-ref="_ZN19G4ParticleHPManager11GetInstanceEv">GetInstance</a>()-&gt;<a class="ref" href="../include/G4ParticleHPManager.hh.html#_ZN19G4ParticleHPManager22GetSkipMissingIsotopesEv" title='G4ParticleHPManager::GetSkipMissingIsotopes' data-ref="_ZN19G4ParticleHPManager22GetSkipMissingIsotopesEv">GetSkipMissingIsotopes</a>() &amp;&amp; !( <a class="local col3 ref" href="#3Z" title='Z' data-ref="3Z">Z</a> == <a class="local col1 ref" href="#11result" title='result' data-ref="11result">result</a>.<a class="ref" href="../include/G4ParticleHPDataUsed.hh.html#_ZN20G4ParticleHPDataUsed4GetZEv" title='G4ParticleHPDataUsed::GetZ' data-ref="_ZN20G4ParticleHPDataUsed4GetZEv">GetZ</a>() &amp;&amp; <a class="local col1 ref" href="#11result" title='result' data-ref="11result">result</a>.<a class="ref" href="../include/G4ParticleHPDataUsed.hh.html#_ZN20G4ParticleHPDataUsed22IsThisNaturalAbundanceEv" title='G4ParticleHPDataUsed::IsThisNaturalAbundance' data-ref="_ZN20G4ParticleHPDataUsed22IsThisNaturalAbundanceEv">IsThisNaturalAbundance</a>() ) )</td></tr>
+<tr><th id="356">356</th><td>          {</td></tr>
+<tr><th id="357">357</th><td>             <b>if</b> ( <a class="local col8 ref" href="#8verboseLevel" title='verboseLevel' data-ref="8verboseLevel">verboseLevel</a> &gt; <var>0</var> ) {</td></tr>
+<tr><th id="358">358</th><td>                <a class="macro" href="../../../../../global/management/include/G4ios.hh.html#46" title="(*_G4cout_p())" data-ref="_M/G4cout">G4cout</a> <span class='error' title="invalid operands to binary expression (&apos;int&apos; and &apos;const char *&apos;)">&lt;&lt;</span> <q>"NeutronHP: "</q> &lt;&lt; reac &lt;&lt; <q>" file for Z = "</q> &lt;&lt; Z &lt;&lt; <q>", A = "</q> &lt;&lt; A &lt;&lt; <q>" is not found and CrossSection set to 0."</q> &lt;&lt; <a class="macro" href="../../../../../global/management/include/G4ios.hh.html#60" title="std::endl" data-ref="_M/G4endl">G4endl</a>;</td></tr>
+<tr><th id="359">359</th><td>             }</td></tr>
+<tr><th id="360">360</th><td>             <a class="type" href="../../../../../global/management/include/G4String.hh.html#G4String" title='G4String' data-ref="G4String">G4String</a> <dfn class="local col4 decl" id="24new_name" title='new_name' data-type='G4String' data-ref="24new_name">new_name</dfn> = base<span class='error' title="invalid operands to binary expression (&apos;G4String&apos; and &apos;const char *&apos;)">+</span><q>"/"</q>+rest+<q>"/"</q>+<q>"0_0_Zero"</q>;  </td></tr>
+<tr><th id="361">361</th><td>             <a class="local col1 ref" href="#11result" title='result' data-ref="11result">result</a>.<a class="ref" href="../include/G4ParticleHPDataUsed.hh.html#_ZN20G4ParticleHPDataUsed7SetNameE8G4String" title='G4ParticleHPDataUsed::SetName' data-ref="_ZN20G4ParticleHPDataUsed7SetNameE8G4String">SetName</a>( <a class="ref fake" href="../../../../../global/management/include/G4String.hh.html#_ZN8G4StringC1ERKS_" title='G4String::G4String' data-ref="_ZN8G4StringC1ERKS_"></a><a class="local col4 ref" href="#24new_name" title='new_name' data-ref="24new_name">new_name</a> );</td></tr>
+<tr><th id="362">362</th><td>          }</td></tr>
+<tr><th id="363">363</th><td>          <b>else</b></td></tr>
+<tr><th id="364">364</th><td>          { </td></tr>
+<tr><th id="365">365</th><td>             <i>//080901 Add protection that deuteron data do not selected for hydrogen and so on by T. Koi</i></td></tr>
+<tr><th id="366">366</th><td><i>             //160216 Increase protencted isotopes for fixing problem on charged particle HP</i></td></tr>
+<tr><th id="367">367</th><td>             <b>if</b> ( ( reac.<span class='error' title="no member named &apos;find&apos; in &apos;G4String&apos;">find</span>(<q>"Inelastic"</q>) != reac.<span class='error' title="no member named &apos;size&apos; in &apos;G4String&apos;">size</span>() &amp;&amp; ( (Z == <var>1</var> &amp;&amp; A == <var>1</var>) || (Z == <var>1</var> &amp;&amp; A == <var>2</var>) || (Z == <var>1</var> &amp;&amp; A == <var>3</var>) || (Z == <var>2</var> &amp;&amp; A == <var>3</var>) || (Z == <var>2</var> &amp;&amp; A == <var>4</var>) ) ) </td></tr>
+<tr><th id="368">368</th><td>               || ( reac.<span class='error' title="no member named &apos;find&apos; in &apos;G4String&apos;">find</span>(<q>"Capture"</q>)   != reac.<span class='error' title="no member named &apos;size&apos; in &apos;G4String&apos;">size</span>() &amp;&amp; ( (Z == <var>1</var> &amp;&amp; A == <var>3</var>) || (Z == <var>2</var> &amp;&amp; A == <var>4</var>) ) )  </td></tr>
+<tr><th id="369">369</th><td>               || ( reac.<span class='error' title="no member named &apos;find&apos; in &apos;G4String&apos;">find</span>(<q>"Fission"</q>)   != reac.<span class='error' title="no member named &apos;size&apos; in &apos;G4String&apos;">size</span>() &amp;&amp; ( (Z == <var>88</var> &amp;&amp; A == <var>224</var>) || (Z == <var>88</var> &amp;&amp; A == <var>225</var>) || (Z == <var>89</var> &amp;&amp; A == <var>225</var>) || (Z == <var>88</var> &amp;&amp; A == <var>226</var>) ) ) ) </td></tr>
+<tr><th id="370">370</th><td>                   </td></tr>
+<tr><th id="371">371</th><td>             {</td></tr>
+<tr><th id="372">372</th><td>                <a class="type" href="../../../../../global/management/include/G4String.hh.html#G4String" title='G4String' data-ref="G4String">G4String</a> <dfn class="local col5 decl" id="25new_name" title='new_name' data-type='G4String' data-ref="25new_name">new_name</dfn> = base<span class='error' title="invalid operands to binary expression (&apos;G4String&apos; and &apos;const char *&apos;)">+</span><q>"/"</q>+rest+<q>"/"</q>+<q>"0_0_Zero"</q>;</td></tr>
+<tr><th id="373">373</th><td>                <a class="local col1 ref" href="#11result" title='result' data-ref="11result">result</a>.<a class="ref" href="../include/G4ParticleHPDataUsed.hh.html#_ZN20G4ParticleHPDataUsed7SetNameE8G4String" title='G4ParticleHPDataUsed::SetName' data-ref="_ZN20G4ParticleHPDataUsed7SetNameE8G4String">SetName</a>( <a class="ref fake" href="../../../../../global/management/include/G4String.hh.html#_ZN8G4StringC1ERKS_" title='G4String::G4String' data-ref="_ZN8G4StringC1ERKS_"></a><a class="local col5 ref" href="#25new_name" title='new_name' data-ref="25new_name">new_name</a> );</td></tr>
+<tr><th id="374">374</th><td>             }</td></tr>
+<tr><th id="375">375</th><td>             <b>else</b></td></tr>
+<tr><th id="376">376</th><td>             {</td></tr>
+<tr><th id="377">377</th><td>                <b>if</b> ( <a class="local col8 ref" href="#8verboseLevel" title='verboseLevel' data-ref="8verboseLevel">verboseLevel</a> &gt; <var>0</var> ) {</td></tr>
+<tr><th id="378">378</th><td>                   <a class="macro" href="../../../../../global/management/include/G4ios.hh.html#46" title="(*_G4cout_p())" data-ref="_M/G4cout">G4cout</a> <span class='error' title="invalid operands to binary expression (&apos;int&apos; and &apos;const char *&apos;)">&lt;&lt;</span> <q>"NeutronHP: "</q> &lt;&lt; reac &lt;&lt; <q>" file for Z = "</q> &lt;&lt; Z &lt;&lt; <q>", A = "</q> &lt;&lt; A &lt;&lt; <q>" is not found and NeutronHP will use "</q> &lt;&lt; result.GetName() &lt;&lt; <a class="macro" href="../../../../../global/management/include/G4ios.hh.html#60" title="std::endl" data-ref="_M/G4endl">G4endl</a>;</td></tr>
+<tr><th id="379">379</th><td>                }</td></tr>
+<tr><th id="380">380</th><td>             }</td></tr>
+<tr><th id="381">381</th><td>          }</td></tr>
+<tr><th id="382">382</th><td>       }</td></tr>
+<tr><th id="383">383</th><td>    }</td></tr>
+<tr><th id="384">384</th><td></td></tr>
+<tr><th id="385">385</th><td>    <b>delete</b> <a class="local col4 ref" href="#14theName" title='theName' data-ref="14theName">theName</a>;</td></tr>
+<tr><th id="386">386</th><td>    <b>if</b>(<a class="local col7 ref" href="#7aFlag" title='aFlag' data-ref="7aFlag">aFlag</a>)</td></tr>
+<tr><th id="387">387</th><td>    {</td></tr>
+<tr><th id="388">388</th><td>      <i>//check-&gt;close();</i></td></tr>
+<tr><th id="389">389</th><td>      <b>delete</b> check;</td></tr>
+<tr><th id="390">390</th><td>      check = <span class='error' title="use of undeclared identifier &apos;NULL&apos;">NULL</span>;</td></tr>
+<tr><th id="391">391</th><td>    }</td></tr>
+<tr><th id="392">392</th><td>    <b>return</b> <a class="local col1 ref" href="#11result" title='result' data-ref="11result">result</a>;</td></tr>
+<tr><th id="393">393</th><td>  }</td></tr>
+<tr><th id="394">394</th><td></td></tr>
+</table><hr/><p id='footer'>
+Generated on <em>2019-Aug-28</em> from project codebrowser<br />Powered by <a href='https://woboq.com'><img alt='Woboq' src='https://code.woboq.org/woboq-16.png' width='41' height='16' /></a> <a href='https://code.woboq.org'>Code Browser</a> 2.1
+<br/>Generator usage only permitted with license.</p>
+</div></body></html>

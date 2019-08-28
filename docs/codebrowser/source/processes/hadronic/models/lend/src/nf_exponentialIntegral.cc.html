@@ -1,0 +1,102 @@
+<!doctype html>
+<html>
+<head>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"><title>nf_exponentialIntegral.cc source code [codebrowser/source/processes/hadronic/models/lend/src/nf_exponentialIntegral.cc] - Woboq Code Browser</title>
+<link rel="stylesheet" href="../../../../../../../../data/qtcreator.css" title="QtCreator"/>
+<link rel="alternate stylesheet" href="../../../../../../../../data/kdevelop.css" title="KDevelop"/>
+<script type="text/javascript" src="../../../../../../../../data/jquery/jquery.min.js"></script>
+<script type="text/javascript" src="../../../../../../../../data/jquery/jquery-ui.min.js"></script>
+<script>var file = 'codebrowser/source/processes/hadronic/models/lend/src/nf_exponentialIntegral.cc'; var root_path = '../../../../../../..'; var data_path = '../../../../../../../../data';</script>
+<script src='../../../../../../../../data/codebrowser.js'></script>
+</head>
+<body><div id='header'><h1 id='breadcrumb'><span>Browse the source code of </span><a href='../../../../../..'>codebrowser</a>/<a href='../../../../..'>source</a>/<a href='../../../..'>processes</a>/<a href='../../..'>hadronic</a>/<a href='../..'>models</a>/<a href='..'>lend</a>/<a href='./'>src</a>/<a href='nf_exponentialIntegral.cc.html'>nf_exponentialIntegral.cc</a></h1></div>
+<hr/><div id='content'><table class="code">
+<tr><th id="1">1</th><td><i>/*********************************************************************</i></td></tr>
+<tr><th id="2">2</th><td><i>   Returns the exponential integral function</i></td></tr>
+<tr><th id="3">3</th><td><i></i></td></tr>
+<tr><th id="4">4</th><td><i>   E_n(x) = int_1^infinity e^( -x * t ) / t^n dt,     for x &gt; 0.</i></td></tr>
+<tr><th id="5">5</th><td><i></i></td></tr>
+<tr><th id="6">6</th><td><i>   C.A. Bertulani        May/15/2000</i></td></tr>
+<tr><th id="7">7</th><td><i>*********************************************************************/</i></td></tr>
+<tr><th id="8">8</th><td></td></tr>
+<tr><th id="9">9</th><td><u>#include <a href="../include/nf_specialFunctions.h.html">"nf_specialFunctions.h"</a></u></td></tr>
+<tr><th id="10">10</th><td></td></tr>
+<tr><th id="11">11</th><td><u>#<span data-ppcond="11">if</span> defined <span class="macro" data-ref="_M/__cplusplus">__cplusplus</span></u></td></tr>
+<tr><th id="12">12</th><td><u>#include <span class='error' title="&apos;cmath&apos; file not found">&lt;</span>cmath&gt;</u></td></tr>
+<tr><th id="13">13</th><td><u>#include <a href="../../../../../global/management/include/G4Exp.hh.html">"G4Exp.hh"</a></u></td></tr>
+<tr><th id="14">14</th><td><u>#include <a href="../../../../../global/management/include/G4Log.hh.html">"G4Log.hh"</a></u></td></tr>
+<tr><th id="15">15</th><td><b>namespace</b> <span class="namespace">GIDI</span> {</td></tr>
+<tr><th id="16">16</th><td><b>using</b> <b>namespace</b> <span class="namespace">GIDI</span>;</td></tr>
+<tr><th id="17">17</th><td><b>using</b> <b>namespace</b> <span class="namespace">std</span>;</td></tr>
+<tr><th id="18">18</th><td><u>#<span data-ppcond="11">endif</span></u></td></tr>
+<tr><th id="19">19</th><td></td></tr>
+<tr><th id="20">20</th><td><u>#define <dfn class="macro" id="_M/EULER" data-ref="_M/EULER">EULER</dfn> 0.57721566490153286   /* Euler's constant gamma */</u></td></tr>
+<tr><th id="21">21</th><td><u>#define <dfn class="macro" id="_M/MAXIT" data-ref="_M/MAXIT">MAXIT</dfn> 100                   /* Maximum allowed number of iterations. */</u></td></tr>
+<tr><th id="22">22</th><td><u>#define <dfn class="macro" id="_M/FPMIN" data-ref="_M/FPMIN">FPMIN</dfn> 1.0e-300              /* close to the smallest representable floting-point number. */</u></td></tr>
+<tr><th id="23">23</th><td><u>#define <dfn class="macro" id="_M/EPS" data-ref="_M/EPS">EPS</dfn> 1.0e-15                 /* Desired relative error, not smaller than the machine precision. */</u></td></tr>
+<tr><th id="24">24</th><td></td></tr>
+<tr><th id="25">25</th><td><i>/*</i></td></tr>
+<tr><th id="26">26</th><td><i>************************************************************</i></td></tr>
+<tr><th id="27">27</th><td><i>*/</i></td></tr>
+<tr><th id="28">28</th><td><em>double</em> <dfn class="decl def" id="GIDI::nf_exponentialIntegral" title='GIDI::nf_exponentialIntegral' data-ref="GIDI::nf_exponentialIntegral">nf_exponentialIntegral</dfn>( <em>int</em> <dfn class="local col1 decl" id="1n" title='n' data-type='int' data-ref="1n">n</dfn>, <em>double</em> <dfn class="local col2 decl" id="2x" title='x' data-type='double' data-ref="2x">x</dfn>, <a class="typedef" href="../include/nf_utilities.h.html#GIDI::nfu_status" title='GIDI::nfu_status' data-type='enum nfu_status_e' data-ref="GIDI::nfu_status">nfu_status</a> *<dfn class="local col3 decl" id="3status" title='status' data-type='nfu_status *' data-ref="3status">status</dfn> ) {</td></tr>
+<tr><th id="29">29</th><td></td></tr>
+<tr><th id="30">30</th><td>    <em>int</em> <dfn class="local col4 decl" id="4i" title='i' data-type='int' data-ref="4i">i</dfn>, <dfn class="local col5 decl" id="5ii" title='ii' data-type='int' data-ref="5ii">ii</dfn>, <dfn class="local col6 decl" id="6nm1" title='nm1' data-type='int' data-ref="6nm1">nm1</dfn>;</td></tr>
+<tr><th id="31">31</th><td>    <em>double</em> <dfn class="local col7 decl" id="7a" title='a' data-type='double' data-ref="7a">a</dfn>, <dfn class="local col8 decl" id="8b" title='b' data-type='double' data-ref="8b">b</dfn>, <dfn class="local col9 decl" id="9c" title='c' data-type='double' data-ref="9c">c</dfn>, <dfn class="local col0 decl" id="10d" title='d' data-type='double' data-ref="10d">d</dfn>, <dfn class="local col1 decl" id="11del" title='del' data-type='double' data-ref="11del">del</dfn>, <dfn class="local col2 decl" id="12fact" title='fact' data-type='double' data-ref="12fact">fact</dfn>, <dfn class="local col3 decl" id="13h" title='h' data-type='double' data-ref="13h">h</dfn>, <dfn class="local col4 decl" id="14psi" title='psi' data-type='double' data-ref="14psi">psi</dfn>;</td></tr>
+<tr><th id="32">32</th><td>    <em>double</em> <dfn class="local col5 decl" id="15ans" title='ans' data-type='double' data-ref="15ans">ans</dfn> = <var>0.0</var>;</td></tr>
+<tr><th id="33">33</th><td></td></tr>
+<tr><th id="34">34</th><td>    *<a class="local col3 ref" href="#3status" title='status' data-ref="3status">status</a> = <a class="enum" href="../include/nf_utilities.h.html#GIDI::nfu_status_e::nfu_badInput" title='GIDI::nfu_status_e::nfu_badInput' data-ref="GIDI::nfu_status_e::nfu_badInput">nfu_badInput</a>;</td></tr>
+<tr><th id="35">35</th><td>    <b>if</b>( !<span class='error' title="use of undeclared identifier &apos;isfinite&apos;">isfinite</span>( x ) ) <b>return</b>( <a class="local col2 ref" href="#2x" title='x' data-ref="2x">x</a> );</td></tr>
+<tr><th id="36">36</th><td>    *<a class="local col3 ref" href="#3status" title='status' data-ref="3status">status</a> = <a class="enum" href="../include/nf_utilities.h.html#GIDI::nfu_status_e::nfu_Okay" title='GIDI::nfu_status_e::nfu_Okay' data-ref="GIDI::nfu_status_e::nfu_Okay">nfu_Okay</a>;</td></tr>
+<tr><th id="37">37</th><td></td></tr>
+<tr><th id="38">38</th><td>    <a class="local col6 ref" href="#6nm1" title='nm1' data-ref="6nm1">nm1</a> = <a class="local col1 ref" href="#1n" title='n' data-ref="1n">n</a> - <var>1</var>;</td></tr>
+<tr><th id="39">39</th><td>    <b>if</b>( ( <a class="local col1 ref" href="#1n" title='n' data-ref="1n">n</a> &lt; <var>0</var> ) || ( <a class="local col2 ref" href="#2x" title='x' data-ref="2x">x</a> &lt; <var>0.0</var> ) || ( ( <a class="local col2 ref" href="#2x" title='x' data-ref="2x">x</a> == <var>0.0</var> ) &amp;&amp; ( ( <a class="local col1 ref" href="#1n" title='n' data-ref="1n">n</a> == <var>0</var> ) || ( <a class="local col1 ref" href="#1n" title='n' data-ref="1n">n</a> == <var>1</var> ) ) ) ) {</td></tr>
+<tr><th id="40">40</th><td>        *<a class="local col3 ref" href="#3status" title='status' data-ref="3status">status</a> = <a class="enum" href="../include/nf_utilities.h.html#GIDI::nfu_status_e::nfu_badInput" title='GIDI::nfu_status_e::nfu_badInput' data-ref="GIDI::nfu_status_e::nfu_badInput">nfu_badInput</a>; }</td></tr>
+<tr><th id="41">41</th><td>    <b>else</b> {</td></tr>
+<tr><th id="42">42</th><td>        <b>if</b>( <a class="local col1 ref" href="#1n" title='n' data-ref="1n">n</a> == <var>0</var> ) {</td></tr>
+<tr><th id="43">43</th><td>            <a class="local col5 ref" href="#15ans" title='ans' data-ref="15ans">ans</a> = <a class="ref" href="../../../../../global/management/include/G4Exp.hh.html#_Z5G4Expd" title='G4Exp' data-ref="_Z5G4Expd">G4Exp</a>( -<a class="local col2 ref" href="#2x" title='x' data-ref="2x">x</a> ) / <a class="local col2 ref" href="#2x" title='x' data-ref="2x">x</a>; }                  <i>/* Special case */</i></td></tr>
+<tr><th id="44">44</th><td>        <b>else</b> <b>if</b>( <a class="local col2 ref" href="#2x" title='x' data-ref="2x">x</a> == <var>0.0</var> ) {</td></tr>
+<tr><th id="45">45</th><td>            <a class="local col5 ref" href="#15ans" title='ans' data-ref="15ans">ans</a> = <var>1.0</var> / <a class="local col6 ref" href="#6nm1" title='nm1' data-ref="6nm1">nm1</a>; }                      <i>/* Another special case */</i></td></tr>
+<tr><th id="46">46</th><td>        <b>else</b> <b>if</b>( <a class="local col2 ref" href="#2x" title='x' data-ref="2x">x</a> &gt; <var>1.0</var> ) {                        <i>/* Lentz's algorithm */</i></td></tr>
+<tr><th id="47">47</th><td>            <a class="local col8 ref" href="#8b" title='b' data-ref="8b">b</a> = <a class="local col2 ref" href="#2x" title='x' data-ref="2x">x</a> + <a class="local col1 ref" href="#1n" title='n' data-ref="1n">n</a>;</td></tr>
+<tr><th id="48">48</th><td>            <a class="local col9 ref" href="#9c" title='c' data-ref="9c">c</a> = <var>1.0</var> / <a class="macro" href="#22" title="1.0e-300" data-ref="_M/FPMIN">FPMIN</a>;</td></tr>
+<tr><th id="49">49</th><td>            <a class="local col0 ref" href="#10d" title='d' data-ref="10d">d</a> = <var>1.0</var> / <a class="local col8 ref" href="#8b" title='b' data-ref="8b">b</a>;</td></tr>
+<tr><th id="50">50</th><td>            <a class="local col3 ref" href="#13h" title='h' data-ref="13h">h</a> = <a class="local col0 ref" href="#10d" title='d' data-ref="10d">d</a>;</td></tr>
+<tr><th id="51">51</th><td>            <b>for</b>( <a class="local col4 ref" href="#4i" title='i' data-ref="4i">i</a> = <var>1</var>; <a class="local col4 ref" href="#4i" title='i' data-ref="4i">i</a> &lt;= <a class="macro" href="#21" title="100" data-ref="_M/MAXIT">MAXIT</a>; <a class="local col4 ref" href="#4i" title='i' data-ref="4i">i</a>++ ) {</td></tr>
+<tr><th id="52">52</th><td>                <a class="local col7 ref" href="#7a" title='a' data-ref="7a">a</a> = -<a class="local col4 ref" href="#4i" title='i' data-ref="4i">i</a> * ( <a class="local col6 ref" href="#6nm1" title='nm1' data-ref="6nm1">nm1</a> + <a class="local col4 ref" href="#4i" title='i' data-ref="4i">i</a> );</td></tr>
+<tr><th id="53">53</th><td>                <a class="local col8 ref" href="#8b" title='b' data-ref="8b">b</a> += <var>2.0</var>;</td></tr>
+<tr><th id="54">54</th><td>                <a class="local col0 ref" href="#10d" title='d' data-ref="10d">d</a> = <var>1.0</var> / ( <a class="local col7 ref" href="#7a" title='a' data-ref="7a">a</a> * <a class="local col0 ref" href="#10d" title='d' data-ref="10d">d</a> + <a class="local col8 ref" href="#8b" title='b' data-ref="8b">b</a> );            <i>/* Denominators cannot be zero */</i></td></tr>
+<tr><th id="55">55</th><td>                <a class="local col9 ref" href="#9c" title='c' data-ref="9c">c</a> = <a class="local col8 ref" href="#8b" title='b' data-ref="8b">b</a> + <a class="local col7 ref" href="#7a" title='a' data-ref="7a">a</a> / <a class="local col9 ref" href="#9c" title='c' data-ref="9c">c</a>;</td></tr>
+<tr><th id="56">56</th><td>                <a class="local col1 ref" href="#11del" title='del' data-ref="11del">del</a> = <a class="local col9 ref" href="#9c" title='c' data-ref="9c">c</a> * <a class="local col0 ref" href="#10d" title='d' data-ref="10d">d</a>;</td></tr>
+<tr><th id="57">57</th><td>                <a class="local col3 ref" href="#13h" title='h' data-ref="13h">h</a> *= <a class="local col1 ref" href="#11del" title='del' data-ref="11del">del</a>;</td></tr>
+<tr><th id="58">58</th><td>                <b>if</b>( <span class='error' title="use of undeclared identifier &apos;fabs&apos;">fabs</span>( del - <var>1.0</var> ) &lt; <a class="macro" href="#23" title="1.0e-15" data-ref="_M/EPS">EPS</a> ) <b>return</b>( <a class="local col3 ref" href="#13h" title='h' data-ref="13h">h</a> * <a class="ref" href="../../../../../global/management/include/G4Exp.hh.html#_Z5G4Expd" title='G4Exp' data-ref="_Z5G4Expd">G4Exp</a>( -<a class="local col2 ref" href="#2x" title='x' data-ref="2x">x</a> ) );</td></tr>
+<tr><th id="59">59</th><td>            }</td></tr>
+<tr><th id="60">60</th><td>            *<a class="local col3 ref" href="#3status" title='status' data-ref="3status">status</a> = <a class="enum" href="../include/nf_utilities.h.html#GIDI::nfu_status_e::nfu_failedToConverge" title='GIDI::nfu_status_e::nfu_failedToConverge' data-ref="GIDI::nfu_status_e::nfu_failedToConverge">nfu_failedToConverge</a>; }</td></tr>
+<tr><th id="61">61</th><td>        <b>else</b> {</td></tr>
+<tr><th id="62">62</th><td>            <a class="local col5 ref" href="#15ans" title='ans' data-ref="15ans">ans</a> = ( <a class="local col6 ref" href="#6nm1" title='nm1' data-ref="6nm1">nm1</a> != <var>0</var> ) ? <var>1.0</var> / <a class="local col6 ref" href="#6nm1" title='nm1' data-ref="6nm1">nm1</a> : -<a class="ref" href="../../../../../global/management/include/G4Log.hh.html#_Z5G4Logd" title='G4Log' data-ref="_Z5G4Logd">G4Log</a>(<a class="local col2 ref" href="#2x" title='x' data-ref="2x">x</a>) - <a class="macro" href="#20" title="0.57721566490153286" data-ref="_M/EULER">EULER</a>;   <i>/* Set first term */</i></td></tr>
+<tr><th id="63">63</th><td>            <a class="local col2 ref" href="#12fact" title='fact' data-ref="12fact">fact</a> = <var>1.0</var>;</td></tr>
+<tr><th id="64">64</th><td>            <b>for</b>( <a class="local col4 ref" href="#4i" title='i' data-ref="4i">i</a> = <var>1</var>; <a class="local col4 ref" href="#4i" title='i' data-ref="4i">i</a> &lt;= <a class="macro" href="#21" title="100" data-ref="_M/MAXIT">MAXIT</a>; <a class="local col4 ref" href="#4i" title='i' data-ref="4i">i</a>++ ) {</td></tr>
+<tr><th id="65">65</th><td>                <a class="local col2 ref" href="#12fact" title='fact' data-ref="12fact">fact</a> *= -<a class="local col2 ref" href="#2x" title='x' data-ref="2x">x</a> / <a class="local col4 ref" href="#4i" title='i' data-ref="4i">i</a>;</td></tr>
+<tr><th id="66">66</th><td>                <b>if</b>( <a class="local col4 ref" href="#4i" title='i' data-ref="4i">i</a> != <a class="local col6 ref" href="#6nm1" title='nm1' data-ref="6nm1">nm1</a> ) {</td></tr>
+<tr><th id="67">67</th><td>                    <a class="local col1 ref" href="#11del" title='del' data-ref="11del">del</a> = -<a class="local col2 ref" href="#12fact" title='fact' data-ref="12fact">fact</a> / ( <a class="local col4 ref" href="#4i" title='i' data-ref="4i">i</a> - <a class="local col6 ref" href="#6nm1" title='nm1' data-ref="6nm1">nm1</a> ); }</td></tr>
+<tr><th id="68">68</th><td>                <b>else</b> {</td></tr>
+<tr><th id="69">69</th><td>                    <a class="local col4 ref" href="#14psi" title='psi' data-ref="14psi">psi</a> = -<a class="macro" href="#20" title="0.57721566490153286" data-ref="_M/EULER">EULER</a>;                   <i>/* Compute psi(n) */</i></td></tr>
+<tr><th id="70">70</th><td>                    <b>for</b>( <a class="local col5 ref" href="#5ii" title='ii' data-ref="5ii">ii</a> = <var>1</var>; <a class="local col5 ref" href="#5ii" title='ii' data-ref="5ii">ii</a> &lt;= <a class="local col6 ref" href="#6nm1" title='nm1' data-ref="6nm1">nm1</a>; <a class="local col5 ref" href="#5ii" title='ii' data-ref="5ii">ii</a>++ ) <a class="local col4 ref" href="#14psi" title='psi' data-ref="14psi">psi</a> += <var>1.0</var> / <a class="local col5 ref" href="#5ii" title='ii' data-ref="5ii">ii</a>;</td></tr>
+<tr><th id="71">71</th><td>                    <a class="local col1 ref" href="#11del" title='del' data-ref="11del">del</a> = <a class="local col2 ref" href="#12fact" title='fact' data-ref="12fact">fact</a> * ( -<a class="ref" href="../../../../../global/management/include/G4Log.hh.html#_Z5G4Logd" title='G4Log' data-ref="_Z5G4Logd">G4Log</a>( <a class="local col2 ref" href="#2x" title='x' data-ref="2x">x</a> ) + <a class="local col4 ref" href="#14psi" title='psi' data-ref="14psi">psi</a> );</td></tr>
+<tr><th id="72">72</th><td>                }</td></tr>
+<tr><th id="73">73</th><td>                <a class="local col5 ref" href="#15ans" title='ans' data-ref="15ans">ans</a> += <a class="local col1 ref" href="#11del" title='del' data-ref="11del">del</a>;</td></tr>
+<tr><th id="74">74</th><td>                <b>if</b>( <span class='error' title="use of undeclared identifier &apos;fabs&apos;">fabs</span>( del ) &lt; <span class='error' title="use of undeclared identifier &apos;fabs&apos;">fabs</span>( ans ) * <a class="macro" href="#23" title="1.0e-15" data-ref="_M/EPS">EPS</a> ) <b>return</b>( <a class="local col5 ref" href="#15ans" title='ans' data-ref="15ans">ans</a> );</td></tr>
+<tr><th id="75">75</th><td>            }</td></tr>
+<tr><th id="76">76</th><td>            *<a class="local col3 ref" href="#3status" title='status' data-ref="3status">status</a> = <a class="enum" href="../include/nf_utilities.h.html#GIDI::nfu_status_e::nfu_failedToConverge" title='GIDI::nfu_status_e::nfu_failedToConverge' data-ref="GIDI::nfu_status_e::nfu_failedToConverge">nfu_failedToConverge</a>;</td></tr>
+<tr><th id="77">77</th><td>        }</td></tr>
+<tr><th id="78">78</th><td>    }</td></tr>
+<tr><th id="79">79</th><td>    <b>return</b>( <a class="local col5 ref" href="#15ans" title='ans' data-ref="15ans">ans</a> );</td></tr>
+<tr><th id="80">80</th><td>}</td></tr>
+<tr><th id="81">81</th><td></td></tr>
+<tr><th id="82">82</th><td><u>#<span data-ppcond="82">if</span> defined <span class="macro" data-ref="_M/__cplusplus">__cplusplus</span></u></td></tr>
+<tr><th id="83">83</th><td>}</td></tr>
+<tr><th id="84">84</th><td><u>#<span data-ppcond="82">endif</span></u></td></tr>
+<tr><th id="85">85</th><td></td></tr>
+</table><hr/><p id='footer'>
+Generated on <em>2019-Aug-28</em> from project codebrowser<br />Powered by <a href='https://woboq.com'><img alt='Woboq' src='https://code.woboq.org/woboq-16.png' width='41' height='16' /></a> <a href='https://code.woboq.org'>Code Browser</a> 2.1
+<br/>Generator usage only permitted with license.</p>
+</div></body></html>

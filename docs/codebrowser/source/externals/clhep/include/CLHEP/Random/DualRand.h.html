@@ -1,0 +1,162 @@
+<!doctype html>
+<html>
+<head>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"><title>DualRand.h source code [codebrowser/source/externals/clhep/include/CLHEP/Random/DualRand.h] - Woboq Code Browser</title>
+<meta name="woboq:interestingDefinitions" content="CLHEP::DualRand "/>
+<link rel="stylesheet" href="../../../../../../../../data/qtcreator.css" title="QtCreator"/>
+<link rel="alternate stylesheet" href="../../../../../../../../data/kdevelop.css" title="KDevelop"/>
+<script type="text/javascript" src="../../../../../../../../data/jquery/jquery.min.js"></script>
+<script type="text/javascript" src="../../../../../../../../data/jquery/jquery-ui.min.js"></script>
+<script>var file = 'codebrowser/source/externals/clhep/include/CLHEP/Random/DualRand.h'; var root_path = '../../../../../../..'; var data_path = '../../../../../../../../data';</script>
+<script src='../../../../../../../../data/codebrowser.js'></script>
+</head>
+<body><div id='header'><h1 id='breadcrumb'><span>Browse the source code of </span><a href='../../../../../..'>codebrowser</a>/<a href='../../../../..'>source</a>/<a href='../../../..'>externals</a>/<a href='../../..'>clhep</a>/<a href='../..'>include</a>/<a href='..'>CLHEP</a>/<a href='./'>Random</a>/<a href='DualRand.h.html'>DualRand.h</a></h1></div>
+<hr/><div id='content'><table class="code">
+<tr><th id="1">1</th><td><i>// -*- C++ -*-</i></td></tr>
+<tr><th id="2">2</th><td><i>//</i></td></tr>
+<tr><th id="3">3</th><td><i>// -----------------------------------------------------------------------</i></td></tr>
+<tr><th id="4">4</th><td><i>//                           Hep Random</i></td></tr>
+<tr><th id="5">5</th><td><i>//                        --- DualRand ---</i></td></tr>
+<tr><th id="6">6</th><td><i>//                        class header file</i></td></tr>
+<tr><th id="7">7</th><td><i>// -----------------------------------------------------------------------</i></td></tr>
+<tr><th id="8">8</th><td><i>//									</i></td></tr>
+<tr><th id="9">9</th><td><i>//  Canopy random number generator DualRand</i></td></tr>
+<tr><th id="10">10</th><td><i>//	Re-written as C++ routine for 32-bit ints MF 1/26/98</i></td></tr>
+<tr><th id="11">11</th><td><i>//</i></td></tr>
+<tr><th id="12">12</th><td><i>//  Exclusive or of a feedback shift register and integer congruence</i></td></tr>
+<tr><th id="13">13</th><td><i>//  random number generator.  The feedback shift register uses offsets</i></td></tr>
+<tr><th id="14">14</th><td><i>//  127 and 97.  The integer congruence generator uses a different</i></td></tr>
+<tr><th id="15">15</th><td><i>//  multiplier for each stream.  The multipliers are chosen to give</i></td></tr>
+<tr><th id="16">16</th><td><i>//  full period and maximum "potency" for modulo 2^32.  The period of</i></td></tr>
+<tr><th id="17">17</th><td><i>//  the combined random number generator is 2^159 - 2^32, and the</i></td></tr>
+<tr><th id="18">18</th><td><i>//  sequences are different for each stream (not just started in a</i></td></tr>
+<tr><th id="19">19</th><td><i>//  different place).</i></td></tr>
+<tr><th id="20">20</th><td><i>//</i></td></tr>
+<tr><th id="21">21</th><td><i>// =======================================================================</i></td></tr>
+<tr><th id="22">22</th><td><i>//  Canopy random number generator DualRand.</i></td></tr>
+<tr><th id="23">23</th><td><i>//  Doug Toussaint   5/25/88					           </i></td></tr>
+<tr><th id="24">24</th><td><i>//  Optimized by GMH 7/26/88					           </i></td></tr>
+<tr><th id="25">25</th><td><i>//  Optimized by GMH 7/26/88					           </i></td></tr>
+<tr><th id="26">26</th><td><i>//  Repaired  by GMH 12/1/88 to update modular congruence state            </i></td></tr>
+<tr><th id="27">27</th><td><i>//  Put into ranlib by GMH 6/23/89				           </i></td></tr>
+<tr><th id="28">28</th><td><i>//  Re-written as C++ routine for 32-bit ints MF 1/26/98	           </i></td></tr>
+<tr><th id="29">29</th><td><i>//  Re-written for CLHEP package	     KLS 6/04/98	           </i></td></tr>
+<tr><th id="30">30</th><td><i>//  Removed pow() from flat method for speed KLS 7/21/98	           </i></td></tr>
+<tr><th id="31">31</th><td><i>//  Ken Smith	   - Added conversion operators:  6th Aug 1998             </i></td></tr>
+<tr><th id="32">32</th><td><i>//  Mark Fischler    methods for distrib. instance save/restore 12/8/04    </i></td></tr>
+<tr><th id="33">33</th><td><i>//  Mark Fischler    methods for anonymous save/restore 12/27/04    </i></td></tr>
+<tr><th id="34">34</th><td><i>// Mark Fischler  - methods for vector save/restore 3/7/05    </i></td></tr>
+<tr><th id="35">35</th><td><i>// =======================================================================</i></td></tr>
+<tr><th id="36">36</th><td></td></tr>
+<tr><th id="37">37</th><td></td></tr>
+<tr><th id="38">38</th><td><u>#<span data-ppcond="38">ifndef</span> <span class="macro" data-ref="_M/DualRand_h">DualRand_h</span></u></td></tr>
+<tr><th id="39">39</th><td><u>#define <dfn class="macro" id="_M/DualRand_h" data-ref="_M/DualRand_h">DualRand_h</dfn></u></td></tr>
+<tr><th id="40">40</th><td></td></tr>
+<tr><th id="41">41</th><td><u>#include <a href="RandomEngine.h.html">"CLHEP/Random/RandomEngine.h"</a></u></td></tr>
+<tr><th id="42">42</th><td></td></tr>
+<tr><th id="43">43</th><td><b>namespace</b> <span class="namespace">CLHEP</span> {</td></tr>
+<tr><th id="44">44</th><td></td></tr>
+<tr><th id="45">45</th><td><i class="doc">/**</i></td></tr>
+<tr><th id="46">46</th><td><i class="doc"> * <span class="command">@author</span></i></td></tr>
+<tr><th id="47">47</th><td><i class="doc"> * <span class="command">@ingroup</span> <span class="verb">random</span></i></td></tr>
+<tr><th id="48">48</th><td><i class="doc"> */</i></td></tr>
+<tr><th id="49">49</th><td><b>class</b> <dfn class="type def" id="CLHEP::DualRand" title='CLHEP::DualRand' data-ref="CLHEP::DualRand">DualRand</dfn>: <b>public</b> <a class="type" href="RandomEngine.h.html#CLHEP::HepRandomEngine" title='CLHEP::HepRandomEngine' data-ref="CLHEP::HepRandomEngine">HepRandomEngine</a> {</td></tr>
+<tr><th id="50">50</th><td></td></tr>
+<tr><th id="51">51</th><td><b>public</b>:</td></tr>
+<tr><th id="52">52</th><td></td></tr>
+<tr><th id="53">53</th><td>  <dfn class="decl" id="_ZN5CLHEP8DualRandC1Ev" title='CLHEP::DualRand::DualRand' data-ref="_ZN5CLHEP8DualRandC1Ev">DualRand</dfn>();</td></tr>
+<tr><th id="54">54</th><td>  <dfn class="decl" id="_ZN5CLHEP8DualRandC1El" title='CLHEP::DualRand::DualRand' data-ref="_ZN5CLHEP8DualRandC1El">DualRand</dfn>(<em>long</em> <dfn class="local col3 decl" id="203seed" title='seed' data-type='long' data-ref="203seed">seed</dfn>);</td></tr>
+<tr><th id="55">55</th><td>  DualRand(<span class='error' title="use of undeclared identifier &apos;std&apos;">std</span>::istream &amp; is);</td></tr>
+<tr><th id="56">56</th><td>  <dfn class="decl" id="_ZN5CLHEP8DualRandC1Eii" title='CLHEP::DualRand::DualRand' data-ref="_ZN5CLHEP8DualRandC1Eii">DualRand</dfn>(<em>int</em> <dfn class="local col4 decl" id="204rowIndex" title='rowIndex' data-type='int' data-ref="204rowIndex">rowIndex</dfn>, <em>int</em> <dfn class="local col5 decl" id="205colIndex" title='colIndex' data-type='int' data-ref="205colIndex">colIndex</dfn>);</td></tr>
+<tr><th id="57">57</th><td>  <b>virtual</b> <dfn class="virtual decl" id="_ZN5CLHEP8DualRandD1Ev" title='CLHEP::DualRand::~DualRand' data-ref="_ZN5CLHEP8DualRandD1Ev">~DualRand</dfn>();</td></tr>
+<tr><th id="58">58</th><td></td></tr>
+<tr><th id="59">59</th><td>  <i>// let the compiler generate the copy constructors</i></td></tr>
+<tr><th id="60">60</th><td><i>  //DualRand(const DualRand &amp; p);</i></td></tr>
+<tr><th id="61">61</th><td><i>  //DualRand &amp; operator=(const DualRand &amp; p);</i></td></tr>
+<tr><th id="62">62</th><td></td></tr>
+<tr><th id="63">63</th><td>  <em>double</em> <dfn class="virtual decl" id="_ZN5CLHEP8DualRand4flatEv" title='CLHEP::DualRand::flat' data-ref="_ZN5CLHEP8DualRand4flatEv">flat</dfn>();</td></tr>
+<tr><th id="64">64</th><td>  <i>// Returns a pseudo random number between 0 and 1 </i></td></tr>
+<tr><th id="65">65</th><td><i>  // (excluding the end points)</i></td></tr>
+<tr><th id="66">66</th><td></td></tr>
+<tr><th id="67">67</th><td>  <em>void</em> <dfn class="virtual decl" id="_ZN5CLHEP8DualRand9flatArrayEiPd" title='CLHEP::DualRand::flatArray' data-ref="_ZN5CLHEP8DualRand9flatArrayEiPd">flatArray</dfn>(<em>const</em> <em>int</em> <dfn class="local col6 decl" id="206size" title='size' data-type='const int' data-ref="206size">size</dfn>, <em>double</em> * <dfn class="local col7 decl" id="207vect" title='vect' data-type='double *' data-ref="207vect">vect</dfn>);</td></tr>
+<tr><th id="68">68</th><td>  <i>// Fills an array "vect" of specified size with flat random values.</i></td></tr>
+<tr><th id="69">69</th><td></td></tr>
+<tr><th id="70">70</th><td>  <em>void</em> <dfn class="virtual decl" id="_ZN5CLHEP8DualRand7setSeedEli" title='CLHEP::DualRand::setSeed' data-ref="_ZN5CLHEP8DualRand7setSeedEli">setSeed</dfn>(<em>long</em> <dfn class="local col8 decl" id="208seed" title='seed' data-type='long' data-ref="208seed">seed</dfn>, <em>int</em>);</td></tr>
+<tr><th id="71">71</th><td>  <i>// Sets the state of the algorithm according to seed.</i></td></tr>
+<tr><th id="72">72</th><td></td></tr>
+<tr><th id="73">73</th><td>  <em>void</em> <dfn class="virtual decl" id="_ZN5CLHEP8DualRand8setSeedsEPKli" title='CLHEP::DualRand::setSeeds' data-ref="_ZN5CLHEP8DualRand8setSeedsEPKli">setSeeds</dfn>(<em>const</em> <em>long</em> * <dfn class="local col9 decl" id="209seeds" title='seeds' data-type='const long *' data-ref="209seeds">seeds</dfn>, <em>int</em>);</td></tr>
+<tr><th id="74">74</th><td>  <i>// Sets the state of the algorithm according to the zero-terminated </i></td></tr>
+<tr><th id="75">75</th><td><i>  // array of seeds.</i></td></tr>
+<tr><th id="76">76</th><td></td></tr>
+<tr><th id="77">77</th><td>  <em>void</em> <dfn class="virtual decl" id="_ZNK5CLHEP8DualRand10saveStatusEPKc" title='CLHEP::DualRand::saveStatus' data-ref="_ZNK5CLHEP8DualRand10saveStatusEPKc">saveStatus</dfn>( <em>const</em> <em>char</em> <dfn class="local col0 decl" id="210filename" title='filename' data-type='const char *' data-ref="210filename">filename</dfn>[] = <q>"DualRand.conf"</q>) <em>const</em>;</td></tr>
+<tr><th id="78">78</th><td>  <i>// Saves on named file the current engine status.</i></td></tr>
+<tr><th id="79">79</th><td></td></tr>
+<tr><th id="80">80</th><td>  <em>void</em> <dfn class="virtual decl" id="_ZN5CLHEP8DualRand13restoreStatusEPKc" title='CLHEP::DualRand::restoreStatus' data-ref="_ZN5CLHEP8DualRand13restoreStatusEPKc">restoreStatus</dfn>( <em>const</em> <em>char</em> <dfn class="local col1 decl" id="211filename" title='filename' data-type='const char *' data-ref="211filename">filename</dfn>[] = <q>"DualRand.conf"</q> );</td></tr>
+<tr><th id="81">81</th><td>  <i>// Reads from named file the last saved engine status and restores it.</i></td></tr>
+<tr><th id="82">82</th><td></td></tr>
+<tr><th id="83">83</th><td>  <em>void</em> <dfn class="virtual decl" id="_ZNK5CLHEP8DualRand10showStatusEv" title='CLHEP::DualRand::showStatus' data-ref="_ZNK5CLHEP8DualRand10showStatusEv">showStatus</dfn>() <em>const</em>;</td></tr>
+<tr><th id="84">84</th><td>  <i>// Dumps the current engine status on the screen.</i></td></tr>
+<tr><th id="85">85</th><td></td></tr>
+<tr><th id="86">86</th><td>  <dfn class="virtual decl" id="_ZN5CLHEP8DualRandcvdEv" title='CLHEP::DualRand::operator double' data-ref="_ZN5CLHEP8DualRandcvdEv"><b>operator</b> <em>double</em></dfn>();        <i>// Returns same as flat()</i></td></tr>
+<tr><th id="87">87</th><td>  <dfn class="virtual decl" id="_ZN5CLHEP8DualRandcvfEv" title='CLHEP::DualRand::operator float' data-ref="_ZN5CLHEP8DualRandcvfEv"><b>operator</b> <em>float</em></dfn>();         <i>// flat value, without worrying about filling bits</i></td></tr>
+<tr><th id="88">88</th><td>  <dfn class="virtual decl" id="_ZN5CLHEP8DualRandcvjEv" title='CLHEP::DualRand::operator unsigned int' data-ref="_ZN5CLHEP8DualRandcvjEv"><b>operator</b> <em>unsigned</em></dfn> <em>int</em>();  <i>// 32-bit flat value, quickest of all</i></td></tr>
+<tr><th id="89">89</th><td></td></tr>
+<tr><th id="90">90</th><td>  <b>virtual</b> <span class='error' title="use of undeclared identifier &apos;std&apos;">std</span>::ostream &amp; <dfn class="decl" id="_ZNK5CLHEP8DualRand3putERi" title='CLHEP::DualRand::put' data-ref="_ZNK5CLHEP8DualRand3putERi">put</dfn> (<span class='error' title="use of undeclared identifier &apos;std&apos;">std</span>::ostream &amp; os) <em>const</em>;</td></tr>
+<tr><th id="91">91</th><td>  <b>virtual</b> <span class='error' title="use of undeclared identifier &apos;std&apos;">std</span>::istream &amp; <dfn class="decl" id="_ZN5CLHEP8DualRand3getERi" title='CLHEP::DualRand::get' data-ref="_ZN5CLHEP8DualRand3getERi">get</dfn> (<span class='error' title="use of undeclared identifier &apos;std&apos;">std</span>::istream &amp; is);</td></tr>
+<tr><th id="92">92</th><td>  <em>static</em>  <span class='error' title="use of undeclared identifier &apos;std&apos;">std</span>::string <dfn class="decl" id="_ZN5CLHEP8DualRand8beginTagEv" title='CLHEP::DualRand::beginTag' data-ref="_ZN5CLHEP8DualRand8beginTagEv">beginTag</dfn> ( );</td></tr>
+<tr><th id="93">93</th><td>  <b>virtual</b> <span class='error' title="use of undeclared identifier &apos;std&apos;">std</span>::istream &amp; <dfn class="decl" id="_ZN5CLHEP8DualRand8getStateERi" title='CLHEP::DualRand::getState' data-ref="_ZN5CLHEP8DualRand8getStateERi">getState</dfn> ( <span class='error' title="use of undeclared identifier &apos;std&apos;">std</span>::istream &amp; is );</td></tr>
+<tr><th id="94">94</th><td>    </td></tr>
+<tr><th id="95">95</th><td>  <span class='error' title="use of undeclared identifier &apos;std&apos;">std</span>::string <dfn class="decl" id="_ZNK5CLHEP8DualRand4nameEv" title='CLHEP::DualRand::name' data-ref="_ZNK5CLHEP8DualRand4nameEv">name</dfn>() <em>const</em>;</td></tr>
+<tr><th id="96">96</th><td>  <em>static</em> <span class='error' title="use of undeclared identifier &apos;std&apos;">std</span>::string <dfn class="decl def" id="_ZN5CLHEP8DualRand10engineNameEv" title='CLHEP::DualRand::engineName' data-ref="_ZN5CLHEP8DualRand10engineNameEv">engineName</dfn>() {<b>return</b> <span class='error' title="cannot initialize return object of type &apos;int&apos; with an lvalue of type &apos;const char [9]&apos;"><q>"DualRand"</q></span>;}</td></tr>
+<tr><th id="97">97</th><td></td></tr>
+<tr><th id="98">98</th><td>  <span class='error' title="use of undeclared identifier &apos;std&apos;">std</span>::vector<span class='error' title="expected member name or &apos;;&apos; after declaration specifiers">&lt;</span><em>unsigned</em> <em>long</em>&gt; put () <em>const</em>;</td></tr>
+<tr><th id="99">99</th><td>  <em>bool</em> get (<em>const</em> <span class='error' title="use of undeclared identifier &apos;std&apos;">std</span>::vector<span class='error' title="expected &apos;)&apos;">&lt;</span><em>unsigned</em> <em>long</em>&gt; &amp; v);</td></tr>
+<tr><th id="100">100</th><td>  <em>bool</em> getState (<em>const</em> <span class='error' title="use of undeclared identifier &apos;std&apos;">std</span>::vector<span class='error' title="expected &apos;)&apos;">&lt;</span><em>unsigned</em> <em>long</em>&gt; &amp; v);</td></tr>
+<tr><th id="101">101</th><td>  </td></tr>
+<tr><th id="102">102</th><td>  <em>static</em> <em>const</em> <em>unsigned</em> <em>int</em> <dfn class="decl" id="CLHEP::DualRand::VECTOR_STATE_SIZE" title='CLHEP::DualRand::VECTOR_STATE_SIZE' data-ref="CLHEP::DualRand::VECTOR_STATE_SIZE">VECTOR_STATE_SIZE</dfn> = <var>9</var>;</td></tr>
+<tr><th id="103">103</th><td></td></tr>
+<tr><th id="104">104</th><td><b>private</b>:</td></tr>
+<tr><th id="105">105</th><td></td></tr>
+<tr><th id="106">106</th><td>  <i>// This generator is composed of two others combined:</i></td></tr>
+<tr><th id="107">107</th><td></td></tr>
+<tr><th id="108">108</th><td>  <b>class</b> <dfn class="type def" id="CLHEP::DualRand::Tausworthe" title='CLHEP::DualRand::Tausworthe' data-ref="CLHEP::DualRand::Tausworthe">Tausworthe</dfn> {</td></tr>
+<tr><th id="109">109</th><td>  <b>public</b>:</td></tr>
+<tr><th id="110">110</th><td>    <dfn class="decl" id="_ZN5CLHEP8DualRand10TauswortheC1Ev" title='CLHEP::DualRand::Tausworthe::Tausworthe' data-ref="_ZN5CLHEP8DualRand10TauswortheC1Ev">Tausworthe</dfn>();</td></tr>
+<tr><th id="111">111</th><td>    <dfn class="decl" id="_ZN5CLHEP8DualRand10TauswortheC1Ej" title='CLHEP::DualRand::Tausworthe::Tausworthe' data-ref="_ZN5CLHEP8DualRand10TauswortheC1Ej">Tausworthe</dfn>(<em>unsigned</em> <em>int</em> <dfn class="local col2 decl" id="212seed" title='seed' data-type='unsigned int' data-ref="212seed">seed</dfn>);</td></tr>
+<tr><th id="112">112</th><td>    <dfn class="decl" id="_ZN5CLHEP8DualRand10TausworthecvjEv" title='CLHEP::DualRand::Tausworthe::operator unsigned int' data-ref="_ZN5CLHEP8DualRand10TausworthecvjEv"><b>operator</b> <em>unsigned</em></dfn> <em>int</em>();</td></tr>
+<tr><th id="113">113</th><td>    <em>void</em> <dfn class="decl" id="_ZNK5CLHEP8DualRand10Tausworthe3putERi" title='CLHEP::DualRand::Tausworthe::put' data-ref="_ZNK5CLHEP8DualRand10Tausworthe3putERi">put</dfn>(<span class='error' title="use of undeclared identifier &apos;std&apos;">std</span>::ostream &amp; <dfn class="local col3 decl" id="213os" title='os' data-type='int &amp;' data-ref="213os">os</dfn>) <em>const</em>;</td></tr>
+<tr><th id="114">114</th><td>    <em>void</em> put(<span class='error' title="use of undeclared identifier &apos;std&apos;">std</span>::vector<span class='error' title="expected &apos;)&apos;">&lt;</span><em>unsigned</em> <em>long</em>&gt; &amp; v) <em>const</em>;</td></tr>
+<tr><th id="115">115</th><td>    <em>void</em> <dfn class="decl" id="_ZN5CLHEP8DualRand10Tausworthe3getERi" title='CLHEP::DualRand::Tausworthe::get' data-ref="_ZN5CLHEP8DualRand10Tausworthe3getERi">get</dfn>(<span class='error' title="use of undeclared identifier &apos;std&apos;">std</span>::istream &amp; <dfn class="local col4 decl" id="214is" title='is' data-type='int &amp;' data-ref="214is">is</dfn>);</td></tr>
+<tr><th id="116">116</th><td>    <em>bool</em> get(<span class='error' title="use of undeclared identifier &apos;std&apos;">std</span>::vector<span class='error' title="expected &apos;)&apos;">&lt;</span><em>unsigned</em> <em>long</em>&gt;::const_iterator &amp; iv);</td></tr>
+<tr><th id="117">117</th><td>  <b>private</b>:</td></tr>
+<tr><th id="118">118</th><td>    <em>int</em> <dfn class="decl" id="CLHEP::DualRand::Tausworthe::wordIndex" title='CLHEP::DualRand::Tausworthe::wordIndex' data-ref="CLHEP::DualRand::Tausworthe::wordIndex">wordIndex</dfn>;</td></tr>
+<tr><th id="119">119</th><td>    <em>unsigned</em> <em>int</em> <dfn class="decl" id="CLHEP::DualRand::Tausworthe::words" title='CLHEP::DualRand::Tausworthe::words' data-ref="CLHEP::DualRand::Tausworthe::words">words</dfn>[<var>4</var>];</td></tr>
+<tr><th id="120">120</th><td>  }; <i>// Tausworthe</i></td></tr>
+<tr><th id="121">121</th><td></td></tr>
+<tr><th id="122">122</th><td>  <b>class</b> <dfn class="type def" id="CLHEP::DualRand::IntegerCong" title='CLHEP::DualRand::IntegerCong' data-ref="CLHEP::DualRand::IntegerCong">IntegerCong</dfn> {</td></tr>
+<tr><th id="123">123</th><td>  <b>public</b>:</td></tr>
+<tr><th id="124">124</th><td>    <dfn class="decl" id="_ZN5CLHEP8DualRand11IntegerCongC1Ev" title='CLHEP::DualRand::IntegerCong::IntegerCong' data-ref="_ZN5CLHEP8DualRand11IntegerCongC1Ev">IntegerCong</dfn>();</td></tr>
+<tr><th id="125">125</th><td>    <dfn class="decl" id="_ZN5CLHEP8DualRand11IntegerCongC1Eji" title='CLHEP::DualRand::IntegerCong::IntegerCong' data-ref="_ZN5CLHEP8DualRand11IntegerCongC1Eji">IntegerCong</dfn>(<em>unsigned</em> <em>int</em> <dfn class="local col5 decl" id="215seed" title='seed' data-type='unsigned int' data-ref="215seed">seed</dfn>, <em>int</em> <dfn class="local col6 decl" id="216streamNumber" title='streamNumber' data-type='int' data-ref="216streamNumber">streamNumber</dfn>);</td></tr>
+<tr><th id="126">126</th><td>    <dfn class="decl" id="_ZN5CLHEP8DualRand11IntegerCongcvjEv" title='CLHEP::DualRand::IntegerCong::operator unsigned int' data-ref="_ZN5CLHEP8DualRand11IntegerCongcvjEv"><b>operator</b> <em>unsigned</em></dfn> <em>int</em>();</td></tr>
+<tr><th id="127">127</th><td>    <em>void</em> <dfn class="decl" id="_ZNK5CLHEP8DualRand11IntegerCong3putERi" title='CLHEP::DualRand::IntegerCong::put' data-ref="_ZNK5CLHEP8DualRand11IntegerCong3putERi">put</dfn>(<span class='error' title="use of undeclared identifier &apos;std&apos;">std</span>::ostream &amp; <dfn class="local col7 decl" id="217os" title='os' data-type='int &amp;' data-ref="217os">os</dfn>) <em>const</em>;</td></tr>
+<tr><th id="128">128</th><td>    <em>void</em> put(<span class='error' title="use of undeclared identifier &apos;std&apos;">std</span>::vector<span class='error' title="expected &apos;)&apos;">&lt;</span><em>unsigned</em> <em>long</em>&gt; &amp; v) <em>const</em>;</td></tr>
+<tr><th id="129">129</th><td>    <em>void</em> <dfn class="decl" id="_ZN5CLHEP8DualRand11IntegerCong3getERi" title='CLHEP::DualRand::IntegerCong::get' data-ref="_ZN5CLHEP8DualRand11IntegerCong3getERi">get</dfn>(<span class='error' title="use of undeclared identifier &apos;std&apos;">std</span>::istream &amp; <dfn class="local col8 decl" id="218is" title='is' data-type='int &amp;' data-ref="218is">is</dfn>);</td></tr>
+<tr><th id="130">130</th><td>    <em>bool</em> get(<span class='error' title="use of undeclared identifier &apos;std&apos;">std</span>::vector<span class='error' title="expected &apos;)&apos;">&lt;</span><em>unsigned</em> <em>long</em>&gt;::const_iterator &amp; iv);</td></tr>
+<tr><th id="131">131</th><td>  <b>private</b>:</td></tr>
+<tr><th id="132">132</th><td>    <em>unsigned</em> <em>int</em> <dfn class="decl" id="CLHEP::DualRand::IntegerCong::state" title='CLHEP::DualRand::IntegerCong::state' data-ref="CLHEP::DualRand::IntegerCong::state">state</dfn>, <dfn class="decl" id="CLHEP::DualRand::IntegerCong::multiplier" title='CLHEP::DualRand::IntegerCong::multiplier' data-ref="CLHEP::DualRand::IntegerCong::multiplier">multiplier</dfn>, <dfn class="decl" id="CLHEP::DualRand::IntegerCong::addend" title='CLHEP::DualRand::IntegerCong::addend' data-ref="CLHEP::DualRand::IntegerCong::addend">addend</dfn>;</td></tr>
+<tr><th id="133">133</th><td>  }; <i>// IntegerCong</i></td></tr>
+<tr><th id="134">134</th><td></td></tr>
+<tr><th id="135">135</th><td>  <em>int</em> <dfn class="decl" id="CLHEP::DualRand::numEngines" title='CLHEP::DualRand::numEngines' data-ref="CLHEP::DualRand::numEngines">numEngines</dfn>;</td></tr>
+<tr><th id="136">136</th><td>  <a class="type" href="#CLHEP::DualRand::Tausworthe" title='CLHEP::DualRand::Tausworthe' data-ref="CLHEP::DualRand::Tausworthe">Tausworthe</a>  <dfn class="decl" id="CLHEP::DualRand::tausworthe" title='CLHEP::DualRand::tausworthe' data-ref="CLHEP::DualRand::tausworthe">tausworthe</dfn>;</td></tr>
+<tr><th id="137">137</th><td>  <a class="type" href="#CLHEP::DualRand::IntegerCong" title='CLHEP::DualRand::IntegerCong' data-ref="CLHEP::DualRand::IntegerCong">IntegerCong</a> <dfn class="decl" id="CLHEP::DualRand::integerCong" title='CLHEP::DualRand::integerCong' data-ref="CLHEP::DualRand::integerCong">integerCong</dfn>;</td></tr>
+<tr><th id="138">138</th><td></td></tr>
+<tr><th id="139">139</th><td>}; <i>// DualRand</i></td></tr>
+<tr><th id="140">140</th><td></td></tr>
+<tr><th id="141">141</th><td>}  <i>// namespace CLHEP</i></td></tr>
+<tr><th id="142">142</th><td></td></tr>
+<tr><th id="143">143</th><td><u>#<span data-ppcond="38">endif</span> // DualRand_h</u></td></tr>
+<tr><th id="144">144</th><td></td></tr>
+</table><hr/><p id='footer'>
+Generated while processing <a href='../../../../../error_propagation/src/G4ErrorMagFieldLimitProcess.cc.html'>codebrowser/source/error_propagation/src/G4ErrorMagFieldLimitProcess.cc</a><br/>Generated on <em>2019-Aug-28</em> from project codebrowser<br />Powered by <a href='https://woboq.com'><img alt='Woboq' src='https://code.woboq.org/woboq-16.png' width='41' height='16' /></a> <a href='https://code.woboq.org'>Code Browser</a> 2.1
+<br/>Generator usage only permitted with license.</p>
+</div></body></html>

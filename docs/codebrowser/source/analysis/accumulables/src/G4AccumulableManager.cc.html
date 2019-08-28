@@ -1,0 +1,233 @@
+<!doctype html>
+<html>
+<head>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"><title>G4AccumulableManager.cc source code [codebrowser/source/analysis/accumulables/src/G4AccumulableManager.cc] - Woboq Code Browser</title>
+<link rel="stylesheet" href="../../../../../../data/qtcreator.css" title="QtCreator"/>
+<link rel="alternate stylesheet" href="../../../../../../data/kdevelop.css" title="KDevelop"/>
+<script type="text/javascript" src="../../../../../../data/jquery/jquery.min.js"></script>
+<script type="text/javascript" src="../../../../../../data/jquery/jquery-ui.min.js"></script>
+<script>var file = 'codebrowser/source/analysis/accumulables/src/G4AccumulableManager.cc'; var root_path = '../../../../..'; var data_path = '../../../../../../data';</script>
+<script src='../../../../../../data/codebrowser.js'></script>
+</head>
+<body><div id='header'><h1 id='breadcrumb'><span>Browse the source code of </span><a href='../../../..'>codebrowser</a>/<a href='../../..'>source</a>/<a href='../..'>analysis</a>/<a href='..'>accumulables</a>/<a href='./'>src</a>/<a href='G4AccumulableManager.cc.html'>G4AccumulableManager.cc</a></h1></div>
+<hr/><div id='content'><table class="code">
+<tr><th id="1">1</th><td><i>//</i></td></tr>
+<tr><th id="2">2</th><td><i>// ********************************************************************</i></td></tr>
+<tr><th id="3">3</th><td><i>// * License and Disclaimer                                           *</i></td></tr>
+<tr><th id="4">4</th><td><i>// *                                                                  *</i></td></tr>
+<tr><th id="5">5</th><td><i>// * The  Geant4 software  is  copyright of the Copyright Holders  of *</i></td></tr>
+<tr><th id="6">6</th><td><i>// * the Geant4 Collaboration.  It is provided  under  the terms  and *</i></td></tr>
+<tr><th id="7">7</th><td><i>// * conditions of the Geant4 Software License,  included in the file *</i></td></tr>
+<tr><th id="8">8</th><td><i>// * LICENSE and available at  <a href="http://cern.ch/geant4/license">http://cern.ch/geant4/license</a> .  These *</i></td></tr>
+<tr><th id="9">9</th><td><i>// * include a list of copyright holders.                             *</i></td></tr>
+<tr><th id="10">10</th><td><i>// *                                                                  *</i></td></tr>
+<tr><th id="11">11</th><td><i>// * Neither the authors of this software system, nor their employing *</i></td></tr>
+<tr><th id="12">12</th><td><i>// * institutes,nor the agencies providing financial support for this *</i></td></tr>
+<tr><th id="13">13</th><td><i>// * work  make  any representation or  warranty, express or implied, *</i></td></tr>
+<tr><th id="14">14</th><td><i>// * regarding  this  software system or assume any liability for its *</i></td></tr>
+<tr><th id="15">15</th><td><i>// * use.  Please see the license in the file  LICENSE  and URL above *</i></td></tr>
+<tr><th id="16">16</th><td><i>// * for the full disclaimer and the limitation of liability.         *</i></td></tr>
+<tr><th id="17">17</th><td><i>// *                                                                  *</i></td></tr>
+<tr><th id="18">18</th><td><i>// * This  code  implementation is the result of  the  scientific and *</i></td></tr>
+<tr><th id="19">19</th><td><i>// * technical work of the GEANT4 collaboration.                      *</i></td></tr>
+<tr><th id="20">20</th><td><i>// * By using,  copying,  modifying or  distributing the software (or *</i></td></tr>
+<tr><th id="21">21</th><td><i>// * any work based  on the software)  you  agree  to acknowledge its *</i></td></tr>
+<tr><th id="22">22</th><td><i>// * use  in  resulting  scientific  publications,  and indicate your *</i></td></tr>
+<tr><th id="23">23</th><td><i>// * acceptance of all terms of the Geant4 Software license.          *</i></td></tr>
+<tr><th id="24">24</th><td><i>// ********************************************************************</i></td></tr>
+<tr><th id="25">25</th><td><i>//</i></td></tr>
+<tr><th id="26">26</th><td><i></i></td></tr>
+<tr><th id="27">27</th><td><i>// Author: Ivana Hrivnacova, 18/06/2013  (ivana@ipno.in2p3.fr)</i></td></tr>
+<tr><th id="28">28</th><td></td></tr>
+<tr><th id="29">29</th><td><u>#include <a href="../include/G4AccumulableManager.hh.html">"G4AccumulableManager.hh"</a></u></td></tr>
+<tr><th id="30">30</th><td><u>#include <a href="../../../global/management/include/G4Threading.hh.html">"G4Threading.hh"</a></u></td></tr>
+<tr><th id="31">31</th><td><u>#include <a href="../../../global/management/include/G4AutoLock.hh.html">"G4AutoLock.hh"</a></u></td></tr>
+<tr><th id="32">32</th><td></td></tr>
+<tr><th id="33">33</th><td><i>// mutex in a file scope</i></td></tr>
+<tr><th id="34">34</th><td></td></tr>
+<tr><th id="35">35</th><td><b>namespace</b> {</td></tr>
+<tr><th id="36">36</th><td>  <i  data-doc="(anonymousnamespace)::mergeMutex">//Mutex to lock master manager when merging accumulables</i></td></tr>
+<tr><th id="37">37</th><td>  <span class='error' title="unknown type name &apos;G4Mutex&apos;">G4Mutex</span> <dfn class="tu decl def" id="(anonymousnamespace)::mergeMutex" title='(anonymous namespace)::mergeMutex' data-type='int' data-ref="(anonymousnamespace)::mergeMutex">mergeMutex</dfn> = <a class="macro" href="../../../global/management/include/G4Threading.hh.html#88" title="{}" data-ref="_M/G4MUTEX_INITIALIZER">G4MUTEX_INITIALIZER</a>;</td></tr>
+<tr><th id="38">38</th><td>}</td></tr>
+<tr><th id="39">39</th><td></td></tr>
+<tr><th id="40">40</th><td><a class="type" href="../include/G4AccumulableManager.hh.html#G4AccumulableManager" title='G4AccumulableManager' data-ref="G4AccumulableManager">G4AccumulableManager</a>* <a class="type" href="../include/G4AccumulableManager.hh.html#G4AccumulableManager" title='G4AccumulableManager' data-ref="G4AccumulableManager">G4AccumulableManager</a>::<dfn class="decl def" id="G4AccumulableManager::fgMasterInstance" title='G4AccumulableManager::fgMasterInstance' data-ref="G4AccumulableManager::fgMasterInstance">fgMasterInstance</dfn> = <b>nullptr</b>;</td></tr>
+<tr><th id="41">41</th><td><a class="macro" href="../../../global/management/include/tls.hh.html#39" title="thread_local" data-ref="_M/G4ThreadLocal">G4ThreadLocal</a> <a class="type" href="../include/G4AccumulableManager.hh.html#G4AccumulableManager" title='G4AccumulableManager' data-ref="G4AccumulableManager">G4AccumulableManager</a>* <a class="type" href="../include/G4AccumulableManager.hh.html#G4AccumulableManager" title='G4AccumulableManager' data-ref="G4AccumulableManager">G4AccumulableManager</a>::<dfn class="decl def" id="G4AccumulableManager::fgInstance" title='G4AccumulableManager::fgInstance' data-ref="G4AccumulableManager::fgInstance">fgInstance</dfn> = <b>nullptr</b>;</td></tr>
+<tr><th id="42">42</th><td></td></tr>
+<tr><th id="43">43</th><td><i>//_____________________________________________________________________________</i></td></tr>
+<tr><th id="44">44</th><td><a class="type" href="../include/G4AccumulableManager.hh.html#G4AccumulableManager" title='G4AccumulableManager' data-ref="G4AccumulableManager">G4AccumulableManager</a>* <a class="type" href="../include/G4AccumulableManager.hh.html#G4AccumulableManager" title='G4AccumulableManager' data-ref="G4AccumulableManager">G4AccumulableManager</a>::<dfn class="decl def" id="_ZN20G4AccumulableManager8InstanceEv" title='G4AccumulableManager::Instance' data-ref="_ZN20G4AccumulableManager8InstanceEv">Instance</dfn>()</td></tr>
+<tr><th id="45">45</th><td>{</td></tr>
+<tr><th id="46">46</th><td>  <b>if</b> ( <a class="member" href="../include/G4AccumulableManager.hh.html#G4AccumulableManager::fgInstance" title='G4AccumulableManager::fgInstance' data-ref="G4AccumulableManager::fgInstance">fgInstance</a> == <b>nullptr</b> ) {</td></tr>
+<tr><th id="47">47</th><td>    <a class="typedef" href="../../../global/management/include/G4Types.hh.html#G4bool" title='G4bool' data-type='bool' data-ref="G4bool">G4bool</a> <dfn class="local col7 decl" id="207isMaster" title='isMaster' data-type='G4bool' data-ref="207isMaster">isMaster</dfn> = ! <span class="namespace">G4Threading::</span><a class="ref" href="../../../global/management/include/G4Threading.hh.html#_ZN11G4Threading14IsWorkerThreadEv" title='G4Threading::IsWorkerThread' data-ref="_ZN11G4Threading14IsWorkerThreadEv">IsWorkerThread</a>();</td></tr>
+<tr><th id="48">48</th><td>    <a class="member" href="../include/G4AccumulableManager.hh.html#G4AccumulableManager::fgInstance" title='G4AccumulableManager::fgInstance' data-ref="G4AccumulableManager::fgInstance">fgInstance</a> = <b>new</b> <a class="type" href="../include/G4AccumulableManager.hh.html#G4AccumulableManager" title='G4AccumulableManager' data-ref="G4AccumulableManager">G4AccumulableManager</a><a class="ref" href="#_ZN20G4AccumulableManagerC1Eb" title='G4AccumulableManager::G4AccumulableManager' data-ref="_ZN20G4AccumulableManagerC1Eb">(</a><a class="local col7 ref" href="#207isMaster" title='isMaster' data-ref="207isMaster">isMaster</a>);</td></tr>
+<tr><th id="49">49</th><td>  }</td></tr>
+<tr><th id="50">50</th><td>  </td></tr>
+<tr><th id="51">51</th><td>  <b>return</b> <a class="member" href="../include/G4AccumulableManager.hh.html#G4AccumulableManager::fgInstance" title='G4AccumulableManager::fgInstance' data-ref="G4AccumulableManager::fgInstance">fgInstance</a>;</td></tr>
+<tr><th id="52">52</th><td>}    </td></tr>
+<tr><th id="53">53</th><td></td></tr>
+<tr><th id="54">54</th><td><i>//_____________________________________________________________________________</i></td></tr>
+<tr><th id="55">55</th><td><a class="type" href="../include/G4AccumulableManager.hh.html#G4AccumulableManager" title='G4AccumulableManager' data-ref="G4AccumulableManager">G4AccumulableManager</a>::<dfn class="decl def" id="_ZN20G4AccumulableManagerC1Eb" title='G4AccumulableManager::G4AccumulableManager' data-ref="_ZN20G4AccumulableManagerC1Eb">G4AccumulableManager</dfn>(<a class="typedef" href="../../../global/management/include/G4Types.hh.html#G4bool" title='G4bool' data-type='bool' data-ref="G4bool">G4bool</a> <dfn class="local col8 decl" id="208isMaster" title='isMaster' data-type='G4bool' data-ref="208isMaster">isMaster</dfn>)</td></tr>
+<tr><th id="56">56</th><td> : <span class='error' title="member initializer &apos;fVector&apos; does not name a non-static data member or base class">fVector</span>(),</td></tr>
+<tr><th id="57">57</th><td>   <span class='error' title="member initializer &apos;fMap&apos; does not name a non-static data member or base class">fMap</span>() </td></tr>
+<tr><th id="58">58</th><td>{</td></tr>
+<tr><th id="59">59</th><td>  <b>if</b> ( ( <a class="local col8 ref" href="#208isMaster" title='isMaster' data-ref="208isMaster">isMaster</a> &amp;&amp; <a class="member" href="../include/G4AccumulableManager.hh.html#G4AccumulableManager::fgMasterInstance" title='G4AccumulableManager::fgMasterInstance' data-ref="G4AccumulableManager::fgMasterInstance">fgMasterInstance</a> ) || ( <a class="member" href="../include/G4AccumulableManager.hh.html#G4AccumulableManager::fgInstance" title='G4AccumulableManager::fgInstance' data-ref="G4AccumulableManager::fgInstance">fgInstance</a> ) ) {</td></tr>
+<tr><th id="60">60</th><td>    <a class="typedef" href="../../../global/management/include/G4Exception.hh.html#G4ExceptionDescription" title='G4ExceptionDescription' data-type='int' data-ref="G4ExceptionDescription">G4ExceptionDescription</a> <dfn class="local col9 decl" id="209description" title='description' data-type='G4ExceptionDescription' data-ref="209description">description</dfn>;</td></tr>
+<tr><th id="61">61</th><td>    description </td></tr>
+<tr><th id="62">62</th><td>      <span class='error' title="invalid operands to binary expression (&apos;G4ExceptionDescription&apos; (aka &apos;int&apos;) and &apos;const char *&apos;)">&lt;&lt;</span> <q>"      "</q> </td></tr>
+<tr><th id="63">63</th><td>      &lt;&lt; <q>"G4AccumulableAnalysisManager already exists."</q> </td></tr>
+<tr><th id="64">64</th><td>      &lt;&lt; <q>"Cannot create another instance."</q>;</td></tr>
+<tr><th id="65">65</th><td>    <a class="ref" href="../../../global/management/include/G4Exception.hh.html#_Z11G4ExceptionPKcS0_19G4ExceptionSeverityRi" title='G4Exception' data-ref="_Z11G4ExceptionPKcS0_19G4ExceptionSeverityRi">G4Exception</a>(<q>"G4AccumulableAnalysisManager::G4AccumulableAnalysisManager()"</q>,</td></tr>
+<tr><th id="66">66</th><td>                <q>"Analysis_F001"</q>, <a class="enum" href="../../../global/management/include/G4ExceptionSeverity.hh.html#G4ExceptionSeverity::FatalException" title='G4ExceptionSeverity::FatalException' data-ref="G4ExceptionSeverity::FatalException">FatalException</a>, <span class='refarg'><a class="local col9 ref" href="#209description" title='description' data-ref="209description">description</a></span>);</td></tr>
+<tr><th id="67">67</th><td>  }</td></tr>
+<tr><th id="68">68</th><td>  <b>if</b> ( <a class="local col8 ref" href="#208isMaster" title='isMaster' data-ref="208isMaster">isMaster</a> ) <a class="member" href="../include/G4AccumulableManager.hh.html#G4AccumulableManager::fgMasterInstance" title='G4AccumulableManager::fgMasterInstance' data-ref="G4AccumulableManager::fgMasterInstance">fgMasterInstance</a> = <b>this</b>;</td></tr>
+<tr><th id="69">69</th><td>  <a class="member" href="../include/G4AccumulableManager.hh.html#G4AccumulableManager::fgInstance" title='G4AccumulableManager::fgInstance' data-ref="G4AccumulableManager::fgInstance">fgInstance</a> = <b>this</b>;</td></tr>
+<tr><th id="70">70</th><td>}</td></tr>
+<tr><th id="71">71</th><td></td></tr>
+<tr><th id="72">72</th><td><i>//_____________________________________________________________________________</i></td></tr>
+<tr><th id="73">73</th><td><a class="type" href="../include/G4AccumulableManager.hh.html#G4AccumulableManager" title='G4AccumulableManager' data-ref="G4AccumulableManager">G4AccumulableManager</a>::<dfn class="virtual decl def" id="_ZN20G4AccumulableManagerD1Ev" title='G4AccumulableManager::~G4AccumulableManager' data-ref="_ZN20G4AccumulableManagerD1Ev">~G4AccumulableManager</dfn>()</td></tr>
+<tr><th id="74">74</th><td>{</td></tr>
+<tr><th id="75">75</th><td>  <i>// delete only accumulables create by the mager itself</i></td></tr>
+<tr><th id="76">76</th><td>  <b>for</b> ( <em>auto</em> it : <span class='error' title="use of undeclared identifier &apos;fAccumulablesToDelete&apos;">fAccumulablesToDelete</span> ) {</td></tr>
+<tr><th id="77">77</th><td>    <b>delete</b> it;</td></tr>
+<tr><th id="78">78</th><td>  }</td></tr>
+<tr><th id="79">79</th><td>}</td></tr>
+<tr><th id="80">80</th><td></td></tr>
+<tr><th id="81">81</th><td><i>//</i></td></tr>
+<tr><th id="82">82</th><td><i>// private methods</i></td></tr>
+<tr><th id="83">83</th><td><i>//</i></td></tr>
+<tr><th id="84">84</th><td><i></i></td></tr>
+<tr><th id="85">85</th><td><i>//_____________________________________________________________________________</i></td></tr>
+<tr><th id="86">86</th><td><a class="type" href="../../../global/management/include/G4String.hh.html#G4String" title='G4String' data-ref="G4String">G4String</a> <a class="type" href="../include/G4AccumulableManager.hh.html#G4AccumulableManager" title='G4AccumulableManager' data-ref="G4AccumulableManager">G4AccumulableManager</a>::<dfn class="decl def" id="_ZNK20G4AccumulableManager12GenerateNameEv" title='G4AccumulableManager::GenerateName' data-ref="_ZNK20G4AccumulableManager12GenerateNameEv">GenerateName</dfn>() <em>const</em></td></tr>
+<tr><th id="87">87</th><td>{</td></tr>
+<tr><th id="88">88</th><td>  <a class="type" href="../../../global/management/include/G4String.hh.html#G4String" title='G4String' data-ref="G4String">G4String</a> <dfn class="local col0 decl" id="210name" title='name' data-type='G4String' data-ref="210name">name</dfn> = <a class="ref fake" href="../../../global/management/include/G4String.icc.html#_ZN8G4StringC1ERKS_" title='G4String::G4String' data-ref="_ZN8G4StringC1ERKS_"></a><a class="member" href="../include/G4AccumulableManager.hh.html#G4AccumulableManager::kBaseName" title='G4AccumulableManager::kBaseName' data-ref="G4AccumulableManager::kBaseName">kBaseName</a>;</td></tr>
+<tr><th id="89">89</th><td>  <span class='error' title="use of undeclared identifier &apos;std&apos;">std</span>::ostringstream <dfn class="local col1 decl" id="211os" title='os' data-type='int' data-ref="211os">os</dfn>;</td></tr>
+<tr><th id="90">90</th><td>  os &lt;&lt; <span class='error' title="use of undeclared identifier &apos;fVector&apos;">fVector</span>.size();</td></tr>
+<tr><th id="91">91</th><td>  <a class="local col0 ref" href="#210name" title='name' data-ref="210name">name</a>.<a class="ref" href="../../../global/management/include/G4String.icc.html#_ZN8G4String6appendERKS_" title='G4String::append' data-ref="_ZN8G4String6appendERKS_">append</a>(<a class="ref fake" href="../../../global/management/include/G4String.icc.html#_ZN8G4StringC1EPKc" title='G4String::G4String' data-ref="_ZN8G4StringC1EPKc"></a><q>"_"</q>);</td></tr>
+<tr><th id="92">92</th><td>  name.append(os.str());</td></tr>
+<tr><th id="93">93</th><td>  <b>return</b> <a class="local col0 ref" href="#210name" title='name' data-ref="210name">name</a>;</td></tr>
+<tr><th id="94">94</th><td>}</td></tr>
+<tr><th id="95">95</th><td></td></tr>
+<tr><th id="96">96</th><td><i>//_____________________________________________________________________________</i></td></tr>
+<tr><th id="97">97</th><td><a class="typedef" href="../../../global/management/include/G4Types.hh.html#G4bool" title='G4bool' data-type='bool' data-ref="G4bool">G4bool</a> <a class="type" href="../include/G4AccumulableManager.hh.html#G4AccumulableManager" title='G4AccumulableManager' data-ref="G4AccumulableManager">G4AccumulableManager</a>::<dfn class="decl def" id="_ZNK20G4AccumulableManager9CheckNameERK8G4StringS2_" title='G4AccumulableManager::CheckName' data-ref="_ZNK20G4AccumulableManager9CheckNameERK8G4StringS2_">CheckName</dfn>(<em>const</em> <a class="type" href="../../../global/management/include/G4String.hh.html#G4String" title='G4String' data-ref="G4String">G4String</a>&amp; <dfn class="local col2 decl" id="212name" title='name' data-type='const G4String &amp;' data-ref="212name">name</dfn>, <em>const</em> <a class="type" href="../../../global/management/include/G4String.hh.html#G4String" title='G4String' data-ref="G4String">G4String</a>&amp; <dfn class="local col3 decl" id="213where" title='where' data-type='const G4String &amp;' data-ref="213where">where</dfn>) <em>const</em></td></tr>
+<tr><th id="98">98</th><td>{</td></tr>
+<tr><th id="99">99</th><td>  <b>if</b> ( <span class='error' title="use of undeclared identifier &apos;fMap&apos;">fMap</span>.find(name) == <span class='error' title="use of undeclared identifier &apos;fMap&apos;">fMap</span>.end() ) <b>return</b> <b>true</b>;</td></tr>
+<tr><th id="100">100</th><td> </td></tr>
+<tr><th id="101">101</th><td>  <a class="typedef" href="../../../global/management/include/G4Exception.hh.html#G4ExceptionDescription" title='G4ExceptionDescription' data-type='int' data-ref="G4ExceptionDescription">G4ExceptionDescription</a> <dfn class="local col4 decl" id="214description" title='description' data-type='G4ExceptionDescription' data-ref="214description">description</dfn>;</td></tr>
+<tr><th id="102">102</th><td>  description <span class='error' title="invalid operands to binary expression (&apos;G4ExceptionDescription&apos; (aka &apos;int&apos;) and &apos;const char *&apos;)">&lt;&lt;</span> <q>"      "</q> &lt;&lt; <q>"Name "</q> &lt;&lt; name &lt;&lt; <q>" is already used."</q> &lt;&lt; <a class="macro" href="../../../global/management/include/G4ios.hh.html#60" title="std::endl" data-ref="_M/G4endl">G4endl</a>;</td></tr>
+<tr><th id="103">103</th><td>  description <span class='error' title="invalid operands to binary expression (&apos;G4ExceptionDescription&apos; (aka &apos;int&apos;) and &apos;const char *&apos;)">&lt;&lt;</span> <q>"      "</q> &lt;&lt; <q>"Paremeter will be not created/registered."</q>;</td></tr>
+<tr><th id="104">104</th><td>  <a class="type" href="../../../global/management/include/G4String.hh.html#G4String" title='G4String' data-ref="G4String">G4String</a> <dfn class="local col5 decl" id="215method" title='method' data-type='G4String' data-ref="215method">method</dfn><a class="ref" href="../../../global/management/include/G4String.icc.html#_ZN8G4StringC1EPKc" title='G4String::G4String' data-ref="_ZN8G4StringC1EPKc">(</a><q>"G4AccumulableManager::"</q>);</td></tr>
+<tr><th id="105">105</th><td>  <a class="local col5 ref" href="#215method" title='method' data-ref="215method">method</a>.<a class="ref" href="../../../global/management/include/G4String.icc.html#_ZN8G4String6appendERKS_" title='G4String::append' data-ref="_ZN8G4String6appendERKS_">append</a>(<a class="local col3 ref" href="#213where" title='where' data-ref="213where">where</a>);</td></tr>
+<tr><th id="106">106</th><td>  <a class="ref" href="../../../global/management/include/G4Exception.hh.html#_Z11G4ExceptionPKcS0_19G4ExceptionSeverityRi" title='G4Exception' data-ref="_Z11G4ExceptionPKcS0_19G4ExceptionSeverityRi">G4Exception</a>(<a class="ref fake" href="../../../global/management/include/G4String.icc.html#_ZNK8G4StringcvPKcEv" title='G4String::operator const char *' data-ref="_ZNK8G4StringcvPKcEv"></a><a class="local col5 ref" href="#215method" title='method' data-ref="215method">method</a>, <q>"Analysis_W002"</q>, <a class="enum" href="../../../global/management/include/G4ExceptionSeverity.hh.html#G4ExceptionSeverity::JustWarning" title='G4ExceptionSeverity::JustWarning' data-ref="G4ExceptionSeverity::JustWarning">JustWarning</a>, <span class='refarg'><a class="local col4 ref" href="#214description" title='description' data-ref="214description">description</a></span>);</td></tr>
+<tr><th id="107">107</th><td>  <b>return</b> <b>false</b>;</td></tr>
+<tr><th id="108">108</th><td>}</td></tr>
+<tr><th id="109">109</th><td></td></tr>
+<tr><th id="110">110</th><td><i>//</i></td></tr>
+<tr><th id="111">111</th><td><i>// public methods</i></td></tr>
+<tr><th id="112">112</th><td><i>//</i></td></tr>
+<tr><th id="113">113</th><td><i></i></td></tr>
+<tr><th id="114">114</th><td><i>//_____________________________________________________________________________</i></td></tr>
+<tr><th id="115">115</th><td><a class="typedef" href="../../../global/management/include/G4Types.hh.html#G4bool" title='G4bool' data-type='bool' data-ref="G4bool">G4bool</a> <a class="type" href="../include/G4AccumulableManager.hh.html#G4AccumulableManager" title='G4AccumulableManager' data-ref="G4AccumulableManager">G4AccumulableManager</a>::<dfn class="decl def" id="_ZN20G4AccumulableManager19RegisterAccumulableEP14G4VAccumulable" title='G4AccumulableManager::RegisterAccumulable' data-ref="_ZN20G4AccumulableManager19RegisterAccumulableEP14G4VAccumulable">RegisterAccumulable</dfn>(<a class="type" href="../include/G4VAccumulable.hh.html#G4VAccumulable" title='G4VAccumulable' data-ref="G4VAccumulable">G4VAccumulable</a>* <dfn class="local col6 decl" id="216accumulable" title='accumulable' data-type='G4VAccumulable *' data-ref="216accumulable">accumulable</dfn>)</td></tr>
+<tr><th id="116">116</th><td>{</td></tr>
+<tr><th id="117">117</th><td>  <em>auto</em> <dfn class="local col7 decl" id="217name" title='name' data-type='G4String' data-ref="217name">name</dfn> = <a class="local col6 ref" href="#216accumulable" title='accumulable' data-ref="216accumulable">accumulable</a>-&gt;<a class="ref" href="../include/G4VAccumulable.icc.html#_ZNK14G4VAccumulable7GetNameEv" title='G4VAccumulable::GetName' data-ref="_ZNK14G4VAccumulable7GetNameEv">GetName</a>();</td></tr>
+<tr><th id="118">118</th><td>  </td></tr>
+<tr><th id="119">119</th><td>  <i>// do not accept name if it is already used</i></td></tr>
+<tr><th id="120">120</th><td>  <b>if</b> ( ! <a class="member" href="#_ZNK20G4AccumulableManager9CheckNameERK8G4StringS2_" title='G4AccumulableManager::CheckName' data-ref="_ZNK20G4AccumulableManager9CheckNameERK8G4StringS2_">CheckName</a>(<a class="local col7 ref" href="#217name" title='name' data-ref="217name">name</a>, <a class="ref fake" href="../../../global/management/include/G4String.icc.html#_ZN8G4StringC1EPKc" title='G4String::G4String' data-ref="_ZN8G4StringC1EPKc"></a><q>"RegisterAccumulable"</q>) ) <b>return</b> <b>false</b>; </td></tr>
+<tr><th id="121">121</th><td></td></tr>
+<tr><th id="122">122</th><td>  <i>// generate name if empty</i></td></tr>
+<tr><th id="123">123</th><td>  <b>if</b> ( ! name.<span class='error' title="no member named &apos;length&apos; in &apos;G4String&apos;">length</span>() ) {</td></tr>
+<tr><th id="124">124</th><td>    <a class="local col7 ref" href="#217name" title='name' data-ref="217name">name</a> <a class="ref" href="../../../global/management/include/G4String.icc.html#_ZN8G4StringaSERKS_" title='G4String::operator=' data-ref="_ZN8G4StringaSERKS_">=</a>  <a class="member" href="#_ZNK20G4AccumulableManager12GenerateNameEv" title='G4AccumulableManager::GenerateName' data-ref="_ZNK20G4AccumulableManager12GenerateNameEv">GenerateName</a>();</td></tr>
+<tr><th id="125">125</th><td>    <a class="local col6 ref" href="#216accumulable" title='accumulable' data-ref="216accumulable">accumulable</a>-&gt;<a class="ref" href="../include/G4VAccumulable.hh.html#G4VAccumulable::fName" title='G4VAccumulable::fName' data-ref="G4VAccumulable::fName">fName</a> <a class="ref" href="../../../global/management/include/G4String.icc.html#_ZN8G4StringaSERKS_" title='G4String::operator=' data-ref="_ZN8G4StringaSERKS_">=</a> <a class="local col7 ref" href="#217name" title='name' data-ref="217name">name</a>;</td></tr>
+<tr><th id="126">126</th><td>  }</td></tr>
+<tr><th id="127">127</th><td></td></tr>
+<tr><th id="128">128</th><td>  <span class='error' title="use of undeclared identifier &apos;fMap&apos;">fMap</span>[name] = accumulable;</td></tr>
+<tr><th id="129">129</th><td>  <span class='error' title="use of undeclared identifier &apos;fVector&apos;">fVector</span>.push_back(accumulable);</td></tr>
+<tr><th id="130">130</th><td>  <b>return</b> <b>true</b>;</td></tr>
+<tr><th id="131">131</th><td>}</td></tr>
+<tr><th id="132">132</th><td></td></tr>
+<tr><th id="133">133</th><td><i>//_____________________________________________________________________________</i></td></tr>
+<tr><th id="134">134</th><td><a class="type" href="../include/G4VAccumulable.hh.html#G4VAccumulable" title='G4VAccumulable' data-ref="G4VAccumulable">G4VAccumulable</a>*  </td></tr>
+<tr><th id="135">135</th><td><a class="type" href="../include/G4AccumulableManager.hh.html#G4AccumulableManager" title='G4AccumulableManager' data-ref="G4AccumulableManager">G4AccumulableManager</a>::<dfn class="decl def" id="_ZNK20G4AccumulableManager14GetAccumulableERK8G4Stringb" title='G4AccumulableManager::GetAccumulable' data-ref="_ZNK20G4AccumulableManager14GetAccumulableERK8G4Stringb">GetAccumulable</dfn>(<em>const</em> <a class="type" href="../../../global/management/include/G4String.hh.html#G4String" title='G4String' data-ref="G4String">G4String</a>&amp; <dfn class="local col8 decl" id="218name" title='name' data-type='const G4String &amp;' data-ref="218name">name</dfn>, <a class="typedef" href="../../../global/management/include/G4Types.hh.html#G4bool" title='G4bool' data-type='bool' data-ref="G4bool">G4bool</a> <dfn class="local col9 decl" id="219warn" title='warn' data-type='G4bool' data-ref="219warn">warn</dfn>) <em>const</em></td></tr>
+<tr><th id="136">136</th><td>{</td></tr>
+<tr><th id="137">137</th><td>  <i>// get G4VParammeter from the map</i></td></tr>
+<tr><th id="138">138</th><td>  <em>auto</em> <dfn class="local col0 decl" id="220it" title='it' data-type='auto' data-ref="220it">it</dfn> = <span class='error' title="use of undeclared identifier &apos;fMap&apos;">fMap</span>.find(name);</td></tr>
+<tr><th id="139">139</th><td>  <b>if</b> ( it == <span class='error' title="use of undeclared identifier &apos;fMap&apos;">fMap</span>.end() ) {</td></tr>
+<tr><th id="140">140</th><td>    <b>if</b> ( <a class="local col9 ref" href="#219warn" title='warn' data-ref="219warn">warn</a>) {</td></tr>
+<tr><th id="141">141</th><td>      <a class="typedef" href="../../../global/management/include/G4Exception.hh.html#G4ExceptionDescription" title='G4ExceptionDescription' data-type='int' data-ref="G4ExceptionDescription">G4ExceptionDescription</a> <dfn class="local col1 decl" id="221description" title='description' data-type='G4ExceptionDescription' data-ref="221description">description</dfn>;</td></tr>
+<tr><th id="142">142</th><td>      description <span class='error' title="invalid operands to binary expression (&apos;G4ExceptionDescription&apos; (aka &apos;int&apos;) and &apos;const char *&apos;)">&lt;&lt;</span> <q>"      "</q> &lt;&lt; <q>"accumulable "</q> &lt;&lt; name &lt;&lt; <q>" does not exist."</q>;</td></tr>
+<tr><th id="143">143</th><td>      <a class="ref" href="../../../global/management/include/G4Exception.hh.html#_Z11G4ExceptionPKcS0_19G4ExceptionSeverityRi" title='G4Exception' data-ref="_Z11G4ExceptionPKcS0_19G4ExceptionSeverityRi">G4Exception</a>(<q>"G4AccumulableManager::GetAccumulable"</q>, </td></tr>
+<tr><th id="144">144</th><td>                  <q>"Analysis_W011"</q>, <a class="enum" href="../../../global/management/include/G4ExceptionSeverity.hh.html#G4ExceptionSeverity::JustWarning" title='G4ExceptionSeverity::JustWarning' data-ref="G4ExceptionSeverity::JustWarning">JustWarning</a>, <span class='refarg'><a class="local col1 ref" href="#221description" title='description' data-ref="221description">description</a></span>);</td></tr>
+<tr><th id="145">145</th><td>    }</td></tr>
+<tr><th id="146">146</th><td>    <b>return</b> <b>nullptr</b>;</td></tr>
+<tr><th id="147">147</th><td>  }</td></tr>
+<tr><th id="148">148</th><td></td></tr>
+<tr><th id="149">149</th><td>  <b>return</b> it-&gt;second;</td></tr>
+<tr><th id="150">150</th><td>}</td></tr>
+<tr><th id="151">151</th><td></td></tr>
+<tr><th id="152">152</th><td><i>//_____________________________________________________________________________</i></td></tr>
+<tr><th id="153">153</th><td><a class="type" href="../include/G4VAccumulable.hh.html#G4VAccumulable" title='G4VAccumulable' data-ref="G4VAccumulable">G4VAccumulable</a>*  </td></tr>
+<tr><th id="154">154</th><td><a class="type" href="../include/G4AccumulableManager.hh.html#G4AccumulableManager" title='G4AccumulableManager' data-ref="G4AccumulableManager">G4AccumulableManager</a>::<dfn class="decl def" id="_ZNK20G4AccumulableManager14GetAccumulableEib" title='G4AccumulableManager::GetAccumulable' data-ref="_ZNK20G4AccumulableManager14GetAccumulableEib">GetAccumulable</dfn>(<a class="typedef" href="../../../global/management/include/G4Types.hh.html#G4int" title='G4int' data-type='int' data-ref="G4int">G4int</a> <dfn class="local col2 decl" id="222id" title='id' data-type='G4int' data-ref="222id">id</dfn>, <a class="typedef" href="../../../global/management/include/G4Types.hh.html#G4bool" title='G4bool' data-type='bool' data-ref="G4bool">G4bool</a> <dfn class="local col3 decl" id="223warn" title='warn' data-type='G4bool' data-ref="223warn">warn</dfn>) <em>const</em></td></tr>
+<tr><th id="155">155</th><td>{</td></tr>
+<tr><th id="156">156</th><td>  <i>// get G4VParammeter from the vector</i></td></tr>
+<tr><th id="157">157</th><td>  <b>if</b> ( id &lt; <var>0</var> || id &gt;= G4int(<span class='error' title="use of undeclared identifier &apos;fVector&apos;">fVector</span>.size()) ) {</td></tr>
+<tr><th id="158">158</th><td>    <b>if</b> ( <a class="local col3 ref" href="#223warn" title='warn' data-ref="223warn">warn</a>) {</td></tr>
+<tr><th id="159">159</th><td>      <a class="typedef" href="../../../global/management/include/G4Exception.hh.html#G4ExceptionDescription" title='G4ExceptionDescription' data-type='int' data-ref="G4ExceptionDescription">G4ExceptionDescription</a> <dfn class="local col4 decl" id="224description" title='description' data-type='G4ExceptionDescription' data-ref="224description">description</dfn>;</td></tr>
+<tr><th id="160">160</th><td>      description <span class='error' title="invalid operands to binary expression (&apos;G4ExceptionDescription&apos; (aka &apos;int&apos;) and &apos;const char *&apos;)">&lt;&lt;</span> <q>"      "</q> &lt;&lt; <q>"accumulable "</q> &lt;&lt; id &lt;&lt; <q>" does not exist."</q>;</td></tr>
+<tr><th id="161">161</th><td>      <a class="ref" href="../../../global/management/include/G4Exception.hh.html#_Z11G4ExceptionPKcS0_19G4ExceptionSeverityRi" title='G4Exception' data-ref="_Z11G4ExceptionPKcS0_19G4ExceptionSeverityRi">G4Exception</a>(<q>"G4AccumulableManager::GetAccumulable"</q>, </td></tr>
+<tr><th id="162">162</th><td>                  <q>"Analysis_W011"</q>, <a class="enum" href="../../../global/management/include/G4ExceptionSeverity.hh.html#G4ExceptionSeverity::JustWarning" title='G4ExceptionSeverity::JustWarning' data-ref="G4ExceptionSeverity::JustWarning">JustWarning</a>, <span class='refarg'><a class="local col4 ref" href="#224description" title='description' data-ref="224description">description</a></span>);</td></tr>
+<tr><th id="163">163</th><td>    }</td></tr>
+<tr><th id="164">164</th><td>    <b>return</b> <b>nullptr</b>;</td></tr>
+<tr><th id="165">165</th><td>  }</td></tr>
+<tr><th id="166">166</th><td></td></tr>
+<tr><th id="167">167</th><td>  <b>return</b> <span class='error' title="use of undeclared identifier &apos;fVector&apos;">fVector</span>[id];</td></tr>
+<tr><th id="168">168</th><td>}</td></tr>
+<tr><th id="169">169</th><td></td></tr>
+<tr><th id="170">170</th><td><i>//_____________________________________________________________________________</i></td></tr>
+<tr><th id="171">171</th><td><em>void</em> <a class="type" href="../include/G4AccumulableManager.hh.html#G4AccumulableManager" title='G4AccumulableManager' data-ref="G4AccumulableManager">G4AccumulableManager</a>::<dfn class="decl def" id="_ZN20G4AccumulableManager5MergeEv" title='G4AccumulableManager::Merge' data-ref="_ZN20G4AccumulableManager5MergeEv">Merge</dfn>() </td></tr>
+<tr><th id="172">172</th><td>{</td></tr>
+<tr><th id="173">173</th><td>  <i>// Do nothing if  there are no accumulables registered</i></td></tr>
+<tr><th id="174">174</th><td><i>  // or if master thread</i></td></tr>
+<tr><th id="175">175</th><td>  <b>if</b> ( (! <span class='error' title="use of undeclared identifier &apos;fVector&apos;">fVector</span>.size()) ||  (! G4Threading::IsWorkerThread()) ) <b>return</b>;</td></tr>
+<tr><th id="176">176</th><td></td></tr>
+<tr><th id="177">177</th><td>  <i>// The manager on mastter must exist</i></td></tr>
+<tr><th id="178">178</th><td>  <b>if</b> ( ! <a class="member" href="../include/G4AccumulableManager.hh.html#G4AccumulableManager::fgMasterInstance" title='G4AccumulableManager::fgMasterInstance' data-ref="G4AccumulableManager::fgMasterInstance">fgMasterInstance</a> ) {</td></tr>
+<tr><th id="179">179</th><td>    <a class="typedef" href="../../../global/management/include/G4Exception.hh.html#G4ExceptionDescription" title='G4ExceptionDescription' data-type='int' data-ref="G4ExceptionDescription">G4ExceptionDescription</a> <dfn class="local col5 decl" id="225description" title='description' data-type='G4ExceptionDescription' data-ref="225description">description</dfn>;</td></tr>
+<tr><th id="180">180</th><td>    description </td></tr>
+<tr><th id="181">181</th><td>      <span class='error' title="invalid operands to binary expression (&apos;G4ExceptionDescription&apos; (aka &apos;int&apos;) and &apos;const char *&apos;)">&lt;&lt;</span> <q>"      "</q> &lt;&lt; <q>"No master G4AccumulableManager instance exists."</q> </td></tr>
+<tr><th id="182">182</th><td>      &lt;&lt; <a class="macro" href="../../../global/management/include/G4ios.hh.html#60" title="std::endl" data-ref="_M/G4endl">G4endl</a> </td></tr>
+<tr><th id="183">183</th><td>      &lt;&lt; <q>"      "</q> &lt;&lt; <q>"Accumulables will not be merged."</q>;</td></tr>
+<tr><th id="184">184</th><td>      <a class="ref" href="../../../global/management/include/G4Exception.hh.html#_Z11G4ExceptionPKcS0_19G4ExceptionSeverityRi" title='G4Exception' data-ref="_Z11G4ExceptionPKcS0_19G4ExceptionSeverityRi">G4Exception</a>(<q>"G4AccumulableManager::Merge()"</q>,</td></tr>
+<tr><th id="185">185</th><td>                <q>"Analysis_W031"</q>, <a class="enum" href="../../../global/management/include/G4ExceptionSeverity.hh.html#G4ExceptionSeverity::JustWarning" title='G4ExceptionSeverity::JustWarning' data-ref="G4ExceptionSeverity::JustWarning">JustWarning</a>, <span class='refarg'><a class="local col5 ref" href="#225description" title='description' data-ref="225description">description</a></span>);</td></tr>
+<tr><th id="186">186</th><td>    <b>return</b>;</td></tr>
+<tr><th id="187">187</th><td>  }</td></tr>
+<tr><th id="188">188</th><td></td></tr>
+<tr><th id="189">189</th><td>  <i>// The worker manager just merges its accumulables to the master</i></td></tr>
+<tr><th id="190">190</th><td><i>  // This operation needs a lock</i></td></tr>
+<tr><th id="191">191</th><td><i>  // G4cout &lt;&lt; "Go to merge accumulables" &lt;&lt; G4endl; </i></td></tr>
+<tr><th id="192">192</th><td>  <a class="typedef" href="../../../global/management/include/G4AutoLock.hh.html#G4AutoLock" title='G4AutoLock' data-type='int' data-ref="G4AutoLock">G4AutoLock</a> <dfn class="local col6 decl" id="226lock" title='lock' data-type='G4AutoLock' data-ref="226lock">lock</dfn>(&amp;mergeMutex);</td></tr>
+<tr><th id="193">193</th><td></td></tr>
+<tr><th id="194">194</th><td>  <i>// the other manager has the vector with the "same" accumulables</i></td></tr>
+<tr><th id="195">195</th><td>  <em>auto</em> <dfn class="local col7 decl" id="227it" title='it' data-type='auto' data-ref="227it">it</dfn> = <span class='error' title="use of undeclared identifier &apos;fVector&apos;">fVector</span>.begin();</td></tr>
+<tr><th id="196">196</th><td>  <b>for</b> ( <em>auto</em> itMaster : fgMasterInstance-&gt;<span class='error' title="no member named &apos;fVector&apos; in &apos;G4AccumulableManager&apos;">fVector</span> ) {</td></tr>
+<tr><th id="197">197</th><td>    <i>// G4VAccumulable* masterAccumulable = itMaster;</i></td></tr>
+<tr><th id="198">198</th><td><i>    // G4VAccumulable* accumulable = *(it++);</i></td></tr>
+<tr><th id="199">199</th><td><i>    // masterAccumulable-&gt;Merge(*(accumulable));</i></td></tr>
+<tr><th id="200">200</th><td>    itMaster-&gt;Merge(*(*(it++)));</td></tr>
+<tr><th id="201">201</th><td>  }  </td></tr>
+<tr><th id="202">202</th><td>  lock<span class='error' title="member reference base type &apos;G4AutoLock&apos; (aka &apos;int&apos;) is not a structure or union">.</span>unlock();</td></tr>
+<tr><th id="203">203</th><td>}</td></tr>
+<tr><th id="204">204</th><td></td></tr>
+<tr><th id="205">205</th><td><i>//_____________________________________________________________________________</i></td></tr>
+<tr><th id="206">206</th><td><em>void</em> <a class="type" href="../include/G4AccumulableManager.hh.html#G4AccumulableManager" title='G4AccumulableManager' data-ref="G4AccumulableManager">G4AccumulableManager</a>::<dfn class="decl def" id="_ZN20G4AccumulableManager5ResetEv" title='G4AccumulableManager::Reset' data-ref="_ZN20G4AccumulableManager5ResetEv">Reset</dfn>()</td></tr>
+<tr><th id="207">207</th><td>{</td></tr>
+<tr><th id="208">208</th><td><i>// Reset histograms and profiles</i></td></tr>
+<tr><th id="209">209</th><td>  </td></tr>
+<tr><th id="210">210</th><td>  <b>for</b> ( <em>auto</em> it : <span class='error' title="use of undeclared identifier &apos;fVector&apos;">fVector</span> ) {</td></tr>
+<tr><th id="211">211</th><td>    it-&gt;Reset();</td></tr>
+<tr><th id="212">212</th><td>  }  </td></tr>
+<tr><th id="213">213</th><td>}  </td></tr>
+<tr><th id="214">214</th><td> </td></tr>
+<tr><th id="215">215</th><td></td></tr>
+<tr><th id="216">216</th><td></td></tr>
+</table><hr/><p id='footer'>
+Generated on <em>2019-Aug-28</em> from project codebrowser<br />Powered by <a href='https://woboq.com'><img alt='Woboq' src='https://code.woboq.org/woboq-16.png' width='41' height='16' /></a> <a href='https://code.woboq.org'>Code Browser</a> 2.1
+<br/>Generator usage only permitted with license.</p>
+</div></body></html>

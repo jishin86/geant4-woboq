@@ -1,0 +1,176 @@
+<!doctype html>
+<html>
+<head>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"><title>G4IonParametrisedLossModel.icc source code [codebrowser/source/processes/electromagnetic/lowenergy/include/G4IonParametrisedLossModel.icc] - Woboq Code Browser</title>
+<link rel="stylesheet" href="../../../../../../../data/qtcreator.css" title="QtCreator"/>
+<link rel="alternate stylesheet" href="../../../../../../../data/kdevelop.css" title="KDevelop"/>
+<script type="text/javascript" src="../../../../../../../data/jquery/jquery.min.js"></script>
+<script type="text/javascript" src="../../../../../../../data/jquery/jquery-ui.min.js"></script>
+<script>var file = 'codebrowser/source/processes/electromagnetic/lowenergy/include/G4IonParametrisedLossModel.icc'; var root_path = '../../../../../..'; var data_path = '../../../../../../../data';</script>
+<script src='../../../../../../../data/codebrowser.js'></script>
+</head>
+<body><div id='header'><h1 id='breadcrumb'><span>Browse the source code of </span><a href='../../../../..'>codebrowser</a>/<a href='../../../..'>source</a>/<a href='../../..'>processes</a>/<a href='../..'>electromagnetic</a>/<a href='..'>lowenergy</a>/<a href='./'>include</a>/<a href='G4IonParametrisedLossModel.icc.html'>G4IonParametrisedLossModel.icc</a></h1></div>
+<hr/><div id='content'><table class="code">
+<tr><th id="1">1</th><td><i>//</i></td></tr>
+<tr><th id="2">2</th><td><i>// ********************************************************************</i></td></tr>
+<tr><th id="3">3</th><td><i>// * License and Disclaimer                                           *</i></td></tr>
+<tr><th id="4">4</th><td><i>// *                                                                  *</i></td></tr>
+<tr><th id="5">5</th><td><i>// * The  Geant4 software  is  copyright of the Copyright Holders  of *</i></td></tr>
+<tr><th id="6">6</th><td><i>// * the Geant4 Collaboration.  It is provided  under  the terms  and *</i></td></tr>
+<tr><th id="7">7</th><td><i>// * conditions of the Geant4 Software License,  included in the file *</i></td></tr>
+<tr><th id="8">8</th><td><i>// * LICENSE and available at  <a href="http://cern.ch/geant4/license">http://cern.ch/geant4/license</a> .  These *</i></td></tr>
+<tr><th id="9">9</th><td><i>// * include a list of copyright holders.                             *</i></td></tr>
+<tr><th id="10">10</th><td><i>// *                                                                  *</i></td></tr>
+<tr><th id="11">11</th><td><i>// * Neither the authors of this software system, nor their employing *</i></td></tr>
+<tr><th id="12">12</th><td><i>// * institutes,nor the agencies providing financial support for this *</i></td></tr>
+<tr><th id="13">13</th><td><i>// * work  make  any representation or  warranty, express or implied, *</i></td></tr>
+<tr><th id="14">14</th><td><i>// * regarding  this  software system or assume any liability for its *</i></td></tr>
+<tr><th id="15">15</th><td><i>// * use.  Please see the license in the file  LICENSE  and URL above *</i></td></tr>
+<tr><th id="16">16</th><td><i>// * for the full disclaimer and the limitation of liability.         *</i></td></tr>
+<tr><th id="17">17</th><td><i>// *                                                                  *</i></td></tr>
+<tr><th id="18">18</th><td><i>// * This  code  implementation is the result of  the  scientific and *</i></td></tr>
+<tr><th id="19">19</th><td><i>// * technical work of the GEANT4 collaboration.                      *</i></td></tr>
+<tr><th id="20">20</th><td><i>// * By using,  copying,  modifying or  distributing the software (or *</i></td></tr>
+<tr><th id="21">21</th><td><i>// * any work based  on the software)  you  agree  to acknowledge its *</i></td></tr>
+<tr><th id="22">22</th><td><i>// * use  in  resulting  scientific  publications,  and indicate your *</i></td></tr>
+<tr><th id="23">23</th><td><i>// * acceptance of all terms of the Geant4 Software license.          *</i></td></tr>
+<tr><th id="24">24</th><td><i>// ********************************************************************</i></td></tr>
+<tr><th id="25">25</th><td><i>//</i></td></tr>
+<tr><th id="26">26</th><td><i>//</i></td></tr>
+<tr><th id="27">27</th><td><i>// ===========================================================================</i></td></tr>
+<tr><th id="28">28</th><td><i>// GEANT4 class</i></td></tr>
+<tr><th id="29">29</th><td><i>//</i></td></tr>
+<tr><th id="30">30</th><td><i>// Class:                G4IonParametrisedLossModel</i></td></tr>
+<tr><th id="31">31</th><td><i>//</i></td></tr>
+<tr><th id="32">32</th><td><i>// Base class:           G4VEmModel (utils)</i></td></tr>
+<tr><th id="33">33</th><td><i>// </i></td></tr>
+<tr><th id="34">34</th><td><i>// Author:               Anton Lechner (Anton.Lechner@cern.ch)</i></td></tr>
+<tr><th id="35">35</th><td><i>//</i></td></tr>
+<tr><th id="36">36</th><td><i>// First implementation: 10. 11. 2008</i></td></tr>
+<tr><th id="37">37</th><td><i>//</i></td></tr>
+<tr><th id="38">38</th><td><i>// Modifications: 03. 02. 2009 - Bug fix iterators (AL)</i></td></tr>
+<tr><th id="39">39</th><td><i>//                11. 03. 2009 - Introduced new table handler (G4IonDEDXHandler)</i></td></tr>
+<tr><th id="40">40</th><td><i>//                               and modified method to add/remove tables</i></td></tr>
+<tr><th id="41">41</th><td><i>//                               (tables are now built in initialisation phase),</i></td></tr>
+<tr><th id="42">42</th><td><i>//                               Minor bug fix in ComputeDEDXPerVolume (AL)</i></td></tr>
+<tr><th id="43">43</th><td><i>//                20. 11. 2009 - Added set-method for energy loss limit (AL)</i></td></tr>
+<tr><th id="44">44</th><td><i>//                04. 11. 2010 - Moved virtual methods to the source (VI)</i></td></tr>
+<tr><th id="45">45</th><td><i>//</i></td></tr>
+<tr><th id="46">46</th><td><i>// Class description:</i></td></tr>
+<tr><th id="47">47</th><td><i>//    Model for computing the energy loss of ions by employing a </i></td></tr>
+<tr><th id="48">48</th><td><i>//    parameterisation of dE/dx tables (default ICRU 73 tables). For </i></td></tr>
+<tr><th id="49">49</th><td><i>//    ion-material combinations and/or projectile energies not covered </i></td></tr>
+<tr><th id="50">50</th><td><i>//    by this model, the G4BraggIonModel and G4BetheBloch models are</i></td></tr>
+<tr><th id="51">51</th><td><i>//    employed.</i></td></tr>
+<tr><th id="52">52</th><td><i>//</i></td></tr>
+<tr><th id="53">53</th><td><i>// Comments:</i></td></tr>
+<tr><th id="54">54</th><td><i>//</i></td></tr>
+<tr><th id="55">55</th><td><i>// =========================================================================== </i></td></tr>
+<tr><th id="56">56</th><td></td></tr>
+<tr><th id="57">57</th><td><b>inline</b> <a class="typedef" href="../../../../global/management/include/G4Types.hh.html#G4double" title='G4double' data-type='double' data-ref="G4double">G4double</a> <a class="type" href="G4IonParametrisedLossModel.hh.html#G4IonParametrisedLossModel" title='G4IonParametrisedLossModel' data-ref="G4IonParametrisedLossModel">G4IonParametrisedLossModel</a>::<dfn class="decl def" id="_ZN26G4IonParametrisedLossModel30DeltaRayMeanEnergyTransferRateEPK10G4MaterialPK20G4ParticleDefinitiondd" title='G4IonParametrisedLossModel::DeltaRayMeanEnergyTransferRate' data-ref="_ZN26G4IonParametrisedLossModel30DeltaRayMeanEnergyTransferRateEPK10G4MaterialPK20G4ParticleDefinitiondd">DeltaRayMeanEnergyTransferRate</dfn>(</td></tr>
+<tr><th id="58">58</th><td>                                      <em>const</em> <a class="type" href="../../../../materials/include/G4Material.hh.html#G4Material" title='G4Material' data-ref="G4Material">G4Material</a>* <dfn class="local col9 decl" id="259material" title='material' data-type='const G4Material *' data-ref="259material">material</dfn>,</td></tr>
+<tr><th id="59">59</th><td>			              <em>const</em> <a class="type" href="../../../../particles/management/include/G4ParticleDefinition.hh.html#G4ParticleDefinition" title='G4ParticleDefinition' data-ref="G4ParticleDefinition">G4ParticleDefinition</a>* <dfn class="local col0 decl" id="260particle" title='particle' data-type='const G4ParticleDefinition *' data-ref="260particle">particle</dfn>,</td></tr>
+<tr><th id="60">60</th><td>				      <a class="typedef" href="../../../../global/management/include/G4Types.hh.html#G4double" title='G4double' data-type='double' data-ref="G4double">G4double</a> <dfn class="local col1 decl" id="261kineticEnergy" title='kineticEnergy' data-type='G4double' data-ref="261kineticEnergy">kineticEnergy</dfn>,</td></tr>
+<tr><th id="61">61</th><td>				      <a class="typedef" href="../../../../global/management/include/G4Types.hh.html#G4double" title='G4double' data-type='double' data-ref="G4double">G4double</a> <dfn class="local col2 decl" id="262cutEnergy" title='cutEnergy' data-type='G4double' data-ref="262cutEnergy">cutEnergy</dfn>) {</td></tr>
+<tr><th id="62">62</th><td></td></tr>
+<tr><th id="63">63</th><td>  <i>// ############## Mean energy transferred to delta-rays ###################</i></td></tr>
+<tr><th id="64">64</th><td><i>  // Computes the mean energy transfered to delta-rays per unit length,</i></td></tr>
+<tr><th id="65">65</th><td><i>  // considering only delta-rays with energies above the energy threshold </i></td></tr>
+<tr><th id="66">66</th><td><i>  // (energy cut)</i></td></tr>
+<tr><th id="67">67</th><td><i>  //</i></td></tr>
+<tr><th id="68">68</th><td><i>  // The mean energy transfer rate is derived by using the differential</i></td></tr>
+<tr><th id="69">69</th><td><i>  // cross section given in the references below.</i></td></tr>
+<tr><th id="70">70</th><td><i>  //</i></td></tr>
+<tr><th id="71">71</th><td><i>  // See Geant4 physics reference manual (version 9.1), section 9.1.3</i></td></tr>
+<tr><th id="72">72</th><td><i>  // </i></td></tr>
+<tr><th id="73">73</th><td><i>  // Ref.: W.M. Yao et al, Jour. of Phys. G 33 (2006) 1.</i></td></tr>
+<tr><th id="74">74</th><td><i>  //       B. Rossi, High energy particles, New York, NY: Prentice-Hall (1952).</i></td></tr>
+<tr><th id="75">75</th><td><i>  //</i></td></tr>
+<tr><th id="76">76</th><td><i>  // (Implementation adapted from G4BraggIonModel)</i></td></tr>
+<tr><th id="77">77</th><td><i></i></td></tr>
+<tr><th id="78">78</th><td><i></i></td></tr>
+<tr><th id="79">79</th><td><i>  //   *** Variables:</i></td></tr>
+<tr><th id="80">80</th><td><i>  //   kineticEnergy = kinetic energy of projectile</i></td></tr>
+<tr><th id="81">81</th><td><i>  //   totEnergy     = total energy of projectile, i.e. kinetic energy</i></td></tr>
+<tr><th id="82">82</th><td><i>  //                   plus rest energy (Mc^2)</i></td></tr>
+<tr><th id="83">83</th><td><i>  //   betaSquared   = beta of projectile squared, calculated as</i></td></tr>
+<tr><th id="84">84</th><td><i>  //                      beta^2 = 1 - 1 / (E/Mc^2)^2</i></td></tr>
+<tr><th id="85">85</th><td><i>  //                             = T * ( E + Mc^2 ) / E^2</i></td></tr>
+<tr><th id="86">86</th><td><i>  //                   where T = kineticEnergy, E = totEnergy</i></td></tr>
+<tr><th id="87">87</th><td><i>  //   cutEnergy     = energy threshold for secondary particle production</i></td></tr>
+<tr><th id="88">88</th><td><i>  //                   i.e. energy cut, below which energy transfered to </i></td></tr>
+<tr><th id="89">89</th><td><i>  //                   electrons is treated as continuous loss of projectile</i></td></tr>
+<tr><th id="90">90</th><td><i>  //   maxKinEnergy  = maximum energy transferable to secondary electrons</i></td></tr>
+<tr><th id="91">91</th><td><i>  //   meanRate      = mean kinetic energy of delta ray (per unit length) </i></td></tr>
+<tr><th id="92">92</th><td><i>  //                   (above cutEnergy)  </i></td></tr>
+<tr><th id="93">93</th><td></td></tr>
+<tr><th id="94">94</th><td>  <a class="typedef" href="../../../../global/management/include/G4Types.hh.html#G4double" title='G4double' data-type='double' data-ref="G4double">G4double</a> <dfn class="local col3 decl" id="263meanRate" title='meanRate' data-type='G4double' data-ref="263meanRate">meanRate</dfn> = <var>0.0</var>;</td></tr>
+<tr><th id="95">95</th><td></td></tr>
+<tr><th id="96">96</th><td>  <a class="typedef" href="../../../../global/management/include/G4Types.hh.html#G4double" title='G4double' data-type='double' data-ref="G4double">G4double</a> <dfn class="local col4 decl" id="264maxKinEnergy" title='maxKinEnergy' data-type='G4double' data-ref="264maxKinEnergy">maxKinEnergy</dfn> = <a class="virtual member" href="G4IonParametrisedLossModel.hh.html#_ZN26G4IonParametrisedLossModel18MaxSecondaryEnergyEPK20G4ParticleDefinitiond" title='G4IonParametrisedLossModel::MaxSecondaryEnergy' data-ref="_ZN26G4IonParametrisedLossModel18MaxSecondaryEnergyEPK20G4ParticleDefinitiond">MaxSecondaryEnergy</a>(<a class="local col0 ref" href="#260particle" title='particle' data-ref="260particle">particle</a>, <a class="local col1 ref" href="#261kineticEnergy" title='kineticEnergy' data-ref="261kineticEnergy">kineticEnergy</a>);</td></tr>
+<tr><th id="97">97</th><td></td></tr>
+<tr><th id="98">98</th><td>  <b>if</b> (<a class="local col2 ref" href="#262cutEnergy" title='cutEnergy' data-ref="262cutEnergy">cutEnergy</a> &lt; <a class="local col4 ref" href="#264maxKinEnergy" title='maxKinEnergy' data-ref="264maxKinEnergy">maxKinEnergy</a>) {</td></tr>
+<tr><th id="99">99</th><td></td></tr>
+<tr><th id="100">100</th><td>    <a class="typedef" href="../../../../global/management/include/G4Types.hh.html#G4double" title='G4double' data-type='double' data-ref="G4double">G4double</a> <dfn class="local col5 decl" id="265totalEnergy" title='totalEnergy' data-type='G4double' data-ref="265totalEnergy">totalEnergy</dfn>  = <a class="local col1 ref" href="#261kineticEnergy" title='kineticEnergy' data-ref="261kineticEnergy">kineticEnergy</a> + <a class="member" href="G4IonParametrisedLossModel.hh.html#G4IonParametrisedLossModel::cacheMass" title='G4IonParametrisedLossModel::cacheMass' data-ref="G4IonParametrisedLossModel::cacheMass">cacheMass</a>;</td></tr>
+<tr><th id="101">101</th><td>    <a class="typedef" href="../../../../global/management/include/G4Types.hh.html#G4double" title='G4double' data-type='double' data-ref="G4double">G4double</a> <dfn class="local col6 decl" id="266betaSquared" title='betaSquared' data-type='G4double' data-ref="266betaSquared">betaSquared</dfn>  = <a class="local col1 ref" href="#261kineticEnergy" title='kineticEnergy' data-ref="261kineticEnergy">kineticEnergy</a> * </td></tr>
+<tr><th id="102">102</th><td>                  (<a class="local col5 ref" href="#265totalEnergy" title='totalEnergy' data-ref="265totalEnergy">totalEnergy</a> + <a class="member" href="G4IonParametrisedLossModel.hh.html#G4IonParametrisedLossModel::cacheMass" title='G4IonParametrisedLossModel::cacheMass' data-ref="G4IonParametrisedLossModel::cacheMass">cacheMass</a>) / (<a class="local col5 ref" href="#265totalEnergy" title='totalEnergy' data-ref="265totalEnergy">totalEnergy</a> * <a class="local col5 ref" href="#265totalEnergy" title='totalEnergy' data-ref="265totalEnergy">totalEnergy</a>);</td></tr>
+<tr><th id="103">103</th><td></td></tr>
+<tr><th id="104">104</th><td>    <a class="typedef" href="../../../../global/management/include/G4Types.hh.html#G4double" title='G4double' data-type='double' data-ref="G4double">G4double</a> <dfn class="local col7 decl" id="267cutMaxEnergyRatio" title='cutMaxEnergyRatio' data-type='G4double' data-ref="267cutMaxEnergyRatio">cutMaxEnergyRatio</dfn> = <a class="local col2 ref" href="#262cutEnergy" title='cutEnergy' data-ref="262cutEnergy">cutEnergy</a> / <a class="local col4 ref" href="#264maxKinEnergy" title='maxKinEnergy' data-ref="264maxKinEnergy">maxKinEnergy</a>;</td></tr>
+<tr><th id="105">105</th><td></td></tr>
+<tr><th id="106">106</th><td>    meanRate = </td></tr>
+<tr><th id="107">107</th><td>        (- <span class='error' title="use of undeclared identifier &apos;std&apos;">std</span>::log(cutMaxEnergyRatio) - (<var>1.0</var> - cutMaxEnergyRatio) * betaSquared) * </td></tr>
+<tr><th id="108">108</th><td>        CLHEP::twopi_mc2_rcl2 * </td></tr>
+<tr><th id="109">109</th><td>        (material-&gt;GetTotNbOfElectPerVolume()) / betaSquared;</td></tr>
+<tr><th id="110">110</th><td></td></tr>
+<tr><th id="111">111</th><td>    <a class="local col3 ref" href="#263meanRate" title='meanRate' data-ref="263meanRate">meanRate</a> *= <a class="virtual member" href="G4IonParametrisedLossModel.hh.html#_ZN26G4IonParametrisedLossModel20GetChargeSquareRatioEPK20G4ParticleDefinitionPK10G4Materiald" title='G4IonParametrisedLossModel::GetChargeSquareRatio' data-ref="_ZN26G4IonParametrisedLossModel20GetChargeSquareRatioEPK20G4ParticleDefinitionPK10G4Materiald">GetChargeSquareRatio</a>(<a class="local col0 ref" href="#260particle" title='particle' data-ref="260particle">particle</a>, <a class="local col9 ref" href="#259material" title='material' data-ref="259material">material</a>, <a class="local col1 ref" href="#261kineticEnergy" title='kineticEnergy' data-ref="261kineticEnergy">kineticEnergy</a>);</td></tr>
+<tr><th id="112">112</th><td>  }</td></tr>
+<tr><th id="113">113</th><td>  </td></tr>
+<tr><th id="114">114</th><td>  <b>return</b> <a class="local col3 ref" href="#263meanRate" title='meanRate' data-ref="263meanRate">meanRate</a>;</td></tr>
+<tr><th id="115">115</th><td>}</td></tr>
+<tr><th id="116">116</th><td></td></tr>
+<tr><th id="117">117</th><td><b>inline</b></td></tr>
+<tr><th id="118">118</th><td><em>void</em> <a class="type" href="G4IonParametrisedLossModel.hh.html#G4IonParametrisedLossModel" title='G4IonParametrisedLossModel' data-ref="G4IonParametrisedLossModel">G4IonParametrisedLossModel</a>::<dfn class="decl def" id="_ZN26G4IonParametrisedLossModel11UpdateCacheEPK20G4ParticleDefinition" title='G4IonParametrisedLossModel::UpdateCache' data-ref="_ZN26G4IonParametrisedLossModel11UpdateCacheEPK20G4ParticleDefinition">UpdateCache</dfn>(</td></tr>
+<tr><th id="119">119</th><td>                             <em>const</em> <a class="type" href="../../../../particles/management/include/G4ParticleDefinition.hh.html#G4ParticleDefinition" title='G4ParticleDefinition' data-ref="G4ParticleDefinition">G4ParticleDefinition</a>* <dfn class="local col8 decl" id="268particle" title='particle' data-type='const G4ParticleDefinition *' data-ref="268particle">particle</dfn>) {</td></tr>
+<tr><th id="120">120</th><td></td></tr>
+<tr><th id="121">121</th><td>  <a class="member" href="G4IonParametrisedLossModel.hh.html#G4IonParametrisedLossModel::cacheParticle" title='G4IonParametrisedLossModel::cacheParticle' data-ref="G4IonParametrisedLossModel::cacheParticle">cacheParticle</a> = <a class="local col8 ref" href="#268particle" title='particle' data-ref="268particle">particle</a>;</td></tr>
+<tr><th id="122">122</th><td>  <a class="member" href="G4IonParametrisedLossModel.hh.html#G4IonParametrisedLossModel::cacheMass" title='G4IonParametrisedLossModel::cacheMass' data-ref="G4IonParametrisedLossModel::cacheMass">cacheMass</a> = <a class="local col8 ref" href="#268particle" title='particle' data-ref="268particle">particle</a> -&gt; <a class="ref" href="../../../../particles/management/include/G4ParticleDefinition.hh.html#_ZNK20G4ParticleDefinition10GetPDGMassEv" title='G4ParticleDefinition::GetPDGMass' data-ref="_ZNK20G4ParticleDefinition10GetPDGMassEv">GetPDGMass</a>();</td></tr>
+<tr><th id="123">123</th><td>  <a class="member" href="G4IonParametrisedLossModel.hh.html#G4IonParametrisedLossModel::cacheElecMassRatio" title='G4IonParametrisedLossModel::cacheElecMassRatio' data-ref="G4IonParametrisedLossModel::cacheElecMassRatio">cacheElecMassRatio</a> = <span class="namespace">CLHEP::</span><a class="ref" href="../../../../externals/clhep/include/CLHEP/Units/PhysicalConstants.h.html#CLHEP::electron_mass_c2" title='CLHEP::electron_mass_c2' data-ref="CLHEP::electron_mass_c2">electron_mass_c2</a> / <a class="member" href="G4IonParametrisedLossModel.hh.html#G4IonParametrisedLossModel::cacheMass" title='G4IonParametrisedLossModel::cacheMass' data-ref="G4IonParametrisedLossModel::cacheMass">cacheMass</a>;</td></tr>
+<tr><th id="124">124</th><td>  <a class="typedef" href="../../../../global/management/include/G4Types.hh.html#G4double" title='G4double' data-type='double' data-ref="G4double">G4double</a> <dfn class="local col9 decl" id="269q" title='q' data-type='G4double' data-ref="269q">q</dfn> = <a class="local col8 ref" href="#268particle" title='particle' data-ref="268particle">particle</a> -&gt; <a class="ref" href="../../../../particles/management/include/G4ParticleDefinition.hh.html#_ZNK20G4ParticleDefinition12GetPDGChargeEv" title='G4ParticleDefinition::GetPDGCharge' data-ref="_ZNK20G4ParticleDefinition12GetPDGChargeEv">GetPDGCharge</a>() / <span class="namespace">CLHEP::</span><a class="ref" href="../../../../externals/clhep/include/CLHEP/Units/SystemOfUnits.h.html#CLHEP::eplus" title='CLHEP::eplus' data-ref="CLHEP::eplus">eplus</a>;</td></tr>
+<tr><th id="125">125</th><td>  <a class="member" href="G4IonParametrisedLossModel.hh.html#G4IonParametrisedLossModel::cacheChargeSquare" title='G4IonParametrisedLossModel::cacheChargeSquare' data-ref="G4IonParametrisedLossModel::cacheChargeSquare">cacheChargeSquare</a> = <a class="local col9 ref" href="#269q" title='q' data-ref="269q">q</a> * <a class="local col9 ref" href="#269q" title='q' data-ref="269q">q</a>;</td></tr>
+<tr><th id="126">126</th><td>}</td></tr>
+<tr><th id="127">127</th><td></td></tr>
+<tr><th id="128">128</th><td><b>inline</b></td></tr>
+<tr><th id="129">129</th><td><span class='error' title="use of undeclared identifier &apos;LossTableList&apos;">LossTableList</span>::iterator G4IonParametrisedLossModel::IsApplicable(</td></tr>
+<tr><th id="130">130</th><td>                    <em>const</em> G4ParticleDefinition* particle,  <i>// Projectile (ion) </i></td></tr>
+<tr><th id="131">131</th><td>                    <em>const</em> G4Material* material) {          <i>// Target material</i></td></tr>
+<tr><th id="132">132</th><td></td></tr>
+<tr><th id="133">133</th><td>  <span class='error' title="use of undeclared identifier &apos;LossTableList&apos;">LossTableList</span>::iterator iter = lossTableList.end();</td></tr>
+<tr><th id="134">134</th><td>  <span class='error' title="use of undeclared identifier &apos;LossTableList&apos;">LossTableList</span>::iterator iterTables = lossTableList.begin();</td></tr>
+<tr><th id="135">135</th><td>  <span class='error' title="use of undeclared identifier &apos;LossTableList&apos;">LossTableList</span>::iterator iterTables_end = lossTableList.end();</td></tr>
+<tr><th id="136">136</th><td></td></tr>
+<tr><th id="137">137</th><td>  <b>for</b>(;iterTables != iterTables_end; iterTables++) {</td></tr>
+<tr><th id="138">138</th><td>      G4bool isApplicable = (*iterTables) -&gt; </td></tr>
+<tr><th id="139">139</th><td>                       IsApplicable(particle, material);</td></tr>
+<tr><th id="140">140</th><td>      <b>if</b>(isApplicable) {</td></tr>
+<tr><th id="141">141</th><td>         iter = iterTables;</td></tr>
+<tr><th id="142">142</th><td>         <b>break</b>;</td></tr>
+<tr><th id="143">143</th><td>      }</td></tr>
+<tr><th id="144">144</th><td>  }</td></tr>
+<tr><th id="145">145</th><td></td></tr>
+<tr><th id="146">146</th><td>  <b>return</b> iter;</td></tr>
+<tr><th id="147">147</th><td>}</td></tr>
+<tr><th id="148">148</th><td></td></tr>
+<tr><th id="149">149</th><td></td></tr>
+<tr><th id="150">150</th><td><b>inline</b></td></tr>
+<tr><th id="151">151</th><td><em>void</em> <a class="type" href="G4IonParametrisedLossModel.hh.html#G4IonParametrisedLossModel" title='G4IonParametrisedLossModel' data-ref="G4IonParametrisedLossModel">G4IonParametrisedLossModel</a>::<dfn class="decl def" id="_ZN26G4IonParametrisedLossModel18SetEnergyLossLimitEd" title='G4IonParametrisedLossModel::SetEnergyLossLimit' data-ref="_ZN26G4IonParametrisedLossModel18SetEnergyLossLimitEd">SetEnergyLossLimit</dfn>(</td></tr>
+<tr><th id="152">152</th><td>                                            <a class="typedef" href="../../../../global/management/include/G4Types.hh.html#G4double" title='G4double' data-type='double' data-ref="G4double">G4double</a> <dfn class="local col0 decl" id="270ionEnergyLossLimit" title='ionEnergyLossLimit' data-type='G4double' data-ref="270ionEnergyLossLimit">ionEnergyLossLimit</dfn>) {</td></tr>
+<tr><th id="153">153</th><td></td></tr>
+<tr><th id="154">154</th><td>  <b>if</b>(<a class="local col0 ref" href="#270ionEnergyLossLimit" title='ionEnergyLossLimit' data-ref="270ionEnergyLossLimit">ionEnergyLossLimit</a> &gt; <var>0</var> &amp;&amp; <a class="local col0 ref" href="#270ionEnergyLossLimit" title='ionEnergyLossLimit' data-ref="270ionEnergyLossLimit">ionEnergyLossLimit</a> &lt;=<var>1</var>) {</td></tr>
+<tr><th id="155">155</th><td></td></tr>
+<tr><th id="156">156</th><td>     <a class="member" href="G4IonParametrisedLossModel.hh.html#G4IonParametrisedLossModel::energyLossLimit" title='G4IonParametrisedLossModel::energyLossLimit' data-ref="G4IonParametrisedLossModel::energyLossLimit">energyLossLimit</a> = <a class="local col0 ref" href="#270ionEnergyLossLimit" title='ionEnergyLossLimit' data-ref="270ionEnergyLossLimit">ionEnergyLossLimit</a>;</td></tr>
+<tr><th id="157">157</th><td>  }</td></tr>
+<tr><th id="158">158</th><td>}</td></tr>
+<tr><th id="159">159</th><td></td></tr>
+</table><hr/><p id='footer'>
+Generated while processing <a href='../../../../physics_lists/constructors/electromagnetic/src/G4EmLivermorePhysics.cc.html'>codebrowser/source/physics_lists/constructors/electromagnetic/src/G4EmLivermorePhysics.cc</a><br/>Generated on <em>2019-Aug-28</em> from project codebrowser<br />Powered by <a href='https://woboq.com'><img alt='Woboq' src='https://code.woboq.org/woboq-16.png' width='41' height='16' /></a> <a href='https://code.woboq.org'>Code Browser</a> 2.1
+<br/>Generator usage only permitted with license.</p>
+</div></body></html>

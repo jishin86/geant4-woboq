@@ -1,0 +1,346 @@
+<!doctype html>
+<html>
+<head>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"><title>RandPoisson.cc source code [codebrowser/source/externals/clhep/src/RandPoisson.cc] - Woboq Code Browser</title>
+<link rel="stylesheet" href="../../../../../../data/qtcreator.css" title="QtCreator"/>
+<link rel="alternate stylesheet" href="../../../../../../data/kdevelop.css" title="KDevelop"/>
+<script type="text/javascript" src="../../../../../../data/jquery/jquery.min.js"></script>
+<script type="text/javascript" src="../../../../../../data/jquery/jquery-ui.min.js"></script>
+<script>var file = 'codebrowser/source/externals/clhep/src/RandPoisson.cc'; var root_path = '../../../../..'; var data_path = '../../../../../../data';</script>
+<script src='../../../../../../data/codebrowser.js'></script>
+</head>
+<body><div id='header'><h1 id='breadcrumb'><span>Browse the source code of </span><a href='../../../..'>codebrowser</a>/<a href='../../..'>source</a>/<a href='../..'>externals</a>/<a href='..'>clhep</a>/<a href='./'>src</a>/<a href='RandPoisson.cc.html'>RandPoisson.cc</a></h1></div>
+<hr/><div id='content'><table class="code">
+<tr><th id="1">1</th><td><i>// -*- C++ -*-</i></td></tr>
+<tr><th id="2">2</th><td><i>//</i></td></tr>
+<tr><th id="3">3</th><td><i>// -----------------------------------------------------------------------</i></td></tr>
+<tr><th id="4">4</th><td><i>//                             HEP Random</i></td></tr>
+<tr><th id="5">5</th><td><i>//                         --- RandPoisson ---</i></td></tr>
+<tr><th id="6">6</th><td><i>//                      class implementation file</i></td></tr>
+<tr><th id="7">7</th><td><i>// -----------------------------------------------------------------------</i></td></tr>
+<tr><th id="8">8</th><td><i>// This file is part of Geant4 (simulation toolkit for HEP).</i></td></tr>
+<tr><th id="9">9</th><td><i></i></td></tr>
+<tr><th id="10">10</th><td><i>// =======================================================================</i></td></tr>
+<tr><th id="11">11</th><td><i>// Gabriele Cosmo - Created: 5th September 1995</i></td></tr>
+<tr><th id="12">12</th><td><i>//                - Added not static Shoot() method: 17th May 1996</i></td></tr>
+<tr><th id="13">13</th><td><i>//                - Algorithm now operates on doubles: 31st Oct 1996</i></td></tr>
+<tr><th id="14">14</th><td><i>//                - Added methods to shoot arrays: 28th July 1997</i></td></tr>
+<tr><th id="15">15</th><td><i>//                - Added check in case xm=-1: 4th February 1998</i></td></tr>
+<tr><th id="16">16</th><td><i>// J.Marraffino   - Added default mean as attribute and</i></td></tr>
+<tr><th id="17">17</th><td><i>//                  operator() with mean: 16th Feb 1998</i></td></tr>
+<tr><th id="18">18</th><td><i>// Gabriele Cosmo - Relocated static data from HepRandom: 5th Jan 1999</i></td></tr>
+<tr><th id="19">19</th><td><i>// M Fischler     - put and get to/from streams 12/15/04</i></td></tr>
+<tr><th id="20">20</th><td><i>// M Fischler	      - put/get to/from streams uses pairs of ulongs when</i></td></tr>
+<tr><th id="21">21</th><td><i>//			+ storing doubles avoid problems with precision </i></td></tr>
+<tr><th id="22">22</th><td><i>//			4/14/05</i></td></tr>
+<tr><th id="23">23</th><td><i>// Mark Fischler  - Repaired BUG - when mean &gt; 2 billion, was returning</i></td></tr>
+<tr><th id="24">24</th><td><i>//                  mean instead of the proper value.  01/13/06</i></td></tr>
+<tr><th id="25">25</th><td><i>// =======================================================================</i></td></tr>
+<tr><th id="26">26</th><td></td></tr>
+<tr><th id="27">27</th><td><u>#include <a href="../include/CLHEP/Random/RandPoisson.h.html">"CLHEP/Random/RandPoisson.h"</a></u></td></tr>
+<tr><th id="28">28</th><td><u>#include <a href="../include/CLHEP/Units/PhysicalConstants.h.html">"CLHEP/Units/PhysicalConstants.h"</a></u></td></tr>
+<tr><th id="29">29</th><td><u>#include <a href="../include/CLHEP/Random/DoubConv.h.html">"CLHEP/Random/DoubConv.h"</a></u></td></tr>
+<tr><th id="30">30</th><td><u>#include <span class='error' title="&apos;cmath&apos; file not found">&lt;</span>cmath&gt;	// for std::floor()</u></td></tr>
+<tr><th id="31">31</th><td></td></tr>
+<tr><th id="32">32</th><td><b>namespace</b> <span class="namespace">CLHEP</span> {</td></tr>
+<tr><th id="33">33</th><td></td></tr>
+<tr><th id="34">34</th><td>std::string RandPoisson::name() <em>const</em> {<b>return</b> <q>"RandPoisson"</q>;}</td></tr>
+<tr><th id="35">35</th><td><a class="type" href="../include/CLHEP/Random/RandomEngine.h.html#CLHEP::HepRandomEngine" title='CLHEP::HepRandomEngine' data-ref="CLHEP::HepRandomEngine">HepRandomEngine</a> &amp; <a class="type" href="../include/CLHEP/Random/RandPoisson.h.html#CLHEP::RandPoisson" title='CLHEP::RandPoisson' data-ref="CLHEP::RandPoisson">RandPoisson</a>::<dfn class="virtual decl def" id="_ZN5CLHEP11RandPoisson6engineEv" title='CLHEP::RandPoisson::engine' data-ref="_ZN5CLHEP11RandPoisson6engineEv">engine</dfn>() {<b>return</b> *localEngine;}</td></tr>
+<tr><th id="36">36</th><td></td></tr>
+<tr><th id="37">37</th><td><i>// Initialisation of static data</i></td></tr>
+<tr><th id="38">38</th><td><a class="macro" href="../include/CLHEP/Utility/thread_local.h.html#13" title="thread_local" data-ref="_M/CLHEP_THREAD_LOCAL">CLHEP_THREAD_LOCAL</a> <em>double</em> <a class="type" href="../include/CLHEP/Random/RandPoisson.h.html#CLHEP::RandPoisson" title='CLHEP::RandPoisson' data-ref="CLHEP::RandPoisson">RandPoisson</a>::<dfn class="decl def" id="CLHEP::RandPoisson::status_st" title='CLHEP::RandPoisson::status_st' data-ref="CLHEP::RandPoisson::status_st">status_st</dfn>[<var>3</var>] = {<var>0.</var>, <var>0.</var>, <var>0.</var>};</td></tr>
+<tr><th id="39">39</th><td><a class="macro" href="../include/CLHEP/Utility/thread_local.h.html#13" title="thread_local" data-ref="_M/CLHEP_THREAD_LOCAL">CLHEP_THREAD_LOCAL</a> <em>double</em> <a class="type" href="../include/CLHEP/Random/RandPoisson.h.html#CLHEP::RandPoisson" title='CLHEP::RandPoisson' data-ref="CLHEP::RandPoisson">RandPoisson</a>::<dfn class="decl def" id="CLHEP::RandPoisson::oldm_st" title='CLHEP::RandPoisson::oldm_st' data-ref="CLHEP::RandPoisson::oldm_st">oldm_st</dfn> = -<var>1.0</var>;</td></tr>
+<tr><th id="40">40</th><td><em>const</em> <em>double</em> <a class="type" href="../include/CLHEP/Random/RandPoisson.h.html#CLHEP::RandPoisson" title='CLHEP::RandPoisson' data-ref="CLHEP::RandPoisson">RandPoisson</a>::<dfn class="decl def" id="CLHEP::RandPoisson::meanMax_st" title='CLHEP::RandPoisson::meanMax_st' data-ref="CLHEP::RandPoisson::meanMax_st">meanMax_st</dfn> = <var>2.0E9</var>;</td></tr>
+<tr><th id="41">41</th><td></td></tr>
+<tr><th id="42">42</th><td><a class="type" href="../include/CLHEP/Random/RandPoisson.h.html#CLHEP::RandPoisson" title='CLHEP::RandPoisson' data-ref="CLHEP::RandPoisson">RandPoisson</a>::<dfn class="virtual decl def" id="_ZN5CLHEP11RandPoissonD1Ev" title='CLHEP::RandPoisson::~RandPoisson' data-ref="_ZN5CLHEP11RandPoissonD1Ev">~RandPoisson</dfn>() {</td></tr>
+<tr><th id="43">43</th><td>}</td></tr>
+<tr><th id="44">44</th><td></td></tr>
+<tr><th id="45">45</th><td><em>double</em> <a class="type" href="../include/CLHEP/Random/RandPoisson.h.html#CLHEP::RandPoisson" title='CLHEP::RandPoisson' data-ref="CLHEP::RandPoisson">RandPoisson</a>::<dfn class="virtual decl def" id="_ZN5CLHEP11RandPoissonclEv" title='CLHEP::RandPoisson::operator()' data-ref="_ZN5CLHEP11RandPoissonclEv"><b>operator</b>()</dfn>() {</td></tr>
+<tr><th id="46">46</th><td>  <b>return</b> <em>double</em>(<a class="member" href="#_ZN5CLHEP11RandPoisson4fireEd" title='CLHEP::RandPoisson::fire' data-ref="_ZN5CLHEP11RandPoisson4fireEd">fire</a>( <a class="member" href="../include/CLHEP/Random/RandPoisson.h.html#CLHEP::RandPoisson::defaultMean" title='CLHEP::RandPoisson::defaultMean' data-ref="CLHEP::RandPoisson::defaultMean">defaultMean</a> ));</td></tr>
+<tr><th id="47">47</th><td>}</td></tr>
+<tr><th id="48">48</th><td></td></tr>
+<tr><th id="49">49</th><td><em>double</em> <a class="type" href="../include/CLHEP/Random/RandPoisson.h.html#CLHEP::RandPoisson" title='CLHEP::RandPoisson' data-ref="CLHEP::RandPoisson">RandPoisson</a>::<dfn class="decl def" id="_ZN5CLHEP11RandPoissonclEd" title='CLHEP::RandPoisson::operator()' data-ref="_ZN5CLHEP11RandPoissonclEd"><b>operator</b>()</dfn>( <em>double</em> <dfn class="local col1 decl" id="1mean" title='mean' data-type='double' data-ref="1mean">mean</dfn> ) {</td></tr>
+<tr><th id="50">50</th><td>  <b>return</b> <em>double</em>(<a class="member" href="#_ZN5CLHEP11RandPoisson4fireEd" title='CLHEP::RandPoisson::fire' data-ref="_ZN5CLHEP11RandPoisson4fireEd">fire</a>( <a class="local col1 ref" href="#1mean" title='mean' data-ref="1mean">mean</a> ));</td></tr>
+<tr><th id="51">51</th><td>}</td></tr>
+<tr><th id="52">52</th><td></td></tr>
+<tr><th id="53">53</th><td><em>double</em> <dfn class="decl def" id="_ZN5CLHEP6gammlnEd" title='CLHEP::gammln' data-ref="_ZN5CLHEP6gammlnEd">gammln</dfn>(<em>double</em> <dfn class="local col2 decl" id="2xx" title='xx' data-type='double' data-ref="2xx">xx</dfn>) {</td></tr>
+<tr><th id="54">54</th><td></td></tr>
+<tr><th id="55">55</th><td><i>// Returns the value ln(Gamma(xx) for xx &gt; 0.  Full accuracy is obtained for </i></td></tr>
+<tr><th id="56">56</th><td><i>// xx &gt; 1. For 0 &lt; xx &lt; 1. the reflection formula (6.1.4) can be used first.</i></td></tr>
+<tr><th id="57">57</th><td><i>// (Adapted from Numerical Recipes in C)</i></td></tr>
+<tr><th id="58">58</th><td></td></tr>
+<tr><th id="59">59</th><td>  <em>static</em> <em>const</em> <em>double</em> <dfn class="local col3 decl" id="3cof" title='cof' data-type='const double [6]' data-ref="3cof">cof</dfn>[<var>6</var>] = {<var>76.18009172947146</var>,-<var>86.50532032941677</var>,</td></tr>
+<tr><th id="60">60</th><td>                             <var>24.01409824083091</var>, -<var>1.231739572450155</var>,</td></tr>
+<tr><th id="61">61</th><td>                             <var>0.1208650973866179e-2</var>, -<var>0.5395239384953e-5</var>};</td></tr>
+<tr><th id="62">62</th><td>  <em>int</em> <dfn class="local col4 decl" id="4j" title='j' data-type='int' data-ref="4j">j</dfn>;</td></tr>
+<tr><th id="63">63</th><td>  <em>double</em> <dfn class="local col5 decl" id="5x" title='x' data-type='double' data-ref="5x">x</dfn> = <a class="local col2 ref" href="#2xx" title='xx' data-ref="2xx">xx</a> - <var>1.0</var>;</td></tr>
+<tr><th id="64">64</th><td>  <em>double</em> <dfn class="local col6 decl" id="6tmp" title='tmp' data-type='double' data-ref="6tmp">tmp</dfn> = <a class="local col5 ref" href="#5x" title='x' data-ref="5x">x</a> + <var>5.5</var>;</td></tr>
+<tr><th id="65">65</th><td>  tmp -= (x + <var>0.5</var>) * std::log(tmp);</td></tr>
+<tr><th id="66">66</th><td>  <em>double</em> <dfn class="local col7 decl" id="7ser" title='ser' data-type='double' data-ref="7ser">ser</dfn> = <var>1.000000000190015</var>;</td></tr>
+<tr><th id="67">67</th><td></td></tr>
+<tr><th id="68">68</th><td>  <b>for</b> ( <a class="local col4 ref" href="#4j" title='j' data-ref="4j">j</a> = <var>0</var>; <a class="local col4 ref" href="#4j" title='j' data-ref="4j">j</a> &lt;= <var>5</var>; <a class="local col4 ref" href="#4j" title='j' data-ref="4j">j</a>++ ) {</td></tr>
+<tr><th id="69">69</th><td>    <a class="local col5 ref" href="#5x" title='x' data-ref="5x">x</a> += <var>1.0</var>;</td></tr>
+<tr><th id="70">70</th><td>    <a class="local col7 ref" href="#7ser" title='ser' data-ref="7ser">ser</a> += <a class="local col3 ref" href="#3cof" title='cof' data-ref="3cof">cof</a>[<a class="local col4 ref" href="#4j" title='j' data-ref="4j">j</a>]/<a class="local col5 ref" href="#5x" title='x' data-ref="5x">x</a>;</td></tr>
+<tr><th id="71">71</th><td>  }</td></tr>
+<tr><th id="72">72</th><td>  <b>return</b> -tmp + std::log(<var>2.5066282746310005</var>*ser);</td></tr>
+<tr><th id="73">73</th><td>}</td></tr>
+<tr><th id="74">74</th><td></td></tr>
+<tr><th id="75">75</th><td><em>static</em></td></tr>
+<tr><th id="76">76</th><td><em>double</em> <dfn class="tu decl def" id="_ZN5CLHEPL6normalEPNS_15HepRandomEngineE" title='CLHEP::normal' data-type='double CLHEP::normal(CLHEP::HepRandomEngine * eptr)' data-ref="_ZN5CLHEPL6normalEPNS_15HepRandomEngineE">normal</dfn> (<a class="type" href="../include/CLHEP/Random/RandomEngine.h.html#CLHEP::HepRandomEngine" title='CLHEP::HepRandomEngine' data-ref="CLHEP::HepRandomEngine">HepRandomEngine</a>* <dfn class="local col8 decl" id="8eptr" title='eptr' data-type='CLHEP::HepRandomEngine *' data-ref="8eptr">eptr</dfn>) 		<i>// mf 1/13/06</i></td></tr>
+<tr><th id="77">77</th><td>{</td></tr>
+<tr><th id="78">78</th><td>  <em>double</em> <dfn class="local col9 decl" id="9r" title='r' data-type='double' data-ref="9r">r</dfn>;</td></tr>
+<tr><th id="79">79</th><td>  <em>double</em> <dfn class="local col0 decl" id="10v1" title='v1' data-type='double' data-ref="10v1">v1</dfn>,<dfn class="local col1 decl" id="11v2" title='v2' data-type='double' data-ref="11v2">v2</dfn>,<dfn class="local col2 decl" id="12fac" title='fac' data-type='double' data-ref="12fac">fac</dfn>;</td></tr>
+<tr><th id="80">80</th><td>  <b>do</b> {</td></tr>
+<tr><th id="81">81</th><td>    <a class="local col0 ref" href="#10v1" title='v1' data-ref="10v1">v1</a> = <var>2.0</var> * <a class="local col8 ref" href="#8eptr" title='eptr' data-ref="8eptr">eptr</a>-&gt;<a class="virtual ref" href="../include/CLHEP/Random/RandomEngine.h.html#_ZN5CLHEP15HepRandomEngine4flatEv" title='CLHEP::HepRandomEngine::flat' data-ref="_ZN5CLHEP15HepRandomEngine4flatEv">flat</a>() - <var>1.0</var>;</td></tr>
+<tr><th id="82">82</th><td>    <a class="local col1 ref" href="#11v2" title='v2' data-ref="11v2">v2</a> = <var>2.0</var> * <a class="local col8 ref" href="#8eptr" title='eptr' data-ref="8eptr">eptr</a>-&gt;<a class="virtual ref" href="../include/CLHEP/Random/RandomEngine.h.html#_ZN5CLHEP15HepRandomEngine4flatEv" title='CLHEP::HepRandomEngine::flat' data-ref="_ZN5CLHEP15HepRandomEngine4flatEv">flat</a>() - <var>1.0</var>;</td></tr>
+<tr><th id="83">83</th><td>    <a class="local col9 ref" href="#9r" title='r' data-ref="9r">r</a> = <a class="local col0 ref" href="#10v1" title='v1' data-ref="10v1">v1</a>*<a class="local col0 ref" href="#10v1" title='v1' data-ref="10v1">v1</a> + <a class="local col1 ref" href="#11v2" title='v2' data-ref="11v2">v2</a>*<a class="local col1 ref" href="#11v2" title='v2' data-ref="11v2">v2</a>;</td></tr>
+<tr><th id="84">84</th><td>  } <b>while</b> ( <a class="local col9 ref" href="#9r" title='r' data-ref="9r">r</a> &gt; <var>1.0</var> );</td></tr>
+<tr><th id="85">85</th><td></td></tr>
+<tr><th id="86">86</th><td>  fac = std::sqrt(-<var>2.0</var>*std::log(r)/r);</td></tr>
+<tr><th id="87">87</th><td>  <b>return</b> <a class="local col1 ref" href="#11v2" title='v2' data-ref="11v2">v2</a>*<a class="local col2 ref" href="#12fac" title='fac' data-ref="12fac">fac</a>;</td></tr>
+<tr><th id="88">88</th><td>}</td></tr>
+<tr><th id="89">89</th><td></td></tr>
+<tr><th id="90">90</th><td><em>long</em> <a class="type" href="../include/CLHEP/Random/RandPoisson.h.html#CLHEP::RandPoisson" title='CLHEP::RandPoisson' data-ref="CLHEP::RandPoisson">RandPoisson</a>::<dfn class="decl def" id="_ZN5CLHEP11RandPoisson5shootEd" title='CLHEP::RandPoisson::shoot' data-ref="_ZN5CLHEP11RandPoisson5shootEd">shoot</dfn>(<em>double</em> <dfn class="local col3 decl" id="13xm" title='xm' data-type='double' data-ref="13xm">xm</dfn>) {</td></tr>
+<tr><th id="91">91</th><td></td></tr>
+<tr><th id="92">92</th><td><i>// Returns as a floating-point number an integer value that is a random</i></td></tr>
+<tr><th id="93">93</th><td><i>// deviation drawn from a Poisson distribution of mean xm, using flat()</i></td></tr>
+<tr><th id="94">94</th><td><i>// as a source of uniform random numbers.</i></td></tr>
+<tr><th id="95">95</th><td><i>// (Adapted from Numerical Recipes in C)</i></td></tr>
+<tr><th id="96">96</th><td></td></tr>
+<tr><th id="97">97</th><td>  <em>double</em> <dfn class="local col4 decl" id="14em" title='em' data-type='double' data-ref="14em">em</dfn>, <dfn class="local col5 decl" id="15t" title='t' data-type='double' data-ref="15t">t</dfn>, <dfn class="local col6 decl" id="16y" title='y' data-type='double' data-ref="16y">y</dfn>;</td></tr>
+<tr><th id="98">98</th><td>  <em>double</em> <dfn class="local col7 decl" id="17sq" title='sq' data-type='double' data-ref="17sq">sq</dfn>, <dfn class="local col8 decl" id="18alxm" title='alxm' data-type='double' data-ref="18alxm">alxm</dfn>, <dfn class="local col9 decl" id="19g1" title='g1' data-type='double' data-ref="19g1">g1</dfn>;</td></tr>
+<tr><th id="99">99</th><td>  <em>double</em> <dfn class="local col0 decl" id="20om" title='om' data-type='double' data-ref="20om">om</dfn> = <a class="member" href="../include/CLHEP/Random/RandPoisson.h.html#_ZN5CLHEP11RandPoisson10getOldMeanEv" title='CLHEP::RandPoisson::getOldMean' data-ref="_ZN5CLHEP11RandPoisson10getOldMeanEv">getOldMean</a>();</td></tr>
+<tr><th id="100">100</th><td>  <a class="type" href="../include/CLHEP/Random/RandomEngine.h.html#CLHEP::HepRandomEngine" title='CLHEP::HepRandomEngine' data-ref="CLHEP::HepRandomEngine">HepRandomEngine</a>* <dfn class="local col1 decl" id="21anEngine" title='anEngine' data-type='CLHEP::HepRandomEngine *' data-ref="21anEngine">anEngine</dfn> = <a class="type" href="../include/CLHEP/Random/Random.h.html#CLHEP::HepRandom" title='CLHEP::HepRandom' data-ref="CLHEP::HepRandom">HepRandom</a>::<a class="member" href="../include/CLHEP/Random/Random.h.html#_ZN5CLHEP9HepRandom12getTheEngineEv" title='CLHEP::HepRandom::getTheEngine' data-ref="_ZN5CLHEP9HepRandom12getTheEngineEv">getTheEngine</a>();</td></tr>
+<tr><th id="101">101</th><td></td></tr>
+<tr><th id="102">102</th><td>  <em>double</em>* <dfn class="local col2 decl" id="22status" title='status' data-type='double *' data-ref="22status">status</dfn> = <a class="member" href="../include/CLHEP/Random/RandPoisson.h.html#_ZN5CLHEP11RandPoisson10getPStatusEv" title='CLHEP::RandPoisson::getPStatus' data-ref="_ZN5CLHEP11RandPoisson10getPStatusEv">getPStatus</a>();</td></tr>
+<tr><th id="103">103</th><td>  <a class="local col7 ref" href="#17sq" title='sq' data-ref="17sq">sq</a> = <a class="local col2 ref" href="#22status" title='status' data-ref="22status">status</a>[<var>0</var>];</td></tr>
+<tr><th id="104">104</th><td>  <a class="local col8 ref" href="#18alxm" title='alxm' data-ref="18alxm">alxm</a> = <a class="local col2 ref" href="#22status" title='status' data-ref="22status">status</a>[<var>1</var>];</td></tr>
+<tr><th id="105">105</th><td>  <a class="local col9 ref" href="#19g1" title='g1' data-ref="19g1">g1</a> = <a class="local col2 ref" href="#22status" title='status' data-ref="22status">status</a>[<var>2</var>];</td></tr>
+<tr><th id="106">106</th><td></td></tr>
+<tr><th id="107">107</th><td>  <b>if</b>( <a class="local col3 ref" href="#13xm" title='xm' data-ref="13xm">xm</a> == -<var>1</var> ) <b>return</b> <var>0</var>;</td></tr>
+<tr><th id="108">108</th><td>  <b>if</b>( <a class="local col3 ref" href="#13xm" title='xm' data-ref="13xm">xm</a> &lt; <var>12.0</var> ) {</td></tr>
+<tr><th id="109">109</th><td>    <b>if</b>( <a class="local col3 ref" href="#13xm" title='xm' data-ref="13xm">xm</a> != <a class="local col0 ref" href="#20om" title='om' data-ref="20om">om</a> ) {</td></tr>
+<tr><th id="110">110</th><td>      <a class="member" href="../include/CLHEP/Random/RandPoisson.h.html#_ZN5CLHEP11RandPoisson10setOldMeanEd" title='CLHEP::RandPoisson::setOldMean' data-ref="_ZN5CLHEP11RandPoisson10setOldMeanEd">setOldMean</a>(<a class="local col3 ref" href="#13xm" title='xm' data-ref="13xm">xm</a>);</td></tr>
+<tr><th id="111">111</th><td>      g1 = std::exp(-xm);</td></tr>
+<tr><th id="112">112</th><td>    }</td></tr>
+<tr><th id="113">113</th><td>    <a class="local col4 ref" href="#14em" title='em' data-ref="14em">em</a> = -<var>1</var>;</td></tr>
+<tr><th id="114">114</th><td>    <a class="local col5 ref" href="#15t" title='t' data-ref="15t">t</a> = <var>1.0</var>;</td></tr>
+<tr><th id="115">115</th><td>    <b>do</b> {</td></tr>
+<tr><th id="116">116</th><td>      <a class="local col4 ref" href="#14em" title='em' data-ref="14em">em</a> += <var>1.0</var>;</td></tr>
+<tr><th id="117">117</th><td>      <a class="local col5 ref" href="#15t" title='t' data-ref="15t">t</a> *= <a class="local col1 ref" href="#21anEngine" title='anEngine' data-ref="21anEngine">anEngine</a>-&gt;<a class="virtual ref" href="../include/CLHEP/Random/RandomEngine.h.html#_ZN5CLHEP15HepRandomEngine4flatEv" title='CLHEP::HepRandomEngine::flat' data-ref="_ZN5CLHEP15HepRandomEngine4flatEv">flat</a>();</td></tr>
+<tr><th id="118">118</th><td>    } <b>while</b>( <a class="local col5 ref" href="#15t" title='t' data-ref="15t">t</a> &gt; <a class="local col9 ref" href="#19g1" title='g1' data-ref="19g1">g1</a> );</td></tr>
+<tr><th id="119">119</th><td>  }</td></tr>
+<tr><th id="120">120</th><td>  <b>else</b> <b>if</b> ( <a class="local col3 ref" href="#13xm" title='xm' data-ref="13xm">xm</a> &lt; <a class="member" href="../include/CLHEP/Random/RandPoisson.h.html#_ZN5CLHEP11RandPoisson10getMaxMeanEv" title='CLHEP::RandPoisson::getMaxMean' data-ref="_ZN5CLHEP11RandPoisson10getMaxMeanEv">getMaxMean</a>() ) {</td></tr>
+<tr><th id="121">121</th><td>    <b>if</b> ( <a class="local col3 ref" href="#13xm" title='xm' data-ref="13xm">xm</a> != <a class="local col0 ref" href="#20om" title='om' data-ref="20om">om</a> ) {</td></tr>
+<tr><th id="122">122</th><td>      <a class="member" href="../include/CLHEP/Random/RandPoisson.h.html#_ZN5CLHEP11RandPoisson10setOldMeanEd" title='CLHEP::RandPoisson::setOldMean' data-ref="_ZN5CLHEP11RandPoisson10setOldMeanEd">setOldMean</a>(<a class="local col3 ref" href="#13xm" title='xm' data-ref="13xm">xm</a>);</td></tr>
+<tr><th id="123">123</th><td>      sq = std::sqrt(<var>2.0</var>*xm);</td></tr>
+<tr><th id="124">124</th><td>      alxm = std::log(xm);</td></tr>
+<tr><th id="125">125</th><td>      <a class="local col9 ref" href="#19g1" title='g1' data-ref="19g1">g1</a> = <a class="local col3 ref" href="#13xm" title='xm' data-ref="13xm">xm</a>*<a class="local col8 ref" href="#18alxm" title='alxm' data-ref="18alxm">alxm</a> - <a class="ref" href="#_ZN5CLHEP6gammlnEd" title='CLHEP::gammln' data-ref="_ZN5CLHEP6gammlnEd">gammln</a>(<a class="local col3 ref" href="#13xm" title='xm' data-ref="13xm">xm</a> + <var>1.0</var>);</td></tr>
+<tr><th id="126">126</th><td>    }</td></tr>
+<tr><th id="127">127</th><td>    <b>do</b> {</td></tr>
+<tr><th id="128">128</th><td>      <b>do</b> {</td></tr>
+<tr><th id="129">129</th><td>	y = std::tan(CLHEP::pi*anEngine-&gt;flat());</td></tr>
+<tr><th id="130">130</th><td>	<a class="local col4 ref" href="#14em" title='em' data-ref="14em">em</a> = <a class="local col7 ref" href="#17sq" title='sq' data-ref="17sq">sq</a>*<a class="local col6 ref" href="#16y" title='y' data-ref="16y">y</a> + <a class="local col3 ref" href="#13xm" title='xm' data-ref="13xm">xm</a>;</td></tr>
+<tr><th id="131">131</th><td>      } <b>while</b>( <a class="local col4 ref" href="#14em" title='em' data-ref="14em">em</a> &lt; <var>0.0</var> );</td></tr>
+<tr><th id="132">132</th><td>      em = std::floor(em);</td></tr>
+<tr><th id="133">133</th><td>      t = <var>0.9</var>*(<var>1.0</var> + y*y)* std::exp(em*alxm - gammln(em + <var>1.0</var>) - g1);</td></tr>
+<tr><th id="134">134</th><td>    } <b>while</b>( <a class="local col1 ref" href="#21anEngine" title='anEngine' data-ref="21anEngine">anEngine</a>-&gt;<a class="virtual ref" href="../include/CLHEP/Random/RandomEngine.h.html#_ZN5CLHEP15HepRandomEngine4flatEv" title='CLHEP::HepRandomEngine::flat' data-ref="_ZN5CLHEP15HepRandomEngine4flatEv">flat</a>() &gt; <a class="local col5 ref" href="#15t" title='t' data-ref="15t">t</a> );</td></tr>
+<tr><th id="135">135</th><td>  }</td></tr>
+<tr><th id="136">136</th><td>  <b>else</b> {</td></tr>
+<tr><th id="137">137</th><td>    em = xm + std::sqrt(xm) * normal (anEngine);	<i>// mf 1/13/06</i></td></tr>
+<tr><th id="138">138</th><td>    <b>if</b> ( <b>static_cast</b>&lt;<em>long</em>&gt;(<a class="local col4 ref" href="#14em" title='em' data-ref="14em">em</a>) &lt; <var>0</var> ) </td></tr>
+<tr><th id="139">139</th><td>      <a class="local col4 ref" href="#14em" title='em' data-ref="14em">em</a> = <b>static_cast</b>&lt;<em>long</em>&gt;(<a class="local col3 ref" href="#13xm" title='xm' data-ref="13xm">xm</a>) &gt;= <var>0</var> ? <a class="local col3 ref" href="#13xm" title='xm' data-ref="13xm">xm</a> : <a class="member" href="../include/CLHEP/Random/RandPoisson.h.html#_ZN5CLHEP11RandPoisson10getMaxMeanEv" title='CLHEP::RandPoisson::getMaxMean' data-ref="_ZN5CLHEP11RandPoisson10getMaxMeanEv">getMaxMean</a>();</td></tr>
+<tr><th id="140">140</th><td>  }    </td></tr>
+<tr><th id="141">141</th><td>  <a class="member" href="../include/CLHEP/Random/RandPoisson.h.html#_ZN5CLHEP11RandPoisson10setPStatusEddd" title='CLHEP::RandPoisson::setPStatus' data-ref="_ZN5CLHEP11RandPoisson10setPStatusEddd">setPStatus</a>(<a class="local col7 ref" href="#17sq" title='sq' data-ref="17sq">sq</a>,<a class="local col8 ref" href="#18alxm" title='alxm' data-ref="18alxm">alxm</a>,<a class="local col9 ref" href="#19g1" title='g1' data-ref="19g1">g1</a>);</td></tr>
+<tr><th id="142">142</th><td>  <b>return</b> <em>long</em>(<a class="local col4 ref" href="#14em" title='em' data-ref="14em">em</a>);</td></tr>
+<tr><th id="143">143</th><td>}</td></tr>
+<tr><th id="144">144</th><td></td></tr>
+<tr><th id="145">145</th><td><em>void</em> <a class="type" href="../include/CLHEP/Random/RandPoisson.h.html#CLHEP::RandPoisson" title='CLHEP::RandPoisson' data-ref="CLHEP::RandPoisson">RandPoisson</a>::<dfn class="decl def" id="_ZN5CLHEP11RandPoisson10shootArrayEiPld" title='CLHEP::RandPoisson::shootArray' data-ref="_ZN5CLHEP11RandPoisson10shootArrayEiPld">shootArray</dfn>(<em>const</em> <em>int</em> <dfn class="local col3 decl" id="23size" title='size' data-type='const int' data-ref="23size">size</dfn>, <em>long</em>* <dfn class="local col4 decl" id="24vect" title='vect' data-type='long *' data-ref="24vect">vect</dfn>, <em>double</em> <dfn class="local col5 decl" id="25m1" title='m1' data-type='double' data-ref="25m1">m1</dfn>)</td></tr>
+<tr><th id="146">146</th><td>{</td></tr>
+<tr><th id="147">147</th><td>  <b>for</b>( <em>long</em>* <dfn class="local col6 decl" id="26v" title='v' data-type='long *' data-ref="26v">v</dfn> = <a class="local col4 ref" href="#24vect" title='vect' data-ref="24vect">vect</a>; <a class="local col6 ref" href="#26v" title='v' data-ref="26v">v</a> != <a class="local col4 ref" href="#24vect" title='vect' data-ref="24vect">vect</a> + <a class="local col3 ref" href="#23size" title='size' data-ref="23size">size</a>; ++<a class="local col6 ref" href="#26v" title='v' data-ref="26v">v</a> )</td></tr>
+<tr><th id="148">148</th><td>    *<a class="local col6 ref" href="#26v" title='v' data-ref="26v">v</a> = <a class="member" href="#_ZN5CLHEP11RandPoisson5shootEd" title='CLHEP::RandPoisson::shoot' data-ref="_ZN5CLHEP11RandPoisson5shootEd">shoot</a>(<a class="local col5 ref" href="#25m1" title='m1' data-ref="25m1">m1</a>);</td></tr>
+<tr><th id="149">149</th><td>}</td></tr>
+<tr><th id="150">150</th><td></td></tr>
+<tr><th id="151">151</th><td><em>long</em> <a class="type" href="../include/CLHEP/Random/RandPoisson.h.html#CLHEP::RandPoisson" title='CLHEP::RandPoisson' data-ref="CLHEP::RandPoisson">RandPoisson</a>::<dfn class="decl def" id="_ZN5CLHEP11RandPoisson5shootEPNS_15HepRandomEngineEd" title='CLHEP::RandPoisson::shoot' data-ref="_ZN5CLHEP11RandPoisson5shootEPNS_15HepRandomEngineEd">shoot</dfn>(<a class="type" href="../include/CLHEP/Random/RandomEngine.h.html#CLHEP::HepRandomEngine" title='CLHEP::HepRandomEngine' data-ref="CLHEP::HepRandomEngine">HepRandomEngine</a>* <dfn class="local col7 decl" id="27anEngine" title='anEngine' data-type='CLHEP::HepRandomEngine *' data-ref="27anEngine">anEngine</dfn>, <em>double</em> <dfn class="local col8 decl" id="28xm" title='xm' data-type='double' data-ref="28xm">xm</dfn>) {</td></tr>
+<tr><th id="152">152</th><td></td></tr>
+<tr><th id="153">153</th><td><i>// Returns as a floating-point number an integer value that is a random</i></td></tr>
+<tr><th id="154">154</th><td><i>// deviation drawn from a Poisson distribution of mean xm, using flat()</i></td></tr>
+<tr><th id="155">155</th><td><i>// of a given Random Engine as a source of uniform random numbers.</i></td></tr>
+<tr><th id="156">156</th><td><i>// (Adapted from Numerical Recipes in C)</i></td></tr>
+<tr><th id="157">157</th><td></td></tr>
+<tr><th id="158">158</th><td>  <em>double</em> <dfn class="local col9 decl" id="29em" title='em' data-type='double' data-ref="29em">em</dfn>, <dfn class="local col0 decl" id="30t" title='t' data-type='double' data-ref="30t">t</dfn>, <dfn class="local col1 decl" id="31y" title='y' data-type='double' data-ref="31y">y</dfn>;</td></tr>
+<tr><th id="159">159</th><td>  <em>double</em> <dfn class="local col2 decl" id="32sq" title='sq' data-type='double' data-ref="32sq">sq</dfn>, <dfn class="local col3 decl" id="33alxm" title='alxm' data-type='double' data-ref="33alxm">alxm</dfn>, <dfn class="local col4 decl" id="34g1" title='g1' data-type='double' data-ref="34g1">g1</dfn>;</td></tr>
+<tr><th id="160">160</th><td>  <em>double</em> <dfn class="local col5 decl" id="35om" title='om' data-type='double' data-ref="35om">om</dfn> = <a class="member" href="../include/CLHEP/Random/RandPoisson.h.html#_ZN5CLHEP11RandPoisson10getOldMeanEv" title='CLHEP::RandPoisson::getOldMean' data-ref="_ZN5CLHEP11RandPoisson10getOldMeanEv">getOldMean</a>();</td></tr>
+<tr><th id="161">161</th><td></td></tr>
+<tr><th id="162">162</th><td>  <em>double</em>* <dfn class="local col6 decl" id="36status" title='status' data-type='double *' data-ref="36status">status</dfn> = <a class="member" href="../include/CLHEP/Random/RandPoisson.h.html#_ZN5CLHEP11RandPoisson10getPStatusEv" title='CLHEP::RandPoisson::getPStatus' data-ref="_ZN5CLHEP11RandPoisson10getPStatusEv">getPStatus</a>();</td></tr>
+<tr><th id="163">163</th><td>  <a class="local col2 ref" href="#32sq" title='sq' data-ref="32sq">sq</a> = <a class="local col6 ref" href="#36status" title='status' data-ref="36status">status</a>[<var>0</var>];</td></tr>
+<tr><th id="164">164</th><td>  <a class="local col3 ref" href="#33alxm" title='alxm' data-ref="33alxm">alxm</a> = <a class="local col6 ref" href="#36status" title='status' data-ref="36status">status</a>[<var>1</var>];</td></tr>
+<tr><th id="165">165</th><td>  <a class="local col4 ref" href="#34g1" title='g1' data-ref="34g1">g1</a> = <a class="local col6 ref" href="#36status" title='status' data-ref="36status">status</a>[<var>2</var>];</td></tr>
+<tr><th id="166">166</th><td></td></tr>
+<tr><th id="167">167</th><td>  <b>if</b>( <a class="local col8 ref" href="#28xm" title='xm' data-ref="28xm">xm</a> == -<var>1</var> ) <b>return</b> <var>0</var>;</td></tr>
+<tr><th id="168">168</th><td>  <b>if</b>( <a class="local col8 ref" href="#28xm" title='xm' data-ref="28xm">xm</a> &lt; <var>12.0</var> ) {</td></tr>
+<tr><th id="169">169</th><td>    <b>if</b>( <a class="local col8 ref" href="#28xm" title='xm' data-ref="28xm">xm</a> != <a class="local col5 ref" href="#35om" title='om' data-ref="35om">om</a> ) {</td></tr>
+<tr><th id="170">170</th><td>      <a class="member" href="../include/CLHEP/Random/RandPoisson.h.html#_ZN5CLHEP11RandPoisson10setOldMeanEd" title='CLHEP::RandPoisson::setOldMean' data-ref="_ZN5CLHEP11RandPoisson10setOldMeanEd">setOldMean</a>(<a class="local col8 ref" href="#28xm" title='xm' data-ref="28xm">xm</a>);</td></tr>
+<tr><th id="171">171</th><td>      g1 = std::exp(-xm);</td></tr>
+<tr><th id="172">172</th><td>    }</td></tr>
+<tr><th id="173">173</th><td>    <a class="local col9 ref" href="#29em" title='em' data-ref="29em">em</a> = -<var>1</var>;</td></tr>
+<tr><th id="174">174</th><td>    <a class="local col0 ref" href="#30t" title='t' data-ref="30t">t</a> = <var>1.0</var>;</td></tr>
+<tr><th id="175">175</th><td>    <b>do</b> {</td></tr>
+<tr><th id="176">176</th><td>      <a class="local col9 ref" href="#29em" title='em' data-ref="29em">em</a> += <var>1.0</var>;</td></tr>
+<tr><th id="177">177</th><td>      <a class="local col0 ref" href="#30t" title='t' data-ref="30t">t</a> *= <a class="local col7 ref" href="#27anEngine" title='anEngine' data-ref="27anEngine">anEngine</a>-&gt;<a class="virtual ref" href="../include/CLHEP/Random/RandomEngine.h.html#_ZN5CLHEP15HepRandomEngine4flatEv" title='CLHEP::HepRandomEngine::flat' data-ref="_ZN5CLHEP15HepRandomEngine4flatEv">flat</a>();</td></tr>
+<tr><th id="178">178</th><td>    } <b>while</b>( <a class="local col0 ref" href="#30t" title='t' data-ref="30t">t</a> &gt; <a class="local col4 ref" href="#34g1" title='g1' data-ref="34g1">g1</a> );</td></tr>
+<tr><th id="179">179</th><td>  }</td></tr>
+<tr><th id="180">180</th><td>  <b>else</b> <b>if</b> ( <a class="local col8 ref" href="#28xm" title='xm' data-ref="28xm">xm</a> &lt; <a class="member" href="../include/CLHEP/Random/RandPoisson.h.html#_ZN5CLHEP11RandPoisson10getMaxMeanEv" title='CLHEP::RandPoisson::getMaxMean' data-ref="_ZN5CLHEP11RandPoisson10getMaxMeanEv">getMaxMean</a>() ) {</td></tr>
+<tr><th id="181">181</th><td>    <b>if</b> ( <a class="local col8 ref" href="#28xm" title='xm' data-ref="28xm">xm</a> != <a class="local col5 ref" href="#35om" title='om' data-ref="35om">om</a> ) {</td></tr>
+<tr><th id="182">182</th><td>      <a class="member" href="../include/CLHEP/Random/RandPoisson.h.html#_ZN5CLHEP11RandPoisson10setOldMeanEd" title='CLHEP::RandPoisson::setOldMean' data-ref="_ZN5CLHEP11RandPoisson10setOldMeanEd">setOldMean</a>(<a class="local col8 ref" href="#28xm" title='xm' data-ref="28xm">xm</a>);</td></tr>
+<tr><th id="183">183</th><td>      sq = std::sqrt(<var>2.0</var>*xm);</td></tr>
+<tr><th id="184">184</th><td>      alxm = std::log(xm);</td></tr>
+<tr><th id="185">185</th><td>      <a class="local col4 ref" href="#34g1" title='g1' data-ref="34g1">g1</a> = <a class="local col8 ref" href="#28xm" title='xm' data-ref="28xm">xm</a>*<a class="local col3 ref" href="#33alxm" title='alxm' data-ref="33alxm">alxm</a> - <a class="ref" href="#_ZN5CLHEP6gammlnEd" title='CLHEP::gammln' data-ref="_ZN5CLHEP6gammlnEd">gammln</a>(<a class="local col8 ref" href="#28xm" title='xm' data-ref="28xm">xm</a> + <var>1.0</var>);</td></tr>
+<tr><th id="186">186</th><td>    }</td></tr>
+<tr><th id="187">187</th><td>    <b>do</b> {</td></tr>
+<tr><th id="188">188</th><td>      <b>do</b> {</td></tr>
+<tr><th id="189">189</th><td>	y = std::tan(CLHEP::pi*anEngine-&gt;flat());</td></tr>
+<tr><th id="190">190</th><td>	<a class="local col9 ref" href="#29em" title='em' data-ref="29em">em</a> = <a class="local col2 ref" href="#32sq" title='sq' data-ref="32sq">sq</a>*<a class="local col1 ref" href="#31y" title='y' data-ref="31y">y</a> + <a class="local col8 ref" href="#28xm" title='xm' data-ref="28xm">xm</a>;</td></tr>
+<tr><th id="191">191</th><td>      } <b>while</b>( <a class="local col9 ref" href="#29em" title='em' data-ref="29em">em</a> &lt; <var>0.0</var> );</td></tr>
+<tr><th id="192">192</th><td>      em = std::floor(em);</td></tr>
+<tr><th id="193">193</th><td>      t = <var>0.9</var>*(<var>1.0</var> + y*y)* std::exp(em*alxm - gammln(em + <var>1.0</var>) - g1);</td></tr>
+<tr><th id="194">194</th><td>    } <b>while</b>( <a class="local col7 ref" href="#27anEngine" title='anEngine' data-ref="27anEngine">anEngine</a>-&gt;<a class="virtual ref" href="../include/CLHEP/Random/RandomEngine.h.html#_ZN5CLHEP15HepRandomEngine4flatEv" title='CLHEP::HepRandomEngine::flat' data-ref="_ZN5CLHEP15HepRandomEngine4flatEv">flat</a>() &gt; <a class="local col0 ref" href="#30t" title='t' data-ref="30t">t</a> );</td></tr>
+<tr><th id="195">195</th><td>  }</td></tr>
+<tr><th id="196">196</th><td>  <b>else</b> {</td></tr>
+<tr><th id="197">197</th><td>    em = xm + std::sqrt(xm) * normal (anEngine);	<i>// mf 1/13/06</i></td></tr>
+<tr><th id="198">198</th><td>    <b>if</b> ( <b>static_cast</b>&lt;<em>long</em>&gt;(<a class="local col9 ref" href="#29em" title='em' data-ref="29em">em</a>) &lt; <var>0</var> ) </td></tr>
+<tr><th id="199">199</th><td>      <a class="local col9 ref" href="#29em" title='em' data-ref="29em">em</a> = <b>static_cast</b>&lt;<em>long</em>&gt;(<a class="local col8 ref" href="#28xm" title='xm' data-ref="28xm">xm</a>) &gt;= <var>0</var> ? <a class="local col8 ref" href="#28xm" title='xm' data-ref="28xm">xm</a> : <a class="member" href="../include/CLHEP/Random/RandPoisson.h.html#_ZN5CLHEP11RandPoisson10getMaxMeanEv" title='CLHEP::RandPoisson::getMaxMean' data-ref="_ZN5CLHEP11RandPoisson10getMaxMeanEv">getMaxMean</a>();</td></tr>
+<tr><th id="200">200</th><td>  }    </td></tr>
+<tr><th id="201">201</th><td>  <a class="member" href="../include/CLHEP/Random/RandPoisson.h.html#_ZN5CLHEP11RandPoisson10setPStatusEddd" title='CLHEP::RandPoisson::setPStatus' data-ref="_ZN5CLHEP11RandPoisson10setPStatusEddd">setPStatus</a>(<a class="local col2 ref" href="#32sq" title='sq' data-ref="32sq">sq</a>,<a class="local col3 ref" href="#33alxm" title='alxm' data-ref="33alxm">alxm</a>,<a class="local col4 ref" href="#34g1" title='g1' data-ref="34g1">g1</a>);</td></tr>
+<tr><th id="202">202</th><td>  <b>return</b> <em>long</em>(<a class="local col9 ref" href="#29em" title='em' data-ref="29em">em</a>);</td></tr>
+<tr><th id="203">203</th><td>}</td></tr>
+<tr><th id="204">204</th><td></td></tr>
+<tr><th id="205">205</th><td><em>void</em> <a class="type" href="../include/CLHEP/Random/RandPoisson.h.html#CLHEP::RandPoisson" title='CLHEP::RandPoisson' data-ref="CLHEP::RandPoisson">RandPoisson</a>::<dfn class="decl def" id="_ZN5CLHEP11RandPoisson10shootArrayEPNS_15HepRandomEngineEiPld" title='CLHEP::RandPoisson::shootArray' data-ref="_ZN5CLHEP11RandPoisson10shootArrayEPNS_15HepRandomEngineEiPld">shootArray</dfn>(<a class="type" href="../include/CLHEP/Random/RandomEngine.h.html#CLHEP::HepRandomEngine" title='CLHEP::HepRandomEngine' data-ref="CLHEP::HepRandomEngine">HepRandomEngine</a>* <dfn class="local col7 decl" id="37anEngine" title='anEngine' data-type='CLHEP::HepRandomEngine *' data-ref="37anEngine">anEngine</dfn>, <em>const</em> <em>int</em> <dfn class="local col8 decl" id="38size" title='size' data-type='const int' data-ref="38size">size</dfn>,</td></tr>
+<tr><th id="206">206</th><td>                             <em>long</em>* <dfn class="local col9 decl" id="39vect" title='vect' data-type='long *' data-ref="39vect">vect</dfn>, <em>double</em> <dfn class="local col0 decl" id="40m1" title='m1' data-type='double' data-ref="40m1">m1</dfn>)</td></tr>
+<tr><th id="207">207</th><td>{</td></tr>
+<tr><th id="208">208</th><td>  <b>for</b>( <em>long</em>* <dfn class="local col1 decl" id="41v" title='v' data-type='long *' data-ref="41v">v</dfn> = <a class="local col9 ref" href="#39vect" title='vect' data-ref="39vect">vect</a>; <a class="local col1 ref" href="#41v" title='v' data-ref="41v">v</a> != <a class="local col9 ref" href="#39vect" title='vect' data-ref="39vect">vect</a> + <a class="local col8 ref" href="#38size" title='size' data-ref="38size">size</a>; ++<a class="local col1 ref" href="#41v" title='v' data-ref="41v">v</a> )</td></tr>
+<tr><th id="209">209</th><td>    *<a class="local col1 ref" href="#41v" title='v' data-ref="41v">v</a> = <a class="member" href="#_ZN5CLHEP11RandPoisson5shootEPNS_15HepRandomEngineEd" title='CLHEP::RandPoisson::shoot' data-ref="_ZN5CLHEP11RandPoisson5shootEPNS_15HepRandomEngineEd">shoot</a>(<a class="local col7 ref" href="#37anEngine" title='anEngine' data-ref="37anEngine">anEngine</a>,<a class="local col0 ref" href="#40m1" title='m1' data-ref="40m1">m1</a>);</td></tr>
+<tr><th id="210">210</th><td>}</td></tr>
+<tr><th id="211">211</th><td></td></tr>
+<tr><th id="212">212</th><td><em>long</em> <a class="type" href="../include/CLHEP/Random/RandPoisson.h.html#CLHEP::RandPoisson" title='CLHEP::RandPoisson' data-ref="CLHEP::RandPoisson">RandPoisson</a>::<dfn class="decl def" id="_ZN5CLHEP11RandPoisson4fireEv" title='CLHEP::RandPoisson::fire' data-ref="_ZN5CLHEP11RandPoisson4fireEv">fire</dfn>() {</td></tr>
+<tr><th id="213">213</th><td>  <b>return</b> <em>long</em>(<a class="member" href="#_ZN5CLHEP11RandPoisson4fireEd" title='CLHEP::RandPoisson::fire' data-ref="_ZN5CLHEP11RandPoisson4fireEd">fire</a>( <a class="member" href="../include/CLHEP/Random/RandPoisson.h.html#CLHEP::RandPoisson::defaultMean" title='CLHEP::RandPoisson::defaultMean' data-ref="CLHEP::RandPoisson::defaultMean">defaultMean</a> ));</td></tr>
+<tr><th id="214">214</th><td>}</td></tr>
+<tr><th id="215">215</th><td></td></tr>
+<tr><th id="216">216</th><td><em>long</em> <a class="type" href="../include/CLHEP/Random/RandPoisson.h.html#CLHEP::RandPoisson" title='CLHEP::RandPoisson' data-ref="CLHEP::RandPoisson">RandPoisson</a>::<dfn class="decl def" id="_ZN5CLHEP11RandPoisson4fireEd" title='CLHEP::RandPoisson::fire' data-ref="_ZN5CLHEP11RandPoisson4fireEd">fire</dfn>(<em>double</em> <dfn class="local col2 decl" id="42xm" title='xm' data-type='double' data-ref="42xm">xm</dfn>) {</td></tr>
+<tr><th id="217">217</th><td></td></tr>
+<tr><th id="218">218</th><td><i>// Returns as a floating-point number an integer value that is a random</i></td></tr>
+<tr><th id="219">219</th><td><i>// deviation drawn from a Poisson distribution of mean xm, using flat()</i></td></tr>
+<tr><th id="220">220</th><td><i>// as a source of uniform random numbers.</i></td></tr>
+<tr><th id="221">221</th><td><i>// (Adapted from Numerical Recipes in C)</i></td></tr>
+<tr><th id="222">222</th><td></td></tr>
+<tr><th id="223">223</th><td>  <em>double</em> <dfn class="local col3 decl" id="43em" title='em' data-type='double' data-ref="43em">em</dfn>, <dfn class="local col4 decl" id="44t" title='t' data-type='double' data-ref="44t">t</dfn>, <dfn class="local col5 decl" id="45y" title='y' data-type='double' data-ref="45y">y</dfn>;</td></tr>
+<tr><th id="224">224</th><td>  <em>double</em> <dfn class="local col6 decl" id="46sq" title='sq' data-type='double' data-ref="46sq">sq</dfn>, <dfn class="local col7 decl" id="47alxm" title='alxm' data-type='double' data-ref="47alxm">alxm</dfn>, <dfn class="local col8 decl" id="48g1" title='g1' data-type='double' data-ref="48g1">g1</dfn>;</td></tr>
+<tr><th id="225">225</th><td></td></tr>
+<tr><th id="226">226</th><td>  <a class="local col6 ref" href="#46sq" title='sq' data-ref="46sq">sq</a> = <a class="member" href="../include/CLHEP/Random/RandPoisson.h.html#CLHEP::RandPoisson::status" title='CLHEP::RandPoisson::status' data-ref="CLHEP::RandPoisson::status">status</a>[<var>0</var>];</td></tr>
+<tr><th id="227">227</th><td>  <a class="local col7 ref" href="#47alxm" title='alxm' data-ref="47alxm">alxm</a> = <a class="member" href="../include/CLHEP/Random/RandPoisson.h.html#CLHEP::RandPoisson::status" title='CLHEP::RandPoisson::status' data-ref="CLHEP::RandPoisson::status">status</a>[<var>1</var>];</td></tr>
+<tr><th id="228">228</th><td>  <a class="local col8 ref" href="#48g1" title='g1' data-ref="48g1">g1</a> = <a class="member" href="../include/CLHEP/Random/RandPoisson.h.html#CLHEP::RandPoisson::status" title='CLHEP::RandPoisson::status' data-ref="CLHEP::RandPoisson::status">status</a>[<var>2</var>];</td></tr>
+<tr><th id="229">229</th><td></td></tr>
+<tr><th id="230">230</th><td>  <b>if</b>( <a class="local col2 ref" href="#42xm" title='xm' data-ref="42xm">xm</a> == -<var>1</var> ) <b>return</b> <var>0</var>;</td></tr>
+<tr><th id="231">231</th><td>  <b>if</b>( <a class="local col2 ref" href="#42xm" title='xm' data-ref="42xm">xm</a> &lt; <var>12.0</var> ) {</td></tr>
+<tr><th id="232">232</th><td>    <b>if</b>( <a class="local col2 ref" href="#42xm" title='xm' data-ref="42xm">xm</a> != <a class="member" href="../include/CLHEP/Random/RandPoisson.h.html#CLHEP::RandPoisson::oldm" title='CLHEP::RandPoisson::oldm' data-ref="CLHEP::RandPoisson::oldm">oldm</a> ) {</td></tr>
+<tr><th id="233">233</th><td>      <a class="member" href="../include/CLHEP/Random/RandPoisson.h.html#CLHEP::RandPoisson::oldm" title='CLHEP::RandPoisson::oldm' data-ref="CLHEP::RandPoisson::oldm">oldm</a> = <a class="local col2 ref" href="#42xm" title='xm' data-ref="42xm">xm</a>;</td></tr>
+<tr><th id="234">234</th><td>      g1 = std::exp(-xm);</td></tr>
+<tr><th id="235">235</th><td>    }</td></tr>
+<tr><th id="236">236</th><td>    <a class="local col3 ref" href="#43em" title='em' data-ref="43em">em</a> = -<var>1</var>;</td></tr>
+<tr><th id="237">237</th><td>    <a class="local col4 ref" href="#44t" title='t' data-ref="44t">t</a> = <var>1.0</var>;</td></tr>
+<tr><th id="238">238</th><td>    <b>do</b> {</td></tr>
+<tr><th id="239">239</th><td>      <a class="local col3 ref" href="#43em" title='em' data-ref="43em">em</a> += <var>1.0</var>;</td></tr>
+<tr><th id="240">240</th><td>      t *= localEngine-&gt;flat();</td></tr>
+<tr><th id="241">241</th><td>    } <b>while</b>( <a class="local col4 ref" href="#44t" title='t' data-ref="44t">t</a> &gt; <a class="local col8 ref" href="#48g1" title='g1' data-ref="48g1">g1</a> );</td></tr>
+<tr><th id="242">242</th><td>  }</td></tr>
+<tr><th id="243">243</th><td>  <b>else</b> <b>if</b> ( <a class="local col2 ref" href="#42xm" title='xm' data-ref="42xm">xm</a> &lt; <a class="member" href="../include/CLHEP/Random/RandPoisson.h.html#CLHEP::RandPoisson::meanMax" title='CLHEP::RandPoisson::meanMax' data-ref="CLHEP::RandPoisson::meanMax">meanMax</a> ) {</td></tr>
+<tr><th id="244">244</th><td>    <b>if</b> ( <a class="local col2 ref" href="#42xm" title='xm' data-ref="42xm">xm</a> != <a class="member" href="../include/CLHEP/Random/RandPoisson.h.html#CLHEP::RandPoisson::oldm" title='CLHEP::RandPoisson::oldm' data-ref="CLHEP::RandPoisson::oldm">oldm</a> ) {</td></tr>
+<tr><th id="245">245</th><td>      <a class="member" href="../include/CLHEP/Random/RandPoisson.h.html#CLHEP::RandPoisson::oldm" title='CLHEP::RandPoisson::oldm' data-ref="CLHEP::RandPoisson::oldm">oldm</a> = <a class="local col2 ref" href="#42xm" title='xm' data-ref="42xm">xm</a>;</td></tr>
+<tr><th id="246">246</th><td>      sq = std::sqrt(<var>2.0</var>*xm);</td></tr>
+<tr><th id="247">247</th><td>      alxm = std::log(xm);</td></tr>
+<tr><th id="248">248</th><td>      <a class="local col8 ref" href="#48g1" title='g1' data-ref="48g1">g1</a> = <a class="local col2 ref" href="#42xm" title='xm' data-ref="42xm">xm</a>*<a class="local col7 ref" href="#47alxm" title='alxm' data-ref="47alxm">alxm</a> - <a class="ref" href="#_ZN5CLHEP6gammlnEd" title='CLHEP::gammln' data-ref="_ZN5CLHEP6gammlnEd">gammln</a>(<a class="local col2 ref" href="#42xm" title='xm' data-ref="42xm">xm</a> + <var>1.0</var>);</td></tr>
+<tr><th id="249">249</th><td>    }</td></tr>
+<tr><th id="250">250</th><td>    <b>do</b> {</td></tr>
+<tr><th id="251">251</th><td>      <b>do</b> {</td></tr>
+<tr><th id="252">252</th><td>	y = std::tan(CLHEP::pi*localEngine-&gt;flat());</td></tr>
+<tr><th id="253">253</th><td>	em = sq*y + xm;</td></tr>
+<tr><th id="254">254</th><td>      } <b>while</b>( em &lt; <var>0.0</var> );</td></tr>
+<tr><th id="255">255</th><td>      em = std::floor(em);</td></tr>
+<tr><th id="256">256</th><td>      t = <var>0.9</var>*(<var>1.0</var> + y*y)* std::exp(em*alxm - gammln(em + <var>1.0</var>) - g1);</td></tr>
+<tr><th id="257">257</th><td>    } <b>while</b>( localEngine-&gt;flat() &gt; t );</td></tr>
+<tr><th id="258">258</th><td>  }</td></tr>
+<tr><th id="259">259</th><td>  <b>else</b> {</td></tr>
+<tr><th id="260">260</th><td>    em = xm + std::sqrt(xm) * normal (localEngine.get());	<i>// mf 1/13/06</i></td></tr>
+<tr><th id="261">261</th><td>    <b>if</b> ( <b>static_cast</b>&lt;<em>long</em>&gt;(<a class="local col3 ref" href="#43em" title='em' data-ref="43em">em</a>) &lt; <var>0</var> ) </td></tr>
+<tr><th id="262">262</th><td>      <a class="local col3 ref" href="#43em" title='em' data-ref="43em">em</a> = <b>static_cast</b>&lt;<em>long</em>&gt;(<a class="local col2 ref" href="#42xm" title='xm' data-ref="42xm">xm</a>) &gt;= <var>0</var> ? <a class="local col2 ref" href="#42xm" title='xm' data-ref="42xm">xm</a> : <a class="member" href="../include/CLHEP/Random/RandPoisson.h.html#_ZN5CLHEP11RandPoisson10getMaxMeanEv" title='CLHEP::RandPoisson::getMaxMean' data-ref="_ZN5CLHEP11RandPoisson10getMaxMeanEv">getMaxMean</a>();</td></tr>
+<tr><th id="263">263</th><td>  }    </td></tr>
+<tr><th id="264">264</th><td>  <a class="member" href="../include/CLHEP/Random/RandPoisson.h.html#CLHEP::RandPoisson::status" title='CLHEP::RandPoisson::status' data-ref="CLHEP::RandPoisson::status">status</a>[<var>0</var>] = <a class="local col6 ref" href="#46sq" title='sq' data-ref="46sq">sq</a>; <a class="member" href="../include/CLHEP/Random/RandPoisson.h.html#CLHEP::RandPoisson::status" title='CLHEP::RandPoisson::status' data-ref="CLHEP::RandPoisson::status">status</a>[<var>1</var>] = <a class="local col7 ref" href="#47alxm" title='alxm' data-ref="47alxm">alxm</a>; <a class="member" href="../include/CLHEP/Random/RandPoisson.h.html#CLHEP::RandPoisson::status" title='CLHEP::RandPoisson::status' data-ref="CLHEP::RandPoisson::status">status</a>[<var>2</var>] = <a class="local col8 ref" href="#48g1" title='g1' data-ref="48g1">g1</a>;</td></tr>
+<tr><th id="265">265</th><td>  <b>return</b> <em>long</em>(<a class="local col3 ref" href="#43em" title='em' data-ref="43em">em</a>);</td></tr>
+<tr><th id="266">266</th><td>}</td></tr>
+<tr><th id="267">267</th><td></td></tr>
+<tr><th id="268">268</th><td><em>void</em> <a class="type" href="../include/CLHEP/Random/RandPoisson.h.html#CLHEP::RandPoisson" title='CLHEP::RandPoisson' data-ref="CLHEP::RandPoisson">RandPoisson</a>::<dfn class="decl def" id="_ZN5CLHEP11RandPoisson9fireArrayEiPl" title='CLHEP::RandPoisson::fireArray' data-ref="_ZN5CLHEP11RandPoisson9fireArrayEiPl">fireArray</dfn>(<em>const</em> <em>int</em> <dfn class="local col9 decl" id="49size" title='size' data-type='const int' data-ref="49size">size</dfn>, <em>long</em>* <dfn class="local col0 decl" id="50vect" title='vect' data-type='long *' data-ref="50vect">vect</dfn> )</td></tr>
+<tr><th id="269">269</th><td>{</td></tr>
+<tr><th id="270">270</th><td>  <b>for</b>( <em>long</em>* <dfn class="local col1 decl" id="51v" title='v' data-type='long *' data-ref="51v">v</dfn> = <a class="local col0 ref" href="#50vect" title='vect' data-ref="50vect">vect</a>; <a class="local col1 ref" href="#51v" title='v' data-ref="51v">v</a> != <a class="local col0 ref" href="#50vect" title='vect' data-ref="50vect">vect</a> + <a class="local col9 ref" href="#49size" title='size' data-ref="49size">size</a>; ++<a class="local col1 ref" href="#51v" title='v' data-ref="51v">v</a> )</td></tr>
+<tr><th id="271">271</th><td>    *<a class="local col1 ref" href="#51v" title='v' data-ref="51v">v</a> = <a class="member" href="#_ZN5CLHEP11RandPoisson4fireEd" title='CLHEP::RandPoisson::fire' data-ref="_ZN5CLHEP11RandPoisson4fireEd">fire</a>( <a class="member" href="../include/CLHEP/Random/RandPoisson.h.html#CLHEP::RandPoisson::defaultMean" title='CLHEP::RandPoisson::defaultMean' data-ref="CLHEP::RandPoisson::defaultMean">defaultMean</a> );</td></tr>
+<tr><th id="272">272</th><td>}</td></tr>
+<tr><th id="273">273</th><td></td></tr>
+<tr><th id="274">274</th><td><em>void</em> <a class="type" href="../include/CLHEP/Random/RandPoisson.h.html#CLHEP::RandPoisson" title='CLHEP::RandPoisson' data-ref="CLHEP::RandPoisson">RandPoisson</a>::<dfn class="decl def" id="_ZN5CLHEP11RandPoisson9fireArrayEiPld" title='CLHEP::RandPoisson::fireArray' data-ref="_ZN5CLHEP11RandPoisson9fireArrayEiPld">fireArray</dfn>(<em>const</em> <em>int</em> <dfn class="local col2 decl" id="52size" title='size' data-type='const int' data-ref="52size">size</dfn>, <em>long</em>* <dfn class="local col3 decl" id="53vect" title='vect' data-type='long *' data-ref="53vect">vect</dfn>, <em>double</em> <dfn class="local col4 decl" id="54m1" title='m1' data-type='double' data-ref="54m1">m1</dfn>)</td></tr>
+<tr><th id="275">275</th><td>{</td></tr>
+<tr><th id="276">276</th><td>  <b>for</b>( <em>long</em>* <dfn class="local col5 decl" id="55v" title='v' data-type='long *' data-ref="55v">v</dfn> = <a class="local col3 ref" href="#53vect" title='vect' data-ref="53vect">vect</a>; <a class="local col5 ref" href="#55v" title='v' data-ref="55v">v</a> != <a class="local col3 ref" href="#53vect" title='vect' data-ref="53vect">vect</a> + <a class="local col2 ref" href="#52size" title='size' data-ref="52size">size</a>; ++<a class="local col5 ref" href="#55v" title='v' data-ref="55v">v</a> )</td></tr>
+<tr><th id="277">277</th><td>    *<a class="local col5 ref" href="#55v" title='v' data-ref="55v">v</a> = <a class="member" href="#_ZN5CLHEP11RandPoisson4fireEd" title='CLHEP::RandPoisson::fire' data-ref="_ZN5CLHEP11RandPoisson4fireEd">fire</a>( <a class="local col4 ref" href="#54m1" title='m1' data-ref="54m1">m1</a> );</td></tr>
+<tr><th id="278">278</th><td>}</td></tr>
+<tr><th id="279">279</th><td></td></tr>
+<tr><th id="280">280</th><td>std::ostream &amp; RandPoisson::put ( std::ostream &amp; os ) <em>const</em> {</td></tr>
+<tr><th id="281">281</th><td>  <em>int</em> pr=os.precision(<var>20</var>);</td></tr>
+<tr><th id="282">282</th><td>  std::vector&lt;<em>unsigned</em> <em>long</em>&gt; t(<var>2</var>);</td></tr>
+<tr><th id="283">283</th><td>  os &lt;&lt; <q>" "</q> &lt;&lt; name() &lt;&lt; <q>"\n"</q>;</td></tr>
+<tr><th id="284">284</th><td>  os &lt;&lt; <q>"Uvec"</q> &lt;&lt; <q>"\n"</q>;</td></tr>
+<tr><th id="285">285</th><td>  t = DoubConv::dto2longs(meanMax);</td></tr>
+<tr><th id="286">286</th><td>  os &lt;&lt; meanMax &lt;&lt; <q>" "</q> &lt;&lt; t[<var>0</var>] &lt;&lt; <q>" "</q> &lt;&lt; t[<var>1</var>] &lt;&lt; <q>"\n"</q>;</td></tr>
+<tr><th id="287">287</th><td>  t = DoubConv::dto2longs(defaultMean);</td></tr>
+<tr><th id="288">288</th><td>  os &lt;&lt; defaultMean &lt;&lt; <q>" "</q> &lt;&lt; t[<var>0</var>] &lt;&lt; <q>" "</q> &lt;&lt; t[<var>1</var>] &lt;&lt; <q>"\n"</q>;</td></tr>
+<tr><th id="289">289</th><td>  t = DoubConv::dto2longs(status[<var>0</var>]);</td></tr>
+<tr><th id="290">290</th><td>  os &lt;&lt; status[<var>0</var>] &lt;&lt; <q>" "</q> &lt;&lt; t[<var>0</var>] &lt;&lt; <q>" "</q> &lt;&lt; t[<var>1</var>] &lt;&lt; <q>"\n"</q>;</td></tr>
+<tr><th id="291">291</th><td>  t = DoubConv::dto2longs(status[<var>1</var>]);</td></tr>
+<tr><th id="292">292</th><td>  os &lt;&lt; status[<var>1</var>] &lt;&lt; <q>" "</q> &lt;&lt; t[<var>0</var>] &lt;&lt; <q>" "</q> &lt;&lt; t[<var>1</var>] &lt;&lt; <q>"\n"</q>;</td></tr>
+<tr><th id="293">293</th><td>  t = DoubConv::dto2longs(status[<var>2</var>]);</td></tr>
+<tr><th id="294">294</th><td>  os &lt;&lt; status[<var>2</var>] &lt;&lt; <q>" "</q> &lt;&lt; t[<var>0</var>] &lt;&lt; <q>" "</q> &lt;&lt; t[<var>1</var>] &lt;&lt; <q>"\n"</q>;</td></tr>
+<tr><th id="295">295</th><td>  t = DoubConv::dto2longs(oldm);</td></tr>
+<tr><th id="296">296</th><td>  os &lt;&lt; oldm &lt;&lt; <q>" "</q> &lt;&lt; t[<var>0</var>] &lt;&lt; <q>" "</q> &lt;&lt; t[<var>1</var>] &lt;&lt; <q>"\n"</q>;</td></tr>
+<tr><th id="297">297</th><td>  os.precision(pr);</td></tr>
+<tr><th id="298">298</th><td>  <b>return</b> os;</td></tr>
+<tr><th id="299">299</th><td>}</td></tr>
+<tr><th id="300">300</th><td></td></tr>
+<tr><th id="301">301</th><td>std::istream &amp; RandPoisson::get ( std::istream &amp; is ) {</td></tr>
+<tr><th id="302">302</th><td>  std::string inName;</td></tr>
+<tr><th id="303">303</th><td>  is &gt;&gt; inName;</td></tr>
+<tr><th id="304">304</th><td>  <b>if</b> (inName != name()) {</td></tr>
+<tr><th id="305">305</th><td>    is.clear(std::ios::badbit | is.rdstate());</td></tr>
+<tr><th id="306">306</th><td>    std::cerr &lt;&lt; <q>"Mismatch when expecting to read state of a "</q></td></tr>
+<tr><th id="307">307</th><td>    	      &lt;&lt; name() &lt;&lt; <q>" distribution\n"</q></td></tr>
+<tr><th id="308">308</th><td>	      &lt;&lt; <q>"Name found was "</q> &lt;&lt; inName</td></tr>
+<tr><th id="309">309</th><td>	      &lt;&lt; <q>"\nistream is left in the badbit state\n"</q>;</td></tr>
+<tr><th id="310">310</th><td>    <b>return</b> is;</td></tr>
+<tr><th id="311">311</th><td>  }</td></tr>
+<tr><th id="312">312</th><td>  <b>if</b> (possibleKeywordInput(is, <q>"Uvec"</q>, meanMax)) {</td></tr>
+<tr><th id="313">313</th><td>    std::vector&lt;<em>unsigned</em> <em>long</em>&gt; t(<var>2</var>);</td></tr>
+<tr><th id="314">314</th><td>    is &gt;&gt; meanMax     &gt;&gt; t[<var>0</var>] &gt;&gt; t[<var>1</var>]; meanMax     = DoubConv::longs2double(t); </td></tr>
+<tr><th id="315">315</th><td>    is &gt;&gt; defaultMean &gt;&gt; t[<var>0</var>] &gt;&gt; t[<var>1</var>]; defaultMean = DoubConv::longs2double(t); </td></tr>
+<tr><th id="316">316</th><td>    is &gt;&gt; status[<var>0</var>]   &gt;&gt; t[<var>0</var>] &gt;&gt; t[<var>1</var>]; status[<var>0</var>]   = DoubConv::longs2double(t); </td></tr>
+<tr><th id="317">317</th><td>    is &gt;&gt; status[<var>1</var>]   &gt;&gt; t[<var>0</var>] &gt;&gt; t[<var>1</var>]; status[<var>1</var>]   = DoubConv::longs2double(t); </td></tr>
+<tr><th id="318">318</th><td>    is &gt;&gt; status[<var>2</var>]   &gt;&gt; t[<var>0</var>] &gt;&gt; t[<var>1</var>]; status[<var>2</var>]   = DoubConv::longs2double(t); </td></tr>
+<tr><th id="319">319</th><td>    is &gt;&gt; oldm        &gt;&gt; t[<var>0</var>] &gt;&gt; t[<var>1</var>]; oldm        = DoubConv::longs2double(t); </td></tr>
+<tr><th id="320">320</th><td>    <b>return</b> is;</td></tr>
+<tr><th id="321">321</th><td>  }</td></tr>
+<tr><th id="322">322</th><td>  <i>// is &gt;&gt; meanMax encompassed by possibleKeywordInput</i></td></tr>
+<tr><th id="323">323</th><td>  is &gt;&gt; defaultMean &gt;&gt; status[<var>0</var>] &gt;&gt; status[<var>1</var>] &gt;&gt; status[<var>2</var>];</td></tr>
+<tr><th id="324">324</th><td>  <b>return</b> is;</td></tr>
+<tr><th id="325">325</th><td>}</td></tr>
+<tr><th id="326">326</th><td></td></tr>
+<tr><th id="327">327</th><td>}  <i>// namespace CLHEP</i></td></tr>
+<tr><th id="328">328</th><td></td></tr>
+<tr><th id="329">329</th><td></td></tr>
+</table><hr/><p id='footer'>
+Generated on <em>2019-Aug-28</em> from project codebrowser<br />Powered by <a href='https://woboq.com'><img alt='Woboq' src='https://code.woboq.org/woboq-16.png' width='41' height='16' /></a> <a href='https://code.woboq.org'>Code Browser</a> 2.1
+<br/>Generator usage only permitted with license.</p>
+</div></body></html>

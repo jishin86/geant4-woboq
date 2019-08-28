@@ -1,0 +1,330 @@
+<!doctype html>
+<html>
+<head>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"><title>Random.cc source code [codebrowser/source/externals/clhep/src/Random.cc] - Woboq Code Browser</title>
+<link rel="stylesheet" href="../../../../../../data/qtcreator.css" title="QtCreator"/>
+<link rel="alternate stylesheet" href="../../../../../../data/kdevelop.css" title="KDevelop"/>
+<script type="text/javascript" src="../../../../../../data/jquery/jquery.min.js"></script>
+<script type="text/javascript" src="../../../../../../data/jquery/jquery-ui.min.js"></script>
+<script>var file = 'codebrowser/source/externals/clhep/src/Random.cc'; var root_path = '../../../../..'; var data_path = '../../../../../../data';</script>
+<script src='../../../../../../data/codebrowser.js'></script>
+</head>
+<body><div id='header'><h1 id='breadcrumb'><span>Browse the source code of </span><a href='../../../..'>codebrowser</a>/<a href='../../..'>source</a>/<a href='../..'>externals</a>/<a href='..'>clhep</a>/<a href='./'>src</a>/<a href='Random.cc.html'>Random.cc</a></h1></div>
+<hr/><div id='content'><table class="code">
+<tr><th id="1">1</th><td><i>// -*- C++ -*-</i></td></tr>
+<tr><th id="2">2</th><td><i>//</i></td></tr>
+<tr><th id="3">3</th><td><i>// -----------------------------------------------------------------------</i></td></tr>
+<tr><th id="4">4</th><td><i>//                             HEP Random</i></td></tr>
+<tr><th id="5">5</th><td><i>//                          --- HepRandom ---</i></td></tr>
+<tr><th id="6">6</th><td><i>//                      class implementation file</i></td></tr>
+<tr><th id="7">7</th><td><i>// -----------------------------------------------------------------------</i></td></tr>
+<tr><th id="8">8</th><td><i>// This file is part of Geant4 (simulation toolkit for HEP).</i></td></tr>
+<tr><th id="9">9</th><td><i></i></td></tr>
+<tr><th id="10">10</th><td><i>// =======================================================================</i></td></tr>
+<tr><th id="11">11</th><td><i>// Gabriele Cosmo - Created: 5th September 1995</i></td></tr>
+<tr><th id="12">12</th><td><i>//                - Minor corrections: 31st October 1996</i></td></tr>
+<tr><th id="13">13</th><td><i>//                - Added methods for engine status: 19th November 1996</i></td></tr>
+<tr><th id="14">14</th><td><i>//                - HepRandom defined as singleton, constructors are</i></td></tr>
+<tr><th id="15">15</th><td><i>//                  kept public for backward compatibility: 27th Feb 1998</i></td></tr>
+<tr><th id="16">16</th><td><i>//                - Relocated Poisson and Gauss data and simplified</i></td></tr>
+<tr><th id="17">17</th><td><i>//                  initialisation of static generator: 5th Jan 1999</i></td></tr>
+<tr><th id="18">18</th><td><i>// =======================================================================</i></td></tr>
+<tr><th id="19">19</th><td></td></tr>
+<tr><th id="20">20</th><td><u>#include <span class='error' title="&apos;assert.h&apos; file not found">&lt;</span>assert.h&gt;</u></td></tr>
+<tr><th id="21">21</th><td><u>#include <a href="../include/CLHEP/Random/MixMaxRng.h.html">"CLHEP/Random/MixMaxRng.h"</a></u></td></tr>
+<tr><th id="22">22</th><td><u>#include <a href="../include/CLHEP/Random/Random.h.html">"CLHEP/Random/Random.h"</a></u></td></tr>
+<tr><th id="23">23</th><td><u>#include <a href="../include/CLHEP/Random/StaticRandomStates.h.html">"CLHEP/Random/StaticRandomStates.h"</a></u></td></tr>
+<tr><th id="24">24</th><td><u>#include <a href="../include/CLHEP/Utility/memory.h.html">"CLHEP/Utility/memory.h"</a></u></td></tr>
+<tr><th id="25">25</th><td><u>#include <a href="../include/CLHEP/Utility/thread_local.h.html">"CLHEP/Utility/thread_local.h"</a></u></td></tr>
+<tr><th id="26">26</th><td><u>#include <a href="../include/CLHEP/Utility/use_atomic.h.html">"CLHEP/Utility/use_atomic.h"</a></u></td></tr>
+<tr><th id="27">27</th><td></td></tr>
+<tr><th id="28">28</th><td><i>// -----------------------------</i></td></tr>
+<tr><th id="29">29</th><td><i>// Static members initialisation</i></td></tr>
+<tr><th id="30">30</th><td><i>// -----------------------------</i></td></tr>
+<tr><th id="31">31</th><td></td></tr>
+<tr><th id="32">32</th><td><u>#include <a href="../include/CLHEP/Random/SeedTable.h.html">"CLHEP/Random/SeedTable.h"</a></u></td></tr>
+<tr><th id="33">33</th><td></td></tr>
+<tr><th id="34">34</th><td><b>namespace</b> <span class="namespace">CLHEP</span> {</td></tr>
+<tr><th id="35">35</th><td></td></tr>
+<tr><th id="36">36</th><td>  <b>namespace</b> {</td></tr>
+<tr><th id="37">37</th><td></td></tr>
+<tr><th id="38">38</th><td>    <b>struct</b> <dfn class="tu type def" id="CLHEP::(anonymousnamespace)::defaults" title='CLHEP::(anonymous namespace)::defaults' data-ref="CLHEP::(anonymousnamespace)::defaults">defaults</dfn> {</td></tr>
+<tr><th id="39">39</th><td></td></tr>
+<tr><th id="40">40</th><td>      <dfn class="tu decl def" id="_ZN5CLHEP12_GLOBAL__N_18defaultsC1Ev" title='CLHEP::(anonymous namespace)::defaults::defaults' data-type='void CLHEP::(anonymous namespace)::defaults::defaults()' data-ref="_ZN5CLHEP12_GLOBAL__N_18defaultsC1Ev">defaults</dfn>()</td></tr>
+<tr><th id="41">41</th><td>        : theGenerator( &amp;theDefaultGenerator, do_nothing_deleter() )</td></tr>
+<tr><th id="42">42</th><td>        , theEngine   ( &amp;theDefaultEngine, do_nothing_deleter() )</td></tr>
+<tr><th id="43">43</th><td>      { }</td></tr>
+<tr><th id="44">44</th><td></td></tr>
+<tr><th id="45">45</th><td>      <dfn class="tu decl def" id="_ZN5CLHEP12_GLOBAL__N_18defaultsC1ERKS1_" title='CLHEP::(anonymous namespace)::defaults::defaults' data-type='void CLHEP::(anonymous namespace)::defaults::defaults(const CLHEP::(anonymous namespace)::defaults &amp; other)' data-ref="_ZN5CLHEP12_GLOBAL__N_18defaultsC1ERKS1_">defaults</dfn>(<a class="tu type" href="#CLHEP::(anonymousnamespace)::defaults" title='CLHEP::(anonymous namespace)::defaults' data-ref="CLHEP::(anonymousnamespace)::defaults">defaults</a> <em>const</em>&amp; <dfn class="local col1 decl" id="1other" title='other' data-type='const CLHEP::(anonymous namespace)::defaults &amp;' data-ref="1other">other</dfn>) = <b>delete</b>;</td></tr>
+<tr><th id="46">46</th><td>      <a class="tu type" href="#CLHEP::(anonymousnamespace)::defaults" title='CLHEP::(anonymous namespace)::defaults' data-ref="CLHEP::(anonymousnamespace)::defaults">defaults</a> <em>const</em>&amp; <dfn class="tu decl def" id="_ZN5CLHEP12_GLOBAL__N_18defaultsaSERKS1_" title='CLHEP::(anonymous namespace)::defaults::operator=' data-type='const CLHEP::(anonymous namespace)::defaults &amp; CLHEP::(anonymous namespace)::defaults::operator=(const CLHEP::(anonymous namespace)::defaults &amp; )' data-ref="_ZN5CLHEP12_GLOBAL__N_18defaultsaSERKS1_"><b>operator</b>=</dfn>(<a class="tu type" href="#CLHEP::(anonymousnamespace)::defaults" title='CLHEP::(anonymous namespace)::defaults' data-ref="CLHEP::(anonymousnamespace)::defaults">defaults</a> <em>const</em>&amp;) = <b>delete</b>;</td></tr>
+<tr><th id="47">47</th><td></td></tr>
+<tr><th id="48">48</th><td>      <em>void</em>  <dfn class="tu decl def" id="_ZN5CLHEP12_GLOBAL__N_18defaults11resetEngineEPNS_15HepRandomEngineE" title='CLHEP::(anonymous namespace)::defaults::resetEngine' data-type='void CLHEP::(anonymous namespace)::defaults::resetEngine(CLHEP::HepRandomEngine * newEngine)' data-ref="_ZN5CLHEP12_GLOBAL__N_18defaults11resetEngineEPNS_15HepRandomEngineE">resetEngine</dfn>( <a class="type" href="../include/CLHEP/Random/RandomEngine.h.html#CLHEP::HepRandomEngine" title='CLHEP::HepRandomEngine' data-ref="CLHEP::HepRandomEngine">HepRandomEngine</a> * <dfn class="local col2 decl" id="2newEngine" title='newEngine' data-type='CLHEP::HepRandomEngine *' data-ref="2newEngine">newEngine</dfn> ) {</td></tr>
+<tr><th id="49">49</th><td>        theEngine.reset( newEngine );</td></tr>
+<tr><th id="50">50</th><td>      }</td></tr>
+<tr><th id="51">51</th><td></td></tr>
+<tr><th id="52">52</th><td>      <em>void</em>  <dfn class="tu decl def" id="_ZN5CLHEP12_GLOBAL__N_18defaults11resetEngineERNS_15HepRandomEngineE" title='CLHEP::(anonymous namespace)::defaults::resetEngine' data-type='void CLHEP::(anonymous namespace)::defaults::resetEngine(CLHEP::HepRandomEngine &amp; newEngine)' data-ref="_ZN5CLHEP12_GLOBAL__N_18defaults11resetEngineERNS_15HepRandomEngineE">resetEngine</dfn>( <a class="type" href="../include/CLHEP/Random/RandomEngine.h.html#CLHEP::HepRandomEngine" title='CLHEP::HepRandomEngine' data-ref="CLHEP::HepRandomEngine">HepRandomEngine</a> &amp; <dfn class="local col3 decl" id="3newEngine" title='newEngine' data-type='CLHEP::HepRandomEngine &amp;' data-ref="3newEngine">newEngine</dfn> ) {</td></tr>
+<tr><th id="53">53</th><td>        theEngine.reset( &amp;newEngine, do_nothing_deleter() );</td></tr>
+<tr><th id="54">54</th><td>      }</td></tr>
+<tr><th id="55">55</th><td></td></tr>
+<tr><th id="56">56</th><td>      <em>bool</em>  <dfn class="tu decl def" id="_ZN5CLHEP12_GLOBAL__N_18defaults17ensureInitializedEv" title='CLHEP::(anonymous namespace)::defaults::ensureInitialized' data-type='bool CLHEP::(anonymous namespace)::defaults::ensureInitialized()' data-ref="_ZN5CLHEP12_GLOBAL__N_18defaults17ensureInitializedEv">ensureInitialized</dfn>()  {</td></tr>
+<tr><th id="57">57</th><td>        assert( theGenerator.get() != <var>0</var>  &amp;&amp; theEngine.get() != <var>0</var> );</td></tr>
+<tr><th id="58">58</th><td>        <b>return</b> <b>true</b>;</td></tr>
+<tr><th id="59">59</th><td>      }</td></tr>
+<tr><th id="60">60</th><td></td></tr>
+<tr><th id="61">61</th><td>      <dfn class="tu decl def" id="_ZN5CLHEP12_GLOBAL__N_18defaultsD1Ev" title='CLHEP::(anonymous namespace)::defaults::~defaults' data-type='void CLHEP::(anonymous namespace)::defaults::~defaults()' data-ref="_ZN5CLHEP12_GLOBAL__N_18defaultsD1Ev">~defaults</dfn>()</td></tr>
+<tr><th id="62">62</th><td>      { }</td></tr>
+<tr><th id="63">63</th><td></td></tr>
+<tr><th id="64">64</th><td>    <b>private</b>:</td></tr>
+<tr><th id="65">65</th><td></td></tr>
+<tr><th id="66">66</th><td>      <a class="type" href="../include/CLHEP/Random/Random.h.html#CLHEP::HepRandom" title='CLHEP::HepRandom' data-ref="CLHEP::HepRandom">HepRandom</a> <dfn class="tu decl" id="CLHEP::(anonymousnamespace)::defaults::theDefaultGenerator" title='CLHEP::(anonymous namespace)::defaults::theDefaultGenerator' data-type='CLHEP::HepRandom' data-ref="CLHEP::(anonymousnamespace)::defaults::theDefaultGenerator">theDefaultGenerator</dfn>;</td></tr>
+<tr><th id="67">67</th><td>      <a class="type" href="../include/CLHEP/Random/MixMaxRng.h.html#CLHEP::MixMaxRng" title='CLHEP::MixMaxRng' data-ref="CLHEP::MixMaxRng">MixMaxRng</a> <dfn class="tu decl" id="CLHEP::(anonymousnamespace)::defaults::theDefaultEngine" title='CLHEP::(anonymous namespace)::defaults::theDefaultEngine' data-type='CLHEP::MixMaxRng' data-ref="CLHEP::(anonymousnamespace)::defaults::theDefaultEngine">theDefaultEngine</dfn>;</td></tr>
+<tr><th id="68">68</th><td></td></tr>
+<tr><th id="69">69</th><td>    <b>public</b>:</td></tr>
+<tr><th id="70">70</th><td></td></tr>
+<tr><th id="71">71</th><td>      std::shared_ptr&lt;HepRandom      &gt;  theGenerator;</td></tr>
+<tr><th id="72">72</th><td>      std::shared_ptr&lt;HepRandomEngine&gt;  theEngine;</td></tr>
+<tr><th id="73">73</th><td>    };  <i>// defaults</i></td></tr>
+<tr><th id="74">74</th><td></td></tr>
+<tr><th id="75">75</th><td></td></tr>
+<tr><th id="76">76</th><td><u>#<span data-ppcond="76">ifdef</span> <a class="macro" href="../include/CLHEP/Utility/use_atomic.h.html#14" data-ref="_M/CLHEP_USE_ATOMIC">CLHEP_USE_ATOMIC</a></u></td></tr>
+<tr><th id="77">77</th><td></td></tr>
+<tr><th id="78">78</th><td>    <i  data-doc="CLHEP::(anonymousnamespace)::ThreadSafeDefaultsCache">// The ThreadSafeDefaultCache is used only by the function named theDefaults.</i></td></tr>
+<tr><th id="79">79</th><td><i  data-doc="CLHEP::(anonymousnamespace)::ThreadSafeDefaultsCache">    // It is a singly linked list that is intended to hold one object of</i></td></tr>
+<tr><th id="80">80</th><td><i  data-doc="CLHEP::(anonymousnamespace)::ThreadSafeDefaultsCache">    // type "defaults" per thread.</i></td></tr>
+<tr><th id="81">81</th><td></td></tr>
+<tr><th id="82">82</th><td>    <b>class</b> <dfn class="tu type def" id="CLHEP::(anonymousnamespace)::ThreadSafeDefaultsCache" title='CLHEP::(anonymous namespace)::ThreadSafeDefaultsCache' data-ref="CLHEP::(anonymousnamespace)::ThreadSafeDefaultsCache">ThreadSafeDefaultsCache</dfn> {</td></tr>
+<tr><th id="83">83</th><td>    <b>public</b>:</td></tr>
+<tr><th id="84">84</th><td></td></tr>
+<tr><th id="85">85</th><td>      <a class="tu decl" href="#_ZN5CLHEP12_GLOBAL__N_123ThreadSafeDefaultsCacheC1Ev" title='CLHEP::(anonymous namespace)::ThreadSafeDefaultsCache::ThreadSafeDefaultsCache' data-type='void CLHEP::(anonymous namespace)::ThreadSafeDefaultsCache::ThreadSafeDefaultsCache()' data-ref="_ZN5CLHEP12_GLOBAL__N_123ThreadSafeDefaultsCacheC1Ev">ThreadSafeDefaultsCache</a>();</td></tr>
+<tr><th id="86">86</th><td></td></tr>
+<tr><th id="87">87</th><td>      <i  data-doc="_ZN5CLHEP12_GLOBAL__N_123ThreadSafeDefaultsCacheD1Ev">// The destructor deletes the objects of type "defaults"</i></td></tr>
+<tr><th id="88">88</th><td>      <a class="tu decl" href="#_ZN5CLHEP12_GLOBAL__N_123ThreadSafeDefaultsCacheD1Ev" title='CLHEP::(anonymous namespace)::ThreadSafeDefaultsCache::~ThreadSafeDefaultsCache' data-type='void CLHEP::(anonymous namespace)::ThreadSafeDefaultsCache::~ThreadSafeDefaultsCache()' data-ref="_ZN5CLHEP12_GLOBAL__N_123ThreadSafeDefaultsCacheD1Ev">~ThreadSafeDefaultsCache</a>();</td></tr>
+<tr><th id="89">89</th><td></td></tr>
+<tr><th id="90">90</th><td>      <i  data-doc="_ZN5CLHEP12_GLOBAL__N_123ThreadSafeDefaultsCache17createNewDefaultsEv">// Creates new objects and adds them to the linked list in a thread safe manner.</i></td></tr>
+<tr><th id="91">91</th><td>      <a class="tu type" href="#CLHEP::(anonymousnamespace)::defaults" title='CLHEP::(anonymous namespace)::defaults' data-ref="CLHEP::(anonymousnamespace)::defaults">defaults</a>* <a class="tu decl" href="#_ZN5CLHEP12_GLOBAL__N_123ThreadSafeDefaultsCache17createNewDefaultsEv" title='CLHEP::(anonymous namespace)::ThreadSafeDefaultsCache::createNewDefaults' data-type='CLHEP::(anonymous namespace)::defaults * CLHEP::(anonymous namespace)::ThreadSafeDefaultsCache::createNewDefaults()' data-ref="_ZN5CLHEP12_GLOBAL__N_123ThreadSafeDefaultsCache17createNewDefaultsEv">createNewDefaults</a>();</td></tr>
+<tr><th id="92">92</th><td></td></tr>
+<tr><th id="93">93</th><td>      <i>// Note that there are no other functions. No erasing or moving or other accessors.</i></td></tr>
+<tr><th id="94">94</th><td></td></tr>
+<tr><th id="95">95</th><td>    <b>private</b>:</td></tr>
+<tr><th id="96">96</th><td></td></tr>
+<tr><th id="97">97</th><td>      <b>class</b> <dfn class="tu type def" id="CLHEP::(anonymousnamespace)::ThreadSafeDefaultsCache::DefaultsNode" title='CLHEP::(anonymous namespace)::ThreadSafeDefaultsCache::DefaultsNode' data-ref="CLHEP::(anonymousnamespace)::ThreadSafeDefaultsCache::DefaultsNode">DefaultsNode</dfn> {</td></tr>
+<tr><th id="98">98</th><td>      <b>public</b>:</td></tr>
+<tr><th id="99">99</th><td>        <a class="tu decl" href="#_ZN5CLHEP12_GLOBAL__N_123ThreadSafeDefaultsCache12DefaultsNodeC1EPS2_" title='CLHEP::(anonymous namespace)::ThreadSafeDefaultsCache::DefaultsNode::DefaultsNode' data-type='void CLHEP::(anonymous namespace)::ThreadSafeDefaultsCache::DefaultsNode::DefaultsNode(CLHEP::(anonymous namespace)::ThreadSafeDefaultsCache::DefaultsNode * iNext)' data-ref="_ZN5CLHEP12_GLOBAL__N_123ThreadSafeDefaultsCache12DefaultsNodeC1EPS2_">DefaultsNode</a>(<a class="tu type" href="#CLHEP::(anonymousnamespace)::ThreadSafeDefaultsCache::DefaultsNode" title='CLHEP::(anonymous namespace)::ThreadSafeDefaultsCache::DefaultsNode' data-ref="CLHEP::(anonymousnamespace)::ThreadSafeDefaultsCache::DefaultsNode">DefaultsNode</a>* <dfn class="local col4 decl" id="4iNext" title='iNext' data-type='CLHEP::(anonymous namespace)::ThreadSafeDefaultsCache::DefaultsNode *' data-ref="4iNext">iNext</dfn>);</td></tr>
+<tr><th id="100">100</th><td>        <a class="tu type" href="#CLHEP::(anonymousnamespace)::ThreadSafeDefaultsCache::DefaultsNode" title='CLHEP::(anonymous namespace)::ThreadSafeDefaultsCache::DefaultsNode' data-ref="CLHEP::(anonymousnamespace)::ThreadSafeDefaultsCache::DefaultsNode">DefaultsNode</a> <em>const</em>* <dfn class="tu decl def" id="_ZNK5CLHEP12_GLOBAL__N_123ThreadSafeDefaultsCache12DefaultsNode4nextEv" title='CLHEP::(anonymous namespace)::ThreadSafeDefaultsCache::DefaultsNode::next' data-type='const CLHEP::(anonymous namespace)::ThreadSafeDefaultsCache::DefaultsNode * CLHEP::(anonymous namespace)::ThreadSafeDefaultsCache::DefaultsNode::next() const' data-ref="_ZNK5CLHEP12_GLOBAL__N_123ThreadSafeDefaultsCache12DefaultsNode4nextEv">next</dfn>() <em>const</em> { <b>return</b> <a class="tu member" href="#CLHEP::(anonymousnamespace)::ThreadSafeDefaultsCache::DefaultsNode::next_" title='CLHEP::(anonymous namespace)::ThreadSafeDefaultsCache::DefaultsNode::next_' data-use='r' data-ref="CLHEP::(anonymousnamespace)::ThreadSafeDefaultsCache::DefaultsNode::next_">next_</a>; }</td></tr>
+<tr><th id="101">101</th><td>        <em>void</em> <dfn class="tu decl def" id="_ZN5CLHEP12_GLOBAL__N_123ThreadSafeDefaultsCache12DefaultsNode7setNextEPS2_" title='CLHEP::(anonymous namespace)::ThreadSafeDefaultsCache::DefaultsNode::setNext' data-type='void CLHEP::(anonymous namespace)::ThreadSafeDefaultsCache::DefaultsNode::setNext(CLHEP::(anonymous namespace)::ThreadSafeDefaultsCache::DefaultsNode * v)' data-ref="_ZN5CLHEP12_GLOBAL__N_123ThreadSafeDefaultsCache12DefaultsNode7setNextEPS2_">setNext</dfn>(<a class="tu type" href="#CLHEP::(anonymousnamespace)::ThreadSafeDefaultsCache::DefaultsNode" title='CLHEP::(anonymous namespace)::ThreadSafeDefaultsCache::DefaultsNode' data-ref="CLHEP::(anonymousnamespace)::ThreadSafeDefaultsCache::DefaultsNode">DefaultsNode</a>* <dfn class="local col5 decl" id="5v" title='v' data-type='CLHEP::(anonymous namespace)::ThreadSafeDefaultsCache::DefaultsNode *' data-ref="5v">v</dfn>) { <a class="tu member" href="#CLHEP::(anonymousnamespace)::ThreadSafeDefaultsCache::DefaultsNode::next_" title='CLHEP::(anonymous namespace)::ThreadSafeDefaultsCache::DefaultsNode::next_' data-use='w' data-ref="CLHEP::(anonymousnamespace)::ThreadSafeDefaultsCache::DefaultsNode::next_">next_</a> = <a class="local col5 ref" href="#5v" title='v' data-ref="5v">v</a>; }</td></tr>
+<tr><th id="102">102</th><td>        <a class="tu type" href="#CLHEP::(anonymousnamespace)::defaults" title='CLHEP::(anonymous namespace)::defaults' data-ref="CLHEP::(anonymousnamespace)::defaults">defaults</a>* <dfn class="tu decl def" id="_ZN5CLHEP12_GLOBAL__N_123ThreadSafeDefaultsCache12DefaultsNode17addressOfDefaultsEv" title='CLHEP::(anonymous namespace)::ThreadSafeDefaultsCache::DefaultsNode::addressOfDefaults' data-type='CLHEP::(anonymous namespace)::defaults * CLHEP::(anonymous namespace)::ThreadSafeDefaultsCache::DefaultsNode::addressOfDefaults()' data-ref="_ZN5CLHEP12_GLOBAL__N_123ThreadSafeDefaultsCache12DefaultsNode17addressOfDefaultsEv">addressOfDefaults</dfn>() { <b>return</b> &amp;<a class="tu member" href="#CLHEP::(anonymousnamespace)::ThreadSafeDefaultsCache::DefaultsNode::defaults_" title='CLHEP::(anonymous namespace)::ThreadSafeDefaultsCache::DefaultsNode::defaults_' data-use='a' data-ref="CLHEP::(anonymousnamespace)::ThreadSafeDefaultsCache::DefaultsNode::defaults_">defaults_</a>; }</td></tr>
+<tr><th id="103">103</th><td>      <b>private</b>:</td></tr>
+<tr><th id="104">104</th><td>        <a class="tu type" href="#CLHEP::(anonymousnamespace)::ThreadSafeDefaultsCache::DefaultsNode" title='CLHEP::(anonymous namespace)::ThreadSafeDefaultsCache::DefaultsNode' data-ref="CLHEP::(anonymousnamespace)::ThreadSafeDefaultsCache::DefaultsNode">DefaultsNode</a>* <dfn class="tu decl" id="CLHEP::(anonymousnamespace)::ThreadSafeDefaultsCache::DefaultsNode::next_" title='CLHEP::(anonymous namespace)::ThreadSafeDefaultsCache::DefaultsNode::next_' data-type='CLHEP::(anonymous namespace)::ThreadSafeDefaultsCache::DefaultsNode *' data-ref="CLHEP::(anonymousnamespace)::ThreadSafeDefaultsCache::DefaultsNode::next_">next_</dfn>;</td></tr>
+<tr><th id="105">105</th><td>        <a class="tu type" href="#CLHEP::(anonymousnamespace)::defaults" title='CLHEP::(anonymous namespace)::defaults' data-ref="CLHEP::(anonymousnamespace)::defaults">defaults</a> <dfn class="tu decl" id="CLHEP::(anonymousnamespace)::ThreadSafeDefaultsCache::DefaultsNode::defaults_" title='CLHEP::(anonymous namespace)::ThreadSafeDefaultsCache::DefaultsNode::defaults_' data-type='CLHEP::(anonymous namespace)::defaults' data-ref="CLHEP::(anonymousnamespace)::ThreadSafeDefaultsCache::DefaultsNode::defaults_">defaults_</dfn>;</td></tr>
+<tr><th id="106">106</th><td>      };</td></tr>
+<tr><th id="107">107</th><td></td></tr>
+<tr><th id="108">108</th><td>      <i>// points to first node in the linked list</i></td></tr>
+<tr><th id="109">109</th><td>      std::atomic&lt;DefaultsNode*&gt; front_;</td></tr>
+<tr><th id="110">110</th><td>    };</td></tr>
+<tr><th id="111">111</th><td></td></tr>
+<tr><th id="112">112</th><td>    <a class="tu type" href="#CLHEP::(anonymousnamespace)::ThreadSafeDefaultsCache" title='CLHEP::(anonymous namespace)::ThreadSafeDefaultsCache' data-ref="CLHEP::(anonymousnamespace)::ThreadSafeDefaultsCache">ThreadSafeDefaultsCache</a>::<dfn class="tu decl def" id="_ZN5CLHEP12_GLOBAL__N_123ThreadSafeDefaultsCacheC1Ev" title='CLHEP::(anonymous namespace)::ThreadSafeDefaultsCache::ThreadSafeDefaultsCache' data-type='void CLHEP::(anonymous namespace)::ThreadSafeDefaultsCache::ThreadSafeDefaultsCache()' data-ref="_ZN5CLHEP12_GLOBAL__N_123ThreadSafeDefaultsCacheC1Ev">ThreadSafeDefaultsCache</dfn>() :</td></tr>
+<tr><th id="113">113</th><td>      front_(<b>nullptr</b>) {</td></tr>
+<tr><th id="114">114</th><td>    }</td></tr>
+<tr><th id="115">115</th><td></td></tr>
+<tr><th id="116">116</th><td>    <a class="tu type" href="#CLHEP::(anonymousnamespace)::defaults" title='CLHEP::(anonymous namespace)::defaults' data-ref="CLHEP::(anonymousnamespace)::defaults">defaults</a>* <a class="tu type" href="#CLHEP::(anonymousnamespace)::ThreadSafeDefaultsCache" title='CLHEP::(anonymous namespace)::ThreadSafeDefaultsCache' data-ref="CLHEP::(anonymousnamespace)::ThreadSafeDefaultsCache">ThreadSafeDefaultsCache</a>::<dfn class="tu decl def" id="_ZN5CLHEP12_GLOBAL__N_123ThreadSafeDefaultsCache17createNewDefaultsEv" title='CLHEP::(anonymous namespace)::ThreadSafeDefaultsCache::createNewDefaults' data-type='CLHEP::(anonymous namespace)::defaults * CLHEP::(anonymous namespace)::ThreadSafeDefaultsCache::createNewDefaults()' data-ref="_ZN5CLHEP12_GLOBAL__N_123ThreadSafeDefaultsCache17createNewDefaultsEv">createNewDefaults</dfn>() {</td></tr>
+<tr><th id="117">117</th><td>      <a class="tu type" href="#CLHEP::(anonymousnamespace)::ThreadSafeDefaultsCache::DefaultsNode" title='CLHEP::(anonymous namespace)::ThreadSafeDefaultsCache::DefaultsNode' data-ref="CLHEP::(anonymousnamespace)::ThreadSafeDefaultsCache::DefaultsNode">DefaultsNode</a>* <dfn class="local col6 decl" id="6expected" title='expected' data-type='CLHEP::(anonymous namespace)::ThreadSafeDefaultsCache::DefaultsNode *' data-ref="6expected">expected</dfn> = front_.load();</td></tr>
+<tr><th id="118">118</th><td>      <a class="tu type" href="#CLHEP::(anonymousnamespace)::ThreadSafeDefaultsCache::DefaultsNode" title='CLHEP::(anonymous namespace)::ThreadSafeDefaultsCache::DefaultsNode' data-ref="CLHEP::(anonymousnamespace)::ThreadSafeDefaultsCache::DefaultsNode">DefaultsNode</a>* <dfn class="local col7 decl" id="7newNode" title='newNode' data-type='CLHEP::(anonymous namespace)::ThreadSafeDefaultsCache::DefaultsNode *' data-ref="7newNode">newNode</dfn> = <b>new</b> <a class="tu type" href="#CLHEP::(anonymousnamespace)::ThreadSafeDefaultsCache::DefaultsNode" title='CLHEP::(anonymous namespace)::ThreadSafeDefaultsCache::DefaultsNode' data-ref="CLHEP::(anonymousnamespace)::ThreadSafeDefaultsCache::DefaultsNode">DefaultsNode</a><a class="tu ref" href="#_ZN5CLHEP12_GLOBAL__N_123ThreadSafeDefaultsCache12DefaultsNodeC1EPS2_" title='CLHEP::(anonymous namespace)::ThreadSafeDefaultsCache::DefaultsNode::DefaultsNode' data-use='c' data-ref="_ZN5CLHEP12_GLOBAL__N_123ThreadSafeDefaultsCache12DefaultsNodeC1EPS2_">(</a><a class="local col6 ref" href="#6expected" title='expected' data-ref="6expected">expected</a>);</td></tr>
+<tr><th id="119">119</th><td>      <b>while</b> (!front_.compare_exchange_strong(expected, newNode)) {</td></tr>
+<tr><th id="120">120</th><td>        <i>// another thread changed front_ before us so try again</i></td></tr>
+<tr><th id="121">121</th><td>        newNode-&gt;setNext(expected);</td></tr>
+<tr><th id="122">122</th><td>      }</td></tr>
+<tr><th id="123">123</th><td>      <b>return</b> <a class="local col7 ref" href="#7newNode" title='newNode' data-ref="7newNode">newNode</a>-&gt;<a class="tu ref" href="#_ZN5CLHEP12_GLOBAL__N_123ThreadSafeDefaultsCache12DefaultsNode17addressOfDefaultsEv" title='CLHEP::(anonymous namespace)::ThreadSafeDefaultsCache::DefaultsNode::addressOfDefaults' data-use='c' data-ref="_ZN5CLHEP12_GLOBAL__N_123ThreadSafeDefaultsCache12DefaultsNode17addressOfDefaultsEv">addressOfDefaults</a>();</td></tr>
+<tr><th id="124">124</th><td>    }</td></tr>
+<tr><th id="125">125</th><td></td></tr>
+<tr><th id="126">126</th><td>    <a class="tu type" href="#CLHEP::(anonymousnamespace)::ThreadSafeDefaultsCache" title='CLHEP::(anonymous namespace)::ThreadSafeDefaultsCache' data-ref="CLHEP::(anonymousnamespace)::ThreadSafeDefaultsCache">ThreadSafeDefaultsCache</a>::<a class="tu type" href="#CLHEP::(anonymousnamespace)::ThreadSafeDefaultsCache::DefaultsNode" title='CLHEP::(anonymous namespace)::ThreadSafeDefaultsCache::DefaultsNode' data-ref="CLHEP::(anonymousnamespace)::ThreadSafeDefaultsCache::DefaultsNode">DefaultsNode</a>::<dfn class="tu decl def" id="_ZN5CLHEP12_GLOBAL__N_123ThreadSafeDefaultsCache12DefaultsNodeC1EPS2_" title='CLHEP::(anonymous namespace)::ThreadSafeDefaultsCache::DefaultsNode::DefaultsNode' data-type='void CLHEP::(anonymous namespace)::ThreadSafeDefaultsCache::DefaultsNode::DefaultsNode(CLHEP::(anonymous namespace)::ThreadSafeDefaultsCache::DefaultsNode * iNext)' data-ref="_ZN5CLHEP12_GLOBAL__N_123ThreadSafeDefaultsCache12DefaultsNodeC1EPS2_">DefaultsNode</dfn>(<a class="tu type" href="#CLHEP::(anonymousnamespace)::ThreadSafeDefaultsCache::DefaultsNode" title='CLHEP::(anonymous namespace)::ThreadSafeDefaultsCache::DefaultsNode' data-ref="CLHEP::(anonymousnamespace)::ThreadSafeDefaultsCache::DefaultsNode">DefaultsNode</a>* <dfn class="local col8 decl" id="8iNext" title='iNext' data-type='CLHEP::(anonymous namespace)::ThreadSafeDefaultsCache::DefaultsNode *' data-ref="8iNext">iNext</dfn>) :</td></tr>
+<tr><th id="127">127</th><td>      <a class="tu member" href="#CLHEP::(anonymousnamespace)::ThreadSafeDefaultsCache::DefaultsNode::next_" title='CLHEP::(anonymous namespace)::ThreadSafeDefaultsCache::DefaultsNode::next_' data-use='w' data-ref="CLHEP::(anonymousnamespace)::ThreadSafeDefaultsCache::DefaultsNode::next_">next_</a>(<a class="local col8 ref" href="#8iNext" title='iNext' data-ref="8iNext">iNext</a>),</td></tr>
+<tr><th id="128">128</th><td>      <a class="tu member" href="#CLHEP::(anonymousnamespace)::ThreadSafeDefaultsCache::DefaultsNode::defaults_" title='CLHEP::(anonymous namespace)::ThreadSafeDefaultsCache::DefaultsNode::defaults_' data-use='w' data-ref="CLHEP::(anonymousnamespace)::ThreadSafeDefaultsCache::DefaultsNode::defaults_">defaults_</a><a class="tu ref" href="#_ZN5CLHEP12_GLOBAL__N_18defaultsC1Ev" title='CLHEP::(anonymous namespace)::defaults::defaults' data-use='c' data-ref="_ZN5CLHEP12_GLOBAL__N_18defaultsC1Ev">(</a>) {</td></tr>
+<tr><th id="129">129</th><td>    }</td></tr>
+<tr><th id="130">130</th><td></td></tr>
+<tr><th id="131">131</th><td>    <a class="tu type" href="#CLHEP::(anonymousnamespace)::ThreadSafeDefaultsCache" title='CLHEP::(anonymous namespace)::ThreadSafeDefaultsCache' data-ref="CLHEP::(anonymousnamespace)::ThreadSafeDefaultsCache">ThreadSafeDefaultsCache</a>::<dfn class="tu decl def" id="_ZN5CLHEP12_GLOBAL__N_123ThreadSafeDefaultsCacheD1Ev" title='CLHEP::(anonymous namespace)::ThreadSafeDefaultsCache::~ThreadSafeDefaultsCache' data-type='void CLHEP::(anonymous namespace)::ThreadSafeDefaultsCache::~ThreadSafeDefaultsCache()' data-ref="_ZN5CLHEP12_GLOBAL__N_123ThreadSafeDefaultsCacheD1Ev">~ThreadSafeDefaultsCache</dfn>() {</td></tr>
+<tr><th id="132">132</th><td>      <a class="tu type" href="#CLHEP::(anonymousnamespace)::ThreadSafeDefaultsCache::DefaultsNode" title='CLHEP::(anonymous namespace)::ThreadSafeDefaultsCache::DefaultsNode' data-ref="CLHEP::(anonymousnamespace)::ThreadSafeDefaultsCache::DefaultsNode">DefaultsNode</a> <em>const</em>* <dfn class="local col9 decl" id="9node" title='node' data-type='const CLHEP::(anonymous namespace)::ThreadSafeDefaultsCache::DefaultsNode *' data-ref="9node">node</dfn> = front_.load();</td></tr>
+<tr><th id="133">133</th><td>      <b>while</b> (<a class="local col9 ref" href="#9node" title='node' data-ref="9node">node</a>) {</td></tr>
+<tr><th id="134">134</th><td>        <a class="tu type" href="#CLHEP::(anonymousnamespace)::ThreadSafeDefaultsCache::DefaultsNode" title='CLHEP::(anonymous namespace)::ThreadSafeDefaultsCache::DefaultsNode' data-ref="CLHEP::(anonymousnamespace)::ThreadSafeDefaultsCache::DefaultsNode">DefaultsNode</a> <em>const</em>* <dfn class="local col0 decl" id="10next" title='next' data-type='const CLHEP::(anonymous namespace)::ThreadSafeDefaultsCache::DefaultsNode *' data-ref="10next">next</dfn> = <a class="local col9 ref" href="#9node" title='node' data-ref="9node">node</a>-&gt;<a class="tu ref" href="#_ZNK5CLHEP12_GLOBAL__N_123ThreadSafeDefaultsCache12DefaultsNode4nextEv" title='CLHEP::(anonymous namespace)::ThreadSafeDefaultsCache::DefaultsNode::next' data-use='c' data-ref="_ZNK5CLHEP12_GLOBAL__N_123ThreadSafeDefaultsCache12DefaultsNode4nextEv">next</a>();</td></tr>
+<tr><th id="135">135</th><td>        <b>delete</b> <a class="local col9 ref" href="#9node" title='node' data-ref="9node">node</a>;</td></tr>
+<tr><th id="136">136</th><td>        <a class="local col9 ref" href="#9node" title='node' data-ref="9node">node</a> = <a class="local col0 ref" href="#10next" title='next' data-ref="10next">next</a>;</td></tr>
+<tr><th id="137">137</th><td>      }</td></tr>
+<tr><th id="138">138</th><td>    }</td></tr>
+<tr><th id="139">139</th><td></td></tr>
+<tr><th id="140">140</th><td>    <a class="tu type" href="#CLHEP::(anonymousnamespace)::defaults" title='CLHEP::(anonymous namespace)::defaults' data-ref="CLHEP::(anonymousnamespace)::defaults">defaults</a> &amp;  <dfn class="tu decl def" id="_ZN5CLHEP12_GLOBAL__N_111theDefaultsEv" title='CLHEP::(anonymous namespace)::theDefaults' data-type='CLHEP::(anonymous namespace)::defaults &amp; CLHEP::(anonymous namespace)::theDefaults()' data-ref="_ZN5CLHEP12_GLOBAL__N_111theDefaultsEv">theDefaults</dfn>()  {</td></tr>
+<tr><th id="141">141</th><td></td></tr>
+<tr><th id="142">142</th><td>      <i>// We need to have different engines on different threads because</i></td></tr>
+<tr><th id="143">143</th><td><i>      // the engines are not thread safe. One cannot generate random numbers</i></td></tr>
+<tr><th id="144">144</th><td><i>      // using the same engine on different threads simultaneously.</i></td></tr>
+<tr><th id="145">145</th><td><i>      // Originally we had the defaults object itself as a thread local,</i></td></tr>
+<tr><th id="146">146</th><td><i>      // but that was failing because on Mac OSX there is not full</i></td></tr>
+<tr><th id="147">147</th><td><i>      // support for thread locals yet.  Objects containing std::shared_ptr</i></td></tr>
+<tr><th id="148">148</th><td><i>      // in thread local storage were causing failures. So now we create</i></td></tr>
+<tr><th id="149">149</th><td><i>      // a container of them that is a function static (not thread local)</i></td></tr>
+<tr><th id="150">150</th><td><i>      // and the thread local contains only a pointer to an object in the</i></td></tr>
+<tr><th id="151">151</th><td><i>      // container.</i></td></tr>
+<tr><th id="152">152</th><td>      <em>static</em> <a class="tu type" href="#CLHEP::(anonymousnamespace)::ThreadSafeDefaultsCache" title='CLHEP::(anonymous namespace)::ThreadSafeDefaultsCache' data-ref="CLHEP::(anonymousnamespace)::ThreadSafeDefaultsCache">ThreadSafeDefaultsCache</a> <a class="tu ref fake" href="#_ZN5CLHEP12_GLOBAL__N_123ThreadSafeDefaultsCacheC1Ev" title='CLHEP::(anonymous namespace)::ThreadSafeDefaultsCache::ThreadSafeDefaultsCache' data-use='c' data-ref="_ZN5CLHEP12_GLOBAL__N_123ThreadSafeDefaultsCacheC1Ev"></a><dfn class="local col1 decl" id="11defaultsForAllThreads" title='defaultsForAllThreads' data-type='CLHEP::(anonymous namespace)::ThreadSafeDefaultsCache' data-ref="11defaultsForAllThreads">defaultsForAllThreads</dfn>;</td></tr>
+<tr><th id="153">153</th><td></td></tr>
+<tr><th id="154">154</th><td>      <i>// A pointer for each thread to defaults object built for each thread.</i></td></tr>
+<tr><th id="155">155</th><td>      <em>static</em> <a class="macro" href="../include/CLHEP/Utility/thread_local.h.html#13" title="thread_local" data-ref="_M/CLHEP_THREAD_LOCAL">CLHEP_THREAD_LOCAL</a> <a class="tu type" href="#CLHEP::(anonymousnamespace)::defaults" title='CLHEP::(anonymous namespace)::defaults' data-ref="CLHEP::(anonymousnamespace)::defaults">defaults</a>* <dfn class="local col2 decl" id="12theDefaults" title='theDefaults' data-type='CLHEP::(anonymous namespace)::defaults *' data-ref="12theDefaults">theDefaults</dfn> = <a class="local col1 ref" href="#11defaultsForAllThreads" title='defaultsForAllThreads' data-ref="11defaultsForAllThreads">defaultsForAllThreads</a>.<a class="tu ref" href="#_ZN5CLHEP12_GLOBAL__N_123ThreadSafeDefaultsCache17createNewDefaultsEv" title='CLHEP::(anonymous namespace)::ThreadSafeDefaultsCache::createNewDefaults' data-use='c' data-ref="_ZN5CLHEP12_GLOBAL__N_123ThreadSafeDefaultsCache17createNewDefaultsEv">createNewDefaults</a>();</td></tr>
+<tr><th id="156">156</th><td></td></tr>
+<tr><th id="157">157</th><td>      <b>return</b> *<a class="local col2 ref" href="#12theDefaults" title='theDefaults' data-ref="12theDefaults">theDefaults</a>;</td></tr>
+<tr><th id="158">158</th><td>    }</td></tr>
+<tr><th id="159">159</th><td><u>#<span data-ppcond="76">else</span></u></td></tr>
+<tr><th id="160">160</th><td></td></tr>
+<tr><th id="161">161</th><td>    <i>// This version is used with old compilers not supporting atomics.</i></td></tr>
+<tr><th id="162">162</th><td><i>    // In that case, the code should not be executed in more than one thread.</i></td></tr>
+<tr><th id="163">163</th><td>    defaults &amp;  theDefaults()  {</td></tr>
+<tr><th id="164">164</th><td>      <em>static</em> defaults theDefaults;</td></tr>
+<tr><th id="165">165</th><td>      <b>return</b> theDefaults;</td></tr>
+<tr><th id="166">166</th><td>    }</td></tr>
+<tr><th id="167">167</th><td></td></tr>
+<tr><th id="168">168</th><td><u>#<span data-ppcond="76">endif</span></u></td></tr>
+<tr><th id="169">169</th><td></td></tr>
+<tr><th id="170">170</th><td>  }  <i>// namespace</i></td></tr>
+<tr><th id="171">171</th><td></td></tr>
+<tr><th id="172">172</th><td><i>//---------------------------- HepRandom ---------------------------------</i></td></tr>
+<tr><th id="173">173</th><td></td></tr>
+<tr><th id="174">174</th><td><a class="type" href="../include/CLHEP/Random/Random.h.html#CLHEP::HepRandom" title='CLHEP::HepRandom' data-ref="CLHEP::HepRandom">HepRandom</a>::<dfn class="decl def" id="_ZN5CLHEP9HepRandomC1Ev" title='CLHEP::HepRandom::HepRandom' data-ref="_ZN5CLHEP9HepRandomC1Ev">HepRandom</dfn>()</td></tr>
+<tr><th id="175">175</th><td>{ }</td></tr>
+<tr><th id="176">176</th><td></td></tr>
+<tr><th id="177">177</th><td><a class="type" href="../include/CLHEP/Random/Random.h.html#CLHEP::HepRandom" title='CLHEP::HepRandom' data-ref="CLHEP::HepRandom">HepRandom</a>::<dfn class="decl def" id="_ZN5CLHEP9HepRandomC1El" title='CLHEP::HepRandom::HepRandom' data-ref="_ZN5CLHEP9HepRandomC1El">HepRandom</dfn>(<em>long</em> <dfn class="local col3 decl" id="13seed" title='seed' data-type='long' data-ref="13seed">seed</dfn>)</td></tr>
+<tr><th id="178">178</th><td>{</td></tr>
+<tr><th id="179">179</th><td>  <a class="member" href="#_ZN5CLHEP9HepRandom10setTheSeedEli" title='CLHEP::HepRandom::setTheSeed' data-ref="_ZN5CLHEP9HepRandom10setTheSeedEli">setTheSeed</a>(<a class="local col3 ref" href="#13seed" title='seed' data-ref="13seed">seed</a>);</td></tr>
+<tr><th id="180">180</th><td>}</td></tr>
+<tr><th id="181">181</th><td></td></tr>
+<tr><th id="182">182</th><td><a class="type" href="../include/CLHEP/Random/Random.h.html#CLHEP::HepRandom" title='CLHEP::HepRandom' data-ref="CLHEP::HepRandom">HepRandom</a>::<dfn class="decl def" id="_ZN5CLHEP9HepRandomC1ERNS_15HepRandomEngineE" title='CLHEP::HepRandom::HepRandom' data-ref="_ZN5CLHEP9HepRandomC1ERNS_15HepRandomEngineE">HepRandom</dfn>(<a class="type" href="../include/CLHEP/Random/RandomEngine.h.html#CLHEP::HepRandomEngine" title='CLHEP::HepRandomEngine' data-ref="CLHEP::HepRandomEngine">HepRandomEngine</a> &amp; <dfn class="local col4 decl" id="14algorithm" title='algorithm' data-type='CLHEP::HepRandomEngine &amp;' data-ref="14algorithm">algorithm</dfn>)</td></tr>
+<tr><th id="183">183</th><td>{</td></tr>
+<tr><th id="184">184</th><td>  <a class="tu ref" href="#_ZN5CLHEP12_GLOBAL__N_111theDefaultsEv" title='CLHEP::(anonymous namespace)::theDefaults' data-use='c' data-ref="_ZN5CLHEP12_GLOBAL__N_111theDefaultsEv">theDefaults</a>().<a class="tu ref" href="#_ZN5CLHEP12_GLOBAL__N_18defaults11resetEngineERNS_15HepRandomEngineE" title='CLHEP::(anonymous namespace)::defaults::resetEngine' data-use='c' data-ref="_ZN5CLHEP12_GLOBAL__N_18defaults11resetEngineERNS_15HepRandomEngineE">resetEngine</a>( <span class='refarg'><a class="local col4 ref" href="#14algorithm" title='algorithm' data-ref="14algorithm">algorithm</a></span> );</td></tr>
+<tr><th id="185">185</th><td>}</td></tr>
+<tr><th id="186">186</th><td></td></tr>
+<tr><th id="187">187</th><td><a class="type" href="../include/CLHEP/Random/Random.h.html#CLHEP::HepRandom" title='CLHEP::HepRandom' data-ref="CLHEP::HepRandom">HepRandom</a>::<dfn class="decl def" id="_ZN5CLHEP9HepRandomC1EPNS_15HepRandomEngineE" title='CLHEP::HepRandom::HepRandom' data-ref="_ZN5CLHEP9HepRandomC1EPNS_15HepRandomEngineE">HepRandom</dfn>(<a class="type" href="../include/CLHEP/Random/RandomEngine.h.html#CLHEP::HepRandomEngine" title='CLHEP::HepRandomEngine' data-ref="CLHEP::HepRandomEngine">HepRandomEngine</a> * <dfn class="local col5 decl" id="15algorithm" title='algorithm' data-type='CLHEP::HepRandomEngine *' data-ref="15algorithm">algorithm</dfn>)</td></tr>
+<tr><th id="188">188</th><td>{</td></tr>
+<tr><th id="189">189</th><td>  <a class="tu ref" href="#_ZN5CLHEP12_GLOBAL__N_111theDefaultsEv" title='CLHEP::(anonymous namespace)::theDefaults' data-use='c' data-ref="_ZN5CLHEP12_GLOBAL__N_111theDefaultsEv">theDefaults</a>().<a class="tu ref" href="#_ZN5CLHEP12_GLOBAL__N_18defaults11resetEngineEPNS_15HepRandomEngineE" title='CLHEP::(anonymous namespace)::defaults::resetEngine' data-use='c' data-ref="_ZN5CLHEP12_GLOBAL__N_18defaults11resetEngineEPNS_15HepRandomEngineE">resetEngine</a>( <a class="local col5 ref" href="#15algorithm" title='algorithm' data-ref="15algorithm">algorithm</a> );</td></tr>
+<tr><th id="190">190</th><td>}</td></tr>
+<tr><th id="191">191</th><td></td></tr>
+<tr><th id="192">192</th><td><a class="type" href="../include/CLHEP/Random/Random.h.html#CLHEP::HepRandom" title='CLHEP::HepRandom' data-ref="CLHEP::HepRandom">HepRandom</a>::<dfn class="virtual decl def" id="_ZN5CLHEP9HepRandomD1Ev" title='CLHEP::HepRandom::~HepRandom' data-ref="_ZN5CLHEP9HepRandomD1Ev">~HepRandom</dfn>()</td></tr>
+<tr><th id="193">193</th><td>{ }</td></tr>
+<tr><th id="194">194</th><td></td></tr>
+<tr><th id="195">195</th><td><em>double</em> <a class="type" href="../include/CLHEP/Random/Random.h.html#CLHEP::HepRandom" title='CLHEP::HepRandom' data-ref="CLHEP::HepRandom">HepRandom</a>::<dfn class="decl def" id="_ZN5CLHEP9HepRandom4flatEv" title='CLHEP::HepRandom::flat' data-ref="_ZN5CLHEP9HepRandom4flatEv">flat</dfn>()</td></tr>
+<tr><th id="196">196</th><td>{</td></tr>
+<tr><th id="197">197</th><td>  <b>return</b> theDefaults().theEngine-&gt;flat();</td></tr>
+<tr><th id="198">198</th><td>}</td></tr>
+<tr><th id="199">199</th><td></td></tr>
+<tr><th id="200">200</th><td><em>void</em> <a class="type" href="../include/CLHEP/Random/Random.h.html#CLHEP::HepRandom" title='CLHEP::HepRandom' data-ref="CLHEP::HepRandom">HepRandom</a>::<dfn class="decl def" id="_ZN5CLHEP9HepRandom9flatArrayEiPd" title='CLHEP::HepRandom::flatArray' data-ref="_ZN5CLHEP9HepRandom9flatArrayEiPd">flatArray</dfn>(<em>const</em> <em>int</em> <dfn class="local col6 decl" id="16size" title='size' data-type='const int' data-ref="16size">size</dfn>, <em>double</em>* <dfn class="local col7 decl" id="17vect" title='vect' data-type='double *' data-ref="17vect">vect</dfn>)</td></tr>
+<tr><th id="201">201</th><td>{</td></tr>
+<tr><th id="202">202</th><td>  theDefaults().theEngine-&gt;flatArray(size,vect);</td></tr>
+<tr><th id="203">203</th><td>}</td></tr>
+<tr><th id="204">204</th><td></td></tr>
+<tr><th id="205">205</th><td><em>double</em> <a class="type" href="../include/CLHEP/Random/Random.h.html#CLHEP::HepRandom" title='CLHEP::HepRandom' data-ref="CLHEP::HepRandom">HepRandom</a>::<dfn class="virtual decl def" id="_ZN5CLHEP9HepRandomclEv" title='CLHEP::HepRandom::operator()' data-ref="_ZN5CLHEP9HepRandomclEv"><b>operator</b>()</dfn>() {</td></tr>
+<tr><th id="206">206</th><td>  <b>return</b> <a class="member" href="#_ZN5CLHEP9HepRandom4flatEv" title='CLHEP::HepRandom::flat' data-ref="_ZN5CLHEP9HepRandom4flatEv">flat</a>();</td></tr>
+<tr><th id="207">207</th><td>}</td></tr>
+<tr><th id="208">208</th><td></td></tr>
+<tr><th id="209">209</th><td>std::string HepRandom::name() <em>const</em> {<b>return</b> <q>"HepRandom"</q>;}</td></tr>
+<tr><th id="210">210</th><td><a class="type" href="../include/CLHEP/Random/RandomEngine.h.html#CLHEP::HepRandomEngine" title='CLHEP::HepRandomEngine' data-ref="CLHEP::HepRandomEngine">HepRandomEngine</a> &amp; <a class="type" href="../include/CLHEP/Random/Random.h.html#CLHEP::HepRandom" title='CLHEP::HepRandom' data-ref="CLHEP::HepRandom">HepRandom</a>::<dfn class="virtual decl def" id="_ZN5CLHEP9HepRandom6engineEv" title='CLHEP::HepRandom::engine' data-ref="_ZN5CLHEP9HepRandom6engineEv">engine</dfn>() {</td></tr>
+<tr><th id="211">211</th><td>  std::cerr &lt;&lt; <q>"HepRandom::engine() called -- there is no assigned engine!\n"</q>;</td></tr>
+<tr><th id="212">212</th><td>  <b>return</b> *theDefaults().theEngine.get();</td></tr>
+<tr><th id="213">213</th><td>}</td></tr>
+<tr><th id="214">214</th><td></td></tr>
+<tr><th id="215">215</th><td>std::ostream &amp; <b>operator</b>&lt;&lt; (std::ostream &amp; os, <em>const</em> HepRandom &amp; dist) {</td></tr>
+<tr><th id="216">216</th><td>  <b>return</b> dist.put(os);</td></tr>
+<tr><th id="217">217</th><td>}</td></tr>
+<tr><th id="218">218</th><td></td></tr>
+<tr><th id="219">219</th><td>std::istream &amp; <b>operator</b>&gt;&gt; (std::istream &amp; is, HepRandom &amp; dist) {</td></tr>
+<tr><th id="220">220</th><td>  <b>return</b> dist.get(is);</td></tr>
+<tr><th id="221">221</th><td>}</td></tr>
+<tr><th id="222">222</th><td></td></tr>
+<tr><th id="223">223</th><td>std::ostream &amp; HepRandom::put(std::ostream &amp; os) <em>const</em> {<b>return</b> os;}</td></tr>
+<tr><th id="224">224</th><td>std::istream &amp; HepRandom::get(std::istream &amp; is) {<b>return</b> is;}</td></tr>
+<tr><th id="225">225</th><td></td></tr>
+<tr><th id="226">226</th><td><i>// --------------------------</i></td></tr>
+<tr><th id="227">227</th><td><i>// Static methods definitions</i></td></tr>
+<tr><th id="228">228</th><td><i>// --------------------------</i></td></tr>
+<tr><th id="229">229</th><td></td></tr>
+<tr><th id="230">230</th><td><em>void</em> <a class="type" href="../include/CLHEP/Random/Random.h.html#CLHEP::HepRandom" title='CLHEP::HepRandom' data-ref="CLHEP::HepRandom">HepRandom</a>::<dfn class="decl def" id="_ZN5CLHEP9HepRandom10setTheSeedEli" title='CLHEP::HepRandom::setTheSeed' data-ref="_ZN5CLHEP9HepRandom10setTheSeedEli">setTheSeed</dfn>(<em>long</em> <dfn class="local col8 decl" id="18seed" title='seed' data-type='long' data-ref="18seed">seed</dfn>, <em>int</em> <dfn class="local col9 decl" id="19lux" title='lux' data-type='int' data-ref="19lux">lux</dfn>)</td></tr>
+<tr><th id="231">231</th><td>{</td></tr>
+<tr><th id="232">232</th><td>  theDefaults().theEngine-&gt;setSeed(seed,lux);</td></tr>
+<tr><th id="233">233</th><td>}</td></tr>
+<tr><th id="234">234</th><td></td></tr>
+<tr><th id="235">235</th><td><em>long</em> <a class="type" href="../include/CLHEP/Random/Random.h.html#CLHEP::HepRandom" title='CLHEP::HepRandom' data-ref="CLHEP::HepRandom">HepRandom</a>::<dfn class="decl def" id="_ZN5CLHEP9HepRandom10getTheSeedEv" title='CLHEP::HepRandom::getTheSeed' data-ref="_ZN5CLHEP9HepRandom10getTheSeedEv">getTheSeed</dfn>()</td></tr>
+<tr><th id="236">236</th><td>{</td></tr>
+<tr><th id="237">237</th><td>  <b>return</b> theDefaults().theEngine-&gt;getSeed();</td></tr>
+<tr><th id="238">238</th><td>}</td></tr>
+<tr><th id="239">239</th><td></td></tr>
+<tr><th id="240">240</th><td><em>void</em> <a class="type" href="../include/CLHEP/Random/Random.h.html#CLHEP::HepRandom" title='CLHEP::HepRandom' data-ref="CLHEP::HepRandom">HepRandom</a>::<dfn class="decl def" id="_ZN5CLHEP9HepRandom11setTheSeedsEPKli" title='CLHEP::HepRandom::setTheSeeds' data-ref="_ZN5CLHEP9HepRandom11setTheSeedsEPKli">setTheSeeds</dfn>(<em>const</em> <em>long</em>* <dfn class="local col0 decl" id="20seeds" title='seeds' data-type='const long *' data-ref="20seeds">seeds</dfn>, <em>int</em> <dfn class="local col1 decl" id="21aux" title='aux' data-type='int' data-ref="21aux">aux</dfn>)</td></tr>
+<tr><th id="241">241</th><td>{</td></tr>
+<tr><th id="242">242</th><td>  theDefaults().theEngine-&gt;setSeeds(seeds,aux);</td></tr>
+<tr><th id="243">243</th><td>}</td></tr>
+<tr><th id="244">244</th><td></td></tr>
+<tr><th id="245">245</th><td><em>const</em> <em>long</em>* <a class="type" href="../include/CLHEP/Random/Random.h.html#CLHEP::HepRandom" title='CLHEP::HepRandom' data-ref="CLHEP::HepRandom">HepRandom</a>::<dfn class="decl def" id="_ZN5CLHEP9HepRandom11getTheSeedsEv" title='CLHEP::HepRandom::getTheSeeds' data-ref="_ZN5CLHEP9HepRandom11getTheSeedsEv">getTheSeeds</dfn> ()</td></tr>
+<tr><th id="246">246</th><td>{</td></tr>
+<tr><th id="247">247</th><td>  <b>return</b> theDefaults().theEngine-&gt;getSeeds();</td></tr>
+<tr><th id="248">248</th><td>}</td></tr>
+<tr><th id="249">249</th><td></td></tr>
+<tr><th id="250">250</th><td><em>void</em> <a class="type" href="../include/CLHEP/Random/Random.h.html#CLHEP::HepRandom" title='CLHEP::HepRandom' data-ref="CLHEP::HepRandom">HepRandom</a>::<dfn class="decl def" id="_ZN5CLHEP9HepRandom16getTheTableSeedsEPli" title='CLHEP::HepRandom::getTheTableSeeds' data-ref="_ZN5CLHEP9HepRandom16getTheTableSeedsEPli">getTheTableSeeds</dfn>(<em>long</em>* <dfn class="local col2 decl" id="22seeds" title='seeds' data-type='long *' data-ref="22seeds">seeds</dfn>, <em>int</em> <dfn class="local col3 decl" id="23index" title='index' data-type='int' data-ref="23index">index</dfn>)</td></tr>
+<tr><th id="251">251</th><td>{</td></tr>
+<tr><th id="252">252</th><td>  <b>if</b> ((<a class="local col3 ref" href="#23index" title='index' data-ref="23index">index</a> &gt;= <var>0</var>) &amp;&amp; (<a class="local col3 ref" href="#23index" title='index' data-ref="23index">index</a> &lt; <var>215</var>)) {</td></tr>
+<tr><th id="253">253</th><td>    <a class="local col2 ref" href="#22seeds" title='seeds' data-ref="22seeds">seeds</a>[<var>0</var>] = <a class="member" href="../include/CLHEP/Random/Random.h.html#CLHEP::HepRandom::seedTable" title='CLHEP::HepRandom::seedTable' data-ref="CLHEP::HepRandom::seedTable">seedTable</a>[<a class="local col3 ref" href="#23index" title='index' data-ref="23index">index</a>][<var>0</var>];</td></tr>
+<tr><th id="254">254</th><td>    <a class="local col2 ref" href="#22seeds" title='seeds' data-ref="22seeds">seeds</a>[<var>1</var>] = <a class="member" href="../include/CLHEP/Random/Random.h.html#CLHEP::HepRandom::seedTable" title='CLHEP::HepRandom::seedTable' data-ref="CLHEP::HepRandom::seedTable">seedTable</a>[<a class="local col3 ref" href="#23index" title='index' data-ref="23index">index</a>][<var>1</var>];</td></tr>
+<tr><th id="255">255</th><td>  }</td></tr>
+<tr><th id="256">256</th><td>  <b>else</b> seeds = NULL;</td></tr>
+<tr><th id="257">257</th><td>}</td></tr>
+<tr><th id="258">258</th><td></td></tr>
+<tr><th id="259">259</th><td><a class="type" href="../include/CLHEP/Random/Random.h.html#CLHEP::HepRandom" title='CLHEP::HepRandom' data-ref="CLHEP::HepRandom">HepRandom</a> * <a class="type" href="../include/CLHEP/Random/Random.h.html#CLHEP::HepRandom" title='CLHEP::HepRandom' data-ref="CLHEP::HepRandom">HepRandom</a>::<dfn class="decl def" id="_ZN5CLHEP9HepRandom15getTheGeneratorEv" title='CLHEP::HepRandom::getTheGenerator' data-ref="_ZN5CLHEP9HepRandom15getTheGeneratorEv">getTheGenerator</dfn>()</td></tr>
+<tr><th id="260">260</th><td>{</td></tr>
+<tr><th id="261">261</th><td>  <b>return</b> theDefaults().theGenerator.get();</td></tr>
+<tr><th id="262">262</th><td>}</td></tr>
+<tr><th id="263">263</th><td></td></tr>
+<tr><th id="264">264</th><td><a class="type" href="../include/CLHEP/Random/RandomEngine.h.html#CLHEP::HepRandomEngine" title='CLHEP::HepRandomEngine' data-ref="CLHEP::HepRandomEngine">HepRandomEngine</a> * <a class="type" href="../include/CLHEP/Random/Random.h.html#CLHEP::HepRandom" title='CLHEP::HepRandom' data-ref="CLHEP::HepRandom">HepRandom</a>::<dfn class="decl def" id="_ZN5CLHEP9HepRandom12getTheEngineEv" title='CLHEP::HepRandom::getTheEngine' data-ref="_ZN5CLHEP9HepRandom12getTheEngineEv">getTheEngine</dfn>()</td></tr>
+<tr><th id="265">265</th><td>{</td></tr>
+<tr><th id="266">266</th><td>  <b>return</b> theDefaults().theEngine.get();</td></tr>
+<tr><th id="267">267</th><td>}</td></tr>
+<tr><th id="268">268</th><td></td></tr>
+<tr><th id="269">269</th><td><em>void</em> <a class="type" href="../include/CLHEP/Random/Random.h.html#CLHEP::HepRandom" title='CLHEP::HepRandom' data-ref="CLHEP::HepRandom">HepRandom</a>::<dfn class="decl def" id="_ZN5CLHEP9HepRandom12setTheEngineEPNS_15HepRandomEngineE" title='CLHEP::HepRandom::setTheEngine' data-ref="_ZN5CLHEP9HepRandom12setTheEngineEPNS_15HepRandomEngineE">setTheEngine</dfn> (<a class="type" href="../include/CLHEP/Random/RandomEngine.h.html#CLHEP::HepRandomEngine" title='CLHEP::HepRandomEngine' data-ref="CLHEP::HepRandomEngine">HepRandomEngine</a>* <dfn class="local col4 decl" id="24theNewEngine" title='theNewEngine' data-type='CLHEP::HepRandomEngine *' data-ref="24theNewEngine">theNewEngine</dfn>)</td></tr>
+<tr><th id="270">270</th><td>{</td></tr>
+<tr><th id="271">271</th><td>  theDefaults().theEngine.reset( theNewEngine, do_nothing_deleter() );</td></tr>
+<tr><th id="272">272</th><td>}</td></tr>
+<tr><th id="273">273</th><td></td></tr>
+<tr><th id="274">274</th><td><em>void</em> <a class="type" href="../include/CLHEP/Random/Random.h.html#CLHEP::HepRandom" title='CLHEP::HepRandom' data-ref="CLHEP::HepRandom">HepRandom</a>::<dfn class="decl def" id="_ZN5CLHEP9HepRandom16saveEngineStatusEPKc" title='CLHEP::HepRandom::saveEngineStatus' data-ref="_ZN5CLHEP9HepRandom16saveEngineStatusEPKc">saveEngineStatus</dfn>( <em>const</em> <em>char</em> <dfn class="local col5 decl" id="25filename" title='filename' data-type='const char *' data-ref="25filename">filename</dfn>[] )</td></tr>
+<tr><th id="275">275</th><td>{</td></tr>
+<tr><th id="276">276</th><td>  theDefaults().theEngine-&gt;saveStatus( filename );</td></tr>
+<tr><th id="277">277</th><td>}</td></tr>
+<tr><th id="278">278</th><td></td></tr>
+<tr><th id="279">279</th><td><em>void</em> <a class="type" href="../include/CLHEP/Random/Random.h.html#CLHEP::HepRandom" title='CLHEP::HepRandom' data-ref="CLHEP::HepRandom">HepRandom</a>::<dfn class="decl def" id="_ZN5CLHEP9HepRandom19restoreEngineStatusEPKc" title='CLHEP::HepRandom::restoreEngineStatus' data-ref="_ZN5CLHEP9HepRandom19restoreEngineStatusEPKc">restoreEngineStatus</dfn>( <em>const</em> <em>char</em> <dfn class="local col6 decl" id="26filename" title='filename' data-type='const char *' data-ref="26filename">filename</dfn>[] )</td></tr>
+<tr><th id="280">280</th><td>{</td></tr>
+<tr><th id="281">281</th><td>  theDefaults().theEngine-&gt;restoreStatus( filename );</td></tr>
+<tr><th id="282">282</th><td>}</td></tr>
+<tr><th id="283">283</th><td></td></tr>
+<tr><th id="284">284</th><td>std::ostream&amp; HepRandom::saveFullState ( std::ostream &amp; os ) {</td></tr>
+<tr><th id="285">285</th><td>  os &lt;&lt; *getTheEngine();</td></tr>
+<tr><th id="286">286</th><td>  <b>return</b> os;</td></tr>
+<tr><th id="287">287</th><td>}</td></tr>
+<tr><th id="288">288</th><td></td></tr>
+<tr><th id="289">289</th><td>std::istream&amp; HepRandom::restoreFullState ( std::istream &amp; is ) {</td></tr>
+<tr><th id="290">290</th><td>  is &gt;&gt; *getTheEngine();</td></tr>
+<tr><th id="291">291</th><td>  <b>return</b> is;</td></tr>
+<tr><th id="292">292</th><td>}</td></tr>
+<tr><th id="293">293</th><td></td></tr>
+<tr><th id="294">294</th><td>std::ostream&amp; HepRandom::saveStaticRandomStates ( std::ostream &amp; os ) {</td></tr>
+<tr><th id="295">295</th><td>  <b>return</b> StaticRandomStates::save(os);</td></tr>
+<tr><th id="296">296</th><td>}</td></tr>
+<tr><th id="297">297</th><td></td></tr>
+<tr><th id="298">298</th><td>std::istream&amp; HepRandom::restoreStaticRandomStates ( std::istream &amp; is ) {</td></tr>
+<tr><th id="299">299</th><td>  <b>return</b> StaticRandomStates::restore(is);</td></tr>
+<tr><th id="300">300</th><td>}</td></tr>
+<tr><th id="301">301</th><td></td></tr>
+<tr><th id="302">302</th><td><em>void</em> <a class="type" href="../include/CLHEP/Random/Random.h.html#CLHEP::HepRandom" title='CLHEP::HepRandom' data-ref="CLHEP::HepRandom">HepRandom</a>::<dfn class="decl def" id="_ZN5CLHEP9HepRandom16showEngineStatusEv" title='CLHEP::HepRandom::showEngineStatus' data-ref="_ZN5CLHEP9HepRandom16showEngineStatusEv">showEngineStatus</dfn>()</td></tr>
+<tr><th id="303">303</th><td>{</td></tr>
+<tr><th id="304">304</th><td>  theDefaults().theEngine-&gt;showStatus();</td></tr>
+<tr><th id="305">305</th><td>}</td></tr>
+<tr><th id="306">306</th><td></td></tr>
+<tr><th id="307">307</th><td><em>int</em> <a class="type" href="../include/CLHEP/Random/Random.h.html#CLHEP::HepRandom" title='CLHEP::HepRandom' data-ref="CLHEP::HepRandom">HepRandom</a>::<dfn class="decl def" id="_ZN5CLHEP9HepRandom14createInstanceEv" title='CLHEP::HepRandom::createInstance' data-ref="_ZN5CLHEP9HepRandom14createInstanceEv">createInstance</dfn>()</td></tr>
+<tr><th id="308">308</th><td>{</td></tr>
+<tr><th id="309">309</th><td>  <b>return</b> <b>static_cast</b>&lt;<em>int</em>&gt;( <a class="tu ref" href="#_ZN5CLHEP12_GLOBAL__N_111theDefaultsEv" title='CLHEP::(anonymous namespace)::theDefaults' data-use='c' data-ref="_ZN5CLHEP12_GLOBAL__N_111theDefaultsEv">theDefaults</a>().<a class="tu ref" href="#_ZN5CLHEP12_GLOBAL__N_18defaults17ensureInitializedEv" title='CLHEP::(anonymous namespace)::defaults::ensureInitialized' data-use='c' data-ref="_ZN5CLHEP12_GLOBAL__N_18defaults17ensureInitializedEv">ensureInitialized</a>() );</td></tr>
+<tr><th id="310">310</th><td>}</td></tr>
+<tr><th id="311">311</th><td></td></tr>
+<tr><th id="312">312</th><td>}  <i>// namespace CLHEP</i></td></tr>
+<tr><th id="313">313</th><td></td></tr>
+</table><hr/><p id='footer'>
+Generated on <em>2019-Aug-28</em> from project codebrowser<br />Powered by <a href='https://woboq.com'><img alt='Woboq' src='https://code.woboq.org/woboq-16.png' width='41' height='16' /></a> <a href='https://code.woboq.org'>Code Browser</a> 2.1
+<br/>Generator usage only permitted with license.</p>
+</div></body></html>

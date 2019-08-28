@@ -1,0 +1,821 @@
+<!doctype html>
+<html>
+<head>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"><title>G4CascadeInterface.cc source code [codebrowser/source/processes/hadronic/models/cascade/cascade/src/G4CascadeInterface.cc] - Woboq Code Browser</title>
+<link rel="stylesheet" href="../../../../../../../../../data/qtcreator.css" title="QtCreator"/>
+<link rel="alternate stylesheet" href="../../../../../../../../../data/kdevelop.css" title="KDevelop"/>
+<script type="text/javascript" src="../../../../../../../../../data/jquery/jquery.min.js"></script>
+<script type="text/javascript" src="../../../../../../../../../data/jquery/jquery-ui.min.js"></script>
+<script>var file = 'codebrowser/source/processes/hadronic/models/cascade/cascade/src/G4CascadeInterface.cc'; var root_path = '../../../../../../../..'; var data_path = '../../../../../../../../../data';</script>
+<script src='../../../../../../../../../data/codebrowser.js'></script>
+</head>
+<body><div id='header'><h1 id='breadcrumb'><span>Browse the source code of </span><a href='../../../../../../..'>codebrowser</a>/<a href='../../../../../..'>source</a>/<a href='../../../../..'>processes</a>/<a href='../../../..'>hadronic</a>/<a href='../../..'>models</a>/<a href='../..'>cascade</a>/<a href='..'>cascade</a>/<a href='./'>src</a>/<a href='G4CascadeInterface.cc.html'>G4CascadeInterface.cc</a></h1></div>
+<hr/><div id='content'><table class="code">
+<tr><th id="1">1</th><td><i>//</i></td></tr>
+<tr><th id="2">2</th><td><i>// ********************************************************************</i></td></tr>
+<tr><th id="3">3</th><td><i>// * License and Disclaimer                                           *</i></td></tr>
+<tr><th id="4">4</th><td><i>// *                                                                  *</i></td></tr>
+<tr><th id="5">5</th><td><i>// * The  Geant4 software  is  copyright of the Copyright Holders  of *</i></td></tr>
+<tr><th id="6">6</th><td><i>// * the Geant4 Collaboration.  It is provided  under  the terms  and *</i></td></tr>
+<tr><th id="7">7</th><td><i>// * conditions of the Geant4 Software License,  included in the file *</i></td></tr>
+<tr><th id="8">8</th><td><i>// * LICENSE and available at  <a href="http://cern.ch/geant4/license">http://cern.ch/geant4/license</a> .  These *</i></td></tr>
+<tr><th id="9">9</th><td><i>// * include a list of copyright holders.                             *</i></td></tr>
+<tr><th id="10">10</th><td><i>// *                                                                  *</i></td></tr>
+<tr><th id="11">11</th><td><i>// * Neither the authors of this software system, nor their employing *</i></td></tr>
+<tr><th id="12">12</th><td><i>// * institutes,nor the agencies providing financial support for this *</i></td></tr>
+<tr><th id="13">13</th><td><i>// * work  make  any representation or  warranty, express or implied, *</i></td></tr>
+<tr><th id="14">14</th><td><i>// * regarding  this  software system or assume any liability for its *</i></td></tr>
+<tr><th id="15">15</th><td><i>// * use.  Please see the license in the file  LICENSE  and URL above *</i></td></tr>
+<tr><th id="16">16</th><td><i>// * for the full disclaimer and the limitation of liability.         *</i></td></tr>
+<tr><th id="17">17</th><td><i>// *                                                                  *</i></td></tr>
+<tr><th id="18">18</th><td><i>// * This  code  implementation is the result of  the  scientific and *</i></td></tr>
+<tr><th id="19">19</th><td><i>// * technical work of the GEANT4 collaboration.                      *</i></td></tr>
+<tr><th id="20">20</th><td><i>// * By using,  copying,  modifying or  distributing the software (or *</i></td></tr>
+<tr><th id="21">21</th><td><i>// * any work based  on the software)  you  agree  to acknowledge its *</i></td></tr>
+<tr><th id="22">22</th><td><i>// * use  in  resulting  scientific  publications,  and indicate your *</i></td></tr>
+<tr><th id="23">23</th><td><i>// * acceptance of all terms of the Geant4 Software license.          *</i></td></tr>
+<tr><th id="24">24</th><td><i>// ********************************************************************</i></td></tr>
+<tr><th id="25">25</th><td><i>//</i></td></tr>
+<tr><th id="26">26</th><td><i>//</i></td></tr>
+<tr><th id="27">27</th><td><i>// 20100114  M. Kelsey -- Remove G4CascadeMomentum, use G4LorentzVector directly</i></td></tr>
+<tr><th id="28">28</th><td><i>// 20100413  M. Kelsey -- Pass G4CollisionOutput by ref to ::collide()</i></td></tr>
+<tr><th id="29">29</th><td><i>// 20100414  M. Kelsey -- Check for K0L/K0S before using G4InuclElemPart::type</i></td></tr>
+<tr><th id="30">30</th><td><i>// 20100418  M. Kelsey -- Reference output particle lists via const-ref, use</i></td></tr>
+<tr><th id="31">31</th><td><i>//		const_iterator for both.</i></td></tr>
+<tr><th id="32">32</th><td><i>// 20100428  M. Kelsey -- Use G4InuclParticleNames enum</i></td></tr>
+<tr><th id="33">33</th><td><i>// 20100429  M. Kelsey -- Change "case gamma:" to "case photon:"</i></td></tr>
+<tr><th id="34">34</th><td><i>// 20100517  M. Kelsey -- Follow new ctors for G4*Collider family.</i></td></tr>
+<tr><th id="35">35</th><td><i>// 20100520  M. Kelsey -- Simplify collision loop, move momentum rotations to</i></td></tr>
+<tr><th id="36">36</th><td><i>//		G4CollisionOutput, copy G4DynamicParticle directly from</i></td></tr>
+<tr><th id="37">37</th><td><i>//		G4InuclParticle, no switch-block required.</i></td></tr>
+<tr><th id="38">38</th><td><i>// 20100615  M. Kelsey -- Bug fix: For K0's need ekin in GEANT4 units</i></td></tr>
+<tr><th id="39">39</th><td><i>// 20100617  M. Kelsey -- Rename "debug_" preprocessor flag to G4CASCADE_DEBUG,</i></td></tr>
+<tr><th id="40">40</th><td><i>//		and "BERTDEV" to "G4CASCADE_COULOMB_DEV"</i></td></tr>
+<tr><th id="41">41</th><td><i>// 20100617  M. Kelsey -- Make G4InuclCollider a local data member</i></td></tr>
+<tr><th id="42">42</th><td><i>// 20100618  M. Kelsey -- Deploy energy-conservation test on final state, with</i></td></tr>
+<tr><th id="43">43</th><td><i>//		preprocessor flag G4CASCADE_SKIP_ECONS to skip test.</i></td></tr>
+<tr><th id="44">44</th><td><i>// 20100620  M. Kelsey -- Use new energy-conservation pseudo-collider</i></td></tr>
+<tr><th id="45">45</th><td><i>// 20100621  M. Kelsey -- Fix compiler warning from GCC 4.5</i></td></tr>
+<tr><th id="46">46</th><td><i>// 20100624  M. Kelsey -- Fix cascade loop to check nTries every time (had</i></td></tr>
+<tr><th id="47">47</th><td><i>//		allowed for infinite loop on E-violation); dump event data</i></td></tr>
+<tr><th id="48">48</th><td><i>//		to output if E-violation exceeds maxTries; use CheckBalance</i></td></tr>
+<tr><th id="49">49</th><td><i>//		for baryon and charge conservation.</i></td></tr>
+<tr><th id="50">50</th><td><i>// 20100701  M. Kelsey -- Pass verbosity through to G4CollisionOutput</i></td></tr>
+<tr><th id="51">51</th><td><i>// 20100714  M. Kelsey -- Report number of iterations before success</i></td></tr>
+<tr><th id="52">52</th><td><i>// 20100720  M. Kelsey -- Use G4CASCADE_SKIP_ECONS flag for reporting</i></td></tr>
+<tr><th id="53">53</th><td><i>// 20100723  M. Kelsey -- Move G4CollisionOutput to .hh file for reuse</i></td></tr>
+<tr><th id="54">54</th><td><i>// 20100914  M. Kelsey -- Migrate to integer A and Z</i></td></tr>
+<tr><th id="55">55</th><td><i>// 20100916  M. Kelsey -- Simplify ApplyYourself() by encapsulating code blocks</i></td></tr>
+<tr><th id="56">56</th><td><i>//		into numerous functions; make data-member colliders pointers;</i></td></tr>
+<tr><th id="57">57</th><td><i>//		provide support for projectile nucleus</i></td></tr>
+<tr><th id="58">58</th><td><i>// 20100919  M. Kelsey -- Fix incorrect logic in retryInelasticNucleus()</i></td></tr>
+<tr><th id="59">59</th><td><i>// 20100922  M. Kelsey -- Add functions to select de-excitation method</i></td></tr>
+<tr><th id="60">60</th><td><i>// 20100924  M. Kelsey -- Migrate to "OutgoingNuclei" names in CollisionOutput </i></td></tr>
+<tr><th id="61">61</th><td><i>// 20110224  M. Kelsey -- Add createTarget() for use with Propagate(); split</i></td></tr>
+<tr><th id="62">62</th><td><i>//		conservation law messages to separate function; begin to add</i></td></tr>
+<tr><th id="63">63</th><td><i>//		infrastructure code to Propagate.  Move verbose</i></td></tr>
+<tr><th id="64">64</th><td><i>//		setting to .cc file, and apply to all member objects.</i></td></tr>
+<tr><th id="65">65</th><td><i>// 20110301  M. Kelsey -- Add copyPreviousCascade() for use with Propagate()  </i></td></tr>
+<tr><th id="66">66</th><td><i>//		along with new buffers and related particle-conversion  </i></td></tr>
+<tr><th id="67">67</th><td><i>//		functions.  Encapulate buffer deletion in clear().  Add some</i></td></tr>
+<tr><th id="68">68</th><td><i>//		diagnostic messages.</i></td></tr>
+<tr><th id="69">69</th><td><i>// 20110302  M. Kelsey -- Redo diagnostics inside G4CASCADE_DEBUG_INTERFACE</i></td></tr>
+<tr><th id="70">70</th><td><i>// 20110304  M. Kelsey -- Drop conversion of Propagate() arguments; pass</i></td></tr>
+<tr><th id="71">71</th><td><i>//		directly to collider for processing.  Rename makeReactionProduct</i></td></tr>
+<tr><th id="72">72</th><td><i>//		to makeDynamicParticle.</i></td></tr>
+<tr><th id="73">73</th><td><i>// 20110316  M. Kelsey -- Move kaon-mixing for type-code into G4InuclParticle;</i></td></tr>
+<tr><th id="74">74</th><td><i>//		add placeholders to capture and use bullet in Propagte</i></td></tr>
+<tr><th id="75">75</th><td><i>// 20110327  G. Folger -- Set up for E/p checking by G4HadronicProcess in ctor</i></td></tr>
+<tr><th id="76">76</th><td><i>// 20110328  M. Kelsey -- Modify balance() initialization to match Gunter's</i></td></tr>
+<tr><th id="77">77</th><td><i>// 20110404  M. Kelsey -- Get primary projectile from base class (ref-03)</i></td></tr>
+<tr><th id="78">78</th><td><i>// 20110502  M. Kelsey -- Add interface to capture random seeds for user</i></td></tr>
+<tr><th id="79">79</th><td><i>// 20110719  M. Kelsey -- Use trivialise() in case maximum retries are reached</i></td></tr>
+<tr><th id="80">80</th><td><i>// 20110720  M. Kelsey -- Discard elastic-cut array (no longer needed),</i></td></tr>
+<tr><th id="81">81</th><td><i>//		discard local "theFinalState" (in base as "theParticleChange"),</i></td></tr>
+<tr><th id="82">82</th><td><i>//		Modify createBullet() to set null pointer if bullet unusable,</i></td></tr>
+<tr><th id="83">83</th><td><i>//		return empty final-state on failures.</i></td></tr>
+<tr><th id="84">84</th><td><i>//		Fix charge violation report before throwing exception.</i></td></tr>
+<tr><th id="85">85</th><td><i>// 20110722  M. Kelsey -- In makeDynamicParticle(), allow invalid type codes</i></td></tr>
+<tr><th id="86">86</th><td><i>//		in order to process, e.g., resonances from Propagate() input</i></td></tr>
+<tr><th id="87">87</th><td><i>// 20110728  M. Kelsey -- Per V.Ivantchenko, change NoInteraction to return</i></td></tr>
+<tr><th id="88">88</th><td><i>//		zero particles, but set kinetic energy from projectile.</i></td></tr>
+<tr><th id="89">89</th><td><i>// 20110801  M. Kelsey -- Make bullet, target point to local buffers, no delete</i></td></tr>
+<tr><th id="90">90</th><td><i>// 20110802  M. Kelsey -- Use new decay handler for Propagate interface</i></td></tr>
+<tr><th id="91">91</th><td><i>// 20110922  M. Kelsey -- Follow migration of G4InuclParticle::print(), use</i></td></tr>
+<tr><th id="92">92</th><td><i>//		G4ExceptionDescription for reporting before throwing exception</i></td></tr>
+<tr><th id="93">93</th><td><i>// 20120125  M. Kelsey -- In retryInelasticProton() check for empty output</i></td></tr>
+<tr><th id="94">94</th><td><i>// 20120525  M. Kelsey -- In NoInteraction, check for Ekin&lt;0., set to zero;</i></td></tr>
+<tr><th id="95">95</th><td><i>//		use SetEnergyChange(0.) explicitly for good final states.</i></td></tr>
+<tr><th id="96">96</th><td><i>// 20120822  M. Kelsey -- Move envvars to G4CascadeParameters.</i></td></tr>
+<tr><th id="97">97</th><td><i>// 20130508  D. Wright -- Add support for muon capture</i></td></tr>
+<tr><th id="98">98</th><td><i>// 20130804  M. Kelsey -- Fix bug #1513 -- "(Z=1)" in boolean expression</i></td></tr>
+<tr><th id="99">99</th><td><i>// 20140116  M. Kelsey -- Move statics to const data members to avoid weird</i></td></tr>
+<tr><th id="100">100</th><td><i>//		interactions with MT.</i></td></tr>
+<tr><th id="101">101</th><td><i>// 20140929  M. Kelsey -- Explicitly call useCascadeDeexcitation() in ctor</i></td></tr>
+<tr><th id="102">102</th><td><i>// 20150506  M. Kelsey -- Call Initialize() in ctor for master thread only</i></td></tr>
+<tr><th id="103">103</th><td><i>// 20150608  M. Kelsey -- Label all while loops as terminating.</i></td></tr>
+<tr><th id="104">104</th><td></td></tr>
+<tr><th id="105">105</th><td><u>#include <span class='error' title="&apos;cmath&apos; file not found">&lt;</span>cmath&gt;</u></td></tr>
+<tr><th id="106">106</th><td><u>#include &lt;iostream&gt;</u></td></tr>
+<tr><th id="107">107</th><td></td></tr>
+<tr><th id="108">108</th><td><u>#include <a href="../include/G4CascadeInterface.hh.html">"G4CascadeInterface.hh"</a></u></td></tr>
+<tr><th id="109">109</th><td><u>#include <a href="../../../../../../global/management/include/globals.hh.html">"globals.hh"</a></u></td></tr>
+<tr><th id="110">110</th><td><u>#include <a href="../../../../../../global/management/include/G4SystemOfUnits.hh.html">"G4SystemOfUnits.hh"</a></u></td></tr>
+<tr><th id="111">111</th><td><u>#include <a href="../include/G4CascadeChannelTables.hh.html">"G4CascadeChannelTables.hh"</a></u></td></tr>
+<tr><th id="112">112</th><td><u>#include <a href="../include/G4CascadeCheckBalance.hh.html">"G4CascadeCheckBalance.hh"</a></u></td></tr>
+<tr><th id="113">113</th><td><u>#include <a href="../include/G4CascadeParameters.hh.html">"G4CascadeParameters.hh"</a></u></td></tr>
+<tr><th id="114">114</th><td><u>#include <a href="../include/G4CollisionOutput.hh.html">"G4CollisionOutput.hh"</a></u></td></tr>
+<tr><th id="115">115</th><td><u>#include <a href="../../../util/include/G4DecayKineticTracks.hh.html">"G4DecayKineticTracks.hh"</a></u></td></tr>
+<tr><th id="116">116</th><td><u>#include <a href="../../../../../../particles/management/include/G4DynamicParticle.hh.html">"G4DynamicParticle.hh"</a></u></td></tr>
+<tr><th id="117">117</th><td><u>#include <a href="../../../../util/include/G4HadronicException.hh.html">"G4HadronicException.hh"</a></u></td></tr>
+<tr><th id="118">118</th><td><u>#include <a href="../include/G4InuclCollider.hh.html">"G4InuclCollider.hh"</a></u></td></tr>
+<tr><th id="119">119</th><td><u>#include <a href="../include/G4InuclElementaryParticle.hh.html">"G4InuclElementaryParticle.hh"</a></u></td></tr>
+<tr><th id="120">120</th><td><u>#include <a href="../include/G4InuclNuclei.hh.html">"G4InuclNuclei.hh"</a></u></td></tr>
+<tr><th id="121">121</th><td><u>#include <a href="../include/G4InuclParticle.hh.html">"G4InuclParticle.hh"</a></u></td></tr>
+<tr><th id="122">122</th><td><u>#include <a href="../include/G4InuclParticleNames.hh.html">"G4InuclParticleNames.hh"</a></u></td></tr>
+<tr><th id="123">123</th><td><u>#include <a href="../../../../../../particles/hadrons/mesons/include/G4KaonZeroLong.hh.html">"G4KaonZeroLong.hh"</a></u></td></tr>
+<tr><th id="124">124</th><td><u>#include <a href="../../../../../../particles/hadrons/mesons/include/G4KaonZeroShort.hh.html">"G4KaonZeroShort.hh"</a></u></td></tr>
+<tr><th id="125">125</th><td><u>#include <a href="../../../util/include/G4KineticTrack.hh.html">"G4KineticTrack.hh"</a></u></td></tr>
+<tr><th id="126">126</th><td><u>#include <a href="../../../util/include/G4KineticTrackVector.hh.html">"G4KineticTrackVector.hh"</a></u></td></tr>
+<tr><th id="127">127</th><td><u>#include <a href="../../../../util/include/G4Nucleus.hh.html">"G4Nucleus.hh"</a></u></td></tr>
+<tr><th id="128">128</th><td><u>#include <a href="../../../../../../particles/management/include/G4ParticleDefinition.hh.html">"G4ParticleDefinition.hh"</a></u></td></tr>
+<tr><th id="129">129</th><td><u>#include <a href="../../../../util/include/G4ReactionProductVector.hh.html">"G4ReactionProductVector.hh"</a></u></td></tr>
+<tr><th id="130">130</th><td><u>#include <a href="../../../../../../global/management/include/G4Threading.hh.html">"G4Threading.hh"</a></u></td></tr>
+<tr><th id="131">131</th><td><u>#include <a href="../../../../../../track/include/G4Track.hh.html">"G4Track.hh"</a></u></td></tr>
+<tr><th id="132">132</th><td><u>#include <a href="../../../management/include/G4V3DNucleus.hh.html">"G4V3DNucleus.hh"</a></u></td></tr>
+<tr><th id="133">133</th><td><u>#include <a href="../include/G4UnboundPN.hh.html">"G4UnboundPN.hh"</a></u></td></tr>
+<tr><th id="134">134</th><td><u>#include <a href="../include/G4Dineutron.hh.html">"G4Dineutron.hh"</a></u></td></tr>
+<tr><th id="135">135</th><td><u>#include <a href="../include/G4Diproton.hh.html">"G4Diproton.hh"</a></u></td></tr>
+<tr><th id="136">136</th><td></td></tr>
+<tr><th id="137">137</th><td><b>using</b> <b>namespace</b> <span class="namespace">G4InuclParticleNames</span>;</td></tr>
+<tr><th id="138">138</th><td></td></tr>
+<tr><th id="139">139</th><td><b>typedef</b> <span class='error' title="use of undeclared identifier &apos;std&apos;">std</span>::vector<span class='error' title="expected unqualified-id">&lt;</span>G4InuclElementaryParticle&gt;::const_iterator particleIterator;</td></tr>
+<tr><th id="140">140</th><td><b>typedef</b> <span class='error' title="use of undeclared identifier &apos;std&apos;">std</span>::vector<span class='error' title="expected unqualified-id">&lt;</span>G4InuclNuclei&gt;::const_iterator nucleiIterator;</td></tr>
+<tr><th id="141">141</th><td></td></tr>
+<tr><th id="142">142</th><td></td></tr>
+<tr><th id="143">143</th><td><i>// Constructor and destrutor</i></td></tr>
+<tr><th id="144">144</th><td></td></tr>
+<tr><th id="145">145</th><td><a class="type" href="../include/G4CascadeInterface.hh.html#G4CascadeInterface" title='G4CascadeInterface' data-ref="G4CascadeInterface">G4CascadeInterface</a>::<dfn class="decl def" id="_ZN18G4CascadeInterfaceC1ERK8G4String" title='G4CascadeInterface::G4CascadeInterface' data-ref="_ZN18G4CascadeInterfaceC1ERK8G4String">G4CascadeInterface</dfn>(<em>const</em> <a class="type" href="../../../../../../global/management/include/G4String.hh.html#G4String" title='G4String' data-ref="G4String">G4String</a>&amp; <dfn class="local col2 decl" id="12name" title='name' data-type='const G4String &amp;' data-ref="12name">name</dfn>)</td></tr>
+<tr><th id="146">146</th><td>  : <a class="type" href="../../../management/include/G4VIntraNuclearTransportModel.hh.html#G4VIntraNuclearTransportModel" title='G4VIntraNuclearTransportModel' data-ref="G4VIntraNuclearTransportModel">G4VIntraNuclearTransportModel</a><a class="ref" href="../../../management/include/G4VIntraNuclearTransportModel.hh.html#_ZN29G4VIntraNuclearTransportModelC1ERK8G4StringP19G4VPreCompoundModel" title='G4VIntraNuclearTransportModel::G4VIntraNuclearTransportModel' data-ref="_ZN29G4VIntraNuclearTransportModelC1ERK8G4StringP19G4VPreCompoundModel">(</a><a class="local col2 ref" href="#12name" title='name' data-ref="12name">name</a>), </td></tr>
+<tr><th id="147">147</th><td>    <a class="member" href="../include/G4CascadeInterface.hh.html#G4CascadeInterface::randomFile" title='G4CascadeInterface::randomFile' data-ref="G4CascadeInterface::randomFile">randomFile</a><a class="ref" href="../../../../../../global/management/include/G4String.hh.html#_ZN8G4StringC1ERKS_" title='G4String::G4String' data-ref="_ZN8G4StringC1ERKS_">(</a><a class="type" href="../include/G4CascadeParameters.hh.html#G4CascadeParameters" title='G4CascadeParameters' data-ref="G4CascadeParameters">G4CascadeParameters</a>::<a class="ref" href="../include/G4CascadeParameters.hh.html#_ZN19G4CascadeParameters10randomFileEv" title='G4CascadeParameters::randomFile' data-ref="_ZN19G4CascadeParameters10randomFileEv">randomFile</a>()),</td></tr>
+<tr><th id="148">148</th><td>    <a class="member" href="../include/G4CascadeInterface.hh.html#G4CascadeInterface::maximumTries" title='G4CascadeInterface::maximumTries' data-ref="G4CascadeInterface::maximumTries">maximumTries</a>(<var>20</var>), <a class="member" href="../include/G4CascadeInterface.hh.html#G4CascadeInterface::numberOfTries" title='G4CascadeInterface::numberOfTries' data-ref="G4CascadeInterface::numberOfTries">numberOfTries</a>(<var>0</var>),</td></tr>
+<tr><th id="149">149</th><td>    <a class="member" href="../include/G4CascadeInterface.hh.html#G4CascadeInterface::collider" title='G4CascadeInterface::collider' data-ref="G4CascadeInterface::collider">collider</a>(<b>new</b> <a class="ref fake" href="../include/G4InuclCollider.hh.html#_ZN15G4InuclColliderC1Ev" title='G4InuclCollider::G4InuclCollider' data-ref="_ZN15G4InuclColliderC1Ev"></a><a class="type" href="../include/G4InuclCollider.hh.html#G4InuclCollider" title='G4InuclCollider' data-ref="G4InuclCollider">G4InuclCollider</a>), <a class="member" href="../include/G4CascadeInterface.hh.html#G4CascadeInterface::balance" title='G4CascadeInterface::balance' data-ref="G4CascadeInterface::balance">balance</a>(<b>new</b> <a class="type" href="../include/G4CascadeCheckBalance.hh.html#G4CascadeCheckBalance" title='G4CascadeCheckBalance' data-ref="G4CascadeCheckBalance">G4CascadeCheckBalance</a><a class="ref" href="../include/G4CascadeCheckBalance.hh.html#_ZN21G4CascadeCheckBalanceC1ERK8G4String" title='G4CascadeCheckBalance::G4CascadeCheckBalance' data-ref="_ZN21G4CascadeCheckBalanceC1ERK8G4String">(</a><a class="local col2 ref" href="#12name" title='name' data-ref="12name">name</a>)),</td></tr>
+<tr><th id="150">150</th><td>    <a class="member" href="../include/G4CascadeInterface.hh.html#G4CascadeInterface::bullet" title='G4CascadeInterface::bullet' data-ref="G4CascadeInterface::bullet">bullet</a>(<var>0</var>), <a class="member" href="../include/G4CascadeInterface.hh.html#G4CascadeInterface::target" title='G4CascadeInterface::target' data-ref="G4CascadeInterface::target">target</a>(<var>0</var>), <a class="member" href="../include/G4CascadeInterface.hh.html#G4CascadeInterface::output" title='G4CascadeInterface::output' data-ref="G4CascadeInterface::output">output</a>(<b>new</b> <a class="ref fake" href="../include/G4CollisionOutput.hh.html#_ZN17G4CollisionOutputC1Ev" title='G4CollisionOutput::G4CollisionOutput' data-ref="_ZN17G4CollisionOutputC1Ev"></a><a class="type" href="../include/G4CollisionOutput.hh.html#G4CollisionOutput" title='G4CollisionOutput' data-ref="G4CollisionOutput">G4CollisionOutput</a>) {</td></tr>
+<tr><th id="151">151</th><td>  <i>// Set up global objects for master thread or sequential build</i></td></tr>
+<tr><th id="152">152</th><td>  <b>if</b> (<span class="namespace">G4Threading::</span><a class="ref" href="../../../../../../global/management/include/G4Threading.hh.html#_ZN11G4Threading14IsMasterThreadEv" title='G4Threading::IsMasterThread' data-ref="_ZN11G4Threading14IsMasterThreadEv">IsMasterThread</a>()) <a class="member" href="#_ZN18G4CascadeInterface10InitializeEv" title='G4CascadeInterface::Initialize' data-ref="_ZN18G4CascadeInterface10InitializeEv">Initialize</a>();</td></tr>
+<tr><th id="153">153</th><td></td></tr>
+<tr><th id="154">154</th><td>  <a class="member" href="../../../management/include/G4HadronicInteraction.hh.html#_ZN21G4HadronicInteraction28SetEnergyMomentumCheckLevelsEdd" title='G4HadronicInteraction::SetEnergyMomentumCheckLevels' data-ref="_ZN21G4HadronicInteraction28SetEnergyMomentumCheckLevelsEdd">SetEnergyMomentumCheckLevels</a>(<var>5</var>*<a class="ref" href="../../../../../../externals/clhep/include/CLHEP/Units/SystemOfUnits.h.html#CLHEP::perCent" title='CLHEP::perCent' data-ref="CLHEP::perCent">perCent</a>, <var>10</var>*<a class="ref" href="../../../../../../externals/clhep/include/CLHEP/Units/SystemOfUnits.h.html#CLHEP::MeV" title='CLHEP::MeV' data-ref="CLHEP::MeV">MeV</a>);</td></tr>
+<tr><th id="155">155</th><td>  <a class="member" href="../include/G4CascadeInterface.hh.html#G4CascadeInterface::balance" title='G4CascadeInterface::balance' data-ref="G4CascadeInterface::balance">balance</a>-&gt;<a class="ref" href="../include/G4CascadeCheckBalance.hh.html#_ZN21G4CascadeCheckBalance9setLimitsEdd" title='G4CascadeCheckBalance::setLimits' data-ref="_ZN21G4CascadeCheckBalance9setLimitsEdd">setLimits</a>(<var>5</var>*<a class="ref" href="../../../../../../externals/clhep/include/CLHEP/Units/SystemOfUnits.h.html#CLHEP::perCent" title='CLHEP::perCent' data-ref="CLHEP::perCent">perCent</a>, <var>10</var>*<a class="ref" href="../../../../../../externals/clhep/include/CLHEP/Units/SystemOfUnits.h.html#CLHEP::MeV" title='CLHEP::MeV' data-ref="CLHEP::MeV">MeV</a>/<a class="ref" href="../../../../../../externals/clhep/include/CLHEP/Units/SystemOfUnits.h.html#CLHEP::GeV" title='CLHEP::GeV' data-ref="CLHEP::GeV">GeV</a>);	<i>// Bertini internal units</i></td></tr>
+<tr><th id="156">156</th><td>  <b>this</b>-&gt;<a class="member" href="#_ZN18G4CascadeInterface15SetVerboseLevelEi" title='G4CascadeInterface::SetVerboseLevel' data-ref="_ZN18G4CascadeInterface15SetVerboseLevelEi">SetVerboseLevel</a>(<a class="type" href="../include/G4CascadeParameters.hh.html#G4CascadeParameters" title='G4CascadeParameters' data-ref="G4CascadeParameters">G4CascadeParameters</a>::<a class="ref" href="../include/G4CascadeParameters.hh.html#_ZN19G4CascadeParameters7verboseEv" title='G4CascadeParameters::verbose' data-ref="_ZN19G4CascadeParameters7verboseEv">verbose</a>());</td></tr>
+<tr><th id="157">157</th><td></td></tr>
+<tr><th id="158">158</th><td>  <b>if</b> (<a class="type" href="../include/G4CascadeParameters.hh.html#G4CascadeParameters" title='G4CascadeParameters' data-ref="G4CascadeParameters">G4CascadeParameters</a>::<a class="ref" href="../include/G4CascadeParameters.hh.html#_ZN19G4CascadeParameters14usePreCompoundEv" title='G4CascadeParameters::usePreCompound' data-ref="_ZN19G4CascadeParameters14usePreCompoundEv">usePreCompound</a>())</td></tr>
+<tr><th id="159">159</th><td>    <a class="member" href="#_ZN18G4CascadeInterface26usePreCompoundDeexcitationEv" title='G4CascadeInterface::usePreCompoundDeexcitation' data-ref="_ZN18G4CascadeInterface26usePreCompoundDeexcitationEv">usePreCompoundDeexcitation</a>();</td></tr>
+<tr><th id="160">160</th><td>  <b>else</b></td></tr>
+<tr><th id="161">161</th><td>    <a class="member" href="#_ZN18G4CascadeInterface22useCascadeDeexcitationEv" title='G4CascadeInterface::useCascadeDeexcitation' data-ref="_ZN18G4CascadeInterface22useCascadeDeexcitationEv">useCascadeDeexcitation</a>();</td></tr>
+<tr><th id="162">162</th><td>}</td></tr>
+<tr><th id="163">163</th><td></td></tr>
+<tr><th id="164">164</th><td><a class="type" href="../include/G4CascadeInterface.hh.html#G4CascadeInterface" title='G4CascadeInterface' data-ref="G4CascadeInterface">G4CascadeInterface</a>::<dfn class="virtual decl def" id="_ZN18G4CascadeInterfaceD1Ev" title='G4CascadeInterface::~G4CascadeInterface' data-ref="_ZN18G4CascadeInterfaceD1Ev">~G4CascadeInterface</dfn>() {</td></tr>
+<tr><th id="165">165</th><td>  <a class="member" href="#_ZN18G4CascadeInterface5clearEv" title='G4CascadeInterface::clear' data-ref="_ZN18G4CascadeInterface5clearEv">clear</a>();</td></tr>
+<tr><th id="166">166</th><td>  <b>delete</b> <a class="member" href="../include/G4CascadeInterface.hh.html#G4CascadeInterface::collider" title='G4CascadeInterface::collider' data-ref="G4CascadeInterface::collider">collider</a>; <a class="member" href="../include/G4CascadeInterface.hh.html#G4CascadeInterface::collider" title='G4CascadeInterface::collider' data-ref="G4CascadeInterface::collider">collider</a>=<var>0</var>;</td></tr>
+<tr><th id="167">167</th><td>  <b>delete</b> <a class="member" href="../include/G4CascadeInterface.hh.html#G4CascadeInterface::balance" title='G4CascadeInterface::balance' data-ref="G4CascadeInterface::balance">balance</a>; <a class="member" href="../include/G4CascadeInterface.hh.html#G4CascadeInterface::balance" title='G4CascadeInterface::balance' data-ref="G4CascadeInterface::balance">balance</a>=<var>0</var>;</td></tr>
+<tr><th id="168">168</th><td>  <b>delete</b> <a class="member" href="../include/G4CascadeInterface.hh.html#G4CascadeInterface::output" title='G4CascadeInterface::output' data-ref="G4CascadeInterface::output">output</a>; <a class="member" href="../include/G4CascadeInterface.hh.html#G4CascadeInterface::output" title='G4CascadeInterface::output' data-ref="G4CascadeInterface::output">output</a>=<var>0</var>;</td></tr>
+<tr><th id="169">169</th><td>}</td></tr>
+<tr><th id="170">170</th><td></td></tr>
+<tr><th id="171">171</th><td><em>void</em> G4CascadeInterface::ModelDescription(<span class='error' title="use of undeclared identifier &apos;std&apos;">std</span>::ostream&amp; outFile) <em>const</em></td></tr>
+<tr><th id="172">172</th><td>{</td></tr>
+<tr><th id="173">173</th><td>  outFile &lt;&lt; <q>"The Bertini-style cascade implements the inelastic scattering\n"</q></td></tr>
+<tr><th id="174">174</th><td>          &lt;&lt; <q>"of hadrons by nuclei.  Nucleons, pions, kaons and hyperons\n"</q></td></tr>
+<tr><th id="175">175</th><td>          &lt;&lt; <q>"from 0 to 15 GeV may be used as projectiles in this model.\n"</q></td></tr>
+<tr><th id="176">176</th><td>          &lt;&lt; <q>"Final state hadrons are produced by a classical cascade\n"</q></td></tr>
+<tr><th id="177">177</th><td>          &lt;&lt; <q>"consisting of individual hadron-nucleon scatterings which use\n"</q></td></tr>
+<tr><th id="178">178</th><td>          &lt;&lt; <q>"free-space partial cross sections, corrected for various\n"</q></td></tr>
+<tr><th id="179">179</th><td>          &lt;&lt; <q>"nuclear medium effects.  The target nucleus is modeled as a\n"</q></td></tr>
+<tr><th id="180">180</th><td>          &lt;&lt; <q>"set of 1, 3 or 6 spherical shells, in which scattered hadrons\n"</q></td></tr>
+<tr><th id="181">181</th><td>          &lt;&lt; <q>"travel in straight lines until they are reflected from or\n"</q></td></tr>
+<tr><th id="182">182</th><td>          &lt;&lt; <q>"transmitted through shell boundaries.\n"</q>;</td></tr>
+<tr><th id="183">183</th><td>}</td></tr>
+<tr><th id="184">184</th><td></td></tr>
+<tr><th id="185">185</th><td><em>void</em> G4CascadeInterface::DumpConfiguration(<span class='error' title="use of undeclared identifier &apos;std&apos;">std</span>::ostream&amp; outFile) <em>const</em> {</td></tr>
+<tr><th id="186">186</th><td>  G4CascadeParameters::DumpConfiguration(outFile);</td></tr>
+<tr><th id="187">187</th><td>}</td></tr>
+<tr><th id="188">188</th><td></td></tr>
+<tr><th id="189">189</th><td><em>void</em> <a class="type" href="../include/G4CascadeInterface.hh.html#G4CascadeInterface" title='G4CascadeInterface' data-ref="G4CascadeInterface">G4CascadeInterface</a>::<dfn class="decl def" id="_ZN18G4CascadeInterface5clearEv" title='G4CascadeInterface::clear' data-ref="_ZN18G4CascadeInterface5clearEv">clear</dfn>() {</td></tr>
+<tr><th id="190">190</th><td>  <a class="member" href="../include/G4CascadeInterface.hh.html#G4CascadeInterface::bullet" title='G4CascadeInterface::bullet' data-ref="G4CascadeInterface::bullet">bullet</a>=<var>0</var>;</td></tr>
+<tr><th id="191">191</th><td>  <a class="member" href="../include/G4CascadeInterface.hh.html#G4CascadeInterface::target" title='G4CascadeInterface::target' data-ref="G4CascadeInterface::target">target</a>=<var>0</var>;</td></tr>
+<tr><th id="192">192</th><td>}</td></tr>
+<tr><th id="193">193</th><td></td></tr>
+<tr><th id="194">194</th><td></td></tr>
+<tr><th id="195">195</th><td><i>// Initialize shared objects for use across multiple threads</i></td></tr>
+<tr><th id="196">196</th><td></td></tr>
+<tr><th id="197">197</th><td><em>void</em> <a class="type" href="../include/G4CascadeInterface.hh.html#G4CascadeInterface" title='G4CascadeInterface' data-ref="G4CascadeInterface">G4CascadeInterface</a>::<dfn class="decl def" id="_ZN18G4CascadeInterface10InitializeEv" title='G4CascadeInterface::Initialize' data-ref="_ZN18G4CascadeInterface10InitializeEv">Initialize</dfn>() {</td></tr>
+<tr><th id="198">198</th><td>  <a class="type" href="../../../../../../particles/management/include/G4ParticleDefinition.hh.html#G4ParticleDefinition" title='G4ParticleDefinition' data-ref="G4ParticleDefinition">G4ParticleDefinition</a>* <dfn class="local col3 decl" id="13pn" title='pn' data-type='G4ParticleDefinition *' data-ref="13pn">pn</dfn> = <a class="type" href="../include/G4UnboundPN.hh.html#G4UnboundPN" title='G4UnboundPN' data-ref="G4UnboundPN">G4UnboundPN</a>::<a class="ref" href="../include/G4UnboundPN.hh.html#_ZN11G4UnboundPN10DefinitionEv" title='G4UnboundPN::Definition' data-ref="_ZN11G4UnboundPN10DefinitionEv">Definition</a>();</td></tr>
+<tr><th id="199">199</th><td>  <a class="type" href="../../../../../../particles/management/include/G4ParticleDefinition.hh.html#G4ParticleDefinition" title='G4ParticleDefinition' data-ref="G4ParticleDefinition">G4ParticleDefinition</a>* <dfn class="local col4 decl" id="14nn" title='nn' data-type='G4ParticleDefinition *' data-ref="14nn">nn</dfn> = <a class="type" href="../include/G4Dineutron.hh.html#G4Dineutron" title='G4Dineutron' data-ref="G4Dineutron">G4Dineutron</a>::<a class="ref" href="../include/G4Dineutron.hh.html#_ZN11G4Dineutron10DefinitionEv" title='G4Dineutron::Definition' data-ref="_ZN11G4Dineutron10DefinitionEv">Definition</a>();</td></tr>
+<tr><th id="200">200</th><td>  <a class="type" href="../../../../../../particles/management/include/G4ParticleDefinition.hh.html#G4ParticleDefinition" title='G4ParticleDefinition' data-ref="G4ParticleDefinition">G4ParticleDefinition</a>* <dfn class="local col5 decl" id="15pp" title='pp' data-type='G4ParticleDefinition *' data-ref="15pp">pp</dfn> = <a class="type" href="../include/G4Diproton.hh.html#G4Diproton" title='G4Diproton' data-ref="G4Diproton">G4Diproton</a>::<a class="ref" href="../include/G4Diproton.hh.html#_ZN10G4Diproton10DefinitionEv" title='G4Diproton::Definition' data-ref="_ZN10G4Diproton10DefinitionEv">Definition</a>();</td></tr>
+<tr><th id="201">201</th><td>  <em>const</em> <a class="type" href="../include/G4CascadeChannelTables.hh.html#G4CascadeChannel" title='G4CascadeChannel' data-ref="G4CascadeChannel">G4CascadeChannel</a>* <dfn class="local col6 decl" id="16ch" title='ch' data-type='const G4CascadeChannel *' data-ref="16ch">ch</dfn> = <a class="type" href="../include/G4CascadeChannelTables.hh.html#G4CascadeChannelTables" title='G4CascadeChannelTables' data-ref="G4CascadeChannelTables">G4CascadeChannelTables</a>::<a class="ref" href="../include/G4CascadeChannelTables.hh.html#_ZN22G4CascadeChannelTables8GetTableEi" title='G4CascadeChannelTables::GetTable' data-ref="_ZN22G4CascadeChannelTables8GetTableEi">GetTable</a>(<var>0</var>);</td></tr>
+<tr><th id="202">202</th><td>  <b>if</b> (!<a class="local col6 ref" href="#16ch" title='ch' data-ref="16ch">ch</a> || !<a class="local col3 ref" href="#13pn" title='pn' data-ref="13pn">pn</a> || !<a class="local col4 ref" href="#14nn" title='nn' data-ref="14nn">nn</a> || !<a class="local col5 ref" href="#15pp" title='pp' data-ref="15pp">pp</a>) <b>return</b>;		<i>// Avoid "unused variables"</i></td></tr>
+<tr><th id="203">203</th><td>}</td></tr>
+<tr><th id="204">204</th><td></td></tr>
+<tr><th id="205">205</th><td></td></tr>
+<tr><th id="206">206</th><td><i>// Select post-cascade processing (default will be CascadeDeexcitation)</i></td></tr>
+<tr><th id="207">207</th><td><i>// NOTE:  Currently just calls through to Collider, in future will do something</i></td></tr>
+<tr><th id="208">208</th><td></td></tr>
+<tr><th id="209">209</th><td><em>void</em> <a class="type" href="../include/G4CascadeInterface.hh.html#G4CascadeInterface" title='G4CascadeInterface' data-ref="G4CascadeInterface">G4CascadeInterface</a>::<dfn class="decl def" id="_ZN18G4CascadeInterface22useCascadeDeexcitationEv" title='G4CascadeInterface::useCascadeDeexcitation' data-ref="_ZN18G4CascadeInterface22useCascadeDeexcitationEv">useCascadeDeexcitation</dfn>() {</td></tr>
+<tr><th id="210">210</th><td>  <a class="member" href="../include/G4CascadeInterface.hh.html#G4CascadeInterface::collider" title='G4CascadeInterface::collider' data-ref="G4CascadeInterface::collider">collider</a>-&gt;<a class="ref" href="../include/G4InuclCollider.hh.html#_ZN15G4InuclCollider22useCascadeDeexcitationEv" title='G4InuclCollider::useCascadeDeexcitation' data-ref="_ZN15G4InuclCollider22useCascadeDeexcitationEv">useCascadeDeexcitation</a>();</td></tr>
+<tr><th id="211">211</th><td>}</td></tr>
+<tr><th id="212">212</th><td></td></tr>
+<tr><th id="213">213</th><td><em>void</em> <a class="type" href="../include/G4CascadeInterface.hh.html#G4CascadeInterface" title='G4CascadeInterface' data-ref="G4CascadeInterface">G4CascadeInterface</a>::<dfn class="decl def" id="_ZN18G4CascadeInterface26usePreCompoundDeexcitationEv" title='G4CascadeInterface::usePreCompoundDeexcitation' data-ref="_ZN18G4CascadeInterface26usePreCompoundDeexcitationEv">usePreCompoundDeexcitation</dfn>() {</td></tr>
+<tr><th id="214">214</th><td>  <a class="member" href="../include/G4CascadeInterface.hh.html#G4CascadeInterface::collider" title='G4CascadeInterface::collider' data-ref="G4CascadeInterface::collider">collider</a>-&gt;<a class="ref" href="../include/G4InuclCollider.hh.html#_ZN15G4InuclCollider26usePreCompoundDeexcitationEv" title='G4InuclCollider::usePreCompoundDeexcitation' data-ref="_ZN15G4InuclCollider26usePreCompoundDeexcitationEv">usePreCompoundDeexcitation</a>();</td></tr>
+<tr><th id="215">215</th><td>}</td></tr>
+<tr><th id="216">216</th><td></td></tr>
+<tr><th id="217">217</th><td></td></tr>
+<tr><th id="218">218</th><td><i>// Apply verbosity to all member objects (overrides base class version)</i></td></tr>
+<tr><th id="219">219</th><td></td></tr>
+<tr><th id="220">220</th><td><em>void</em> <a class="type" href="../include/G4CascadeInterface.hh.html#G4CascadeInterface" title='G4CascadeInterface' data-ref="G4CascadeInterface">G4CascadeInterface</a>::<dfn class="decl def" id="_ZN18G4CascadeInterface15SetVerboseLevelEi" title='G4CascadeInterface::SetVerboseLevel' data-ref="_ZN18G4CascadeInterface15SetVerboseLevelEi">SetVerboseLevel</dfn>(<a class="typedef" href="../../../../../../global/management/include/G4Types.hh.html#G4int" title='G4int' data-type='int' data-ref="G4int">G4int</a> <dfn class="local col7 decl" id="17verbose" title='verbose' data-type='G4int' data-ref="17verbose">verbose</dfn>) {</td></tr>
+<tr><th id="221">221</th><td>  <a class="type" href="../../../management/include/G4HadronicInteraction.hh.html#G4HadronicInteraction" title='G4HadronicInteraction' data-ref="G4HadronicInteraction">G4HadronicInteraction</a>::<a class="member" href="../../../management/include/G4HadronicInteraction.hh.html#_ZN21G4HadronicInteraction15SetVerboseLevelEi" title='G4HadronicInteraction::SetVerboseLevel' data-ref="_ZN21G4HadronicInteraction15SetVerboseLevelEi">SetVerboseLevel</a>(<a class="local col7 ref" href="#17verbose" title='verbose' data-ref="17verbose">verbose</a>);</td></tr>
+<tr><th id="222">222</th><td>  <a class="member" href="../include/G4CascadeInterface.hh.html#G4CascadeInterface::collider" title='G4CascadeInterface::collider' data-ref="G4CascadeInterface::collider">collider</a>-&gt;<a class="virtual ref" href="../include/G4InuclCollider.hh.html#_ZN15G4InuclCollider15setVerboseLevelEi" title='G4InuclCollider::setVerboseLevel' data-ref="_ZN15G4InuclCollider15setVerboseLevelEi">setVerboseLevel</a>(<a class="local col7 ref" href="#17verbose" title='verbose' data-ref="17verbose">verbose</a>);</td></tr>
+<tr><th id="223">223</th><td>  <a class="member" href="../include/G4CascadeInterface.hh.html#G4CascadeInterface::balance" title='G4CascadeInterface::balance' data-ref="G4CascadeInterface::balance">balance</a>-&gt;<a class="virtual ref" href="../include/G4VCascadeCollider.hh.html#_ZN18G4VCascadeCollider15setVerboseLevelEi" title='G4VCascadeCollider::setVerboseLevel' data-ref="_ZN18G4VCascadeCollider15setVerboseLevelEi">setVerboseLevel</a>(<a class="local col7 ref" href="#17verbose" title='verbose' data-ref="17verbose">verbose</a>);</td></tr>
+<tr><th id="224">224</th><td>  <a class="member" href="../include/G4CascadeInterface.hh.html#G4CascadeInterface::output" title='G4CascadeInterface::output' data-ref="G4CascadeInterface::output">output</a>-&gt;<a class="ref" href="../include/G4CollisionOutput.hh.html#_ZN17G4CollisionOutput15setVerboseLevelEi" title='G4CollisionOutput::setVerboseLevel' data-ref="_ZN17G4CollisionOutput15setVerboseLevelEi">setVerboseLevel</a>(<a class="local col7 ref" href="#17verbose" title='verbose' data-ref="17verbose">verbose</a>);</td></tr>
+<tr><th id="225">225</th><td>}</td></tr>
+<tr><th id="226">226</th><td></td></tr>
+<tr><th id="227">227</th><td></td></tr>
+<tr><th id="228">228</th><td><i>// Test whether inputs are valid for this model</i></td></tr>
+<tr><th id="229">229</th><td></td></tr>
+<tr><th id="230">230</th><td><a class="typedef" href="../../../../../../global/management/include/G4Types.hh.html#G4bool" title='G4bool' data-type='bool' data-ref="G4bool">G4bool</a> <a class="type" href="../include/G4CascadeInterface.hh.html#G4CascadeInterface" title='G4CascadeInterface' data-ref="G4CascadeInterface">G4CascadeInterface</a>::<dfn class="virtual decl def" id="_ZN18G4CascadeInterface12IsApplicableERK15G4HadProjectileR9G4Nucleus" title='G4CascadeInterface::IsApplicable' data-ref="_ZN18G4CascadeInterface12IsApplicableERK15G4HadProjectileR9G4Nucleus">IsApplicable</dfn>(<em>const</em> <a class="type" href="../../../../util/include/G4HadProjectile.hh.html#G4HadProjectile" title='G4HadProjectile' data-ref="G4HadProjectile">G4HadProjectile</a>&amp; <dfn class="local col8 decl" id="18aTrack" title='aTrack' data-type='const G4HadProjectile &amp;' data-ref="18aTrack">aTrack</dfn>,</td></tr>
+<tr><th id="231">231</th><td>					<a class="type" href="../../../../util/include/G4Nucleus.hh.html#G4Nucleus" title='G4Nucleus' data-ref="G4Nucleus">G4Nucleus</a>&amp; <i>/* theNucleus */</i>) {</td></tr>
+<tr><th id="232">232</th><td>  <b>return</b> <a class="member" href="#_ZNK18G4CascadeInterface12IsApplicableEPK20G4ParticleDefinition" title='G4CascadeInterface::IsApplicable' data-ref="_ZNK18G4CascadeInterface12IsApplicableEPK20G4ParticleDefinition">IsApplicable</a>(<a class="local col8 ref" href="#18aTrack" title='aTrack' data-ref="18aTrack">aTrack</a>.<a class="ref" href="../../../../util/include/G4HadProjectile.hh.html#_ZNK15G4HadProjectile13GetDefinitionEv" title='G4HadProjectile::GetDefinition' data-ref="_ZNK15G4HadProjectile13GetDefinitionEv">GetDefinition</a>());  </td></tr>
+<tr><th id="233">233</th><td>}</td></tr>
+<tr><th id="234">234</th><td></td></tr>
+<tr><th id="235">235</th><td><a class="typedef" href="../../../../../../global/management/include/G4Types.hh.html#G4bool" title='G4bool' data-type='bool' data-ref="G4bool">G4bool</a> <a class="type" href="../include/G4CascadeInterface.hh.html#G4CascadeInterface" title='G4CascadeInterface' data-ref="G4CascadeInterface">G4CascadeInterface</a>::<dfn class="decl def" id="_ZNK18G4CascadeInterface12IsApplicableEPK20G4ParticleDefinition" title='G4CascadeInterface::IsApplicable' data-ref="_ZNK18G4CascadeInterface12IsApplicableEPK20G4ParticleDefinition">IsApplicable</dfn>(<em>const</em> <a class="type" href="../../../../../../particles/management/include/G4ParticleDefinition.hh.html#G4ParticleDefinition" title='G4ParticleDefinition' data-ref="G4ParticleDefinition">G4ParticleDefinition</a>* <dfn class="local col9 decl" id="19aPD" title='aPD' data-type='const G4ParticleDefinition *' data-ref="19aPD">aPD</dfn>) <em>const</em> {</td></tr>
+<tr><th id="236">236</th><td>  <b>if</b> (<a class="local col9 ref" href="#19aPD" title='aPD' data-ref="19aPD">aPD</a>-&gt;<a class="ref" href="../../../../../../particles/management/include/G4ParticleDefinition.hh.html#_ZNK20G4ParticleDefinition13GetAtomicMassEv" title='G4ParticleDefinition::GetAtomicMass' data-ref="_ZNK20G4ParticleDefinition13GetAtomicMassEv">GetAtomicMass</a>() &gt; <var>1</var>) <b>return</b> <b>true</b>;		<i>// Nuclei are okay</i></td></tr>
+<tr><th id="237">237</th><td></td></tr>
+<tr><th id="238">238</th><td>  <i>// Valid particle and have interactions available</i></td></tr>
+<tr><th id="239">239</th><td>  <a class="typedef" href="../../../../../../global/management/include/G4Types.hh.html#G4int" title='G4int' data-type='int' data-ref="G4int">G4int</a> <dfn class="local col0 decl" id="20type" title='type' data-type='G4int' data-ref="20type">type</dfn> = <a class="type" href="../include/G4InuclElementaryParticle.hh.html#G4InuclElementaryParticle" title='G4InuclElementaryParticle' data-ref="G4InuclElementaryParticle">G4InuclElementaryParticle</a>::<a class="ref" href="../include/G4InuclElementaryParticle.hh.html#_ZN25G4InuclElementaryParticle4typeEPK20G4ParticleDefinition" title='G4InuclElementaryParticle::type' data-ref="_ZN25G4InuclElementaryParticle4typeEPK20G4ParticleDefinition">type</a>(<a class="local col9 ref" href="#19aPD" title='aPD' data-ref="19aPD">aPD</a>);</td></tr>
+<tr><th id="240">240</th><td>  <b>return</b> (<a class="type" href="../include/G4CascadeChannelTables.hh.html#G4CascadeChannelTables" title='G4CascadeChannelTables' data-ref="G4CascadeChannelTables">G4CascadeChannelTables</a>::<a class="ref" href="../include/G4CascadeChannelTables.hh.html#_ZN22G4CascadeChannelTables8GetTableEi" title='G4CascadeChannelTables::GetTable' data-ref="_ZN22G4CascadeChannelTables8GetTableEi">GetTable</a>(<a class="local col0 ref" href="#20type" title='type' data-ref="20type">type</a>));</td></tr>
+<tr><th id="241">241</th><td>}</td></tr>
+<tr><th id="242">242</th><td></td></tr>
+<tr><th id="243">243</th><td></td></tr>
+<tr><th id="244">244</th><td><i>// Main Actions</i></td></tr>
+<tr><th id="245">245</th><td></td></tr>
+<tr><th id="246">246</th><td><a class="type" href="../../../../util/include/G4HadFinalState.hh.html#G4HadFinalState" title='G4HadFinalState' data-ref="G4HadFinalState">G4HadFinalState</a>* </td></tr>
+<tr><th id="247">247</th><td><a class="type" href="../include/G4CascadeInterface.hh.html#G4CascadeInterface" title='G4CascadeInterface' data-ref="G4CascadeInterface">G4CascadeInterface</a>::<dfn class="virtual decl def" id="_ZN18G4CascadeInterface13ApplyYourselfERK15G4HadProjectileR9G4Nucleus" title='G4CascadeInterface::ApplyYourself' data-ref="_ZN18G4CascadeInterface13ApplyYourselfERK15G4HadProjectileR9G4Nucleus">ApplyYourself</dfn>(<em>const</em> <a class="type" href="../../../../util/include/G4HadProjectile.hh.html#G4HadProjectile" title='G4HadProjectile' data-ref="G4HadProjectile">G4HadProjectile</a>&amp; <dfn class="local col1 decl" id="21aTrack" title='aTrack' data-type='const G4HadProjectile &amp;' data-ref="21aTrack">aTrack</dfn>, </td></tr>
+<tr><th id="248">248</th><td>				  <a class="type" href="../../../../util/include/G4Nucleus.hh.html#G4Nucleus" title='G4Nucleus' data-ref="G4Nucleus">G4Nucleus</a>&amp; <dfn class="local col2 decl" id="22theNucleus" title='theNucleus' data-type='G4Nucleus &amp;' data-ref="22theNucleus">theNucleus</dfn>) {</td></tr>
+<tr><th id="249">249</th><td>  <b>if</b> (verboseLevel)</td></tr>
+<tr><th id="250">250</th><td>    <a class="macro" href="../../../../../../global/management/include/G4ios.hh.html#46" title="(*_G4cout_p())" data-ref="_M/G4cout">G4cout</a> <span class='error' title="invalid operands to binary expression (&apos;int&apos; and &apos;const char *&apos;)">&lt;&lt;</span> <q>" &gt;&gt;&gt; G4CascadeInterface::ApplyYourself"</q> &lt;&lt; <a class="macro" href="../../../../../../global/management/include/G4ios.hh.html#60" title="std::endl" data-ref="_M/G4endl">G4endl</a>;</td></tr>
+<tr><th id="251">251</th><td></td></tr>
+<tr><th id="252">252</th><td>  <b>if</b> (<a class="local col1 ref" href="#21aTrack" title='aTrack' data-ref="21aTrack">aTrack</a>.<a class="ref" href="../../../../util/include/G4HadProjectile.hh.html#_ZNK15G4HadProjectile16GetKineticEnergyEv" title='G4HadProjectile::GetKineticEnergy' data-ref="_ZNK15G4HadProjectile16GetKineticEnergyEv">GetKineticEnergy</a>() &lt; <var>0.</var>) {</td></tr>
+<tr><th id="253">253</th><td>    <a class="macro" href="../../../../../../global/management/include/G4ios.hh.html#47" title="(*_G4cerr_p())" data-ref="_M/G4cerr">G4cerr</a> <span class='error' title="invalid operands to binary expression (&apos;int&apos; and &apos;const char *&apos;)">&lt;&lt;</span> <q>" &gt;&gt;&gt; G4CascadeInterface got negative-energy track: "</q></td></tr>
+<tr><th id="254">254</th><td>	   &lt;&lt; aTrack.GetDefinition()-&gt;GetParticleName() &lt;&lt; <q>" Ekin = "</q></td></tr>
+<tr><th id="255">255</th><td>	   &lt;&lt; aTrack.GetKineticEnergy() &lt;&lt; <a class="macro" href="../../../../../../global/management/include/G4ios.hh.html#60" title="std::endl" data-ref="_M/G4endl">G4endl</a>;</td></tr>
+<tr><th id="256">256</th><td>  }</td></tr>
+<tr><th id="257">257</th><td></td></tr>
+<tr><th id="258">258</th><td><u>#<span data-ppcond="258">ifdef</span> <span class="macro" data-ref="_M/G4CASCADE_DEBUG_INTERFACE">G4CASCADE_DEBUG_INTERFACE</span></u></td></tr>
+<tr><th id="259">259</th><td>  <em>static</em> G4int counter(<var>0</var>);</td></tr>
+<tr><th id="260">260</th><td>  counter++;</td></tr>
+<tr><th id="261">261</th><td>  G4cerr &lt;&lt; <q>"Reaction number "</q>&lt;&lt; counter &lt;&lt; <q>" "</q></td></tr>
+<tr><th id="262">262</th><td>	 &lt;&lt; aTrack.GetDefinition()-&gt;GetParticleName() &lt;&lt; <q>" "</q></td></tr>
+<tr><th id="263">263</th><td>	 &lt;&lt; aTrack.GetKineticEnergy() &lt;&lt; <q>" MeV"</q> &lt;&lt; G4endl;</td></tr>
+<tr><th id="264">264</th><td><u>#<span data-ppcond="258">endif</span></u></td></tr>
+<tr><th id="265">265</th><td></td></tr>
+<tr><th id="266">266</th><td>  <b>if</b> (!randomFile.<span class='error' title="no member named &apos;empty&apos; in &apos;G4String&apos;">empty</span>()) {		<i>// User requested random-seed capture</i></td></tr>
+<tr><th id="267">267</th><td>    <b>if</b> (verboseLevel&gt;<var>1</var>) </td></tr>
+<tr><th id="268">268</th><td>      <a class="macro" href="../../../../../../global/management/include/G4ios.hh.html#46" title="(*_G4cout_p())" data-ref="_M/G4cout">G4cout</a> <span class='error' title="invalid operands to binary expression (&apos;int&apos; and &apos;const char *&apos;)">&lt;&lt;</span> <q>" Saving random engine state to "</q> &lt;&lt; randomFile &lt;&lt; <a class="macro" href="../../../../../../global/management/include/G4ios.hh.html#60" title="std::endl" data-ref="_M/G4endl">G4endl</a>;</td></tr>
+<tr><th id="269">269</th><td>    <span class="namespace">CLHEP::</span><a class="type" href="../../../../../../externals/clhep/include/CLHEP/Random/Random.h.html#CLHEP::HepRandom" title='CLHEP::HepRandom' data-ref="CLHEP::HepRandom">HepRandom</a>::<a class="ref" href="../../../../../../externals/clhep/include/CLHEP/Random/Random.h.html#_ZN5CLHEP9HepRandom16saveEngineStatusEPKc" title='CLHEP::HepRandom::saveEngineStatus' data-ref="_ZN5CLHEP9HepRandom16saveEngineStatusEPKc">saveEngineStatus</a>(<a class="ref fake" href="../../../../../../global/management/include/G4String.hh.html#_ZNK8G4StringcvPKcEv" title='G4String::operator const char *' data-ref="_ZNK8G4StringcvPKcEv"></a><a class="member" href="../include/G4CascadeInterface.hh.html#G4CascadeInterface::randomFile" title='G4CascadeInterface::randomFile' data-ref="G4CascadeInterface::randomFile">randomFile</a>);</td></tr>
+<tr><th id="270">270</th><td>  }</td></tr>
+<tr><th id="271">271</th><td></td></tr>
+<tr><th id="272">272</th><td>  <a class="member" href="../../../management/include/G4HadronicInteraction.hh.html#G4HadronicInteraction::theParticleChange" title='G4HadronicInteraction::theParticleChange' data-ref="G4HadronicInteraction::theParticleChange">theParticleChange</a>.<a class="ref" href="../../../../util/include/G4HadFinalState.hh.html#_ZN15G4HadFinalState5ClearEv" title='G4HadFinalState::Clear' data-ref="_ZN15G4HadFinalState5ClearEv">Clear</a>();</td></tr>
+<tr><th id="273">273</th><td>  <a class="member" href="#_ZN18G4CascadeInterface5clearEv" title='G4CascadeInterface::clear' data-ref="_ZN18G4CascadeInterface5clearEv">clear</a>();</td></tr>
+<tr><th id="274">274</th><td></td></tr>
+<tr><th id="275">275</th><td>  <i>// Abort processing if no interaction is possible</i></td></tr>
+<tr><th id="276">276</th><td>  <b>if</b> (!<a class="virtual member" href="#_ZN18G4CascadeInterface12IsApplicableERK15G4HadProjectileR9G4Nucleus" title='G4CascadeInterface::IsApplicable' data-ref="_ZN18G4CascadeInterface12IsApplicableERK15G4HadProjectileR9G4Nucleus">IsApplicable</a>(<a class="local col1 ref" href="#21aTrack" title='aTrack' data-ref="21aTrack">aTrack</a>, <span class='refarg'><a class="local col2 ref" href="#22theNucleus" title='theNucleus' data-ref="22theNucleus">theNucleus</a></span>)) {</td></tr>
+<tr><th id="277">277</th><td>    <b>if</b> (verboseLevel) <a class="macro" href="../../../../../../global/management/include/G4ios.hh.html#47" title="(*_G4cerr_p())" data-ref="_M/G4cerr">G4cerr</a> <span class='error' title="invalid operands to binary expression (&apos;int&apos; and &apos;const char *&apos;)">&lt;&lt;</span> <q>" No interaction possible "</q> &lt;&lt; <a class="macro" href="../../../../../../global/management/include/G4ios.hh.html#60" title="std::endl" data-ref="_M/G4endl">G4endl</a>;</td></tr>
+<tr><th id="278">278</th><td>    <b>return</b> <a class="member" href="#_ZN18G4CascadeInterface13NoInteractionERK15G4HadProjectileR9G4Nucleus" title='G4CascadeInterface::NoInteraction' data-ref="_ZN18G4CascadeInterface13NoInteractionERK15G4HadProjectileR9G4Nucleus">NoInteraction</a>(<a class="local col1 ref" href="#21aTrack" title='aTrack' data-ref="21aTrack">aTrack</a>, <span class='refarg'><a class="local col2 ref" href="#22theNucleus" title='theNucleus' data-ref="22theNucleus">theNucleus</a></span>);</td></tr>
+<tr><th id="279">279</th><td>  }</td></tr>
+<tr><th id="280">280</th><td></td></tr>
+<tr><th id="281">281</th><td>  <i>// Make conversion between native Geant4 and Bertini cascade classes.</i></td></tr>
+<tr><th id="282">282</th><td>  <b>if</b> (!<a class="member" href="#_ZN18G4CascadeInterface12createBulletERK15G4HadProjectile" title='G4CascadeInterface::createBullet' data-ref="_ZN18G4CascadeInterface12createBulletERK15G4HadProjectile">createBullet</a>(<a class="local col1 ref" href="#21aTrack" title='aTrack' data-ref="21aTrack">aTrack</a>)) {</td></tr>
+<tr><th id="283">283</th><td>    <b>if</b> (verboseLevel) <a class="macro" href="../../../../../../global/management/include/G4ios.hh.html#47" title="(*_G4cerr_p())" data-ref="_M/G4cerr">G4cerr</a> <span class='error' title="invalid operands to binary expression (&apos;int&apos; and &apos;const char *&apos;)">&lt;&lt;</span> <q>" Unable to create usable bullet"</q> &lt;&lt; <a class="macro" href="../../../../../../global/management/include/G4ios.hh.html#60" title="std::endl" data-ref="_M/G4endl">G4endl</a>;</td></tr>
+<tr><th id="284">284</th><td>    <b>return</b> <a class="member" href="#_ZN18G4CascadeInterface13NoInteractionERK15G4HadProjectileR9G4Nucleus" title='G4CascadeInterface::NoInteraction' data-ref="_ZN18G4CascadeInterface13NoInteractionERK15G4HadProjectileR9G4Nucleus">NoInteraction</a>(<a class="local col1 ref" href="#21aTrack" title='aTrack' data-ref="21aTrack">aTrack</a>, <span class='refarg'><a class="local col2 ref" href="#22theNucleus" title='theNucleus' data-ref="22theNucleus">theNucleus</a></span>);</td></tr>
+<tr><th id="285">285</th><td>  }</td></tr>
+<tr><th id="286">286</th><td></td></tr>
+<tr><th id="287">287</th><td>  <b>if</b> (!<a class="member" href="#_ZN18G4CascadeInterface12createTargetER9G4Nucleus" title='G4CascadeInterface::createTarget' data-ref="_ZN18G4CascadeInterface12createTargetER9G4Nucleus">createTarget</a>(<span class='refarg'><a class="local col2 ref" href="#22theNucleus" title='theNucleus' data-ref="22theNucleus">theNucleus</a></span>)) {</td></tr>
+<tr><th id="288">288</th><td>    <b>if</b> (verboseLevel) <a class="macro" href="../../../../../../global/management/include/G4ios.hh.html#47" title="(*_G4cerr_p())" data-ref="_M/G4cerr">G4cerr</a> <span class='error' title="invalid operands to binary expression (&apos;int&apos; and &apos;const char *&apos;)">&lt;&lt;</span> <q>" Unable to create usable target"</q> &lt;&lt; <a class="macro" href="../../../../../../global/management/include/G4ios.hh.html#60" title="std::endl" data-ref="_M/G4endl">G4endl</a>;</td></tr>
+<tr><th id="289">289</th><td>    <b>return</b> <a class="member" href="#_ZN18G4CascadeInterface13NoInteractionERK15G4HadProjectileR9G4Nucleus" title='G4CascadeInterface::NoInteraction' data-ref="_ZN18G4CascadeInterface13NoInteractionERK15G4HadProjectileR9G4Nucleus">NoInteraction</a>(<a class="local col1 ref" href="#21aTrack" title='aTrack' data-ref="21aTrack">aTrack</a>, <span class='refarg'><a class="local col2 ref" href="#22theNucleus" title='theNucleus' data-ref="22theNucleus">theNucleus</a></span>);</td></tr>
+<tr><th id="290">290</th><td>  }</td></tr>
+<tr><th id="291">291</th><td></td></tr>
+<tr><th id="292">292</th><td>  <i>// Different retry conditions for proton target vs. nucleus</i></td></tr>
+<tr><th id="293">293</th><td>  <em>const</em> <a class="typedef" href="../../../../../../global/management/include/G4Types.hh.html#G4bool" title='G4bool' data-type='bool' data-ref="G4bool">G4bool</a> <dfn class="local col3 decl" id="23isHydrogen" title='isHydrogen' data-type='const G4bool' data-ref="23isHydrogen">isHydrogen</dfn> = (<a class="local col2 ref" href="#22theNucleus" title='theNucleus' data-ref="22theNucleus">theNucleus</a>.<a class="ref" href="../../../../util/include/G4Nucleus.hh.html#_ZNK9G4Nucleus10GetA_asIntEv" title='G4Nucleus::GetA_asInt' data-ref="_ZNK9G4Nucleus10GetA_asIntEv">GetA_asInt</a>() == <var>1</var>);</td></tr>
+<tr><th id="294">294</th><td></td></tr>
+<tr><th id="295">295</th><td>  <a class="member" href="../include/G4CascadeInterface.hh.html#G4CascadeInterface::numberOfTries" title='G4CascadeInterface::numberOfTries' data-ref="G4CascadeInterface::numberOfTries">numberOfTries</a> = <var>0</var>;</td></tr>
+<tr><th id="296">296</th><td>  <b>do</b> {   			<i>// we try to create inelastic interaction</i></td></tr>
+<tr><th id="297">297</th><td>    <b>if</b> (verboseLevel &gt; <var>1</var>)</td></tr>
+<tr><th id="298">298</th><td>      <a class="macro" href="../../../../../../global/management/include/G4ios.hh.html#46" title="(*_G4cout_p())" data-ref="_M/G4cout">G4cout</a> <span class='error' title="invalid operands to binary expression (&apos;int&apos; and &apos;const char *&apos;)">&lt;&lt;</span> <q>" Generating cascade attempt "</q> &lt;&lt; numberOfTries &lt;&lt; <a class="macro" href="../../../../../../global/management/include/G4ios.hh.html#60" title="std::endl" data-ref="_M/G4endl">G4endl</a>;</td></tr>
+<tr><th id="299">299</th><td>    </td></tr>
+<tr><th id="300">300</th><td>    <a class="member" href="../include/G4CascadeInterface.hh.html#G4CascadeInterface::output" title='G4CascadeInterface::output' data-ref="G4CascadeInterface::output">output</a>-&gt;<a class="ref" href="../include/G4CollisionOutput.hh.html#_ZN17G4CollisionOutput5resetEv" title='G4CollisionOutput::reset' data-ref="_ZN17G4CollisionOutput5resetEv">reset</a>();</td></tr>
+<tr><th id="301">301</th><td>    <a class="member" href="../include/G4CascadeInterface.hh.html#G4CascadeInterface::collider" title='G4CascadeInterface::collider' data-ref="G4CascadeInterface::collider">collider</a>-&gt;<a class="virtual ref" href="../include/G4InuclCollider.hh.html#_ZN15G4InuclCollider7collideEP15G4InuclParticleS1_R17G4CollisionOutput" title='G4InuclCollider::collide' data-ref="_ZN15G4InuclCollider7collideEP15G4InuclParticleS1_R17G4CollisionOutput">collide</a>(<a class="member" href="../include/G4CascadeInterface.hh.html#G4CascadeInterface::bullet" title='G4CascadeInterface::bullet' data-ref="G4CascadeInterface::bullet">bullet</a>, <a class="member" href="../include/G4CascadeInterface.hh.html#G4CascadeInterface::target" title='G4CascadeInterface::target' data-ref="G4CascadeInterface::target">target</a>, <span class='refarg'>*<a class="member" href="../include/G4CascadeInterface.hh.html#G4CascadeInterface::output" title='G4CascadeInterface::output' data-ref="G4CascadeInterface::output">output</a></span>);</td></tr>
+<tr><th id="302">302</th><td>    <a class="member" href="../include/G4CascadeInterface.hh.html#G4CascadeInterface::balance" title='G4CascadeInterface::balance' data-ref="G4CascadeInterface::balance">balance</a>-&gt;<a class="virtual ref" href="../include/G4CascadeCheckBalance.hh.html#_ZN21G4CascadeCheckBalance7collideEP15G4InuclParticleS1_R17G4CollisionOutput" title='G4CascadeCheckBalance::collide' data-ref="_ZN21G4CascadeCheckBalance7collideEP15G4InuclParticleS1_R17G4CollisionOutput">collide</a>(<a class="member" href="../include/G4CascadeInterface.hh.html#G4CascadeInterface::bullet" title='G4CascadeInterface::bullet' data-ref="G4CascadeInterface::bullet">bullet</a>, <a class="member" href="../include/G4CascadeInterface.hh.html#G4CascadeInterface::target" title='G4CascadeInterface::target' data-ref="G4CascadeInterface::target">target</a>, <span class='refarg'>*<a class="member" href="../include/G4CascadeInterface.hh.html#G4CascadeInterface::output" title='G4CascadeInterface::output' data-ref="G4CascadeInterface::output">output</a></span>);</td></tr>
+<tr><th id="303">303</th><td>    </td></tr>
+<tr><th id="304">304</th><td>    <a class="member" href="../include/G4CascadeInterface.hh.html#G4CascadeInterface::numberOfTries" title='G4CascadeInterface::numberOfTries' data-ref="G4CascadeInterface::numberOfTries">numberOfTries</a>++;</td></tr>
+<tr><th id="305">305</th><td>    <i>/* Loop checking 08.06.2015 MHK */</i></td></tr>
+<tr><th id="306">306</th><td>  } <b>while</b> ( <a class="local col3 ref" href="#23isHydrogen" title='isHydrogen' data-ref="23isHydrogen">isHydrogen</a> ? <a class="member" href="#_ZNK18G4CascadeInterface20retryInelasticProtonEv" title='G4CascadeInterface::retryInelasticProton' data-ref="_ZNK18G4CascadeInterface20retryInelasticProtonEv">retryInelasticProton</a>() : <a class="member" href="#_ZNK18G4CascadeInterface21retryInelasticNucleusEv" title='G4CascadeInterface::retryInelasticNucleus' data-ref="_ZNK18G4CascadeInterface21retryInelasticNucleusEv">retryInelasticNucleus</a>() );</td></tr>
+<tr><th id="307">307</th><td></td></tr>
+<tr><th id="308">308</th><td>  <i>// Null event if unsuccessful</i></td></tr>
+<tr><th id="309">309</th><td>  <b>if</b> (<a class="member" href="../include/G4CascadeInterface.hh.html#G4CascadeInterface::numberOfTries" title='G4CascadeInterface::numberOfTries' data-ref="G4CascadeInterface::numberOfTries">numberOfTries</a> &gt;= <a class="member" href="../include/G4CascadeInterface.hh.html#G4CascadeInterface::maximumTries" title='G4CascadeInterface::maximumTries' data-ref="G4CascadeInterface::maximumTries">maximumTries</a>) {</td></tr>
+<tr><th id="310">310</th><td>    <b>if</b> (verboseLevel) </td></tr>
+<tr><th id="311">311</th><td>      <a class="macro" href="../../../../../../global/management/include/G4ios.hh.html#46" title="(*_G4cout_p())" data-ref="_M/G4cout">G4cout</a> <span class='error' title="invalid operands to binary expression (&apos;int&apos; and &apos;const char *&apos;)">&lt;&lt;</span> <q>" Cascade aborted after trials "</q> &lt;&lt; numberOfTries &lt;&lt; <a class="macro" href="../../../../../../global/management/include/G4ios.hh.html#60" title="std::endl" data-ref="_M/G4endl">G4endl</a>;</td></tr>
+<tr><th id="312">312</th><td>    <b>return</b> <a class="member" href="#_ZN18G4CascadeInterface13NoInteractionERK15G4HadProjectileR9G4Nucleus" title='G4CascadeInterface::NoInteraction' data-ref="_ZN18G4CascadeInterface13NoInteractionERK15G4HadProjectileR9G4Nucleus">NoInteraction</a>(<a class="local col1 ref" href="#21aTrack" title='aTrack' data-ref="21aTrack">aTrack</a>, <span class='refarg'><a class="local col2 ref" href="#22theNucleus" title='theNucleus' data-ref="22theNucleus">theNucleus</a></span>);</td></tr>
+<tr><th id="313">313</th><td>  }</td></tr>
+<tr><th id="314">314</th><td></td></tr>
+<tr><th id="315">315</th><td>  <i>// Abort job if energy or momentum are not conserved</i></td></tr>
+<tr><th id="316">316</th><td>  <b>if</b> (!<a class="member" href="../include/G4CascadeInterface.hh.html#G4CascadeInterface::balance" title='G4CascadeInterface::balance' data-ref="G4CascadeInterface::balance">balance</a>-&gt;<a class="ref" href="../include/G4CascadeCheckBalance.hh.html#_ZNK21G4CascadeCheckBalance4okayEv" title='G4CascadeCheckBalance::okay' data-ref="_ZNK21G4CascadeCheckBalance4okayEv">okay</a>()) {</td></tr>
+<tr><th id="317">317</th><td>    <a class="member" href="#_ZN18G4CascadeInterface27throwNonConservationFailureEv" title='G4CascadeInterface::throwNonConservationFailure' data-ref="_ZN18G4CascadeInterface27throwNonConservationFailureEv">throwNonConservationFailure</a>();</td></tr>
+<tr><th id="318">318</th><td>    <b>return</b> <a class="member" href="#_ZN18G4CascadeInterface13NoInteractionERK15G4HadProjectileR9G4Nucleus" title='G4CascadeInterface::NoInteraction' data-ref="_ZN18G4CascadeInterface13NoInteractionERK15G4HadProjectileR9G4Nucleus">NoInteraction</a>(<a class="local col1 ref" href="#21aTrack" title='aTrack' data-ref="21aTrack">aTrack</a>, <span class='refarg'><a class="local col2 ref" href="#22theNucleus" title='theNucleus' data-ref="22theNucleus">theNucleus</a></span>);</td></tr>
+<tr><th id="319">319</th><td>  }</td></tr>
+<tr><th id="320">320</th><td></td></tr>
+<tr><th id="321">321</th><td>  <i>// Successful cascade -- clean up and return</i></td></tr>
+<tr><th id="322">322</th><td>  <b>if</b> (<a class="member" href="../../../management/include/G4HadronicInteraction.hh.html#G4HadronicInteraction::verboseLevel" title='G4HadronicInteraction::verboseLevel' data-ref="G4HadronicInteraction::verboseLevel">verboseLevel</a>) {</td></tr>
+<tr><th id="323">323</th><td>    <a class="macro" href="../../../../../../global/management/include/G4ios.hh.html#46" title="(*_G4cout_p())" data-ref="_M/G4cout">G4cout</a> <span class='error' title="invalid operands to binary expression (&apos;int&apos; and &apos;const char *&apos;)">&lt;&lt;</span> <q>" Cascade output after trials "</q> &lt;&lt; numberOfTries &lt;&lt; <a class="macro" href="../../../../../../global/management/include/G4ios.hh.html#60" title="std::endl" data-ref="_M/G4endl">G4endl</a>;</td></tr>
+<tr><th id="324">324</th><td>    <b>if</b> (verboseLevel &gt; <var>1</var>) output-&gt;printCollisionOutput();</td></tr>
+<tr><th id="325">325</th><td>  }</td></tr>
+<tr><th id="326">326</th><td></td></tr>
+<tr><th id="327">327</th><td>  <i>// Rotate event to put Z axis along original projectile direction</i></td></tr>
+<tr><th id="328">328</th><td><i>  // Removed by DHW to fix bug #1990</i></td></tr>
+<tr><th id="329">329</th><td><i>  // output-&gt;rotateEvent(bulletInLabFrame);</i></td></tr>
+<tr><th id="330">330</th><td></td></tr>
+<tr><th id="331">331</th><td>  <a class="member" href="#_ZN18G4CascadeInterface26copyOutputToHadronicResultEv" title='G4CascadeInterface::copyOutputToHadronicResult' data-ref="_ZN18G4CascadeInterface26copyOutputToHadronicResultEv">copyOutputToHadronicResult</a>();</td></tr>
+<tr><th id="332">332</th><td></td></tr>
+<tr><th id="333">333</th><td>  <i>// Report violations of conservation laws in original frame</i></td></tr>
+<tr><th id="334">334</th><td>  <a class="member" href="#_ZN18G4CascadeInterface16checkFinalResultEv" title='G4CascadeInterface::checkFinalResult' data-ref="_ZN18G4CascadeInterface16checkFinalResultEv">checkFinalResult</a>();</td></tr>
+<tr><th id="335">335</th><td></td></tr>
+<tr><th id="336">336</th><td>  <i>// Clean up and return final result;</i></td></tr>
+<tr><th id="337">337</th><td>  <a class="member" href="#_ZN18G4CascadeInterface5clearEv" title='G4CascadeInterface::clear' data-ref="_ZN18G4CascadeInterface5clearEv">clear</a>();</td></tr>
+<tr><th id="338">338</th><td><i>/*</i></td></tr>
+<tr><th id="339">339</th><td><i>  G4int nSec = theParticleChange.GetNumberOfSecondaries();</i></td></tr>
+<tr><th id="340">340</th><td><i>  for (G4int i = 0; i &lt; nSec; i++) {</i></td></tr>
+<tr><th id="341">341</th><td><i>    G4HadSecondary* sec = theParticleChange.GetSecondary(i);</i></td></tr>
+<tr><th id="342">342</th><td><i>    G4DynamicParticle* dp = sec-&gt;GetParticle();</i></td></tr>
+<tr><th id="343">343</th><td><i>    if (dp-&gt;GetDefinition()-&gt;GetParticleName() == "neutron") </i></td></tr>
+<tr><th id="344">344</th><td><i>      G4cout &lt;&lt; dp-&gt;GetDefinition()-&gt;GetParticleName() &lt;&lt; " has "</i></td></tr>
+<tr><th id="345">345</th><td><i>             &lt;&lt; dp-&gt;GetKineticEnergy()/MeV &lt;&lt; " MeV " &lt;&lt; G4endl;</i></td></tr>
+<tr><th id="346">346</th><td><i>  }</i></td></tr>
+<tr><th id="347">347</th><td><i>*/</i></td></tr>
+<tr><th id="348">348</th><td>  <b>return</b> &amp;<a class="member" href="../../../management/include/G4HadronicInteraction.hh.html#G4HadronicInteraction::theParticleChange" title='G4HadronicInteraction::theParticleChange' data-ref="G4HadronicInteraction::theParticleChange">theParticleChange</a>;</td></tr>
+<tr><th id="349">349</th><td>}</td></tr>
+<tr><th id="350">350</th><td></td></tr>
+<tr><th id="351">351</th><td><span class='error' title="unknown type name &apos;G4ReactionProductVector&apos;">G4ReactionProductVector</span>* </td></tr>
+<tr><th id="352">352</th><td>G4CascadeInterface::Propagate(G4KineticTrackVector* theSecondaries,</td></tr>
+<tr><th id="353">353</th><td>			      G4V3DNucleus* theNucleus) {</td></tr>
+<tr><th id="354">354</th><td>  <b>if</b> (verboseLevel) <a class="macro" href="../../../../../../global/management/include/G4ios.hh.html#46" title="(*_G4cout_p())" data-ref="_M/G4cout">G4cout</a> <span class='error' title="invalid operands to binary expression (&apos;int&apos; and &apos;const char *&apos;)">&lt;&lt;</span> <q>" &gt;&gt;&gt; G4CascadeInterface::Propagate"</q> &lt;&lt; <a class="macro" href="../../../../../../global/management/include/G4ios.hh.html#60" title="std::endl" data-ref="_M/G4endl">G4endl</a>;</td></tr>
+<tr><th id="355">355</th><td></td></tr>
+<tr><th id="356">356</th><td><u>#<span data-ppcond="356">ifdef</span> <span class="macro" data-ref="_M/G4CASCADE_DEBUG_INTERFACE">G4CASCADE_DEBUG_INTERFACE</span></u></td></tr>
+<tr><th id="357">357</th><td>  <b>if</b> (verboseLevel&gt;<var>1</var>) {</td></tr>
+<tr><th id="358">358</th><td>    G4cout &lt;&lt; <q>" G4V3DNucleus A "</q> &lt;&lt; theNucleus-&gt;GetMassNumber()</td></tr>
+<tr><th id="359">359</th><td>	   &lt;&lt; <q>" Z "</q> &lt;&lt; theNucleus-&gt;GetCharge()</td></tr>
+<tr><th id="360">360</th><td>	   &lt;&lt; <q>"\n "</q> &lt;&lt; theSecondaries-&gt;size() &lt;&lt; <q>" secondaries:"</q> &lt;&lt; G4endl;</td></tr>
+<tr><th id="361">361</th><td>    <b>for</b> (size_t i=<var>0</var>; i&lt;theSecondaries-&gt;size(); i++) {</td></tr>
+<tr><th id="362">362</th><td>      G4KineticTrack* kt = (*theSecondaries)[i];</td></tr>
+<tr><th id="363">363</th><td>      G4cout &lt;&lt; <q>" "</q> &lt;&lt; i &lt;&lt; <q>": "</q> &lt;&lt; kt-&gt;GetDefinition()-&gt;GetParticleName() </td></tr>
+<tr><th id="364">364</th><td>	     &lt;&lt; <q>" p "</q> &lt;&lt; kt-&gt;Get4Momentum() &lt;&lt; <q>" @ "</q> &lt;&lt; kt-&gt;GetPosition()</td></tr>
+<tr><th id="365">365</th><td>	     &lt;&lt; <q>" t "</q> &lt;&lt; kt-&gt;GetFormationTime() &lt;&lt; G4endl;</td></tr>
+<tr><th id="366">366</th><td>    }</td></tr>
+<tr><th id="367">367</th><td>  }</td></tr>
+<tr><th id="368">368</th><td><u>#<span data-ppcond="356">endif</span></u></td></tr>
+<tr><th id="369">369</th><td></td></tr>
+<tr><th id="370">370</th><td>  <b>if</b> (!randomFile.<span class='error' title="no member named &apos;empty&apos; in &apos;G4String&apos;">empty</span>()) {		<i>// User requested random-seed capture</i></td></tr>
+<tr><th id="371">371</th><td>    <b>if</b> (verboseLevel&gt;<var>1</var>) </td></tr>
+<tr><th id="372">372</th><td>      <a class="macro" href="../../../../../../global/management/include/G4ios.hh.html#46" title="(*_G4cout_p())" data-ref="_M/G4cout">G4cout</a> <span class='error' title="invalid operands to binary expression (&apos;int&apos; and &apos;const char *&apos;)">&lt;&lt;</span> <q>" Saving random engine state to "</q> &lt;&lt; randomFile &lt;&lt; <a class="macro" href="../../../../../../global/management/include/G4ios.hh.html#60" title="std::endl" data-ref="_M/G4endl">G4endl</a>;</td></tr>
+<tr><th id="373">373</th><td>    CLHEP::HepRandom::saveEngineStatus(randomFile);</td></tr>
+<tr><th id="374">374</th><td>  }</td></tr>
+<tr><th id="375">375</th><td></td></tr>
+<tr><th id="376">376</th><td>  theParticleChange.Clear();</td></tr>
+<tr><th id="377">377</th><td>  clear();</td></tr>
+<tr><th id="378">378</th><td></td></tr>
+<tr><th id="379">379</th><td>  <i>// Process input secondaries list to eliminate resonances</i></td></tr>
+<tr><th id="380">380</th><td>  G4DecayKineticTracks decay(theSecondaries);</td></tr>
+<tr><th id="381">381</th><td></td></tr>
+<tr><th id="382">382</th><td>  <i>// NOTE:  Requires 9.4-ref-03 mods to base class and G4TheoFSGenerator</i></td></tr>
+<tr><th id="383">383</th><td>  <em>const</em> G4HadProjectile* projectile = GetPrimaryProjectile();</td></tr>
+<tr><th id="384">384</th><td>  <b>if</b> (projectile) createBullet(*projectile);</td></tr>
+<tr><th id="385">385</th><td></td></tr>
+<tr><th id="386">386</th><td>  <b>if</b> (!createTarget(theNucleus)) {</td></tr>
+<tr><th id="387">387</th><td>    <b>if</b> (verboseLevel) <a class="macro" href="../../../../../../global/management/include/G4ios.hh.html#47" title="(*_G4cerr_p())" data-ref="_M/G4cerr">G4cerr</a> <span class='error' title="invalid operands to binary expression (&apos;int&apos; and &apos;const char *&apos;)">&lt;&lt;</span> <q>" Unable to create usable target"</q> &lt;&lt; <a class="macro" href="../../../../../../global/management/include/G4ios.hh.html#60" title="std::endl" data-ref="_M/G4endl">G4endl</a>;</td></tr>
+<tr><th id="388">388</th><td>    <b>return</b> <var>0</var>;	<i>// FIXME:  This will cause a segfault later</i></td></tr>
+<tr><th id="389">389</th><td>  }</td></tr>
+<tr><th id="390">390</th><td></td></tr>
+<tr><th id="391">391</th><td>  numberOfTries = <var>0</var>;</td></tr>
+<tr><th id="392">392</th><td>  <b>do</b> {</td></tr>
+<tr><th id="393">393</th><td>    <b>if</b> (verboseLevel &gt; <var>1</var>)</td></tr>
+<tr><th id="394">394</th><td>      <a class="macro" href="../../../../../../global/management/include/G4ios.hh.html#46" title="(*_G4cout_p())" data-ref="_M/G4cout">G4cout</a> <span class='error' title="invalid operands to binary expression (&apos;int&apos; and &apos;const char *&apos;)">&lt;&lt;</span> <q>" Generating rescatter attempt "</q> &lt;&lt; numberOfTries &lt;&lt; <a class="macro" href="../../../../../../global/management/include/G4ios.hh.html#60" title="std::endl" data-ref="_M/G4endl">G4endl</a>;</td></tr>
+<tr><th id="395">395</th><td></td></tr>
+<tr><th id="396">396</th><td>    output-&gt;reset();</td></tr>
+<tr><th id="397">397</th><td>    collider-&gt;rescatter(bullet, theSecondaries, theNucleus, *output);</td></tr>
+<tr><th id="398">398</th><td>    balance-&gt;collide(bullet, target, *output);</td></tr>
+<tr><th id="399">399</th><td></td></tr>
+<tr><th id="400">400</th><td>    numberOfTries++;</td></tr>
+<tr><th id="401">401</th><td>    <i>// FIXME:  retry checks will SEGFAULT until we can define the bullet!</i></td></tr>
+<tr><th id="402">402</th><td>  } <b>while</b> (retryInelasticNucleus());	<i>/* Loop checking 08.06.2015 MHK */</i></td></tr>
+<tr><th id="403">403</th><td></td></tr>
+<tr><th id="404">404</th><td>  <i>// Check whether repeated attempts have all failed; report and exit</i></td></tr>
+<tr><th id="405">405</th><td>  <b>if</b> (numberOfTries &gt;= maximumTries &amp;&amp; !balance-&gt;okay()) {</td></tr>
+<tr><th id="406">406</th><td>    throwNonConservationFailure();	<i>// This terminates the job</i></td></tr>
+<tr><th id="407">407</th><td>  }</td></tr>
+<tr><th id="408">408</th><td></td></tr>
+<tr><th id="409">409</th><td>  <i>// Successful cascade -- clean up and return</i></td></tr>
+<tr><th id="410">410</th><td>  <b>if</b> (verboseLevel) {</td></tr>
+<tr><th id="411">411</th><td>    <a class="macro" href="../../../../../../global/management/include/G4ios.hh.html#46" title="(*_G4cout_p())" data-ref="_M/G4cout">G4cout</a> <span class='error' title="invalid operands to binary expression (&apos;int&apos; and &apos;const char *&apos;)">&lt;&lt;</span> <q>" Cascade rescatter after trials "</q> &lt;&lt; numberOfTries &lt;&lt; <a class="macro" href="../../../../../../global/management/include/G4ios.hh.html#60" title="std::endl" data-ref="_M/G4endl">G4endl</a>;</td></tr>
+<tr><th id="412">412</th><td>    <b>if</b> (verboseLevel &gt; <var>1</var>) output-&gt;printCollisionOutput();</td></tr>
+<tr><th id="413">413</th><td>  }</td></tr>
+<tr><th id="414">414</th><td></td></tr>
+<tr><th id="415">415</th><td>  <i>// Does calling code take ownership?  I hope so!</i></td></tr>
+<tr><th id="416">416</th><td>  <span class='error' title="unknown type name &apos;G4ReactionProductVector&apos;">G4ReactionProductVector</span>* propResult = copyOutputToReactionProducts();</td></tr>
+<tr><th id="417">417</th><td></td></tr>
+<tr><th id="418">418</th><td>  <i>// Clean up and and return final result</i></td></tr>
+<tr><th id="419">419</th><td>  clear();</td></tr>
+<tr><th id="420">420</th><td>  <b>return</b> propResult;</td></tr>
+<tr><th id="421">421</th><td>}</td></tr>
+<tr><th id="422">422</th><td></td></tr>
+<tr><th id="423">423</th><td></td></tr>
+<tr><th id="424">424</th><td><i>// Replicate input particles onto output</i></td></tr>
+<tr><th id="425">425</th><td></td></tr>
+<tr><th id="426">426</th><td><a class="type" href="../../../../util/include/G4HadFinalState.hh.html#G4HadFinalState" title='G4HadFinalState' data-ref="G4HadFinalState">G4HadFinalState</a>* </td></tr>
+<tr><th id="427">427</th><td><a class="type" href="../include/G4CascadeInterface.hh.html#G4CascadeInterface" title='G4CascadeInterface' data-ref="G4CascadeInterface">G4CascadeInterface</a>::<dfn class="decl def" id="_ZN18G4CascadeInterface13NoInteractionERK15G4HadProjectileR9G4Nucleus" title='G4CascadeInterface::NoInteraction' data-ref="_ZN18G4CascadeInterface13NoInteractionERK15G4HadProjectileR9G4Nucleus">NoInteraction</dfn>(<em>const</em> <a class="type" href="../../../../util/include/G4HadProjectile.hh.html#G4HadProjectile" title='G4HadProjectile' data-ref="G4HadProjectile">G4HadProjectile</a>&amp; <dfn class="local col4 decl" id="24aTrack" title='aTrack' data-type='const G4HadProjectile &amp;' data-ref="24aTrack">aTrack</dfn>,</td></tr>
+<tr><th id="428">428</th><td>				  <a class="type" href="../../../../util/include/G4Nucleus.hh.html#G4Nucleus" title='G4Nucleus' data-ref="G4Nucleus">G4Nucleus</a>&amp; <i>/*theNucleus*/</i>) {</td></tr>
+<tr><th id="429">429</th><td>  <b>if</b> (verboseLevel) </td></tr>
+<tr><th id="430">430</th><td>    <a class="macro" href="../../../../../../global/management/include/G4ios.hh.html#46" title="(*_G4cout_p())" data-ref="_M/G4cout">G4cout</a> <span class='error' title="invalid operands to binary expression (&apos;int&apos; and &apos;const char *&apos;)">&lt;&lt;</span> <q>" &gt;&gt;&gt; G4CascadeInterface::NoInteraction"</q> &lt;&lt; <a class="macro" href="../../../../../../global/management/include/G4ios.hh.html#60" title="std::endl" data-ref="_M/G4endl">G4endl</a>;</td></tr>
+<tr><th id="431">431</th><td></td></tr>
+<tr><th id="432">432</th><td>  <a class="member" href="../../../management/include/G4HadronicInteraction.hh.html#G4HadronicInteraction::theParticleChange" title='G4HadronicInteraction::theParticleChange' data-ref="G4HadronicInteraction::theParticleChange">theParticleChange</a>.<a class="ref" href="../../../../util/include/G4HadFinalState.hh.html#_ZN15G4HadFinalState5ClearEv" title='G4HadFinalState::Clear' data-ref="_ZN15G4HadFinalState5ClearEv">Clear</a>();</td></tr>
+<tr><th id="433">433</th><td>  <a class="member" href="../../../management/include/G4HadronicInteraction.hh.html#G4HadronicInteraction::theParticleChange" title='G4HadronicInteraction::theParticleChange' data-ref="G4HadronicInteraction::theParticleChange">theParticleChange</a>.<a class="ref" href="../../../../util/include/G4HadFinalState.hh.html#_ZN15G4HadFinalState15SetStatusChangeE21G4HadFinalStateStatus" title='G4HadFinalState::SetStatusChange' data-ref="_ZN15G4HadFinalState15SetStatusChangeE21G4HadFinalStateStatus">SetStatusChange</a>(<a class="enum" href="../../../../util/include/G4HadFinalState.hh.html#G4HadFinalStateStatus::isAlive" title='G4HadFinalStateStatus::isAlive' data-ref="G4HadFinalStateStatus::isAlive">isAlive</a>);</td></tr>
+<tr><th id="434">434</th><td></td></tr>
+<tr><th id="435">435</th><td>  <a class="typedef" href="../../../../../../global/management/include/G4Types.hh.html#G4double" title='G4double' data-type='double' data-ref="G4double">G4double</a> <dfn class="local col5 decl" id="25ekin" title='ekin' data-type='G4double' data-ref="25ekin">ekin</dfn> = <a class="local col4 ref" href="#24aTrack" title='aTrack' data-ref="24aTrack">aTrack</a>.<a class="ref" href="../../../../util/include/G4HadProjectile.hh.html#_ZNK15G4HadProjectile16GetKineticEnergyEv" title='G4HadProjectile::GetKineticEnergy' data-ref="_ZNK15G4HadProjectile16GetKineticEnergyEv">GetKineticEnergy</a>()&gt;<var>0.</var> ? <a class="local col4 ref" href="#24aTrack" title='aTrack' data-ref="24aTrack">aTrack</a>.<a class="ref" href="../../../../util/include/G4HadProjectile.hh.html#_ZNK15G4HadProjectile16GetKineticEnergyEv" title='G4HadProjectile::GetKineticEnergy' data-ref="_ZNK15G4HadProjectile16GetKineticEnergyEv">GetKineticEnergy</a>() : <var>0.</var>;</td></tr>
+<tr><th id="436">436</th><td>  <a class="member" href="../../../management/include/G4HadronicInteraction.hh.html#G4HadronicInteraction::theParticleChange" title='G4HadronicInteraction::theParticleChange' data-ref="G4HadronicInteraction::theParticleChange">theParticleChange</a>.<a class="ref" href="../../../../util/include/G4HadFinalState.hh.html#_ZN15G4HadFinalState15SetEnergyChangeEd" title='G4HadFinalState::SetEnergyChange' data-ref="_ZN15G4HadFinalState15SetEnergyChangeEd">SetEnergyChange</a>(<a class="local col5 ref" href="#25ekin" title='ekin' data-ref="25ekin">ekin</a>);	<i>// Protect against rounding</i></td></tr>
+<tr><th id="437">437</th><td></td></tr>
+<tr><th id="438">438</th><td>  <b>return</b> &amp;<a class="member" href="../../../management/include/G4HadronicInteraction.hh.html#G4HadronicInteraction::theParticleChange" title='G4HadronicInteraction::theParticleChange' data-ref="G4HadronicInteraction::theParticleChange">theParticleChange</a>;</td></tr>
+<tr><th id="439">439</th><td>}</td></tr>
+<tr><th id="440">440</th><td></td></tr>
+<tr><th id="441">441</th><td></td></tr>
+<tr><th id="442">442</th><td><i>// Convert input projectile to Bertini internal object</i></td></tr>
+<tr><th id="443">443</th><td></td></tr>
+<tr><th id="444">444</th><td><a class="typedef" href="../../../../../../global/management/include/G4Types.hh.html#G4bool" title='G4bool' data-type='bool' data-ref="G4bool">G4bool</a> <a class="type" href="../include/G4CascadeInterface.hh.html#G4CascadeInterface" title='G4CascadeInterface' data-ref="G4CascadeInterface">G4CascadeInterface</a>::<dfn class="decl def" id="_ZN18G4CascadeInterface12createBulletERK15G4HadProjectile" title='G4CascadeInterface::createBullet' data-ref="_ZN18G4CascadeInterface12createBulletERK15G4HadProjectile">createBullet</dfn>(<em>const</em> <a class="type" href="../../../../util/include/G4HadProjectile.hh.html#G4HadProjectile" title='G4HadProjectile' data-ref="G4HadProjectile">G4HadProjectile</a>&amp; <dfn class="local col6 decl" id="26aTrack" title='aTrack' data-type='const G4HadProjectile &amp;' data-ref="26aTrack">aTrack</dfn>) {</td></tr>
+<tr><th id="445">445</th><td>  <em>const</em> <a class="type" href="../../../../../../particles/management/include/G4ParticleDefinition.hh.html#G4ParticleDefinition" title='G4ParticleDefinition' data-ref="G4ParticleDefinition">G4ParticleDefinition</a>* <dfn class="local col7 decl" id="27trkDef" title='trkDef' data-type='const G4ParticleDefinition *' data-ref="27trkDef">trkDef</dfn> = <a class="local col6 ref" href="#26aTrack" title='aTrack' data-ref="26aTrack">aTrack</a>.<a class="ref" href="../../../../util/include/G4HadProjectile.hh.html#_ZNK15G4HadProjectile13GetDefinitionEv" title='G4HadProjectile::GetDefinition' data-ref="_ZNK15G4HadProjectile13GetDefinitionEv">GetDefinition</a>();</td></tr>
+<tr><th id="446">446</th><td>  <a class="typedef" href="../../../../../../global/management/include/G4Types.hh.html#G4int" title='G4int' data-type='int' data-ref="G4int">G4int</a> <dfn class="local col8 decl" id="28bulletType" title='bulletType' data-type='G4int' data-ref="28bulletType">bulletType</dfn> = <var>0</var>;			<i>// For elementary particles</i></td></tr>
+<tr><th id="447">447</th><td>  <a class="typedef" href="../../../../../../global/management/include/G4Types.hh.html#G4int" title='G4int' data-type='int' data-ref="G4int">G4int</a> <dfn class="local col9 decl" id="29bulletA" title='bulletA' data-type='G4int' data-ref="29bulletA">bulletA</dfn> = <var>0</var>, <dfn class="local col0 decl" id="30bulletZ" title='bulletZ' data-type='G4int' data-ref="30bulletZ">bulletZ</dfn> = <var>0</var>;	<i>// For nucleus projectile</i></td></tr>
+<tr><th id="448">448</th><td></td></tr>
+<tr><th id="449">449</th><td>  <b>if</b> (<a class="local col7 ref" href="#27trkDef" title='trkDef' data-ref="27trkDef">trkDef</a>-&gt;<a class="ref" href="../../../../../../particles/management/include/G4ParticleDefinition.hh.html#_ZNK20G4ParticleDefinition13GetAtomicMassEv" title='G4ParticleDefinition::GetAtomicMass' data-ref="_ZNK20G4ParticleDefinition13GetAtomicMassEv">GetAtomicMass</a>() &lt;= <var>1</var>) {</td></tr>
+<tr><th id="450">450</th><td>    <a class="local col8 ref" href="#28bulletType" title='bulletType' data-ref="28bulletType">bulletType</a> = <a class="type" href="../include/G4InuclElementaryParticle.hh.html#G4InuclElementaryParticle" title='G4InuclElementaryParticle' data-ref="G4InuclElementaryParticle">G4InuclElementaryParticle</a>::<a class="ref" href="../include/G4InuclElementaryParticle.hh.html#_ZN25G4InuclElementaryParticle4typeEPK20G4ParticleDefinition" title='G4InuclElementaryParticle::type' data-ref="_ZN25G4InuclElementaryParticle4typeEPK20G4ParticleDefinition">type</a>(<a class="local col7 ref" href="#27trkDef" title='trkDef' data-ref="27trkDef">trkDef</a>);</td></tr>
+<tr><th id="451">451</th><td>  } <b>else</b> {</td></tr>
+<tr><th id="452">452</th><td>    <a class="local col9 ref" href="#29bulletA" title='bulletA' data-ref="29bulletA">bulletA</a> = <a class="local col7 ref" href="#27trkDef" title='trkDef' data-ref="27trkDef">trkDef</a>-&gt;<a class="ref" href="../../../../../../particles/management/include/G4ParticleDefinition.hh.html#_ZNK20G4ParticleDefinition13GetAtomicMassEv" title='G4ParticleDefinition::GetAtomicMass' data-ref="_ZNK20G4ParticleDefinition13GetAtomicMassEv">GetAtomicMass</a>();</td></tr>
+<tr><th id="453">453</th><td>    <a class="local col0 ref" href="#30bulletZ" title='bulletZ' data-ref="30bulletZ">bulletZ</a> = <a class="local col7 ref" href="#27trkDef" title='trkDef' data-ref="27trkDef">trkDef</a>-&gt;<a class="ref" href="../../../../../../particles/management/include/G4ParticleDefinition.hh.html#_ZNK20G4ParticleDefinition15GetAtomicNumberEv" title='G4ParticleDefinition::GetAtomicNumber' data-ref="_ZNK20G4ParticleDefinition15GetAtomicNumberEv">GetAtomicNumber</a>();</td></tr>
+<tr><th id="454">454</th><td>  }</td></tr>
+<tr><th id="455">455</th><td></td></tr>
+<tr><th id="456">456</th><td>  <b>if</b> (<var>0</var> == <a class="local col8 ref" href="#28bulletType" title='bulletType' data-ref="28bulletType">bulletType</a> &amp;&amp; <var>0</var> == <a class="local col9 ref" href="#29bulletA" title='bulletA' data-ref="29bulletA">bulletA</a>*<a class="local col0 ref" href="#30bulletZ" title='bulletZ' data-ref="30bulletZ">bulletZ</a>) {</td></tr>
+<tr><th id="457">457</th><td>    <b>if</b> (<a class="member" href="../../../management/include/G4HadronicInteraction.hh.html#G4HadronicInteraction::verboseLevel" title='G4HadronicInteraction::verboseLevel' data-ref="G4HadronicInteraction::verboseLevel">verboseLevel</a>) {</td></tr>
+<tr><th id="458">458</th><td>      <a class="macro" href="../../../../../../global/management/include/G4ios.hh.html#47" title="(*_G4cerr_p())" data-ref="_M/G4cerr">G4cerr</a> <span class='error' title="invalid operands to binary expression (&apos;int&apos; and &apos;const char *&apos;)">&lt;&lt;</span> <q>" G4CascadeInterface: "</q> &lt;&lt; trkDef-&gt;GetParticleName()</td></tr>
+<tr><th id="459">459</th><td>	     &lt;&lt; <q>" not usable as bullet."</q> &lt;&lt; <a class="macro" href="../../../../../../global/management/include/G4ios.hh.html#60" title="std::endl" data-ref="_M/G4endl">G4endl</a>;</td></tr>
+<tr><th id="460">460</th><td>    }</td></tr>
+<tr><th id="461">461</th><td>    <a class="member" href="../include/G4CascadeInterface.hh.html#G4CascadeInterface::bullet" title='G4CascadeInterface::bullet' data-ref="G4CascadeInterface::bullet">bullet</a> = <var>0</var>;</td></tr>
+<tr><th id="462">462</th><td>    <b>return</b> <b>false</b>;</td></tr>
+<tr><th id="463">463</th><td>  }</td></tr>
+<tr><th id="464">464</th><td></td></tr>
+<tr><th id="465">465</th><td>  <i>// Code momentum and energy -- Bertini wants z-axis and GeV units</i></td></tr>
+<tr><th id="466">466</th><td>  <a class="typedef" href="../../../../../../global/HEPGeometry/include/G4LorentzVector.hh.html#G4LorentzVector" title='G4LorentzVector' data-type='CLHEP::HepLorentzVector' data-ref="G4LorentzVector">G4LorentzVector</a> <dfn class="local col1 decl" id="31projectileMomentum" title='projectileMomentum' data-type='G4LorentzVector' data-ref="31projectileMomentum">projectileMomentum</dfn> = <a class="local col6 ref" href="#26aTrack" title='aTrack' data-ref="26aTrack">aTrack</a>.<a class="ref" href="../../../../util/include/G4HadProjectile.hh.html#_ZNK15G4HadProjectile12Get4MomentumEv" title='G4HadProjectile::Get4Momentum' data-ref="_ZNK15G4HadProjectile12Get4MomentumEv">Get4Momentum</a>()<a class="ref" href="../../../../../../externals/clhep/include/CLHEP/Vector/LorentzVector.h.html#_ZN5CLHEPdvERKNS_16HepLorentzVectorEd" title='CLHEP::operator/' data-ref="_ZN5CLHEPdvERKNS_16HepLorentzVectorEd">/</a><a class="ref" href="../../../../../../externals/clhep/include/CLHEP/Units/SystemOfUnits.h.html#CLHEP::GeV" title='CLHEP::GeV' data-ref="CLHEP::GeV">GeV</a>;</td></tr>
+<tr><th id="467">467</th><td></td></tr>
+<tr><th id="468">468</th><td>  <i>// Rotation/boost to get from z-axis back to original frame</i></td></tr>
+<tr><th id="469">469</th><td><i>  // According to bug report #1990 this rotation is unnecessary and causes</i></td></tr>
+<tr><th id="470">470</th><td><i>  // irreproducibility.  Verifed and fixed by DHW 27 Nov 2017</i></td></tr>
+<tr><th id="471">471</th><td><i>  // bulletInLabFrame = G4LorentzRotation::IDENTITY;	// Initialize</i></td></tr>
+<tr><th id="472">472</th><td><i>  // bulletInLabFrame.rotateZ(-projectileMomentum.phi());</i></td></tr>
+<tr><th id="473">473</th><td><i>  // bulletInLabFrame.rotateY(-projectileMomentum.theta());</i></td></tr>
+<tr><th id="474">474</th><td><i>  // bulletInLabFrame.invert();</i></td></tr>
+<tr><th id="475">475</th><td></td></tr>
+<tr><th id="476">476</th><td>  <a class="typedef" href="../../../../../../global/HEPGeometry/include/G4LorentzVector.hh.html#G4LorentzVector" title='G4LorentzVector' data-type='CLHEP::HepLorentzVector' data-ref="G4LorentzVector">G4LorentzVector</a> <dfn class="local col2 decl" id="32momentumBullet" title='momentumBullet' data-type='G4LorentzVector' data-ref="32momentumBullet">momentumBullet</dfn><a class="ref" href="../../../../../../externals/clhep/include/CLHEP/Vector/LorentzVector.h.html#_ZN5CLHEP16HepLorentzVectorC1Edddd" title='CLHEP::HepLorentzVector::HepLorentzVector' data-ref="_ZN5CLHEP16HepLorentzVectorC1Edddd">(</a><var>0.</var>, <var>0.</var>, <a class="local col1 ref" href="#31projectileMomentum" title='projectileMomentum' data-ref="31projectileMomentum">projectileMomentum</a>.<a class="ref" href="../../../../../../externals/clhep/include/CLHEP/Vector/LorentzVector.h.html#_ZNK5CLHEP16HepLorentzVector3rhoEv" title='CLHEP::HepLorentzVector::rho' data-ref="_ZNK5CLHEP16HepLorentzVector3rhoEv">rho</a>(),</td></tr>
+<tr><th id="477">477</th><td>				 <a class="local col1 ref" href="#31projectileMomentum" title='projectileMomentum' data-ref="31projectileMomentum">projectileMomentum</a>.<a class="ref" href="../../../../../../externals/clhep/include/CLHEP/Vector/LorentzVector.h.html#_ZNK5CLHEP16HepLorentzVector1eEv" title='CLHEP::HepLorentzVector::e' data-ref="_ZNK5CLHEP16HepLorentzVector1eEv">e</a>());</td></tr>
+<tr><th id="478">478</th><td>  </td></tr>
+<tr><th id="479">479</th><td>  <b>if</b> (<a class="type" href="../include/G4InuclElementaryParticle.hh.html#G4InuclElementaryParticle" title='G4InuclElementaryParticle' data-ref="G4InuclElementaryParticle">G4InuclElementaryParticle</a>::<a class="ref" href="../include/G4InuclElementaryParticle.hh.html#_ZN25G4InuclElementaryParticle5validEi" title='G4InuclElementaryParticle::valid' data-ref="_ZN25G4InuclElementaryParticle5validEi">valid</a>(<a class="local col8 ref" href="#28bulletType" title='bulletType' data-ref="28bulletType">bulletType</a>)) {</td></tr>
+<tr><th id="480">480</th><td>    <a class="member" href="../include/G4CascadeInterface.hh.html#G4CascadeInterface::hadronBullet" title='G4CascadeInterface::hadronBullet' data-ref="G4CascadeInterface::hadronBullet">hadronBullet</a>.<a class="ref" href="../include/G4InuclElementaryParticle.hh.html#_ZN25G4InuclElementaryParticle4fillERKN5CLHEP16HepLorentzVectorEiN15G4InuclParticle5ModelE" title='G4InuclElementaryParticle::fill' data-ref="_ZN25G4InuclElementaryParticle4fillERKN5CLHEP16HepLorentzVectorEiN15G4InuclParticle5ModelE">fill</a>(<a class="local col2 ref" href="#32momentumBullet" title='momentumBullet' data-ref="32momentumBullet">momentumBullet</a>, <a class="local col8 ref" href="#28bulletType" title='bulletType' data-ref="28bulletType">bulletType</a>);</td></tr>
+<tr><th id="481">481</th><td>    <a class="member" href="../include/G4CascadeInterface.hh.html#G4CascadeInterface::bullet" title='G4CascadeInterface::bullet' data-ref="G4CascadeInterface::bullet">bullet</a> = &amp;<a class="member" href="../include/G4CascadeInterface.hh.html#G4CascadeInterface::hadronBullet" title='G4CascadeInterface::hadronBullet' data-ref="G4CascadeInterface::hadronBullet">hadronBullet</a>;</td></tr>
+<tr><th id="482">482</th><td>  } <b>else</b> {</td></tr>
+<tr><th id="483">483</th><td>    <a class="member" href="../include/G4CascadeInterface.hh.html#G4CascadeInterface::nucleusBullet" title='G4CascadeInterface::nucleusBullet' data-ref="G4CascadeInterface::nucleusBullet">nucleusBullet</a>.<a class="ref" href="../include/G4InuclNuclei.hh.html#_ZN13G4InuclNuclei4fillERKN5CLHEP16HepLorentzVectorEiidN15G4InuclParticle5ModelE" title='G4InuclNuclei::fill' data-ref="_ZN13G4InuclNuclei4fillERKN5CLHEP16HepLorentzVectorEiidN15G4InuclParticle5ModelE">fill</a>(<a class="local col2 ref" href="#32momentumBullet" title='momentumBullet' data-ref="32momentumBullet">momentumBullet</a>, <a class="local col9 ref" href="#29bulletA" title='bulletA' data-ref="29bulletA">bulletA</a>, <a class="local col0 ref" href="#30bulletZ" title='bulletZ' data-ref="30bulletZ">bulletZ</a>);</td></tr>
+<tr><th id="484">484</th><td>    <a class="member" href="../include/G4CascadeInterface.hh.html#G4CascadeInterface::bullet" title='G4CascadeInterface::bullet' data-ref="G4CascadeInterface::bullet">bullet</a> = &amp;<a class="member" href="../include/G4CascadeInterface.hh.html#G4CascadeInterface::nucleusBullet" title='G4CascadeInterface::nucleusBullet' data-ref="G4CascadeInterface::nucleusBullet">nucleusBullet</a>;</td></tr>
+<tr><th id="485">485</th><td>  }</td></tr>
+<tr><th id="486">486</th><td></td></tr>
+<tr><th id="487">487</th><td>  <b>if</b> (verboseLevel &gt; <var>2</var>) <a class="macro" href="../../../../../../global/management/include/G4ios.hh.html#46" title="(*_G4cout_p())" data-ref="_M/G4cout">G4cout</a> <span class='error' title="invalid operands to binary expression (&apos;int&apos; and &apos;const char *&apos;)">&lt;&lt;</span> <q>"Bullet:  \n"</q> &lt;&lt; *bullet &lt;&lt; <a class="macro" href="../../../../../../global/management/include/G4ios.hh.html#60" title="std::endl" data-ref="_M/G4endl">G4endl</a>;  </td></tr>
+<tr><th id="488">488</th><td></td></tr>
+<tr><th id="489">489</th><td>  <b>return</b> <b>true</b>;</td></tr>
+<tr><th id="490">490</th><td>}</td></tr>
+<tr><th id="491">491</th><td></td></tr>
+<tr><th id="492">492</th><td></td></tr>
+<tr><th id="493">493</th><td><i>// Convert input nuclear target to Bertini internal object</i></td></tr>
+<tr><th id="494">494</th><td></td></tr>
+<tr><th id="495">495</th><td><a class="typedef" href="../../../../../../global/management/include/G4Types.hh.html#G4bool" title='G4bool' data-type='bool' data-ref="G4bool">G4bool</a> <a class="type" href="../include/G4CascadeInterface.hh.html#G4CascadeInterface" title='G4CascadeInterface' data-ref="G4CascadeInterface">G4CascadeInterface</a>::<dfn class="decl def" id="_ZN18G4CascadeInterface12createTargetER9G4Nucleus" title='G4CascadeInterface::createTarget' data-ref="_ZN18G4CascadeInterface12createTargetER9G4Nucleus">createTarget</dfn>(<a class="type" href="../../../../util/include/G4Nucleus.hh.html#G4Nucleus" title='G4Nucleus' data-ref="G4Nucleus">G4Nucleus</a>&amp; <dfn class="local col3 decl" id="33theNucleus" title='theNucleus' data-type='G4Nucleus &amp;' data-ref="33theNucleus">theNucleus</dfn>) {</td></tr>
+<tr><th id="496">496</th><td>  <b>return</b> <a class="member" href="#_ZN18G4CascadeInterface12createTargetEii" title='G4CascadeInterface::createTarget' data-ref="_ZN18G4CascadeInterface12createTargetEii">createTarget</a>(<a class="local col3 ref" href="#33theNucleus" title='theNucleus' data-ref="33theNucleus">theNucleus</a>.<a class="ref" href="../../../../util/include/G4Nucleus.hh.html#_ZNK9G4Nucleus10GetA_asIntEv" title='G4Nucleus::GetA_asInt' data-ref="_ZNK9G4Nucleus10GetA_asIntEv">GetA_asInt</a>(), <a class="local col3 ref" href="#33theNucleus" title='theNucleus' data-ref="33theNucleus">theNucleus</a>.<a class="ref" href="../../../../util/include/G4Nucleus.hh.html#_ZNK9G4Nucleus10GetZ_asIntEv" title='G4Nucleus::GetZ_asInt' data-ref="_ZNK9G4Nucleus10GetZ_asIntEv">GetZ_asInt</a>());</td></tr>
+<tr><th id="497">497</th><td>}</td></tr>
+<tr><th id="498">498</th><td></td></tr>
+<tr><th id="499">499</th><td><a class="typedef" href="../../../../../../global/management/include/G4Types.hh.html#G4bool" title='G4bool' data-type='bool' data-ref="G4bool">G4bool</a> <a class="type" href="../include/G4CascadeInterface.hh.html#G4CascadeInterface" title='G4CascadeInterface' data-ref="G4CascadeInterface">G4CascadeInterface</a>::<dfn class="decl def" id="_ZN18G4CascadeInterface12createTargetEP12G4V3DNucleus" title='G4CascadeInterface::createTarget' data-ref="_ZN18G4CascadeInterface12createTargetEP12G4V3DNucleus">createTarget</dfn>(<a class="type" href="../../../management/include/G4V3DNucleus.hh.html#G4V3DNucleus" title='G4V3DNucleus' data-ref="G4V3DNucleus">G4V3DNucleus</a>* <dfn class="local col4 decl" id="34theNucleus" title='theNucleus' data-type='G4V3DNucleus *' data-ref="34theNucleus">theNucleus</dfn>) {</td></tr>
+<tr><th id="500">500</th><td>  <b>return</b> <a class="member" href="#_ZN18G4CascadeInterface12createTargetEii" title='G4CascadeInterface::createTarget' data-ref="_ZN18G4CascadeInterface12createTargetEii">createTarget</a>(<a class="local col4 ref" href="#34theNucleus" title='theNucleus' data-ref="34theNucleus">theNucleus</a>-&gt;<a class="virtual ref" href="../../../management/include/G4V3DNucleus.hh.html#_ZN12G4V3DNucleus13GetMassNumberEv" title='G4V3DNucleus::GetMassNumber' data-ref="_ZN12G4V3DNucleus13GetMassNumberEv">GetMassNumber</a>(), <a class="local col4 ref" href="#34theNucleus" title='theNucleus' data-ref="34theNucleus">theNucleus</a>-&gt;<a class="virtual ref" href="../../../management/include/G4V3DNucleus.hh.html#_ZN12G4V3DNucleus9GetChargeEv" title='G4V3DNucleus::GetCharge' data-ref="_ZN12G4V3DNucleus9GetChargeEv">GetCharge</a>());</td></tr>
+<tr><th id="501">501</th><td>}</td></tr>
+<tr><th id="502">502</th><td></td></tr>
+<tr><th id="503">503</th><td><a class="typedef" href="../../../../../../global/management/include/G4Types.hh.html#G4bool" title='G4bool' data-type='bool' data-ref="G4bool">G4bool</a> <a class="type" href="../include/G4CascadeInterface.hh.html#G4CascadeInterface" title='G4CascadeInterface' data-ref="G4CascadeInterface">G4CascadeInterface</a>::<dfn class="decl def" id="_ZN18G4CascadeInterface12createTargetEii" title='G4CascadeInterface::createTarget' data-ref="_ZN18G4CascadeInterface12createTargetEii">createTarget</dfn>(<a class="typedef" href="../../../../../../global/management/include/G4Types.hh.html#G4int" title='G4int' data-type='int' data-ref="G4int">G4int</a> <dfn class="local col5 decl" id="35A" title='A' data-type='G4int' data-ref="35A">A</dfn>, <a class="typedef" href="../../../../../../global/management/include/G4Types.hh.html#G4int" title='G4int' data-type='int' data-ref="G4int">G4int</a> <dfn class="local col6 decl" id="36Z" title='Z' data-type='G4int' data-ref="36Z">Z</dfn>) {</td></tr>
+<tr><th id="504">504</th><td>  <b>if</b> (<a class="local col5 ref" href="#35A" title='A' data-ref="35A">A</a> &gt; <var>1</var>) {</td></tr>
+<tr><th id="505">505</th><td>    <a class="member" href="../include/G4CascadeInterface.hh.html#G4CascadeInterface::nucleusTarget" title='G4CascadeInterface::nucleusTarget' data-ref="G4CascadeInterface::nucleusTarget">nucleusTarget</a>.<a class="ref" href="../include/G4InuclNuclei.hh.html#_ZN13G4InuclNuclei4fillEiidN15G4InuclParticle5ModelE" title='G4InuclNuclei::fill' data-ref="_ZN13G4InuclNuclei4fillEiidN15G4InuclParticle5ModelE">fill</a>(<a class="local col5 ref" href="#35A" title='A' data-ref="35A">A</a>, <a class="local col6 ref" href="#36Z" title='Z' data-ref="36Z">Z</a>);</td></tr>
+<tr><th id="506">506</th><td>    <a class="member" href="../include/G4CascadeInterface.hh.html#G4CascadeInterface::target" title='G4CascadeInterface::target' data-ref="G4CascadeInterface::target">target</a> = &amp;<a class="member" href="../include/G4CascadeInterface.hh.html#G4CascadeInterface::nucleusTarget" title='G4CascadeInterface::nucleusTarget' data-ref="G4CascadeInterface::nucleusTarget">nucleusTarget</a>;</td></tr>
+<tr><th id="507">507</th><td>  } <b>else</b> {</td></tr>
+<tr><th id="508">508</th><td>    <a class="member" href="../include/G4CascadeInterface.hh.html#G4CascadeInterface::hadronTarget" title='G4CascadeInterface::hadronTarget' data-ref="G4CascadeInterface::hadronTarget">hadronTarget</a>.<a class="ref" href="../include/G4InuclElementaryParticle.hh.html#_ZN25G4InuclElementaryParticle4fillEdiN15G4InuclParticle5ModelE" title='G4InuclElementaryParticle::fill' data-ref="_ZN25G4InuclElementaryParticle4fillEdiN15G4InuclParticle5ModelE">fill</a>(<var>0.</var>, (<a class="local col6 ref" href="#36Z" title='Z' data-ref="36Z">Z</a>==<var>1</var>?<a class="enum" href="../include/G4InuclParticleNames.hh.html#G4InuclParticleNames::Long::proton" title='G4InuclParticleNames::Long::proton' data-ref="G4InuclParticleNames::Long::proton">proton</a>:<a class="enum" href="../include/G4InuclParticleNames.hh.html#G4InuclParticleNames::Long::neutron" title='G4InuclParticleNames::Long::neutron' data-ref="G4InuclParticleNames::Long::neutron">neutron</a>));</td></tr>
+<tr><th id="509">509</th><td>    <a class="member" href="../include/G4CascadeInterface.hh.html#G4CascadeInterface::target" title='G4CascadeInterface::target' data-ref="G4CascadeInterface::target">target</a> = &amp;<a class="member" href="../include/G4CascadeInterface.hh.html#G4CascadeInterface::hadronTarget" title='G4CascadeInterface::hadronTarget' data-ref="G4CascadeInterface::hadronTarget">hadronTarget</a>;</td></tr>
+<tr><th id="510">510</th><td>  }</td></tr>
+<tr><th id="511">511</th><td></td></tr>
+<tr><th id="512">512</th><td>  <b>if</b> (verboseLevel &gt; <var>2</var>) <a class="macro" href="../../../../../../global/management/include/G4ios.hh.html#46" title="(*_G4cout_p())" data-ref="_M/G4cout">G4cout</a> <span class='error' title="invalid operands to binary expression (&apos;int&apos; and &apos;const char *&apos;)">&lt;&lt;</span> <q>"Target:  \n"</q> &lt;&lt; *target &lt;&lt; <a class="macro" href="../../../../../../global/management/include/G4ios.hh.html#60" title="std::endl" data-ref="_M/G4endl">G4endl</a>;</td></tr>
+<tr><th id="513">513</th><td></td></tr>
+<tr><th id="514">514</th><td>  <b>return</b> <b>true</b>;		<i>// Right now, target never fails</i></td></tr>
+<tr><th id="515">515</th><td>}</td></tr>
+<tr><th id="516">516</th><td></td></tr>
+<tr><th id="517">517</th><td></td></tr>
+<tr><th id="518">518</th><td><i>// Convert Bertini particle to output (G4DynamicParticle)</i></td></tr>
+<tr><th id="519">519</th><td></td></tr>
+<tr><th id="520">520</th><td><a class="type" href="../../../../../../particles/management/include/G4DynamicParticle.hh.html#G4DynamicParticle" title='G4DynamicParticle' data-ref="G4DynamicParticle">G4DynamicParticle</a>* <a class="type" href="../include/G4CascadeInterface.hh.html#G4CascadeInterface" title='G4CascadeInterface' data-ref="G4CascadeInterface">G4CascadeInterface</a>::</td></tr>
+<tr><th id="521">521</th><td><dfn class="decl def" id="_ZNK18G4CascadeInterface19makeDynamicParticleERK25G4InuclElementaryParticle" title='G4CascadeInterface::makeDynamicParticle' data-ref="_ZNK18G4CascadeInterface19makeDynamicParticleERK25G4InuclElementaryParticle">makeDynamicParticle</dfn>(<em>const</em> <a class="type" href="../include/G4InuclElementaryParticle.hh.html#G4InuclElementaryParticle" title='G4InuclElementaryParticle' data-ref="G4InuclElementaryParticle">G4InuclElementaryParticle</a>&amp; <dfn class="local col7 decl" id="37iep" title='iep' data-type='const G4InuclElementaryParticle &amp;' data-ref="37iep">iep</dfn>) <em>const</em> {</td></tr>
+<tr><th id="522">522</th><td>  <a class="typedef" href="../../../../../../global/management/include/G4Types.hh.html#G4int" title='G4int' data-type='int' data-ref="G4int">G4int</a> <dfn class="local col8 decl" id="38outgoingType" title='outgoingType' data-type='G4int' data-ref="38outgoingType">outgoingType</dfn> = <a class="local col7 ref" href="#37iep" title='iep' data-ref="37iep">iep</a>.<a class="ref" href="../include/G4InuclElementaryParticle.hh.html#_ZNK25G4InuclElementaryParticle4typeEv" title='G4InuclElementaryParticle::type' data-ref="_ZNK25G4InuclElementaryParticle4typeEv">type</a>();</td></tr>
+<tr><th id="523">523</th><td>  </td></tr>
+<tr><th id="524">524</th><td>  <b>if</b> (<a class="local col7 ref" href="#37iep" title='iep' data-ref="37iep">iep</a>.<a class="ref" href="../include/G4InuclElementaryParticle.hh.html#_ZNK25G4InuclElementaryParticle13quasi_deutronEv" title='G4InuclElementaryParticle::quasi_deutron' data-ref="_ZNK25G4InuclElementaryParticle13quasi_deutronEv">quasi_deutron</a>()) {</td></tr>
+<tr><th id="525">525</th><td>    <a class="macro" href="../../../../../../global/management/include/G4ios.hh.html#47" title="(*_G4cerr_p())" data-ref="_M/G4cerr">G4cerr</a> <span class='error' title="invalid operands to binary expression (&apos;int&apos; and &apos;const char *&apos;)">&lt;&lt;</span> <q>" ERROR: G4CascadeInterface incompatible particle type "</q></td></tr>
+<tr><th id="526">526</th><td>	   &lt;&lt; outgoingType &lt;&lt; <a class="macro" href="../../../../../../global/management/include/G4ios.hh.html#60" title="std::endl" data-ref="_M/G4endl">G4endl</a>;</td></tr>
+<tr><th id="527">527</th><td>    <b>return</b> <var>0</var>;</td></tr>
+<tr><th id="528">528</th><td>  }</td></tr>
+<tr><th id="529">529</th><td>  </td></tr>
+<tr><th id="530">530</th><td>  <i>// Copy local G4DynPart to public output (handle kaon mixing specially)</i></td></tr>
+<tr><th id="531">531</th><td>  <b>if</b> (<a class="local col8 ref" href="#38outgoingType" title='outgoingType' data-ref="38outgoingType">outgoingType</a> == <a class="enum" href="../include/G4InuclParticleNames.hh.html#G4InuclParticleNames::Long::kaonZero" title='G4InuclParticleNames::Long::kaonZero' data-ref="G4InuclParticleNames::Long::kaonZero">kaonZero</a> || <a class="local col8 ref" href="#38outgoingType" title='outgoingType' data-ref="38outgoingType">outgoingType</a> == <a class="enum" href="../include/G4InuclParticleNames.hh.html#G4InuclParticleNames::Long::kaonZeroBar" title='G4InuclParticleNames::Long::kaonZeroBar' data-ref="G4InuclParticleNames::Long::kaonZeroBar">kaonZeroBar</a>) {</td></tr>
+<tr><th id="532">532</th><td>    <a class="typedef" href="../../../../../../global/management/include/G4ThreeVector.hh.html#G4ThreeVector" title='G4ThreeVector' data-type='CLHEP::Hep3Vector' data-ref="G4ThreeVector">G4ThreeVector</a> <dfn class="local col9 decl" id="39momDir" title='momDir' data-type='G4ThreeVector' data-ref="39momDir">momDir</dfn> = <a class="local col7 ref" href="#37iep" title='iep' data-ref="37iep">iep</a>.<a class="ref" href="../include/G4InuclParticle.hh.html#_ZNK15G4InuclParticle11getMomentumEv" title='G4InuclParticle::getMomentum' data-ref="_ZNK15G4InuclParticle11getMomentumEv">getMomentum</a>().<a class="ref" href="../../../../../../externals/clhep/include/CLHEP/Vector/LorentzVector.h.html#_ZNK5CLHEP16HepLorentzVector4vectEv" title='CLHEP::HepLorentzVector::vect' data-ref="_ZNK5CLHEP16HepLorentzVector4vectEv">vect</a>().<a class="ref" href="../../../../../../externals/clhep/include/CLHEP/Vector/ThreeVector.h.html#_ZNK5CLHEP10Hep3Vector4unitEv" title='CLHEP::Hep3Vector::unit' data-ref="_ZNK5CLHEP10Hep3Vector4unitEv">unit</a>();</td></tr>
+<tr><th id="533">533</th><td>    <a class="typedef" href="../../../../../../global/management/include/G4Types.hh.html#G4double" title='G4double' data-type='double' data-ref="G4double">G4double</a> <dfn class="local col0 decl" id="40ekin" title='ekin' data-type='G4double' data-ref="40ekin">ekin</dfn> = <a class="local col7 ref" href="#37iep" title='iep' data-ref="37iep">iep</a>.<a class="ref" href="../include/G4InuclParticle.hh.html#_ZNK15G4InuclParticle16getKineticEnergyEv" title='G4InuclParticle::getKineticEnergy' data-ref="_ZNK15G4InuclParticle16getKineticEnergyEv">getKineticEnergy</a>()*<a class="ref" href="../../../../../../externals/clhep/include/CLHEP/Units/SystemOfUnits.h.html#CLHEP::GeV" title='CLHEP::GeV' data-ref="CLHEP::GeV">GeV</a>;	<i>// Bertini -&gt; G4 units</i></td></tr>
+<tr><th id="534">534</th><td>    </td></tr>
+<tr><th id="535">535</th><td>    <a class="type" href="../../../../../../particles/management/include/G4ParticleDefinition.hh.html#G4ParticleDefinition" title='G4ParticleDefinition' data-ref="G4ParticleDefinition">G4ParticleDefinition</a>* <dfn class="local col1 decl" id="41pd" title='pd' data-type='G4ParticleDefinition *' data-ref="41pd">pd</dfn> = <a class="type" href="../../../../../../particles/hadrons/mesons/include/G4KaonZeroShort.hh.html#G4KaonZeroShort" title='G4KaonZeroShort' data-ref="G4KaonZeroShort">G4KaonZeroShort</a>::<a class="ref" href="../../../../../../particles/hadrons/mesons/include/G4KaonZeroShort.hh.html#_ZN15G4KaonZeroShort10DefinitionEv" title='G4KaonZeroShort::Definition' data-ref="_ZN15G4KaonZeroShort10DefinitionEv">Definition</a>();</td></tr>
+<tr><th id="536">536</th><td>    <b>if</b> (<a class="macro" href="../../../../../../global/HEPRandom/include/Randomize.hh.html#52" title="CLHEP::HepRandom::getTheEngine()-&gt;flat()" data-ref="_M/G4UniformRand">G4UniformRand</a>() &gt; <var>0.5</var>) <a class="local col1 ref" href="#41pd" title='pd' data-ref="41pd">pd</a> = <a class="type" href="../../../../../../particles/hadrons/mesons/include/G4KaonZeroLong.hh.html#G4KaonZeroLong" title='G4KaonZeroLong' data-ref="G4KaonZeroLong">G4KaonZeroLong</a>::<a class="ref" href="../../../../../../particles/hadrons/mesons/include/G4KaonZeroLong.hh.html#_ZN14G4KaonZeroLong10DefinitionEv" title='G4KaonZeroLong::Definition' data-ref="_ZN14G4KaonZeroLong10DefinitionEv">Definition</a>();</td></tr>
+<tr><th id="537">537</th><td>    </td></tr>
+<tr><th id="538">538</th><td>    <b>return</b> <b>new</b> <a class="type" href="../../../../../../particles/management/include/G4DynamicParticle.hh.html#G4DynamicParticle" title='G4DynamicParticle' data-ref="G4DynamicParticle">G4DynamicParticle</a><a class="ref" href="../../../../../../particles/management/include/G4DynamicParticle.hh.html#_ZN17G4DynamicParticleC1EPK20G4ParticleDefinitionRKN5CLHEP10Hep3VectorEd" title='G4DynamicParticle::G4DynamicParticle' data-ref="_ZN17G4DynamicParticleC1EPK20G4ParticleDefinitionRKN5CLHEP10Hep3VectorEd">(</a><a class="local col1 ref" href="#41pd" title='pd' data-ref="41pd">pd</a>, <a class="local col9 ref" href="#39momDir" title='momDir' data-ref="39momDir">momDir</a>, <a class="local col0 ref" href="#40ekin" title='ekin' data-ref="40ekin">ekin</a>);</td></tr>
+<tr><th id="539">539</th><td>  } <b>else</b> {</td></tr>
+<tr><th id="540">540</th><td>    <b>return</b> <b>new</b> <a class="type" href="../../../../../../particles/management/include/G4DynamicParticle.hh.html#G4DynamicParticle" title='G4DynamicParticle' data-ref="G4DynamicParticle">G4DynamicParticle</a><a class="ref" href="../../../../../../particles/management/include/G4DynamicParticle.hh.html#_ZN17G4DynamicParticleC1ERKS_" title='G4DynamicParticle::G4DynamicParticle' data-ref="_ZN17G4DynamicParticleC1ERKS_">(</a><a class="local col7 ref" href="#37iep" title='iep' data-ref="37iep">iep</a>.<a class="ref" href="../include/G4InuclParticle.hh.html#_ZNK15G4InuclParticle18getDynamicParticleEv" title='G4InuclParticle::getDynamicParticle' data-ref="_ZNK15G4InuclParticle18getDynamicParticleEv">getDynamicParticle</a>());</td></tr>
+<tr><th id="541">541</th><td>  }</td></tr>
+<tr><th id="542">542</th><td>  </td></tr>
+<tr><th id="543">543</th><td>  <b>return</b> <var>0</var>;	<i>// Should never get here!</i></td></tr>
+<tr><th id="544">544</th><td>}</td></tr>
+<tr><th id="545">545</th><td> </td></tr>
+<tr><th id="546">546</th><td><a class="type" href="../../../../../../particles/management/include/G4DynamicParticle.hh.html#G4DynamicParticle" title='G4DynamicParticle' data-ref="G4DynamicParticle">G4DynamicParticle</a>* </td></tr>
+<tr><th id="547">547</th><td><a class="type" href="../include/G4CascadeInterface.hh.html#G4CascadeInterface" title='G4CascadeInterface' data-ref="G4CascadeInterface">G4CascadeInterface</a>::<dfn class="decl def" id="_ZNK18G4CascadeInterface19makeDynamicParticleERK13G4InuclNuclei" title='G4CascadeInterface::makeDynamicParticle' data-ref="_ZNK18G4CascadeInterface19makeDynamicParticleERK13G4InuclNuclei">makeDynamicParticle</dfn>(<em>const</em> <a class="type" href="../include/G4InuclNuclei.hh.html#G4InuclNuclei" title='G4InuclNuclei' data-ref="G4InuclNuclei">G4InuclNuclei</a>&amp; <dfn class="local col2 decl" id="42inuc" title='inuc' data-type='const G4InuclNuclei &amp;' data-ref="42inuc">inuc</dfn>) <em>const</em> {</td></tr>
+<tr><th id="548">548</th><td>  <b>if</b> (<a class="member" href="../../../management/include/G4HadronicInteraction.hh.html#G4HadronicInteraction::verboseLevel" title='G4HadronicInteraction::verboseLevel' data-ref="G4HadronicInteraction::verboseLevel">verboseLevel</a> &gt; <var>2</var>) {</td></tr>
+<tr><th id="549">549</th><td>    <a class="macro" href="../../../../../../global/management/include/G4ios.hh.html#46" title="(*_G4cout_p())" data-ref="_M/G4cout">G4cout</a> <span class='error' title="invalid operands to binary expression (&apos;int&apos; and &apos;const char *&apos;)">&lt;&lt;</span> <q>" Nuclei fragment: \n"</q> &lt;&lt; inuc &lt;&lt; <a class="macro" href="../../../../../../global/management/include/G4ios.hh.html#60" title="std::endl" data-ref="_M/G4endl">G4endl</a>;</td></tr>
+<tr><th id="550">550</th><td>  }</td></tr>
+<tr><th id="551">551</th><td>  </td></tr>
+<tr><th id="552">552</th><td>  <i>// Copy local G4DynPart to public output </i></td></tr>
+<tr><th id="553">553</th><td>  <b>return</b> <b>new</b> <a class="type" href="../../../../../../particles/management/include/G4DynamicParticle.hh.html#G4DynamicParticle" title='G4DynamicParticle' data-ref="G4DynamicParticle">G4DynamicParticle</a><a class="ref" href="../../../../../../particles/management/include/G4DynamicParticle.hh.html#_ZN17G4DynamicParticleC1ERKS_" title='G4DynamicParticle::G4DynamicParticle' data-ref="_ZN17G4DynamicParticleC1ERKS_">(</a><a class="local col2 ref" href="#42inuc" title='inuc' data-ref="42inuc">inuc</a>.<a class="ref" href="../include/G4InuclParticle.hh.html#_ZNK15G4InuclParticle18getDynamicParticleEv" title='G4InuclParticle::getDynamicParticle' data-ref="_ZNK15G4InuclParticle18getDynamicParticleEv">getDynamicParticle</a>());</td></tr>
+<tr><th id="554">554</th><td>}</td></tr>
+<tr><th id="555">555</th><td></td></tr>
+<tr><th id="556">556</th><td></td></tr>
+<tr><th id="557">557</th><td><i>// Transfer Bertini internal final state to hadronics interface</i></td></tr>
+<tr><th id="558">558</th><td></td></tr>
+<tr><th id="559">559</th><td><em>void</em> <a class="type" href="../include/G4CascadeInterface.hh.html#G4CascadeInterface" title='G4CascadeInterface' data-ref="G4CascadeInterface">G4CascadeInterface</a>::<dfn class="decl def" id="_ZN18G4CascadeInterface26copyOutputToHadronicResultEv" title='G4CascadeInterface::copyOutputToHadronicResult' data-ref="_ZN18G4CascadeInterface26copyOutputToHadronicResultEv">copyOutputToHadronicResult</dfn>() {</td></tr>
+<tr><th id="560">560</th><td>  <b>if</b> (verboseLevel &gt; <var>1</var>)</td></tr>
+<tr><th id="561">561</th><td>    <a class="macro" href="../../../../../../global/management/include/G4ios.hh.html#46" title="(*_G4cout_p())" data-ref="_M/G4cout">G4cout</a> <span class='error' title="invalid operands to binary expression (&apos;int&apos; and &apos;const char *&apos;)">&lt;&lt;</span> <q>" &gt;&gt;&gt; G4CascadeInterface::copyOutputToHadronicResult"</q> &lt;&lt; <a class="macro" href="../../../../../../global/management/include/G4ios.hh.html#60" title="std::endl" data-ref="_M/G4endl">G4endl</a>;</td></tr>
+<tr><th id="562">562</th><td></td></tr>
+<tr><th id="563">563</th><td>  <em>const</em> <span class='error' title="use of undeclared identifier &apos;std&apos;">std</span>::vector<span class='error' title="expected unqualified-id">&lt;</span>G4InuclNuclei&gt;&amp; outgoingNuclei = output-&gt;getOutgoingNuclei();</td></tr>
+<tr><th id="564">564</th><td>  <em>const</em> <span class='error' title="use of undeclared identifier &apos;std&apos;">std</span>::vector<span class='error' title="expected unqualified-id">&lt;</span>G4InuclElementaryParticle&gt;&amp; particles = output-&gt;getOutgoingParticles();</td></tr>
+<tr><th id="565">565</th><td></td></tr>
+<tr><th id="566">566</th><td>  <a class="member" href="../../../management/include/G4HadronicInteraction.hh.html#G4HadronicInteraction::theParticleChange" title='G4HadronicInteraction::theParticleChange' data-ref="G4HadronicInteraction::theParticleChange">theParticleChange</a>.<a class="ref" href="../../../../util/include/G4HadFinalState.hh.html#_ZN15G4HadFinalState15SetStatusChangeE21G4HadFinalStateStatus" title='G4HadFinalState::SetStatusChange' data-ref="_ZN15G4HadFinalState15SetStatusChangeE21G4HadFinalStateStatus">SetStatusChange</a>(<a class="enum" href="../../../../util/include/G4HadFinalState.hh.html#G4HadFinalStateStatus::stopAndKill" title='G4HadFinalStateStatus::stopAndKill' data-ref="G4HadFinalStateStatus::stopAndKill">stopAndKill</a>);</td></tr>
+<tr><th id="567">567</th><td>  <a class="member" href="../../../management/include/G4HadronicInteraction.hh.html#G4HadronicInteraction::theParticleChange" title='G4HadronicInteraction::theParticleChange' data-ref="G4HadronicInteraction::theParticleChange">theParticleChange</a>.<a class="ref" href="../../../../util/include/G4HadFinalState.hh.html#_ZN15G4HadFinalState15SetEnergyChangeEd" title='G4HadFinalState::SetEnergyChange' data-ref="_ZN15G4HadFinalState15SetEnergyChangeEd">SetEnergyChange</a>(<var>0.</var>);</td></tr>
+<tr><th id="568">568</th><td></td></tr>
+<tr><th id="569">569</th><td>  <i>// Get outcoming particles</i></td></tr>
+<tr><th id="570">570</th><td>  <b>if</b> (!<span class='error' title="use of undeclared identifier &apos;particles&apos;">particles</span>.empty()) { </td></tr>
+<tr><th id="571">571</th><td>    <span class='error' title="unknown type name &apos;particleIterator&apos;">particleIterator</span> <dfn class="local col3 decl" id="43ipart" title='ipart' data-type='int' data-ref="43ipart">ipart</dfn> = <span class='error' title="use of undeclared identifier &apos;particles&apos;">particles</span>.begin();</td></tr>
+<tr><th id="572">572</th><td>    <b>for</b> (; ipart != <span class='error' title="use of undeclared identifier &apos;particles&apos;">particles</span>.end(); ipart++) {</td></tr>
+<tr><th id="573">573</th><td>      theParticleChange.AddSecondary(makeDynamicParticle(*ipart));</td></tr>
+<tr><th id="574">574</th><td>    }</td></tr>
+<tr><th id="575">575</th><td>  }</td></tr>
+<tr><th id="576">576</th><td></td></tr>
+<tr><th id="577">577</th><td>  <i>// get nuclei fragments</i></td></tr>
+<tr><th id="578">578</th><td>  <b>if</b> (!<span class='error' title="use of undeclared identifier &apos;outgoingNuclei&apos;">outgoingNuclei</span>.empty()) { </td></tr>
+<tr><th id="579">579</th><td>    <span class='error' title="unknown type name &apos;nucleiIterator&apos;">nucleiIterator</span> <dfn class="local col4 decl" id="44ifrag" title='ifrag' data-type='int' data-ref="44ifrag">ifrag</dfn> = <span class='error' title="use of undeclared identifier &apos;outgoingNuclei&apos;">outgoingNuclei</span>.begin();</td></tr>
+<tr><th id="580">580</th><td>    <b>for</b> (; ifrag != <span class='error' title="use of undeclared identifier &apos;outgoingNuclei&apos;">outgoingNuclei</span>.end(); ifrag++) {</td></tr>
+<tr><th id="581">581</th><td>      theParticleChange.AddSecondary(makeDynamicParticle(*ifrag)); </td></tr>
+<tr><th id="582">582</th><td>    }</td></tr>
+<tr><th id="583">583</th><td>  }</td></tr>
+<tr><th id="584">584</th><td>}</td></tr>
+<tr><th id="585">585</th><td></td></tr>
+<tr><th id="586">586</th><td><span class='error' title="unknown type name &apos;G4ReactionProductVector&apos;">G4ReactionProductVector</span>* G4CascadeInterface::copyOutputToReactionProducts() {</td></tr>
+<tr><th id="587">587</th><td>  <b>if</b> (verboseLevel &gt; <var>1</var>)</td></tr>
+<tr><th id="588">588</th><td>    <a class="macro" href="../../../../../../global/management/include/G4ios.hh.html#46" title="(*_G4cout_p())" data-ref="_M/G4cout">G4cout</a> <span class='error' title="invalid operands to binary expression (&apos;int&apos; and &apos;const char *&apos;)">&lt;&lt;</span> <q>" &gt;&gt;&gt; G4CascadeInterface::copyOutputToReactionProducts"</q> &lt;&lt; <a class="macro" href="../../../../../../global/management/include/G4ios.hh.html#60" title="std::endl" data-ref="_M/G4endl">G4endl</a>;</td></tr>
+<tr><th id="589">589</th><td></td></tr>
+<tr><th id="590">590</th><td>  <em>const</em> <span class='error' title="use of undeclared identifier &apos;std&apos;">std</span>::vector<span class='error' title="expected unqualified-id">&lt;</span>G4InuclElementaryParticle&gt;&amp; particles = output-&gt;getOutgoingParticles();</td></tr>
+<tr><th id="591">591</th><td>  <em>const</em> <span class='error' title="use of undeclared identifier &apos;std&apos;">std</span>::vector<span class='error' title="expected unqualified-id">&lt;</span>G4InuclNuclei&gt;&amp; fragments = output-&gt;getOutgoingNuclei();</td></tr>
+<tr><th id="592">592</th><td></td></tr>
+<tr><th id="593">593</th><td>  <span class='error' title="unknown type name &apos;G4ReactionProductVector&apos;">G4ReactionProductVector</span>* propResult = <b>new</b> <span class='error' title="unknown type name &apos;G4ReactionProductVector&apos;">G4ReactionProductVector</span>;</td></tr>
+<tr><th id="594">594</th><td></td></tr>
+<tr><th id="595">595</th><td>  G4ReactionProduct* rp = <var>0</var>;	<i>// Buffers to create outgoing tracks</i></td></tr>
+<tr><th id="596">596</th><td>  G4DynamicParticle* dp = <var>0</var>;</td></tr>
+<tr><th id="597">597</th><td></td></tr>
+<tr><th id="598">598</th><td>  <i>// Get outcoming particles</i></td></tr>
+<tr><th id="599">599</th><td>  <b>if</b> (!<span class='error' title="use of undeclared identifier &apos;particles&apos;">particles</span>.empty()) { </td></tr>
+<tr><th id="600">600</th><td>    <span class='error' title="unknown type name &apos;particleIterator&apos;">particleIterator</span> ipart = <span class='error' title="use of undeclared identifier &apos;particles&apos;">particles</span>.begin();</td></tr>
+<tr><th id="601">601</th><td>    <b>for</b> (; ipart != <span class='error' title="use of undeclared identifier &apos;particles&apos;">particles</span>.end(); ipart++) {</td></tr>
+<tr><th id="602">602</th><td>      rp = <b>new</b> G4ReactionProduct;</td></tr>
+<tr><th id="603">603</th><td>      dp = makeDynamicParticle(*ipart);</td></tr>
+<tr><th id="604">604</th><td>      (*rp) = (*dp);		<i>// This does all the necessary copying</i></td></tr>
+<tr><th id="605">605</th><td>      propResult-&gt;push_back(rp);</td></tr>
+<tr><th id="606">606</th><td>      <b>delete</b> dp;</td></tr>
+<tr><th id="607">607</th><td>    }</td></tr>
+<tr><th id="608">608</th><td>  }</td></tr>
+<tr><th id="609">609</th><td></td></tr>
+<tr><th id="610">610</th><td>  <i>// get nuclei fragments</i></td></tr>
+<tr><th id="611">611</th><td>  <b>if</b> (!<span class='error' title="use of undeclared identifier &apos;fragments&apos;">fragments</span>.empty()) { </td></tr>
+<tr><th id="612">612</th><td>    <span class='error' title="unknown type name &apos;nucleiIterator&apos;">nucleiIterator</span> ifrag = <span class='error' title="use of undeclared identifier &apos;fragments&apos;">fragments</span>.begin();</td></tr>
+<tr><th id="613">613</th><td>    <b>for</b> (; ifrag != <span class='error' title="use of undeclared identifier &apos;fragments&apos;">fragments</span>.end(); ifrag++) {</td></tr>
+<tr><th id="614">614</th><td>      rp = <b>new</b> G4ReactionProduct;</td></tr>
+<tr><th id="615">615</th><td>      dp = makeDynamicParticle(*ifrag);</td></tr>
+<tr><th id="616">616</th><td>      (*rp) = (*dp);		<i>// This does all the necessary copying</i></td></tr>
+<tr><th id="617">617</th><td>      propResult-&gt;push_back(rp);</td></tr>
+<tr><th id="618">618</th><td>      <b>delete</b> dp;</td></tr>
+<tr><th id="619">619</th><td>    }</td></tr>
+<tr><th id="620">620</th><td>  }</td></tr>
+<tr><th id="621">621</th><td></td></tr>
+<tr><th id="622">622</th><td>  <b>return</b> propResult;</td></tr>
+<tr><th id="623">623</th><td>}</td></tr>
+<tr><th id="624">624</th><td></td></tr>
+<tr><th id="625">625</th><td></td></tr>
+<tr><th id="626">626</th><td><i>// Report violations of conservation laws in original frame</i></td></tr>
+<tr><th id="627">627</th><td></td></tr>
+<tr><th id="628">628</th><td><em>void</em> <a class="type" href="../include/G4CascadeInterface.hh.html#G4CascadeInterface" title='G4CascadeInterface' data-ref="G4CascadeInterface">G4CascadeInterface</a>::<dfn class="decl def" id="_ZN18G4CascadeInterface16checkFinalResultEv" title='G4CascadeInterface::checkFinalResult' data-ref="_ZN18G4CascadeInterface16checkFinalResultEv">checkFinalResult</dfn>() {</td></tr>
+<tr><th id="629">629</th><td>  <a class="member" href="../include/G4CascadeInterface.hh.html#G4CascadeInterface::balance" title='G4CascadeInterface::balance' data-ref="G4CascadeInterface::balance">balance</a>-&gt;<a class="virtual ref" href="../include/G4CascadeCheckBalance.hh.html#_ZN21G4CascadeCheckBalance7collideEP15G4InuclParticleS1_R17G4CollisionOutput" title='G4CascadeCheckBalance::collide' data-ref="_ZN21G4CascadeCheckBalance7collideEP15G4InuclParticleS1_R17G4CollisionOutput">collide</a>(<a class="member" href="../include/G4CascadeInterface.hh.html#G4CascadeInterface::bullet" title='G4CascadeInterface::bullet' data-ref="G4CascadeInterface::bullet">bullet</a>, <a class="member" href="../include/G4CascadeInterface.hh.html#G4CascadeInterface::target" title='G4CascadeInterface::target' data-ref="G4CascadeInterface::target">target</a>, <span class='refarg'>*<a class="member" href="../include/G4CascadeInterface.hh.html#G4CascadeInterface::output" title='G4CascadeInterface::output' data-ref="G4CascadeInterface::output">output</a></span>);</td></tr>
+<tr><th id="630">630</th><td></td></tr>
+<tr><th id="631">631</th><td>  <b>if</b> (<a class="member" href="../../../management/include/G4HadronicInteraction.hh.html#G4HadronicInteraction::verboseLevel" title='G4HadronicInteraction::verboseLevel' data-ref="G4HadronicInteraction::verboseLevel">verboseLevel</a> &gt; <var>2</var>) {</td></tr>
+<tr><th id="632">632</th><td>    <b>if</b> (!<a class="member" href="../include/G4CascadeInterface.hh.html#G4CascadeInterface::balance" title='G4CascadeInterface::balance' data-ref="G4CascadeInterface::balance">balance</a>-&gt;<a class="ref" href="../include/G4CascadeCheckBalance.hh.html#_ZNK21G4CascadeCheckBalance10baryonOkayEv" title='G4CascadeCheckBalance::baryonOkay' data-ref="_ZNK21G4CascadeCheckBalance10baryonOkayEv">baryonOkay</a>()) {</td></tr>
+<tr><th id="633">633</th><td>      <a class="macro" href="../../../../../../global/management/include/G4ios.hh.html#47" title="(*_G4cerr_p())" data-ref="_M/G4cerr">G4cerr</a> <span class='error' title="invalid operands to binary expression (&apos;int&apos; and &apos;const char *&apos;)">&lt;&lt;</span> <q>"ERROR: no baryon number conservation, sum of baryons = "</q></td></tr>
+<tr><th id="634">634</th><td>             &lt;&lt; balance-&gt;deltaB() &lt;&lt; <a class="macro" href="../../../../../../global/management/include/G4ios.hh.html#60" title="std::endl" data-ref="_M/G4endl">G4endl</a>;</td></tr>
+<tr><th id="635">635</th><td>    }</td></tr>
+<tr><th id="636">636</th><td></td></tr>
+<tr><th id="637">637</th><td>    <b>if</b> (!<a class="member" href="../include/G4CascadeInterface.hh.html#G4CascadeInterface::balance" title='G4CascadeInterface::balance' data-ref="G4CascadeInterface::balance">balance</a>-&gt;<a class="ref" href="../include/G4CascadeCheckBalance.hh.html#_ZNK21G4CascadeCheckBalance10chargeOkayEv" title='G4CascadeCheckBalance::chargeOkay' data-ref="_ZNK21G4CascadeCheckBalance10chargeOkayEv">chargeOkay</a>()) {</td></tr>
+<tr><th id="638">638</th><td>      <a class="macro" href="../../../../../../global/management/include/G4ios.hh.html#47" title="(*_G4cerr_p())" data-ref="_M/G4cerr">G4cerr</a> <span class='error' title="invalid operands to binary expression (&apos;int&apos; and &apos;const char *&apos;)">&lt;&lt;</span> <q>"ERROR: no charge conservation, sum of charges = "</q></td></tr>
+<tr><th id="639">639</th><td>	     &lt;&lt; balance-&gt;deltaQ() &lt;&lt; <a class="macro" href="../../../../../../global/management/include/G4ios.hh.html#60" title="std::endl" data-ref="_M/G4endl">G4endl</a>;</td></tr>
+<tr><th id="640">640</th><td>    }</td></tr>
+<tr><th id="641">641</th><td></td></tr>
+<tr><th id="642">642</th><td>    <b>if</b> (<span class='error' title="use of undeclared identifier &apos;std&apos;">std</span>::abs(balance-&gt;deltaKE()) &gt; <var>0.01</var> ) {	<i>// GeV</i></td></tr>
+<tr><th id="643">643</th><td>      <a class="macro" href="../../../../../../global/management/include/G4ios.hh.html#47" title="(*_G4cerr_p())" data-ref="_M/G4cerr">G4cerr</a> <span class='error' title="invalid operands to binary expression (&apos;int&apos; and &apos;const char *&apos;)">&lt;&lt;</span> <q>"Kinetic energy conservation violated by "</q></td></tr>
+<tr><th id="644">644</th><td>	     &lt;&lt; balance-&gt;deltaKE() &lt;&lt; <q>" GeV"</q> &lt;&lt; <a class="macro" href="../../../../../../global/management/include/G4ios.hh.html#60" title="std::endl" data-ref="_M/G4endl">G4endl</a>;</td></tr>
+<tr><th id="645">645</th><td>    }</td></tr>
+<tr><th id="646">646</th><td></td></tr>
+<tr><th id="647">647</th><td>    <a class="typedef" href="../../../../../../global/management/include/G4Types.hh.html#G4double" title='G4double' data-type='double' data-ref="G4double">G4double</a> <dfn class="local col5 decl" id="45eInit" title='eInit' data-type='G4double' data-ref="45eInit">eInit</dfn> = <a class="member" href="../include/G4CascadeInterface.hh.html#G4CascadeInterface::bullet" title='G4CascadeInterface::bullet' data-ref="G4CascadeInterface::bullet">bullet</a>-&gt;<a class="ref" href="../include/G4InuclParticle.hh.html#_ZNK15G4InuclParticle9getEnergyEv" title='G4InuclParticle::getEnergy' data-ref="_ZNK15G4InuclParticle9getEnergyEv">getEnergy</a>() + <a class="member" href="../include/G4CascadeInterface.hh.html#G4CascadeInterface::target" title='G4CascadeInterface::target' data-ref="G4CascadeInterface::target">target</a>-&gt;<a class="ref" href="../include/G4InuclParticle.hh.html#_ZNK15G4InuclParticle9getEnergyEv" title='G4InuclParticle::getEnergy' data-ref="_ZNK15G4InuclParticle9getEnergyEv">getEnergy</a>();</td></tr>
+<tr><th id="648">648</th><td>    <a class="typedef" href="../../../../../../global/management/include/G4Types.hh.html#G4double" title='G4double' data-type='double' data-ref="G4double">G4double</a> <dfn class="local col6 decl" id="46eFinal" title='eFinal' data-type='G4double' data-ref="46eFinal">eFinal</dfn> = <a class="local col5 ref" href="#45eInit" title='eInit' data-ref="45eInit">eInit</a> + <a class="member" href="../include/G4CascadeInterface.hh.html#G4CascadeInterface::balance" title='G4CascadeInterface::balance' data-ref="G4CascadeInterface::balance">balance</a>-&gt;<a class="ref" href="../include/G4CascadeCheckBalance.hh.html#_ZNK21G4CascadeCheckBalance6deltaEEv" title='G4CascadeCheckBalance::deltaE' data-ref="_ZNK21G4CascadeCheckBalance6deltaEEv">deltaE</a>();</td></tr>
+<tr><th id="649">649</th><td></td></tr>
+<tr><th id="650">650</th><td>    <a class="macro" href="../../../../../../global/management/include/G4ios.hh.html#46" title="(*_G4cout_p())" data-ref="_M/G4cout">G4cout</a> <span class='error' title="invalid operands to binary expression (&apos;int&apos; and &apos;const char *&apos;)">&lt;&lt;</span> <q>"Initial energy "</q> &lt;&lt; eInit &lt;&lt; <q>" final energy "</q> &lt;&lt; eFinal</td></tr>
+<tr><th id="651">651</th><td>	   &lt;&lt; <q>"\nTotal energy conservation at level "</q></td></tr>
+<tr><th id="652">652</th><td>	   &lt;&lt; balance-&gt;deltaE() * GeV &lt;&lt; <q>" MeV"</q> &lt;&lt; <a class="macro" href="../../../../../../global/management/include/G4ios.hh.html#60" title="std::endl" data-ref="_M/G4endl">G4endl</a>;</td></tr>
+<tr><th id="653">653</th><td>    </td></tr>
+<tr><th id="654">654</th><td>    <b>if</b> (<a class="member" href="../include/G4CascadeInterface.hh.html#G4CascadeInterface::balance" title='G4CascadeInterface::balance' data-ref="G4CascadeInterface::balance">balance</a>-&gt;<a class="ref" href="../include/G4CascadeCheckBalance.hh.html#_ZNK21G4CascadeCheckBalance7deltaKEEv" title='G4CascadeCheckBalance::deltaKE' data-ref="_ZNK21G4CascadeCheckBalance7deltaKEEv">deltaKE</a>() &gt; <var>5.0e-5</var> ) { 	<i>// 0.05 MeV</i></td></tr>
+<tr><th id="655">655</th><td>      <a class="macro" href="../../../../../../global/management/include/G4ios.hh.html#47" title="(*_G4cerr_p())" data-ref="_M/G4cerr">G4cerr</a> <span class='error' title="invalid operands to binary expression (&apos;int&apos; and &apos;const char *&apos;)">&lt;&lt;</span> <q>"FATAL ERROR: kinetic energy created  "</q></td></tr>
+<tr><th id="656">656</th><td>             &lt;&lt; balance-&gt;deltaKE() * GeV &lt;&lt; <q>" MeV"</q> &lt;&lt; <a class="macro" href="../../../../../../global/management/include/G4ios.hh.html#60" title="std::endl" data-ref="_M/G4endl">G4endl</a>;</td></tr>
+<tr><th id="657">657</th><td>    }</td></tr>
+<tr><th id="658">658</th><td>  }</td></tr>
+<tr><th id="659">659</th><td>}</td></tr>
+<tr><th id="660">660</th><td></td></tr>
+<tr><th id="661">661</th><td></td></tr>
+<tr><th id="662">662</th><td><i>// Evaluate whether any outgoing particles penetrated Coulomb barrier</i></td></tr>
+<tr><th id="663">663</th><td></td></tr>
+<tr><th id="664">664</th><td><a class="typedef" href="../../../../../../global/management/include/G4Types.hh.html#G4bool" title='G4bool' data-type='bool' data-ref="G4bool">G4bool</a> <a class="type" href="../include/G4CascadeInterface.hh.html#G4CascadeInterface" title='G4CascadeInterface' data-ref="G4CascadeInterface">G4CascadeInterface</a>::<dfn class="decl def" id="_ZNK18G4CascadeInterface23coulombBarrierViolationEv" title='G4CascadeInterface::coulombBarrierViolation' data-ref="_ZNK18G4CascadeInterface23coulombBarrierViolationEv">coulombBarrierViolation</dfn>() <em>const</em> {</td></tr>
+<tr><th id="665">665</th><td>  <a class="typedef" href="../../../../../../global/management/include/G4Types.hh.html#G4bool" title='G4bool' data-type='bool' data-ref="G4bool">G4bool</a> <dfn class="local col7 decl" id="47violated" title='violated' data-type='G4bool' data-ref="47violated">violated</dfn> = <b>false</b>;  		<i>// by default coulomb analysis is OK</i></td></tr>
+<tr><th id="666">666</th><td></td></tr>
+<tr><th id="667">667</th><td>  <em>const</em> <a class="typedef" href="../../../../../../global/management/include/G4Types.hh.html#G4double" title='G4double' data-type='double' data-ref="G4double">G4double</a> <dfn class="local col8 decl" id="48coulumbBarrier" title='coulumbBarrier' data-type='const G4double' data-ref="48coulumbBarrier">coulumbBarrier</dfn> = <var>8.7</var> * <a class="ref" href="../../../../../../externals/clhep/include/CLHEP/Units/SystemOfUnits.h.html#CLHEP::MeV" title='CLHEP::MeV' data-ref="CLHEP::MeV">MeV</a>/<a class="ref" href="../../../../../../externals/clhep/include/CLHEP/Units/SystemOfUnits.h.html#CLHEP::GeV" title='CLHEP::GeV' data-ref="CLHEP::GeV">GeV</a>; 	<i>// Bertini uses GeV</i></td></tr>
+<tr><th id="668">668</th><td></td></tr>
+<tr><th id="669">669</th><td>  <em>const</em> <span class='error' title="use of undeclared identifier &apos;std&apos;">std</span>::vector<span class='error' title="expected unqualified-id">&lt;</span>G4InuclElementaryParticle&gt;&amp; p =</td></tr>
+<tr><th id="670">670</th><td>    output-&gt;getOutgoingParticles();</td></tr>
+<tr><th id="671">671</th><td></td></tr>
+<tr><th id="672">672</th><td>  <b>for</b> (<span class='error' title="unknown type name &apos;particleIterator&apos;">particleIterator</span> <dfn class="local col9 decl" id="49ipart" title='ipart' data-type='int' data-ref="49ipart">ipart</dfn>=<span class='error' title="use of undeclared identifier &apos;p&apos;">p</span>.begin(); ipart != <span class='error' title="use of undeclared identifier &apos;p&apos;">p</span>.end(); ipart++) {</td></tr>
+<tr><th id="673">673</th><td>    <b>if</b> (ipart-&gt;type() == proton) {</td></tr>
+<tr><th id="674">674</th><td>      violated |= (ipart-&gt;getKineticEnergy() &lt; coulumbBarrier);</td></tr>
+<tr><th id="675">675</th><td>    }</td></tr>
+<tr><th id="676">676</th><td>  }</td></tr>
+<tr><th id="677">677</th><td></td></tr>
+<tr><th id="678">678</th><td>  <b>return</b> <a class="local col7 ref" href="#47violated" title='violated' data-ref="47violated">violated</a>;</td></tr>
+<tr><th id="679">679</th><td>}</td></tr>
+<tr><th id="680">680</th><td></td></tr>
+<tr><th id="681">681</th><td><i>// Check whether inelastic collision on proton failed</i></td></tr>
+<tr><th id="682">682</th><td></td></tr>
+<tr><th id="683">683</th><td><a class="typedef" href="../../../../../../global/management/include/G4Types.hh.html#G4bool" title='G4bool' data-type='bool' data-ref="G4bool">G4bool</a> <a class="type" href="../include/G4CascadeInterface.hh.html#G4CascadeInterface" title='G4CascadeInterface' data-ref="G4CascadeInterface">G4CascadeInterface</a>::<dfn class="decl def" id="_ZNK18G4CascadeInterface20retryInelasticProtonEv" title='G4CascadeInterface::retryInelasticProton' data-ref="_ZNK18G4CascadeInterface20retryInelasticProtonEv">retryInelasticProton</dfn>() <em>const</em> {</td></tr>
+<tr><th id="684">684</th><td>  <em>const</em> <span class='error' title="use of undeclared identifier &apos;std&apos;">std</span>::vector<span class='error' title="expected unqualified-id">&lt;</span>G4InuclElementaryParticle&gt;&amp; out =</td></tr>
+<tr><th id="685">685</th><td>    output-&gt;getOutgoingParticles();</td></tr>
+<tr><th id="686">686</th><td></td></tr>
+<tr><th id="687">687</th><td><u>#<span data-ppcond="687">ifdef</span> <span class="macro" data-ref="_M/G4CASCADE_DEBUG_INTERFACE">G4CASCADE_DEBUG_INTERFACE</span></u></td></tr>
+<tr><th id="688">688</th><td>  <i>// Report on all retry conditions, in order of return logic</i></td></tr>
+<tr><th id="689">689</th><td>  G4cout &lt;&lt; <q>" retryInelasticProton: number of Tries "</q></td></tr>
+<tr><th id="690">690</th><td>	 &lt;&lt; ((numberOfTries &lt; maximumTries) ? <q>"RETRY (t)"</q> : <q>"EXIT (f)"</q>)</td></tr>
+<tr><th id="691">691</th><td>	 &lt;&lt; <q>"\n retryInelasticProton: AND collision type "</q>;</td></tr>
+<tr><th id="692">692</th><td>  <b>if</b> (out.empty()) G4cout &lt;&lt; <q>"FAILED"</q> &lt;&lt; G4endl;</td></tr>
+<tr><th id="693">693</th><td>  <b>else</b> {</td></tr>
+<tr><th id="694">694</th><td>    G4cout &lt;&lt; (out.size() == <var>2</var> ? <q>"ELASTIC (t)"</q> : <q>"INELASTIC (f)"</q>)</td></tr>
+<tr><th id="695">695</th><td>	   &lt;&lt; <q>"\n retryInelasticProton: AND Leading particles bullet "</q></td></tr>
+<tr><th id="696">696</th><td>	   &lt;&lt; (out.size() &gt;= <var>2</var> &amp;&amp;</td></tr>
+<tr><th id="697">697</th><td>	       (out[<var>0</var>].getDefinition() == bullet-&gt;getDefinition() ||</td></tr>
+<tr><th id="698">698</th><td>		out[<var>1</var>].getDefinition() == bullet-&gt;getDefinition())</td></tr>
+<tr><th id="699">699</th><td>	       ? <q>"YES (t)"</q> : <q>"NO (f)"</q>)</td></tr>
+<tr><th id="700">700</th><td>	   &lt;&lt; G4endl;</td></tr>
+<tr><th id="701">701</th><td>  }</td></tr>
+<tr><th id="702">702</th><td><u>#<span data-ppcond="687">endif</span></u></td></tr>
+<tr><th id="703">703</th><td></td></tr>
+<tr><th id="704">704</th><td>  <b>return</b> ( (numberOfTries &lt; maximumTries) &amp;&amp;</td></tr>
+<tr><th id="705">705</th><td>	   (<span class='error' title="use of undeclared identifier &apos;out&apos;">out</span>.empty() ||</td></tr>
+<tr><th id="706">706</th><td>	    (<span class='error' title="use of undeclared identifier &apos;out&apos;">out</span>.size() == <var>2</var> &amp;&amp;</td></tr>
+<tr><th id="707">707</th><td>	     (<span class='error' title="use of undeclared identifier &apos;out&apos;">out</span>[<var>0</var>].getDefinition() == bullet-&gt;getDefinition() ||</td></tr>
+<tr><th id="708">708</th><td>	      <span class='error' title="use of undeclared identifier &apos;out&apos;">out</span>[<var>1</var>].getDefinition() == bullet-&gt;getDefinition())))</td></tr>
+<tr><th id="709">709</th><td>	   );</td></tr>
+<tr><th id="710">710</th><td>}</td></tr>
+<tr><th id="711">711</th><td></td></tr>
+<tr><th id="712">712</th><td><i>// Check whether generic inelastic collision failed</i></td></tr>
+<tr><th id="713">713</th><td><i>// NOTE:  some conditions are set by compiler flags</i></td></tr>
+<tr><th id="714">714</th><td></td></tr>
+<tr><th id="715">715</th><td><a class="typedef" href="../../../../../../global/management/include/G4Types.hh.html#G4bool" title='G4bool' data-type='bool' data-ref="G4bool">G4bool</a> <a class="type" href="../include/G4CascadeInterface.hh.html#G4CascadeInterface" title='G4CascadeInterface' data-ref="G4CascadeInterface">G4CascadeInterface</a>::<dfn class="decl def" id="_ZNK18G4CascadeInterface21retryInelasticNucleusEv" title='G4CascadeInterface::retryInelasticNucleus' data-ref="_ZNK18G4CascadeInterface21retryInelasticNucleusEv">retryInelasticNucleus</dfn>() <em>const</em> {</td></tr>
+<tr><th id="716">716</th><td>  <i>// Quantities necessary for conditional block below</i></td></tr>
+<tr><th id="717">717</th><td>  <a class="typedef" href="../../../../../../global/management/include/G4Types.hh.html#G4int" title='G4int' data-type='int' data-ref="G4int">G4int</a> <dfn class="local col0 decl" id="50npart" title='npart' data-type='G4int' data-ref="50npart">npart</dfn> = <a class="member" href="../include/G4CascadeInterface.hh.html#G4CascadeInterface::output" title='G4CascadeInterface::output' data-ref="G4CascadeInterface::output">output</a>-&gt;<a class="ref" href="../include/G4CollisionOutput.hh.html#_ZNK17G4CollisionOutput25numberOfOutgoingParticlesEv" title='G4CollisionOutput::numberOfOutgoingParticles' data-ref="_ZNK17G4CollisionOutput25numberOfOutgoingParticlesEv">numberOfOutgoingParticles</a>();</td></tr>
+<tr><th id="718">718</th><td>  <a class="typedef" href="../../../../../../global/management/include/G4Types.hh.html#G4int" title='G4int' data-type='int' data-ref="G4int">G4int</a> <dfn class="local col1 decl" id="51nfrag" title='nfrag' data-type='G4int' data-ref="51nfrag">nfrag</dfn> = <a class="member" href="../include/G4CascadeInterface.hh.html#G4CascadeInterface::output" title='G4CascadeInterface::output' data-ref="G4CascadeInterface::output">output</a>-&gt;<a class="ref" href="../include/G4CollisionOutput.hh.html#_ZNK17G4CollisionOutput22numberOfOutgoingNucleiEv" title='G4CollisionOutput::numberOfOutgoingNuclei' data-ref="_ZNK17G4CollisionOutput22numberOfOutgoingNucleiEv">numberOfOutgoingNuclei</a>();</td></tr>
+<tr><th id="719">719</th><td></td></tr>
+<tr><th id="720">720</th><td>  <em>const</em> <a class="type" href="../../../../../../particles/management/include/G4ParticleDefinition.hh.html#G4ParticleDefinition" title='G4ParticleDefinition' data-ref="G4ParticleDefinition">G4ParticleDefinition</a>* <dfn class="local col2 decl" id="52firstOut" title='firstOut' data-type='const G4ParticleDefinition *' data-ref="52firstOut">firstOut</dfn> = (npart == <var>0</var>) ? <var>0</var> :</td></tr>
+<tr><th id="721">721</th><td>    output-&gt;<span class='error' title="no member named &apos;getOutgoingParticles&apos; in &apos;G4CollisionOutput&apos;">getOutgoingParticles</span>().begin()-&gt;getDefinition();</td></tr>
+<tr><th id="722">722</th><td></td></tr>
+<tr><th id="723">723</th><td><u>#<span data-ppcond="723">ifdef</span> <span class="macro" data-ref="_M/G4CASCADE_DEBUG_INTERFACE">G4CASCADE_DEBUG_INTERFACE</span></u></td></tr>
+<tr><th id="724">724</th><td>  <i>// Report on all retry conditions, in order of return logic</i></td></tr>
+<tr><th id="725">725</th><td>  G4cout &lt;&lt; <q>" retryInelasticNucleus: numberOfTries "</q></td></tr>
+<tr><th id="726">726</th><td>	 &lt;&lt; ((numberOfTries &lt; maximumTries) ? <q>"RETRY (t)"</q> : <q>"EXIT (f)"</q>)</td></tr>
+<tr><th id="727">727</th><td>	 &lt;&lt; <q>"\n retryInelasticNucleus: AND outputParticles "</q></td></tr>
+<tr><th id="728">728</th><td>	 &lt;&lt; ((npart != <var>0</var>) ? <q>"NON-ZERO (t)"</q> : <q>"EMPTY (f)"</q>)</td></tr>
+<tr><th id="729">729</th><td><u>#ifdef G4CASCADE_COULOMB_DEV</u></td></tr>
+<tr><th id="730">730</th><td>	 &lt;&lt; <q>"\n retryInelasticNucleus: AND coulombBarrier (COULOMB_DEV) "</q></td></tr>
+<tr><th id="731">731</th><td>	 &lt;&lt; (coulombBarrierViolation() ? <q>"VIOLATED (t)"</q> : <q>"PASSED (f)"</q>)</td></tr>
+<tr><th id="732">732</th><td>	 &lt;&lt; <q>"\n retryInelasticNucleus: AND collision type (COULOMB_DEV) "</q></td></tr>
+<tr><th id="733">733</th><td>	 &lt;&lt; ((npart+nfrag &gt; <var>2</var>) ? <q>"INELASTIC (t)"</q> : <q>"ELASTIC (f)"</q>)</td></tr>
+<tr><th id="734">734</th><td><u>#else</u></td></tr>
+<tr><th id="735">735</th><td>	 &lt;&lt; <q>"\n retryInelasticNucleus: AND collision type "</q></td></tr>
+<tr><th id="736">736</th><td>	 &lt;&lt; ((npart+nfrag &lt; <var>3</var>) ? <q>"ELASTIC (t)"</q> : <q>"INELASTIC (f)"</q>)</td></tr>
+<tr><th id="737">737</th><td>	 &lt;&lt; <q>"\n retryInelasticNucleus: AND Leading particle bullet "</q></td></tr>
+<tr><th id="738">738</th><td>	 &lt;&lt; ((firstOut == bullet-&gt;getDefinition()) ? <q>"YES (t)"</q> : <q>"NO (f)"</q>)</td></tr>
+<tr><th id="739">739</th><td><u>#endif</u></td></tr>
+<tr><th id="740">740</th><td>	 &lt;&lt; <q>"\n retryInelasticNucleus: OR conservation "</q></td></tr>
+<tr><th id="741">741</th><td>	 &lt;&lt; (!balance-&gt;okay() ? <q>"FAILED (t)"</q> : <q>"PASSED (f)"</q>)</td></tr>
+<tr><th id="742">742</th><td>	 &lt;&lt; G4endl;</td></tr>
+<tr><th id="743">743</th><td><u>#<span data-ppcond="723">endif</span></u></td></tr>
+<tr><th id="744">744</th><td></td></tr>
+<tr><th id="745">745</th><td>  <b>return</b> ( (<a class="member" href="../include/G4CascadeInterface.hh.html#G4CascadeInterface::numberOfTries" title='G4CascadeInterface::numberOfTries' data-ref="G4CascadeInterface::numberOfTries">numberOfTries</a> &lt; <a class="member" href="../include/G4CascadeInterface.hh.html#G4CascadeInterface::maximumTries" title='G4CascadeInterface::maximumTries' data-ref="G4CascadeInterface::maximumTries">maximumTries</a>) &amp;&amp;</td></tr>
+<tr><th id="746">746</th><td>	   ( ((<a class="local col0 ref" href="#50npart" title='npart' data-ref="50npart">npart</a> != <var>0</var>) &amp;&amp;</td></tr>
+<tr><th id="747">747</th><td><u>#<span data-ppcond="747">ifdef</span> <span class="macro" data-ref="_M/G4CASCADE_COULOMB_DEV">G4CASCADE_COULOMB_DEV</span></u></td></tr>
+<tr><th id="748">748</th><td>	      (coulombBarrierViolation() &amp;&amp; npart+nfrag &gt; <var>2</var>)</td></tr>
+<tr><th id="749">749</th><td><u>#<span data-ppcond="747">else</span></u></td></tr>
+<tr><th id="750">750</th><td>	      (<a class="local col0 ref" href="#50npart" title='npart' data-ref="50npart">npart</a>+<a class="local col1 ref" href="#51nfrag" title='nfrag' data-ref="51nfrag">nfrag</a> &lt; <var>3</var> &amp;&amp; <a class="local col2 ref" href="#52firstOut" title='firstOut' data-ref="52firstOut">firstOut</a> == <a class="member" href="../include/G4CascadeInterface.hh.html#G4CascadeInterface::bullet" title='G4CascadeInterface::bullet' data-ref="G4CascadeInterface::bullet">bullet</a>-&gt;<a class="ref" href="../include/G4InuclParticle.hh.html#_ZNK15G4InuclParticle13getDefinitionEv" title='G4InuclParticle::getDefinition' data-ref="_ZNK15G4InuclParticle13getDefinitionEv">getDefinition</a>())</td></tr>
+<tr><th id="751">751</th><td><u>#<span data-ppcond="747">endif</span></u></td></tr>
+<tr><th id="752">752</th><td>             )</td></tr>
+<tr><th id="753">753</th><td><u>#<span data-ppcond="753">ifndef</span> <span class="macro" data-ref="_M/G4CASCADE_SKIP_ECONS">G4CASCADE_SKIP_ECONS</span></u></td></tr>
+<tr><th id="754">754</th><td>	     || (!<a class="member" href="../include/G4CascadeInterface.hh.html#G4CascadeInterface::balance" title='G4CascadeInterface::balance' data-ref="G4CascadeInterface::balance">balance</a>-&gt;<a class="ref" href="../include/G4CascadeCheckBalance.hh.html#_ZNK21G4CascadeCheckBalance4okayEv" title='G4CascadeCheckBalance::okay' data-ref="_ZNK21G4CascadeCheckBalance4okayEv">okay</a>())</td></tr>
+<tr><th id="755">755</th><td><u>#<span data-ppcond="753">endif</span></u></td></tr>
+<tr><th id="756">756</th><td>           )</td></tr>
+<tr><th id="757">757</th><td>	 );</td></tr>
+<tr><th id="758">758</th><td>}</td></tr>
+<tr><th id="759">759</th><td></td></tr>
+<tr><th id="760">760</th><td></td></tr>
+<tr><th id="761">761</th><td><i>// Terminate job in case of persistent non-conservation</i></td></tr>
+<tr><th id="762">762</th><td><i>// FIXME:  Need to migrate to G4ExceptionDescription</i></td></tr>
+<tr><th id="763">763</th><td></td></tr>
+<tr><th id="764">764</th><td><em>void</em> <a class="type" href="../include/G4CascadeInterface.hh.html#G4CascadeInterface" title='G4CascadeInterface' data-ref="G4CascadeInterface">G4CascadeInterface</a>::<dfn class="decl def" id="_ZN18G4CascadeInterface27throwNonConservationFailureEv" title='G4CascadeInterface::throwNonConservationFailure' data-ref="_ZN18G4CascadeInterface27throwNonConservationFailureEv">throwNonConservationFailure</dfn>() {</td></tr>
+<tr><th id="765">765</th><td>  <i>// NOTE:  Once G4HadronicException is changed, use the following line!</i></td></tr>
+<tr><th id="766">766</th><td><i>  // G4ExceptionDescription errInfo;</i></td></tr>
+<tr><th id="767">767</th><td>  <span class='error' title="use of undeclared identifier &apos;std&apos;">std</span>::ostream&amp; <dfn class="local col3 decl" id="53errInfo" title='errInfo' data-type='int &amp;' data-ref="53errInfo">errInfo</dfn> = <a class="macro" href="../../../../../../global/management/include/G4ios.hh.html#47" title="(*_G4cerr_p())" data-ref="_M/G4cerr">G4cerr</a>;</td></tr>
+<tr><th id="768">768</th><td></td></tr>
+<tr><th id="769">769</th><td>  errInfo &lt;&lt; <q>" &gt;&gt;&gt; G4CascadeInterface has non-conserving"</q></td></tr>
+<tr><th id="770">770</th><td>	  &lt;&lt; <q>" cascade after "</q> &lt;&lt; numberOfTries &lt;&lt; <q>" attempts."</q> &lt;&lt; <a class="macro" href="../../../../../../global/management/include/G4ios.hh.html#60" title="std::endl" data-ref="_M/G4endl">G4endl</a>;</td></tr>
+<tr><th id="771">771</th><td></td></tr>
+<tr><th id="772">772</th><td>  <a class="type" href="../../../../../../global/management/include/G4String.hh.html#G4String" title='G4String' data-ref="G4String">G4String</a> <dfn class="local col4 decl" id="54throwMsg" title='throwMsg' data-type='G4String' data-ref="54throwMsg">throwMsg</dfn> = <a class="ref fake" href="../../../../../../global/management/include/G4String.hh.html#_ZN8G4StringC1EPKc" title='G4String::G4String' data-ref="_ZN8G4StringC1EPKc"></a><q>"G4CascadeInterface - "</q>;</td></tr>
+<tr><th id="773">773</th><td>  <b>if</b> (!<a class="member" href="../include/G4CascadeInterface.hh.html#G4CascadeInterface::balance" title='G4CascadeInterface::balance' data-ref="G4CascadeInterface::balance">balance</a>-&gt;<a class="ref" href="../include/G4CascadeCheckBalance.hh.html#_ZNK21G4CascadeCheckBalance10energyOkayEv" title='G4CascadeCheckBalance::energyOkay' data-ref="_ZNK21G4CascadeCheckBalance10energyOkayEv">energyOkay</a>()) {</td></tr>
+<tr><th id="774">774</th><td>    <a class="local col4 ref" href="#54throwMsg" title='throwMsg' data-ref="54throwMsg">throwMsg</a> <a class="ref" href="../../../../../../global/management/include/G4String.hh.html#_ZN8G4StringpLEPKc" title='G4String::operator+=' data-ref="_ZN8G4StringpLEPKc">+=</a> <q>"Energy"</q>;</td></tr>
+<tr><th id="775">775</th><td>    errInfo &lt;&lt; <q>" Energy conservation violated by "</q> &lt;&lt; balance-&gt;deltaE()</td></tr>
+<tr><th id="776">776</th><td>	    &lt;&lt; <q>" GeV ("</q> &lt;&lt; balance-&gt;relativeE() &lt;&lt; <q>")"</q> &lt;&lt; <a class="macro" href="../../../../../../global/management/include/G4ios.hh.html#60" title="std::endl" data-ref="_M/G4endl">G4endl</a>;</td></tr>
+<tr><th id="777">777</th><td>  }</td></tr>
+<tr><th id="778">778</th><td>  </td></tr>
+<tr><th id="779">779</th><td>  <b>if</b> (!<a class="member" href="../include/G4CascadeInterface.hh.html#G4CascadeInterface::balance" title='G4CascadeInterface::balance' data-ref="G4CascadeInterface::balance">balance</a>-&gt;<a class="ref" href="../include/G4CascadeCheckBalance.hh.html#_ZNK21G4CascadeCheckBalance12momentumOkayEv" title='G4CascadeCheckBalance::momentumOkay' data-ref="_ZNK21G4CascadeCheckBalance12momentumOkayEv">momentumOkay</a>()) {</td></tr>
+<tr><th id="780">780</th><td>    <a class="local col4 ref" href="#54throwMsg" title='throwMsg' data-ref="54throwMsg">throwMsg</a> <a class="ref" href="../../../../../../global/management/include/G4String.hh.html#_ZN8G4StringpLEPKc" title='G4String::operator+=' data-ref="_ZN8G4StringpLEPKc">+=</a> <q>"Momentum"</q>;</td></tr>
+<tr><th id="781">781</th><td>    errInfo &lt;&lt; <q>" Momentum conservation violated by "</q> &lt;&lt; balance-&gt;deltaP()</td></tr>
+<tr><th id="782">782</th><td>	    &lt;&lt; <q>" GeV/c ("</q> &lt;&lt; balance-&gt;relativeP() &lt;&lt; <q>")"</q> &lt;&lt; <a class="macro" href="../../../../../../global/management/include/G4ios.hh.html#60" title="std::endl" data-ref="_M/G4endl">G4endl</a>;</td></tr>
+<tr><th id="783">783</th><td>  }</td></tr>
+<tr><th id="784">784</th><td>  </td></tr>
+<tr><th id="785">785</th><td>  <b>if</b> (!<a class="member" href="../include/G4CascadeInterface.hh.html#G4CascadeInterface::balance" title='G4CascadeInterface::balance' data-ref="G4CascadeInterface::balance">balance</a>-&gt;<a class="ref" href="../include/G4CascadeCheckBalance.hh.html#_ZNK21G4CascadeCheckBalance10baryonOkayEv" title='G4CascadeCheckBalance::baryonOkay' data-ref="_ZNK21G4CascadeCheckBalance10baryonOkayEv">baryonOkay</a>()) {</td></tr>
+<tr><th id="786">786</th><td>    <a class="local col4 ref" href="#54throwMsg" title='throwMsg' data-ref="54throwMsg">throwMsg</a> <a class="ref" href="../../../../../../global/management/include/G4String.hh.html#_ZN8G4StringpLEPKc" title='G4String::operator+=' data-ref="_ZN8G4StringpLEPKc">+=</a> <q>"Baryon number"</q>;</td></tr>
+<tr><th id="787">787</th><td>    errInfo &lt;&lt; <q>" Baryon number violated by "</q> &lt;&lt; balance-&gt;deltaB() &lt;&lt; <a class="macro" href="../../../../../../global/management/include/G4ios.hh.html#60" title="std::endl" data-ref="_M/G4endl">G4endl</a>;</td></tr>
+<tr><th id="788">788</th><td>  }</td></tr>
+<tr><th id="789">789</th><td>  </td></tr>
+<tr><th id="790">790</th><td>  <b>if</b> (!<a class="member" href="../include/G4CascadeInterface.hh.html#G4CascadeInterface::balance" title='G4CascadeInterface::balance' data-ref="G4CascadeInterface::balance">balance</a>-&gt;<a class="ref" href="../include/G4CascadeCheckBalance.hh.html#_ZNK21G4CascadeCheckBalance10chargeOkayEv" title='G4CascadeCheckBalance::chargeOkay' data-ref="_ZNK21G4CascadeCheckBalance10chargeOkayEv">chargeOkay</a>()) {</td></tr>
+<tr><th id="791">791</th><td>    <a class="local col4 ref" href="#54throwMsg" title='throwMsg' data-ref="54throwMsg">throwMsg</a> <a class="ref" href="../../../../../../global/management/include/G4String.hh.html#_ZN8G4StringpLEPKc" title='G4String::operator+=' data-ref="_ZN8G4StringpLEPKc">+=</a> <q>"Charge"</q>;</td></tr>
+<tr><th id="792">792</th><td>    errInfo &lt;&lt; <q>" Charge conservation violated by "</q> &lt;&lt; balance-&gt;deltaQ()</td></tr>
+<tr><th id="793">793</th><td>	    &lt;&lt; <a class="macro" href="../../../../../../global/management/include/G4ios.hh.html#60" title="std::endl" data-ref="_M/G4endl">G4endl</a>;</td></tr>
+<tr><th id="794">794</th><td>  }</td></tr>
+<tr><th id="795">795</th><td></td></tr>
+<tr><th id="796">796</th><td>  errInfo &lt;&lt; <q>" Final event output, for debugging:\n"</q></td></tr>
+<tr><th id="797">797</th><td>	 &lt;&lt; <q>" Bullet:  \n"</q> &lt;&lt; *bullet &lt;&lt; <a class="macro" href="../../../../../../global/management/include/G4ios.hh.html#60" title="std::endl" data-ref="_M/G4endl">G4endl</a></td></tr>
+<tr><th id="798">798</th><td>	 &lt;&lt; <q>" Target:  \n"</q> &lt;&lt; *target &lt;&lt; <a class="macro" href="../../../../../../global/management/include/G4ios.hh.html#60" title="std::endl" data-ref="_M/G4endl">G4endl</a>;</td></tr>
+<tr><th id="799">799</th><td>  output-&gt;printCollisionOutput(errInfo);</td></tr>
+<tr><th id="800">800</th><td>  </td></tr>
+<tr><th id="801">801</th><td>  <a class="local col4 ref" href="#54throwMsg" title='throwMsg' data-ref="54throwMsg">throwMsg</a> <a class="ref" href="../../../../../../global/management/include/G4String.hh.html#_ZN8G4StringpLEPKc" title='G4String::operator+=' data-ref="_ZN8G4StringpLEPKc">+=</a> <q>" non-conservation. More info in output."</q>;</td></tr>
+<tr><th id="802">802</th><td>  <b>throw</b> <a class="type" href="../../../../util/include/G4HadronicException.hh.html#G4HadronicException" title='G4HadronicException' data-ref="G4HadronicException">G4HadronicException</a><a class="ref" href="../../../../util/include/G4HadronicException.hh.html#_ZN19G4HadronicExceptionC1E8G4StringiS0_" title='G4HadronicException::G4HadronicException' data-ref="_ZN19G4HadronicExceptionC1E8G4StringiS0_">(</a><span class="macro" title="&quot;/home/jishin/app/geant4/1005p1/geant4.10.05.p01/source/processes/hadronic/models/cascade/cascade/src/G4CascadeInterface.cc&quot;" data-ref="_M/__FILE__">__FILE__</span>, <span class="macro" title="802" data-ref="_M/__LINE__">__LINE__</span>, <a class="ref fake" href="../../../../../../global/management/include/G4String.hh.html#_ZN8G4StringC1ERKS_" title='G4String::G4String' data-ref="_ZN8G4StringC1ERKS_"></a><a class="local col4 ref" href="#54throwMsg" title='throwMsg' data-ref="54throwMsg">throwMsg</a>);   <i>// Job ends here!</i></td></tr>
+<tr><th id="803">803</th><td>}</td></tr>
+<tr><th id="804">804</th><td></td></tr>
+</table><hr/><p id='footer'>
+Generated on <em>2019-Aug-28</em> from project codebrowser<br />Powered by <a href='https://woboq.com'><img alt='Woboq' src='https://code.woboq.org/woboq-16.png' width='41' height='16' /></a> <a href='https://code.woboq.org'>Code Browser</a> 2.1
+<br/>Generator usage only permitted with license.</p>
+</div></body></html>

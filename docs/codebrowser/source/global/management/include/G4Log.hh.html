@@ -1,0 +1,368 @@
+<!doctype html>
+<html>
+<head>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"><title>G4Log.hh source code [codebrowser/source/global/management/include/G4Log.hh] - Woboq Code Browser</title>
+<meta name="woboq:interestingDefinitions" content="G4LogConsts::ieee754 "/>
+<link rel="stylesheet" href="../../../../../../data/qtcreator.css" title="QtCreator"/>
+<link rel="alternate stylesheet" href="../../../../../../data/kdevelop.css" title="KDevelop"/>
+<script type="text/javascript" src="../../../../../../data/jquery/jquery.min.js"></script>
+<script type="text/javascript" src="../../../../../../data/jquery/jquery-ui.min.js"></script>
+<script>var file = 'codebrowser/source/global/management/include/G4Log.hh'; var root_path = '../../../../..'; var data_path = '../../../../../../data';</script>
+<script src='../../../../../../data/codebrowser.js'></script>
+</head>
+<body><div id='header'><h1 id='breadcrumb'><span>Browse the source code of </span><a href='../../../..'>codebrowser</a>/<a href='../../..'>source</a>/<a href='../..'>global</a>/<a href='..'>management</a>/<a href='./'>include</a>/<a href='G4Log.hh.html'>G4Log.hh</a></h1></div>
+<hr/><div id='content'><table class="code">
+<tr><th id="1">1</th><td><i>//</i></td></tr>
+<tr><th id="2">2</th><td><i>// ********************************************************************</i></td></tr>
+<tr><th id="3">3</th><td><i>// * License and Disclaimer                                           *</i></td></tr>
+<tr><th id="4">4</th><td><i>// *                                                                  *</i></td></tr>
+<tr><th id="5">5</th><td><i>// * The  Geant4 software  is  copyright of the Copyright Holders  of *</i></td></tr>
+<tr><th id="6">6</th><td><i>// * the Geant4 Collaboration.  It is provided  under  the terms  and *</i></td></tr>
+<tr><th id="7">7</th><td><i>// * conditions of the Geant4 Software License,  included in the file *</i></td></tr>
+<tr><th id="8">8</th><td><i>// * LICENSE and available at  <a href="http://cern.ch/geant4/license">http://cern.ch/geant4/license</a> .  These *</i></td></tr>
+<tr><th id="9">9</th><td><i>// * include a list of copyright holders.                             *</i></td></tr>
+<tr><th id="10">10</th><td><i>// *                                                                  *</i></td></tr>
+<tr><th id="11">11</th><td><i>// * Neither the authors of this software system, nor their employing *</i></td></tr>
+<tr><th id="12">12</th><td><i>// * institutes,nor the agencies providing financial support for this *</i></td></tr>
+<tr><th id="13">13</th><td><i>// * work  make  any representation or  warranty, express or implied, *</i></td></tr>
+<tr><th id="14">14</th><td><i>// * regarding  this  software system or assume any liability for its *</i></td></tr>
+<tr><th id="15">15</th><td><i>// * use.  Please see the license in the file  LICENSE  and URL above *</i></td></tr>
+<tr><th id="16">16</th><td><i>// * for the full disclaimer and the limitation of liability.         *</i></td></tr>
+<tr><th id="17">17</th><td><i>// *                                                                  *</i></td></tr>
+<tr><th id="18">18</th><td><i>// * This  code  implementation is the result of  the  scientific and *</i></td></tr>
+<tr><th id="19">19</th><td><i>// * technical work of the GEANT4 collaboration.                      *</i></td></tr>
+<tr><th id="20">20</th><td><i>// * By using,  copying,  modifying or  distributing the software (or *</i></td></tr>
+<tr><th id="21">21</th><td><i>// * any work based  on the software)  you  agree  to acknowledge its *</i></td></tr>
+<tr><th id="22">22</th><td><i>// * use  in  resulting  scientific  publications,  and indicate your *</i></td></tr>
+<tr><th id="23">23</th><td><i>// * acceptance of all terms of the Geant4 Software license.          *</i></td></tr>
+<tr><th id="24">24</th><td><i>// ********************************************************************</i></td></tr>
+<tr><th id="25">25</th><td><i>//</i></td></tr>
+<tr><th id="26">26</th><td><i>//</i></td></tr>
+<tr><th id="27">27</th><td><i>//</i></td></tr>
+<tr><th id="28">28</th><td><i>//</i></td></tr>
+<tr><th id="29">29</th><td><i>// --------------------------------------------------------------------</i></td></tr>
+<tr><th id="30">30</th><td><i>//</i></td></tr>
+<tr><th id="31">31</th><td><i>// Class Description:</i></td></tr>
+<tr><th id="32">32</th><td><i>//</i></td></tr>
+<tr><th id="33">33</th><td><i>//</i></td></tr>
+<tr><th id="34">34</th><td><i>// The basic idea is to exploit Pade polynomials.</i></td></tr>
+<tr><th id="35">35</th><td><i>// A lot of ideas were inspired by the cephes math library</i></td></tr>
+<tr><th id="36">36</th><td><i>// (by Stephen L. Moshier moshier@na-net.ornl.gov) as well as actual code. </i></td></tr>
+<tr><th id="37">37</th><td><i>// The Cephes library can be found here:  <a href="http://www.netlib.org/cephes/">http://www.netlib.org/cephes/</a></i></td></tr>
+<tr><th id="38">38</th><td><i>// Code and algorithms for G4Exp have been extracted and adapted for Geant4</i></td></tr>
+<tr><th id="39">39</th><td><i>// from the original implementation in the VDT mathematical library</i></td></tr>
+<tr><th id="40">40</th><td><i>// (<a href="https://svnweb.cern.ch/trac/vdt),">https://svnweb.cern.ch/trac/vdt),</a> version 0.3.7.</i></td></tr>
+<tr><th id="41">41</th><td><i></i></td></tr>
+<tr><th id="42">42</th><td><i>// Original implementation created on: Jun 23, 2012</i></td></tr>
+<tr><th id="43">43</th><td><i>//      Author: Danilo Piparo, Thomas Hauth, Vincenzo Innocente</i></td></tr>
+<tr><th id="44">44</th><td><i>//</i></td></tr>
+<tr><th id="45">45</th><td><i>// --------------------------------------------------------------------</i></td></tr>
+<tr><th id="46">46</th><td><i>/* </i></td></tr>
+<tr><th id="47">47</th><td><i> * VDT is free software: you can redistribute it and/or modify</i></td></tr>
+<tr><th id="48">48</th><td><i> * it under the terms of the GNU Lesser Public License as published by</i></td></tr>
+<tr><th id="49">49</th><td><i> * the Free Software Foundation, either version 3 of the License, or</i></td></tr>
+<tr><th id="50">50</th><td><i> * (at your option) any later version.</i></td></tr>
+<tr><th id="51">51</th><td><i> * </i></td></tr>
+<tr><th id="52">52</th><td><i> * This program is distributed in the hope that it will be useful,</i></td></tr>
+<tr><th id="53">53</th><td><i> * but WITHOUT ANY WARRANTY; without even the implied warranty of</i></td></tr>
+<tr><th id="54">54</th><td><i> * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the</i></td></tr>
+<tr><th id="55">55</th><td><i> * GNU Lesser Public License for more details.</i></td></tr>
+<tr><th id="56">56</th><td><i> * </i></td></tr>
+<tr><th id="57">57</th><td><i> * You should have received a copy of the GNU Lesser Public License</i></td></tr>
+<tr><th id="58">58</th><td><i> * along with this program.  If not, see &lt;<a href="http://www.gnu.org/licenses/">http://www.gnu.org/licenses/</a>&gt;.</i></td></tr>
+<tr><th id="59">59</th><td><i> */</i></td></tr>
+<tr><th id="60">60</th><td><i>// --------------------------------------------------------------------</i></td></tr>
+<tr><th id="61">61</th><td><u>#<span data-ppcond="61">ifndef</span> <span class="macro" data-ref="_M/G4Log_h">G4Log_h</span></u></td></tr>
+<tr><th id="62">62</th><td><u>#define <dfn class="macro" id="_M/G4Log_h" data-ref="_M/G4Log_h">G4Log_h</dfn> 1</u></td></tr>
+<tr><th id="63">63</th><td></td></tr>
+<tr><th id="64">64</th><td><u>#<span data-ppcond="64">ifdef</span> <span class="macro" data-ref="_M/WIN32">WIN32</span></u></td></tr>
+<tr><th id="65">65</th><td></td></tr>
+<tr><th id="66">66</th><td>  <u>#define G4Log std::log</u></td></tr>
+<tr><th id="67">67</th><td></td></tr>
+<tr><th id="68">68</th><td><u>#<span data-ppcond="64">else</span></u></td></tr>
+<tr><th id="69">69</th><td></td></tr>
+<tr><th id="70">70</th><td><u>#include <span class='error' title="&apos;limits&apos; file not found">&lt;</span>limits&gt;</u></td></tr>
+<tr><th id="71">71</th><td><u>#include &lt;stdint.h&gt;</u></td></tr>
+<tr><th id="72">72</th><td><u>#include <a href="G4Types.hh.html">"G4Types.hh"</a></u></td></tr>
+<tr><th id="73">73</th><td></td></tr>
+<tr><th id="74">74</th><td><i>// local namespace for the constants/functions which are necessary only here</i></td></tr>
+<tr><th id="75">75</th><td><i>//</i></td></tr>
+<tr><th id="76">76</th><td><b>namespace</b> <span class="namespace">G4LogConsts</span></td></tr>
+<tr><th id="77">77</th><td>{</td></tr>
+<tr><th id="78">78</th><td>  <em>const</em> <a class="typedef" href="G4Types.hh.html#G4double" title='G4double' data-type='double' data-ref="G4double">G4double</a> <dfn class="decl def" id="G4LogConsts::LOG_UPPER_LIMIT" title='G4LogConsts::LOG_UPPER_LIMIT' data-ref="G4LogConsts::LOG_UPPER_LIMIT">LOG_UPPER_LIMIT</dfn> = <var>1e307</var>;</td></tr>
+<tr><th id="79">79</th><td>  <em>const</em> <a class="typedef" href="G4Types.hh.html#G4double" title='G4double' data-type='double' data-ref="G4double">G4double</a> <dfn class="decl def" id="G4LogConsts::LOG_LOWER_LIMIT" title='G4LogConsts::LOG_LOWER_LIMIT' data-ref="G4LogConsts::LOG_LOWER_LIMIT">LOG_LOWER_LIMIT</dfn> = <var>0</var>;</td></tr>
+<tr><th id="80">80</th><td></td></tr>
+<tr><th id="81">81</th><td>  <em>const</em> <a class="typedef" href="G4Types.hh.html#G4double" title='G4double' data-type='double' data-ref="G4double">G4double</a> <dfn class="decl def" id="G4LogConsts::SQRTH" title='G4LogConsts::SQRTH' data-ref="G4LogConsts::SQRTH">SQRTH</dfn> = <var>0.70710678118654752440</var>;</td></tr>
+<tr><th id="82">82</th><td>  <em>const</em> <a class="typedef" href="G4Types.hh.html#G4float" title='G4float' data-type='float' data-ref="G4float">G4float</a> <dfn class="decl def" id="G4LogConsts::MAXNUMF" title='G4LogConsts::MAXNUMF' data-ref="G4LogConsts::MAXNUMF">MAXNUMF</dfn> = <var>3.4028234663852885981170418348451692544e38f</var>;</td></tr>
+<tr><th id="83">83</th><td></td></tr>
+<tr><th id="84">84</th><td>  <i>//----------------------------------------------------------------------------</i></td></tr>
+<tr><th id="85">85</th><td><i>  // Used to switch between different type of interpretations of the data</i></td></tr>
+<tr><th id="86">86</th><td><i>  // (64 bits)</i></td></tr>
+<tr><th id="87">87</th><td><i>  //</i></td></tr>
+<tr><th id="88">88</th><td>  <b>union</b> <dfn class="type def" id="G4LogConsts::ieee754" title='G4LogConsts::ieee754' data-ref="G4LogConsts::ieee754">ieee754</dfn></td></tr>
+<tr><th id="89">89</th><td>  {</td></tr>
+<tr><th id="90">90</th><td>	<dfn class="decl def" id="_ZN11G4LogConsts7ieee754C1Ev" title='G4LogConsts::ieee754::ieee754' data-ref="_ZN11G4LogConsts7ieee754C1Ev">ieee754</dfn> () {};</td></tr>
+<tr><th id="91">91</th><td>	<dfn class="decl def" id="_ZN11G4LogConsts7ieee754C1Ed" title='G4LogConsts::ieee754::ieee754' data-ref="_ZN11G4LogConsts7ieee754C1Ed">ieee754</dfn> (<a class="typedef" href="G4Types.hh.html#G4double" title='G4double' data-type='double' data-ref="G4double">G4double</a> <dfn class="local col4 decl" id="994thed" title='thed' data-type='G4double' data-ref="994thed">thed</dfn>) {<a class="member" href="#G4LogConsts::ieee754::d" title='G4LogConsts::ieee754::d' data-ref="G4LogConsts::ieee754::d">d</a>=<a class="local col4 ref" href="#994thed" title='thed' data-ref="994thed">thed</a>;};</td></tr>
+<tr><th id="92">92</th><td>	<dfn class="decl def" id="_ZN11G4LogConsts7ieee754C1Em" title='G4LogConsts::ieee754::ieee754' data-ref="_ZN11G4LogConsts7ieee754C1Em">ieee754</dfn> (<span class='typedef' title='uint64_t' data-type='unsigned long' data-ref="uint64_t">uint64_t</span> <dfn class="local col5 decl" id="995thell" title='thell' data-type='uint64_t' data-ref="995thell">thell</dfn>) {<a class="member" href="#G4LogConsts::ieee754::ll" title='G4LogConsts::ieee754::ll' data-ref="G4LogConsts::ieee754::ll">ll</a>=<a class="local col5 ref" href="#995thell" title='thell' data-ref="995thell">thell</a>;};</td></tr>
+<tr><th id="93">93</th><td>	<dfn class="decl def" id="_ZN11G4LogConsts7ieee754C1Ef" title='G4LogConsts::ieee754::ieee754' data-ref="_ZN11G4LogConsts7ieee754C1Ef">ieee754</dfn> (<a class="typedef" href="G4Types.hh.html#G4float" title='G4float' data-type='float' data-ref="G4float">G4float</a> <dfn class="local col6 decl" id="996thef" title='thef' data-type='G4float' data-ref="996thef">thef</dfn>) {<a class="member" href="#G4LogConsts::ieee754::f" title='G4LogConsts::ieee754::f' data-ref="G4LogConsts::ieee754::f">f</a>[<var>0</var>]=<a class="local col6 ref" href="#996thef" title='thef' data-ref="996thef">thef</a>;};</td></tr>
+<tr><th id="94">94</th><td>	<dfn class="decl def" id="_ZN11G4LogConsts7ieee754C1Ej" title='G4LogConsts::ieee754::ieee754' data-ref="_ZN11G4LogConsts7ieee754C1Ej">ieee754</dfn> (<span class='typedef' title='uint32_t' data-type='unsigned int' data-ref="uint32_t">uint32_t</span> <dfn class="local col7 decl" id="997thei" title='thei' data-type='uint32_t' data-ref="997thei">thei</dfn>) {<a class="member" href="#G4LogConsts::ieee754::i" title='G4LogConsts::ieee754::i' data-ref="G4LogConsts::ieee754::i">i</a>[<var>0</var>]=<a class="local col7 ref" href="#997thei" title='thei' data-ref="997thei">thei</a>;};</td></tr>
+<tr><th id="95">95</th><td>    <a class="typedef" href="G4Types.hh.html#G4double" title='G4double' data-type='double' data-ref="G4double">G4double</a> <dfn class="decl" id="G4LogConsts::ieee754::d" title='G4LogConsts::ieee754::d' data-ref="G4LogConsts::ieee754::d">d</dfn>;</td></tr>
+<tr><th id="96">96</th><td>    <a class="typedef" href="G4Types.hh.html#G4float" title='G4float' data-type='float' data-ref="G4float">G4float</a> <dfn class="decl" id="G4LogConsts::ieee754::f" title='G4LogConsts::ieee754::f' data-ref="G4LogConsts::ieee754::f">f</dfn>[<var>2</var>];</td></tr>
+<tr><th id="97">97</th><td>    <span class='typedef' title='uint32_t' data-type='unsigned int' data-ref="uint32_t">uint32_t</span> <dfn class="decl" id="G4LogConsts::ieee754::i" title='G4LogConsts::ieee754::i' data-ref="G4LogConsts::ieee754::i">i</dfn>[<var>2</var>];</td></tr>
+<tr><th id="98">98</th><td>    <span class='typedef' title='uint64_t' data-type='unsigned long' data-ref="uint64_t">uint64_t</span> <dfn class="decl" id="G4LogConsts::ieee754::ll" title='G4LogConsts::ieee754::ll' data-ref="G4LogConsts::ieee754::ll">ll</dfn>;</td></tr>
+<tr><th id="99">99</th><td>    <span class='typedef' title='uint16_t' data-type='unsigned short' data-ref="uint16_t">uint16_t</span> <dfn class="decl" id="G4LogConsts::ieee754::s" title='G4LogConsts::ieee754::s' data-ref="G4LogConsts::ieee754::s">s</dfn>[<var>4</var>];</td></tr>
+<tr><th id="100">100</th><td>  };</td></tr>
+<tr><th id="101">101</th><td></td></tr>
+<tr><th id="102">102</th><td>  <b>inline</b> <a class="typedef" href="G4Types.hh.html#G4double" title='G4double' data-type='double' data-ref="G4double">G4double</a> <dfn class="decl def" id="_ZN11G4LogConsts10get_log_pxEd" title='G4LogConsts::get_log_px' data-ref="_ZN11G4LogConsts10get_log_pxEd">get_log_px</dfn>(<em>const</em> <a class="typedef" href="G4Types.hh.html#G4double" title='G4double' data-type='double' data-ref="G4double">G4double</a> <dfn class="local col8 decl" id="998x" title='x' data-type='const G4double' data-ref="998x">x</dfn>)</td></tr>
+<tr><th id="103">103</th><td>  {</td></tr>
+<tr><th id="104">104</th><td>        <em>const</em> <a class="typedef" href="G4Types.hh.html#G4double" title='G4double' data-type='double' data-ref="G4double">G4double</a> <dfn class="local col9 decl" id="999PX1log" title='PX1log' data-type='const G4double' data-ref="999PX1log">PX1log</dfn> = <var>1.01875663804580931796E-4</var>;</td></tr>
+<tr><th id="105">105</th><td>        <em>const</em> <a class="typedef" href="G4Types.hh.html#G4double" title='G4double' data-type='double' data-ref="G4double">G4double</a> <dfn class="local col0 decl" id="1000PX2log" title='PX2log' data-type='const G4double' data-ref="1000PX2log">PX2log</dfn> = <var>4.97494994976747001425E-1</var>;</td></tr>
+<tr><th id="106">106</th><td>        <em>const</em> <a class="typedef" href="G4Types.hh.html#G4double" title='G4double' data-type='double' data-ref="G4double">G4double</a> <dfn class="local col1 decl" id="1001PX3log" title='PX3log' data-type='const G4double' data-ref="1001PX3log">PX3log</dfn> = <var>4.70579119878881725854E0</var>;</td></tr>
+<tr><th id="107">107</th><td>        <em>const</em> <a class="typedef" href="G4Types.hh.html#G4double" title='G4double' data-type='double' data-ref="G4double">G4double</a> <dfn class="local col2 decl" id="1002PX4log" title='PX4log' data-type='const G4double' data-ref="1002PX4log">PX4log</dfn> = <var>1.44989225341610930846E1</var>;</td></tr>
+<tr><th id="108">108</th><td>        <em>const</em> <a class="typedef" href="G4Types.hh.html#G4double" title='G4double' data-type='double' data-ref="G4double">G4double</a> <dfn class="local col3 decl" id="1003PX5log" title='PX5log' data-type='const G4double' data-ref="1003PX5log">PX5log</dfn> = <var>1.79368678507819816313E1</var>;</td></tr>
+<tr><th id="109">109</th><td>        <em>const</em> <a class="typedef" href="G4Types.hh.html#G4double" title='G4double' data-type='double' data-ref="G4double">G4double</a> <dfn class="local col4 decl" id="1004PX6log" title='PX6log' data-type='const G4double' data-ref="1004PX6log">PX6log</dfn> = <var>7.70838733755885391666E0</var>;</td></tr>
+<tr><th id="110">110</th><td></td></tr>
+<tr><th id="111">111</th><td>        <a class="typedef" href="G4Types.hh.html#G4double" title='G4double' data-type='double' data-ref="G4double">G4double</a> <dfn class="local col5 decl" id="1005px" title='px' data-type='G4double' data-ref="1005px">px</dfn> = <a class="local col9 ref" href="#999PX1log" title='PX1log' data-ref="999PX1log">PX1log</a>;</td></tr>
+<tr><th id="112">112</th><td>        <a class="local col5 ref" href="#1005px" title='px' data-ref="1005px">px</a> *= <a class="local col8 ref" href="#998x" title='x' data-ref="998x">x</a>;</td></tr>
+<tr><th id="113">113</th><td>        <a class="local col5 ref" href="#1005px" title='px' data-ref="1005px">px</a> += <a class="local col0 ref" href="#1000PX2log" title='PX2log' data-ref="1000PX2log">PX2log</a>;</td></tr>
+<tr><th id="114">114</th><td>        <a class="local col5 ref" href="#1005px" title='px' data-ref="1005px">px</a> *= <a class="local col8 ref" href="#998x" title='x' data-ref="998x">x</a>;</td></tr>
+<tr><th id="115">115</th><td>        <a class="local col5 ref" href="#1005px" title='px' data-ref="1005px">px</a> += <a class="local col1 ref" href="#1001PX3log" title='PX3log' data-ref="1001PX3log">PX3log</a>;</td></tr>
+<tr><th id="116">116</th><td>        <a class="local col5 ref" href="#1005px" title='px' data-ref="1005px">px</a> *= <a class="local col8 ref" href="#998x" title='x' data-ref="998x">x</a>;</td></tr>
+<tr><th id="117">117</th><td>        <a class="local col5 ref" href="#1005px" title='px' data-ref="1005px">px</a> += <a class="local col2 ref" href="#1002PX4log" title='PX4log' data-ref="1002PX4log">PX4log</a>;</td></tr>
+<tr><th id="118">118</th><td>        <a class="local col5 ref" href="#1005px" title='px' data-ref="1005px">px</a> *= <a class="local col8 ref" href="#998x" title='x' data-ref="998x">x</a>;</td></tr>
+<tr><th id="119">119</th><td>        <a class="local col5 ref" href="#1005px" title='px' data-ref="1005px">px</a> += <a class="local col3 ref" href="#1003PX5log" title='PX5log' data-ref="1003PX5log">PX5log</a>;</td></tr>
+<tr><th id="120">120</th><td>        <a class="local col5 ref" href="#1005px" title='px' data-ref="1005px">px</a> *= <a class="local col8 ref" href="#998x" title='x' data-ref="998x">x</a>;</td></tr>
+<tr><th id="121">121</th><td>        <a class="local col5 ref" href="#1005px" title='px' data-ref="1005px">px</a> += <a class="local col4 ref" href="#1004PX6log" title='PX6log' data-ref="1004PX6log">PX6log</a>;</td></tr>
+<tr><th id="122">122</th><td>        <b>return</b> <a class="local col5 ref" href="#1005px" title='px' data-ref="1005px">px</a>;</td></tr>
+<tr><th id="123">123</th><td>  }</td></tr>
+<tr><th id="124">124</th><td></td></tr>
+<tr><th id="125">125</th><td>  <b>inline</b> <a class="typedef" href="G4Types.hh.html#G4double" title='G4double' data-type='double' data-ref="G4double">G4double</a> <dfn class="decl def" id="_ZN11G4LogConsts10get_log_qxEd" title='G4LogConsts::get_log_qx' data-ref="_ZN11G4LogConsts10get_log_qxEd">get_log_qx</dfn>(<em>const</em> <a class="typedef" href="G4Types.hh.html#G4double" title='G4double' data-type='double' data-ref="G4double">G4double</a> <dfn class="local col6 decl" id="1006x" title='x' data-type='const G4double' data-ref="1006x">x</dfn>)</td></tr>
+<tr><th id="126">126</th><td>  {</td></tr>
+<tr><th id="127">127</th><td>        <em>const</em> <a class="typedef" href="G4Types.hh.html#G4double" title='G4double' data-type='double' data-ref="G4double">G4double</a> <dfn class="local col7 decl" id="1007QX1log" title='QX1log' data-type='const G4double' data-ref="1007QX1log">QX1log</dfn> = <var>1.12873587189167450590E1</var>;</td></tr>
+<tr><th id="128">128</th><td>        <em>const</em> <a class="typedef" href="G4Types.hh.html#G4double" title='G4double' data-type='double' data-ref="G4double">G4double</a> <dfn class="local col8 decl" id="1008QX2log" title='QX2log' data-type='const G4double' data-ref="1008QX2log">QX2log</dfn> = <var>4.52279145837532221105E1</var>;</td></tr>
+<tr><th id="129">129</th><td>        <em>const</em> <a class="typedef" href="G4Types.hh.html#G4double" title='G4double' data-type='double' data-ref="G4double">G4double</a> <dfn class="local col9 decl" id="1009QX3log" title='QX3log' data-type='const G4double' data-ref="1009QX3log">QX3log</dfn> = <var>8.29875266912776603211E1</var>;</td></tr>
+<tr><th id="130">130</th><td>        <em>const</em> <a class="typedef" href="G4Types.hh.html#G4double" title='G4double' data-type='double' data-ref="G4double">G4double</a> <dfn class="local col0 decl" id="1010QX4log" title='QX4log' data-type='const G4double' data-ref="1010QX4log">QX4log</dfn> = <var>7.11544750618563894466E1</var>;</td></tr>
+<tr><th id="131">131</th><td>        <em>const</em> <a class="typedef" href="G4Types.hh.html#G4double" title='G4double' data-type='double' data-ref="G4double">G4double</a> <dfn class="local col1 decl" id="1011QX5log" title='QX5log' data-type='const G4double' data-ref="1011QX5log">QX5log</dfn> = <var>2.31251620126765340583E1</var>;</td></tr>
+<tr><th id="132">132</th><td></td></tr>
+<tr><th id="133">133</th><td>        <a class="typedef" href="G4Types.hh.html#G4double" title='G4double' data-type='double' data-ref="G4double">G4double</a> <dfn class="local col2 decl" id="1012qx" title='qx' data-type='G4double' data-ref="1012qx">qx</dfn> = <a class="local col6 ref" href="#1006x" title='x' data-ref="1006x">x</a>;</td></tr>
+<tr><th id="134">134</th><td>        <a class="local col2 ref" href="#1012qx" title='qx' data-ref="1012qx">qx</a> += <a class="local col7 ref" href="#1007QX1log" title='QX1log' data-ref="1007QX1log">QX1log</a>;</td></tr>
+<tr><th id="135">135</th><td>        <a class="local col2 ref" href="#1012qx" title='qx' data-ref="1012qx">qx</a> *=<a class="local col6 ref" href="#1006x" title='x' data-ref="1006x">x</a>;</td></tr>
+<tr><th id="136">136</th><td>        <a class="local col2 ref" href="#1012qx" title='qx' data-ref="1012qx">qx</a> += <a class="local col8 ref" href="#1008QX2log" title='QX2log' data-ref="1008QX2log">QX2log</a>;</td></tr>
+<tr><th id="137">137</th><td>        <a class="local col2 ref" href="#1012qx" title='qx' data-ref="1012qx">qx</a> *=<a class="local col6 ref" href="#1006x" title='x' data-ref="1006x">x</a>;</td></tr>
+<tr><th id="138">138</th><td>        <a class="local col2 ref" href="#1012qx" title='qx' data-ref="1012qx">qx</a> += <a class="local col9 ref" href="#1009QX3log" title='QX3log' data-ref="1009QX3log">QX3log</a>;</td></tr>
+<tr><th id="139">139</th><td>        <a class="local col2 ref" href="#1012qx" title='qx' data-ref="1012qx">qx</a> *=<a class="local col6 ref" href="#1006x" title='x' data-ref="1006x">x</a>;</td></tr>
+<tr><th id="140">140</th><td>        <a class="local col2 ref" href="#1012qx" title='qx' data-ref="1012qx">qx</a> += <a class="local col0 ref" href="#1010QX4log" title='QX4log' data-ref="1010QX4log">QX4log</a>;</td></tr>
+<tr><th id="141">141</th><td>        <a class="local col2 ref" href="#1012qx" title='qx' data-ref="1012qx">qx</a> *=<a class="local col6 ref" href="#1006x" title='x' data-ref="1006x">x</a>;</td></tr>
+<tr><th id="142">142</th><td>        <a class="local col2 ref" href="#1012qx" title='qx' data-ref="1012qx">qx</a> += <a class="local col1 ref" href="#1011QX5log" title='QX5log' data-ref="1011QX5log">QX5log</a>;</td></tr>
+<tr><th id="143">143</th><td>        <b>return</b> <a class="local col2 ref" href="#1012qx" title='qx' data-ref="1012qx">qx</a>;</td></tr>
+<tr><th id="144">144</th><td>  }</td></tr>
+<tr><th id="145">145</th><td></td></tr>
+<tr><th id="146">146</th><td>  <i>//----------------------------------------------------------------------------</i></td></tr>
+<tr><th id="147">147</th><td><i>  // Converts a double to an unsigned long long</i></td></tr>
+<tr><th id="148">148</th><td><i>  //</i></td></tr>
+<tr><th id="149">149</th><td>  <b>inline</b> <span class='typedef' title='uint64_t' data-type='unsigned long' data-ref="uint64_t">uint64_t</span> <dfn class="decl def" id="_ZN11G4LogConsts9dp2uint64Ed" title='G4LogConsts::dp2uint64' data-ref="_ZN11G4LogConsts9dp2uint64Ed">dp2uint64</dfn>(<a class="typedef" href="G4Types.hh.html#G4double" title='G4double' data-type='double' data-ref="G4double">G4double</a> <dfn class="local col3 decl" id="1013x" title='x' data-type='G4double' data-ref="1013x">x</dfn>)</td></tr>
+<tr><th id="150">150</th><td>  {</td></tr>
+<tr><th id="151">151</th><td>    <a class="type" href="#G4LogConsts::ieee754" title='G4LogConsts::ieee754' data-ref="G4LogConsts::ieee754">ieee754</a> <a class="ref fake" href="#_ZN11G4LogConsts7ieee754C1Ev" title='G4LogConsts::ieee754::ieee754' data-ref="_ZN11G4LogConsts7ieee754C1Ev"></a><dfn class="local col4 decl" id="1014tmp" title='tmp' data-type='G4LogConsts::ieee754' data-ref="1014tmp">tmp</dfn>;</td></tr>
+<tr><th id="152">152</th><td>    <a class="local col4 ref" href="#1014tmp" title='tmp' data-ref="1014tmp">tmp</a>.<a class="ref" href="#G4LogConsts::ieee754::d" title='G4LogConsts::ieee754::d' data-ref="G4LogConsts::ieee754::d">d</a>=<a class="local col3 ref" href="#1013x" title='x' data-ref="1013x">x</a>;</td></tr>
+<tr><th id="153">153</th><td>    <b>return</b> <a class="local col4 ref" href="#1014tmp" title='tmp' data-ref="1014tmp">tmp</a>.<a class="ref" href="#G4LogConsts::ieee754::ll" title='G4LogConsts::ieee754::ll' data-ref="G4LogConsts::ieee754::ll">ll</a>;</td></tr>
+<tr><th id="154">154</th><td>  }</td></tr>
+<tr><th id="155">155</th><td></td></tr>
+<tr><th id="156">156</th><td>  <i>//----------------------------------------------------------------------------</i></td></tr>
+<tr><th id="157">157</th><td><i>  // Converts an unsigned long long to a double</i></td></tr>
+<tr><th id="158">158</th><td><i>  //</i></td></tr>
+<tr><th id="159">159</th><td>  <b>inline</b> <a class="typedef" href="G4Types.hh.html#G4double" title='G4double' data-type='double' data-ref="G4double">G4double</a> <dfn class="decl def" id="_ZN11G4LogConsts9uint642dpEm" title='G4LogConsts::uint642dp' data-ref="_ZN11G4LogConsts9uint642dpEm">uint642dp</dfn>(<span class='typedef' title='uint64_t' data-type='unsigned long' data-ref="uint64_t">uint64_t</span> <dfn class="local col5 decl" id="1015ll" title='ll' data-type='uint64_t' data-ref="1015ll">ll</dfn>)</td></tr>
+<tr><th id="160">160</th><td>  {</td></tr>
+<tr><th id="161">161</th><td>    <a class="type" href="#G4LogConsts::ieee754" title='G4LogConsts::ieee754' data-ref="G4LogConsts::ieee754">ieee754</a> <a class="ref fake" href="#_ZN11G4LogConsts7ieee754C1Ev" title='G4LogConsts::ieee754::ieee754' data-ref="_ZN11G4LogConsts7ieee754C1Ev"></a><dfn class="local col6 decl" id="1016tmp" title='tmp' data-type='G4LogConsts::ieee754' data-ref="1016tmp">tmp</dfn>;</td></tr>
+<tr><th id="162">162</th><td>    <a class="local col6 ref" href="#1016tmp" title='tmp' data-ref="1016tmp">tmp</a>.<a class="ref" href="#G4LogConsts::ieee754::ll" title='G4LogConsts::ieee754::ll' data-ref="G4LogConsts::ieee754::ll">ll</a>=<a class="local col5 ref" href="#1015ll" title='ll' data-ref="1015ll">ll</a>;</td></tr>
+<tr><th id="163">163</th><td>    <b>return</b> <a class="local col6 ref" href="#1016tmp" title='tmp' data-ref="1016tmp">tmp</a>.<a class="ref" href="#G4LogConsts::ieee754::d" title='G4LogConsts::ieee754::d' data-ref="G4LogConsts::ieee754::d">d</a>;</td></tr>
+<tr><th id="164">164</th><td>  }</td></tr>
+<tr><th id="165">165</th><td></td></tr>
+<tr><th id="166">166</th><td>  <i>//----------------------------------------------------------------------------</i></td></tr>
+<tr><th id="167">167</th><td><i>  // Converts an int to a float</i></td></tr>
+<tr><th id="168">168</th><td><i>  //</i></td></tr>
+<tr><th id="169">169</th><td>  <b>inline</b> <a class="typedef" href="G4Types.hh.html#G4float" title='G4float' data-type='float' data-ref="G4float">G4float</a> <dfn class="decl def" id="_ZN11G4LogConsts9uint322spEi" title='G4LogConsts::uint322sp' data-ref="_ZN11G4LogConsts9uint322spEi">uint322sp</dfn>(<a class="typedef" href="G4Types.hh.html#G4int" title='G4int' data-type='int' data-ref="G4int">G4int</a> <dfn class="local col7 decl" id="1017x" title='x' data-type='G4int' data-ref="1017x">x</dfn>)</td></tr>
+<tr><th id="170">170</th><td>  {</td></tr>
+<tr><th id="171">171</th><td>    <a class="type" href="#G4LogConsts::ieee754" title='G4LogConsts::ieee754' data-ref="G4LogConsts::ieee754">ieee754</a> <a class="ref fake" href="#_ZN11G4LogConsts7ieee754C1Ev" title='G4LogConsts::ieee754::ieee754' data-ref="_ZN11G4LogConsts7ieee754C1Ev"></a><dfn class="local col8 decl" id="1018tmp" title='tmp' data-type='G4LogConsts::ieee754' data-ref="1018tmp">tmp</dfn>;</td></tr>
+<tr><th id="172">172</th><td>    <a class="local col8 ref" href="#1018tmp" title='tmp' data-ref="1018tmp">tmp</a>.<a class="ref" href="#G4LogConsts::ieee754::i" title='G4LogConsts::ieee754::i' data-ref="G4LogConsts::ieee754::i">i</a>[<var>0</var>]=<a class="local col7 ref" href="#1017x" title='x' data-ref="1017x">x</a>;</td></tr>
+<tr><th id="173">173</th><td>    <b>return</b> <a class="local col8 ref" href="#1018tmp" title='tmp' data-ref="1018tmp">tmp</a>.<a class="ref" href="#G4LogConsts::ieee754::f" title='G4LogConsts::ieee754::f' data-ref="G4LogConsts::ieee754::f">f</a>[<var>0</var>];</td></tr>
+<tr><th id="174">174</th><td>  }</td></tr>
+<tr><th id="175">175</th><td></td></tr>
+<tr><th id="176">176</th><td>  <i>//----------------------------------------------------------------------------</i></td></tr>
+<tr><th id="177">177</th><td><i>  // Converts a float to an int</i></td></tr>
+<tr><th id="178">178</th><td><i>  //</i></td></tr>
+<tr><th id="179">179</th><td>  <b>inline</b> <span class='typedef' title='uint32_t' data-type='unsigned int' data-ref="uint32_t">uint32_t</span> <dfn class="decl def" id="_ZN11G4LogConsts9sp2uint32Ef" title='G4LogConsts::sp2uint32' data-ref="_ZN11G4LogConsts9sp2uint32Ef">sp2uint32</dfn>(<a class="typedef" href="G4Types.hh.html#G4float" title='G4float' data-type='float' data-ref="G4float">G4float</a> <dfn class="local col9 decl" id="1019x" title='x' data-type='G4float' data-ref="1019x">x</dfn>)</td></tr>
+<tr><th id="180">180</th><td>  {</td></tr>
+<tr><th id="181">181</th><td>    <a class="type" href="#G4LogConsts::ieee754" title='G4LogConsts::ieee754' data-ref="G4LogConsts::ieee754">ieee754</a> <a class="ref fake" href="#_ZN11G4LogConsts7ieee754C1Ev" title='G4LogConsts::ieee754::ieee754' data-ref="_ZN11G4LogConsts7ieee754C1Ev"></a><dfn class="local col0 decl" id="1020tmp" title='tmp' data-type='G4LogConsts::ieee754' data-ref="1020tmp">tmp</dfn>;</td></tr>
+<tr><th id="182">182</th><td>    <a class="local col0 ref" href="#1020tmp" title='tmp' data-ref="1020tmp">tmp</a>.<a class="ref" href="#G4LogConsts::ieee754::f" title='G4LogConsts::ieee754::f' data-ref="G4LogConsts::ieee754::f">f</a>[<var>0</var>]=<a class="local col9 ref" href="#1019x" title='x' data-ref="1019x">x</a>;</td></tr>
+<tr><th id="183">183</th><td>    <b>return</b> <a class="local col0 ref" href="#1020tmp" title='tmp' data-ref="1020tmp">tmp</a>.<a class="ref" href="#G4LogConsts::ieee754::i" title='G4LogConsts::ieee754::i' data-ref="G4LogConsts::ieee754::i">i</a>[<var>0</var>];</td></tr>
+<tr><th id="184">184</th><td>  }</td></tr>
+<tr><th id="185">185</th><td></td></tr>
+<tr><th id="186">186</th><td>  <i>//----------------------------------------------------------------------------</i></td></tr>
+<tr><th id="187">187</th><td><i>  /// Like frexp but vectorising and the exponent is a double.</i></td></tr>
+<tr><th id="188">188</th><td>  <b>inline</b> <a class="typedef" href="G4Types.hh.html#G4double" title='G4double' data-type='double' data-ref="G4double">G4double</a> <dfn class="decl def" id="_ZN11G4LogConsts15getMantExponentEdRd" title='G4LogConsts::getMantExponent' data-ref="_ZN11G4LogConsts15getMantExponentEdRd">getMantExponent</dfn>(<em>const</em> <a class="typedef" href="G4Types.hh.html#G4double" title='G4double' data-type='double' data-ref="G4double">G4double</a> <dfn class="local col1 decl" id="1021x" title='x' data-type='const G4double' data-ref="1021x">x</dfn>, <a class="typedef" href="G4Types.hh.html#G4double" title='G4double' data-type='double' data-ref="G4double">G4double</a> &amp; <dfn class="local col2 decl" id="1022fe" title='fe' data-type='G4double &amp;' data-ref="1022fe">fe</dfn>)</td></tr>
+<tr><th id="189">189</th><td>  {</td></tr>
+<tr><th id="190">190</th><td>    <span class='typedef' title='uint64_t' data-type='unsigned long' data-ref="uint64_t">uint64_t</span> <dfn class="local col3 decl" id="1023n" title='n' data-type='uint64_t' data-ref="1023n">n</dfn> = <a class="ref" href="#_ZN11G4LogConsts9dp2uint64Ed" title='G4LogConsts::dp2uint64' data-ref="_ZN11G4LogConsts9dp2uint64Ed">dp2uint64</a>(<a class="local col1 ref" href="#1021x" title='x' data-ref="1021x">x</a>);</td></tr>
+<tr><th id="191">191</th><td></td></tr>
+<tr><th id="192">192</th><td>    <i>// Shift to the right up to the beginning of the exponent.</i></td></tr>
+<tr><th id="193">193</th><td><i>    // Then with a mask, cut off the sign bit</i></td></tr>
+<tr><th id="194">194</th><td>    <span class='typedef' title='uint64_t' data-type='unsigned long' data-ref="uint64_t">uint64_t</span> <dfn class="local col4 decl" id="1024le" title='le' data-type='uint64_t' data-ref="1024le">le</dfn> = (<a class="local col3 ref" href="#1023n" title='n' data-ref="1023n">n</a> &gt;&gt; <var>52</var>);</td></tr>
+<tr><th id="195">195</th><td></td></tr>
+<tr><th id="196">196</th><td>    <i>// chop the head of the number: an int contains more than 11 bits (32)</i></td></tr>
+<tr><th id="197">197</th><td>    <span class='typedef' title='int32_t' data-type='int' data-ref="int32_t">int32_t</span> <dfn class="local col5 decl" id="1025e" title='e' data-type='int32_t' data-ref="1025e">e</dfn> = <a class="local col4 ref" href="#1024le" title='le' data-ref="1024le">le</a>; <i>// This is important since sums on uint64_t do not vectorise</i></td></tr>
+<tr><th id="198">198</th><td>    <a class="local col2 ref" href="#1022fe" title='fe' data-ref="1022fe">fe</a> = <a class="local col5 ref" href="#1025e" title='e' data-ref="1025e">e</a>-<var>1023</var> ;</td></tr>
+<tr><th id="199">199</th><td></td></tr>
+<tr><th id="200">200</th><td>    <i>// This puts to 11 zeroes the exponent</i></td></tr>
+<tr><th id="201">201</th><td>    <a class="local col3 ref" href="#1023n" title='n' data-ref="1023n">n</a> &amp;=<var>0x800FFFFFFFFFFFFFULL</var>;</td></tr>
+<tr><th id="202">202</th><td>    <i>// build a mask which is 0.5, i.e. an exponent equal to 1022</i></td></tr>
+<tr><th id="203">203</th><td><i>    // which means *2, see the above +1.</i></td></tr>
+<tr><th id="204">204</th><td>    <em>const</em> <span class='typedef' title='uint64_t' data-type='unsigned long' data-ref="uint64_t">uint64_t</span> <dfn class="local col6 decl" id="1026p05" title='p05' data-type='const uint64_t' data-ref="1026p05">p05</dfn> = <var>0x3FE0000000000000ULL</var>; <i>//dp2uint64(0.5);</i></td></tr>
+<tr><th id="205">205</th><td>    <a class="local col3 ref" href="#1023n" title='n' data-ref="1023n">n</a> |= <a class="local col6 ref" href="#1026p05" title='p05' data-ref="1026p05">p05</a>;</td></tr>
+<tr><th id="206">206</th><td></td></tr>
+<tr><th id="207">207</th><td>    <b>return</b> <a class="ref" href="#_ZN11G4LogConsts9uint642dpEm" title='G4LogConsts::uint642dp' data-ref="_ZN11G4LogConsts9uint642dpEm">uint642dp</a>(<a class="local col3 ref" href="#1023n" title='n' data-ref="1023n">n</a>);</td></tr>
+<tr><th id="208">208</th><td>  }</td></tr>
+<tr><th id="209">209</th><td></td></tr>
+<tr><th id="210">210</th><td>  <i>//----------------------------------------------------------------------------</i></td></tr>
+<tr><th id="211">211</th><td><i>  /// Like frexp but vectorising and the exponent is a float.</i></td></tr>
+<tr><th id="212">212</th><td>  <b>inline</b> <a class="typedef" href="G4Types.hh.html#G4float" title='G4float' data-type='float' data-ref="G4float">G4float</a> <dfn class="decl def" id="_ZN11G4LogConsts16getMantExponentfEfRf" title='G4LogConsts::getMantExponentf' data-ref="_ZN11G4LogConsts16getMantExponentfEfRf">getMantExponentf</dfn>(<em>const</em> <a class="typedef" href="G4Types.hh.html#G4float" title='G4float' data-type='float' data-ref="G4float">G4float</a> <dfn class="local col7 decl" id="1027x" title='x' data-type='const G4float' data-ref="1027x">x</dfn>, <a class="typedef" href="G4Types.hh.html#G4float" title='G4float' data-type='float' data-ref="G4float">G4float</a> &amp; <dfn class="local col8 decl" id="1028fe" title='fe' data-type='G4float &amp;' data-ref="1028fe">fe</dfn>)</td></tr>
+<tr><th id="213">213</th><td>  {</td></tr>
+<tr><th id="214">214</th><td>    <span class='typedef' title='uint32_t' data-type='unsigned int' data-ref="uint32_t">uint32_t</span> <dfn class="local col9 decl" id="1029n" title='n' data-type='uint32_t' data-ref="1029n">n</dfn> = <a class="ref" href="#_ZN11G4LogConsts9sp2uint32Ef" title='G4LogConsts::sp2uint32' data-ref="_ZN11G4LogConsts9sp2uint32Ef">sp2uint32</a>(<a class="local col7 ref" href="#1027x" title='x' data-ref="1027x">x</a>);</td></tr>
+<tr><th id="215">215</th><td>    <span class='typedef' title='int32_t' data-type='int' data-ref="int32_t">int32_t</span> <dfn class="local col0 decl" id="1030e" title='e' data-type='int32_t' data-ref="1030e">e</dfn> = (<a class="local col9 ref" href="#1029n" title='n' data-ref="1029n">n</a> &gt;&gt; <var>23</var>)-<var>127</var>;</td></tr>
+<tr><th id="216">216</th><td>    <a class="local col8 ref" href="#1028fe" title='fe' data-ref="1028fe">fe</a> = <a class="local col0 ref" href="#1030e" title='e' data-ref="1030e">e</a>;</td></tr>
+<tr><th id="217">217</th><td></td></tr>
+<tr><th id="218">218</th><td>    <i>// fractional part</i></td></tr>
+<tr><th id="219">219</th><td>    <em>const</em> <span class='typedef' title='uint32_t' data-type='unsigned int' data-ref="uint32_t">uint32_t</span> <dfn class="local col1 decl" id="1031p05f" title='p05f' data-type='const uint32_t' data-ref="1031p05f">p05f</dfn> = <var>0x3f000000</var>; <i>// //sp2uint32(0.5);</i></td></tr>
+<tr><th id="220">220</th><td>    <a class="local col9 ref" href="#1029n" title='n' data-ref="1029n">n</a> &amp;= <var>0x807fffff</var>;<i>// ~0x7f800000;</i></td></tr>
+<tr><th id="221">221</th><td>    <a class="local col9 ref" href="#1029n" title='n' data-ref="1029n">n</a> |= <a class="local col1 ref" href="#1031p05f" title='p05f' data-ref="1031p05f">p05f</a>;</td></tr>
+<tr><th id="222">222</th><td></td></tr>
+<tr><th id="223">223</th><td>    <b>return</b> <a class="ref" href="#_ZN11G4LogConsts9uint322spEi" title='G4LogConsts::uint322sp' data-ref="_ZN11G4LogConsts9uint322spEi">uint322sp</a>(<a class="local col9 ref" href="#1029n" title='n' data-ref="1029n">n</a>);</td></tr>
+<tr><th id="224">224</th><td>  }</td></tr>
+<tr><th id="225">225</th><td>}</td></tr>
+<tr><th id="226">226</th><td></td></tr>
+<tr><th id="227">227</th><td><i>// Log double precision --------------------------------------------------------</i></td></tr>
+<tr><th id="228">228</th><td></td></tr>
+<tr><th id="229">229</th><td><b>inline</b> <a class="typedef" href="G4Types.hh.html#G4double" title='G4double' data-type='double' data-ref="G4double">G4double</a> <dfn class="decl def" id="_Z5G4Logd" title='G4Log' data-ref="_Z5G4Logd">G4Log</dfn>(<a class="typedef" href="G4Types.hh.html#G4double" title='G4double' data-type='double' data-ref="G4double">G4double</a> <dfn class="local col2 decl" id="1032x" title='x' data-type='G4double' data-ref="1032x">x</dfn>)</td></tr>
+<tr><th id="230">230</th><td>{</td></tr>
+<tr><th id="231">231</th><td>        <em>const</em> <a class="typedef" href="G4Types.hh.html#G4double" title='G4double' data-type='double' data-ref="G4double">G4double</a> <dfn class="local col3 decl" id="1033original_x" title='original_x' data-type='const G4double' data-ref="1033original_x">original_x</dfn> = <a class="local col2 ref" href="#1032x" title='x' data-ref="1032x">x</a>;</td></tr>
+<tr><th id="232">232</th><td></td></tr>
+<tr><th id="233">233</th><td>        <i>/* separate mantissa from exponent */</i></td></tr>
+<tr><th id="234">234</th><td>        <a class="typedef" href="G4Types.hh.html#G4double" title='G4double' data-type='double' data-ref="G4double">G4double</a> <dfn class="local col4 decl" id="1034fe" title='fe' data-type='G4double' data-ref="1034fe">fe</dfn>;</td></tr>
+<tr><th id="235">235</th><td>        <a class="local col2 ref" href="#1032x" title='x' data-ref="1032x">x</a> = <span class="namespace">G4LogConsts::</span><a class="ref" href="#_ZN11G4LogConsts15getMantExponentEdRd" title='G4LogConsts::getMantExponent' data-ref="_ZN11G4LogConsts15getMantExponentEdRd">getMantExponent</a>(<a class="local col2 ref" href="#1032x" title='x' data-ref="1032x">x</a>,<span class='refarg'><a class="local col4 ref" href="#1034fe" title='fe' data-ref="1034fe">fe</a></span>);</td></tr>
+<tr><th id="236">236</th><td></td></tr>
+<tr><th id="237">237</th><td>        <i>// blending</i></td></tr>
+<tr><th id="238">238</th><td>        <a class="local col2 ref" href="#1032x" title='x' data-ref="1032x">x</a> &gt; <span class="namespace">G4LogConsts::</span><a class="ref" href="#G4LogConsts::SQRTH" title='G4LogConsts::SQRTH' data-ref="G4LogConsts::SQRTH">SQRTH</a>? <a class="local col4 ref" href="#1034fe" title='fe' data-ref="1034fe">fe</a>+=<var>1.</var> : <a class="local col2 ref" href="#1032x" title='x' data-ref="1032x">x</a>+=<a class="local col2 ref" href="#1032x" title='x' data-ref="1032x">x</a> ;</td></tr>
+<tr><th id="239">239</th><td>        <a class="local col2 ref" href="#1032x" title='x' data-ref="1032x">x</a> -= <var>1.0</var>;</td></tr>
+<tr><th id="240">240</th><td></td></tr>
+<tr><th id="241">241</th><td>        <i>/* rational form */</i></td></tr>
+<tr><th id="242">242</th><td>        <a class="typedef" href="G4Types.hh.html#G4double" title='G4double' data-type='double' data-ref="G4double">G4double</a> <dfn class="local col5 decl" id="1035px" title='px' data-type='G4double' data-ref="1035px">px</dfn> =  <span class="namespace">G4LogConsts::</span><a class="ref" href="#_ZN11G4LogConsts10get_log_pxEd" title='G4LogConsts::get_log_px' data-ref="_ZN11G4LogConsts10get_log_pxEd">get_log_px</a>(<a class="local col2 ref" href="#1032x" title='x' data-ref="1032x">x</a>);</td></tr>
+<tr><th id="243">243</th><td></td></tr>
+<tr><th id="244">244</th><td>        <i>//for the final formula</i></td></tr>
+<tr><th id="245">245</th><td>        <em>const</em> <a class="typedef" href="G4Types.hh.html#G4double" title='G4double' data-type='double' data-ref="G4double">G4double</a> <dfn class="local col6 decl" id="1036x2" title='x2' data-type='const G4double' data-ref="1036x2">x2</dfn> = <a class="local col2 ref" href="#1032x" title='x' data-ref="1032x">x</a>*<a class="local col2 ref" href="#1032x" title='x' data-ref="1032x">x</a>;</td></tr>
+<tr><th id="246">246</th><td>        <a class="local col5 ref" href="#1035px" title='px' data-ref="1035px">px</a> *= <a class="local col2 ref" href="#1032x" title='x' data-ref="1032x">x</a>;</td></tr>
+<tr><th id="247">247</th><td>        <a class="local col5 ref" href="#1035px" title='px' data-ref="1035px">px</a> *= <a class="local col6 ref" href="#1036x2" title='x2' data-ref="1036x2">x2</a>;</td></tr>
+<tr><th id="248">248</th><td></td></tr>
+<tr><th id="249">249</th><td>        <em>const</em> <a class="typedef" href="G4Types.hh.html#G4double" title='G4double' data-type='double' data-ref="G4double">G4double</a> <dfn class="local col7 decl" id="1037qx" title='qx' data-type='const G4double' data-ref="1037qx">qx</dfn> = <span class="namespace">G4LogConsts::</span><a class="ref" href="#_ZN11G4LogConsts10get_log_qxEd" title='G4LogConsts::get_log_qx' data-ref="_ZN11G4LogConsts10get_log_qxEd">get_log_qx</a>(<a class="local col2 ref" href="#1032x" title='x' data-ref="1032x">x</a>);</td></tr>
+<tr><th id="250">250</th><td></td></tr>
+<tr><th id="251">251</th><td>        <a class="typedef" href="G4Types.hh.html#G4double" title='G4double' data-type='double' data-ref="G4double">G4double</a> <dfn class="local col8 decl" id="1038res" title='res' data-type='G4double' data-ref="1038res">res</dfn> = <a class="local col5 ref" href="#1035px" title='px' data-ref="1035px">px</a> / <a class="local col7 ref" href="#1037qx" title='qx' data-ref="1037qx">qx</a> ;</td></tr>
+<tr><th id="252">252</th><td></td></tr>
+<tr><th id="253">253</th><td>        <a class="local col8 ref" href="#1038res" title='res' data-ref="1038res">res</a> -= <a class="local col4 ref" href="#1034fe" title='fe' data-ref="1034fe">fe</a> * <var>2.121944400546905827679e-4</var>;</td></tr>
+<tr><th id="254">254</th><td>        <a class="local col8 ref" href="#1038res" title='res' data-ref="1038res">res</a> -= <var>0.5</var> * <a class="local col6 ref" href="#1036x2" title='x2' data-ref="1036x2">x2</a>  ;</td></tr>
+<tr><th id="255">255</th><td></td></tr>
+<tr><th id="256">256</th><td>        <a class="local col8 ref" href="#1038res" title='res' data-ref="1038res">res</a> = <a class="local col2 ref" href="#1032x" title='x' data-ref="1032x">x</a> + <a class="local col8 ref" href="#1038res" title='res' data-ref="1038res">res</a>;</td></tr>
+<tr><th id="257">257</th><td>        <a class="local col8 ref" href="#1038res" title='res' data-ref="1038res">res</a> += <a class="local col4 ref" href="#1034fe" title='fe' data-ref="1034fe">fe</a> * <var>0.693359375</var>;</td></tr>
+<tr><th id="258">258</th><td></td></tr>
+<tr><th id="259">259</th><td>        <b>if</b> (original_x &gt; G4LogConsts::LOG_UPPER_LIMIT)</td></tr>
+<tr><th id="260">260</th><td>                res = <span class='error' title="use of undeclared identifier &apos;std&apos;">std</span>::numeric_limits&lt;<span class='error' title="unexpected type name &apos;G4double&apos;: expected expression">G4double</span>&gt;::<span class='error' title="no member named &apos;infinity&apos; in the global namespace">infinity</span>();</td></tr>
+<tr><th id="261">261</th><td>        <b>if</b> (original_x &lt; G4LogConsts::LOG_LOWER_LIMIT) <i>// THIS IS NAN!</i></td></tr>
+<tr><th id="262">262</th><td>                res =  - <span class='error' title="use of undeclared identifier &apos;std&apos;">std</span>::numeric_limits&lt;<span class='error' title="unexpected type name &apos;G4double&apos;: expected expression">G4double</span>&gt;::<span class='error' title="no member named &apos;quiet_NaN&apos; in the global namespace">quiet_NaN</span>();</td></tr>
+<tr><th id="263">263</th><td></td></tr>
+<tr><th id="264">264</th><td>        <b>return</b> <a class="local col8 ref" href="#1038res" title='res' data-ref="1038res">res</a>;</td></tr>
+<tr><th id="265">265</th><td>}</td></tr>
+<tr><th id="266">266</th><td></td></tr>
+<tr><th id="267">267</th><td><i>// Log single precision --------------------------------------------------------</i></td></tr>
+<tr><th id="268">268</th><td></td></tr>
+<tr><th id="269">269</th><td><b>namespace</b> <span class="namespace">G4LogConsts</span></td></tr>
+<tr><th id="270">270</th><td>{</td></tr>
+<tr><th id="271">271</th><td>  <em>const</em> <a class="typedef" href="G4Types.hh.html#G4float" title='G4float' data-type='float' data-ref="G4float">G4float</a> <dfn class="decl def" id="G4LogConsts::LOGF_UPPER_LIMIT" title='G4LogConsts::LOGF_UPPER_LIMIT' data-ref="G4LogConsts::LOGF_UPPER_LIMIT">LOGF_UPPER_LIMIT</dfn> = <a class="ref" href="#G4LogConsts::MAXNUMF" title='G4LogConsts::MAXNUMF' data-ref="G4LogConsts::MAXNUMF">MAXNUMF</a>;</td></tr>
+<tr><th id="272">272</th><td>  <em>const</em> <a class="typedef" href="G4Types.hh.html#G4float" title='G4float' data-type='float' data-ref="G4float">G4float</a> <dfn class="decl def" id="G4LogConsts::LOGF_LOWER_LIMIT" title='G4LogConsts::LOGF_LOWER_LIMIT' data-ref="G4LogConsts::LOGF_LOWER_LIMIT">LOGF_LOWER_LIMIT</dfn> = <var>0</var>;</td></tr>
+<tr><th id="273">273</th><td></td></tr>
+<tr><th id="274">274</th><td>  <em>const</em> <a class="typedef" href="G4Types.hh.html#G4float" title='G4float' data-type='float' data-ref="G4float">G4float</a> <dfn class="decl def" id="G4LogConsts::PX1logf" title='G4LogConsts::PX1logf' data-ref="G4LogConsts::PX1logf">PX1logf</dfn> = <var>7.0376836292E-2f</var>;</td></tr>
+<tr><th id="275">275</th><td>  <em>const</em> <a class="typedef" href="G4Types.hh.html#G4float" title='G4float' data-type='float' data-ref="G4float">G4float</a> <dfn class="decl def" id="G4LogConsts::PX2logf" title='G4LogConsts::PX2logf' data-ref="G4LogConsts::PX2logf">PX2logf</dfn> = -<var>1.1514610310E-1f</var>;</td></tr>
+<tr><th id="276">276</th><td>  <em>const</em> <a class="typedef" href="G4Types.hh.html#G4float" title='G4float' data-type='float' data-ref="G4float">G4float</a> <dfn class="decl def" id="G4LogConsts::PX3logf" title='G4LogConsts::PX3logf' data-ref="G4LogConsts::PX3logf">PX3logf</dfn> = <var>1.1676998740E-1f</var>;</td></tr>
+<tr><th id="277">277</th><td>  <em>const</em> <a class="typedef" href="G4Types.hh.html#G4float" title='G4float' data-type='float' data-ref="G4float">G4float</a> <dfn class="decl def" id="G4LogConsts::PX4logf" title='G4LogConsts::PX4logf' data-ref="G4LogConsts::PX4logf">PX4logf</dfn> = -<var>1.2420140846E-1f</var>;</td></tr>
+<tr><th id="278">278</th><td>  <em>const</em> <a class="typedef" href="G4Types.hh.html#G4float" title='G4float' data-type='float' data-ref="G4float">G4float</a> <dfn class="decl def" id="G4LogConsts::PX5logf" title='G4LogConsts::PX5logf' data-ref="G4LogConsts::PX5logf">PX5logf</dfn> = <var>1.4249322787E-1f</var>;</td></tr>
+<tr><th id="279">279</th><td>  <em>const</em> <a class="typedef" href="G4Types.hh.html#G4float" title='G4float' data-type='float' data-ref="G4float">G4float</a> <dfn class="decl def" id="G4LogConsts::PX6logf" title='G4LogConsts::PX6logf' data-ref="G4LogConsts::PX6logf">PX6logf</dfn> = -<var>1.6668057665E-1f</var>;</td></tr>
+<tr><th id="280">280</th><td>  <em>const</em> <a class="typedef" href="G4Types.hh.html#G4float" title='G4float' data-type='float' data-ref="G4float">G4float</a> <dfn class="decl def" id="G4LogConsts::PX7logf" title='G4LogConsts::PX7logf' data-ref="G4LogConsts::PX7logf">PX7logf</dfn> = <var>2.0000714765E-1f</var>;</td></tr>
+<tr><th id="281">281</th><td>  <em>const</em> <a class="typedef" href="G4Types.hh.html#G4float" title='G4float' data-type='float' data-ref="G4float">G4float</a> <dfn class="decl def" id="G4LogConsts::PX8logf" title='G4LogConsts::PX8logf' data-ref="G4LogConsts::PX8logf">PX8logf</dfn> = -<var>2.4999993993E-1f</var>;</td></tr>
+<tr><th id="282">282</th><td>  <em>const</em> <a class="typedef" href="G4Types.hh.html#G4float" title='G4float' data-type='float' data-ref="G4float">G4float</a> <dfn class="decl def" id="G4LogConsts::PX9logf" title='G4LogConsts::PX9logf' data-ref="G4LogConsts::PX9logf">PX9logf</dfn> = <var>3.3333331174E-1f</var>;</td></tr>
+<tr><th id="283">283</th><td></td></tr>
+<tr><th id="284">284</th><td>  <b>inline</b> <a class="typedef" href="G4Types.hh.html#G4float" title='G4float' data-type='float' data-ref="G4float">G4float</a> <dfn class="decl def" id="_ZN11G4LogConsts12get_log_polyEf" title='G4LogConsts::get_log_poly' data-ref="_ZN11G4LogConsts12get_log_polyEf">get_log_poly</dfn>(<em>const</em> <a class="typedef" href="G4Types.hh.html#G4float" title='G4float' data-type='float' data-ref="G4float">G4float</a> <dfn class="local col9 decl" id="1039x" title='x' data-type='const G4float' data-ref="1039x">x</dfn>)</td></tr>
+<tr><th id="285">285</th><td>  {</td></tr>
+<tr><th id="286">286</th><td>        <a class="typedef" href="G4Types.hh.html#G4float" title='G4float' data-type='float' data-ref="G4float">G4float</a> <dfn class="local col0 decl" id="1040y" title='y' data-type='G4float' data-ref="1040y">y</dfn> = <a class="local col9 ref" href="#1039x" title='x' data-ref="1039x">x</a>*<a class="ref" href="#G4LogConsts::PX1logf" title='G4LogConsts::PX1logf' data-ref="G4LogConsts::PX1logf">PX1logf</a>;</td></tr>
+<tr><th id="287">287</th><td>        <a class="local col0 ref" href="#1040y" title='y' data-ref="1040y">y</a> += <a class="ref" href="#G4LogConsts::PX2logf" title='G4LogConsts::PX2logf' data-ref="G4LogConsts::PX2logf">PX2logf</a>;</td></tr>
+<tr><th id="288">288</th><td>        <a class="local col0 ref" href="#1040y" title='y' data-ref="1040y">y</a> *= <a class="local col9 ref" href="#1039x" title='x' data-ref="1039x">x</a>;</td></tr>
+<tr><th id="289">289</th><td>        <a class="local col0 ref" href="#1040y" title='y' data-ref="1040y">y</a> += <a class="ref" href="#G4LogConsts::PX3logf" title='G4LogConsts::PX3logf' data-ref="G4LogConsts::PX3logf">PX3logf</a>;</td></tr>
+<tr><th id="290">290</th><td>        <a class="local col0 ref" href="#1040y" title='y' data-ref="1040y">y</a> *= <a class="local col9 ref" href="#1039x" title='x' data-ref="1039x">x</a>;</td></tr>
+<tr><th id="291">291</th><td>        <a class="local col0 ref" href="#1040y" title='y' data-ref="1040y">y</a> += <a class="ref" href="#G4LogConsts::PX4logf" title='G4LogConsts::PX4logf' data-ref="G4LogConsts::PX4logf">PX4logf</a>;</td></tr>
+<tr><th id="292">292</th><td>        <a class="local col0 ref" href="#1040y" title='y' data-ref="1040y">y</a> *= <a class="local col9 ref" href="#1039x" title='x' data-ref="1039x">x</a>;</td></tr>
+<tr><th id="293">293</th><td>        <a class="local col0 ref" href="#1040y" title='y' data-ref="1040y">y</a> += <a class="ref" href="#G4LogConsts::PX5logf" title='G4LogConsts::PX5logf' data-ref="G4LogConsts::PX5logf">PX5logf</a>;</td></tr>
+<tr><th id="294">294</th><td>        <a class="local col0 ref" href="#1040y" title='y' data-ref="1040y">y</a> *= <a class="local col9 ref" href="#1039x" title='x' data-ref="1039x">x</a>;</td></tr>
+<tr><th id="295">295</th><td>        <a class="local col0 ref" href="#1040y" title='y' data-ref="1040y">y</a> += <a class="ref" href="#G4LogConsts::PX6logf" title='G4LogConsts::PX6logf' data-ref="G4LogConsts::PX6logf">PX6logf</a>;</td></tr>
+<tr><th id="296">296</th><td>        <a class="local col0 ref" href="#1040y" title='y' data-ref="1040y">y</a> *= <a class="local col9 ref" href="#1039x" title='x' data-ref="1039x">x</a>;</td></tr>
+<tr><th id="297">297</th><td>        <a class="local col0 ref" href="#1040y" title='y' data-ref="1040y">y</a> += <a class="ref" href="#G4LogConsts::PX7logf" title='G4LogConsts::PX7logf' data-ref="G4LogConsts::PX7logf">PX7logf</a>;</td></tr>
+<tr><th id="298">298</th><td>        <a class="local col0 ref" href="#1040y" title='y' data-ref="1040y">y</a> *= <a class="local col9 ref" href="#1039x" title='x' data-ref="1039x">x</a>;</td></tr>
+<tr><th id="299">299</th><td>        <a class="local col0 ref" href="#1040y" title='y' data-ref="1040y">y</a> += <a class="ref" href="#G4LogConsts::PX8logf" title='G4LogConsts::PX8logf' data-ref="G4LogConsts::PX8logf">PX8logf</a>;</td></tr>
+<tr><th id="300">300</th><td>        <a class="local col0 ref" href="#1040y" title='y' data-ref="1040y">y</a> *= <a class="local col9 ref" href="#1039x" title='x' data-ref="1039x">x</a>;</td></tr>
+<tr><th id="301">301</th><td>        <a class="local col0 ref" href="#1040y" title='y' data-ref="1040y">y</a> += <a class="ref" href="#G4LogConsts::PX9logf" title='G4LogConsts::PX9logf' data-ref="G4LogConsts::PX9logf">PX9logf</a>;</td></tr>
+<tr><th id="302">302</th><td>        <b>return</b> <a class="local col0 ref" href="#1040y" title='y' data-ref="1040y">y</a>;</td></tr>
+<tr><th id="303">303</th><td>  }</td></tr>
+<tr><th id="304">304</th><td></td></tr>
+<tr><th id="305">305</th><td>  <em>const</em> <a class="typedef" href="G4Types.hh.html#G4float" title='G4float' data-type='float' data-ref="G4float">G4float</a> <dfn class="decl def" id="G4LogConsts::SQRTHF" title='G4LogConsts::SQRTHF' data-ref="G4LogConsts::SQRTHF">SQRTHF</dfn> = <var>0.707106781186547524f</var>;</td></tr>
+<tr><th id="306">306</th><td>}</td></tr>
+<tr><th id="307">307</th><td></td></tr>
+<tr><th id="308">308</th><td><i>// Log single precision --------------------------------------------------------</i></td></tr>
+<tr><th id="309">309</th><td></td></tr>
+<tr><th id="310">310</th><td><b>inline</b> <a class="typedef" href="G4Types.hh.html#G4float" title='G4float' data-type='float' data-ref="G4float">G4float</a> <dfn class="decl def" id="_Z6G4Logff" title='G4Logf' data-ref="_Z6G4Logff">G4Logf</dfn>( <a class="typedef" href="G4Types.hh.html#G4float" title='G4float' data-type='float' data-ref="G4float">G4float</a> <dfn class="local col1 decl" id="1041x" title='x' data-type='G4float' data-ref="1041x">x</dfn> )</td></tr>
+<tr><th id="311">311</th><td>{</td></tr>
+<tr><th id="312">312</th><td>        <em>const</em> <a class="typedef" href="G4Types.hh.html#G4float" title='G4float' data-type='float' data-ref="G4float">G4float</a> <dfn class="local col2 decl" id="1042original_x" title='original_x' data-type='const G4float' data-ref="1042original_x">original_x</dfn> = <a class="local col1 ref" href="#1041x" title='x' data-ref="1041x">x</a>;</td></tr>
+<tr><th id="313">313</th><td></td></tr>
+<tr><th id="314">314</th><td>        <a class="typedef" href="G4Types.hh.html#G4float" title='G4float' data-type='float' data-ref="G4float">G4float</a> <dfn class="local col3 decl" id="1043fe" title='fe' data-type='G4float' data-ref="1043fe">fe</dfn>;</td></tr>
+<tr><th id="315">315</th><td>        <a class="local col1 ref" href="#1041x" title='x' data-ref="1041x">x</a> = <span class="namespace">G4LogConsts::</span><a class="ref" href="#_ZN11G4LogConsts16getMantExponentfEfRf" title='G4LogConsts::getMantExponentf' data-ref="_ZN11G4LogConsts16getMantExponentfEfRf">getMantExponentf</a>( <a class="local col1 ref" href="#1041x" title='x' data-ref="1041x">x</a>, <span class='refarg'><a class="local col3 ref" href="#1043fe" title='fe' data-ref="1043fe">fe</a></span>);</td></tr>
+<tr><th id="316">316</th><td></td></tr>
+<tr><th id="317">317</th><td>        <a class="local col1 ref" href="#1041x" title='x' data-ref="1041x">x</a> &gt; <span class="namespace">G4LogConsts::</span><a class="ref" href="#G4LogConsts::SQRTHF" title='G4LogConsts::SQRTHF' data-ref="G4LogConsts::SQRTHF">SQRTHF</a>? <a class="local col3 ref" href="#1043fe" title='fe' data-ref="1043fe">fe</a>+=<var>1.f</var> : <a class="local col1 ref" href="#1041x" title='x' data-ref="1041x">x</a>+=<a class="local col1 ref" href="#1041x" title='x' data-ref="1041x">x</a> ;</td></tr>
+<tr><th id="318">318</th><td>        <a class="local col1 ref" href="#1041x" title='x' data-ref="1041x">x</a> -= <var>1.0f</var>;</td></tr>
+<tr><th id="319">319</th><td></td></tr>
+<tr><th id="320">320</th><td>        <em>const</em> <a class="typedef" href="G4Types.hh.html#G4float" title='G4float' data-type='float' data-ref="G4float">G4float</a> <dfn class="local col4 decl" id="1044x2" title='x2' data-type='const G4float' data-ref="1044x2">x2</dfn> = <a class="local col1 ref" href="#1041x" title='x' data-ref="1041x">x</a>*<a class="local col1 ref" href="#1041x" title='x' data-ref="1041x">x</a>;</td></tr>
+<tr><th id="321">321</th><td></td></tr>
+<tr><th id="322">322</th><td>        <a class="typedef" href="G4Types.hh.html#G4float" title='G4float' data-type='float' data-ref="G4float">G4float</a> <dfn class="local col5 decl" id="1045res" title='res' data-type='G4float' data-ref="1045res">res</dfn> = <span class="namespace">G4LogConsts::</span><a class="ref" href="#_ZN11G4LogConsts12get_log_polyEf" title='G4LogConsts::get_log_poly' data-ref="_ZN11G4LogConsts12get_log_polyEf">get_log_poly</a>(<a class="local col1 ref" href="#1041x" title='x' data-ref="1041x">x</a>);</td></tr>
+<tr><th id="323">323</th><td>        <a class="local col5 ref" href="#1045res" title='res' data-ref="1045res">res</a> *= <a class="local col4 ref" href="#1044x2" title='x2' data-ref="1044x2">x2</a>*<a class="local col1 ref" href="#1041x" title='x' data-ref="1041x">x</a>;</td></tr>
+<tr><th id="324">324</th><td></td></tr>
+<tr><th id="325">325</th><td>        <a class="local col5 ref" href="#1045res" title='res' data-ref="1045res">res</a> += -<var>2.12194440e-4f</var> * <a class="local col3 ref" href="#1043fe" title='fe' data-ref="1043fe">fe</a>;</td></tr>
+<tr><th id="326">326</th><td>        <a class="local col5 ref" href="#1045res" title='res' data-ref="1045res">res</a> +=  -<var>0.5f</var> * <a class="local col4 ref" href="#1044x2" title='x2' data-ref="1044x2">x2</a>;</td></tr>
+<tr><th id="327">327</th><td></td></tr>
+<tr><th id="328">328</th><td>        <a class="local col5 ref" href="#1045res" title='res' data-ref="1045res">res</a>= <a class="local col1 ref" href="#1041x" title='x' data-ref="1041x">x</a> + <a class="local col5 ref" href="#1045res" title='res' data-ref="1045res">res</a>;</td></tr>
+<tr><th id="329">329</th><td></td></tr>
+<tr><th id="330">330</th><td>        <a class="local col5 ref" href="#1045res" title='res' data-ref="1045res">res</a> += <var>0.693359375f</var> * <a class="local col3 ref" href="#1043fe" title='fe' data-ref="1043fe">fe</a>;</td></tr>
+<tr><th id="331">331</th><td></td></tr>
+<tr><th id="332">332</th><td>        <b>if</b> (original_x &gt; G4LogConsts::LOGF_UPPER_LIMIT)</td></tr>
+<tr><th id="333">333</th><td>                res = <span class='error' title="use of undeclared identifier &apos;std&apos;">std</span>::numeric_limits&lt;<span class='error' title="unexpected type name &apos;G4float&apos;: expected expression">G4float</span>&gt;::<span class='error' title="no member named &apos;infinity&apos; in the global namespace">infinity</span>();</td></tr>
+<tr><th id="334">334</th><td>        <b>if</b> (original_x &lt; G4LogConsts::LOGF_LOWER_LIMIT)</td></tr>
+<tr><th id="335">335</th><td>                res = -<span class='error' title="use of undeclared identifier &apos;std&apos;">std</span>::numeric_limits&lt;<span class='error' title="unexpected type name &apos;G4float&apos;: expected expression">G4float</span>&gt;::<span class='error' title="no member named &apos;quiet_NaN&apos; in the global namespace">quiet_NaN</span>();</td></tr>
+<tr><th id="336">336</th><td></td></tr>
+<tr><th id="337">337</th><td>        <b>return</b> <a class="local col5 ref" href="#1045res" title='res' data-ref="1045res">res</a>;</td></tr>
+<tr><th id="338">338</th><td>}</td></tr>
+<tr><th id="339">339</th><td></td></tr>
+<tr><th id="340">340</th><td><i>//------------------------------------------------------------------------------</i></td></tr>
+<tr><th id="341">341</th><td></td></tr>
+<tr><th id="342">342</th><td><em>void</em> <dfn class="decl" id="_Z4logvjPKdPd" title='logv' data-ref="_Z4logvjPKdPd">logv</dfn>(<em>const</em> <span class='typedef' title='uint32_t' data-type='unsigned int' data-ref="uint32_t">uint32_t</span> <dfn class="local col6 decl" id="1046size" title='size' data-type='const uint32_t' data-ref="1046size">size</dfn>, <a class="typedef" href="G4Types.hh.html#G4double" title='G4double' data-type='double' data-ref="G4double">G4double</a> <em>const</em> * <b>__restrict__</b> <dfn class="local col7 decl" id="1047iarray" title='iarray' data-type='const G4double *__restrict' data-ref="1047iarray">iarray</dfn>, <a class="typedef" href="G4Types.hh.html#G4double" title='G4double' data-type='double' data-ref="G4double">G4double</a>* <b>__restrict__</b> <dfn class="local col8 decl" id="1048oarray" title='oarray' data-type='G4double *__restrict' data-ref="1048oarray">oarray</dfn>);</td></tr>
+<tr><th id="343">343</th><td><em>void</em> <dfn class="decl" id="_Z6G4LogvjPKdPd" title='G4Logv' data-ref="_Z6G4LogvjPKdPd">G4Logv</dfn>(<em>const</em> <span class='typedef' title='uint32_t' data-type='unsigned int' data-ref="uint32_t">uint32_t</span> <dfn class="local col9 decl" id="1049size" title='size' data-type='const uint32_t' data-ref="1049size">size</dfn>, <a class="typedef" href="G4Types.hh.html#G4double" title='G4double' data-type='double' data-ref="G4double">G4double</a> <em>const</em> * <b>__restrict__</b> <dfn class="local col0 decl" id="1050iarray" title='iarray' data-type='const G4double *__restrict' data-ref="1050iarray">iarray</dfn>, <a class="typedef" href="G4Types.hh.html#G4double" title='G4double' data-type='double' data-ref="G4double">G4double</a>* <b>__restrict__</b> <dfn class="local col1 decl" id="1051oarray" title='oarray' data-type='G4double *__restrict' data-ref="1051oarray">oarray</dfn>);</td></tr>
+<tr><th id="344">344</th><td><em>void</em> <dfn class="decl" id="_Z5logfvjPKfPf" title='logfv' data-ref="_Z5logfvjPKfPf">logfv</dfn>(<em>const</em> <span class='typedef' title='uint32_t' data-type='unsigned int' data-ref="uint32_t">uint32_t</span> <dfn class="local col2 decl" id="1052size" title='size' data-type='const uint32_t' data-ref="1052size">size</dfn>, <a class="typedef" href="G4Types.hh.html#G4float" title='G4float' data-type='float' data-ref="G4float">G4float</a> <em>const</em> * <b>__restrict__</b> <dfn class="local col3 decl" id="1053iarray" title='iarray' data-type='const G4float *__restrict' data-ref="1053iarray">iarray</dfn>, <a class="typedef" href="G4Types.hh.html#G4float" title='G4float' data-type='float' data-ref="G4float">G4float</a>* <b>__restrict__</b> <dfn class="local col4 decl" id="1054oarray" title='oarray' data-type='G4float *__restrict' data-ref="1054oarray">oarray</dfn>);</td></tr>
+<tr><th id="345">345</th><td><em>void</em> <dfn class="decl" id="_Z7G4LogfvjPKfPf" title='G4Logfv' data-ref="_Z7G4LogfvjPKfPf">G4Logfv</dfn>(<em>const</em> <span class='typedef' title='uint32_t' data-type='unsigned int' data-ref="uint32_t">uint32_t</span> <dfn class="local col5 decl" id="1055size" title='size' data-type='const uint32_t' data-ref="1055size">size</dfn>, <a class="typedef" href="G4Types.hh.html#G4float" title='G4float' data-type='float' data-ref="G4float">G4float</a> <em>const</em> * <b>__restrict__</b> <dfn class="local col6 decl" id="1056iarray" title='iarray' data-type='const G4float *__restrict' data-ref="1056iarray">iarray</dfn>, <a class="typedef" href="G4Types.hh.html#G4float" title='G4float' data-type='float' data-ref="G4float">G4float</a>* <b>__restrict__</b> <dfn class="local col7 decl" id="1057oarray" title='oarray' data-type='G4float *__restrict' data-ref="1057oarray">oarray</dfn>);</td></tr>
+<tr><th id="346">346</th><td></td></tr>
+<tr><th id="347">347</th><td><u>#<span data-ppcond="64">endif</span> /* WIN32 */</u></td></tr>
+<tr><th id="348">348</th><td></td></tr>
+<tr><th id="349">349</th><td><u>#<span data-ppcond="61">endif</span> /* LOG_H_ */</u></td></tr>
+<tr><th id="350">350</th><td></td></tr>
+</table><hr/><p id='footer'>
+Generated while processing <a href='../../../digits_hits/detector/src/G4CellScoreComposer.cc.html'>codebrowser/source/digits_hits/detector/src/G4CellScoreComposer.cc</a><br/>Generated on <em>2019-Aug-28</em> from project codebrowser<br />Powered by <a href='https://woboq.com'><img alt='Woboq' src='https://code.woboq.org/woboq-16.png' width='41' height='16' /></a> <a href='https://code.woboq.org'>Code Browser</a> 2.1
+<br/>Generator usage only permitted with license.</p>
+</div></body></html>
